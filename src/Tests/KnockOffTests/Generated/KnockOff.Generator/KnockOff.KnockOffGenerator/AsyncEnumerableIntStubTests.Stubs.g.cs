@@ -15,7 +15,7 @@ partial class AsyncEnumerableIntStubTests
 			internal global::System.Collections.Generic.IAsyncEnumerable<int>? _source;
 
 			/// <summary>Delegate for GetAsyncEnumerator.</summary>
-			public delegate global::System.Collections.Generic.IAsyncEnumerator<int> GetAsyncEnumeratorDelegate(Stubs.IAsyncEnumerable ko, global::System.Threading.CancellationToken cancellationToken);
+			public delegate global::System.Collections.Generic.IAsyncEnumerator<int> GetAsyncEnumeratorDelegate(global::System.Threading.CancellationToken cancellationToken);
 
 			private GetAsyncEnumeratorDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class AsyncEnumerableIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IAsyncEnumerator<int> Invoke(Stubs.IAsyncEnumerable ko, global::System.Threading.CancellationToken cancellationToken)
+			internal global::System.Collections.Generic.IAsyncEnumerator<int> Invoke(bool strict, global::System.Threading.CancellationToken cancellationToken)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(cancellationToken);
 					_sequenceIndex++;
-					return callback(ko, cancellationToken);
+					return callback(cancellationToken);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(cancellationToken);
-					return _onCall(ko, cancellationToken);
+					return _onCall(cancellationToken);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = cancellationToken;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetAsyncEnumerator");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetAsyncEnumerator");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetAsyncEnumerator(cancellationToken);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetAsyncEnumerator");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAsyncEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetAsyncEnumerator. Configure via OnCall.");
 			}
 
@@ -250,7 +250,7 @@ partial class AsyncEnumerableIntStubTests
 
 			global::System.Collections.Generic.IAsyncEnumerator<int> global::System.Collections.Generic.IAsyncEnumerable<int>.GetAsyncEnumerator(global::System.Threading.CancellationToken cancellationToken)
 			{
-				return GetAsyncEnumerator.Invoke(this, cancellationToken);
+				return GetAsyncEnumerator.Invoke(Strict, cancellationToken);
 			}
 
 			/// <summary>The global::System.Collections.Generic.IAsyncEnumerable<int> instance. Use for passing to code expecting the interface.</summary>

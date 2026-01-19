@@ -460,10 +460,10 @@ internal static class InlineModelBuilder
             ? $"typeof({typeParams[0].Name})"
             : $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
 
-        // Build delegate signature
+        // Build delegate signature (no stub parameter)
         var delegateReturnType = group.IsVoid ? "void" : group.ReturnType;
         var allParams = genericOverload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
-        var delegateParams = new List<string> { $"{stubClassRef} ko" };
+        var delegateParams = new List<string>();
         foreach (var p in allParams)
         {
             delegateParams.Add($"{p.Type} {p.Name}");
@@ -759,7 +759,7 @@ internal static class InlineModelBuilder
             ArgumentList: argList,
             InvokeSuffix: "",  // Indexers don't use invoke suffix
             RecordCallArgs: argList,
-            OnCallArgs: $"this, {argList}",
+            OnCallArgs: argList,
             DefaultExpression: defaultExpr,
             DefaultStrategy: member.DefaultStrategy,
             IsNullable: member.IsNullable,
@@ -931,7 +931,7 @@ internal static class InlineModelBuilder
             ArgumentList: argList,
             InvokeSuffix: "",  // Generic methods use Of<T>() pattern, not invoke suffix
             RecordCallArgs: nonGenericArgList,
-            OnCallArgs: member.Parameters.Count > 0 ? $"this, {argList}" : "this",
+            OnCallArgs: argList,
             DefaultExpression: defaultExpr,
             DefaultStrategy: member.DefaultStrategy,
             IsNullable: member.IsNullable,
@@ -1073,22 +1073,19 @@ internal static class InlineModelBuilder
         var invokeParamList = string.Join(", ", del.Parameters.Select(p => $"{p.Type} {p.Name}"));
         var invokeArgList = string.Join(", ", del.Parameters.Select(p => p.Name));
 
-        // OnCall type - include type params for open generics so T is in scope
-        var stubClassRef = del.IsOpenGeneric && typeParamList.Length > 0
-            ? $"Stubs.{stubClassName}{typeParamList}"
-            : $"Stubs.{stubClassName}";
+        // OnCall type - no stub parameter
         string onCallType;
         if (del.IsVoid)
         {
             onCallType = del.Parameters.Count == 0
-                ? $"global::System.Action<{stubClassRef}>"
-                : $"global::System.Action<{stubClassRef}, {string.Join(", ", del.Parameters.Select(p => p.Type))}>";
+                ? "global::System.Action"
+                : $"global::System.Action<{string.Join(", ", del.Parameters.Select(p => p.Type))}>";
         }
         else
         {
             onCallType = del.Parameters.Count == 0
-                ? $"global::System.Func<{stubClassRef}, {del.ReturnType}>"
-                : $"global::System.Func<{stubClassRef}, {string.Join(", ", del.Parameters.Select(p => p.Type))}, {del.ReturnType}>";
+                ? $"global::System.Func<{del.ReturnType}>"
+                : $"global::System.Func<{string.Join(", ", del.Parameters.Select(p => p.Type))}, {del.ReturnType}>";
         }
 
         // LastCallArg/Args types

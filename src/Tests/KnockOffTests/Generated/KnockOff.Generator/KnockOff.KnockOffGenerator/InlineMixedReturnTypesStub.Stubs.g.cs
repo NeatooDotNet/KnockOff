@@ -12,7 +12,7 @@ partial class InlineMixedReturnTypesStub
 		public sealed class IFactoryWithMixedReturnTypes_Fetch1Interceptor
 		{
 			/// <summary>Delegate for Fetch1.</summary>
-			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Fetch1Delegate(Stubs.IFactoryWithMixedReturnTypes ko, long id);
+			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Fetch1Delegate(long id);
 
 			private Fetch1Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -63,31 +63,31 @@ partial class InlineMixedReturnTypesStub
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Invoke(Stubs.IFactoryWithMixedReturnTypes ko, long id)
+			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Invoke(bool strict, long id)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(id);
 					_sequenceIndex++;
-					return callback(ko, id);
+					return callback(id);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(id);
-					return _onCall(ko, id);
+					return _onCall(id);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Fetch1");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Fetch1");
 					return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleArea?>(default!);
 				}
 
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Fetch1");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Fetch1");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleArea?>(default!);
 			}
 
@@ -239,7 +239,7 @@ partial class InlineMixedReturnTypesStub
 		public sealed class IFactoryWithMixedReturnTypes_Fetch2Interceptor
 		{
 			/// <summary>Delegate for Fetch2.</summary>
-			public delegate global::KnockOff.Tests.ISampleArea Fetch2Delegate(Stubs.IFactoryWithMixedReturnTypes ko, global::KnockOff.Tests.SampleEntity entity);
+			public delegate global::KnockOff.Tests.ISampleArea Fetch2Delegate(global::KnockOff.Tests.SampleEntity entity);
 
 			private Fetch2Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -290,31 +290,31 @@ partial class InlineMixedReturnTypesStub
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::KnockOff.Tests.ISampleArea Invoke(Stubs.IFactoryWithMixedReturnTypes ko, global::KnockOff.Tests.SampleEntity entity)
+			internal global::KnockOff.Tests.ISampleArea Invoke(bool strict, global::KnockOff.Tests.SampleEntity entity)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(entity);
 					_sequenceIndex++;
-					return callback(ko, entity);
+					return callback(entity);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(entity);
-					return _onCall(ko, entity);
+					return _onCall(entity);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = entity;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Fetch2");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Fetch2");
 					return default!;
 				}
 
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Fetch2");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Fetch2");
 				return default!;
 			}
 
@@ -473,12 +473,12 @@ partial class InlineMixedReturnTypesStub
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(long id)
 			{
-				return Fetch1.Invoke(this, id);
+				return Fetch1.Invoke(Strict, id);
 			}
 
 			global::KnockOff.Tests.ISampleArea global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(global::KnockOff.Tests.SampleEntity entity)
 			{
-				return Fetch2.Invoke(this, entity);
+				return Fetch2.Invoke(Strict, entity);
 			}
 
 			/// <summary>The global::KnockOff.Tests.IFactoryWithMixedReturnTypes instance. Use for passing to code expecting the interface.</summary>

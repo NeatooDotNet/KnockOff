@@ -69,14 +69,14 @@ public class MethodInterceptorApiTests
         var stub = new ApiMethodRepoStub();
 
         // Configure void method with OnCall and mark verifiable
-        var saveTracking = stub.Save.OnCall((ko, user) => { }).Verifiable();
+        var saveTracking = stub.Save.OnCall((user) => { }).Verifiable();
 
         // Configure return method with OnCall and mark verifiable
-        var getTracking = stub.GetById.OnCall((ko, id) =>
+        var getTracking = stub.GetById.OnCall((id) =>
             new User { Id = id, Name = $"User{id}" }).Verifiable();
 
         // Configure multi-parameter method and mark verifiable
-        var updateTracking = stub.Update.OnCall((ko, id, name) => { }).Verifiable();
+        var updateTracking = stub.Update.OnCall((id, name) => { }).Verifiable();
 
         IApiMethodRepo repository = stub;
 
@@ -138,14 +138,14 @@ public class PropertyInterceptorApiTests
 
         // OnGet replaces Value with callback return
         // Note: OnGet takes the stub as first parameter (ko)
-        stub.Timeout.OnGet = (ko) => 30;
+        stub.Timeout.OnGet = () => 30;
         var timeout = repository.Timeout;
         Assert.Equal(30, timeout);
 
         // OnSet provides custom setter behavior
-        // Note: OnSet takes (ko, value) - does NOT automatically update Value
+        // Note: OnSet takes (value) - does NOT automatically update Value
         var setWasCalled = false;
-        stub.Timeout.OnSet = (ko, val) =>
+        stub.Timeout.OnSet = (val) =>
         {
             setWasCalled = true;
             // Manually update Value if needed:
@@ -201,15 +201,15 @@ public class IndexerInterceptorApiTests
         Assert.Equal("Charlie", lastEntry.Value.Value?.Name);
 
         // OnGet overrides Backing lookup
-        // Note: OnGet takes (ko, key)
-        stub.Indexer.OnGet = (ko, k) => new User { Id = k, Name = "FromCallback" };
+        // Note: OnGet takes (key)
+        stub.Indexer.OnGet = (k) => new User { Id = k, Name = "FromCallback" };
         var fromCallback = repository[999];
         Assert.Equal("FromCallback", fromCallback?.Name);
 
         // OnSet overrides Backing storage
-        // Note: OnSet takes (ko, key, value) - does NOT automatically update Backing
+        // Note: OnSet takes (key, value) - does NOT automatically update Backing
         var onSetCalled = false;
-        stub.Indexer.OnSet = (ko, k, v) =>
+        stub.Indexer.OnSet = (k, v) =>
         {
             onSetCalled = true;
             // Manually update Backing if needed:
@@ -283,10 +283,10 @@ public class GenericMethodInterceptorApiTests
         var stub = new ApiGenericRepoStub();
 
         // Configure OnCall for specific type arguments
-        var userTracking = stub.GetById.Of<User>().OnCall((ko, id) =>
+        var userTracking = stub.GetById.Of<User>().OnCall((id) =>
             new User { Id = id, Name = $"User{id}" });
 
-        var productTracking = stub.GetById.Of<Product>().OnCall((ko, id) =>
+        var productTracking = stub.GetById.Of<Product>().OnCall((id) =>
             new Product { Id = id, Name = $"Product{id}" });
 
         IApiGenericRepo repository = stub;

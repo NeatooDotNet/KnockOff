@@ -11,10 +11,10 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.IMultiConstraintService<T>? _source;
 
-		private global::System.Action<MultiConstraintStub<T>, T>? _onCall;
+		private global::System.Action<T>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<MultiConstraintStub<T>, T> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<MultiConstraintStub<T>, T> callback)
+		public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<T> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<MultiConstraintStub<T>, T>> OnCallSequence(global::System.Action<MultiConstraintStub<T>, T> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<T>> OnCallSequence(global::System.Action<T> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<MultiConstraintStub<T>, T> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(MultiConstraintStub<T> ko, bool strict, T entity)
+		internal void Invoke(bool strict, T entity)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(entity);
 				_sequenceIndex++;
-				callback(ko, entity);
+				callback(entity);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(entity);
-				_onCall(ko, entity);
+				_onCall(entity);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MultiConstraintStub<T>, T>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<T>>
 		{
 			private readonly SaveInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MultiConstraintStub<T>, T>> ThenCall(global::System.Action<MultiConstraintStub<T>, T> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> ThenCall(global::System.Action<T> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,7 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MultiConstraintStub<T>, T>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -245,7 +245,7 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 		internal global::KnockOff.Tests.IMultiConstraintService<T>? _source;
 
 		/// <summary>Delegate for Find.</summary>
-		public delegate T? FindDelegate(MultiConstraintStub<T> ko, int id);
+		public delegate T? FindDelegate(int id);
 
 		private FindDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -296,20 +296,20 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal T? Invoke(MultiConstraintStub<T> ko, bool strict, int id)
+		internal T? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -520,12 +520,12 @@ partial class MultiConstraintStub<T> : global::KnockOff.Tests.IMultiConstraintSe
 
 	void global::KnockOff.Tests.IMultiConstraintService<T>.Save(T entity)
 	{
-		Save.Invoke(this, Strict, entity);
+		Save.Invoke(Strict, entity);
 	}
 
 	T? global::KnockOff.Tests.IMultiConstraintService<T>.Find(int id)
 	{
-		return Find.Invoke(this, Strict, id);
+		return Find.Invoke(Strict, id);
 	}
 
 }

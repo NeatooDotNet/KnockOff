@@ -11,10 +11,10 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Person.Ef.IPersonDbContext? _source;
 
-		private global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person>? _onCall;
+		private global::System.Action<global::DomainModel.Person>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::DomainModel.Person> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::DomainModel.Person> OnCall(global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person> callback)
+		public global::KnockOff.IMethodTracking<global::DomainModel.Person> OnCall(global::System.Action<global::DomainModel.Person> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person>> OnCallSequence(global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::DomainModel.Person>> OnCallSequence(global::System.Action<global::DomainModel.Person> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::DomainModel.Person> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(PersonDbContextKnockOff ko, bool strict, global::DomainModel.Person person)
+		internal void Invoke(bool strict, global::DomainModel.Person person)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(person);
 				_sequenceIndex++;
-				callback(ko, person);
+				callback(person);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(person);
-				_onCall(ko, person);
+				_onCall(person);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::DomainModel.Person>>
 		{
 			private readonly SavePersonInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person>> ThenCall(global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::DomainModel.Person>> ThenCall(global::System.Action<global::DomainModel.Person> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,7 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<PersonDbContextKnockOff, global::DomainModel.Person>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::DomainModel.Person>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -245,7 +245,7 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 		internal global::Person.Ef.IPersonDbContext? _source;
 
 		/// <summary>Delegate for GetPerson.</summary>
-		public delegate global::DomainModel.Person? GetPersonDelegate(PersonDbContextKnockOff ko, int id);
+		public delegate global::DomainModel.Person? GetPersonDelegate(int id);
 
 		private GetPersonDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -296,20 +296,20 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::DomainModel.Person? Invoke(PersonDbContextKnockOff ko, bool strict, int id)
+		internal global::DomainModel.Person? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -520,12 +520,12 @@ partial class PersonDbContextKnockOff : global::Person.Ef.IPersonDbContext, glob
 
 	void global::Person.Ef.IPersonDbContext.SavePerson(global::DomainModel.Person person)
 	{
-		SavePerson.Invoke(this, Strict, person);
+		SavePerson.Invoke(Strict, person);
 	}
 
 	global::DomainModel.Person? global::Person.Ef.IPersonDbContext.GetPerson(int id)
 	{
-		return GetPerson.Invoke(this, Strict, id);
+		return GetPerson.Invoke(Strict, id);
 	}
 
 }

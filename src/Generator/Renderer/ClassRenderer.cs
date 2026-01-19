@@ -118,9 +118,9 @@ internal static class ClassRenderer
             w.Line($"{indent1}/// <summary>Number of times the getter was accessed.</summary>");
             w.Line($"{indent1}public int GetCount {{ get; private set; }}");
             w.Line();
-            w.Line($"{indent1}private global::System.Func<{prop.StubClassName}, {prop.ReturnType}>? _onGet;");
+            w.Line($"{indent1}private global::System.Func<{prop.ReturnType}>? _onGet;");
             w.Line($"{indent1}/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>");
-            w.Line($"{indent1}public global::System.Func<{prop.StubClassName}, {prop.ReturnType}>? OnGet");
+            w.Line($"{indent1}public global::System.Func<{prop.ReturnType}>? OnGet");
             w.Line($"{indent1}{{");
             w.Line($"{indent1}\tget => _onGet;");
             w.Line($"{indent1}\tset {{ _onGet = value; if (value != null) _configured = true; }}");
@@ -136,9 +136,9 @@ internal static class ClassRenderer
             w.Line($"{indent1}/// <summary>The last value passed to the setter.</summary>");
             w.Line($"{indent1}public {prop.NullableReturnType} LastSetValue {{ get; private set; }}");
             w.Line();
-            w.Line($"{indent1}private global::System.Action<{prop.StubClassName}, {prop.ReturnType}>? _onSet;");
+            w.Line($"{indent1}private global::System.Action<{prop.ReturnType}>? _onSet;");
             w.Line($"{indent1}/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>");
-            w.Line($"{indent1}public global::System.Action<{prop.StubClassName}, {prop.ReturnType}>? OnSet");
+            w.Line($"{indent1}public global::System.Action<{prop.ReturnType}>? OnSet");
             w.Line($"{indent1}{{");
             w.Line($"{indent1}\tget => _onSet;");
             w.Line($"{indent1}\tset {{ _onSet = value; if (value != null) _configured = true; }}");
@@ -283,7 +283,7 @@ internal static class ClassRenderer
             var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => p.Trim().Split(' ')[0]).ToArray();
             var paramList = string.Join(", ", paramTypes);
             w.Line($"{indent1}/// <summary>Callback for getter.</summary>");
-            w.Line($"{indent1}public global::System.Func<{indexer.StubClassName}, {paramList}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
+            w.Line($"{indent1}public global::System.Func<{paramList}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
             w.Line();
         }
 
@@ -301,7 +301,7 @@ internal static class ClassRenderer
             var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => p.Trim().Split(' ')[0]).ToArray();
             var paramList = string.Join(", ", paramTypes);
             w.Line($"{indent1}/// <summary>Callback for setter.</summary>");
-            w.Line($"{indent1}public global::System.Action<{indexer.StubClassName}, {paramList}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
+            w.Line($"{indent1}public global::System.Action<{paramList}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
             w.Line();
         }
 
@@ -755,7 +755,7 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             // Handle calls from base constructor when _stub is null
             w.Line($"{indent2}_stub?.{prop.PropertyName}.RecordGet();");
-            w.Line($"{indent2}if (_stub?.{prop.PropertyName}.OnGet is {{ }} onGet) return onGet(_stub);");
+            w.Line($"{indent2}if (_stub?.{prop.PropertyName}.OnGet is {{ }} onGet) return onGet();");
             if (prop.IsAbstract)
             {
                 w.Line($"{indent2}return default!;");
@@ -774,7 +774,7 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             // Handle calls from base constructor when _stub is null
             w.Line($"{indent2}_stub?.{prop.PropertyName}.RecordSet(value);");
-            w.Line($"{indent2}if (_stub?.{prop.PropertyName}.OnSet is {{ }} onSet) onSet(_stub, value);");
+            w.Line($"{indent2}if (_stub?.{prop.PropertyName}.OnSet is {{ }} onSet) onSet(value);");
             if (!prop.IsAbstract)
             {
                 w.Line($"{indent2}else base.{prop.PropertyName} = value;");
@@ -800,7 +800,7 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             // Handle calls from base constructor when _stub is null
             w.Line($"{indent2}_stub?.{indexer.IndexerName}.RecordGet({indexer.ArgumentList});");
-            w.Line($"{indent2}if (_stub?.{indexer.IndexerName}.OnGet is {{ }} onGet) return onGet(_stub, {indexer.ArgumentList});");
+            w.Line($"{indent2}if (_stub?.{indexer.IndexerName}.OnGet is {{ }} onGet) return onGet({indexer.ArgumentList});");
             if (indexer.IsAbstract)
             {
                 var defaultExpr = indexer.IsNullable ? "default" : GetDefaultForType(indexer.ReturnType, indexer.DefaultStrategy, indexer.ConcreteTypeForNew);
@@ -820,7 +820,7 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             // Handle calls from base constructor when _stub is null
             w.Line($"{indent2}_stub?.{indexer.IndexerName}.RecordSet({indexer.ArgumentList}, value);");
-            w.Line($"{indent2}if (_stub?.{indexer.IndexerName}.OnSet is {{ }} onSet) onSet(_stub, {indexer.ArgumentList}, value);");
+            w.Line($"{indent2}if (_stub?.{indexer.IndexerName}.OnSet is {{ }} onSet) onSet({indexer.ArgumentList}, value);");
             if (indexer.IsAbstract)
             {
                 w.Line($"{indent2}else if (_stub is not null) _stub.{indexer.IndexerName}.Backing[{indexer.KeyExpression}] = value;");

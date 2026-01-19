@@ -11,10 +11,10 @@ partial class PaymentGatewayStub : global::KnockOff.Documentation.Samples.Advanc
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.IPaymentGateway? _source;
 
-		private global::System.Action<PaymentGatewayStub, decimal>? _onCall;
+		private global::System.Action<decimal>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<PaymentGatewayStub, decimal> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<decimal> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class PaymentGatewayStub : global::KnockOff.Documentation.Samples.Advanc
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<decimal> OnCall(global::System.Action<PaymentGatewayStub, decimal> callback)
+		public global::KnockOff.IMethodTracking<decimal> OnCall(global::System.Action<decimal> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class PaymentGatewayStub : global::KnockOff.Documentation.Samples.Advanc
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<PaymentGatewayStub, decimal>> OnCallSequence(global::System.Action<PaymentGatewayStub, decimal> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<decimal>> OnCallSequence(global::System.Action<decimal> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<PaymentGatewayStub, decimal> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<decimal> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class PaymentGatewayStub : global::KnockOff.Documentation.Samples.Advanc
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(PaymentGatewayStub ko, bool strict, decimal amount)
+		internal void Invoke(bool strict, decimal amount)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(amount);
 				_sequenceIndex++;
-				callback(ko, amount);
+				callback(amount);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(amount);
-				_onCall(ko, amount);
+				_onCall(amount);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class PaymentGatewayStub : global::KnockOff.Documentation.Samples.Advanc
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<PaymentGatewayStub, decimal>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<decimal>>
 		{
 			private readonly ChargeInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class PaymentGatewayStub : global::KnockOff.Documentation.Samples.Advanc
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<PaymentGatewayStub, decimal>> ThenCall(global::System.Action<PaymentGatewayStub, decimal> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<decimal>> ThenCall(global::System.Action<decimal> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,7 @@ partial class PaymentGatewayStub : global::KnockOff.Documentation.Samples.Advanc
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<PaymentGatewayStub, decimal>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<decimal>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -280,7 +280,7 @@ partial class PaymentGatewayStub : global::KnockOff.Documentation.Samples.Advanc
 
 	void global::KnockOff.Documentation.Samples.AdvancedCallbacks.IPaymentGateway.Charge(decimal amount)
 	{
-		Charge.Invoke(this, Strict, amount);
+		Charge.Invoke(Strict, amount);
 	}
 
 }

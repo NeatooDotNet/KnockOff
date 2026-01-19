@@ -19,7 +19,7 @@ public class InlineStubBugTests
 		var entity = new SampleEntity { Id = 1 };
 
 		// Set up sync callback - Fetch2 is the sync overload
-		stub.Fetch2.OnCall((ko, e) => new SampleArea { Id = e.Id });
+		stub.Fetch2.OnCall((e) => new SampleArea { Id = e.Id });
 
 		// Call the sync overload
 		var result = factory.Fetch(entity);
@@ -35,7 +35,7 @@ public class InlineStubBugTests
 		IFactoryWithMixedReturnTypes factory = stub;
 
 		// Set up async callback - Fetch1 is the async overload
-		stub.Fetch1.OnCall((ko, id) =>
+		stub.Fetch1.OnCall((id) =>
 			Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
 
 		// Call the async overload
@@ -60,7 +60,7 @@ public class InlineStubBugTests
 		var expectedResult = new SampleResult { Success = true };
 
 		// Set up callback for typed version - Execute1 takes ISampleTarget
-		stub.Execute1.OnCall((ko, t, ct) =>
+		stub.Execute1.OnCall((t, ct) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via typed interface
@@ -79,7 +79,7 @@ public class InlineStubBugTests
 		var expectedResult = new SampleResult { Success = true };
 
 		// Set up callback for base version - Execute2 takes ISampleRuleTarget
-		stub.Execute2.OnCall((ko, t, ct) =>
+		stub.Execute2.OnCall((t, ct) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via base interface

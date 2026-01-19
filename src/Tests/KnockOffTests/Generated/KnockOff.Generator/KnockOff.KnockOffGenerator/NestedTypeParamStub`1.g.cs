@@ -12,7 +12,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		internal global::KnockOff.Tests.INestedTypeParamService<T>? _source;
 
 		/// <summary>Delegate for GetItems.</summary>
-		public delegate global::System.Collections.Generic.List<T> GetItemsDelegate(NestedTypeParamStub<T> ko);
+		public delegate global::System.Collections.Generic.List<T> GetItemsDelegate();
 
 		private GetItemsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.List<T> Invoke(NestedTypeParamStub<T> ko, bool strict)
+		internal global::System.Collections.Generic.List<T> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -232,10 +232,10 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.INestedTypeParamService<T>? _source;
 
-		private global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>>? _onCall;
+		private global::System.Action<global::System.Collections.Generic.IEnumerable<T>>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<T>> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -255,7 +255,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<T>> OnCall(global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>> callback)
+		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<T>> OnCall(global::System.Action<global::System.Collections.Generic.IEnumerable<T>> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -267,13 +267,13 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>>> OnCallSequence(global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<T>>> OnCallSequence(global::System.Action<global::System.Collections.Generic.IEnumerable<T>> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<T>> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -281,21 +281,21 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(NestedTypeParamStub<T> ko, bool strict, global::System.Collections.Generic.IEnumerable<T> items)
+		internal void Invoke(bool strict, global::System.Collections.Generic.IEnumerable<T> items)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(items);
 				_sequenceIndex++;
-				callback(ko, items);
+				callback(items);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(items);
-				_onCall(ko, items);
+				_onCall(items);
 				return;
 			}
 
@@ -405,7 +405,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<T>>>
 		{
 			private readonly AddItemsInterceptor _interceptor;
 
@@ -425,7 +425,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>>> ThenCall(global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<T>>> ThenCall(global::System.Action<global::System.Collections.Generic.IEnumerable<T>> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -446,7 +446,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<NestedTypeParamStub<T>, global::System.Collections.Generic.IEnumerable<T>>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<T>>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -507,12 +507,12 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 
 	global::System.Collections.Generic.List<T> global::KnockOff.Tests.INestedTypeParamService<T>.GetItems()
 	{
-		return GetItems.Invoke(this, Strict);
+		return GetItems.Invoke(Strict);
 	}
 
 	void global::KnockOff.Tests.INestedTypeParamService<T>.AddItems(global::System.Collections.Generic.IEnumerable<T> items)
 	{
-		AddItems.Invoke(this, Strict, items);
+		AddItems.Invoke(Strict, items);
 	}
 
 }

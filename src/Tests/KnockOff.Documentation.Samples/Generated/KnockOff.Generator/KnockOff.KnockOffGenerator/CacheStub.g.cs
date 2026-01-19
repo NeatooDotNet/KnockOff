@@ -19,7 +19,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<CacheStub, global::KnockOff.Documentation.Samples.AdvancedCallbacks.CacheStats>? OnGet { get; set; }
+		public global::System.Func<global::KnockOff.Documentation.Samples.AdvancedCallbacks.CacheStats>? OnGet { get; set; }
 
 		private global::KnockOff.Documentation.Samples.AdvancedCallbacks.CacheStats _value = new global::KnockOff.Documentation.Samples.AdvancedCallbacks.CacheStats();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -93,7 +93,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.ICache? _source;
 
 		/// <summary>Delegate for Get.</summary>
-		public delegate string? GetDelegate(CacheStub ko, string key);
+		public delegate string? GetDelegate(string key);
 
 		private GetDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -144,20 +144,20 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string? Invoke(CacheStub ko, bool strict, string key)
+		internal string? Invoke(bool strict, string key)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(key);
 				_sequenceIndex++;
-				return callback(ko, key);
+				return callback(key);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(key);
-				return _onCall(ko, key);
+				return _onCall(key);
 			}
 
 			_unconfiguredCallCount++;
@@ -326,10 +326,10 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.ICache? _source;
 
-		private global::System.Action<CacheStub, string, string>? _onCall;
+		private global::System.Action<string, string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<CacheStub, string, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -349,7 +349,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(string? key, string? @value)> OnCall(global::System.Action<CacheStub, string, string> callback)
+		public global::KnockOff.IMethodTrackingArgs<(string? key, string? @value)> OnCall(global::System.Action<string, string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -361,13 +361,13 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<CacheStub, string, string>> OnCallSequence(global::System.Action<CacheStub, string, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string, string>> OnCallSequence(global::System.Action<string, string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<CacheStub, string, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string, string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -375,21 +375,21 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(CacheStub ko, bool strict, string key, string @value)
+		internal void Invoke(bool strict, string key, string @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((key, @value));
 				_sequenceIndex++;
-				callback(ko, key, @value);
+				callback(key, @value);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((key, @value));
-				_onCall(ko, key, @value);
+				_onCall(key, @value);
 				return;
 			}
 
@@ -499,7 +499,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<CacheStub, string, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string, string>>
 		{
 			private readonly SetInterceptor _interceptor;
 
@@ -519,7 +519,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<CacheStub, string, string>> ThenCall(global::System.Action<CacheStub, string, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string, string>> ThenCall(global::System.Action<string, string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -540,7 +540,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<CacheStub, string, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string, string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -559,10 +559,10 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.ICache? _source;
 
-		private global::System.Action<CacheStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<CacheStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -578,7 +578,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<CacheStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -590,13 +590,13 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<CacheStub>> OnCallSequence(global::System.Action<CacheStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<CacheStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -604,21 +604,21 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(CacheStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -719,7 +719,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<CacheStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearInterceptor _interceptor;
 
@@ -739,7 +739,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<CacheStub>> ThenCall(global::System.Action<CacheStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -760,7 +760,7 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<CacheStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -833,22 +833,22 @@ partial class CacheStub : global::KnockOff.Documentation.Samples.AdvancedCallbac
 
 	global::KnockOff.Documentation.Samples.AdvancedCallbacks.CacheStats global::KnockOff.Documentation.Samples.AdvancedCallbacks.ICache.Stats
 	{
-		get { Stats.RecordGet(); if (Stats.OnGet is { } onGet) return onGet(this); if (Stats._source is { } src) return src.Stats; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICache", "Stats"); return Stats.Value; }
+		get { Stats.RecordGet(); if (Stats.OnGet is { } onGet) return onGet(); if (Stats._source is { } src) return src.Stats; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICache", "Stats"); return Stats.Value; }
 	}
 
 	string? global::KnockOff.Documentation.Samples.AdvancedCallbacks.ICache.Get(string key)
 	{
-		return Get.Invoke(this, Strict, key);
+		return Get.Invoke(Strict, key);
 	}
 
 	void global::KnockOff.Documentation.Samples.AdvancedCallbacks.ICache.Set(string key, string @value)
 	{
-		Set.Invoke(this, Strict, key, @value);
+		Set.Invoke(Strict, key, @value);
 	}
 
 	void global::KnockOff.Documentation.Samples.AdvancedCallbacks.ICache.Clear()
 	{
-		Clear.Invoke(this, Strict);
+		Clear.Invoke(Strict);
 	}
 
 }

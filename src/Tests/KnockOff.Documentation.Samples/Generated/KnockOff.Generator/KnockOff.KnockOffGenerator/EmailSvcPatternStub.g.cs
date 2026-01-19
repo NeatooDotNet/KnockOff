@@ -19,7 +19,7 @@ partial class EmailSvcPatternStub : global::KnockOff.Documentation.Samples.Patte
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EmailSvcPatternStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -93,7 +93,7 @@ partial class EmailSvcPatternStub : global::KnockOff.Documentation.Samples.Patte
 		internal global::KnockOff.Documentation.Samples.Patterns.IEmailSvcPattern? _source;
 
 		/// <summary>Delegate for Send.</summary>
-		public delegate bool SendDelegate(EmailSvcPatternStub ko, string to, string subject, string body);
+		public delegate bool SendDelegate(string to, string subject, string body);
 
 		private SendDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -144,20 +144,20 @@ partial class EmailSvcPatternStub : global::KnockOff.Documentation.Samples.Patte
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(EmailSvcPatternStub ko, bool strict, string to, string subject, string body)
+		internal bool Invoke(bool strict, string to, string subject, string body)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((to, subject, body));
 				_sequenceIndex++;
-				return callback(ko, to, subject, body);
+				return callback(to, subject, body);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((to, subject, body));
-				return _onCall(ko, to, subject, body);
+				return _onCall(to, subject, body);
 			}
 
 			_unconfiguredCallCount++;
@@ -368,12 +368,12 @@ partial class EmailSvcPatternStub : global::KnockOff.Documentation.Samples.Patte
 
 	bool global::KnockOff.Documentation.Samples.Patterns.IEmailSvcPattern.IsConfigured
 	{
-		get { IsConfigured.RecordGet(); if (IsConfigured.OnGet is { } onGet) return onGet(this); if (IsConfigured._source is { } src) return src.IsConfigured; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailSvcPattern", "IsConfigured"); return IsConfigured.Value; }
+		get { IsConfigured.RecordGet(); if (IsConfigured.OnGet is { } onGet) return onGet(); if (IsConfigured._source is { } src) return src.IsConfigured; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailSvcPattern", "IsConfigured"); return IsConfigured.Value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.Patterns.IEmailSvcPattern.Send(string to, string subject, string body)
 	{
-		return Send.Invoke(this, Strict, to, subject, body);
+		return Send.Invoke(Strict, to, subject, body);
 	}
 
 }

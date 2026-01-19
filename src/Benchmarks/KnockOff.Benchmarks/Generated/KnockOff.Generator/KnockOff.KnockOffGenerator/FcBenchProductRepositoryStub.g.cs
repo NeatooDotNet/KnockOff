@@ -12,7 +12,7 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
 
 		/// <summary>Delegate for GetByIdAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> GetByIdAsyncDelegate(FcBenchProductRepositoryStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> GetByIdAsyncDelegate(int id);
 
 		private GetByIdAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> Invoke(FcBenchProductRepositoryStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
 
 		/// <summary>Delegate for GetAllAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> GetAllAsyncDelegate(FcBenchProductRepositoryStub ko);
+		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> GetAllAsyncDelegate();
 
 		private GetAllAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -293,20 +293,20 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> Invoke(FcBenchProductRepositoryStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -467,7 +467,7 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
 
 		/// <summary>Delegate for SaveAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(FcBenchProductRepositoryStub ko, global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product);
+		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product);
 
 		private SaveAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -518,20 +518,20 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(FcBenchProductRepositoryStub ko, bool strict, global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(product);
 				_sequenceIndex++;
-				return callback(ko, product);
+				return callback(product);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(product);
-				return _onCall(ko, product);
+				return _onCall(product);
 			}
 
 			_unconfiguredCallCount++;
@@ -701,7 +701,7 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
 
 		/// <summary>Delegate for DeleteAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task DeleteAsyncDelegate(FcBenchProductRepositoryStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task DeleteAsyncDelegate(int id);
 
 		private DeleteAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -752,20 +752,20 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(FcBenchProductRepositoryStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -988,22 +988,22 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.GetByIdAsync(int id)
 	{
-		return GetByIdAsync.Invoke(this, Strict, id);
+		return GetByIdAsync.Invoke(Strict, id);
 	}
 
 	global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.GetAllAsync()
 	{
-		return GetAllAsync.Invoke(this, Strict);
+		return GetAllAsync.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.SaveAsync(global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product)
 	{
-		return SaveAsync.Invoke(this, Strict, product);
+		return SaveAsync.Invoke(Strict, product);
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.DeleteAsync(int id)
 	{
-		return DeleteAsync.Invoke(this, Strict, id);
+		return DeleteAsync.Invoke(Strict, id);
 	}
 
 }

@@ -21,7 +21,7 @@ public void VoidMethod_ConfiguredWithOnCall()
 
     // OnCall for void methods uses Action<TStub, ...params>
     var logged = new List<string>();
-    var tracking = stub.LogMessage.OnCall((ko, message) =>
+    var tracking = stub.LogMessage.OnCall((message) =>
     {
         logged.Add(message);
     });
@@ -47,8 +47,8 @@ public void MethodWithReturn_ConfiguredWithOnCall()
 {
     var stub = new LogSvcMethodsStub();
 
-    // OnCall with return value: first param is stub (ko), then method params
-    var tracking = stub.GetUserName.OnCall((ko, userId) => "TestUser");
+    // OnCall callback receives the method parameters
+    var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
 
     ILogSvcMethods logger = stub;
     var name = logger.GetUserName(42);
@@ -72,8 +72,8 @@ public void MethodWithMultipleParams_AllAvailableInOnCall()
 {
     var stub = new AuthSvcMethodsStub();
 
-    // All method parameters follow the stub instance (ko)
-    var tracking = stub.ValidateCredentials.OnCall((ko, username, password) =>
+    // All method parameters are passed to the callback
+    var tracking = stub.ValidateCredentials.OnCall((username, password) =>
         username == "admin" && password == "secret");
 
     IAuthSvcMethods auth = stub;
@@ -101,7 +101,7 @@ The recommended approach is to call `.Verify()` on the tracking object returned 
 public void Verify_VerifiesMethodInvocation()
 {
     var stub = new SaveRepoMethodsStub();
-    stub.Save.OnCall((ko, entity) => { }).Verifiable();
+    stub.Save.OnCall((entity) => { }).Verifiable();
 
     ISaveRepoMethods repository = stub;
     repository.Save(new User { Id = 1 });
@@ -122,7 +122,7 @@ Use `Times` to specify exact call count requirements:
 public void Verify_ExactCallCount()
 {
     var stub = new NotifierMethodsStub();
-    var tracking = stub.Notify.OnCall((ko, message) => { });
+    var tracking = stub.Notify.OnCall((message) => { });
 
     INotifierMethods notifier = stub;
 
@@ -151,8 +151,8 @@ public void Verifiable_BatchVerification()
     var stub = new SaveRepoMethodsStub();
 
     // Mark expected calls
-    stub.Save.OnCall((ko, entity) => { }).Verifiable(Times.Once);
-    stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
+    stub.Save.OnCall((entity) => { }).Verifiable(Times.Once);
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 
     ISaveRepoMethods repository = stub;
     repository.Save(new User { Id = 1 });
@@ -178,7 +178,7 @@ Access the last call's argument using `LastCallArg`:
 public void LastArg_CapturesSingleParameter()
 {
     var stub = new UserRepoMethodsStub();
-    var tracking = stub.GetUser.OnCall((ko, userId) => new User { Id = userId });
+    var tracking = stub.GetUser.OnCall((userId) => new User { Id = userId });
 
     IUserRepoMethods repository = stub;
     repository.GetUser(42);
@@ -200,7 +200,7 @@ Access arguments using the `LastCallArgs` named tuple:
 public void LastArgs_CapturesAllParameters()
 {
     var stub = new AuthSvcMethodsStub();
-    var tracking = stub.ValidateCredentials.OnCall((ko, username, password) => true);
+    var tracking = stub.ValidateCredentials.OnCall((username, password) => true);
 
     IAuthSvcMethods auth = stub;
     auth.ValidateCredentials("admin", "secret123");
@@ -228,11 +228,11 @@ public void Overloads_DistinguishedByCallbackSignature()
 
     // Overloads are distinguished by the callback parameter types
     // The fully-typed lambda tells KnockOff which overload to configure
-    var findAllTracking = stub.Find.OnCall((SearchRepoStub ko) =>
+    var findAllTracking = stub.Find.OnCall(() =>
         new List<User>()).Verifiable();
-    var findByIdTracking = stub.Find.OnCall((SearchRepoStub ko, int id) =>
+    var findByIdTracking = stub.Find.OnCall((int id) =>
         new User { Id = id, Name = "ById" }).Verifiable();
-    var findByNameTracking = stub.Find.OnCall((SearchRepoStub ko, string name) =>
+    var findByNameTracking = stub.Find.OnCall((string name) =>
         new User { Id = 1, Name = name }).Verifiable();
 
     ISearchRepo repo = stub;
@@ -266,7 +266,7 @@ Clear call counts and remove callbacks using `Reset()`:
 public void Reset_ClearsTrackingState()
 {
     var stub = new ProcessorMethodsStub();
-    var tracking = stub.ProcessData.OnCall((ko, data) => { });
+    var tracking = stub.ProcessData.OnCall((data) => { });
 
     IProcessorMethods processor = stub;
     processor.ProcessData("initial");
@@ -300,8 +300,8 @@ public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
     var stub = new CompleteUserRepoStub();
 
     var testUser = new User { Id = 1, Name = "Alice", Email = "old@test.com" };
-    var getTracking = stub.GetUser.OnCall((ko, id) => id == 1 ? testUser : null).Verifiable();
-    var saveTracking = stub.SaveUser.OnCall((ko, user) => { }).Verifiable();
+    var getTracking = stub.GetUser.OnCall((id) => id == 1 ? testUser : null).Verifiable();
+    var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
 
     var service = new UserService(stub);
 

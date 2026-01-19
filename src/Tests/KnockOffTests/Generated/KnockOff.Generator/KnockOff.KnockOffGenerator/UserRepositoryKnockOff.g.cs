@@ -12,7 +12,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		internal global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>? _source;
 
 		/// <summary>Delegate for GetById.</summary>
-		public delegate global::KnockOff.Tests.User? GetByIdDelegate(UserRepositoryKnockOff ko, int id);
+		public delegate global::KnockOff.Tests.User? GetByIdDelegate(int id);
 
 		private GetByIdDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Tests.User? Invoke(UserRepositoryKnockOff ko, bool strict, int id)
+		internal global::KnockOff.Tests.User? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -245,10 +245,10 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>? _source;
 
-		private global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User>? _onCall;
+		private global::System.Action<global::KnockOff.Tests.User>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Tests.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -268,7 +268,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::KnockOff.Tests.User> OnCall(global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User> callback)
+		public global::KnockOff.IMethodTracking<global::KnockOff.Tests.User> OnCall(global::System.Action<global::KnockOff.Tests.User> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -280,13 +280,13 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User>> OnCallSequence(global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Tests.User>> OnCallSequence(global::System.Action<global::KnockOff.Tests.User> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Tests.User> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -294,21 +294,21 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(UserRepositoryKnockOff ko, bool strict, global::KnockOff.Tests.User entity)
+		internal void Invoke(bool strict, global::KnockOff.Tests.User entity)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(entity);
 				_sequenceIndex++;
-				callback(ko, entity);
+				callback(entity);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(entity);
-				_onCall(ko, entity);
+				_onCall(entity);
 				return;
 			}
 
@@ -418,7 +418,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Tests.User>>
 		{
 			private readonly SaveInterceptor _interceptor;
 
@@ -438,7 +438,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User>> ThenCall(global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Tests.User>> ThenCall(global::System.Action<global::KnockOff.Tests.User> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -459,7 +459,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<UserRepositoryKnockOff, global::KnockOff.Tests.User>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Tests.User>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -479,7 +479,7 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		internal global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>? _source;
 
 		/// <summary>Delegate for GetByIdAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(UserRepositoryKnockOff ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate(int id);
 
 		private GetByIdAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -530,20 +530,20 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> Invoke(UserRepositoryKnockOff ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -760,17 +760,17 @@ partial class UserRepositoryKnockOff : global::KnockOff.Tests.IRepository<global
 
 	global::KnockOff.Tests.User? global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.GetById(int id)
 	{
-		return GetById.Invoke(this, Strict, id);
+		return GetById.Invoke(Strict, id);
 	}
 
 	void global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.Save(global::KnockOff.Tests.User entity)
 	{
-		Save.Invoke(this, Strict, entity);
+		Save.Invoke(Strict, entity);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IRepository<global::KnockOff.Tests.User>.GetByIdAsync(int id)
 	{
-		return GetByIdAsync.Invoke(this, Strict, id);
+		return GetByIdAsync.Invoke(Strict, id);
 	}
 
 }

@@ -12,7 +12,7 @@ partial class UserRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 		internal global::KnockOff.Documentation.Samples.Methods.IUserRepoMethods? _source;
 
 		/// <summary>Delegate for GetUser.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? GetUserDelegate(UserRepoMethodsStub ko, int userId);
+		public delegate global::KnockOff.Documentation.Samples.User? GetUserDelegate(int userId);
 
 		private GetUserDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class UserRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke(UserRepoMethodsStub ko, bool strict, int userId)
+		internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int userId)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(userId);
 				_sequenceIndex++;
-				return callback(ko, userId);
+				return callback(userId);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(userId);
-				return _onCall(ko, userId);
+				return _onCall(userId);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class UserRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.Methods.IUserRepoMethods.GetUser(int userId)
 	{
-		return GetUser.Invoke(this, Strict, userId);
+		return GetUser.Invoke(Strict, userId);
 	}
 
 }

@@ -58,7 +58,7 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 		public sealed class GetByIdTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for GetById.</summary>
-			public delegate T? GetByIdDelegate(ApiGenericRepoStub ko, int id);
+			public delegate T? GetByIdDelegate(int id);
 
 			private GetByIdDelegate? _onCall;
 
@@ -139,7 +139,7 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 		public sealed class SaveTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for Save.</summary>
-			public delegate void SaveDelegate(ApiGenericRepoStub ko, T item);
+			public delegate void SaveDelegate(T item);
 
 			private SaveDelegate? _onCall;
 
@@ -225,7 +225,7 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 	{
 		GetById.Of<T>().RecordCall(id);
 		if (GetById.Of<T>().Callback is { } callback)
-			return callback(this, id);
+			return callback(id);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiGenericRepo", "GetById");
 		return default!;
 	}
@@ -234,7 +234,7 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 	{
 		Save.Of<T>().RecordCall();
 		if (Save.Of<T>().Callback is { } onCallCallback)
-		{ onCallCallback(this, item); return; }
+		{ onCallCallback(item); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiGenericRepo", "Save");
 	}
 

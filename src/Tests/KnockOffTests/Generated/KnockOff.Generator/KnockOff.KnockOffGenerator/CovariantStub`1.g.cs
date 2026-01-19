@@ -12,7 +12,7 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 		internal global::KnockOff.Tests.ICovariantService<T>? _source;
 
 		/// <summary>Delegate for Get.</summary>
-		public delegate T GetDelegate(CovariantStub<T> ko);
+		public delegate T GetDelegate();
 
 		private GetDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal T Invoke(CovariantStub<T> ko, bool strict)
+		internal T Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -268,7 +268,7 @@ partial class CovariantStub<T> : global::KnockOff.Tests.ICovariantService<T>, gl
 
 	T global::KnockOff.Tests.ICovariantService<T>.Get()
 	{
-		return Get.Invoke(this, Strict);
+		return Get.Invoke(Strict);
 	}
 
 }

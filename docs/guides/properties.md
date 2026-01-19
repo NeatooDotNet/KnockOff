@@ -84,7 +84,7 @@ public void OnGet_ReturnsComputedValue()
     var stub = new TimeProviderPropsStub();
 
     // OnGet callback returns dynamic value on each access
-    stub.Timestamp.OnGet = (ko) => DateTime.UtcNow;
+    stub.Timestamp.OnGet = () => DateTime.UtcNow;
 
     ITimeProviderProps timeProvider = stub;
 
@@ -108,8 +108,8 @@ public void OnGet_DependsOnOtherInterceptorState()
     var stub = new ServiceWithInitPropsStub();
 
     // OnGet checks if Initialize() was called via interceptor CallCount
-    stub.IsReady.OnGet = (ko) => stub.Initialize.CallCount > 0;
-    var initTracking = stub.Initialize.OnCall((ko) => { });
+    stub.IsReady.OnGet = () => stub.Initialize.CallCount > 0;
+    var initTracking = stub.Initialize.OnCall(() => { });
 
     IServiceWithInitProps service = stub;
 
@@ -143,7 +143,7 @@ public void OnSet_TracksAllWrittenValues()
     var stub = new ConfigPropsStub();
 
     var setValues = new List<string>();
-    stub.Name.OnSet = (ko, value) => setValues.Add(value);
+    stub.Name.OnSet = ((value) => setValues.Add(value);
 
     IConfigProps config = stub;
 
@@ -167,7 +167,7 @@ public void OnSet_SimulatesValidation()
     var stub = new ConfigPropsStub();
 
     // OnSet throws for invalid values
-    stub.Age.OnSet = (ko, value) =>
+    stub.Age.OnSet = ((value) =>
     {
         if (value < 0)
             throw new ArgumentException("Age cannot be negative");
@@ -288,7 +288,7 @@ public void OnGet_TakesPrecedenceOverValue()
     stub.Name.Value = "initial";
 
     // Then set OnGet - it takes precedence
-    stub.Name.OnGet = (ko) => "dynamic";
+    stub.Name.OnGet = () => "dynamic";
 
     IConfigProps config = stub;
 
@@ -345,10 +345,10 @@ Choose your configuration approach based on the test scenario:
 | Scenario | Use This | Example |
 |----------|----------|---------|
 | Property should return fixed test data | `Value` | `stub.UserId.Value = 42;` |
-| Property should return current time/random value | `OnGet` | `stub.Now.OnGet = (ko) => DateTime.UtcNow;` |
-| Property depends on other stub state | `OnGet` | `stub.IsReady.OnGet = (ko) => ko.Init.WasCalled;` |
-| Track all values written to property | `OnSet` | `stub.Name.OnSet = (ko, v) => list.Add(v);` |
-| Simulate validation in dependency | `OnSet` | `stub.Age.OnSet = (ko, v) => Validate(v);` |
+| Property should return current time/random value | `OnGet` | `stub.Now.OnGet = () => DateTime.UtcNow;` |
+| Property depends on other stub state | `OnGet` | `stub.IsReady.OnGet = () => stub.Init.WasCalled;` |
+| Track all values written to property | `OnSet` | `stub.Name.OnSet = (v) => list.Add(v);` |
+| Simulate validation in dependency | `OnSet` | `stub.Age.OnSet = (v) => Validate(v);` |
 | Verify property was accessed N times | Verification | `Assert.Equal(2, stub.UserId.GetCount);` |
 | Verify last value written | Verification | `Assert.Equal("x", stub.Name.LastSetValue);` |
 
@@ -369,14 +369,14 @@ public void CompletePropertyExample_AllConfigurationApproaches()
     stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
     // OnGet: State-dependent behavior
-    stub.IsConnected.OnGet = (ko) => stub.Connect.CallCount > 0;
+    stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
 
     // OnSet: Track all values written
     var connectionStrings = new List<string>();
-    stub.ConnectionString.OnSet = (ko, value) => connectionStrings.Add(value);
+    stub.ConnectionString.OnSet = ((value) => connectionStrings.Add(value);
 
     // Configure the Connect method
-    var connectTracking = stub.Connect.OnCall((ko) => { });
+    var connectTracking = stub.Connect.OnCall(() => { });
 
     IUserConfigComplete service = stub;
 

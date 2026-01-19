@@ -14,10 +14,10 @@ partial class PatternComparisonTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Documentation.Samples.Patterns.ILogSvc? _source;
 
-			private global::System.Action<Stubs.ILogSvc, string>? _onCall;
+			private global::System.Action<string>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.ILogSvc, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -37,7 +37,7 @@ partial class PatternComparisonTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<Stubs.ILogSvc, string> callback)
+			public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -49,13 +49,13 @@ partial class PatternComparisonTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ILogSvc, string>> OnCallSequence(global::System.Action<Stubs.ILogSvc, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.ILogSvc, string> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -63,21 +63,21 @@ partial class PatternComparisonTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.ILogSvc ko, string message)
+			internal void Invoke(bool strict, string message)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(message);
 					_sequenceIndex++;
-					callback(ko, message);
+					callback(message);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(message);
-					_onCall(ko, message);
+					_onCall(message);
 					return;
 				}
 
@@ -85,14 +85,14 @@ partial class PatternComparisonTests
 				_unconfiguredLastArg = message;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Log");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Log");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Log(message); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}
 
@@ -187,7 +187,7 @@ partial class PatternComparisonTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.ILogSvc, string>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 			{
 				private readonly ILogSvc_LogInterceptor _interceptor;
 
@@ -207,7 +207,7 @@ partial class PatternComparisonTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ILogSvc, string>> ThenCall(global::System.Action<Stubs.ILogSvc, string> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -228,7 +228,7 @@ partial class PatternComparisonTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ILogSvc, string>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -249,7 +249,7 @@ partial class PatternComparisonTests
 
 			void global::KnockOff.Documentation.Samples.Patterns.ILogSvc.Log(string message)
 			{
-				Log.Invoke(this, message);
+				Log.Invoke(Strict, message);
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Patterns.ILogSvc instance. Use for passing to code expecting the interface.</summary>
@@ -298,7 +298,7 @@ partial class PatternComparisonTests
 		/// <summary>Interceptor for AuditSvcBase.Audit.</summary>
 		public sealed class AuditSvcBase_AuditInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Action<Stubs.AuditSvcBase, string>? _onCall;
+			private global::System.Action<string>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -310,10 +310,10 @@ partial class PatternComparisonTests
 			public string? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.AuditSvcBase, string> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<string> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.AuditSvcBase, string>? Callback => _onCall;
+			internal global::System.Action<string>? Callback => _onCall;
 
 			public void RecordCall(string action) { CallCount++; LastCallArg = action; }
 
@@ -416,7 +416,7 @@ partial class PatternComparisonTests
 				public override void Audit(string action)
 				{
 					_stub?.Audit.RecordCall(action);
-					if (_stub?.Audit.Callback is { } onCall) { onCall(_stub, action); return; }
+					if (_stub?.Audit.Callback is { } onCall) { onCall(action); return; }
 				}
 
 			}

@@ -19,7 +19,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<DataProviderStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -95,7 +95,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string(DataProviderStub ko);
+		public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string();
 
 		private GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string? _onCall_NoParams_Collections_Generic_IEnumerator_string;
 		private MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string? _onCallTracking_NoParams_Collections_Generic_IEnumerator_string;
@@ -107,7 +107,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_Generic_IEnumerator_string;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator(DataProviderStub ko);
+		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator();
 
 		private GetEnumeratorDelegate_NoParams_Collections_IEnumerator? _onCall_NoParams_Collections_IEnumerator;
 		private MethodTrackingImpl_NoParams_Collections_IEnumerator? _onCallTracking_NoParams_Collections_IEnumerator;
@@ -177,20 +177,20 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.Generic.IEnumerator<string> Invoke_NoParams_Collections_Generic_IEnumerator_string(DataProviderStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerator<string> Invoke_NoParams_Collections_Generic_IEnumerator_string(bool strict)
 		{
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_string != null && _sequenceIndex_NoParams_Collections_Generic_IEnumerator_string < _sequence_NoParams_Collections_Generic_IEnumerator_string.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_Generic_IEnumerator_string[_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_Generic_IEnumerator_string != null && _onCallTracking_NoParams_Collections_Generic_IEnumerator_string != null)
 			{
 				_onCallTracking_NoParams_Collections_Generic_IEnumerator_string.RecordCall();
-				return _onCall_NoParams_Collections_Generic_IEnumerator_string(ko);
+				return _onCall_NoParams_Collections_Generic_IEnumerator_string();
 			}
 
 			_unconfiguredCallCount++;
@@ -208,20 +208,20 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(DataProviderStub ko, bool strict)
+		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(bool strict)
 		{
 			if (_sequence_NoParams_Collections_IEnumerator != null && _sequenceIndex_NoParams_Collections_IEnumerator < _sequence_NoParams_Collections_IEnumerator.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_IEnumerator[_sequenceIndex_NoParams_Collections_IEnumerator];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_IEnumerator++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_IEnumerator != null && _onCallTracking_NoParams_Collections_IEnumerator != null)
 			{
 				_onCallTracking_NoParams_Collections_IEnumerator.RecordCall();
-				return _onCall_NoParams_Collections_IEnumerator(ko);
+				return _onCall_NoParams_Collections_IEnumerator();
 			}
 
 			_unconfiguredCallCount++;
@@ -507,10 +507,10 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.IDisposable? _source;
 
-		private global::System.Action<DataProviderStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<DataProviderStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -526,7 +526,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<DataProviderStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -538,13 +538,13 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<DataProviderStub>> OnCallSequence(global::System.Action<DataProviderStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<DataProviderStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -552,21 +552,21 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(DataProviderStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -667,7 +667,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<DataProviderStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly DisposeInterceptor _interceptor;
 
@@ -687,7 +687,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DataProviderStub>> ThenCall(global::System.Action<DataProviderStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -708,7 +708,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DataProviderStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -802,12 +802,12 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 
 	int global::KnockOff.Benchmarks.Interfaces.IDataProvider.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
-		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_string(this, Strict);
+		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_string(Strict);
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
@@ -815,7 +815,7 @@ partial class DataProviderStub : global::KnockOff.Benchmarks.Interfaces.IDataPro
 
 	void global::System.IDisposable.Dispose()
 	{
-		Dispose.Invoke(this, Strict);
+		Dispose.Invoke(Strict);
 	}
 
 }

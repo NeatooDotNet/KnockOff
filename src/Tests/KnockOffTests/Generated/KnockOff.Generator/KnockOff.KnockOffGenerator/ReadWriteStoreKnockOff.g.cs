@@ -18,7 +18,7 @@ partial class ReadWriteStoreKnockOff : global::KnockOff.Tests.IReadWriteStore, g
 		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<ReadWriteStoreKnockOff, string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
+		public global::System.Func<string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -27,7 +27,7 @@ partial class ReadWriteStoreKnockOff : global::KnockOff.Tests.IReadWriteStore, g
 		public (string? Key, global::KnockOff.Tests.PropertyInfo? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ReadWriteStoreKnockOff, string, global::KnockOff.Tests.PropertyInfo?>? OnSet { get; set; }
+		public global::System.Action<string, global::KnockOff.Tests.PropertyInfo?>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
@@ -137,8 +137,8 @@ partial class ReadWriteStoreKnockOff : global::KnockOff.Tests.IReadWriteStore, g
 
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IReadWriteStore.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadWriteStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
-		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Indexer._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadWriteStore", "this[]"); Indexer.Backing[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadWriteStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(key, value); return; } if (Indexer._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadWriteStore", "this[]"); Indexer.Backing[key] = value; }
 	}
 
 }

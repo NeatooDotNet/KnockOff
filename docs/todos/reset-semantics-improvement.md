@@ -2,13 +2,12 @@
 
 ## Summary
 
-Currently `Reset()` clears both tracking state AND callbacks. Sometimes you want to reset tracking but keep callback behavior.
+Currently `Reset()` clears both tracking state AND callbacks. This may not match what Moq developers expect.
 
 ## Task List
 
-- [ ] Add `ResetTracking()` - clears call history only
-- [ ] Add `ResetCallback()` - clears OnCall/OnGet/OnSet only
-- [ ] Keep `Reset()` as convenience that does both
+- [ ] Research what Moq's `Reset()` does
+- [ ] Update KnockOff's `Reset()` to match Moq developer expectations
 - [ ] Update documentation
 
 ## Current Behavior
@@ -24,28 +23,15 @@ knockOff.GetUser.Reset();
 // OnCall = null  <-- callback also cleared!
 ```
 
-## Proposed API
+## Proposed Solution
 
-```csharp
-// Clear tracking only, keep callbacks
-knockOff.GetUser.ResetTracking();
-// CallCount = 0, LastCallArg = default
-// OnCall still set!
-
-// Clear callbacks only, keep tracking
-knockOff.GetUser.ResetCallback();
-// CallCount unchanged
-// OnCall = null
-
-// Clear everything (existing behavior)
-knockOff.GetUser.Reset();
-```
+Match what a Moq developer would expect from `Reset()`.
 
 ## Impact
 
-- Non-breaking (additive API)
+- May be breaking if current behavior changes
 - Applies to all interceptor types: methods, properties, indexers, delegates
 
 ## Priority
 
-Medium - improves test ergonomics without breaking changes.
+Medium - improves familiarity for Moq developers migrating to KnockOff.

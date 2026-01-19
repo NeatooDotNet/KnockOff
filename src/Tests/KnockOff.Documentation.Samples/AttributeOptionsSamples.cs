@@ -50,7 +50,7 @@ public class StandAlonePatternTests
         // Stand-alone stub is created directly
         var stub = new AttrUserRepositoryStub();
 
-        stub.GetById.OnCall((ko, id) => new User { Id = id, Name = "Test User" });
+        stub.GetById.OnCall((id) => new User { Id = id, Name = "Test User" });
 
         IAttrUserRepository repository = stub;
         var user = repository.GetById(42);
@@ -75,7 +75,7 @@ public partial class InlineInterfacePatternTests
         // Generated stub: Stubs.IAttrUserRepository
         var stub = new Stubs.IAttrUserRepository();
 
-        stub.GetById.OnCall((ko, id) => new User { Id = id, Name = "Inline User" });
+        stub.GetById.OnCall((id) => new User { Id = id, Name = "Inline User" });
 
         IAttrUserRepository repository = stub;
         var user = repository.GetById(1);
@@ -105,7 +105,7 @@ public partial class InlineClassPatternTests
         EmailServiceBase service = stub.Object;
 
         // Can intercept virtual members and mark verifiable
-        stub.Send.OnCall((ko, to, subject, body) => { }).Verifiable();
+        stub.Send.OnCall((to, subject, body) => { }).Verifiable();
 
         service.Send("test@example.com", "Hello", "World");
 
@@ -134,9 +134,9 @@ public partial class MultipleStubsPatternTests
         var logger = new Stubs.IAttrLogger();
 
         // Configure each stub independently with verifiable
-        userRepo.GetById.OnCall((ko, id) => new User { Id = id, Name = "Test" }).Verifiable();
-        emailService.Send.OnCall((ko, to, subject, body) => { }).Verifiable();
-        logger.Log.OnCall((ko, message) => { }).Verifiable();
+        userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        emailService.Send.OnCall((to, subject, body) => { }).Verifiable();
+        logger.Log.OnCall((message) => { }).Verifiable();
 
         // Use in tests
         IAttrUserRepository repo = userRepo;
@@ -166,7 +166,7 @@ public class ChoosingPatternTests
     {
         // Stand-alone pattern
         var standalone = new AttrUserRepositoryStub();
-        var saveTracking = standalone.Save.OnCall((ko, user) => { }).Verifiable();
+        var saveTracking = standalone.Save.OnCall((user) => { }).Verifiable();
 
         // All patterns have the same interceptor capabilities:
         // - OnCall for behavior

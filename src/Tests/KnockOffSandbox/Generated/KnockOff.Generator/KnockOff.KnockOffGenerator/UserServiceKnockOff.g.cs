@@ -19,7 +19,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<UserServiceKnockOff, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<UserServiceKnockOff, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -122,7 +122,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<UserServiceKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -195,10 +195,10 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Sandbox.IUserService? _source;
 
-		private global::System.Action<UserServiceKnockOff>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<UserServiceKnockOff> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -214,7 +214,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<UserServiceKnockOff> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -226,13 +226,13 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff>> OnCallSequence(global::System.Action<UserServiceKnockOff> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<UserServiceKnockOff> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -240,21 +240,21 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(UserServiceKnockOff ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -355,7 +355,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly DoWorkInterceptor _interceptor;
 
@@ -375,7 +375,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff>> ThenCall(global::System.Action<UserServiceKnockOff> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -396,7 +396,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -415,10 +415,10 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Sandbox.IUserService? _source;
 
-		private global::System.Action<UserServiceKnockOff, string, int, bool>? _onCall;
+		private global::System.Action<string, int, bool>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<UserServiceKnockOff, string, int, bool> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string, int, bool> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -438,7 +438,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(string? id, int? count, bool? urgent)> OnCall(global::System.Action<UserServiceKnockOff, string, int, bool> callback)
+		public global::KnockOff.IMethodTrackingArgs<(string? id, int? count, bool? urgent)> OnCall(global::System.Action<string, int, bool> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -450,13 +450,13 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff, string, int, bool>> OnCallSequence(global::System.Action<UserServiceKnockOff, string, int, bool> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string, int, bool>> OnCallSequence(global::System.Action<string, int, bool> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<UserServiceKnockOff, string, int, bool> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string, int, bool> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -464,21 +464,21 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(UserServiceKnockOff ko, bool strict, string id, int count, bool urgent)
+		internal void Invoke(bool strict, string id, int count, bool urgent)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((id, count, urgent));
 				_sequenceIndex++;
-				callback(ko, id, count, urgent);
+				callback(id, count, urgent);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((id, count, urgent));
-				_onCall(ko, id, count, urgent);
+				_onCall(id, count, urgent);
 				return;
 			}
 
@@ -588,7 +588,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff, string, int, bool>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string, int, bool>>
 		{
 			private readonly ProcessInterceptor _interceptor;
 
@@ -608,7 +608,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff, string, int, bool>> ThenCall(global::System.Action<UserServiceKnockOff, string, int, bool> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string, int, bool>> ThenCall(global::System.Action<string, int, bool> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -629,7 +629,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<UserServiceKnockOff, string, int, bool>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string, int, bool>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -745,18 +745,18 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 
 	string global::KnockOff.Sandbox.IUserService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Name"); Name.Value = value; }
 	}
 
 	int global::KnockOff.Sandbox.IUserService.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserService", "Count"); return Count.Value; }
 	}
 
 	void global::KnockOff.Sandbox.IUserService.DoWork()
 	{
-		DoWork.Invoke(this, Strict);
+		DoWork.Invoke(Strict);
 	}
 
 	string global::KnockOff.Sandbox.IUserService.GetGreeting(string name)
@@ -767,7 +767,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 
 	void global::KnockOff.Sandbox.IUserService.Process(string id, int count, bool urgent)
 	{
-		Process.Invoke(this, Strict, id, count, urgent);
+		Process.Invoke(Strict, id, count, urgent);
 	}
 
 }

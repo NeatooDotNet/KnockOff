@@ -12,7 +12,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Add.</summary>
-		public delegate int AddDelegate(CalculatorStub ko, int a, int b);
+		public delegate int AddDelegate(int a, int b);
 
 		private AddDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(CalculatorStub ko, bool strict, int a, int b)
+		internal int Invoke(bool strict, int a, int b)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((a, b));
 				_sequenceIndex++;
-				return callback(ko, a, b);
+				return callback(a, b);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((a, b));
-				return _onCall(ko, a, b);
+				return _onCall(a, b);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Subtract.</summary>
-		public delegate int SubtractDelegate(CalculatorStub ko, int a, int b);
+		public delegate int SubtractDelegate(int a, int b);
 
 		private SubtractDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -297,20 +297,20 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(CalculatorStub ko, bool strict, int a, int b)
+		internal int Invoke(bool strict, int a, int b)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((a, b));
 				_sequenceIndex++;
-				return callback(ko, a, b);
+				return callback(a, b);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((a, b));
-				return _onCall(ko, a, b);
+				return _onCall(a, b);
 			}
 
 			_unconfiguredCallCount++;
@@ -480,7 +480,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Multiply.</summary>
-		public delegate int MultiplyDelegate(CalculatorStub ko, int a, int b);
+		public delegate int MultiplyDelegate(int a, int b);
 
 		private MultiplyDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -531,20 +531,20 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(CalculatorStub ko, bool strict, int a, int b)
+		internal int Invoke(bool strict, int a, int b)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((a, b));
 				_sequenceIndex++;
-				return callback(ko, a, b);
+				return callback(a, b);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((a, b));
-				return _onCall(ko, a, b);
+				return _onCall(a, b);
 			}
 
 			_unconfiguredCallCount++;
@@ -714,7 +714,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Divide.</summary>
-		public delegate double DivideDelegate(CalculatorStub ko, double a, double b);
+		public delegate double DivideDelegate(double a, double b);
 
 		private DivideDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -765,20 +765,20 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal double Invoke(CalculatorStub ko, bool strict, double a, double b)
+		internal double Invoke(bool strict, double a, double b)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((a, b));
 				_sequenceIndex++;
-				return callback(ko, a, b);
+				return callback(a, b);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((a, b));
-				return _onCall(ko, a, b);
+				return _onCall(a, b);
 			}
 
 			_unconfiguredCallCount++;
@@ -948,7 +948,7 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Square.</summary>
-		public delegate int SquareDelegate(CalculatorStub ko, int x);
+		public delegate int SquareDelegate(int x);
 
 		private SquareDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -999,20 +999,20 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(CalculatorStub ko, bool strict, int x)
+		internal int Invoke(bool strict, int x)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(x);
 				_sequenceIndex++;
-				return callback(ko, x);
+				return callback(x);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(x);
-				return _onCall(ko, x);
+				return _onCall(x);
 			}
 
 			_unconfiguredCallCount++;
@@ -1241,27 +1241,27 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
 	{
-		return Add.Invoke(this, Strict, a, b);
+		return Add.Invoke(Strict, a, b);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Subtract(int a, int b)
 	{
-		return Subtract.Invoke(this, Strict, a, b);
+		return Subtract.Invoke(Strict, a, b);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Multiply(int a, int b)
 	{
-		return Multiply.Invoke(this, Strict, a, b);
+		return Multiply.Invoke(Strict, a, b);
 	}
 
 	double global::KnockOff.Benchmarks.Interfaces.ICalculator.Divide(double a, double b)
 	{
-		return Divide.Invoke(this, Strict, a, b);
+		return Divide.Invoke(Strict, a, b);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Square(int x)
 	{
-		return Square.Invoke(this, Strict, x);
+		return Square.Invoke(Strict, x);
 	}
 
 }

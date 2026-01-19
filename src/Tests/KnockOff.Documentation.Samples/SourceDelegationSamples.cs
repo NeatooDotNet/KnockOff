@@ -113,7 +113,7 @@ public class PartialOverrideTests
         stub.Source(realRepo);
 
         // Override specific method for testing
-        stub.GetById.OnCall((ko, id) =>
+        stub.GetById.OnCall((id) =>
             id == 999 ? new User { Id = 999, Name = "Test User" } : null);
 
         IRepository repository = stub;
@@ -213,7 +213,7 @@ public class PriorityOrderTests
         Assert.Equal(1, fromSource);
 
         // OnCall overrides source
-        stub.GetPriority.OnCall((ko, user) => 42);
+        stub.GetPriority.OnCall((user) => 42);
         var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(42, fromOnCall);
     }
@@ -251,7 +251,7 @@ public class CompleteSourceExampleTests
 
         // Track calls to verify caching behavior
         var callCount = 0;
-        stub.GetUser.OnCall((ko, id) =>
+        stub.GetUser.OnCall((id) =>
         {
             callCount++;
             // Delegate to source

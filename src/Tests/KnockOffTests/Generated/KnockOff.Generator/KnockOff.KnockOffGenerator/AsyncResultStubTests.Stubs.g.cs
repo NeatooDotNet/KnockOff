@@ -19,7 +19,7 @@ partial class AsyncResultStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncResult, object?>? OnGet { get; set; }
+			public global::System.Func<object?>? OnGet { get; set; }
 
 			private object? _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class AsyncResultStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncResult, global::System.Threading.WaitHandle>? OnGet { get; set; }
+			public global::System.Func<global::System.Threading.WaitHandle>? OnGet { get; set; }
 
 			private global::System.Threading.WaitHandle _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class AsyncResultStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncResult, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class AsyncResultStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncResult, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -352,7 +352,7 @@ partial class AsyncResultStubTests
 				get
 				{
 					AsyncState.RecordGet();
-					if (AsyncState.OnGet is { } onGet) return onGet(this);
+					if (AsyncState.OnGet is { } onGet) return onGet();
 					if (AsyncState._source is { } src) return src.AsyncState;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncState");
 					return AsyncState.Value;
@@ -364,7 +364,7 @@ partial class AsyncResultStubTests
 				get
 				{
 					AsyncWaitHandle.RecordGet();
-					if (AsyncWaitHandle.OnGet is { } onGet) return onGet(this);
+					if (AsyncWaitHandle.OnGet is { } onGet) return onGet();
 					if (AsyncWaitHandle._source is { } src) return src.AsyncWaitHandle;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncWaitHandle");
 					return AsyncWaitHandle.Value;
@@ -376,7 +376,7 @@ partial class AsyncResultStubTests
 				get
 				{
 					CompletedSynchronously.RecordGet();
-					if (CompletedSynchronously.OnGet is { } onGet) return onGet(this);
+					if (CompletedSynchronously.OnGet is { } onGet) return onGet();
 					if (CompletedSynchronously._source is { } src) return src.CompletedSynchronously;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "CompletedSynchronously");
 					return CompletedSynchronously.Value;
@@ -388,7 +388,7 @@ partial class AsyncResultStubTests
 				get
 				{
 					IsCompleted.RecordGet();
-					if (IsCompleted.OnGet is { } onGet) return onGet(this);
+					if (IsCompleted.OnGet is { } onGet) return onGet();
 					if (IsCompleted._source is { } src) return src.IsCompleted;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "IsCompleted");
 					return IsCompleted.Value;

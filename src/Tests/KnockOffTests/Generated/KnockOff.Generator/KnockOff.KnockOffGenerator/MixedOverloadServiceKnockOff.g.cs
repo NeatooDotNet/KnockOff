@@ -29,7 +29,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(string).</summary>
-		public delegate void ProcessDelegate_String_void(MixedOverloadServiceKnockOff ko, string @value);
+		public delegate void ProcessDelegate_String_void(string @value);
 
 		private ProcessDelegate_String_void? _onCall_String_void;
 		private MethodTrackingImpl_String_void? _onCallTracking_String_void;
@@ -41,7 +41,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		private global::KnockOff.Times? _verifiableTimes_String_void;
 
 		/// <summary>Delegate for Process(int).</summary>
-		public delegate void ProcessDelegate_Int32_void(MixedOverloadServiceKnockOff ko, int @value);
+		public delegate void ProcessDelegate_Int32_void(int @value);
 
 		private ProcessDelegate_Int32_void? _onCall_Int32_void;
 		private MethodTrackingImpl_Int32_void? _onCallTracking_Int32_void;
@@ -111,21 +111,21 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		}
 
 		/// <summary>Invokes configured callback for Process(string).</summary>
-		internal void Invoke_String_void(MixedOverloadServiceKnockOff ko, bool strict, string @value)
+		internal void Invoke_String_void(bool strict, string @value)
 		{
 			if (_sequence_String_void != null && _sequenceIndex_String_void < _sequence_String_void.Count)
 			{
 				var (callback, tracking) = _sequence_String_void[_sequenceIndex_String_void];
 				tracking.RecordCall(@value);
 				_sequenceIndex_String_void++;
-				callback(ko, @value);
+				callback(@value);
 				return;
 			}
 
 			if (_onCall_String_void != null && _onCallTracking_String_void != null)
 			{
 				_onCallTracking_String_void.RecordCall(@value);
-				_onCall_String_void(ko, @value);
+				_onCall_String_void(@value);
 				return;
 			}
 
@@ -144,21 +144,21 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		}
 
 		/// <summary>Invokes configured callback for Process(int).</summary>
-		internal void Invoke_Int32_void(MixedOverloadServiceKnockOff ko, bool strict, int @value)
+		internal void Invoke_Int32_void(bool strict, int @value)
 		{
 			if (_sequence_Int32_void != null && _sequenceIndex_Int32_void < _sequence_Int32_void.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_void[_sequenceIndex_Int32_void];
 				tracking.RecordCall(@value);
 				_sequenceIndex_Int32_void++;
-				callback(ko, @value);
+				callback(@value);
 				return;
 			}
 
 			if (_onCall_Int32_void != null && _onCallTracking_Int32_void != null)
 			{
 				_onCallTracking_Int32_void.RecordCall(@value);
-				_onCall_Int32_void(ko, @value);
+				_onCall_Int32_void(@value);
 				return;
 			}
 
@@ -460,7 +460,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		internal global::KnockOff.Tests.IMixedOverloadService? _source;
 
 		/// <summary>Delegate for Format.</summary>
-		public delegate string FormatDelegate(MixedOverloadServiceKnockOff ko, int @value);
+		public delegate string FormatDelegate(int @value);
 
 		private FormatDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -511,20 +511,20 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(MixedOverloadServiceKnockOff ko, bool strict, int @value)
+		internal string Invoke(bool strict, int @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(@value);
 				_sequenceIndex++;
-				return callback(ko, @value);
+				return callback(@value);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(@value);
-				return _onCall(ko, @value);
+				return _onCall(@value);
 			}
 
 			_unconfiguredCallCount++;
@@ -725,7 +725,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Process.</summary>
-			public delegate void ProcessDelegate(MixedOverloadServiceKnockOff ko, T @value);
+			public delegate void ProcessDelegate(T @value);
 
 			private ProcessDelegate? _onCall;
 
@@ -803,7 +803,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		public sealed class FormatTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Format.</summary>
-			public delegate string FormatDelegate(MixedOverloadServiceKnockOff ko, T @value);
+			public delegate string FormatDelegate(T @value);
 
 			private FormatDelegate? _onCall;
 
@@ -919,32 +919,32 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 	void global::KnockOff.Tests.IMixedOverloadService.Process(string @value)
 	{
-		Process.Invoke_String_void(this, Strict, @value);
+		Process.Invoke_String_void(Strict, @value);
 	}
 
 	void global::KnockOff.Tests.IMixedOverloadService.Process(int @value)
 	{
-		Process.Invoke_Int32_void(this, Strict, @value);
+		Process.Invoke_Int32_void(Strict, @value);
 	}
 
 	void global::KnockOff.Tests.IMixedOverloadService.Process<T>(T @value)
 	{
 		ProcessGeneric.Of<T>().RecordCall();
 		if (ProcessGeneric.Of<T>().Callback is { } onCallCallback)
-		{ onCallCallback(this, @value); return; }
+		{ onCallCallback(@value); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Process");
 	}
 
 	string global::KnockOff.Tests.IMixedOverloadService.Format(int @value)
 	{
-		return Format.Invoke(this, Strict, @value);
+		return Format.Invoke(Strict, @value);
 	}
 
 	string global::KnockOff.Tests.IMixedOverloadService.Format<T>(T @value)
 	{
 		FormatGeneric.Of<T>().RecordCall();
 		if (FormatGeneric.Of<T>().Callback is { } callback)
-			return callback(this, @value);
+			return callback(@value);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IMixedOverloadService", "Format");
 		return SmartDefault<string>("Format");
 	}

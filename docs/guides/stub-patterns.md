@@ -54,7 +54,7 @@ public void StandaloneStub_CanBeConfiguredAndVerified()
     var stub = new UserRepoStandaloneStub();
 
     // Configure void method via OnCall and mark verifiable
-    stub.Save.OnCall((ko, user) => { }).Verifiable();
+    stub.Save.OnCall((user) => { }).Verifiable();
 
     // Act - cast to interface for use
     IUserRepoStandalone repository = stub;
@@ -118,8 +118,8 @@ public void InlineInterfaceStub_GeneratedInStubsNamespace()
     var stub = new Stubs.IUserRepoInline();
 
     // Configure behavior and mark verifiable
-    stub.GetById.OnCall((ko, id) => new User { Id = id, Name = "Test" }).Verifiable();
-    stub.Save.OnCall((ko, user) => { }).Verifiable();
+    stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
+    stub.Save.OnCall((user) => { }).Verifiable();
 
     // Act
     IUserRepoInline repository = stub;
@@ -189,7 +189,7 @@ public void InlineClassStub_UsesObjectProperty()
     var stub = new Stubs.UserServiceClass();
 
     // Configure virtual member behavior and mark verifiable
-    stub.GetUser.OnCall((ko, id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+    stub.GetUser.OnCall((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
     // Act - use .Object to get the actual class instance
     UserServiceClass service = stub.Object;
@@ -275,17 +275,17 @@ public partial class PatternComparisonTests
     {
         // Stand-Alone: Reusable email stub
         var emailStub = new EmailSvcPatternStub();
-        emailStub.Send.OnCall((ko, to, subject, body) => true).Verifiable();
+        emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
         emailStub.IsConfigured.Value = true;
 
         // Inline Interface: Test-local logger stub
         var loggerStub = new Stubs.ILogSvc();
         var logMessages = new List<string>();
-        var logTracking = loggerStub.Log.OnCall((ko, msg) => logMessages.Add(msg)).Verifiable(Times.Exactly(2));
+        var logTracking = loggerStub.Log.OnCall((msg) => logMessages.Add(msg)).Verifiable(Times.Exactly(2));
 
         // Inline Class: Stub for abstract base class
         var auditStub = new Stubs.AuditSvcBase();
-        auditStub.Audit.OnCall((ko, action) => { }).Verifiable();
+        auditStub.Audit.OnCall((action) => { }).Verifiable();
 
         // Act - simulate integration scenario
         IEmailSvcPattern email = emailStub;

@@ -20,7 +20,7 @@ partial class OrderedEnumerableStringStubTests
 			internal global::System.Collections.Generic.IEnumerable<string>? _source;
 
 			/// <summary>Delegate for GetEnumerator.</summary>
-			public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate(Stubs.IOrderedEnumerable ko);
+			public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate();
 
 			private GetEnumeratorDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -67,33 +67,33 @@ partial class OrderedEnumerableStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IEnumerator<string> Invoke(Stubs.IOrderedEnumerable ko)
+			internal global::System.Collections.Generic.IEnumerator<string> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetEnumerator();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
 
@@ -285,7 +285,7 @@ partial class OrderedEnumerableStringStubTests
 			public sealed class CreateOrderedEnumerableTypedHandler<TKey> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for CreateOrderedEnumerable.</summary>
-				public delegate global::System.Linq.IOrderedEnumerable<string> CreateOrderedEnumerableDelegate(Stubs.IOrderedEnumerable ko, global::System.Func<string, TKey> keySelector, global::System.Collections.Generic.IComparer<TKey>? comparer, bool descending);
+				public delegate global::System.Linq.IOrderedEnumerable<string> CreateOrderedEnumerableDelegate(global::System.Func<string, TKey> keySelector, global::System.Collections.Generic.IComparer<TKey>? comparer, bool descending);
 
 				private CreateOrderedEnumerableDelegate? _onCall;
 
@@ -342,19 +342,19 @@ partial class OrderedEnumerableStringStubTests
 				var typedHandler = CreateOrderedEnumerable.Of<TKey>();
 				typedHandler.RecordCall(descending);
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, keySelector, comparer, descending);
+					return onCallCallback(keySelector, comparer, descending);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IOrderedEnumerable<string>", "CreateOrderedEnumerable");
 				return SmartDefault<global::System.Linq.IOrderedEnumerable<string>>("CreateOrderedEnumerable");
 			}
 
 			global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			/// <summary>The global::System.Linq.IOrderedEnumerable<string> instance. Use for passing to code expecting the interface.</summary>

@@ -58,7 +58,7 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 		public sealed class SerializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Serialize.</summary>
-			public delegate string SerializeDelegate(SerializerStub ko, T obj);
+			public delegate string SerializeDelegate(T obj);
 
 			private SerializeDelegate? _onCall;
 
@@ -136,7 +136,7 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 		public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : new()
 		{
 			/// <summary>Delegate for Deserialize.</summary>
-			public delegate T DeserializeDelegate(SerializerStub ko, string data);
+			public delegate T DeserializeDelegate(string data);
 
 			private DeserializeDelegate? _onCall;
 
@@ -225,7 +225,7 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 	{
 		Serialize.Of<T>().RecordCall();
 		if (Serialize.Of<T>().Callback is { } callback)
-			return callback(this, obj);
+			return callback(obj);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISerializer", "Serialize");
 		return SmartDefault<string>("Serialize");
 	}
@@ -234,7 +234,7 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 	{
 		Deserialize.Of<T>().RecordCall(data);
 		if (Deserialize.Of<T>().Callback is { } callback)
-			return callback(this, data);
+			return callback(data);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("ISerializer", "Deserialize");
 		return SmartDefault<T>("Deserialize");
 	}

@@ -12,7 +12,7 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 		internal global::KnockOff.Tests.IStructConstraintService<T>? _source;
 
 		/// <summary>Delegate for GetDefault.</summary>
-		public delegate T GetDefaultDelegate(StructConstraintStub<T> ko);
+		public delegate T GetDefaultDelegate();
 
 		private GetDefaultDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal T Invoke(StructConstraintStub<T> ko, bool strict)
+		internal T Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -232,10 +232,10 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.IStructConstraintService<T>? _source;
 
-		private global::System.Action<StructConstraintStub<T>, T>? _onCall;
+		private global::System.Action<T>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<StructConstraintStub<T>, T> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -255,7 +255,7 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<StructConstraintStub<T>, T> callback)
+		public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<T> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -267,13 +267,13 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<StructConstraintStub<T>, T>> OnCallSequence(global::System.Action<StructConstraintStub<T>, T> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<T>> OnCallSequence(global::System.Action<T> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<StructConstraintStub<T>, T> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -281,21 +281,21 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(StructConstraintStub<T> ko, bool strict, T @value)
+		internal void Invoke(bool strict, T @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(@value);
 				_sequenceIndex++;
-				callback(ko, @value);
+				callback(@value);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(@value);
-				_onCall(ko, @value);
+				_onCall(@value);
 				return;
 			}
 
@@ -405,7 +405,7 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<StructConstraintStub<T>, T>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<T>>
 		{
 			private readonly SetInterceptor _interceptor;
 
@@ -425,7 +425,7 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<StructConstraintStub<T>, T>> ThenCall(global::System.Action<StructConstraintStub<T>, T> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> ThenCall(global::System.Action<T> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -446,7 +446,7 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<StructConstraintStub<T>, T>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -507,12 +507,12 @@ partial class StructConstraintStub<T> : global::KnockOff.Tests.IStructConstraint
 
 	T global::KnockOff.Tests.IStructConstraintService<T>.GetDefault()
 	{
-		return GetDefault.Invoke(this, Strict);
+		return GetDefault.Invoke(Strict);
 	}
 
 	void global::KnockOff.Tests.IStructConstraintService<T>.Set(T @value)
 	{
-		Set.Invoke(this, Strict, @value);
+		Set.Invoke(Strict, @value);
 	}
 
 }

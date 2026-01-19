@@ -11,10 +11,10 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Methods.ILogSvcMethods? _source;
 
-		private global::System.Action<LogSvcMethodsStub, string>? _onCall;
+		private global::System.Action<string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LogSvcMethodsStub, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<LogSvcMethodsStub, string> callback)
+		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LogSvcMethodsStub, string>> OnCallSequence(global::System.Action<LogSvcMethodsStub, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LogSvcMethodsStub, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LogSvcMethodsStub ko, bool strict, string message)
+		internal void Invoke(bool strict, string message)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(message);
 				_sequenceIndex++;
-				callback(ko, message);
+				callback(message);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(message);
-				_onCall(ko, message);
+				_onCall(message);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LogSvcMethodsStub, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 		{
 			private readonly LogMessageInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LogSvcMethodsStub, string>> ThenCall(global::System.Action<LogSvcMethodsStub, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,7 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LogSvcMethodsStub, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -245,7 +245,7 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 		internal global::KnockOff.Documentation.Samples.Methods.ILogSvcMethods? _source;
 
 		/// <summary>Delegate for GetUserName.</summary>
-		public delegate string GetUserNameDelegate(LogSvcMethodsStub ko, int userId);
+		public delegate string GetUserNameDelegate(int userId);
 
 		private GetUserNameDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -296,20 +296,20 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LogSvcMethodsStub ko, bool strict, int userId)
+		internal string Invoke(bool strict, int userId)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(userId);
 				_sequenceIndex++;
-				return callback(ko, userId);
+				return callback(userId);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(userId);
-				return _onCall(ko, userId);
+				return _onCall(userId);
 			}
 
 			_unconfiguredCallCount++;
@@ -520,12 +520,12 @@ partial class LogSvcMethodsStub : global::KnockOff.Documentation.Samples.Methods
 
 	void global::KnockOff.Documentation.Samples.Methods.ILogSvcMethods.LogMessage(string message)
 	{
-		LogMessage.Invoke(this, Strict, message);
+		LogMessage.Invoke(Strict, message);
 	}
 
 	string global::KnockOff.Documentation.Samples.Methods.ILogSvcMethods.GetUserName(int userId)
 	{
-		return GetUserName.Invoke(this, Strict, userId);
+		return GetUserName.Invoke(Strict, userId);
 	}
 
 }

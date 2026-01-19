@@ -107,7 +107,7 @@ public class SequentialQueueTests
         // Queue of results: first succeeds, second fails
         var results = new Queue<bool>(new[] { true, false });
 
-        var tracking = stub.Send.OnCall((ko, to, message) => results.Dequeue());
+        var tracking = stub.Send.OnCall((to, message) => results.Dequeue());
 
         IEmailService service = stub;
 
@@ -131,7 +131,7 @@ public class SequentialCounterTests
 
         var attempts = 0;
 
-        var tracking = stub.Attempt.OnCall((ko) =>
+        var tracking = stub.Attempt.OnCall(() =>
         {
             attempts++;
             return attempts > 3; // Succeed on 4th attempt
@@ -159,7 +159,7 @@ public class ConditionalReturnsTests
     {
         var stub = new UserRepositoryStub();
 
-        var tracking = stub.FindById.OnCall((ko, id) => id switch
+        var tracking = stub.FindById.OnCall((id) => id switch
         {
             1 => new User { Id = 1, Name = "Admin", Email = "admin@test.com" },
             2 => new User { Id = 2, Name = "User", Email = "user@test.com" },
@@ -194,7 +194,7 @@ public class ExceptionTests
     {
         var stub = new PaymentGatewayStub();
 
-        var tracking = stub.Charge.OnCall((ko, amount) =>
+        var tracking = stub.Charge.OnCall((amount) =>
         {
             if (amount > 1000)
                 throw new PaymentException("Insufficient funds");
@@ -224,9 +224,9 @@ public class StateDependentPropertyTests
         var stub = new ConnectionStub();
 
         // IsConnected returns true only after Connect() has been called
-        stub.IsConnected.OnGet = (ko) => stub.Connect.CallCount > 0;
+        stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
 
-        var connectTracking = stub.Connect.OnCall((ko) => { });
+        var connectTracking = stub.Connect.OnCall(() => { });
 
         IConnection connection = stub;
 
@@ -252,9 +252,9 @@ public class StateDependentMethodTests
     {
         var stub = new DatabaseStub();
 
-        var initTracking = stub.Initialize.OnCall((ko) => { });
+        var initTracking = stub.Initialize.OnCall(() => { });
 
-        var queryTracking = stub.Query.OnCall((ko, sql) =>
+        var queryTracking = stub.Query.OnCall((sql) =>
         {
             if (stub.Initialize.CallCount == 0)
                 throw new InvalidOperationException("Must call Initialize() first");
@@ -290,7 +290,7 @@ public class SideEffectsTests
         var notifications = new List<string>();
         var nextOrderId = 100;
 
-        var tracking = stub.PlaceOrder.OnCall((ko, order) =>
+        var tracking = stub.PlaceOrder.OnCall((order) =>
         {
             // Track the order
             placedOrders.Add(order);
@@ -334,7 +334,7 @@ public class CacheSimulationTests
         var misses = 0;
 
         // Get: Check expiration, track hits/misses
-        stub.Get.OnCall((ko, key) =>
+        stub.Get.OnCall((key) =>
         {
             if (cache.TryGetValue(key, out var entry))
             {
@@ -350,7 +350,7 @@ public class CacheSimulationTests
         });
 
         // Set: Enforce capacity, evict oldest if needed
-        stub.Set.OnCall((ko, key, value) =>
+        stub.Set.OnCall((key, value) =>
         {
             if (cache.Count >= maxCapacity && !cache.ContainsKey(key))
             {
@@ -362,7 +362,7 @@ public class CacheSimulationTests
         });
 
         // Clear: Reset everything
-        stub.Clear.OnCall((ko) =>
+        stub.Clear.OnCall(() =>
         {
             cache.Clear();
             hits = 0;
@@ -370,7 +370,7 @@ public class CacheSimulationTests
         });
 
         // Stats: Return current counts
-        stub.Stats.OnGet = (ko) => new CacheStats { Hits = hits, Misses = misses };
+        stub.Stats.OnGet = () => new CacheStats { Hits = hits, Misses = misses };
 
         ICache cacheService = stub;
 

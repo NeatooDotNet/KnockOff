@@ -19,7 +19,7 @@ partial class DbCommandStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDbCommand, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class DbCommandStubTests
 			public string? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDbCommand, string>? OnSet { get; set; }
+			public global::System.Action<string>? OnSet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -122,7 +122,7 @@ partial class DbCommandStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDbCommand, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -131,7 +131,7 @@ partial class DbCommandStubTests
 			public int? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDbCommand, int>? OnSet { get; set; }
+			public global::System.Action<int>? OnSet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -225,7 +225,7 @@ partial class DbCommandStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDbCommand, global::System.Data.CommandType>? OnGet { get; set; }
+			public global::System.Func<global::System.Data.CommandType>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -234,7 +234,7 @@ partial class DbCommandStubTests
 			public global::System.Data.CommandType? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDbCommand, global::System.Data.CommandType>? OnSet { get; set; }
+			public global::System.Action<global::System.Data.CommandType>? OnSet { get; set; }
 
 			private global::System.Data.CommandType _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -328,7 +328,7 @@ partial class DbCommandStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDbCommand, global::System.Data.IDbConnection?>? OnGet { get; set; }
+			public global::System.Func<global::System.Data.IDbConnection?>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -337,7 +337,7 @@ partial class DbCommandStubTests
 			public global::System.Data.IDbConnection? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDbCommand, global::System.Data.IDbConnection?>? OnSet { get; set; }
+			public global::System.Action<global::System.Data.IDbConnection?>? OnSet { get; set; }
 
 			private global::System.Data.IDbConnection? _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -431,7 +431,7 @@ partial class DbCommandStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDbCommand, global::System.Data.IDataParameterCollection>? OnGet { get; set; }
+			public global::System.Func<global::System.Data.IDataParameterCollection>? OnGet { get; set; }
 
 			private global::System.Data.IDataParameterCollection _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -512,7 +512,7 @@ partial class DbCommandStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDbCommand, global::System.Data.IDbTransaction?>? OnGet { get; set; }
+			public global::System.Func<global::System.Data.IDbTransaction?>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -521,7 +521,7 @@ partial class DbCommandStubTests
 			public global::System.Data.IDbTransaction? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDbCommand, global::System.Data.IDbTransaction?>? OnSet { get; set; }
+			public global::System.Action<global::System.Data.IDbTransaction?>? OnSet { get; set; }
 
 			private global::System.Data.IDbTransaction? _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -615,7 +615,7 @@ partial class DbCommandStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDbCommand, global::System.Data.UpdateRowSource>? OnGet { get; set; }
+			public global::System.Func<global::System.Data.UpdateRowSource>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -624,7 +624,7 @@ partial class DbCommandStubTests
 			public global::System.Data.UpdateRowSource? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDbCommand, global::System.Data.UpdateRowSource>? OnSet { get; set; }
+			public global::System.Action<global::System.Data.UpdateRowSource>? OnSet { get; set; }
 
 			private global::System.Data.UpdateRowSource _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -713,10 +713,10 @@ partial class DbCommandStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Data.IDbCommand? _source;
 
-			private global::System.Action<Stubs.IDbCommand>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -732,7 +732,7 @@ partial class DbCommandStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IDbCommand> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -744,13 +744,13 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> OnCallSequence(global::System.Action<Stubs.IDbCommand> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -758,35 +758,35 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IDbCommand ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Cancel");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Cancel");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Cancel(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Cancel");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Cancel");
 				return;
 			}
 
@@ -873,7 +873,7 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IDbCommand_CancelInterceptor _interceptor;
 
@@ -893,7 +893,7 @@ partial class DbCommandStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> ThenCall(global::System.Action<Stubs.IDbCommand> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -914,7 +914,7 @@ partial class DbCommandStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -934,7 +934,7 @@ partial class DbCommandStubTests
 			internal global::System.Data.IDbCommand? _source;
 
 			/// <summary>Delegate for CreateParameter.</summary>
-			public delegate global::System.Data.IDbDataParameter CreateParameterDelegate(Stubs.IDbCommand ko);
+			public delegate global::System.Data.IDbDataParameter CreateParameterDelegate();
 
 			private CreateParameterDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -981,33 +981,33 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Data.IDbDataParameter Invoke(Stubs.IDbCommand ko)
+			internal global::System.Data.IDbDataParameter Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("CreateParameter");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CreateParameter");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.CreateParameter();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CreateParameter");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CreateParameter");
 				return default!;
 			}
 
@@ -1155,7 +1155,7 @@ partial class DbCommandStubTests
 			internal global::System.Data.IDbCommand? _source;
 
 			/// <summary>Delegate for ExecuteNonQuery.</summary>
-			public delegate int ExecuteNonQueryDelegate(Stubs.IDbCommand ko);
+			public delegate int ExecuteNonQueryDelegate();
 
 			private ExecuteNonQueryDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1202,33 +1202,33 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IDbCommand ko)
+			internal int Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ExecuteNonQuery");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ExecuteNonQuery");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ExecuteNonQuery();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteNonQuery");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteNonQuery");
 				return default!;
 			}
 
@@ -1378,7 +1378,7 @@ partial class DbCommandStubTests
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for ExecuteReader().</summary>
-			public delegate global::System.Data.IDataReader ExecuteReaderDelegate_NoParams_Data_IDataReader(Stubs.IDbCommand ko);
+			public delegate global::System.Data.IDataReader ExecuteReaderDelegate_NoParams_Data_IDataReader();
 
 			private ExecuteReaderDelegate_NoParams_Data_IDataReader? _onCall_NoParams_Data_IDataReader;
 			private MethodTrackingImpl_NoParams_Data_IDataReader? _onCallTracking_NoParams_Data_IDataReader;
@@ -1390,7 +1390,7 @@ partial class DbCommandStubTests
 			private global::KnockOff.Times? _verifiableTimes_NoParams_Data_IDataReader;
 
 			/// <summary>Delegate for ExecuteReader(global::System.Data.CommandBehavior).</summary>
-			public delegate global::System.Data.IDataReader ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader(Stubs.IDbCommand ko, global::System.Data.CommandBehavior behavior);
+			public delegate global::System.Data.IDataReader ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader(global::System.Data.CommandBehavior behavior);
 
 			private ExecuteReaderDelegate_Data_CommandBehavior_Data_IDataReader? _onCall_Data_CommandBehavior_Data_IDataReader;
 			private MethodTrackingImpl_Data_CommandBehavior_Data_IDataReader? _onCallTracking_Data_CommandBehavior_Data_IDataReader;
@@ -1460,64 +1460,64 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Invokes configured callback for ExecuteReader().</summary>
-			internal global::System.Data.IDataReader Invoke_NoParams_Data_IDataReader(Stubs.IDbCommand ko)
+			internal global::System.Data.IDataReader Invoke_NoParams_Data_IDataReader(bool strict)
 			{
 				if (_sequence_NoParams_Data_IDataReader != null && _sequenceIndex_NoParams_Data_IDataReader < _sequence_NoParams_Data_IDataReader.Count)
 				{
 					var (callback, tracking) = _sequence_NoParams_Data_IDataReader[_sequenceIndex_NoParams_Data_IDataReader];
 					tracking.RecordCall();
 					_sequenceIndex_NoParams_Data_IDataReader++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall_NoParams_Data_IDataReader != null && _onCallTracking_NoParams_Data_IDataReader != null)
 				{
 					_onCallTracking_NoParams_Data_IDataReader.RecordCall();
-					return _onCall_NoParams_Data_IDataReader(ko);
+					return _onCall_NoParams_Data_IDataReader();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_NoParams_Data_IDataReader != null && _sequenceIndex_NoParams_Data_IDataReader >= _sequence_NoParams_Data_IDataReader.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ExecuteReader");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ExecuteReader");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ExecuteReader();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteReader");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteReader");
 				throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Configure via OnCall.");
 			}
 
 			/// <summary>Invokes configured callback for ExecuteReader(global::System.Data.CommandBehavior).</summary>
-			internal global::System.Data.IDataReader Invoke_Data_CommandBehavior_Data_IDataReader(Stubs.IDbCommand ko, global::System.Data.CommandBehavior behavior)
+			internal global::System.Data.IDataReader Invoke_Data_CommandBehavior_Data_IDataReader(bool strict, global::System.Data.CommandBehavior behavior)
 			{
 				if (_sequence_Data_CommandBehavior_Data_IDataReader != null && _sequenceIndex_Data_CommandBehavior_Data_IDataReader < _sequence_Data_CommandBehavior_Data_IDataReader.Count)
 				{
 					var (callback, tracking) = _sequence_Data_CommandBehavior_Data_IDataReader[_sequenceIndex_Data_CommandBehavior_Data_IDataReader];
 					tracking.RecordCall(behavior);
 					_sequenceIndex_Data_CommandBehavior_Data_IDataReader++;
-					return callback(ko, behavior);
+					return callback(behavior);
 				}
 
 				if (_onCall_Data_CommandBehavior_Data_IDataReader != null && _onCallTracking_Data_CommandBehavior_Data_IDataReader != null)
 				{
 					_onCallTracking_Data_CommandBehavior_Data_IDataReader.RecordCall(behavior);
-					return _onCall_Data_CommandBehavior_Data_IDataReader(ko, behavior);
+					return _onCall_Data_CommandBehavior_Data_IDataReader(behavior);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Data_CommandBehavior_Data_IDataReader != null && _sequenceIndex_Data_CommandBehavior_Data_IDataReader >= _sequence_Data_CommandBehavior_Data_IDataReader.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ExecuteReader");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ExecuteReader");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ExecuteReader(behavior);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteReader");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteReader");
 				throw new global::System.InvalidOperationException("No implementation provided for ExecuteReader. Configure via OnCall.");
 			}
 
@@ -1798,7 +1798,7 @@ partial class DbCommandStubTests
 			internal global::System.Data.IDbCommand? _source;
 
 			/// <summary>Delegate for ExecuteScalar.</summary>
-			public delegate object? ExecuteScalarDelegate(Stubs.IDbCommand ko);
+			public delegate object? ExecuteScalarDelegate();
 
 			private ExecuteScalarDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1845,33 +1845,33 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal object? Invoke(Stubs.IDbCommand ko)
+			internal object? Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ExecuteScalar");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ExecuteScalar");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ExecuteScalar();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteScalar");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ExecuteScalar");
 				return default!;
 			}
 
@@ -2018,10 +2018,10 @@ partial class DbCommandStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Data.IDbCommand? _source;
 
-			private global::System.Action<Stubs.IDbCommand>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -2037,7 +2037,7 @@ partial class DbCommandStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IDbCommand> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -2049,13 +2049,13 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> OnCallSequence(global::System.Action<Stubs.IDbCommand> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -2063,35 +2063,35 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IDbCommand ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Prepare");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Prepare");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Prepare(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Prepare");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Prepare");
 				return;
 			}
 
@@ -2178,7 +2178,7 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IDbCommand_PrepareInterceptor _interceptor;
 
@@ -2198,7 +2198,7 @@ partial class DbCommandStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> ThenCall(global::System.Action<Stubs.IDbCommand> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -2219,7 +2219,7 @@ partial class DbCommandStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -2238,10 +2238,10 @@ partial class DbCommandStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.IDisposable? _source;
 
-			private global::System.Action<Stubs.IDbCommand>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -2257,7 +2257,7 @@ partial class DbCommandStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IDbCommand> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -2269,13 +2269,13 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> OnCallSequence(global::System.Action<Stubs.IDbCommand> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IDbCommand> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -2283,35 +2283,35 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IDbCommand ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Dispose");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Dispose");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Dispose(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Dispose");
 				return;
 			}
 
@@ -2398,7 +2398,7 @@ partial class DbCommandStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IDbCommand_DisposeInterceptor _interceptor;
 
@@ -2418,7 +2418,7 @@ partial class DbCommandStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> ThenCall(global::System.Action<Stubs.IDbCommand> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -2439,7 +2439,7 @@ partial class DbCommandStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDbCommand>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -2499,37 +2499,37 @@ partial class DbCommandStubTests
 
 			void global::System.Data.IDbCommand.Cancel()
 			{
-				Cancel.Invoke(this);
+				Cancel.Invoke(Strict);
 			}
 
 			global::System.Data.IDbDataParameter global::System.Data.IDbCommand.CreateParameter()
 			{
-				return CreateParameter.Invoke(this);
+				return CreateParameter.Invoke(Strict);
 			}
 
 			int global::System.Data.IDbCommand.ExecuteNonQuery()
 			{
-				return ExecuteNonQuery.Invoke(this);
+				return ExecuteNonQuery.Invoke(Strict);
 			}
 
 			global::System.Data.IDataReader global::System.Data.IDbCommand.ExecuteReader()
 			{
-				return ExecuteReader.Invoke_NoParams_Data_IDataReader(this);
+				return ExecuteReader.Invoke_NoParams_Data_IDataReader(Strict);
 			}
 
 			global::System.Data.IDataReader global::System.Data.IDbCommand.ExecuteReader(global::System.Data.CommandBehavior behavior)
 			{
-				return ExecuteReader.Invoke_Data_CommandBehavior_Data_IDataReader(this, behavior);
+				return ExecuteReader.Invoke_Data_CommandBehavior_Data_IDataReader(Strict, behavior);
 			}
 
 			object? global::System.Data.IDbCommand.ExecuteScalar()
 			{
-				return ExecuteScalar.Invoke(this);
+				return ExecuteScalar.Invoke(Strict);
 			}
 
 			void global::System.Data.IDbCommand.Prepare()
 			{
-				Prepare.Invoke(this);
+				Prepare.Invoke(Strict);
 			}
 
 			string global::System.Data.IDbCommand.CommandText
@@ -2537,7 +2537,7 @@ partial class DbCommandStubTests
 				get
 				{
 					CommandText.RecordGet();
-					if (CommandText.OnGet is { } onGet) return onGet(this);
+					if (CommandText.OnGet is { } onGet) return onGet();
 					if (CommandText._source is { } src) return src.CommandText;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandText");
 					return CommandText.Value;
@@ -2546,7 +2546,7 @@ partial class DbCommandStubTests
 				set
 				{
 					CommandText.RecordSet(value);
-					if (CommandText.OnSet is { } onSet) { onSet(this, value); return; }
+					if (CommandText.OnSet is { } onSet) { onSet(value); return; }
 					if (CommandText._source is { } src) { src.CommandText = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandText");
 					CommandText.Value = value;
@@ -2560,7 +2560,7 @@ partial class DbCommandStubTests
 				get
 				{
 					CommandTimeout.RecordGet();
-					if (CommandTimeout.OnGet is { } onGet) return onGet(this);
+					if (CommandTimeout.OnGet is { } onGet) return onGet();
 					if (CommandTimeout._source is { } src) return src.CommandTimeout;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandTimeout");
 					return CommandTimeout.Value;
@@ -2568,7 +2568,7 @@ partial class DbCommandStubTests
 				set
 				{
 					CommandTimeout.RecordSet(value);
-					if (CommandTimeout.OnSet is { } onSet) { onSet(this, value); return; }
+					if (CommandTimeout.OnSet is { } onSet) { onSet(value); return; }
 					if (CommandTimeout._source is { } src) { src.CommandTimeout = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandTimeout");
 					CommandTimeout.Value = value;
@@ -2580,7 +2580,7 @@ partial class DbCommandStubTests
 				get
 				{
 					CommandType.RecordGet();
-					if (CommandType.OnGet is { } onGet) return onGet(this);
+					if (CommandType.OnGet is { } onGet) return onGet();
 					if (CommandType._source is { } src) return src.CommandType;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandType");
 					return CommandType.Value;
@@ -2588,7 +2588,7 @@ partial class DbCommandStubTests
 				set
 				{
 					CommandType.RecordSet(value);
-					if (CommandType.OnSet is { } onSet) { onSet(this, value); return; }
+					if (CommandType.OnSet is { } onSet) { onSet(value); return; }
 					if (CommandType._source is { } src) { src.CommandType = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "CommandType");
 					CommandType.Value = value;
@@ -2600,7 +2600,7 @@ partial class DbCommandStubTests
 				get
 				{
 					Connection.RecordGet();
-					if (Connection.OnGet is { } onGet) return onGet(this);
+					if (Connection.OnGet is { } onGet) return onGet();
 					if (Connection._source is { } src) return src.Connection;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Connection");
 					return Connection.Value;
@@ -2608,7 +2608,7 @@ partial class DbCommandStubTests
 				set
 				{
 					Connection.RecordSet(value);
-					if (Connection.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Connection.OnSet is { } onSet) { onSet(value); return; }
 					if (Connection._source is { } src) { src.Connection = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Connection");
 					Connection.Value = value;
@@ -2620,7 +2620,7 @@ partial class DbCommandStubTests
 				get
 				{
 					Parameters.RecordGet();
-					if (Parameters.OnGet is { } onGet) return onGet(this);
+					if (Parameters.OnGet is { } onGet) return onGet();
 					if (Parameters._source is { } src) return src.Parameters;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Parameters");
 					return Parameters.Value;
@@ -2632,7 +2632,7 @@ partial class DbCommandStubTests
 				get
 				{
 					Transaction.RecordGet();
-					if (Transaction.OnGet is { } onGet) return onGet(this);
+					if (Transaction.OnGet is { } onGet) return onGet();
 					if (Transaction._source is { } src) return src.Transaction;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Transaction");
 					return Transaction.Value;
@@ -2640,7 +2640,7 @@ partial class DbCommandStubTests
 				set
 				{
 					Transaction.RecordSet(value);
-					if (Transaction.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Transaction.OnSet is { } onSet) { onSet(value); return; }
 					if (Transaction._source is { } src) { src.Transaction = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "Transaction");
 					Transaction.Value = value;
@@ -2652,7 +2652,7 @@ partial class DbCommandStubTests
 				get
 				{
 					UpdatedRowSource.RecordGet();
-					if (UpdatedRowSource.OnGet is { } onGet) return onGet(this);
+					if (UpdatedRowSource.OnGet is { } onGet) return onGet();
 					if (UpdatedRowSource._source is { } src) return src.UpdatedRowSource;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "UpdatedRowSource");
 					return UpdatedRowSource.Value;
@@ -2660,7 +2660,7 @@ partial class DbCommandStubTests
 				set
 				{
 					UpdatedRowSource.RecordSet(value);
-					if (UpdatedRowSource.OnSet is { } onSet) { onSet(this, value); return; }
+					if (UpdatedRowSource.OnSet is { } onSet) { onSet(value); return; }
 					if (UpdatedRowSource._source is { } src) { src.UpdatedRowSource = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDbCommand", "UpdatedRowSource");
 					UpdatedRowSource.Value = value;
@@ -2669,7 +2669,7 @@ partial class DbCommandStubTests
 
 			void global::System.IDisposable.Dispose()
 			{
-				Dispose.Invoke(this);
+				Dispose.Invoke(Strict);
 			}
 
 			/// <summary>The global::System.Data.IDbCommand instance. Use for passing to code expecting the interface.</summary>

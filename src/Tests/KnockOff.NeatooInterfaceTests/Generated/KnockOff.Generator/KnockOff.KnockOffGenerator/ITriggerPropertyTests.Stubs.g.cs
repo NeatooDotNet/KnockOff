@@ -19,7 +19,7 @@ partial class ITriggerPropertyTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.ITriggerProperty, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -96,7 +96,7 @@ partial class ITriggerPropertyTests
 			internal global::Neatoo.Rules.ITriggerProperty? _source;
 
 			/// <summary>Delegate for IsMatch.</summary>
-			public delegate bool IsMatchDelegate(Stubs.ITriggerProperty ko, string propertyName);
+			public delegate bool IsMatchDelegate(string propertyName);
 
 			private IsMatchDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -147,34 +147,34 @@ partial class ITriggerPropertyTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.ITriggerProperty ko, string propertyName)
+			internal bool Invoke(bool strict, string propertyName)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(propertyName);
 					_sequenceIndex++;
-					return callback(ko, propertyName);
+					return callback(propertyName);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(propertyName);
-					return _onCall(ko, propertyName);
+					return _onCall(propertyName);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("IsMatch");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsMatch");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.IsMatch(propertyName);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IsMatch");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsMatch");
 				return default!;
 			}
 
@@ -334,7 +334,7 @@ partial class ITriggerPropertyTests
 
 			bool global::Neatoo.Rules.ITriggerProperty.IsMatch(string propertyName)
 			{
-				return IsMatch.Invoke(this, propertyName);
+				return IsMatch.Invoke(Strict, propertyName);
 			}
 
 			string global::Neatoo.Rules.ITriggerProperty.PropertyName
@@ -342,7 +342,7 @@ partial class ITriggerPropertyTests
 				get
 				{
 					PropertyName.RecordGet();
-					if (PropertyName.OnGet is { } onGet) return onGet(this);
+					if (PropertyName.OnGet is { } onGet) return onGet();
 					if (PropertyName._source is { } src) return src.PropertyName;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName");
 					return PropertyName.Value;

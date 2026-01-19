@@ -58,7 +58,7 @@ partial class RepositoryStub : global::KnockOff.Documentation.Samples.GenericMet
 		public sealed class GetByIdTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, new()
 		{
 			/// <summary>Delegate for GetById.</summary>
-			public delegate T? GetByIdDelegate(RepositoryStub ko, int id);
+			public delegate T? GetByIdDelegate(int id);
 
 			private GetByIdDelegate? _onCall;
 
@@ -144,7 +144,7 @@ partial class RepositoryStub : global::KnockOff.Documentation.Samples.GenericMet
 	{
 		GetById.Of<T>().RecordCall(id);
 		if (GetById.Of<T>().Callback is { } callback)
-			return callback(this, id);
+			return callback(id);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IRepository", "GetById");
 		return default!;
 	}

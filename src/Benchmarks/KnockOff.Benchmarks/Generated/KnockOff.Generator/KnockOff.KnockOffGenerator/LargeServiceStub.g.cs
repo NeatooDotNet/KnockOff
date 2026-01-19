@@ -11,10 +11,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -30,7 +30,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -42,13 +42,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -56,21 +56,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -171,7 +171,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod01Interceptor _interceptor;
 
@@ -191,7 +191,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -212,7 +212,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -231,10 +231,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -250,7 +250,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -262,13 +262,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -276,21 +276,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -391,7 +391,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod02Interceptor _interceptor;
 
@@ -411,7 +411,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -432,7 +432,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -451,10 +451,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -470,7 +470,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -482,13 +482,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -496,21 +496,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -611,7 +611,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod03Interceptor _interceptor;
 
@@ -631,7 +631,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -652,7 +652,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -671,10 +671,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -690,7 +690,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -702,13 +702,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -716,21 +716,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -831,7 +831,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod04Interceptor _interceptor;
 
@@ -851,7 +851,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -872,7 +872,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -891,10 +891,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -910,7 +910,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -922,13 +922,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -936,21 +936,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -1051,7 +1051,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod05Interceptor _interceptor;
 
@@ -1071,7 +1071,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1092,7 +1092,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1111,10 +1111,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1130,7 +1130,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1142,13 +1142,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1156,21 +1156,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -1271,7 +1271,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod06Interceptor _interceptor;
 
@@ -1291,7 +1291,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1312,7 +1312,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1331,10 +1331,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1350,7 +1350,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1362,13 +1362,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1376,21 +1376,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -1491,7 +1491,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod07Interceptor _interceptor;
 
@@ -1511,7 +1511,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1532,7 +1532,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1551,10 +1551,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1570,7 +1570,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1582,13 +1582,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1596,21 +1596,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -1711,7 +1711,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod08Interceptor _interceptor;
 
@@ -1731,7 +1731,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1752,7 +1752,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1771,10 +1771,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1790,7 +1790,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1802,13 +1802,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1816,21 +1816,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -1931,7 +1931,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod09Interceptor _interceptor;
 
@@ -1951,7 +1951,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1972,7 +1972,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1991,10 +1991,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2010,7 +2010,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2022,13 +2022,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> OnCallSequence(global::System.Action<LargeServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2036,21 +2036,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -2151,7 +2151,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly VoidMethod10Interceptor _interceptor;
 
@@ -2171,7 +2171,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> ThenCall(global::System.Action<LargeServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2192,7 +2192,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2211,10 +2211,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2234,7 +2234,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2246,13 +2246,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2260,21 +2260,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -2384,7 +2384,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam01Interceptor _interceptor;
 
@@ -2404,7 +2404,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2425,7 +2425,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2444,10 +2444,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2467,7 +2467,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2479,13 +2479,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2493,21 +2493,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -2617,7 +2617,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam02Interceptor _interceptor;
 
@@ -2637,7 +2637,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2658,7 +2658,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2677,10 +2677,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2700,7 +2700,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2712,13 +2712,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2726,21 +2726,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -2850,7 +2850,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam03Interceptor _interceptor;
 
@@ -2870,7 +2870,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2891,7 +2891,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2910,10 +2910,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2933,7 +2933,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2945,13 +2945,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2959,21 +2959,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -3083,7 +3083,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam04Interceptor _interceptor;
 
@@ -3103,7 +3103,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -3124,7 +3124,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -3143,10 +3143,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -3166,7 +3166,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -3178,13 +3178,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -3192,21 +3192,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -3316,7 +3316,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam05Interceptor _interceptor;
 
@@ -3336,7 +3336,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -3357,7 +3357,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -3376,10 +3376,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -3399,7 +3399,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -3411,13 +3411,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -3425,21 +3425,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -3549,7 +3549,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam06Interceptor _interceptor;
 
@@ -3569,7 +3569,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -3590,7 +3590,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -3609,10 +3609,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -3632,7 +3632,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -3644,13 +3644,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -3658,21 +3658,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -3782,7 +3782,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam07Interceptor _interceptor;
 
@@ -3802,7 +3802,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -3823,7 +3823,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -3842,10 +3842,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -3865,7 +3865,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -3877,13 +3877,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -3891,21 +3891,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -4015,7 +4015,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam08Interceptor _interceptor;
 
@@ -4035,7 +4035,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -4056,7 +4056,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -4075,10 +4075,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -4098,7 +4098,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -4110,13 +4110,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -4124,21 +4124,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -4248,7 +4248,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam09Interceptor _interceptor;
 
@@ -4268,7 +4268,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -4289,7 +4289,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -4308,10 +4308,10 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
-		private global::System.Action<LargeServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -4331,7 +4331,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -4343,13 +4343,13 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> OnCallSequence(global::System.Action<LargeServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LargeServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -4357,21 +4357,21 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LargeServiceStub ko, bool strict, int p)
+		internal void Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				callback(ko, p);
+				callback(p);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				_onCall(ko, p);
+				_onCall(p);
 				return;
 			}
 
@@ -4481,7 +4481,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly VoidMethodWithParam10Interceptor _interceptor;
 
@@ -4501,7 +4501,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> ThenCall(global::System.Action<LargeServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -4522,7 +4522,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LargeServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -4542,7 +4542,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod01.</summary>
-		public delegate int IntMethod01Delegate(LargeServiceStub ko);
+		public delegate int IntMethod01Delegate();
 
 		private IntMethod01Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -4589,20 +4589,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -4763,7 +4763,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod02.</summary>
-		public delegate int IntMethod02Delegate(LargeServiceStub ko);
+		public delegate int IntMethod02Delegate();
 
 		private IntMethod02Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -4810,20 +4810,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -4984,7 +4984,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod03.</summary>
-		public delegate int IntMethod03Delegate(LargeServiceStub ko);
+		public delegate int IntMethod03Delegate();
 
 		private IntMethod03Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -5031,20 +5031,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -5205,7 +5205,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod04.</summary>
-		public delegate int IntMethod04Delegate(LargeServiceStub ko);
+		public delegate int IntMethod04Delegate();
 
 		private IntMethod04Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -5252,20 +5252,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -5426,7 +5426,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod05.</summary>
-		public delegate int IntMethod05Delegate(LargeServiceStub ko);
+		public delegate int IntMethod05Delegate();
 
 		private IntMethod05Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -5473,20 +5473,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -5647,7 +5647,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod06.</summary>
-		public delegate int IntMethod06Delegate(LargeServiceStub ko);
+		public delegate int IntMethod06Delegate();
 
 		private IntMethod06Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -5694,20 +5694,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -5868,7 +5868,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod07.</summary>
-		public delegate int IntMethod07Delegate(LargeServiceStub ko);
+		public delegate int IntMethod07Delegate();
 
 		private IntMethod07Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -5915,20 +5915,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -6089,7 +6089,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod08.</summary>
-		public delegate int IntMethod08Delegate(LargeServiceStub ko);
+		public delegate int IntMethod08Delegate();
 
 		private IntMethod08Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -6136,20 +6136,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -6310,7 +6310,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod09.</summary>
-		public delegate int IntMethod09Delegate(LargeServiceStub ko);
+		public delegate int IntMethod09Delegate();
 
 		private IntMethod09Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -6357,20 +6357,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -6531,7 +6531,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethod10.</summary>
-		public delegate int IntMethod10Delegate(LargeServiceStub ko);
+		public delegate int IntMethod10Delegate();
 
 		private IntMethod10Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -6578,20 +6578,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -6752,7 +6752,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod01.</summary>
-		public delegate string StringMethod01Delegate(LargeServiceStub ko);
+		public delegate string StringMethod01Delegate();
 
 		private StringMethod01Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -6799,20 +6799,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -6973,7 +6973,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod02.</summary>
-		public delegate string StringMethod02Delegate(LargeServiceStub ko);
+		public delegate string StringMethod02Delegate();
 
 		private StringMethod02Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -7020,20 +7020,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -7194,7 +7194,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod03.</summary>
-		public delegate string StringMethod03Delegate(LargeServiceStub ko);
+		public delegate string StringMethod03Delegate();
 
 		private StringMethod03Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -7241,20 +7241,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -7415,7 +7415,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod04.</summary>
-		public delegate string StringMethod04Delegate(LargeServiceStub ko);
+		public delegate string StringMethod04Delegate();
 
 		private StringMethod04Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -7462,20 +7462,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -7636,7 +7636,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod05.</summary>
-		public delegate string StringMethod05Delegate(LargeServiceStub ko);
+		public delegate string StringMethod05Delegate();
 
 		private StringMethod05Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -7683,20 +7683,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -7857,7 +7857,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod06.</summary>
-		public delegate string StringMethod06Delegate(LargeServiceStub ko);
+		public delegate string StringMethod06Delegate();
 
 		private StringMethod06Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -7904,20 +7904,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -8078,7 +8078,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod07.</summary>
-		public delegate string StringMethod07Delegate(LargeServiceStub ko);
+		public delegate string StringMethod07Delegate();
 
 		private StringMethod07Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -8125,20 +8125,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -8299,7 +8299,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod08.</summary>
-		public delegate string StringMethod08Delegate(LargeServiceStub ko);
+		public delegate string StringMethod08Delegate();
 
 		private StringMethod08Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -8346,20 +8346,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -8520,7 +8520,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod09.</summary>
-		public delegate string StringMethod09Delegate(LargeServiceStub ko);
+		public delegate string StringMethod09Delegate();
 
 		private StringMethod09Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -8567,20 +8567,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -8741,7 +8741,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for StringMethod10.</summary>
-		public delegate string StringMethod10Delegate(LargeServiceStub ko);
+		public delegate string StringMethod10Delegate();
 
 		private StringMethod10Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -8788,20 +8788,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(LargeServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -8962,7 +8962,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam01.</summary>
-		public delegate int IntMethodWithParam01Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam01Delegate(int p);
 
 		private IntMethodWithParam01Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -9013,20 +9013,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -9196,7 +9196,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam02.</summary>
-		public delegate int IntMethodWithParam02Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam02Delegate(int p);
 
 		private IntMethodWithParam02Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -9247,20 +9247,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -9430,7 +9430,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam03.</summary>
-		public delegate int IntMethodWithParam03Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam03Delegate(int p);
 
 		private IntMethodWithParam03Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -9481,20 +9481,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -9664,7 +9664,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam04.</summary>
-		public delegate int IntMethodWithParam04Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam04Delegate(int p);
 
 		private IntMethodWithParam04Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -9715,20 +9715,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -9898,7 +9898,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam05.</summary>
-		public delegate int IntMethodWithParam05Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam05Delegate(int p);
 
 		private IntMethodWithParam05Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -9949,20 +9949,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -10132,7 +10132,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam06.</summary>
-		public delegate int IntMethodWithParam06Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam06Delegate(int p);
 
 		private IntMethodWithParam06Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -10183,20 +10183,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -10366,7 +10366,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam07.</summary>
-		public delegate int IntMethodWithParam07Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam07Delegate(int p);
 
 		private IntMethodWithParam07Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -10417,20 +10417,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -10600,7 +10600,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam08.</summary>
-		public delegate int IntMethodWithParam08Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam08Delegate(int p);
 
 		private IntMethodWithParam08Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -10651,20 +10651,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -10834,7 +10834,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam09.</summary>
-		public delegate int IntMethodWithParam09Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam09Delegate(int p);
 
 		private IntMethodWithParam09Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -10885,20 +10885,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -11068,7 +11068,7 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		internal global::KnockOff.Benchmarks.Interfaces.ILargeService? _source;
 
 		/// <summary>Delegate for IntMethodWithParam10.</summary>
-		public delegate int IntMethodWithParam10Delegate(LargeServiceStub ko, int p);
+		public delegate int IntMethodWithParam10Delegate(int p);
 
 		private IntMethodWithParam10Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -11119,20 +11119,20 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(LargeServiceStub ko, bool strict, int p)
+		internal int Invoke(bool strict, int p)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(p);
 				_sequenceIndex++;
-				return callback(ko, p);
+				return callback(p);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(p);
-				return _onCall(ko, p);
+				return _onCall(p);
 			}
 
 			_unconfiguredCallCount++;
@@ -11631,252 +11631,252 @@ partial class LargeServiceStub : global::KnockOff.Benchmarks.Interfaces.ILargeSe
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod01()
 	{
-		VoidMethod01.Invoke(this, Strict);
+		VoidMethod01.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod02()
 	{
-		VoidMethod02.Invoke(this, Strict);
+		VoidMethod02.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod03()
 	{
-		VoidMethod03.Invoke(this, Strict);
+		VoidMethod03.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod04()
 	{
-		VoidMethod04.Invoke(this, Strict);
+		VoidMethod04.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod05()
 	{
-		VoidMethod05.Invoke(this, Strict);
+		VoidMethod05.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod06()
 	{
-		VoidMethod06.Invoke(this, Strict);
+		VoidMethod06.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod07()
 	{
-		VoidMethod07.Invoke(this, Strict);
+		VoidMethod07.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod08()
 	{
-		VoidMethod08.Invoke(this, Strict);
+		VoidMethod08.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod09()
 	{
-		VoidMethod09.Invoke(this, Strict);
+		VoidMethod09.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethod10()
 	{
-		VoidMethod10.Invoke(this, Strict);
+		VoidMethod10.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam01(int p)
 	{
-		VoidMethodWithParam01.Invoke(this, Strict, p);
+		VoidMethodWithParam01.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam02(int p)
 	{
-		VoidMethodWithParam02.Invoke(this, Strict, p);
+		VoidMethodWithParam02.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam03(int p)
 	{
-		VoidMethodWithParam03.Invoke(this, Strict, p);
+		VoidMethodWithParam03.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam04(int p)
 	{
-		VoidMethodWithParam04.Invoke(this, Strict, p);
+		VoidMethodWithParam04.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam05(int p)
 	{
-		VoidMethodWithParam05.Invoke(this, Strict, p);
+		VoidMethodWithParam05.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam06(int p)
 	{
-		VoidMethodWithParam06.Invoke(this, Strict, p);
+		VoidMethodWithParam06.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam07(int p)
 	{
-		VoidMethodWithParam07.Invoke(this, Strict, p);
+		VoidMethodWithParam07.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam08(int p)
 	{
-		VoidMethodWithParam08.Invoke(this, Strict, p);
+		VoidMethodWithParam08.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam09(int p)
 	{
-		VoidMethodWithParam09.Invoke(this, Strict, p);
+		VoidMethodWithParam09.Invoke(Strict, p);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.ILargeService.VoidMethodWithParam10(int p)
 	{
-		VoidMethodWithParam10.Invoke(this, Strict, p);
+		VoidMethodWithParam10.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod01()
 	{
-		return IntMethod01.Invoke(this, Strict);
+		return IntMethod01.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod02()
 	{
-		return IntMethod02.Invoke(this, Strict);
+		return IntMethod02.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod03()
 	{
-		return IntMethod03.Invoke(this, Strict);
+		return IntMethod03.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod04()
 	{
-		return IntMethod04.Invoke(this, Strict);
+		return IntMethod04.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod05()
 	{
-		return IntMethod05.Invoke(this, Strict);
+		return IntMethod05.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod06()
 	{
-		return IntMethod06.Invoke(this, Strict);
+		return IntMethod06.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod07()
 	{
-		return IntMethod07.Invoke(this, Strict);
+		return IntMethod07.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod08()
 	{
-		return IntMethod08.Invoke(this, Strict);
+		return IntMethod08.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod09()
 	{
-		return IntMethod09.Invoke(this, Strict);
+		return IntMethod09.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethod10()
 	{
-		return IntMethod10.Invoke(this, Strict);
+		return IntMethod10.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod01()
 	{
-		return StringMethod01.Invoke(this, Strict);
+		return StringMethod01.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod02()
 	{
-		return StringMethod02.Invoke(this, Strict);
+		return StringMethod02.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod03()
 	{
-		return StringMethod03.Invoke(this, Strict);
+		return StringMethod03.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod04()
 	{
-		return StringMethod04.Invoke(this, Strict);
+		return StringMethod04.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod05()
 	{
-		return StringMethod05.Invoke(this, Strict);
+		return StringMethod05.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod06()
 	{
-		return StringMethod06.Invoke(this, Strict);
+		return StringMethod06.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod07()
 	{
-		return StringMethod07.Invoke(this, Strict);
+		return StringMethod07.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod08()
 	{
-		return StringMethod08.Invoke(this, Strict);
+		return StringMethod08.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod09()
 	{
-		return StringMethod09.Invoke(this, Strict);
+		return StringMethod09.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.ILargeService.StringMethod10()
 	{
-		return StringMethod10.Invoke(this, Strict);
+		return StringMethod10.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam01(int p)
 	{
-		return IntMethodWithParam01.Invoke(this, Strict, p);
+		return IntMethodWithParam01.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam02(int p)
 	{
-		return IntMethodWithParam02.Invoke(this, Strict, p);
+		return IntMethodWithParam02.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam03(int p)
 	{
-		return IntMethodWithParam03.Invoke(this, Strict, p);
+		return IntMethodWithParam03.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam04(int p)
 	{
-		return IntMethodWithParam04.Invoke(this, Strict, p);
+		return IntMethodWithParam04.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam05(int p)
 	{
-		return IntMethodWithParam05.Invoke(this, Strict, p);
+		return IntMethodWithParam05.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam06(int p)
 	{
-		return IntMethodWithParam06.Invoke(this, Strict, p);
+		return IntMethodWithParam06.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam07(int p)
 	{
-		return IntMethodWithParam07.Invoke(this, Strict, p);
+		return IntMethodWithParam07.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam08(int p)
 	{
-		return IntMethodWithParam08.Invoke(this, Strict, p);
+		return IntMethodWithParam08.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam09(int p)
 	{
-		return IntMethodWithParam09.Invoke(this, Strict, p);
+		return IntMethodWithParam09.Invoke(Strict, p);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ILargeService.IntMethodWithParam10(int p)
 	{
-		return IntMethodWithParam10.Invoke(this, Strict, p);
+		return IntMethodWithParam10.Invoke(Strict, p);
 	}
 
 }

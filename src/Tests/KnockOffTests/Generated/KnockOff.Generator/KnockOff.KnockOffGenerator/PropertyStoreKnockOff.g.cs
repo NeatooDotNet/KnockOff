@@ -18,7 +18,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<PropertyStoreKnockOff, string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
+		public global::System.Func<string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
@@ -115,7 +115,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IPropertyStore.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
 	}
 
 }

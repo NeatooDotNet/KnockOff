@@ -64,7 +64,7 @@ partial class InlineGenericMethodTest
 			public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : new()
 			{
 				/// <summary>Delegate for Create.</summary>
-				public delegate T CreateDelegate(Stubs.IGenericMethodService ko);
+				public delegate T CreateDelegate();
 
 				private CreateDelegate? _onCall;
 
@@ -155,7 +155,7 @@ partial class InlineGenericMethodTest
 			public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for Process.</summary>
-				public delegate void ProcessDelegate(Stubs.IGenericMethodService ko, T value);
+				public delegate void ProcessDelegate(T value);
 
 				private ProcessDelegate? _onCall;
 
@@ -246,7 +246,7 @@ partial class InlineGenericMethodTest
 			public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for Deserialize.</summary>
-				public delegate T DeserializeDelegate(Stubs.IGenericMethodService ko, string json);
+				public delegate T DeserializeDelegate(string json);
 
 				private DeserializeDelegate? _onCall;
 
@@ -340,7 +340,7 @@ partial class InlineGenericMethodTest
 			public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for Convert.</summary>
-				public delegate TOut ConvertDelegate(Stubs.IGenericMethodService ko, TIn input);
+				public delegate TOut ConvertDelegate(TIn input);
 
 				private ConvertDelegate? _onCall;
 
@@ -431,7 +431,7 @@ partial class InlineGenericMethodTest
 			public sealed class FindTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 			{
 				/// <summary>Delegate for Find.</summary>
-				public delegate T? FindDelegate(Stubs.IGenericMethodService ko, int id);
+				public delegate T? FindDelegate(int id);
 
 				private FindDelegate? _onCall;
 
@@ -525,7 +525,7 @@ partial class InlineGenericMethodTest
 			public sealed class TransferTypedHandler<TSource, TDest> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for Transfer.</summary>
-				public delegate void TransferDelegate(Stubs.IGenericMethodService ko, TSource source, TDest destination);
+				public delegate void TransferDelegate(TSource source, TDest destination);
 
 				private TransferDelegate? _onCall;
 
@@ -591,7 +591,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Create.Of<T>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this);
+					return onCallCallback();
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Create");
 				return SmartDefault<T>("Create");
 			}
@@ -601,7 +601,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Process.Of<T>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-				{ onCallCallback(this, value); return; }
+				{ onCallCallback(value); return; }
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Process");
 			}
 
@@ -610,7 +610,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Deserialize.Of<T>();
 				typedHandler.RecordCall(json);
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, json);
+					return onCallCallback(json);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Deserialize");
 				return SmartDefault<T>("Deserialize");
 			}
@@ -620,7 +620,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Convert.Of<TIn, TOut>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, input);
+					return onCallCallback(input);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Convert");
 				return SmartDefault<TOut>("Convert");
 			}
@@ -630,7 +630,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Find.Of<T>();
 				typedHandler.RecordCall(id);
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, id);
+					return onCallCallback(id);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Find");
 				return default!;
 			}
@@ -640,7 +640,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Transfer.Of<TSource, TDest>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-				{ onCallCallback(this, source, destination); return; }
+				{ onCallCallback(source, destination); return; }
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Transfer");
 			}
 

@@ -12,7 +12,7 @@ partial class UserRepositoryStub : global::KnockOff.Documentation.Samples.Advanc
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.IUserRepository? _source;
 
 		/// <summary>Delegate for FindById.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? FindByIdDelegate(UserRepositoryStub ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.User? FindByIdDelegate(int id);
 
 		private FindByIdDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class UserRepositoryStub : global::KnockOff.Documentation.Samples.Advanc
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke(UserRepositoryStub ko, bool strict, int id)
+		internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class UserRepositoryStub : global::KnockOff.Documentation.Samples.Advanc
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.AdvancedCallbacks.IUserRepository.FindById(int id)
 	{
-		return FindById.Invoke(this, Strict, id);
+		return FindById.Invoke(Strict, id);
 	}
 
 }

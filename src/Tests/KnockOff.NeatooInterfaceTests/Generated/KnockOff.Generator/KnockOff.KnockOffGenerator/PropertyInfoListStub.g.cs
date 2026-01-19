@@ -12,7 +12,7 @@ partial class PropertyInfoListStub : global::Neatoo.IPropertyInfoList, global::K
 		internal global::Neatoo.IPropertyInfoList? _source;
 
 		/// <summary>Delegate for GetPropertyInfo.</summary>
-		public delegate global::Neatoo.IPropertyInfo? GetPropertyInfoDelegate(PropertyInfoListStub ko, string name);
+		public delegate global::Neatoo.IPropertyInfo? GetPropertyInfoDelegate(string name);
 
 		private GetPropertyInfoDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class PropertyInfoListStub : global::Neatoo.IPropertyInfoList, global::K
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::Neatoo.IPropertyInfo? Invoke(PropertyInfoListStub ko, bool strict, string name)
+		internal global::Neatoo.IPropertyInfo? Invoke(bool strict, string name)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(name);
 				_sequenceIndex++;
-				return callback(ko, name);
+				return callback(name);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(name);
-				return _onCall(ko, name);
+				return _onCall(name);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class PropertyInfoListStub : global::Neatoo.IPropertyInfoList, global::K
 		internal global::Neatoo.IPropertyInfoList? _source;
 
 		/// <summary>Delegate for Properties.</summary>
-		public delegate global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> PropertiesDelegate(PropertyInfoListStub ko);
+		public delegate global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> PropertiesDelegate();
 
 		private PropertiesDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -293,20 +293,20 @@ partial class PropertyInfoListStub : global::Neatoo.IPropertyInfoList, global::K
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> Invoke(PropertyInfoListStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -467,7 +467,7 @@ partial class PropertyInfoListStub : global::Neatoo.IPropertyInfoList, global::K
 		internal global::Neatoo.IPropertyInfoList? _source;
 
 		/// <summary>Delegate for HasProperty.</summary>
-		public delegate bool HasPropertyDelegate(PropertyInfoListStub ko, string propertyName);
+		public delegate bool HasPropertyDelegate(string propertyName);
 
 		private HasPropertyDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -518,20 +518,20 @@ partial class PropertyInfoListStub : global::Neatoo.IPropertyInfoList, global::K
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(PropertyInfoListStub ko, bool strict, string propertyName)
+		internal bool Invoke(bool strict, string propertyName)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(propertyName);
 				_sequenceIndex++;
-				return callback(ko, propertyName);
+				return callback(propertyName);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(propertyName);
-				return _onCall(ko, propertyName);
+				return _onCall(propertyName);
 			}
 
 			_unconfiguredCallCount++;
@@ -748,17 +748,17 @@ partial class PropertyInfoListStub : global::Neatoo.IPropertyInfoList, global::K
 
 	global::Neatoo.IPropertyInfo? global::Neatoo.IPropertyInfoList.GetPropertyInfo(string name)
 	{
-		return GetPropertyInfo.Invoke(this, Strict, name);
+		return GetPropertyInfo.Invoke(Strict, name);
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> global::Neatoo.IPropertyInfoList.Properties()
 	{
-		return Properties.Invoke(this, Strict);
+		return Properties.Invoke(Strict);
 	}
 
 	bool global::Neatoo.IPropertyInfoList.HasProperty(string propertyName)
 	{
-		return HasProperty.Invoke(this, Strict, propertyName);
+		return HasProperty.Invoke(Strict, propertyName);
 	}
 
 }

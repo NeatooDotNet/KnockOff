@@ -19,7 +19,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidateListBaseOfTStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
+		public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
 		private global::Neatoo.IValidateBase? _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidateListBaseOfTStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidateListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidateListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -343,7 +343,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidateListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -424,7 +424,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidateListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -505,7 +505,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidateListBaseOfTStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -585,7 +585,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public int? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase>? OnGet { get; set; }
+		public global::System.Func<int, global::Neatoo.IValidateBase>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -594,7 +594,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		public (int? Key, global::Neatoo.IValidateBase? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase>? OnSet { get; set; }
+		public global::System.Action<int, global::Neatoo.IValidateBase>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
@@ -691,7 +691,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		internal global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>? _source;
 
 		/// <summary>Delegate for IndexOf.</summary>
-		public delegate int IndexOfDelegate(ValidateListBaseOfTStub ko, global::Neatoo.IValidateBase item);
+		public delegate int IndexOfDelegate(global::Neatoo.IValidateBase item);
 
 		private IndexOfDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -742,20 +742,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(ValidateListBaseOfTStub ko, bool strict, global::Neatoo.IValidateBase item)
+		internal int Invoke(bool strict, global::Neatoo.IValidateBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -924,10 +924,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>? _source;
 
-		private global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase>? _onCall;
+		private global::System.Action<int, global::Neatoo.IValidateBase>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -947,7 +947,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(int? index, global::Neatoo.IValidateBase? item)> OnCall(global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase> callback)
+		public global::KnockOff.IMethodTrackingArgs<(int? index, global::Neatoo.IValidateBase? item)> OnCall(global::System.Action<int, global::Neatoo.IValidateBase> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -959,13 +959,13 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase>> OnCallSequence(global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IValidateBase>> OnCallSequence(global::System.Action<int, global::Neatoo.IValidateBase> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -973,21 +973,21 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidateListBaseOfTStub ko, bool strict, int index, global::Neatoo.IValidateBase item)
+		internal void Invoke(bool strict, int index, global::Neatoo.IValidateBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((index, item));
 				_sequenceIndex++;
-				callback(ko, index, item);
+				callback(index, item);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((index, item));
-				_onCall(ko, index, item);
+				_onCall(index, item);
 				return;
 			}
 
@@ -1097,7 +1097,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IValidateBase>>
 		{
 			private readonly InsertInterceptor _interceptor;
 
@@ -1117,7 +1117,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase>> ThenCall(global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IValidateBase>> ThenCall(global::System.Action<int, global::Neatoo.IValidateBase> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1138,7 +1138,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, int, global::Neatoo.IValidateBase>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IValidateBase>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1157,10 +1157,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>? _source;
 
-		private global::System.Action<ValidateListBaseOfTStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1180,7 +1180,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<ValidateListBaseOfTStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1192,13 +1192,13 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, int>> OnCallSequence(global::System.Action<ValidateListBaseOfTStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1206,21 +1206,21 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidateListBaseOfTStub ko, bool strict, int index)
+		internal void Invoke(bool strict, int index)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(index);
 				_sequenceIndex++;
-				callback(ko, index);
+				callback(index);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(index);
-				_onCall(ko, index);
+				_onCall(index);
 				return;
 			}
 
@@ -1330,7 +1330,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly RemoveAtInterceptor _interceptor;
 
@@ -1350,7 +1350,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, int>> ThenCall(global::System.Action<ValidateListBaseOfTStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1371,7 +1371,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1390,10 +1390,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
-		private global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase>? _onCall;
+		private global::System.Action<global::Neatoo.IValidateBase>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1413,7 +1413,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase> callback)
+		public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(global::System.Action<global::Neatoo.IValidateBase> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1425,13 +1425,13 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase>> OnCallSequence(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase>> OnCallSequence(global::System.Action<global::Neatoo.IValidateBase> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1439,21 +1439,21 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidateListBaseOfTStub ko, bool strict, global::Neatoo.IValidateBase item)
+		internal void Invoke(bool strict, global::Neatoo.IValidateBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				callback(ko, item);
+				callback(item);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				_onCall(ko, item);
+				_onCall(item);
 				return;
 			}
 
@@ -1563,7 +1563,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase>>
 		{
 			private readonly AddInterceptor _interceptor;
 
@@ -1583,7 +1583,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase>> ThenCall(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase>> ThenCall(global::System.Action<global::Neatoo.IValidateBase> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1604,7 +1604,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1623,10 +1623,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
-		private global::System.Action<ValidateListBaseOfTStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1642,7 +1642,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidateListBaseOfTStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1654,13 +1654,13 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> OnCallSequence(global::System.Action<ValidateListBaseOfTStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1668,21 +1668,21 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidateListBaseOfTStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -1783,7 +1783,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearInterceptor _interceptor;
 
@@ -1803,7 +1803,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> ThenCall(global::System.Action<ValidateListBaseOfTStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1824,7 +1824,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1844,7 +1844,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
 		/// <summary>Delegate for Contains.</summary>
-		public delegate bool ContainsDelegate(ValidateListBaseOfTStub ko, global::Neatoo.IValidateBase item);
+		public delegate bool ContainsDelegate(global::Neatoo.IValidateBase item);
 
 		private ContainsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1895,20 +1895,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(ValidateListBaseOfTStub ko, bool strict, global::Neatoo.IValidateBase item)
+		internal bool Invoke(bool strict, global::Neatoo.IValidateBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -2077,10 +2077,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
-		private global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int>? _onCall;
+		private global::System.Action<global::Neatoo.IValidateBase[], int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateBase[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2100,7 +2100,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.IValidateBase[]? array, int? arrayIndex)> OnCall(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int> callback)
+		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.IValidateBase[]? array, int? arrayIndex)> OnCall(global::System.Action<global::Neatoo.IValidateBase[], int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2112,13 +2112,13 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int>> OnCallSequence(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase[], int>> OnCallSequence(global::System.Action<global::Neatoo.IValidateBase[], int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateBase[], int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2126,21 +2126,21 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidateListBaseOfTStub ko, bool strict, global::Neatoo.IValidateBase[] array, int arrayIndex)
+		internal void Invoke(bool strict, global::Neatoo.IValidateBase[] array, int arrayIndex)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((array, arrayIndex));
 				_sequenceIndex++;
-				callback(ko, array, arrayIndex);
+				callback(array, arrayIndex);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((array, arrayIndex));
-				_onCall(ko, array, arrayIndex);
+				_onCall(array, arrayIndex);
 				return;
 			}
 
@@ -2250,7 +2250,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase[], int>>
 		{
 			private readonly CopyToInterceptor _interceptor;
 
@@ -2270,7 +2270,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int>> ThenCall(global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase[], int>> ThenCall(global::System.Action<global::Neatoo.IValidateBase[], int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2291,7 +2291,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub, global::Neatoo.IValidateBase[], int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase[], int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2311,7 +2311,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
 		/// <summary>Delegate for Remove.</summary>
-		public delegate bool RemoveDelegate(ValidateListBaseOfTStub ko, global::Neatoo.IValidateBase item);
+		public delegate bool RemoveDelegate(global::Neatoo.IValidateBase item);
 
 		private RemoveDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2362,20 +2362,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(ValidateListBaseOfTStub ko, bool strict, global::Neatoo.IValidateBase item)
+		internal bool Invoke(bool strict, global::Neatoo.IValidateBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -2547,7 +2547,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase(ValidateListBaseOfTStub ko);
+		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase();
 
 		private GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase? _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase;
 		private MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase? _onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase;
@@ -2559,7 +2559,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator(ValidateListBaseOfTStub ko);
+		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator();
 
 		private GetEnumeratorDelegate_NoParams_Collections_IEnumerator? _onCall_NoParams_Collections_IEnumerator;
 		private MethodTrackingImpl_NoParams_Collections_IEnumerator? _onCallTracking_NoParams_Collections_IEnumerator;
@@ -2629,20 +2629,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase(ValidateListBaseOfTStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase(bool strict)
 		{
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase != null && _sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase < _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase[_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase != null && _onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase != null)
 			{
 				_onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase.RecordCall();
-				return _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase(ko);
+				return _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase();
 			}
 
 			_unconfiguredCallCount++;
@@ -2660,20 +2660,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(ValidateListBaseOfTStub ko, bool strict)
+		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(bool strict)
 		{
 			if (_sequence_NoParams_Collections_IEnumerator != null && _sequenceIndex_NoParams_Collections_IEnumerator < _sequence_NoParams_Collections_IEnumerator.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_IEnumerator[_sequenceIndex_NoParams_Collections_IEnumerator];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_IEnumerator++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_IEnumerator != null && _onCallTracking_NoParams_Collections_IEnumerator != null)
 			{
 				_onCallTracking_NoParams_Collections_IEnumerator.RecordCall();
-				return _onCall_NoParams_Collections_IEnumerator(ko);
+				return _onCall_NoParams_Collections_IEnumerator();
 			}
 
 			_unconfiguredCallCount++;
@@ -2962,7 +2962,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for WaitForTasks().</summary>
-		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task(ValidateListBaseOfTStub ko);
+		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task();
 
 		private WaitForTasksDelegate_NoParams_Threading_Tasks_Task? _onCall_NoParams_Threading_Tasks_Task;
 		private MethodTrackingImpl_NoParams_Threading_Tasks_Task? _onCallTracking_NoParams_Threading_Tasks_Task;
@@ -2974,7 +2974,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Threading_Tasks_Task;
 
 		/// <summary>Delegate for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(ValidateListBaseOfTStub ko, global::System.Threading.CancellationToken token);
+		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(global::System.Threading.CancellationToken token);
 
 		private WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Threading_CancellationToken_Threading_Tasks_Task;
 		private MethodTrackingImpl_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task;
@@ -3044,20 +3044,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes configured callback for WaitForTasks().</summary>
-		internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(ValidateListBaseOfTStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(bool strict)
 		{
 			if (_sequence_NoParams_Threading_Tasks_Task != null && _sequenceIndex_NoParams_Threading_Tasks_Task < _sequence_NoParams_Threading_Tasks_Task.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Threading_Tasks_Task[_sequenceIndex_NoParams_Threading_Tasks_Task];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Threading_Tasks_Task++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Threading_Tasks_Task != null && _onCallTracking_NoParams_Threading_Tasks_Task != null)
 			{
 				_onCallTracking_NoParams_Threading_Tasks_Task.RecordCall();
-				return _onCall_NoParams_Threading_Tasks_Task(ko);
+				return _onCall_NoParams_Threading_Tasks_Task();
 			}
 
 			_unconfiguredCallCount++;
@@ -3075,20 +3075,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes configured callback for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-		internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(ValidateListBaseOfTStub ko, bool strict, global::System.Threading.CancellationToken token)
+		internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::System.Threading.CancellationToken token)
 		{
 			if (_sequence_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Threading_CancellationToken_Threading_Tasks_Task.Count)
 			{
 				var (callback, tracking) = _sequence_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task];
 				tracking.RecordCall(token);
 				_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task++;
-				return callback(ko, token);
+				return callback(token);
 			}
 
 			if (_onCall_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task != null)
 			{
 				_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task.RecordCall(token);
-				return _onCall_Threading_CancellationToken_Threading_Tasks_Task(ko, token);
+				return _onCall_Threading_CancellationToken_Threading_Tasks_Task(token);
 			}
 
 			_unconfiguredCallCount++;
@@ -3384,7 +3384,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(ValidateListBaseOfTStub ko, string propertyName, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(string propertyName, global::System.Threading.CancellationToken? token);
 
 		private RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task? _onCall_String_Threading_CancellationToken_Threading_Tasks_Task;
 		private MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task;
@@ -3396,7 +3396,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		private global::KnockOff.Times? _verifiableTimes_String_Threading_CancellationToken_Threading_Tasks_Task;
 
 		/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(ValidateListBaseOfTStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
 		private RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 		private MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
@@ -3466,20 +3466,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes configured callback for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-		internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(ValidateListBaseOfTStub ko, bool strict, string propertyName, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(bool strict, string propertyName, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task < _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count)
 			{
 				var (callback, tracking) = _sequence_String_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task];
 				tracking.RecordCall((propertyName, token));
 				_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task++;
-				return callback(ko, propertyName, token);
+				return callback(propertyName, token);
 			}
 
 			if (_onCall_String_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task != null)
 			{
 				_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((propertyName, token));
-				return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(ko, propertyName, token);
+				return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(propertyName, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -3497,20 +3497,20 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes configured callback for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-		internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(ValidateListBaseOfTStub ko, bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count)
 			{
 				var (callback, tracking) = _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task];
 				tracking.RecordCall((runRules, token));
 				_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task++;
-				return callback(ko, runRules, token);
+				return callback(runRules, token);
 			}
 
 			if (_onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null)
 			{
 				_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((runRules, token));
-				return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(ko, runRules, token);
+				return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(runRules, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -3810,10 +3810,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidateMetaProperties? _source;
 
-		private global::System.Action<ValidateListBaseOfTStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -3829,7 +3829,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidateListBaseOfTStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -3841,13 +3841,13 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> OnCallSequence(global::System.Action<ValidateListBaseOfTStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -3855,21 +3855,21 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidateListBaseOfTStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -3970,7 +3970,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearAllMessagesInterceptor _interceptor;
 
@@ -3990,7 +3990,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> ThenCall(global::System.Action<ValidateListBaseOfTStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -4011,7 +4011,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -4030,10 +4030,10 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidateMetaProperties? _source;
 
-		private global::System.Action<ValidateListBaseOfTStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -4049,7 +4049,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ValidateListBaseOfTStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -4061,13 +4061,13 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> OnCallSequence(global::System.Action<ValidateListBaseOfTStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidateListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -4075,21 +4075,21 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidateListBaseOfTStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -4190,7 +4190,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearSelfMessagesInterceptor _interceptor;
 
@@ -4210,7 +4210,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> ThenCall(global::System.Action<ValidateListBaseOfTStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -4231,7 +4231,7 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidateListBaseOfTStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -4943,88 +4943,88 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateListBase<global::Neatoo.IValidateBase>.Parent
 	{
-		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Parent._source is { } src) return src.Parent; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Parent"); return Parent.Value; }
+		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(); if (Parent._source is { } src) return src.Parent; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Parent"); return Parent.Value; }
 	}
 
 	int global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "IsReadOnly"); return IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	global::Neatoo.IValidateBase global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Indexer._source is { } src) { src[index] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]"); Indexer.Backing[index] = value; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(index, value); return; } if (Indexer._source is { } src) { src[index] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 	int global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.IndexOf(global::Neatoo.IValidateBase item)
 	{
-		return IndexOf.Invoke(this, Strict, item);
+		return IndexOf.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.Insert(int index, global::Neatoo.IValidateBase item)
 	{
-		Insert.Invoke(this, Strict, index, item);
+		Insert.Invoke(Strict, index, item);
 	}
 
 	void global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.RemoveAt(int index)
 	{
-		RemoveAt.Invoke(this, Strict, index);
+		RemoveAt.Invoke(Strict, index);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Add(global::Neatoo.IValidateBase item)
 	{
-		Add.Invoke(this, Strict, item);
+		Add.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Clear()
 	{
-		Clear.Invoke(this, Strict);
+		Clear.Invoke(Strict);
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Contains(global::Neatoo.IValidateBase item)
 	{
-		return Contains.Invoke(this, Strict, item);
+		return Contains.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.CopyTo(global::Neatoo.IValidateBase[] array, int arrayIndex)
 	{
-		CopyTo.Invoke(this, Strict, array, arrayIndex);
+		CopyTo.Invoke(Strict, array, arrayIndex);
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Remove(global::Neatoo.IValidateBase item)
 	{
-		return Remove.Invoke(this, Strict, item);
+		return Remove.Invoke(Strict, item);
 	}
 
 	global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateBase>.GetEnumerator()
 	{
-		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase(this, Strict);
+		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_IValidateBase(Strict);
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
@@ -5032,32 +5032,32 @@ partial class ValidateListBaseOfTStub : global::Neatoo.IValidateListBase<global:
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 	{
-		return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(this, Strict);
+		return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
 	{
-		return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(this, Strict, token);
+		return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(Strict, token);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
-		return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(this, Strict, propertyName, token);
+		return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(Strict, propertyName, token);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
-		return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(this, Strict, runRules, token);
+		return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Strict, runRules, token);
 	}
 
 	void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 	{
-		ClearAllMessages.Invoke(this, Strict);
+		ClearAllMessages.Invoke(Strict);
 	}
 
 	void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 	{
-		ClearSelfMessages.Invoke(this, Strict);
+		ClearSelfMessages.Invoke(Strict);
 	}
 
 	event global::System.Collections.Specialized.NotifyCollectionChangedEventHandler? global::System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged

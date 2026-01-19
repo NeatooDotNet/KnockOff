@@ -14,7 +14,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Format(string).</summary>
-		public delegate string FormatDelegate_String_String(MethodOverloadServiceKnockOff ko, string input);
+		public delegate string FormatDelegate_String_String(string input);
 
 		private FormatDelegate_String_String? _onCall_String_String;
 		private MethodTrackingImpl_String_String? _onCallTracking_String_String;
@@ -26,7 +26,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		private global::KnockOff.Times? _verifiableTimes_String_String;
 
 		/// <summary>Delegate for Format(string, bool).</summary>
-		public delegate string FormatDelegate_String_Boolean_String(MethodOverloadServiceKnockOff ko, string input, bool uppercase);
+		public delegate string FormatDelegate_String_Boolean_String(string input, bool uppercase);
 
 		private FormatDelegate_String_Boolean_String? _onCall_String_Boolean_String;
 		private MethodTrackingImpl_String_Boolean_String? _onCallTracking_String_Boolean_String;
@@ -38,7 +38,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		private global::KnockOff.Times? _verifiableTimes_String_Boolean_String;
 
 		/// <summary>Delegate for Format(string, int).</summary>
-		public delegate string FormatDelegate_String_Int32_String(MethodOverloadServiceKnockOff ko, string input, int maxLength);
+		public delegate string FormatDelegate_String_Int32_String(string input, int maxLength);
 
 		private FormatDelegate_String_Int32_String? _onCall_String_Int32_String;
 		private MethodTrackingImpl_String_Int32_String? _onCallTracking_String_Int32_String;
@@ -134,20 +134,20 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		}
 
 		/// <summary>Invokes configured callback for Format(string).</summary>
-		internal string Invoke_String_String(MethodOverloadServiceKnockOff ko, bool strict, string input)
+		internal string Invoke_String_String(bool strict, string input)
 		{
 			if (_sequence_String_String != null && _sequenceIndex_String_String < _sequence_String_String.Count)
 			{
 				var (callback, tracking) = _sequence_String_String[_sequenceIndex_String_String];
 				tracking.RecordCall(input);
 				_sequenceIndex_String_String++;
-				return callback(ko, input);
+				return callback(input);
 			}
 
 			if (_onCall_String_String != null && _onCallTracking_String_String != null)
 			{
 				_onCallTracking_String_String.RecordCall(input);
-				return _onCall_String_String(ko, input);
+				return _onCall_String_String(input);
 			}
 
 			_unconfiguredCallCount++;
@@ -165,20 +165,20 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		}
 
 		/// <summary>Invokes configured callback for Format(string, bool).</summary>
-		internal string Invoke_String_Boolean_String(MethodOverloadServiceKnockOff ko, bool strict, string input, bool uppercase)
+		internal string Invoke_String_Boolean_String(bool strict, string input, bool uppercase)
 		{
 			if (_sequence_String_Boolean_String != null && _sequenceIndex_String_Boolean_String < _sequence_String_Boolean_String.Count)
 			{
 				var (callback, tracking) = _sequence_String_Boolean_String[_sequenceIndex_String_Boolean_String];
 				tracking.RecordCall((input, uppercase));
 				_sequenceIndex_String_Boolean_String++;
-				return callback(ko, input, uppercase);
+				return callback(input, uppercase);
 			}
 
 			if (_onCall_String_Boolean_String != null && _onCallTracking_String_Boolean_String != null)
 			{
 				_onCallTracking_String_Boolean_String.RecordCall((input, uppercase));
-				return _onCall_String_Boolean_String(ko, input, uppercase);
+				return _onCall_String_Boolean_String(input, uppercase);
 			}
 
 			_unconfiguredCallCount++;
@@ -196,20 +196,20 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		}
 
 		/// <summary>Invokes configured callback for Format(string, int).</summary>
-		internal string Invoke_String_Int32_String(MethodOverloadServiceKnockOff ko, bool strict, string input, int maxLength)
+		internal string Invoke_String_Int32_String(bool strict, string input, int maxLength)
 		{
 			if (_sequence_String_Int32_String != null && _sequenceIndex_String_Int32_String < _sequence_String_Int32_String.Count)
 			{
 				var (callback, tracking) = _sequence_String_Int32_String[_sequenceIndex_String_Int32_String];
 				tracking.RecordCall((input, maxLength));
 				_sequenceIndex_String_Int32_String++;
-				return callback(ko, input, maxLength);
+				return callback(input, maxLength);
 			}
 
 			if (_onCall_String_Int32_String != null && _onCallTracking_String_Int32_String != null)
 			{
 				_onCallTracking_String_Int32_String.RecordCall((input, maxLength));
-				return _onCall_String_Int32_String(ko, input, maxLength);
+				return _onCall_String_Int32_String(input, maxLength);
 			}
 
 			_unconfiguredCallCount++;
@@ -670,17 +670,17 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 	string global::KnockOffTests.IMethodOverloadService.Format(string input)
 	{
-		return Format.Invoke_String_String(this, Strict, input);
+		return Format.Invoke_String_String(Strict, input);
 	}
 
 	string global::KnockOffTests.IMethodOverloadService.Format(string input, bool uppercase)
 	{
-		return Format.Invoke_String_Boolean_String(this, Strict, input, uppercase);
+		return Format.Invoke_String_Boolean_String(Strict, input, uppercase);
 	}
 
 	string global::KnockOffTests.IMethodOverloadService.Format(string input, int maxLength)
 	{
-		return Format.Invoke_String_Int32_String(this, Strict, input, maxLength);
+		return Format.Invoke_String_Int32_String(Strict, input, maxLength);
 	}
 
 }

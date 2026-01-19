@@ -19,7 +19,7 @@ partial class IValidateListBaseOfTTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateListBase, global::Neatoo.IValidateBase?>? OnGet { get; set; }
+			public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
 			private global::Neatoo.IValidateBase? _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class IValidateListBaseOfTTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateListBase, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class IValidateListBaseOfTTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateListBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class IValidateListBaseOfTTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateListBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -343,7 +343,7 @@ partial class IValidateListBaseOfTTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateListBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -424,7 +424,7 @@ partial class IValidateListBaseOfTTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateListBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -505,7 +505,7 @@ partial class IValidateListBaseOfTTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateListBase, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
+			public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
 			private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -588,9 +588,9 @@ partial class IValidateListBaseOfTTests
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }
 
-			private global::System.Func<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>? _onGet;
+			private global::System.Func<int, global::Neatoo.IValidateBase>? _onGet;
 			/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>
-			public global::System.Func<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>? OnGet
+			public global::System.Func<int, global::Neatoo.IValidateBase>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -602,9 +602,9 @@ partial class IValidateListBaseOfTTests
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (int Key, global::Neatoo.IValidateBase Value)? LastSetEntry { get; private set; }
 
-			private global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>? _onSet;
+			private global::System.Action<int, global::Neatoo.IValidateBase>? _onSet;
 			/// <summary>Callback for setter. Setting this marks the indexer as configured.</summary>
-			public global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>? OnSet
+			public global::System.Action<int, global::Neatoo.IValidateBase>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -693,7 +693,7 @@ partial class IValidateListBaseOfTTests
 			internal global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>? _source;
 
 			/// <summary>Delegate for IndexOf.</summary>
-			public delegate int IndexOfDelegate(Stubs.IValidateListBase ko, global::Neatoo.IValidateBase item);
+			public delegate int IndexOfDelegate(global::Neatoo.IValidateBase item);
 
 			private IndexOfDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -744,34 +744,34 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IValidateListBase ko, global::Neatoo.IValidateBase item)
+			internal int Invoke(bool strict, global::Neatoo.IValidateBase item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					return callback(ko, item);
+					return callback(item);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					return _onCall(ko, item);
+					return _onCall(item);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("IndexOf");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IndexOf");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.IndexOf(item);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IndexOf");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IndexOf");
 				return default!;
 			}
 
@@ -926,10 +926,10 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>? _source;
 
-			private global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>? _onCall;
+			private global::System.Action<int, global::Neatoo.IValidateBase>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<int, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -949,7 +949,7 @@ partial class IValidateListBaseOfTTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTrackingArgs<(int index, global::Neatoo.IValidateBase item)> OnCall(global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase> callback)
+			public global::KnockOff.IMethodTrackingArgs<(int index, global::Neatoo.IValidateBase item)> OnCall(global::System.Action<int, global::Neatoo.IValidateBase> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -961,13 +961,13 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>> OnCallSequence(global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IValidateBase>> OnCallSequence(global::System.Action<int, global::Neatoo.IValidateBase> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<int, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -975,21 +975,21 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateListBase ko, int index, global::Neatoo.IValidateBase item)
+			internal void Invoke(bool strict, int index, global::Neatoo.IValidateBase item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((index, item));
 					_sequenceIndex++;
-					callback(ko, index, item);
+					callback(index, item);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((index, item));
-					_onCall(ko, index, item);
+					_onCall(index, item);
 					return;
 				}
 
@@ -997,14 +997,14 @@ partial class IValidateListBaseOfTTests
 				_unconfiguredLastArgs = ((index, item));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Insert");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Insert");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Insert(index, item); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Insert");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Insert");
 				return;
 			}
 
@@ -1099,7 +1099,7 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IValidateBase>>
 			{
 				private readonly IValidateListBase_InsertInterceptor _interceptor;
 
@@ -1119,7 +1119,7 @@ partial class IValidateListBaseOfTTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>> ThenCall(global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IValidateBase>> ThenCall(global::System.Action<int, global::Neatoo.IValidateBase> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1140,7 +1140,7 @@ partial class IValidateListBaseOfTTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, int, global::Neatoo.IValidateBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IValidateBase>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1159,10 +1159,10 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>? _source;
 
-			private global::System.Action<Stubs.IValidateListBase, int>? _onCall;
+			private global::System.Action<int>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -1182,7 +1182,7 @@ partial class IValidateListBaseOfTTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<Stubs.IValidateListBase, int> callback)
+			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -1194,13 +1194,13 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, int>> OnCallSequence(global::System.Action<Stubs.IValidateListBase, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase, int> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -1208,21 +1208,21 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateListBase ko, int index)
+			internal void Invoke(bool strict, int index)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(index);
 					_sequenceIndex++;
-					callback(ko, index);
+					callback(index);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(index);
-					_onCall(ko, index);
+					_onCall(index);
 					return;
 				}
 
@@ -1230,14 +1230,14 @@ partial class IValidateListBaseOfTTests
 				_unconfiguredLastArg = index;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("RemoveAt");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("RemoveAt");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.RemoveAt(index); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveAt");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RemoveAt");
 				return;
 			}
 
@@ -1332,7 +1332,7 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, int>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 			{
 				private readonly IValidateListBase_RemoveAtInterceptor _interceptor;
 
@@ -1352,7 +1352,7 @@ partial class IValidateListBaseOfTTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, int>> ThenCall(global::System.Action<Stubs.IValidateListBase, int> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1373,7 +1373,7 @@ partial class IValidateListBaseOfTTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, int>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1392,10 +1392,10 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
-			private global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase>? _onCall;
+			private global::System.Action<global::Neatoo.IValidateBase>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -1415,7 +1415,7 @@ partial class IValidateListBaseOfTTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase> callback)
+			public global::KnockOff.IMethodTracking<global::Neatoo.IValidateBase> OnCall(global::System.Action<global::Neatoo.IValidateBase> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -1427,13 +1427,13 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase>> OnCallSequence(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase>> OnCallSequence(global::System.Action<global::Neatoo.IValidateBase> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateBase> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -1441,21 +1441,21 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateListBase ko, global::Neatoo.IValidateBase item)
+			internal void Invoke(bool strict, global::Neatoo.IValidateBase item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					callback(ko, item);
+					callback(item);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					_onCall(ko, item);
+					_onCall(item);
 					return;
 				}
 
@@ -1463,14 +1463,14 @@ partial class IValidateListBaseOfTTests
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Add(item); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
 
@@ -1565,7 +1565,7 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase>>
 			{
 				private readonly IValidateListBase_AddInterceptor _interceptor;
 
@@ -1585,7 +1585,7 @@ partial class IValidateListBaseOfTTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase>> ThenCall(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase>> ThenCall(global::System.Action<global::Neatoo.IValidateBase> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1606,7 +1606,7 @@ partial class IValidateListBaseOfTTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1625,10 +1625,10 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
-			private global::System.Action<Stubs.IValidateListBase>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -1644,7 +1644,7 @@ partial class IValidateListBaseOfTTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IValidateListBase> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -1656,13 +1656,13 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> OnCallSequence(global::System.Action<Stubs.IValidateListBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -1670,35 +1670,35 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateListBase ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Clear");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Clear");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Clear(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
 
@@ -1785,7 +1785,7 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IValidateListBase_ClearInterceptor _interceptor;
 
@@ -1805,7 +1805,7 @@ partial class IValidateListBaseOfTTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> ThenCall(global::System.Action<Stubs.IValidateListBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1826,7 +1826,7 @@ partial class IValidateListBaseOfTTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1846,7 +1846,7 @@ partial class IValidateListBaseOfTTests
 			internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
 			/// <summary>Delegate for Contains.</summary>
-			public delegate bool ContainsDelegate(Stubs.IValidateListBase ko, global::Neatoo.IValidateBase item);
+			public delegate bool ContainsDelegate(global::Neatoo.IValidateBase item);
 
 			private ContainsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1897,34 +1897,34 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IValidateListBase ko, global::Neatoo.IValidateBase item)
+			internal bool Invoke(bool strict, global::Neatoo.IValidateBase item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					return callback(ko, item);
+					return callback(item);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					return _onCall(ko, item);
+					return _onCall(item);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Contains");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Contains");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Contains(item);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 				return default!;
 			}
 
@@ -2079,10 +2079,10 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
-			private global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int>? _onCall;
+			private global::System.Action<global::Neatoo.IValidateBase[], int>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateBase[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -2102,7 +2102,7 @@ partial class IValidateListBaseOfTTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.IValidateBase[] array, int arrayIndex)> OnCall(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int> callback)
+			public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.IValidateBase[] array, int arrayIndex)> OnCall(global::System.Action<global::Neatoo.IValidateBase[], int> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -2114,13 +2114,13 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int>> OnCallSequence(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase[], int>> OnCallSequence(global::System.Action<global::Neatoo.IValidateBase[], int> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateBase[], int> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -2128,21 +2128,21 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateListBase ko, global::Neatoo.IValidateBase[] array, int arrayIndex)
+			internal void Invoke(bool strict, global::Neatoo.IValidateBase[] array, int arrayIndex)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((array, arrayIndex));
 					_sequenceIndex++;
-					callback(ko, array, arrayIndex);
+					callback(array, arrayIndex);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((array, arrayIndex));
-					_onCall(ko, array, arrayIndex);
+					_onCall(array, arrayIndex);
 					return;
 				}
 
@@ -2150,14 +2150,14 @@ partial class IValidateListBaseOfTTests
 				_unconfiguredLastArgs = ((array, arrayIndex));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("CopyTo");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CopyTo");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 				return;
 			}
 
@@ -2252,7 +2252,7 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase[], int>>
 			{
 				private readonly IValidateListBase_CopyToInterceptor _interceptor;
 
@@ -2272,7 +2272,7 @@ partial class IValidateListBaseOfTTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int>> ThenCall(global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase[], int>> ThenCall(global::System.Action<global::Neatoo.IValidateBase[], int> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -2293,7 +2293,7 @@ partial class IValidateListBaseOfTTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase, global::Neatoo.IValidateBase[], int>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IValidateBase[], int>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -2313,7 +2313,7 @@ partial class IValidateListBaseOfTTests
 			internal global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>? _source;
 
 			/// <summary>Delegate for Remove.</summary>
-			public delegate bool RemoveDelegate(Stubs.IValidateListBase ko, global::Neatoo.IValidateBase item);
+			public delegate bool RemoveDelegate(global::Neatoo.IValidateBase item);
 
 			private RemoveDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2364,34 +2364,34 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IValidateListBase ko, global::Neatoo.IValidateBase item)
+			internal bool Invoke(bool strict, global::Neatoo.IValidateBase item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					return callback(ko, item);
+					return callback(item);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					return _onCall(ko, item);
+					return _onCall(item);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Remove");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Remove");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Remove(item);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return default!;
 			}
 
@@ -2547,7 +2547,7 @@ partial class IValidateListBaseOfTTests
 			internal global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateBase>? _source;
 
 			/// <summary>Delegate for GetEnumerator.</summary>
-			public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> GetEnumeratorDelegate(Stubs.IValidateListBase ko);
+			public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> GetEnumeratorDelegate();
 
 			private GetEnumeratorDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2594,33 +2594,33 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> Invoke(Stubs.IValidateListBase ko)
+			internal global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetEnumerator();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
 
@@ -2770,7 +2770,7 @@ partial class IValidateListBaseOfTTests
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for WaitForTasks().</summary>
-			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task(Stubs.IValidateListBase ko);
+			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task();
 
 			private WaitForTasksDelegate_NoParams_Threading_Tasks_Task? _onCall_NoParams_Threading_Tasks_Task;
 			private MethodTrackingImpl_NoParams_Threading_Tasks_Task? _onCallTracking_NoParams_Threading_Tasks_Task;
@@ -2782,7 +2782,7 @@ partial class IValidateListBaseOfTTests
 			private global::KnockOff.Times? _verifiableTimes_NoParams_Threading_Tasks_Task;
 
 			/// <summary>Delegate for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateListBase ko, global::System.Threading.CancellationToken token);
+			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(global::System.Threading.CancellationToken token);
 
 			private WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task;
@@ -2852,64 +2852,64 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes configured callback for WaitForTasks().</summary>
-			internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(Stubs.IValidateListBase ko)
+			internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(bool strict)
 			{
 				if (_sequence_NoParams_Threading_Tasks_Task != null && _sequenceIndex_NoParams_Threading_Tasks_Task < _sequence_NoParams_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_NoParams_Threading_Tasks_Task[_sequenceIndex_NoParams_Threading_Tasks_Task];
 					tracking.RecordCall();
 					_sequenceIndex_NoParams_Threading_Tasks_Task++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall_NoParams_Threading_Tasks_Task != null && _onCallTracking_NoParams_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_NoParams_Threading_Tasks_Task.RecordCall();
-					return _onCall_NoParams_Threading_Tasks_Task(ko);
+					return _onCall_NoParams_Threading_Tasks_Task();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_NoParams_Threading_Tasks_Task != null && _sequenceIndex_NoParams_Threading_Tasks_Task >= _sequence_NoParams_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			/// <summary>Invokes configured callback for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateListBase ko, global::System.Threading.CancellationToken token)
+			internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::System.Threading.CancellationToken token)
 			{
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall(token);
 					_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, token);
+					return callback(token);
 				}
 
 				if (_onCall_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task.RecordCall(token);
-					return _onCall_Threading_CancellationToken_Threading_Tasks_Task(ko, token);
+					return _onCall_Threading_CancellationToken_Threading_Tasks_Task(token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks(token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -3192,7 +3192,7 @@ partial class IValidateListBaseOfTTests
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateListBase ko, string propertyName, global::System.Threading.CancellationToken? token);
+			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(string propertyName, global::System.Threading.CancellationToken? token);
 
 			private RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task? _onCall_String_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task;
@@ -3204,7 +3204,7 @@ partial class IValidateListBaseOfTTests
 			private global::KnockOff.Times? _verifiableTimes_String_Threading_CancellationToken_Threading_Tasks_Task;
 
 			/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateListBase ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
+			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
 			private RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
@@ -3274,64 +3274,64 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes configured callback for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateListBase ko, string propertyName, global::System.Threading.CancellationToken? token)
+			internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(bool strict, string propertyName, global::System.Threading.CancellationToken? token)
 			{
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task < _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_String_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall((propertyName, token));
 					_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, propertyName, token);
+					return callback(propertyName, token);
 				}
 
 				if (_onCall_String_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((propertyName, token));
-					return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(ko, propertyName, token);
+					return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(propertyName, token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(propertyName, token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			/// <summary>Invokes configured callback for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateListBase ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+			internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall((runRules, token));
 					_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, runRules, token);
+					return callback(runRules, token);
 				}
 
 				if (_onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((runRules, token));
-					return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(ko, runRules, token);
+					return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(runRules, token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(runRules, token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -3618,10 +3618,10 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
-			private global::System.Action<Stubs.IValidateListBase>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -3637,7 +3637,7 @@ partial class IValidateListBaseOfTTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IValidateListBase> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -3649,13 +3649,13 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> OnCallSequence(global::System.Action<Stubs.IValidateListBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -3663,35 +3663,35 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateListBase ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ClearAllMessages");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ClearAllMessages");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearAllMessages(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
 
@@ -3778,7 +3778,7 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IValidateListBase_ClearAllMessagesInterceptor _interceptor;
 
@@ -3798,7 +3798,7 @@ partial class IValidateListBaseOfTTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> ThenCall(global::System.Action<Stubs.IValidateListBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -3819,7 +3819,7 @@ partial class IValidateListBaseOfTTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -3838,10 +3838,10 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
-			private global::System.Action<Stubs.IValidateListBase>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -3857,7 +3857,7 @@ partial class IValidateListBaseOfTTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IValidateListBase> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -3869,13 +3869,13 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> OnCallSequence(global::System.Action<Stubs.IValidateListBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateListBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -3883,35 +3883,35 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateListBase ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ClearSelfMessages");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ClearSelfMessages");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearSelfMessages(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}
 
@@ -3998,7 +3998,7 @@ partial class IValidateListBaseOfTTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IValidateListBase_ClearSelfMessagesInterceptor _interceptor;
 
@@ -4018,7 +4018,7 @@ partial class IValidateListBaseOfTTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> ThenCall(global::System.Action<Stubs.IValidateListBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -4039,7 +4039,7 @@ partial class IValidateListBaseOfTTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateListBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -4423,7 +4423,7 @@ partial class IValidateListBaseOfTTests
 				get
 				{
 					Parent.RecordGet();
-					if (Parent.OnGet is { } onGet) return onGet(this);
+					if (Parent.OnGet is { } onGet) return onGet();
 					if (Parent._source is { } src) return src.Parent;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Parent");
 					return Parent.Value;
@@ -4432,17 +4432,17 @@ partial class IValidateListBaseOfTTests
 
 			int global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.IndexOf(global::Neatoo.IValidateBase item)
 			{
-				return IndexOf.Invoke(this, item);
+				return IndexOf.Invoke(Strict, item);
 			}
 
 			void global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.Insert(int index, global::Neatoo.IValidateBase item)
 			{
-				Insert.Invoke(this, index, item);
+				Insert.Invoke(Strict, index, item);
 			}
 
 			void global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.RemoveAt(int index)
 			{
-				RemoveAt.Invoke(this, index);
+				RemoveAt.Invoke(Strict, index);
 			}
 
 			global::Neatoo.IValidateBase global::System.Collections.Generic.IList<global::Neatoo.IValidateBase>.this[int index]
@@ -4450,7 +4450,7 @@ partial class IValidateListBaseOfTTests
 				get
 				{
 					Indexer.RecordGet(index);
-					if (Indexer.OnGet is { } onGet) return onGet(this, index);
+					if (Indexer.OnGet is { } onGet) return onGet(index);
 					if (Indexer._source is { } src) return src[index];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]");
 					return Indexer.Backing.TryGetValue(index, out var v) ? v : default!;
@@ -4458,7 +4458,7 @@ partial class IValidateListBaseOfTTests
 				set
 				{
 					Indexer.RecordSet(index, value);
-					if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; }
+					if (Indexer.OnSet is { } onSet) { onSet(index, value); return; }
 					if (Indexer._source is { } src) { src[index] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "this[]");
 					Indexer.Backing[index] = value;
@@ -4467,27 +4467,27 @@ partial class IValidateListBaseOfTTests
 
 			void global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Add(global::Neatoo.IValidateBase item)
 			{
-				Add.Invoke(this, item);
+				Add.Invoke(Strict, item);
 			}
 
 			void global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Clear()
 			{
-				Clear.Invoke(this);
+				Clear.Invoke(Strict);
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Contains(global::Neatoo.IValidateBase item)
 			{
-				return Contains.Invoke(this, item);
+				return Contains.Invoke(Strict, item);
 			}
 
 			void global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.CopyTo(global::Neatoo.IValidateBase[] array, int arrayIndex)
 			{
-				CopyTo.Invoke(this, array, arrayIndex);
+				CopyTo.Invoke(Strict, array, arrayIndex);
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Remove(global::Neatoo.IValidateBase item)
 			{
-				return Remove.Invoke(this, item);
+				return Remove.Invoke(Strict, item);
 			}
 
 			int global::System.Collections.Generic.ICollection<global::Neatoo.IValidateBase>.Count
@@ -4495,7 +4495,7 @@ partial class IValidateListBaseOfTTests
 				get
 				{
 					Count.RecordGet();
-					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count.OnGet is { } onGet) return onGet();
 					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "Count");
 					return Count.Value;
@@ -4507,7 +4507,7 @@ partial class IValidateListBaseOfTTests
 				get
 				{
 					IsReadOnly.RecordGet();
-					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly.OnGet is { } onGet) return onGet();
 					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase>", "IsReadOnly");
 					return IsReadOnly.Value;
@@ -4516,42 +4516,42 @@ partial class IValidateListBaseOfTTests
 
 			global::System.Collections.Generic.IEnumerator<global::Neatoo.IValidateBase> global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateBase>.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 			{
-				return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(this);
+				return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(Strict);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
 			{
-				return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(this, token);
+				return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(Strict, token);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 			{
-				return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(this, propertyName, token);
+				return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(Strict, propertyName, token);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
-				return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(this, runRules, token);
+				return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Strict, runRules, token);
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 			{
-				ClearAllMessages.Invoke(this);
+				ClearAllMessages.Invoke(Strict);
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
-				ClearSelfMessages.Invoke(this);
+				ClearSelfMessages.Invoke(Strict);
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -4559,7 +4559,7 @@ partial class IValidateListBaseOfTTests
 				get
 				{
 					IsBusy.RecordGet();
-					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (IsBusy.OnGet is { } onGet) return onGet();
 					if (IsBusy._source is { } src) return src.IsBusy;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
@@ -4571,7 +4571,7 @@ partial class IValidateListBaseOfTTests
 				get
 				{
 					IsValid.RecordGet();
-					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (IsValid.OnGet is { } onGet) return onGet();
 					if (IsValid._source is { } src) return src.IsValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
@@ -4583,7 +4583,7 @@ partial class IValidateListBaseOfTTests
 				get
 				{
 					IsSelfValid.RecordGet();
-					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (IsSelfValid.OnGet is { } onGet) return onGet();
 					if (IsSelfValid._source is { } src) return src.IsSelfValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
@@ -4595,7 +4595,7 @@ partial class IValidateListBaseOfTTests
 				get
 				{
 					PropertyMessages.RecordGet();
-					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (PropertyMessages.OnGet is { } onGet) return onGet();
 					if (PropertyMessages._source is { } src) return src.PropertyMessages;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;

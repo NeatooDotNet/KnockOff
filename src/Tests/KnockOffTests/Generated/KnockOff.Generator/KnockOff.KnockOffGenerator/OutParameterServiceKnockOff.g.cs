@@ -12,7 +12,7 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 		internal global::KnockOff.Tests.IOutParameterService? _source;
 
 		/// <summary>Delegate for TryGetValue.</summary>
-		public delegate bool TryGetValueDelegate(OutParameterServiceKnockOff ko, string key, out string? @value);
+		public delegate bool TryGetValueDelegate(string key, out string? @value);
 
 		private TryGetValueDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,7 +63,7 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(OutParameterServiceKnockOff ko, bool strict, string key, out string? @value)
+		internal bool Invoke(bool strict, string key, out string? @value)
 		{
 			@value = default!;
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
@@ -71,13 +71,13 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(key);
 				_sequenceIndex++;
-				return callback(ko, key, out @value);
+				return callback(key, out @value);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(key);
-				return _onCall(ko, key, out @value);
+				return _onCall(key, out @value);
 			}
 
 			_unconfiguredCallCount++;
@@ -247,7 +247,7 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 		internal global::KnockOff.Tests.IOutParameterService? _source;
 
 		/// <summary>Delegate for TryParse.</summary>
-		public delegate bool TryParseDelegate(OutParameterServiceKnockOff ko, string input, out int result);
+		public delegate bool TryParseDelegate(string input, out int result);
 
 		private TryParseDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -298,7 +298,7 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(OutParameterServiceKnockOff ko, bool strict, string input, out int result)
+		internal bool Invoke(bool strict, string input, out int result)
 		{
 			result = default!;
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
@@ -306,13 +306,13 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(input);
 				_sequenceIndex++;
-				return callback(ko, input, out result);
+				return callback(input, out result);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(input);
-				return _onCall(ko, input, out result);
+				return _onCall(input, out result);
 			}
 
 			_unconfiguredCallCount++;
@@ -482,7 +482,7 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 		internal global::KnockOff.Tests.IOutParameterService? _source;
 
 		/// <summary>Delegate for GetData.</summary>
-		public delegate void GetDataDelegate(OutParameterServiceKnockOff ko, out string name, out int count);
+		public delegate void GetDataDelegate(out string name, out int count);
 
 		private GetDataDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -529,7 +529,7 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(OutParameterServiceKnockOff ko, bool strict, out string name, out int count)
+		internal void Invoke(bool strict, out string name, out int count)
 		{
 			name = default!;
 			count = default!;
@@ -538,14 +538,14 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko, out name, out count);
+				callback(out name, out count);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko, out name, out count);
+				_onCall(out name, out count);
 				return;
 			}
 
@@ -754,17 +754,17 @@ partial class OutParameterServiceKnockOff : global::KnockOff.Tests.IOutParameter
 
 	bool global::KnockOff.Tests.IOutParameterService.TryGetValue(string key, out string? @value)
 	{
-		return TryGetValue.Invoke(this, Strict, key, out @value);
+		return TryGetValue.Invoke(Strict, key, out @value);
 	}
 
 	bool global::KnockOff.Tests.IOutParameterService.TryParse(string input, out int result)
 	{
-		return TryParse.Invoke(this, Strict, input, out result);
+		return TryParse.Invoke(Strict, input, out result);
 	}
 
 	void global::KnockOff.Tests.IOutParameterService.GetData(out string name, out int count)
 	{
-		GetData.Invoke(this, Strict, out name, out count);
+		GetData.Invoke(Strict, out name, out count);
 	}
 
 }

@@ -250,15 +250,22 @@ internal static class ClassModelBuilder
 
         var inputParams = GetInputParameters(member.Parameters).ToArray();
 
-        // Build delegate type
+        // Build delegate type (no stub parameter - callbacks only get method parameters)
         var delegateParamTypes = string.Join(", ", inputParams.Select(p => p.Type));
-        var delegateParams = string.IsNullOrEmpty(delegateParamTypes)
-            ? stubClassRef
-            : $"{stubClassRef}, {delegateParamTypes}";
         var isVoid = member.ReturnType == "void";
-        var delegateType = isVoid
-            ? $"global::System.Action<{delegateParams}>"
-            : $"global::System.Func<{delegateParams}, {member.ReturnType}>";
+        string delegateType;
+        if (isVoid)
+        {
+            delegateType = string.IsNullOrEmpty(delegateParamTypes)
+                ? "global::System.Action"
+                : $"global::System.Action<{delegateParamTypes}>";
+        }
+        else
+        {
+            delegateType = string.IsNullOrEmpty(delegateParamTypes)
+                ? $"global::System.Func<{member.ReturnType}>"
+                : $"global::System.Func<{delegateParamTypes}, {member.ReturnType}>";
+        }
 
         // Build input parameters model
         var inputParamModels = inputParams.Select(p => new ParameterModel(
@@ -373,7 +380,7 @@ internal static class ClassModelBuilder
         var isTask = member.ReturnType == "global::System.Threading.Tasks.Task";
         var isValueTask = member.ReturnType == "global::System.Threading.Tasks.ValueTask";
 
-        var onCallArgs = inputParams.Length > 0 ? $"_stub, {inputArgList}" : "_stub";
+        var onCallArgs = inputArgList; // No stub parameter - callbacks only get method parameters
 
         return new InlineClassImplMethodModel(
             HandlerName: handlerName,

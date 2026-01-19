@@ -15,7 +15,7 @@ partial class CustomFormatterStubTests
 			internal global::System.ICustomFormatter? _source;
 
 			/// <summary>Delegate for Format.</summary>
-			public delegate string FormatDelegate(Stubs.ICustomFormatter ko, string? format, object? arg, global::System.IFormatProvider? formatProvider);
+			public delegate string FormatDelegate(string? format, object? arg, global::System.IFormatProvider? formatProvider);
 
 			private FormatDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class CustomFormatterStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal string Invoke(Stubs.ICustomFormatter ko, string? format, object? arg, global::System.IFormatProvider? formatProvider)
+			internal string Invoke(bool strict, string? format, object? arg, global::System.IFormatProvider? formatProvider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((format, arg, formatProvider));
 					_sequenceIndex++;
-					return callback(ko, format, arg, formatProvider);
+					return callback(format, arg, formatProvider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((format, arg, formatProvider));
-					return _onCall(ko, format, arg, formatProvider);
+					return _onCall(format, arg, formatProvider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((format, arg, formatProvider));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Format");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Format");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Format(format, arg, formatProvider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class CustomFormatterStubTests
 
 			string global::System.ICustomFormatter.Format(string? format, object? arg, global::System.IFormatProvider? formatProvider)
 			{
-				return Format.Invoke(this, format, arg, formatProvider);
+				return Format.Invoke(Strict, format, arg, formatProvider);
 			}
 
 			/// <summary>The global::System.ICustomFormatter instance. Use for passing to code expecting the interface.</summary>

@@ -15,7 +15,7 @@ partial class CloneableStubTests
 			internal global::System.ICloneable? _source;
 
 			/// <summary>Delegate for Clone.</summary>
-			public delegate object CloneDelegate(Stubs.ICloneable ko);
+			public delegate object CloneDelegate();
 
 			private CloneDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -62,33 +62,33 @@ partial class CloneableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal object Invoke(Stubs.ICloneable ko)
+			internal object Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Clone");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Clone");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Clone();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clone");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clone");
 				return default!;
 			}
 
@@ -237,7 +237,7 @@ partial class CloneableStubTests
 
 			object global::System.ICloneable.Clone()
 			{
-				return Clone.Invoke(this);
+				return Clone.Invoke(Strict);
 			}
 
 			/// <summary>The global::System.ICloneable instance. Use for passing to code expecting the interface.</summary>

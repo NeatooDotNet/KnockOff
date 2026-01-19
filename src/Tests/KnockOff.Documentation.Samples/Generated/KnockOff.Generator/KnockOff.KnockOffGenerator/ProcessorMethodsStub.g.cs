@@ -11,10 +11,10 @@ partial class ProcessorMethodsStub : global::KnockOff.Documentation.Samples.Meth
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Methods.IProcessorMethods? _source;
 
-		private global::System.Action<ProcessorMethodsStub, string>? _onCall;
+		private global::System.Action<string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ProcessorMethodsStub, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class ProcessorMethodsStub : global::KnockOff.Documentation.Samples.Meth
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<ProcessorMethodsStub, string> callback)
+		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class ProcessorMethodsStub : global::KnockOff.Documentation.Samples.Meth
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ProcessorMethodsStub, string>> OnCallSequence(global::System.Action<ProcessorMethodsStub, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ProcessorMethodsStub, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class ProcessorMethodsStub : global::KnockOff.Documentation.Samples.Meth
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ProcessorMethodsStub ko, bool strict, string data)
+		internal void Invoke(bool strict, string data)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(data);
 				_sequenceIndex++;
-				callback(ko, data);
+				callback(data);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(data);
-				_onCall(ko, data);
+				_onCall(data);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class ProcessorMethodsStub : global::KnockOff.Documentation.Samples.Meth
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ProcessorMethodsStub, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 		{
 			private readonly ProcessDataInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class ProcessorMethodsStub : global::KnockOff.Documentation.Samples.Meth
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ProcessorMethodsStub, string>> ThenCall(global::System.Action<ProcessorMethodsStub, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,7 @@ partial class ProcessorMethodsStub : global::KnockOff.Documentation.Samples.Meth
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ProcessorMethodsStub, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -280,7 +280,7 @@ partial class ProcessorMethodsStub : global::KnockOff.Documentation.Samples.Meth
 
 	void global::KnockOff.Documentation.Samples.Methods.IProcessorMethods.ProcessData(string data)
 	{
-		ProcessData.Invoke(this, Strict, data);
+		ProcessData.Invoke(Strict, data);
 	}
 
 }

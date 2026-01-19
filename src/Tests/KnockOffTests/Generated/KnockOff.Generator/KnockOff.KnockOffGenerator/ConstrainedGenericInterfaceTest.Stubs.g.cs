@@ -14,10 +14,10 @@ partial class ConstrainedGenericInterfaceTest
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Tests.IClassRepository<T>? _source;
 
-			private global::System.Action<Stubs.IClassRepository<T>, T>? _onCall;
+			private global::System.Action<T>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IClassRepository<T>, T> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -37,7 +37,7 @@ partial class ConstrainedGenericInterfaceTest
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<Stubs.IClassRepository<T>, T> callback)
+			public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<T> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -49,13 +49,13 @@ partial class ConstrainedGenericInterfaceTest
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IClassRepository<T>, T>> OnCallSequence(global::System.Action<Stubs.IClassRepository<T>, T> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> OnCallSequence(global::System.Action<T> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IClassRepository<T>, T> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -63,21 +63,21 @@ partial class ConstrainedGenericInterfaceTest
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IClassRepository<T> ko, T item)
+			internal void Invoke(bool strict, T item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					callback(ko, item);
+					callback(item);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					_onCall(ko, item);
+					_onCall(item);
 					return;
 				}
 
@@ -85,14 +85,14 @@ partial class ConstrainedGenericInterfaceTest
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Add(item); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
 
@@ -187,7 +187,7 @@ partial class ConstrainedGenericInterfaceTest
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IClassRepository<T>, T>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<T>>
 			{
 				private readonly IClassRepository_AddInterceptor<T> _interceptor;
 
@@ -207,7 +207,7 @@ partial class ConstrainedGenericInterfaceTest
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IClassRepository<T>, T>> ThenCall(global::System.Action<Stubs.IClassRepository<T>, T> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<T>> ThenCall(global::System.Action<T> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -228,7 +228,7 @@ partial class ConstrainedGenericInterfaceTest
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IClassRepository<T>, T>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<T>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -248,7 +248,7 @@ partial class ConstrainedGenericInterfaceTest
 			internal global::KnockOff.Tests.IClassRepository<T>? _source;
 
 			/// <summary>Delegate for Find.</summary>
-			public delegate T? FindDelegate(Stubs.IClassRepository<T> ko, int id);
+			public delegate T? FindDelegate(int id);
 
 			private FindDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -299,34 +299,34 @@ partial class ConstrainedGenericInterfaceTest
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal T? Invoke(Stubs.IClassRepository<T> ko, int id)
+			internal T? Invoke(bool strict, int id)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(id);
 					_sequenceIndex++;
-					return callback(ko, id);
+					return callback(id);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(id);
-					return _onCall(ko, id);
+					return _onCall(id);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Find");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Find");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Find(id);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
 				return default!;
 			}
 
@@ -486,12 +486,12 @@ partial class ConstrainedGenericInterfaceTest
 
 			void global::KnockOff.Tests.IClassRepository<T>.Add(T item)
 			{
-				Add.Invoke(this, item);
+				Add.Invoke(Strict, item);
 			}
 
 			T? global::KnockOff.Tests.IClassRepository<T>.Find(int id)
 			{
-				return Find.Invoke(this, id);
+				return Find.Invoke(Strict, id);
 			}
 
 			/// <summary>The global::KnockOff.Tests.IClassRepository<T> instance. Use for passing to code expecting the interface.</summary>

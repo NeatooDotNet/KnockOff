@@ -67,7 +67,7 @@ public void SaveUser_WhenCalled_TracksInvocation()
 
     // Configure method behavior using OnCall
     // Chain .Verifiable() to mark for batch verification
-    stub.SaveUser.OnCall((ko, user) => true).Verifiable();
+    stub.SaveUser.OnCall((user) => true).Verifiable();
 
     // Act - use through the interface
     IUserRepo repository = stub;
@@ -115,7 +115,7 @@ public void Send_WhenCalled_TracksMessage()
 
     // Configure behavior and mark as verifiable
     // OnCall returns a tracking object for argument access
-    var tracking = stub.Send.OnCall((ko, to, subject, body) => { }).Verifiable();
+    var tracking = stub.Send.OnCall((to, subject, body) => { }).Verifiable();
 
     // Act - use through the interface
     IEmailSvc emailService = stub;

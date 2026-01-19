@@ -18,9 +18,9 @@ partial class MixedStubTestClass
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.MixedService, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.MixedService, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -32,9 +32,9 @@ partial class MixedStubTestClass
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.MixedService, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.MixedService, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -113,7 +113,7 @@ partial class MixedStubTestClass
 		/// <summary>Interceptor for MixedService.VirtualMethod.</summary>
 		public sealed class MixedService_VirtualMethodInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Action<Stubs.MixedService>? _onCall;
+			private global::System.Action? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -122,10 +122,10 @@ partial class MixedStubTestClass
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.MixedService> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.MixedService>? Callback => _onCall;
+			internal global::System.Action? Callback => _onCall;
 
 			public void RecordCall() { CallCount++; }
 
@@ -235,13 +235,13 @@ partial class MixedStubTestClass
 					get
 					{
 						_stub?.VirtualProperty.RecordGet();
-						if (_stub?.VirtualProperty.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.VirtualProperty.OnGet is { } onGet) return onGet();
 						return base.VirtualProperty;
 					}
 					set
 					{
 						_stub?.VirtualProperty.RecordSet(value);
-						if (_stub?.VirtualProperty.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.VirtualProperty.OnSet is { } onSet) onSet(value);
 						else base.VirtualProperty = value;
 					}
 				}
@@ -250,7 +250,7 @@ partial class MixedStubTestClass
 				public override void VirtualMethod()
 				{
 					_stub?.VirtualMethod.RecordCall();
-					if (_stub?.VirtualMethod.Callback is { } onCall) { onCall(_stub); return; }
+					if (_stub?.VirtualMethod.Callback is { } onCall) { onCall(); return; }
 					base.VirtualMethod();
 				}
 

@@ -12,7 +12,7 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		internal global::KnockOff.Benchmarks.Interfaces.IAsyncService? _source;
 
 		/// <summary>Delegate for DoWorkAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task DoWorkAsyncDelegate(AsyncServiceStub ko);
+		public delegate global::System.Threading.Tasks.Task DoWorkAsyncDelegate();
 
 		private DoWorkAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(AsyncServiceStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -233,7 +233,7 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		internal global::KnockOff.Benchmarks.Interfaces.IAsyncService? _source;
 
 		/// <summary>Delegate for GetValueAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<int> GetValueAsyncDelegate(AsyncServiceStub ko);
+		public delegate global::System.Threading.Tasks.Task<int> GetValueAsyncDelegate();
 
 		private GetValueAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -280,20 +280,20 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<int> Invoke(AsyncServiceStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task<int> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -454,7 +454,7 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		internal global::KnockOff.Benchmarks.Interfaces.IAsyncService? _source;
 
 		/// <summary>Delegate for GetStringValueAsync.</summary>
-		public delegate global::System.Threading.Tasks.ValueTask<string> GetStringValueAsyncDelegate(AsyncServiceStub ko);
+		public delegate global::System.Threading.Tasks.ValueTask<string> GetStringValueAsyncDelegate();
 
 		private GetStringValueAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -501,20 +501,20 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.ValueTask<string> Invoke(AsyncServiceStub ko, bool strict)
+		internal global::System.Threading.Tasks.ValueTask<string> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -722,17 +722,17 @@ partial class AsyncServiceStub : global::KnockOff.Benchmarks.Interfaces.IAsyncSe
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Interfaces.IAsyncService.DoWorkAsync()
 	{
-		return DoWorkAsync.Invoke(this, Strict);
+		return DoWorkAsync.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Benchmarks.Interfaces.IAsyncService.GetValueAsync()
 	{
-		return GetValueAsync.Invoke(this, Strict);
+		return GetValueAsync.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.ValueTask<string> global::KnockOff.Benchmarks.Interfaces.IAsyncService.GetStringValueAsync()
 	{
-		return GetStringValueAsync.Invoke(this, Strict);
+		return GetStringValueAsync.Invoke(Strict);
 	}
 
 }

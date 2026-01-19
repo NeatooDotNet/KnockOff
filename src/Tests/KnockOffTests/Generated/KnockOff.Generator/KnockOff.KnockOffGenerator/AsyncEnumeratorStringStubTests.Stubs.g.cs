@@ -19,7 +19,7 @@ partial class AsyncEnumeratorStringStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncEnumerator, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -96,7 +96,7 @@ partial class AsyncEnumeratorStringStubTests
 			internal global::System.Collections.Generic.IAsyncEnumerator<string>? _source;
 
 			/// <summary>Delegate for MoveNextAsync.</summary>
-			public delegate global::System.Threading.Tasks.ValueTask<bool> MoveNextAsyncDelegate(Stubs.IAsyncEnumerator ko);
+			public delegate global::System.Threading.Tasks.ValueTask<bool> MoveNextAsyncDelegate();
 
 			private MoveNextAsyncDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -143,33 +143,33 @@ partial class AsyncEnumeratorStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Threading.Tasks.ValueTask<bool> Invoke(Stubs.IAsyncEnumerator ko)
+			internal global::System.Threading.Tasks.ValueTask<bool> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("MoveNextAsync");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("MoveNextAsync");
 					return new global::System.Threading.Tasks.ValueTask<bool>((bool)default!);
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.MoveNextAsync();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "MoveNextAsync");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "MoveNextAsync");
 				return new global::System.Threading.Tasks.ValueTask<bool>((bool)default!);
 			}
 
@@ -317,7 +317,7 @@ partial class AsyncEnumeratorStringStubTests
 			internal global::System.IAsyncDisposable? _source;
 
 			/// <summary>Delegate for DisposeAsync.</summary>
-			public delegate global::System.Threading.Tasks.ValueTask DisposeAsyncDelegate(Stubs.IAsyncEnumerator ko);
+			public delegate global::System.Threading.Tasks.ValueTask DisposeAsyncDelegate();
 
 			private DisposeAsyncDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -364,33 +364,33 @@ partial class AsyncEnumeratorStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Threading.Tasks.ValueTask Invoke(Stubs.IAsyncEnumerator ko)
+			internal global::System.Threading.Tasks.ValueTask Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("DisposeAsync");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("DisposeAsync");
 					return default;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.DisposeAsync();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DisposeAsync");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DisposeAsync");
 				return default;
 			}
 
@@ -545,7 +545,7 @@ partial class AsyncEnumeratorStringStubTests
 
 			global::System.Threading.Tasks.ValueTask<bool> global::System.Collections.Generic.IAsyncEnumerator<string>.MoveNextAsync()
 			{
-				return MoveNextAsync.Invoke(this);
+				return MoveNextAsync.Invoke(Strict);
 			}
 
 			string global::System.Collections.Generic.IAsyncEnumerator<string>.Current
@@ -553,7 +553,7 @@ partial class AsyncEnumeratorStringStubTests
 				get
 				{
 					Current.RecordGet();
-					if (Current.OnGet is { } onGet) return onGet(this);
+					if (Current.OnGet is { } onGet) return onGet();
 					if (Current._source is { } src) return src.Current;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncEnumerator<string>", "Current");
 					return Current.Value;
@@ -562,7 +562,7 @@ partial class AsyncEnumeratorStringStubTests
 
 			global::System.Threading.Tasks.ValueTask global::System.IAsyncDisposable.DisposeAsync()
 			{
-				return DisposeAsync.Invoke(this);
+				return DisposeAsync.Invoke(Strict);
 			}
 
 			/// <summary>The global::System.Collections.Generic.IAsyncEnumerator<string> instance. Use for passing to code expecting the interface.</summary>

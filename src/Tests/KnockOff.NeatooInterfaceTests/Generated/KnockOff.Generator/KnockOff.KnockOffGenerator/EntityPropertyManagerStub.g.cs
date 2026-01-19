@@ -19,7 +19,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.IEnumerable<string> _value = new global::System.Collections.Generic.List<string>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -343,7 +343,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -424,7 +424,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -505,7 +505,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityPropertyManagerStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -586,7 +586,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityPropertyManagerStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -666,7 +666,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<EntityPropertyManagerStub, string, global::Neatoo.IEntityProperty>? OnGet { get; set; }
+		public global::System.Func<string, global::Neatoo.IEntityProperty>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? propertyName) { GetCount++; LastGetKey = propertyName; }
@@ -749,10 +749,10 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IEntityPropertyManager? _source;
 
-		private global::System.Action<EntityPropertyManagerStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -768,7 +768,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -780,13 +780,13 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> OnCallSequence(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -794,21 +794,21 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityPropertyManagerStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -909,7 +909,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly MarkSelfUnmodifiedInterceptor _interceptor;
 
@@ -929,7 +929,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> ThenCall(global::System.Action<EntityPropertyManagerStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -950,7 +950,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -970,7 +970,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
 		/// <summary>Delegate for WaitForTasks.</summary>
-		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate(EntityPropertyManagerStub ko);
+		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate();
 
 		private WaitForTasksDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1017,20 +1017,20 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(EntityPropertyManagerStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1191,7 +1191,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
 		/// <summary>Delegate for HasProperty.</summary>
-		public delegate bool HasPropertyDelegate(EntityPropertyManagerStub ko, string propertyName);
+		public delegate bool HasPropertyDelegate(string propertyName);
 
 		private HasPropertyDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1242,20 +1242,20 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(EntityPropertyManagerStub ko, bool strict, string propertyName)
+		internal bool Invoke(bool strict, string propertyName)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(propertyName);
 				_sequenceIndex++;
-				return callback(ko, propertyName);
+				return callback(propertyName);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(propertyName);
-				return _onCall(ko, propertyName);
+				return _onCall(propertyName);
 			}
 
 			_unconfiguredCallCount++;
@@ -1425,7 +1425,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
 		/// <summary>Delegate for GetProperty.</summary>
-		public delegate global::Neatoo.IEntityProperty GetPropertyDelegate(EntityPropertyManagerStub ko, string propertyName);
+		public delegate global::Neatoo.IEntityProperty GetPropertyDelegate(string propertyName);
 
 		private GetPropertyDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1476,20 +1476,20 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::Neatoo.IEntityProperty Invoke(EntityPropertyManagerStub ko, bool strict, string propertyName)
+		internal global::Neatoo.IEntityProperty Invoke(bool strict, string propertyName)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(propertyName);
 				_sequenceIndex++;
-				return callback(ko, propertyName);
+				return callback(propertyName);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(propertyName);
-				return _onCall(ko, propertyName);
+				return _onCall(propertyName);
 			}
 
 			_unconfiguredCallCount++;
@@ -1658,10 +1658,10 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
-		private global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>? _onCall;
+		private global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1681,7 +1681,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> OnCall(global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> callback)
+		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> OnCall(global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1693,13 +1693,13 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>> OnCallSequence(global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>> OnCallSequence(global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1707,21 +1707,21 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityPropertyManagerStub ko, bool strict, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty> properties)
+		internal void Invoke(bool strict, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty> properties)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(properties);
 				_sequenceIndex++;
-				callback(ko, properties);
+				callback(properties);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(properties);
-				_onCall(ko, properties);
+				_onCall(properties);
 				return;
 			}
 
@@ -1831,7 +1831,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>>
 		{
 			private readonly SetPropertiesInterceptor _interceptor;
 
@@ -1851,7 +1851,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>> ThenCall(global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>> ThenCall(global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1872,7 +1872,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub, global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty>>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1892,7 +1892,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
 		/// <summary>Delegate for RunRules.</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(EntityPropertyManagerStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
 		private RunRulesDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1943,20 +1943,20 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(EntityPropertyManagerStub ko, bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((runRules, token));
 				_sequenceIndex++;
-				return callback(ko, runRules, token);
+				return callback(runRules, token);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((runRules, token));
-				return _onCall(ko, runRules, token);
+				return _onCall(runRules, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -2125,10 +2125,10 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
-		private global::System.Action<EntityPropertyManagerStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2144,7 +2144,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2156,13 +2156,13 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> OnCallSequence(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2170,21 +2170,21 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityPropertyManagerStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -2285,7 +2285,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly PauseAllActionsInterceptor _interceptor;
 
@@ -2305,7 +2305,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> ThenCall(global::System.Action<EntityPropertyManagerStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2326,7 +2326,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2345,10 +2345,10 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
-		private global::System.Action<EntityPropertyManagerStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2364,7 +2364,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2376,13 +2376,13 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> OnCallSequence(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2390,21 +2390,21 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityPropertyManagerStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -2505,7 +2505,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ResumeAllActionsInterceptor _interceptor;
 
@@ -2525,7 +2525,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> ThenCall(global::System.Action<EntityPropertyManagerStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2546,7 +2546,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2565,10 +2565,10 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
-		private global::System.Action<EntityPropertyManagerStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2584,7 +2584,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2596,13 +2596,13 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> OnCallSequence(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2610,21 +2610,21 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityPropertyManagerStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -2725,7 +2725,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearAllMessagesInterceptor _interceptor;
 
@@ -2745,7 +2745,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> ThenCall(global::System.Action<EntityPropertyManagerStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2766,7 +2766,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2785,10 +2785,10 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>? _source;
 
-		private global::System.Action<EntityPropertyManagerStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2804,7 +2804,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2816,13 +2816,13 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> OnCallSequence(global::System.Action<EntityPropertyManagerStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityPropertyManagerStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2830,21 +2830,21 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityPropertyManagerStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -2945,7 +2945,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearSelfMessagesInterceptor _interceptor;
 
@@ -2965,7 +2965,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> ThenCall(global::System.Action<EntityPropertyManagerStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2986,7 +2986,7 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityPropertyManagerStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -3438,97 +3438,97 @@ partial class EntityPropertyManagerStub : global::Neatoo.IEntityPropertyManager,
 
 	bool global::Neatoo.IEntityPropertyManager.IsModified
 	{
-		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(this); if (IsModified._source is { } src) return src.IsModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "IsModified"); return IsModified.Value; }
+		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(); if (IsModified._source is { } src) return src.IsModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "IsModified"); return IsModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityPropertyManager.IsSelfModified
 	{
-		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(this); if (IsSelfModified._source is { } src) return src.IsSelfModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "IsSelfModified"); return IsSelfModified.Value; }
+		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(); if (IsSelfModified._source is { } src) return src.IsSelfModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "IsSelfModified"); return IsSelfModified.Value; }
 	}
 
 	global::System.Collections.Generic.IEnumerable<string> global::Neatoo.IEntityPropertyManager.ModifiedProperties
 	{
-		get { ModifiedProperties.RecordGet(); if (ModifiedProperties.OnGet is { } onGet) return onGet(this); if (ModifiedProperties._source is { } src) return src.ModifiedProperties; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "ModifiedProperties"); return ModifiedProperties.Value; }
+		get { ModifiedProperties.RecordGet(); if (ModifiedProperties.OnGet is { } onGet) return onGet(); if (ModifiedProperties._source is { } src) return src.ModifiedProperties; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityPropertyManager", "ModifiedProperties"); return ModifiedProperties.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsBusy
 	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsBusy"); return IsBusy.Value; }
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsBusy"); return IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsSelfValid"); return IsSelfValid.Value; }
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsSelfValid"); return IsSelfValid.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsValid
 	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsValid"); return IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsValid"); return IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "PropertyMessages"); return PropertyMessages.Value; }
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.IsPaused
 	{
-		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(this); if (IsPaused._source is { } src) return src.IsPaused; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsPaused"); return IsPaused.Value; }
+		get { IsPaused.RecordGet(); if (IsPaused.OnGet is { } onGet) return onGet(); if (IsPaused._source is { } src) return src.IsPaused; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "IsPaused"); return IsPaused.Value; }
 	}
 
 	global::Neatoo.IEntityProperty global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.this[string propertyName]
 	{
-		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(this, propertyName); if (Indexer._source is { } src) return src[propertyName]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
+		get { Indexer.RecordGet(propertyName); if (Indexer.OnGet is { } onGet) return onGet(propertyName); if (Indexer._source is { } src) return src[propertyName]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityProperty>", "this[]"); return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!; }
 	}
 
 	void global::Neatoo.IEntityPropertyManager.MarkSelfUnmodified()
 	{
-		MarkSelfUnmodified.Invoke(this, Strict);
+		MarkSelfUnmodified.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.WaitForTasks()
 	{
-		return WaitForTasks.Invoke(this, Strict);
+		return WaitForTasks.Invoke(Strict);
 	}
 
 	bool global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.HasProperty(string propertyName)
 	{
-		return HasProperty.Invoke(this, Strict, propertyName);
+		return HasProperty.Invoke(Strict, propertyName);
 	}
 
 	global::Neatoo.IEntityProperty global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.GetProperty(string propertyName)
 	{
-		return GetProperty.Invoke(this, Strict, propertyName);
+		return GetProperty.Invoke(Strict, propertyName);
 	}
 
 	void global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.SetProperties(global::System.Collections.Generic.IEnumerable<global::Neatoo.IValidateProperty> properties)
 	{
-		SetProperties.Invoke(this, Strict, properties);
+		SetProperties.Invoke(Strict, properties);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
-		return RunRules.Invoke(this, Strict, runRules, token);
+		return RunRules.Invoke(Strict, runRules, token);
 	}
 
 	void global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.PauseAllActions()
 	{
-		PauseAllActions.Invoke(this, Strict);
+		PauseAllActions.Invoke(Strict);
 	}
 
 	void global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.ResumeAllActions()
 	{
-		ResumeAllActions.Invoke(this, Strict);
+		ResumeAllActions.Invoke(Strict);
 	}
 
 	void global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.ClearAllMessages()
 	{
-		ClearAllMessages.Invoke(this, Strict);
+		ClearAllMessages.Invoke(Strict);
 	}
 
 	void global::Neatoo.IValidatePropertyManager<global::Neatoo.IEntityProperty>.ClearSelfMessages()
 	{
-		ClearSelfMessages.Invoke(this, Strict);
+		ClearSelfMessages.Invoke(Strict);
 	}
 
 	event global::Neatoo.NeatooPropertyChanged? global::Neatoo.INotifyNeatooPropertyChanged.NeatooPropertyChanged

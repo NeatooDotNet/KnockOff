@@ -19,7 +19,7 @@ partial class IEntityMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class IEntityMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class IEntityMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class IEntityMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -343,7 +343,7 @@ partial class IEntityMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -424,7 +424,7 @@ partial class IEntityMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -505,7 +505,7 @@ partial class IEntityMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -604,7 +604,7 @@ partial class IEntityMetaPropertiesTests
 				get
 				{
 					IsChild.RecordGet();
-					if (IsChild.OnGet is { } onGet) return onGet(this);
+					if (IsChild.OnGet is { } onGet) return onGet();
 					if (IsChild._source is { } src) return src.IsChild;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild");
 					return IsChild.Value;
@@ -616,7 +616,7 @@ partial class IEntityMetaPropertiesTests
 				get
 				{
 					IsModified.RecordGet();
-					if (IsModified.OnGet is { } onGet) return onGet(this);
+					if (IsModified.OnGet is { } onGet) return onGet();
 					if (IsModified._source is { } src) return src.IsModified;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified");
 					return IsModified.Value;
@@ -628,7 +628,7 @@ partial class IEntityMetaPropertiesTests
 				get
 				{
 					IsSelfModified.RecordGet();
-					if (IsSelfModified.OnGet is { } onGet) return onGet(this);
+					if (IsSelfModified.OnGet is { } onGet) return onGet();
 					if (IsSelfModified._source is { } src) return src.IsSelfModified;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified");
 					return IsSelfModified.Value;
@@ -640,7 +640,7 @@ partial class IEntityMetaPropertiesTests
 				get
 				{
 					IsMarkedModified.RecordGet();
-					if (IsMarkedModified.OnGet is { } onGet) return onGet(this);
+					if (IsMarkedModified.OnGet is { } onGet) return onGet();
 					if (IsMarkedModified._source is { } src) return src.IsMarkedModified;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified");
 					return IsMarkedModified.Value;
@@ -652,7 +652,7 @@ partial class IEntityMetaPropertiesTests
 				get
 				{
 					IsSavable.RecordGet();
-					if (IsSavable.OnGet is { } onGet) return onGet(this);
+					if (IsSavable.OnGet is { } onGet) return onGet();
 					if (IsSavable._source is { } src) return src.IsSavable;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable");
 					return IsSavable.Value;
@@ -664,7 +664,7 @@ partial class IEntityMetaPropertiesTests
 				get
 				{
 					IsDeleted.RecordGet();
-					if (IsDeleted.OnGet is { } onGet) return onGet(this);
+					if (IsDeleted.OnGet is { } onGet) return onGet();
 					if (IsDeleted._source is { } src) return src.IsDeleted;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted");
 					return IsDeleted.Value;
@@ -676,7 +676,7 @@ partial class IEntityMetaPropertiesTests
 				get
 				{
 					IsNew.RecordGet();
-					if (IsNew.OnGet is { } onGet) return onGet(this);
+					if (IsNew.OnGet is { } onGet) return onGet();
 					if (IsNew._source is { } src) return src.IsNew;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew");
 					return IsNew.Value;

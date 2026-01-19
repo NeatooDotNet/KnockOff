@@ -227,7 +227,7 @@ public class NoConstructorSmartDefaultsTests
         // For non-nullable return types without ctor, configure explicitly.
 
         // Configure OnCall to provide value
-        stub.GetUser.OnCall((ko) => new User { Id = 1, Name = "Configured" });
+        stub.GetUser.OnCall(() => new User { Id = 1, Name = "Configured" });
 
         var user = factory.GetUser();
         Assert.NotNull(user);

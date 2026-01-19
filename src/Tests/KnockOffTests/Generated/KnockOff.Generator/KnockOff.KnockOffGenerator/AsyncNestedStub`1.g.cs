@@ -12,7 +12,7 @@ partial class AsyncNestedStub<T> : global::KnockOff.Tests.IAsyncNestedService<T>
 		internal global::KnockOff.Tests.IAsyncNestedService<T>? _source;
 
 		/// <summary>Delegate for GetAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<T?> GetAsyncDelegate(AsyncNestedStub<T> ko);
+		public delegate global::System.Threading.Tasks.Task<T?> GetAsyncDelegate();
 
 		private GetAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class AsyncNestedStub<T> : global::KnockOff.Tests.IAsyncNestedService<T>
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<T?> Invoke(AsyncNestedStub<T> ko, bool strict)
+		internal global::System.Threading.Tasks.Task<T?> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -268,7 +268,7 @@ partial class AsyncNestedStub<T> : global::KnockOff.Tests.IAsyncNestedService<T>
 
 	global::System.Threading.Tasks.Task<T?> global::KnockOff.Tests.IAsyncNestedService<T>.GetAsync()
 	{
-		return GetAsync.Invoke(this, Strict);
+		return GetAsync.Invoke(Strict);
 	}
 
 }

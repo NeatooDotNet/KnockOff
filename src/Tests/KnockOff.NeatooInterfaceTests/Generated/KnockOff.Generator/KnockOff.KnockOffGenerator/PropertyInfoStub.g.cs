@@ -34,7 +34,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<PropertyInfoStub, global::System.Reflection.PropertyInfo>? OnGet { get; set; }
+		public global::System.Func<global::System.Reflection.PropertyInfo>? OnGet { get; set; }
 
 		private global::System.Reflection.PropertyInfo _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -115,7 +115,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<PropertyInfoStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -196,7 +196,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<PropertyInfoStub, global::System.Type>? OnGet { get; set; }
+		public global::System.Func<global::System.Type>? OnGet { get; set; }
 
 		private global::System.Type _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -277,7 +277,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<PropertyInfoStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -358,7 +358,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<PropertyInfoStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -432,7 +432,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		internal global::Neatoo.IPropertyInfo? _source;
 
 		/// <summary>Delegate for GetCustomAttributes.</summary>
-		public delegate global::System.Collections.Generic.IEnumerable<global::System.Attribute> GetCustomAttributesDelegate(PropertyInfoStub ko);
+		public delegate global::System.Collections.Generic.IEnumerable<global::System.Attribute> GetCustomAttributesDelegate();
 
 		private GetCustomAttributesDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -479,20 +479,20 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IEnumerable<global::System.Attribute> Invoke(PropertyInfoStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerable<global::System.Attribute> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -684,7 +684,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		public sealed class GetCustomAttributeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : global::System.Attribute
 		{
 			/// <summary>Delegate for GetCustomAttribute.</summary>
-			public delegate T? GetCustomAttributeDelegate(PropertyInfoStub ko);
+			public delegate T? GetCustomAttributeDelegate();
 
 			private GetCustomAttributeDelegate? _onCall;
 
@@ -821,41 +821,41 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 
 	global::System.Reflection.PropertyInfo global::Neatoo.IPropertyInfo.PropertyInfo
 	{
-		get { PropertyInfo.RecordGet(); if (PropertyInfo.OnGet is { } onGet) return onGet(this); if (PropertyInfo._source is { } src) return src.PropertyInfo; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "PropertyInfo"); return PropertyInfo.Value; }
+		get { PropertyInfo.RecordGet(); if (PropertyInfo.OnGet is { } onGet) return onGet(); if (PropertyInfo._source is { } src) return src.PropertyInfo; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "PropertyInfo"); return PropertyInfo.Value; }
 	}
 
 	string global::Neatoo.IPropertyInfo.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Name"); return Name.Value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Name"); return Name.Value; }
 	}
 
 	global::System.Type global::Neatoo.IPropertyInfo.Type
 	{
-		get { Type.RecordGet(); if (Type.OnGet is { } onGet) return onGet(this); if (Type._source is { } src) return src.Type; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Type"); return Type.Value; }
+		get { Type.RecordGet(); if (Type.OnGet is { } onGet) return onGet(); if (Type._source is { } src) return src.Type; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Type"); return Type.Value; }
 	}
 
 	string global::Neatoo.IPropertyInfo.Key
 	{
-		get { Key.RecordGet(); if (Key.OnGet is { } onGet) return onGet(this); if (Key._source is { } src) return src.Key; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Key"); return Key.Value; }
+		get { Key.RecordGet(); if (Key.OnGet is { } onGet) return onGet(); if (Key._source is { } src) return src.Key; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Key"); return Key.Value; }
 	}
 
 	bool global::Neatoo.IPropertyInfo.IsPrivateSetter
 	{
-		get { IsPrivateSetter.RecordGet(); if (IsPrivateSetter.OnGet is { } onGet) return onGet(this); if (IsPrivateSetter._source is { } src) return src.IsPrivateSetter; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "IsPrivateSetter"); return IsPrivateSetter.Value; }
+		get { IsPrivateSetter.RecordGet(); if (IsPrivateSetter.OnGet is { } onGet) return onGet(); if (IsPrivateSetter._source is { } src) return src.IsPrivateSetter; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "IsPrivateSetter"); return IsPrivateSetter.Value; }
 	}
 
 	T? global::Neatoo.IPropertyInfo.GetCustomAttribute<T>() where T : class
 	{
 		GetCustomAttribute.Of<T>().RecordCall();
 		if (GetCustomAttribute.Of<T>().Callback is { } callback)
-			return callback(this);
+			return callback();
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttribute");
 		return default!;
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::System.Attribute> global::Neatoo.IPropertyInfo.GetCustomAttributes()
 	{
-		return GetCustomAttributes.Invoke(this, Strict);
+		return GetCustomAttributes.Invoke(Strict);
 	}
 
 }

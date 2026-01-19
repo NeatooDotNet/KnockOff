@@ -15,7 +15,7 @@ partial class EqualityComparerStubTests
 			internal global::System.Collections.IEqualityComparer? _source;
 
 			/// <summary>Delegate for Equals.</summary>
-			public delegate bool EqualsDelegate(Stubs.IEqualityComparer ko, object? x, object? y);
+			public delegate bool EqualsDelegate(object? x, object? y);
 
 			private EqualsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class EqualityComparerStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IEqualityComparer ko, object? x, object? y)
+			internal bool Invoke(bool strict, object? x, object? y)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((x, y));
 					_sequenceIndex++;
-					return callback(ko, x, y);
+					return callback(x, y);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((x, y));
-					return _onCall(ko, x, y);
+					return _onCall(x, y);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((x, y));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Equals");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Equals");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Equals(x, y);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
 				return default!;
 			}
 
@@ -249,7 +249,7 @@ partial class EqualityComparerStubTests
 			internal global::System.Collections.IEqualityComparer? _source;
 
 			/// <summary>Delegate for GetHashCode.</summary>
-			public delegate int GetHashCodeDelegate(Stubs.IEqualityComparer ko, object obj);
+			public delegate int GetHashCodeDelegate(object obj);
 
 			private GetHashCodeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -300,34 +300,34 @@ partial class EqualityComparerStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IEqualityComparer ko, object obj)
+			internal int Invoke(bool strict, object obj)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(obj);
 					_sequenceIndex++;
-					return callback(ko, obj);
+					return callback(obj);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(obj);
-					return _onCall(ko, obj);
+					return _onCall(obj);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = obj;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetHashCode");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetHashCode");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetHashCode(obj);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetHashCode");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetHashCode");
 				return default!;
 			}
 
@@ -487,12 +487,12 @@ partial class EqualityComparerStubTests
 
 			bool global::System.Collections.IEqualityComparer.Equals(object? x, object? y)
 			{
-				return Equals.Invoke(this, x, y);
+				return Equals.Invoke(Strict, x, y);
 			}
 
 			int global::System.Collections.IEqualityComparer.GetHashCode(object obj)
 			{
-				return GetHashCode.Invoke(this, obj);
+				return GetHashCode.Invoke(Strict, obj);
 			}
 
 			/// <summary>The global::System.Collections.IEqualityComparer instance. Use for passing to code expecting the interface.</summary>

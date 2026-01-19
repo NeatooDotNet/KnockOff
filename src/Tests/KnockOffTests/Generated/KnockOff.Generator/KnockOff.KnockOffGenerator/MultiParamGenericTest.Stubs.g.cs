@@ -14,10 +14,10 @@ partial class MultiParamGenericTest
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Tests.IKeyValueStore<TKey, TValue>? _source;
 
-			private global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue>? _onCall;
+			private global::System.Action<TKey, TValue>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<TKey, TValue> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -37,7 +37,7 @@ partial class MultiParamGenericTest
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTrackingArgs<(TKey key, TValue @value)> OnCall(global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue> callback)
+			public global::KnockOff.IMethodTrackingArgs<(TKey key, TValue @value)> OnCall(global::System.Action<TKey, TValue> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -49,13 +49,13 @@ partial class MultiParamGenericTest
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue>> OnCallSequence(global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<TKey, TValue>> OnCallSequence(global::System.Action<TKey, TValue> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<TKey, TValue> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -63,21 +63,21 @@ partial class MultiParamGenericTest
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IKeyValueStore<TKey, TValue> ko, TKey key, TValue @value)
+			internal void Invoke(bool strict, TKey key, TValue @value)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((key, @value));
 					_sequenceIndex++;
-					callback(ko, key, @value);
+					callback(key, @value);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((key, @value));
-					_onCall(ko, key, @value);
+					_onCall(key, @value);
 					return;
 				}
 
@@ -85,14 +85,14 @@ partial class MultiParamGenericTest
 				_unconfiguredLastArgs = ((key, @value));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Set");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Set");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Set(key, @value); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Set");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Set");
 				return;
 			}
 
@@ -187,7 +187,7 @@ partial class MultiParamGenericTest
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<TKey, TValue>>
 			{
 				private readonly IKeyValueStore_SetInterceptor<TKey, TValue> _interceptor;
 
@@ -207,7 +207,7 @@ partial class MultiParamGenericTest
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue>> ThenCall(global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<TKey, TValue>> ThenCall(global::System.Action<TKey, TValue> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -228,7 +228,7 @@ partial class MultiParamGenericTest
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IKeyValueStore<TKey, TValue>, TKey, TValue>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<TKey, TValue>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -248,7 +248,7 @@ partial class MultiParamGenericTest
 			internal global::KnockOff.Tests.IKeyValueStore<TKey, TValue>? _source;
 
 			/// <summary>Delegate for Get.</summary>
-			public delegate TValue? GetDelegate(Stubs.IKeyValueStore<TKey, TValue> ko, TKey key);
+			public delegate TValue? GetDelegate(TKey key);
 
 			private GetDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -299,34 +299,34 @@ partial class MultiParamGenericTest
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal TValue? Invoke(Stubs.IKeyValueStore<TKey, TValue> ko, TKey key)
+			internal TValue? Invoke(bool strict, TKey key)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(key);
 					_sequenceIndex++;
-					return callback(ko, key);
+					return callback(key);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(key);
-					return _onCall(ko, key);
+					return _onCall(key);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Get");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Get");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Get(key);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Get");
 				return default!;
 			}
 
@@ -486,12 +486,12 @@ partial class MultiParamGenericTest
 
 			void global::KnockOff.Tests.IKeyValueStore<TKey, TValue>.Set(TKey key, TValue value)
 			{
-				Set.Invoke(this, key, value);
+				Set.Invoke(Strict, key, value);
 			}
 
 			TValue? global::KnockOff.Tests.IKeyValueStore<TKey, TValue>.Get(TKey key)
 			{
-				return Get.Invoke(this, key);
+				return Get.Invoke(Strict, key);
 			}
 
 			/// <summary>The global::KnockOff.Tests.IKeyValueStore<TKey, TValue> instance. Use for passing to code expecting the interface.</summary>

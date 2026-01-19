@@ -12,7 +12,7 @@ partial class ServiceProviderKnockOff : global::System.IServiceProvider, global:
 		internal global::System.IServiceProvider? _source;
 
 		/// <summary>Delegate for GetService.</summary>
-		public delegate object? GetServiceDelegate(ServiceProviderKnockOff ko, global::System.Type serviceType);
+		public delegate object? GetServiceDelegate(global::System.Type serviceType);
 
 		private GetServiceDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class ServiceProviderKnockOff : global::System.IServiceProvider, global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal object? Invoke(ServiceProviderKnockOff ko, bool strict, global::System.Type serviceType)
+		internal object? Invoke(bool strict, global::System.Type serviceType)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(serviceType);
 				_sequenceIndex++;
-				return callback(ko, serviceType);
+				return callback(serviceType);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(serviceType);
-				return _onCall(ko, serviceType);
+				return _onCall(serviceType);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class ServiceProviderKnockOff : global::System.IServiceProvider, global:
 
 	object? global::System.IServiceProvider.GetService(global::System.Type serviceType)
 	{
-		return GetService.Invoke(this, Strict, serviceType);
+		return GetService.Invoke(Strict, serviceType);
 	}
 
 }

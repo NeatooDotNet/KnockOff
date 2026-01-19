@@ -15,7 +15,7 @@ partial class IPropertyInfoListTests
 			internal global::Neatoo.IPropertyInfoList? _source;
 
 			/// <summary>Delegate for GetPropertyInfo.</summary>
-			public delegate global::Neatoo.IPropertyInfo? GetPropertyInfoDelegate(Stubs.IPropertyInfoList ko, string name);
+			public delegate global::Neatoo.IPropertyInfo? GetPropertyInfoDelegate(string name);
 
 			private GetPropertyInfoDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class IPropertyInfoListTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::Neatoo.IPropertyInfo? Invoke(Stubs.IPropertyInfoList ko, string name)
+			internal global::Neatoo.IPropertyInfo? Invoke(bool strict, string name)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(name);
 					_sequenceIndex++;
-					return callback(ko, name);
+					return callback(name);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(name);
-					return _onCall(ko, name);
+					return _onCall(name);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = name;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetPropertyInfo");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetPropertyInfo");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetPropertyInfo(name);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetPropertyInfo");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetPropertyInfo");
 				return default!;
 			}
 
@@ -249,7 +249,7 @@ partial class IPropertyInfoListTests
 			internal global::Neatoo.IPropertyInfoList? _source;
 
 			/// <summary>Delegate for Properties.</summary>
-			public delegate global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> PropertiesDelegate(Stubs.IPropertyInfoList ko);
+			public delegate global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> PropertiesDelegate();
 
 			private PropertiesDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -296,33 +296,33 @@ partial class IPropertyInfoListTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> Invoke(Stubs.IPropertyInfoList ko)
+			internal global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Properties");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Properties");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Properties();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Properties");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Properties");
 				throw new global::System.InvalidOperationException("No implementation provided for Properties. Configure via OnCall.");
 			}
 
@@ -470,7 +470,7 @@ partial class IPropertyInfoListTests
 			internal global::Neatoo.IPropertyInfoList? _source;
 
 			/// <summary>Delegate for HasProperty.</summary>
-			public delegate bool HasPropertyDelegate(Stubs.IPropertyInfoList ko, string propertyName);
+			public delegate bool HasPropertyDelegate(string propertyName);
 
 			private HasPropertyDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -521,34 +521,34 @@ partial class IPropertyInfoListTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IPropertyInfoList ko, string propertyName)
+			internal bool Invoke(bool strict, string propertyName)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(propertyName);
 					_sequenceIndex++;
-					return callback(ko, propertyName);
+					return callback(propertyName);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(propertyName);
-					return _onCall(ko, propertyName);
+					return _onCall(propertyName);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("HasProperty");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("HasProperty");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.HasProperty(propertyName);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
 				return default!;
 			}
 
@@ -711,17 +711,17 @@ partial class IPropertyInfoListTests
 
 			global::Neatoo.IPropertyInfo? global::Neatoo.IPropertyInfoList.GetPropertyInfo(string name)
 			{
-				return GetPropertyInfo.Invoke(this, name);
+				return GetPropertyInfo.Invoke(Strict, name);
 			}
 
 			global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> global::Neatoo.IPropertyInfoList.Properties()
 			{
-				return Properties.Invoke(this);
+				return Properties.Invoke(Strict);
 			}
 
 			bool global::Neatoo.IPropertyInfoList.HasProperty(string propertyName)
 			{
-				return HasProperty.Invoke(this, propertyName);
+				return HasProperty.Invoke(Strict, propertyName);
 			}
 
 			/// <summary>The global::Neatoo.IPropertyInfoList instance. Use for passing to code expecting the interface.</summary>

@@ -19,7 +19,7 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<StrictByDefaultStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<StrictByDefaultStub, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -115,7 +115,7 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 		internal global::KnockOff.Tests.IStrictModeTest? _source;
 
 		/// <summary>Delegate for GetValue.</summary>
-		public delegate int GetValueDelegate(StrictByDefaultStub ko, int x);
+		public delegate int GetValueDelegate(int x);
 
 		private GetValueDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -166,20 +166,20 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(StrictByDefaultStub ko, bool strict, int x)
+		internal int Invoke(bool strict, int x)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(x);
 				_sequenceIndex++;
-				return callback(ko, x);
+				return callback(x);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(x);
-				return _onCall(ko, x);
+				return _onCall(x);
 			}
 
 			_unconfiguredCallCount++;
@@ -348,10 +348,10 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.IStrictModeTest? _source;
 
-		private global::System.Action<StrictByDefaultStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<StrictByDefaultStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -367,7 +367,7 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<StrictByDefaultStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -379,13 +379,13 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<StrictByDefaultStub>> OnCallSequence(global::System.Action<StrictByDefaultStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<StrictByDefaultStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -393,21 +393,21 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(StrictByDefaultStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -508,7 +508,7 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<StrictByDefaultStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly DoSomethingInterceptor _interceptor;
 
@@ -528,7 +528,7 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<StrictByDefaultStub>> ThenCall(global::System.Action<StrictByDefaultStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -549,7 +549,7 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<StrictByDefaultStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -616,18 +616,18 @@ partial class StrictByDefaultStub : global::KnockOff.Tests.IStrictModeTest, glob
 
 	string global::KnockOff.Tests.IStrictModeTest.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IStrictModeTest", "Name"); Name.Value = value; }
 	}
 
 	int global::KnockOff.Tests.IStrictModeTest.GetValue(int x)
 	{
-		return GetValue.Invoke(this, Strict, x);
+		return GetValue.Invoke(Strict, x);
 	}
 
 	void global::KnockOff.Tests.IStrictModeTest.DoSomething()
 	{
-		DoSomething.Invoke(this, Strict);
+		DoSomething.Invoke(Strict);
 	}
 
 }

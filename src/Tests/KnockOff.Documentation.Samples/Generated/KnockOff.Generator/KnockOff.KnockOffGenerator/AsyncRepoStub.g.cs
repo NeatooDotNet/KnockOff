@@ -12,7 +12,7 @@ partial class AsyncRepoStub : global::KnockOff.Documentation.Samples.Async.IAsyn
 		internal global::KnockOff.Documentation.Samples.Async.IAsyncRepo? _source;
 
 		/// <summary>Delegate for FindAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> FindAsyncDelegate(AsyncRepoStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> FindAsyncDelegate(int id);
 
 		private FindAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class AsyncRepoStub : global::KnockOff.Documentation.Samples.Async.IAsyn
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(AsyncRepoStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class AsyncRepoStub : global::KnockOff.Documentation.Samples.Async.IAsyn
 		internal global::KnockOff.Documentation.Samples.Async.IAsyncRepo? _source;
 
 		/// <summary>Delegate for SaveAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(AsyncRepoStub ko, global::KnockOff.Documentation.Samples.User user);
+		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(global::KnockOff.Documentation.Samples.User user);
 
 		private SaveAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -297,20 +297,20 @@ partial class AsyncRepoStub : global::KnockOff.Documentation.Samples.Async.IAsyn
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(AsyncRepoStub ko, bool strict, global::KnockOff.Documentation.Samples.User user)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, global::KnockOff.Documentation.Samples.User user)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(user);
 				_sequenceIndex++;
-				return callback(ko, user);
+				return callback(user);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(user);
-				return _onCall(ko, user);
+				return _onCall(user);
 			}
 
 			_unconfiguredCallCount++;
@@ -521,12 +521,12 @@ partial class AsyncRepoStub : global::KnockOff.Documentation.Samples.Async.IAsyn
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> global::KnockOff.Documentation.Samples.Async.IAsyncRepo.FindAsync(int id)
 	{
-		return FindAsync.Invoke(this, Strict, id);
+		return FindAsync.Invoke(Strict, id);
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Async.IAsyncRepo.SaveAsync(global::KnockOff.Documentation.Samples.User user)
 	{
-		return SaveAsync.Invoke(this, Strict, user);
+		return SaveAsync.Invoke(Strict, user);
 	}
 
 }

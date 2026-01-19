@@ -14,10 +14,10 @@ partial class ProgressIntStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.IProgress<int>? _source;
 
-			private global::System.Action<Stubs.IProgress, int>? _onCall;
+			private global::System.Action<int>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IProgress, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -37,7 +37,7 @@ partial class ProgressIntStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<Stubs.IProgress, int> callback)
+			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -49,13 +49,13 @@ partial class ProgressIntStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IProgress, int>> OnCallSequence(global::System.Action<Stubs.IProgress, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IProgress, int> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -63,21 +63,21 @@ partial class ProgressIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IProgress ko, int @value)
+			internal void Invoke(bool strict, int @value)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(@value);
 					_sequenceIndex++;
-					callback(ko, @value);
+					callback(@value);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(@value);
-					_onCall(ko, @value);
+					_onCall(@value);
 					return;
 				}
 
@@ -85,14 +85,14 @@ partial class ProgressIntStubTests
 				_unconfiguredLastArg = @value;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Report");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Report");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Report(@value); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Report");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Report");
 				return;
 			}
 
@@ -187,7 +187,7 @@ partial class ProgressIntStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IProgress, int>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 			{
 				private readonly IProgress_ReportInterceptor _interceptor;
 
@@ -207,7 +207,7 @@ partial class ProgressIntStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IProgress, int>> ThenCall(global::System.Action<Stubs.IProgress, int> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -228,7 +228,7 @@ partial class ProgressIntStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IProgress, int>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -249,7 +249,7 @@ partial class ProgressIntStubTests
 
 			void global::System.IProgress<int>.Report(int value)
 			{
-				Report.Invoke(this, value);
+				Report.Invoke(Strict, value);
 			}
 
 			/// <summary>The global::System.IProgress<int> instance. Use for passing to code expecting the interface.</summary>

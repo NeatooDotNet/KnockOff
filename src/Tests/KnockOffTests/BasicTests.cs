@@ -49,7 +49,7 @@ public class BasicTests
 	public void Method_VoidNoParams_TracksInvocation()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.DoSomething.OnCall(ko => { });
+		var tracking = knockOff.DoSomething.OnCall(() => { });
 		ISampleService service = knockOff;
 
 		service.DoSomething();
@@ -77,7 +77,7 @@ public class BasicTests
 	public void Method_WithMultipleParams_TracksArgs_AsNamedTuple()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.Calculate.OnCall((ko, name, value, flag) => { });
+		var tracking = knockOff.Calculate.OnCall((name, value, flag) => { });
 		ISampleService service = knockOff;
 
 		service.Calculate("test", 100, true);
@@ -106,7 +106,7 @@ public class BasicTests
 	public void Method_WithNullableReturn_NoUserMethod_ReturnsDefault()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.GetOptional.OnCall(ko => null);
+		var tracking = knockOff.GetOptional.OnCall(() => null);
 		ISampleService service = knockOff;
 
 		var result = service.GetOptional();
@@ -130,7 +130,7 @@ public class BasicTests
 	public void Reset_ClearsTrackingState()
 	{
 		var knockOff = new SampleKnockOff();
-		var doSomethingTracking = knockOff.DoSomething.OnCall(ko => { });
+		var doSomethingTracking = knockOff.DoSomething.OnCall(() => { });
 		ISampleService service = knockOff;
 
 		service.Name = "Test";
@@ -151,7 +151,7 @@ public class BasicTests
 	public void TupleDestructuring_Works()
 	{
 		var knockOff = new SampleKnockOff();
-		var tracking = knockOff.Calculate.OnCall((ko, name, value, flag) => { });
+		var tracking = knockOff.Calculate.OnCall((name, value, flag) => { });
 		ISampleService service = knockOff;
 
 		service.Calculate("test", 42, true);

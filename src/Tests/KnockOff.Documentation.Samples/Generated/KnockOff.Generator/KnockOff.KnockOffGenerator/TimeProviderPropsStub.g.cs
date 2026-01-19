@@ -19,7 +19,7 @@ partial class TimeProviderPropsStub : global::KnockOff.Documentation.Samples.Pro
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<TimeProviderPropsStub, global::System.DateTime>? OnGet { get; set; }
+		public global::System.Func<global::System.DateTime>? OnGet { get; set; }
 
 		private global::System.DateTime _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -106,7 +106,7 @@ partial class TimeProviderPropsStub : global::KnockOff.Documentation.Samples.Pro
 
 	global::System.DateTime global::KnockOff.Documentation.Samples.Properties.ITimeProviderProps.Timestamp
 	{
-		get { Timestamp.RecordGet(); if (Timestamp.OnGet is { } onGet) return onGet(this); if (Timestamp._source is { } src) return src.Timestamp; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimeProviderProps", "Timestamp"); return Timestamp.Value; }
+		get { Timestamp.RecordGet(); if (Timestamp.OnGet is { } onGet) return onGet(); if (Timestamp._source is { } src) return src.Timestamp; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimeProviderProps", "Timestamp"); return Timestamp.Value; }
 	}
 
 }

@@ -19,7 +19,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AuditableEntityKnockOff, global::System.DateTime?>? OnGet { get; set; }
+		public global::System.Func<global::System.DateTime?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		public global::System.DateTime? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<AuditableEntityKnockOff, global::System.DateTime?>? OnSet { get; set; }
+		public global::System.Action<global::System.DateTime?>? OnSet { get; set; }
 
 		private global::System.DateTime? _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -122,7 +122,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AuditableEntityKnockOff, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -131,7 +131,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<AuditableEntityKnockOff, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -225,7 +225,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AuditableEntityKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -306,7 +306,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AuditableEntityKnockOff, global::System.DateTime>? OnGet { get; set; }
+		public global::System.Func<global::System.DateTime>? OnGet { get; set; }
 
 		private global::System.DateTime _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -415,24 +415,24 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 
 	global::System.DateTime? global::KnockOff.Tests.IAuditableEntity.ModifiedAt
 	{
-		get { ModifiedAt.RecordGet(); if (ModifiedAt.OnGet is { } onGet) return onGet(this); if (ModifiedAt._source is { } src) return src.ModifiedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedAt"); return ModifiedAt.Value; }
-		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet is { } onSet) { onSet(this, value); return; } if (ModifiedAt._source is { } src) { src.ModifiedAt = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedAt"); ModifiedAt.Value = value; }
+		get { ModifiedAt.RecordGet(); if (ModifiedAt.OnGet is { } onGet) return onGet(); if (ModifiedAt._source is { } src) return src.ModifiedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedAt"); return ModifiedAt.Value; }
+		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet is { } onSet) { onSet(value); return; } if (ModifiedAt._source is { } src) { src.ModifiedAt = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedAt"); ModifiedAt.Value = value; }
 	}
 
 	string global::KnockOff.Tests.IAuditableEntity.ModifiedBy
 	{
-		get { ModifiedBy.RecordGet(); if (ModifiedBy.OnGet is { } onGet) return onGet(this); if (ModifiedBy._source is { } src) return src.ModifiedBy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedBy"); return ModifiedBy.Value; }
-		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet is { } onSet) { onSet(this, value); return; } if (ModifiedBy._source is { } src) { src.ModifiedBy = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedBy"); ModifiedBy.Value = value; }
+		get { ModifiedBy.RecordGet(); if (ModifiedBy.OnGet is { } onGet) return onGet(); if (ModifiedBy._source is { } src) return src.ModifiedBy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedBy"); return ModifiedBy.Value; }
+		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet is { } onSet) { onSet(value); return; } if (ModifiedBy._source is { } src) { src.ModifiedBy = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedBy"); ModifiedBy.Value = value; }
 	}
 
 	int global::KnockOff.Tests.IBaseEntity.Id
 	{
-		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
 	}
 
 	global::System.DateTime global::KnockOff.Tests.IBaseEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(this); if (CreatedAt._source is { } src) return src.CreatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "CreatedAt"); return CreatedAt.Value; }
+		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(); if (CreatedAt._source is { } src) return src.CreatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "CreatedAt"); return CreatedAt.Value; }
 	}
 
 }

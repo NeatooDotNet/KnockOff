@@ -12,7 +12,7 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.SmartDe
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IConfigService? _source;
 
 		/// <summary>Delegate for GetConfig.</summary>
-		public delegate global::KnockOff.Documentation.Samples.SmartDefaults.AppConfig GetConfigDelegate(ConfigServiceStub ko);
+		public delegate global::KnockOff.Documentation.Samples.SmartDefaults.AppConfig GetConfigDelegate();
 
 		private GetConfigDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.SmartDe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.SmartDefaults.AppConfig Invoke(ConfigServiceStub ko, bool strict)
+		internal global::KnockOff.Documentation.Samples.SmartDefaults.AppConfig Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -233,7 +233,7 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.SmartDe
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IConfigService? _source;
 
 		/// <summary>Delegate for GetOptions.</summary>
-		public delegate global::KnockOff.Documentation.Samples.SmartDefaults.FeatureOptions GetOptionsDelegate(ConfigServiceStub ko);
+		public delegate global::KnockOff.Documentation.Samples.SmartDefaults.FeatureOptions GetOptionsDelegate();
 
 		private GetOptionsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -280,20 +280,20 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.SmartDe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.SmartDefaults.FeatureOptions Invoke(ConfigServiceStub ko, bool strict)
+		internal global::KnockOff.Documentation.Samples.SmartDefaults.FeatureOptions Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -495,12 +495,12 @@ partial class ConfigServiceStub : global::KnockOff.Documentation.Samples.SmartDe
 
 	global::KnockOff.Documentation.Samples.SmartDefaults.AppConfig global::KnockOff.Documentation.Samples.SmartDefaults.IConfigService.GetConfig()
 	{
-		return GetConfig.Invoke(this, Strict);
+		return GetConfig.Invoke(Strict);
 	}
 
 	global::KnockOff.Documentation.Samples.SmartDefaults.FeatureOptions global::KnockOff.Documentation.Samples.SmartDefaults.IConfigService.GetOptions()
 	{
-		return GetOptions.Invoke(this, Strict);
+		return GetOptions.Invoke(Strict);
 	}
 
 }

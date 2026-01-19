@@ -125,8 +125,8 @@ internal static class InlineRenderer
         {
             var options = new InterceptorRenderOptions(
                 BaseIndent: 2,
-                IncludeStrictParameter: false,
-                StrictAccessExpression: "ko.Strict",
+                IncludeStrictParameter: true,
+                StrictAccessExpression: "strict",
                 InterceptorTypeParameters: methodTypeParams,
                 InterceptorConstraints: methodConstraints);
             MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
@@ -268,7 +268,7 @@ internal static class InlineRenderer
             w.Line("\t\t\tpublic int GetCount { get; private set; }");
             w.Line();
             w.Line($"\t\t\t/// <summary>Callback for getter. If set, returns its value.</summary>");
-            w.Line($"\t\t\tpublic global::System.Func<{prop.StubClassName}, {prop.ReturnType}>? OnGet {{ get; set; }}");
+            w.Line($"\t\t\tpublic global::System.Func<{prop.ReturnType}>? OnGet {{ get; set; }}");
             w.Line();
         }
 
@@ -281,7 +281,7 @@ internal static class InlineRenderer
             w.Line($"\t\t\tpublic {prop.NullableReturnType} LastSetValue {{ get; private set; }}");
             w.Line();
             w.Line($"\t\t\t/// <summary>Callback for setter.</summary>");
-            w.Line($"\t\t\tpublic global::System.Action<{prop.StubClassName}, {prop.ReturnType}>? OnSet {{ get; set; }}");
+            w.Line($"\t\t\tpublic global::System.Action<{prop.ReturnType}>? OnSet {{ get; set; }}");
             w.Line();
         }
 
@@ -444,9 +444,9 @@ internal static class InlineRenderer
             w.Line($"\t\t\t/// <summary>The last key used to access the getter.</summary>");
             w.Line($"\t\t\tpublic {indexer.NullableKeyType} LastGetKey {{ get; private set; }}");
             w.Line();
-            w.Line($"\t\t\tprivate global::System.Func<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? _onGet;");
+            w.Line($"\t\t\tprivate global::System.Func<{indexer.ParameterTypes}, {indexer.ReturnType}>? _onGet;");
             w.Line($"\t\t\t/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>");
-            w.Line($"\t\t\tpublic global::System.Func<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? OnGet");
+            w.Line($"\t\t\tpublic global::System.Func<{indexer.ParameterTypes}, {indexer.ReturnType}>? OnGet");
             w.Line("\t\t\t{");
             w.Line("\t\t\t\tget => _onGet;");
             w.Line("\t\t\t\tset { _onGet = value; if (value != null) _configured = true; }");
@@ -462,9 +462,9 @@ internal static class InlineRenderer
             w.Line($"\t\t\t/// <summary>The last key-value pair passed to the setter.</summary>");
             w.Line($"\t\t\tpublic ({indexer.KeyType} Key, {indexer.ReturnType} Value)? LastSetEntry {{ get; private set; }}");
             w.Line();
-            w.Line($"\t\t\tprivate global::System.Action<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? _onSet;");
+            w.Line($"\t\t\tprivate global::System.Action<{indexer.ParameterTypes}, {indexer.ReturnType}>? _onSet;");
             w.Line($"\t\t\t/// <summary>Callback for setter. Setting this marks the indexer as configured.</summary>");
-            w.Line($"\t\t\tpublic global::System.Action<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? OnSet");
+            w.Line($"\t\t\tpublic global::System.Action<{indexer.ParameterTypes}, {indexer.ReturnType}>? OnSet");
             w.Line("\t\t\t{");
             w.Line("\t\t\t\tget => _onSet;");
             w.Line("\t\t\t\tset { _onSet = value; if (value != null) _configured = true; }");
@@ -983,7 +983,7 @@ internal static class InlineRenderer
             // Init-only properties don't support OnGet/OnSet or _source
             if (!impl.IsInitOnly)
             {
-                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnGet is {{ }} onGet) return onGet(this);");
+                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnGet is {{ }} onGet) return onGet();");
                 w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) return src.{impl.MemberName};");
                 w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
             }
@@ -1007,7 +1007,7 @@ internal static class InlineRenderer
             else
             {
                 w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordSet(value);");
-                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }}");
+                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(value); return; }}");
                 w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) {{ src.{impl.MemberName} = value; return; }}");
                 w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
                 w.Line($"\t\t\t\t\t{impl.InterceptorName}.Value = value;");
@@ -1083,10 +1083,10 @@ internal static class InlineRenderer
         w.Line($"\t\t\t{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}({impl.ParameterDeclarations})");
         w.Line("\t\t\t{");
 
-        // Build invoke args (this + parameters)
+        // Build invoke args (includes Strict, no stub parameter)
         var invokeArgs = string.IsNullOrEmpty(impl.ArgumentList)
-            ? "this"
-            : $"this, {impl.ArgumentList}";
+            ? "Strict"
+            : $"Strict, {impl.ArgumentList}";
 
         // Call the interceptor's Invoke method (handles out params, tracking, callbacks, strict, defaults)
         if (impl.IsVoid)
@@ -1267,12 +1267,12 @@ internal static class InlineRenderer
         }
         if (del.IsVoid)
         {
-            var onCallArgs = del.Parameters.Count > 0 ? $"this, {del.InvokeArgumentList}" : "this";
+            var onCallArgs = del.InvokeArgumentList;
             w.Line($"\t\t\t\tif (Interceptor.OnCall is {{ }} onCall) onCall({onCallArgs});");
         }
         else
         {
-            var onCallArgs = del.Parameters.Count > 0 ? $"this, {del.InvokeArgumentList}" : "this";
+            var onCallArgs = del.InvokeArgumentList;
             w.Line($"\t\t\t\tif (Interceptor.OnCall is {{ }} onCall) return onCall({onCallArgs});");
             w.Line($"\t\t\t\treturn {del.DefaultExpression};");
         }

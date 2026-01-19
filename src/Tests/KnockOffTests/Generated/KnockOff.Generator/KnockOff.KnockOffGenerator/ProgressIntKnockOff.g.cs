@@ -11,10 +11,10 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.IProgress<int>? _source;
 
-		private global::System.Action<ProgressIntKnockOff, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ProgressIntKnockOff, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<ProgressIntKnockOff, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ProgressIntKnockOff, int>> OnCallSequence(global::System.Action<ProgressIntKnockOff, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ProgressIntKnockOff, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ProgressIntKnockOff ko, bool strict, int @value)
+		internal void Invoke(bool strict, int @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(@value);
 				_sequenceIndex++;
-				callback(ko, @value);
+				callback(@value);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(@value);
-				_onCall(ko, @value);
+				_onCall(@value);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ProgressIntKnockOff, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly ReportInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ProgressIntKnockOff, int>> ThenCall(global::System.Action<ProgressIntKnockOff, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,7 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ProgressIntKnockOff, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -280,7 +280,7 @@ partial class ProgressIntKnockOff : global::System.IProgress<int>, global::Knock
 
 	void global::System.IProgress<int>.Report(int @value)
 	{
-		Report.Invoke(this, Strict, @value);
+		Report.Invoke(Strict, @value);
 	}
 
 }

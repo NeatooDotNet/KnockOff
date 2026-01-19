@@ -18,9 +18,9 @@ partial class InlineClassPatternTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EmailServiceBase, bool>? _onGet;
+			private global::System.Func<bool>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EmailServiceBase, bool>? OnGet
+			public global::System.Func<bool>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -86,7 +86,7 @@ partial class InlineClassPatternTests
 		/// <summary>Interceptor for EmailServiceBase.Send.</summary>
 		public sealed class EmailServiceBase_SendInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Action<Stubs.EmailServiceBase, string, string, string>? _onCall;
+			private global::System.Action<string, string, string>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -98,10 +98,10 @@ partial class InlineClassPatternTests
 			public (string? to, string? subject, string? body)? LastCallArgs { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.EmailServiceBase, string, string, string> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<string, string, string> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.EmailServiceBase, string, string, string>? Callback => _onCall;
+			internal global::System.Action<string, string, string>? Callback => _onCall;
 
 			public void RecordCall(string to, string subject, string body) { CallCount++; LastCallArgs = (to, subject, body); }
 
@@ -211,7 +211,7 @@ partial class InlineClassPatternTests
 					get
 					{
 						_stub?.IsConfigured.RecordGet();
-						if (_stub?.IsConfigured.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.IsConfigured.OnGet is { } onGet) return onGet();
 						return base.IsConfigured;
 					}
 				}
@@ -220,7 +220,7 @@ partial class InlineClassPatternTests
 				public override void Send(string to, string subject, string body)
 				{
 					_stub?.Send.RecordCall(to, subject, body);
-					if (_stub?.Send.Callback is { } onCall) { onCall(_stub, to, subject, body); return; }
+					if (_stub?.Send.Callback is { } onCall) { onCall(to, subject, body); return; }
 					base.Send(to, subject, body);
 				}
 

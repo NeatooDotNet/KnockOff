@@ -12,7 +12,7 @@ partial class NestedDictStub<TKey, TValue> : global::KnockOff.Tests.INestedDictS
 		internal global::KnockOff.Tests.INestedDictService<TKey, TValue>? _source;
 
 		/// <summary>Delegate for GetMapping.</summary>
-		public delegate global::System.Collections.Generic.Dictionary<TKey, TValue> GetMappingDelegate(NestedDictStub<TKey, TValue> ko);
+		public delegate global::System.Collections.Generic.Dictionary<TKey, TValue> GetMappingDelegate();
 
 		private GetMappingDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class NestedDictStub<TKey, TValue> : global::KnockOff.Tests.INestedDictS
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.Dictionary<TKey, TValue> Invoke(NestedDictStub<TKey, TValue> ko, bool strict)
+		internal global::System.Collections.Generic.Dictionary<TKey, TValue> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -268,7 +268,7 @@ partial class NestedDictStub<TKey, TValue> : global::KnockOff.Tests.INestedDictS
 
 	global::System.Collections.Generic.Dictionary<TKey, TValue> global::KnockOff.Tests.INestedDictService<TKey, TValue>.GetMapping()
 	{
-		return GetMapping.Invoke(this, Strict);
+		return GetMapping.Invoke(Strict);
 	}
 
 }

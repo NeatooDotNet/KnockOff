@@ -14,7 +14,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetByIdAsync(int).</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate_Int32_Threading_Tasks_Task_KnockOff_Tests_User(OverloadedServiceKnockOff ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate_Int32_Threading_Tasks_Task_KnockOff_Tests_User(int id);
 
 		private GetByIdAsyncDelegate_Int32_Threading_Tasks_Task_KnockOff_Tests_User? _onCall_Int32_Threading_Tasks_Task_KnockOff_Tests_User;
 		private MethodTrackingImpl_Int32_Threading_Tasks_Task_KnockOff_Tests_User? _onCallTracking_Int32_Threading_Tasks_Task_KnockOff_Tests_User;
@@ -26,7 +26,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private global::KnockOff.Times? _verifiableTimes_Int32_Threading_Tasks_Task_KnockOff_Tests_User;
 
 		/// <summary>Delegate for GetByIdAsync(int, global::System.Threading.CancellationToken).</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(OverloadedServiceKnockOff ko, int id, global::System.Threading.CancellationToken cancellationToken);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> GetByIdAsyncDelegate_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(int id, global::System.Threading.CancellationToken cancellationToken);
 
 		private GetByIdAsyncDelegate_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User? _onCall_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User;
 		private MethodTrackingImpl_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User? _onCallTracking_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User;
@@ -96,20 +96,20 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		}
 
 		/// <summary>Invokes configured callback for GetByIdAsync(int).</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> Invoke_Int32_Threading_Tasks_Task_KnockOff_Tests_User(OverloadedServiceKnockOff ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> Invoke_Int32_Threading_Tasks_Task_KnockOff_Tests_User(bool strict, int id)
 		{
 			if (_sequence_Int32_Threading_Tasks_Task_KnockOff_Tests_User != null && _sequenceIndex_Int32_Threading_Tasks_Task_KnockOff_Tests_User < _sequence_Int32_Threading_Tasks_Task_KnockOff_Tests_User.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_Threading_Tasks_Task_KnockOff_Tests_User[_sequenceIndex_Int32_Threading_Tasks_Task_KnockOff_Tests_User];
 				tracking.RecordCall(id);
 				_sequenceIndex_Int32_Threading_Tasks_Task_KnockOff_Tests_User++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall_Int32_Threading_Tasks_Task_KnockOff_Tests_User != null && _onCallTracking_Int32_Threading_Tasks_Task_KnockOff_Tests_User != null)
 			{
 				_onCallTracking_Int32_Threading_Tasks_Task_KnockOff_Tests_User.RecordCall(id);
-				return _onCall_Int32_Threading_Tasks_Task_KnockOff_Tests_User(ko, id);
+				return _onCall_Int32_Threading_Tasks_Task_KnockOff_Tests_User(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -127,20 +127,20 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		}
 
 		/// <summary>Invokes configured callback for GetByIdAsync(int, global::System.Threading.CancellationToken).</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> Invoke_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(OverloadedServiceKnockOff ko, bool strict, int id, global::System.Threading.CancellationToken cancellationToken)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> Invoke_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(bool strict, int id, global::System.Threading.CancellationToken cancellationToken)
 		{
 			if (_sequence_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User != null && _sequenceIndex_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User < _sequence_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User[_sequenceIndex_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User];
 				tracking.RecordCall((id, cancellationToken));
 				_sequenceIndex_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User++;
-				return callback(ko, id, cancellationToken);
+				return callback(id, cancellationToken);
 			}
 
 			if (_onCall_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User != null && _onCallTracking_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User != null)
 			{
 				_onCallTracking_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User.RecordCall((id, cancellationToken));
-				return _onCall_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(ko, id, cancellationToken);
+				return _onCall_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(id, cancellationToken);
 			}
 
 			_unconfiguredCallCount++;
@@ -443,7 +443,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(string).</summary>
-		public delegate void ProcessDelegate_String_void(OverloadedServiceKnockOff ko, string data);
+		public delegate void ProcessDelegate_String_void(string data);
 
 		private ProcessDelegate_String_void? _onCall_String_void;
 		private MethodTrackingImpl_String_void? _onCallTracking_String_void;
@@ -455,7 +455,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private global::KnockOff.Times? _verifiableTimes_String_void;
 
 		/// <summary>Delegate for Process(string, int).</summary>
-		public delegate void ProcessDelegate_String_Int32_void(OverloadedServiceKnockOff ko, string data, int priority);
+		public delegate void ProcessDelegate_String_Int32_void(string data, int priority);
 
 		private ProcessDelegate_String_Int32_void? _onCall_String_Int32_void;
 		private MethodTrackingImpl_String_Int32_void? _onCallTracking_String_Int32_void;
@@ -467,7 +467,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private global::KnockOff.Times? _verifiableTimes_String_Int32_void;
 
 		/// <summary>Delegate for Process(string, int, bool).</summary>
-		public delegate void ProcessDelegate_String_Int32_Boolean_void(OverloadedServiceKnockOff ko, string data, int priority, bool async);
+		public delegate void ProcessDelegate_String_Int32_Boolean_void(string data, int priority, bool async);
 
 		private ProcessDelegate_String_Int32_Boolean_void? _onCall_String_Int32_Boolean_void;
 		private MethodTrackingImpl_String_Int32_Boolean_void? _onCallTracking_String_Int32_Boolean_void;
@@ -563,21 +563,21 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		}
 
 		/// <summary>Invokes configured callback for Process(string).</summary>
-		internal void Invoke_String_void(OverloadedServiceKnockOff ko, bool strict, string data)
+		internal void Invoke_String_void(bool strict, string data)
 		{
 			if (_sequence_String_void != null && _sequenceIndex_String_void < _sequence_String_void.Count)
 			{
 				var (callback, tracking) = _sequence_String_void[_sequenceIndex_String_void];
 				tracking.RecordCall(data);
 				_sequenceIndex_String_void++;
-				callback(ko, data);
+				callback(data);
 				return;
 			}
 
 			if (_onCall_String_void != null && _onCallTracking_String_void != null)
 			{
 				_onCallTracking_String_void.RecordCall(data);
-				_onCall_String_void(ko, data);
+				_onCall_String_void(data);
 				return;
 			}
 
@@ -596,21 +596,21 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		}
 
 		/// <summary>Invokes configured callback for Process(string, int).</summary>
-		internal void Invoke_String_Int32_void(OverloadedServiceKnockOff ko, bool strict, string data, int priority)
+		internal void Invoke_String_Int32_void(bool strict, string data, int priority)
 		{
 			if (_sequence_String_Int32_void != null && _sequenceIndex_String_Int32_void < _sequence_String_Int32_void.Count)
 			{
 				var (callback, tracking) = _sequence_String_Int32_void[_sequenceIndex_String_Int32_void];
 				tracking.RecordCall((data, priority));
 				_sequenceIndex_String_Int32_void++;
-				callback(ko, data, priority);
+				callback(data, priority);
 				return;
 			}
 
 			if (_onCall_String_Int32_void != null && _onCallTracking_String_Int32_void != null)
 			{
 				_onCallTracking_String_Int32_void.RecordCall((data, priority));
-				_onCall_String_Int32_void(ko, data, priority);
+				_onCall_String_Int32_void(data, priority);
 				return;
 			}
 
@@ -629,21 +629,21 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		}
 
 		/// <summary>Invokes configured callback for Process(string, int, bool).</summary>
-		internal void Invoke_String_Int32_Boolean_void(OverloadedServiceKnockOff ko, bool strict, string data, int priority, bool async)
+		internal void Invoke_String_Int32_Boolean_void(bool strict, string data, int priority, bool async)
 		{
 			if (_sequence_String_Int32_Boolean_void != null && _sequenceIndex_String_Int32_Boolean_void < _sequence_String_Int32_Boolean_void.Count)
 			{
 				var (callback, tracking) = _sequence_String_Int32_Boolean_void[_sequenceIndex_String_Int32_Boolean_void];
 				tracking.RecordCall((data, priority, async));
 				_sequenceIndex_String_Int32_Boolean_void++;
-				callback(ko, data, priority, async);
+				callback(data, priority, async);
 				return;
 			}
 
 			if (_onCall_String_Int32_Boolean_void != null && _onCallTracking_String_Int32_Boolean_void != null)
 			{
 				_onCallTracking_String_Int32_Boolean_void.RecordCall((data, priority, async));
-				_onCall_String_Int32_Boolean_void(ko, data, priority, async);
+				_onCall_String_Int32_Boolean_void(data, priority, async);
 				return;
 			}
 
@@ -1072,7 +1072,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Calculate(int).</summary>
-		public delegate int CalculateDelegate_Int32_Int32(OverloadedServiceKnockOff ko, int @value);
+		public delegate int CalculateDelegate_Int32_Int32(int @value);
 
 		private CalculateDelegate_Int32_Int32? _onCall_Int32_Int32;
 		private MethodTrackingImpl_Int32_Int32? _onCallTracking_Int32_Int32;
@@ -1084,7 +1084,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private global::KnockOff.Times? _verifiableTimes_Int32_Int32;
 
 		/// <summary>Delegate for Calculate(int, int).</summary>
-		public delegate int CalculateDelegate_Int32_Int32_Int32(OverloadedServiceKnockOff ko, int a, int b);
+		public delegate int CalculateDelegate_Int32_Int32_Int32(int a, int b);
 
 		private CalculateDelegate_Int32_Int32_Int32? _onCall_Int32_Int32_Int32;
 		private MethodTrackingImpl_Int32_Int32_Int32? _onCallTracking_Int32_Int32_Int32;
@@ -1154,20 +1154,20 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		}
 
 		/// <summary>Invokes configured callback for Calculate(int).</summary>
-		internal int Invoke_Int32_Int32(OverloadedServiceKnockOff ko, bool strict, int @value)
+		internal int Invoke_Int32_Int32(bool strict, int @value)
 		{
 			if (_sequence_Int32_Int32 != null && _sequenceIndex_Int32_Int32 < _sequence_Int32_Int32.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_Int32[_sequenceIndex_Int32_Int32];
 				tracking.RecordCall(@value);
 				_sequenceIndex_Int32_Int32++;
-				return callback(ko, @value);
+				return callback(@value);
 			}
 
 			if (_onCall_Int32_Int32 != null && _onCallTracking_Int32_Int32 != null)
 			{
 				_onCallTracking_Int32_Int32.RecordCall(@value);
-				return _onCall_Int32_Int32(ko, @value);
+				return _onCall_Int32_Int32(@value);
 			}
 
 			_unconfiguredCallCount++;
@@ -1185,20 +1185,20 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		}
 
 		/// <summary>Invokes configured callback for Calculate(int, int).</summary>
-		internal int Invoke_Int32_Int32_Int32(OverloadedServiceKnockOff ko, bool strict, int a, int b)
+		internal int Invoke_Int32_Int32_Int32(bool strict, int a, int b)
 		{
 			if (_sequence_Int32_Int32_Int32 != null && _sequenceIndex_Int32_Int32_Int32 < _sequence_Int32_Int32_Int32.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_Int32_Int32[_sequenceIndex_Int32_Int32_Int32];
 				tracking.RecordCall((a, b));
 				_sequenceIndex_Int32_Int32_Int32++;
-				return callback(ko, a, b);
+				return callback(a, b);
 			}
 
 			if (_onCall_Int32_Int32_Int32 != null && _onCallTracking_Int32_Int32_Int32 != null)
 			{
 				_onCallTracking_Int32_Int32_Int32.RecordCall((a, b));
-				return _onCall_Int32_Int32_Int32(ko, a, b);
+				return _onCall_Int32_Int32_Int32(a, b);
 			}
 
 			_unconfiguredCallCount++;
@@ -1546,37 +1546,37 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id)
 	{
-		return GetByIdAsync.Invoke_Int32_Threading_Tasks_Task_KnockOff_Tests_User(this, Strict, id);
+		return GetByIdAsync.Invoke_Int32_Threading_Tasks_Task_KnockOff_Tests_User(Strict, id);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.User?> global::KnockOff.Tests.IOverloadedService.GetByIdAsync(int id, global::System.Threading.CancellationToken cancellationToken)
 	{
-		return GetByIdAsync.Invoke_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(this, Strict, id, cancellationToken);
+		return GetByIdAsync.Invoke_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(Strict, id, cancellationToken);
 	}
 
 	void global::KnockOff.Tests.IOverloadedService.Process(string data)
 	{
-		Process.Invoke_String_void(this, Strict, data);
+		Process.Invoke_String_void(Strict, data);
 	}
 
 	void global::KnockOff.Tests.IOverloadedService.Process(string data, int priority)
 	{
-		Process.Invoke_String_Int32_void(this, Strict, data, priority);
+		Process.Invoke_String_Int32_void(Strict, data, priority);
 	}
 
 	void global::KnockOff.Tests.IOverloadedService.Process(string data, int priority, bool async)
 	{
-		Process.Invoke_String_Int32_Boolean_void(this, Strict, data, priority, async);
+		Process.Invoke_String_Int32_Boolean_void(Strict, data, priority, async);
 	}
 
 	int global::KnockOff.Tests.IOverloadedService.Calculate(int @value)
 	{
-		return Calculate.Invoke_Int32_Int32(this, Strict, @value);
+		return Calculate.Invoke_Int32_Int32(Strict, @value);
 	}
 
 	int global::KnockOff.Tests.IOverloadedService.Calculate(int a, int b)
 	{
-		return Calculate.Invoke_Int32_Int32_Int32(this, Strict, a, b);
+		return Calculate.Invoke_Int32_Int32_Int32(Strict, a, b);
 	}
 
 }

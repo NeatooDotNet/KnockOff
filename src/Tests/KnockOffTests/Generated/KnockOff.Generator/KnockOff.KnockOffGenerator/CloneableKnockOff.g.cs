@@ -12,7 +12,7 @@ partial class CloneableKnockOff : global::System.ICloneable, global::KnockOff.IK
 		internal global::System.ICloneable? _source;
 
 		/// <summary>Delegate for Clone.</summary>
-		public delegate object CloneDelegate(CloneableKnockOff ko);
+		public delegate object CloneDelegate();
 
 		private CloneDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class CloneableKnockOff : global::System.ICloneable, global::KnockOff.IK
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal object Invoke(CloneableKnockOff ko, bool strict)
+		internal object Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -268,7 +268,7 @@ partial class CloneableKnockOff : global::System.ICloneable, global::KnockOff.IK
 
 	object global::System.ICloneable.Clone()
 	{
-		return Clone.Invoke(this, Strict);
+		return Clone.Invoke(Strict);
 	}
 
 }

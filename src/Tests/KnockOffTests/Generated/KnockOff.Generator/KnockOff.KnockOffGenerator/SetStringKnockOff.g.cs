@@ -19,7 +19,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<SetStringKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<SetStringKnockOff, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -176,7 +176,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Add(string).</summary>
-		public delegate bool AddDelegate_String_Boolean(SetStringKnockOff ko, string item);
+		public delegate bool AddDelegate_String_Boolean(string item);
 
 		private AddDelegate_String_Boolean? _onCall_String_Boolean;
 		private MethodTrackingImpl_String_Boolean? _onCallTracking_String_Boolean;
@@ -188,7 +188,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private global::KnockOff.Times? _verifiableTimes_String_Boolean;
 
 		/// <summary>Delegate for Add(string).</summary>
-		public delegate void AddDelegate_String_void(SetStringKnockOff ko, string item);
+		public delegate void AddDelegate_String_void(string item);
 
 		private AddDelegate_String_void? _onCall_String_void;
 		private MethodTrackingImpl_String_void? _onCallTracking_String_void;
@@ -258,20 +258,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes configured callback for Add(string).</summary>
-		internal bool Invoke_String_Boolean(SetStringKnockOff ko, bool strict, string item)
+		internal bool Invoke_String_Boolean(bool strict, string item)
 		{
 			if (_sequence_String_Boolean != null && _sequenceIndex_String_Boolean < _sequence_String_Boolean.Count)
 			{
 				var (callback, tracking) = _sequence_String_Boolean[_sequenceIndex_String_Boolean];
 				tracking.RecordCall(item);
 				_sequenceIndex_String_Boolean++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall_String_Boolean != null && _onCallTracking_String_Boolean != null)
 			{
 				_onCallTracking_String_Boolean.RecordCall(item);
-				return _onCall_String_Boolean(ko, item);
+				return _onCall_String_Boolean(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -289,21 +289,21 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes configured callback for Add(string).</summary>
-		internal void Invoke_String_void(SetStringKnockOff ko, bool strict, string item)
+		internal void Invoke_String_void(bool strict, string item)
 		{
 			if (_sequence_String_void != null && _sequenceIndex_String_void < _sequence_String_void.Count)
 			{
 				var (callback, tracking) = _sequence_String_void[_sequenceIndex_String_void];
 				tracking.RecordCall(item);
 				_sequenceIndex_String_void++;
-				callback(ko, item);
+				callback(item);
 				return;
 			}
 
 			if (_onCall_String_void != null && _onCallTracking_String_void != null)
 			{
 				_onCallTracking_String_void.RecordCall(item);
-				_onCall_String_void(ko, item);
+				_onCall_String_void(item);
 				return;
 			}
 
@@ -604,10 +604,10 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
-		private global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>? _onCall;
+		private global::System.Action<global::System.Collections.Generic.IEnumerable<string>>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -627,7 +627,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<string>> OnCall(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<string>> OnCall(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -639,13 +639,13 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> OnCallSequence(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> OnCallSequence(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -653,21 +653,21 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal void Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				callback(ko, other);
+				callback(other);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				_onCall(ko, other);
+				_onCall(other);
 				return;
 			}
 
@@ -777,7 +777,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>>
 		{
 			private readonly ExceptWithInterceptor _interceptor;
 
@@ -797,7 +797,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> ThenCall(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> ThenCall(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -818,7 +818,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -837,10 +837,10 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
-		private global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>? _onCall;
+		private global::System.Action<global::System.Collections.Generic.IEnumerable<string>>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -860,7 +860,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<string>> OnCall(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<string>> OnCall(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -872,13 +872,13 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> OnCallSequence(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> OnCallSequence(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -886,21 +886,21 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal void Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				callback(ko, other);
+				callback(other);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				_onCall(ko, other);
+				_onCall(other);
 				return;
 			}
 
@@ -1010,7 +1010,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>>
 		{
 			private readonly IntersectWithInterceptor _interceptor;
 
@@ -1030,7 +1030,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> ThenCall(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> ThenCall(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1051,7 +1051,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1071,7 +1071,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
 		/// <summary>Delegate for IsProperSubsetOf.</summary>
-		public delegate bool IsProperSubsetOfDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
+		public delegate bool IsProperSubsetOfDelegate(global::System.Collections.Generic.IEnumerable<string> other);
 
 		private IsProperSubsetOfDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1122,20 +1122,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal bool Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				return callback(ko, other);
+				return callback(other);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				return _onCall(ko, other);
+				return _onCall(other);
 			}
 
 			_unconfiguredCallCount++;
@@ -1305,7 +1305,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
 		/// <summary>Delegate for IsProperSupersetOf.</summary>
-		public delegate bool IsProperSupersetOfDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
+		public delegate bool IsProperSupersetOfDelegate(global::System.Collections.Generic.IEnumerable<string> other);
 
 		private IsProperSupersetOfDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1356,20 +1356,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal bool Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				return callback(ko, other);
+				return callback(other);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				return _onCall(ko, other);
+				return _onCall(other);
 			}
 
 			_unconfiguredCallCount++;
@@ -1539,7 +1539,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
 		/// <summary>Delegate for IsSubsetOf.</summary>
-		public delegate bool IsSubsetOfDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
+		public delegate bool IsSubsetOfDelegate(global::System.Collections.Generic.IEnumerable<string> other);
 
 		private IsSubsetOfDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1590,20 +1590,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal bool Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				return callback(ko, other);
+				return callback(other);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				return _onCall(ko, other);
+				return _onCall(other);
 			}
 
 			_unconfiguredCallCount++;
@@ -1773,7 +1773,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
 		/// <summary>Delegate for IsSupersetOf.</summary>
-		public delegate bool IsSupersetOfDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
+		public delegate bool IsSupersetOfDelegate(global::System.Collections.Generic.IEnumerable<string> other);
 
 		private IsSupersetOfDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1824,20 +1824,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal bool Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				return callback(ko, other);
+				return callback(other);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				return _onCall(ko, other);
+				return _onCall(other);
 			}
 
 			_unconfiguredCallCount++;
@@ -2007,7 +2007,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
 		/// <summary>Delegate for Overlaps.</summary>
-		public delegate bool OverlapsDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
+		public delegate bool OverlapsDelegate(global::System.Collections.Generic.IEnumerable<string> other);
 
 		private OverlapsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2058,20 +2058,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal bool Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				return callback(ko, other);
+				return callback(other);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				return _onCall(ko, other);
+				return _onCall(other);
 			}
 
 			_unconfiguredCallCount++;
@@ -2241,7 +2241,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
 		/// <summary>Delegate for SetEquals.</summary>
-		public delegate bool SetEqualsDelegate(SetStringKnockOff ko, global::System.Collections.Generic.IEnumerable<string> other);
+		public delegate bool SetEqualsDelegate(global::System.Collections.Generic.IEnumerable<string> other);
 
 		private SetEqualsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2292,20 +2292,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal bool Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				return callback(ko, other);
+				return callback(other);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				return _onCall(ko, other);
+				return _onCall(other);
 			}
 
 			_unconfiguredCallCount++;
@@ -2474,10 +2474,10 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
-		private global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>? _onCall;
+		private global::System.Action<global::System.Collections.Generic.IEnumerable<string>>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2497,7 +2497,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<string>> OnCall(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<string>> OnCall(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2509,13 +2509,13 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> OnCallSequence(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> OnCallSequence(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2523,21 +2523,21 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal void Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				callback(ko, other);
+				callback(other);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				_onCall(ko, other);
+				_onCall(other);
 				return;
 			}
 
@@ -2647,7 +2647,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>>
 		{
 			private readonly SymmetricExceptWithInterceptor _interceptor;
 
@@ -2667,7 +2667,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> ThenCall(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> ThenCall(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2688,7 +2688,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2707,10 +2707,10 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ISet<string>? _source;
 
-		private global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>? _onCall;
+		private global::System.Action<global::System.Collections.Generic.IEnumerable<string>>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2730,7 +2730,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<string>> OnCall(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.IEnumerable<string>> OnCall(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2742,13 +2742,13 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> OnCallSequence(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> OnCallSequence(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2756,21 +2756,21 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SetStringKnockOff ko, bool strict, global::System.Collections.Generic.IEnumerable<string> other)
+		internal void Invoke(bool strict, global::System.Collections.Generic.IEnumerable<string> other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				callback(ko, other);
+				callback(other);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				_onCall(ko, other);
+				_onCall(other);
 				return;
 			}
 
@@ -2880,7 +2880,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>>
 		{
 			private readonly UnionWithInterceptor _interceptor;
 
@@ -2900,7 +2900,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> ThenCall(global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> ThenCall(global::System.Action<global::System.Collections.Generic.IEnumerable<string>> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2921,7 +2921,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, global::System.Collections.Generic.IEnumerable<string>>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.IEnumerable<string>>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2940,10 +2940,10 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<string>? _source;
 
-		private global::System.Action<SetStringKnockOff>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2959,7 +2959,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<SetStringKnockOff> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2971,13 +2971,13 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff>> OnCallSequence(global::System.Action<SetStringKnockOff> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2985,21 +2985,21 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SetStringKnockOff ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -3100,7 +3100,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearInterceptor _interceptor;
 
@@ -3120,7 +3120,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff>> ThenCall(global::System.Action<SetStringKnockOff> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -3141,7 +3141,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -3161,7 +3161,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		internal global::System.Collections.Generic.ICollection<string>? _source;
 
 		/// <summary>Delegate for Contains.</summary>
-		public delegate bool ContainsDelegate(SetStringKnockOff ko, string item);
+		public delegate bool ContainsDelegate(string item);
 
 		private ContainsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -3212,20 +3212,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SetStringKnockOff ko, bool strict, string item)
+		internal bool Invoke(bool strict, string item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -3394,10 +3394,10 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<string>? _source;
 
-		private global::System.Action<SetStringKnockOff, string[], int>? _onCall;
+		private global::System.Action<string[], int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, string[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -3417,7 +3417,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(string[]? array, int? arrayIndex)> OnCall(global::System.Action<SetStringKnockOff, string[], int> callback)
+		public global::KnockOff.IMethodTrackingArgs<(string[]? array, int? arrayIndex)> OnCall(global::System.Action<string[], int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -3429,13 +3429,13 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, string[], int>> OnCallSequence(global::System.Action<SetStringKnockOff, string[], int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string[], int>> OnCallSequence(global::System.Action<string[], int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SetStringKnockOff, string[], int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string[], int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -3443,21 +3443,21 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SetStringKnockOff ko, bool strict, string[] array, int arrayIndex)
+		internal void Invoke(bool strict, string[] array, int arrayIndex)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((array, arrayIndex));
 				_sequenceIndex++;
-				callback(ko, array, arrayIndex);
+				callback(array, arrayIndex);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((array, arrayIndex));
-				_onCall(ko, array, arrayIndex);
+				_onCall(array, arrayIndex);
 				return;
 			}
 
@@ -3567,7 +3567,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, string[], int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string[], int>>
 		{
 			private readonly CopyToInterceptor _interceptor;
 
@@ -3587,7 +3587,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, string[], int>> ThenCall(global::System.Action<SetStringKnockOff, string[], int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string[], int>> ThenCall(global::System.Action<string[], int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -3608,7 +3608,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SetStringKnockOff, string[], int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string[], int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -3628,7 +3628,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		internal global::System.Collections.Generic.ICollection<string>? _source;
 
 		/// <summary>Delegate for Remove.</summary>
-		public delegate bool RemoveDelegate(SetStringKnockOff ko, string item);
+		public delegate bool RemoveDelegate(string item);
 
 		private RemoveDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -3679,20 +3679,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SetStringKnockOff ko, bool strict, string item)
+		internal bool Invoke(bool strict, string item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -3864,7 +3864,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string(SetStringKnockOff ko);
+		public delegate global::System.Collections.Generic.IEnumerator<string> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string();
 
 		private GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string? _onCall_NoParams_Collections_Generic_IEnumerator_string;
 		private MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string? _onCallTracking_NoParams_Collections_Generic_IEnumerator_string;
@@ -3876,7 +3876,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_Generic_IEnumerator_string;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator(SetStringKnockOff ko);
+		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator();
 
 		private GetEnumeratorDelegate_NoParams_Collections_IEnumerator? _onCall_NoParams_Collections_IEnumerator;
 		private MethodTrackingImpl_NoParams_Collections_IEnumerator? _onCallTracking_NoParams_Collections_IEnumerator;
@@ -3946,20 +3946,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.Generic.IEnumerator<string> Invoke_NoParams_Collections_Generic_IEnumerator_string(SetStringKnockOff ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerator<string> Invoke_NoParams_Collections_Generic_IEnumerator_string(bool strict)
 		{
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_string != null && _sequenceIndex_NoParams_Collections_Generic_IEnumerator_string < _sequence_NoParams_Collections_Generic_IEnumerator_string.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_Generic_IEnumerator_string[_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_Generic_IEnumerator_string++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_Generic_IEnumerator_string != null && _onCallTracking_NoParams_Collections_Generic_IEnumerator_string != null)
 			{
 				_onCallTracking_NoParams_Collections_Generic_IEnumerator_string.RecordCall();
-				return _onCall_NoParams_Collections_Generic_IEnumerator_string(ko);
+				return _onCall_NoParams_Collections_Generic_IEnumerator_string();
 			}
 
 			_unconfiguredCallCount++;
@@ -3977,20 +3977,20 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(SetStringKnockOff ko, bool strict)
+		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(bool strict)
 		{
 			if (_sequence_NoParams_Collections_IEnumerator != null && _sequenceIndex_NoParams_Collections_IEnumerator < _sequence_NoParams_Collections_IEnumerator.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_IEnumerator[_sequenceIndex_NoParams_Collections_IEnumerator];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_IEnumerator++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_IEnumerator != null && _onCallTracking_NoParams_Collections_IEnumerator != null)
 			{
 				_onCallTracking_NoParams_Collections_IEnumerator.RecordCall();
-				return _onCall_NoParams_Collections_IEnumerator(ko);
+				return _onCall_NoParams_Collections_IEnumerator();
 			}
 
 			_unconfiguredCallCount++;
@@ -4486,97 +4486,97 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 	int global::System.Collections.Generic.ICollection<string>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<string>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.Add(string item)
 	{
-		return Add.Invoke_String_Boolean(this, Strict, item);
+		return Add.Invoke_String_Boolean(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ISet<string>.ExceptWith(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		ExceptWith.Invoke(this, Strict, other);
+		ExceptWith.Invoke(Strict, other);
 	}
 
 	void global::System.Collections.Generic.ISet<string>.IntersectWith(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		IntersectWith.Invoke(this, Strict, other);
+		IntersectWith.Invoke(Strict, other);
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.IsProperSubsetOf(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		return IsProperSubsetOf.Invoke(this, Strict, other);
+		return IsProperSubsetOf.Invoke(Strict, other);
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.IsProperSupersetOf(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		return IsProperSupersetOf.Invoke(this, Strict, other);
+		return IsProperSupersetOf.Invoke(Strict, other);
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.IsSubsetOf(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		return IsSubsetOf.Invoke(this, Strict, other);
+		return IsSubsetOf.Invoke(Strict, other);
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.IsSupersetOf(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		return IsSupersetOf.Invoke(this, Strict, other);
+		return IsSupersetOf.Invoke(Strict, other);
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.Overlaps(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		return Overlaps.Invoke(this, Strict, other);
+		return Overlaps.Invoke(Strict, other);
 	}
 
 	bool global::System.Collections.Generic.ISet<string>.SetEquals(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		return SetEquals.Invoke(this, Strict, other);
+		return SetEquals.Invoke(Strict, other);
 	}
 
 	void global::System.Collections.Generic.ISet<string>.SymmetricExceptWith(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		SymmetricExceptWith.Invoke(this, Strict, other);
+		SymmetricExceptWith.Invoke(Strict, other);
 	}
 
 	void global::System.Collections.Generic.ISet<string>.UnionWith(global::System.Collections.Generic.IEnumerable<string> other)
 	{
-		UnionWith.Invoke(this, Strict, other);
+		UnionWith.Invoke(Strict, other);
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.Add(string item)
 	{
-		Add.Invoke_String_void(this, Strict, item);
+		Add.Invoke_String_void(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.Clear()
 	{
-		Clear.Invoke(this, Strict);
+		Clear.Invoke(Strict);
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.Contains(string item)
 	{
-		return Contains.Invoke(this, Strict, item);
+		return Contains.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<string>.CopyTo(string[] array, int arrayIndex)
 	{
-		CopyTo.Invoke(this, Strict, array, arrayIndex);
+		CopyTo.Invoke(Strict, array, arrayIndex);
 	}
 
 	bool global::System.Collections.Generic.ICollection<string>.Remove(string item)
 	{
-		return Remove.Invoke(this, Strict, item);
+		return Remove.Invoke(Strict, item);
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()
 	{
-		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_string(this, Strict);
+		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_string(Strict);
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()

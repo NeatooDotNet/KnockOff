@@ -12,7 +12,7 @@ partial class NewConstraintStub<T> : global::KnockOff.Tests.INewConstraintServic
 		internal global::KnockOff.Tests.INewConstraintService<T>? _source;
 
 		/// <summary>Delegate for Create.</summary>
-		public delegate T CreateDelegate(NewConstraintStub<T> ko);
+		public delegate T CreateDelegate();
 
 		private CreateDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class NewConstraintStub<T> : global::KnockOff.Tests.INewConstraintServic
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal T Invoke(NewConstraintStub<T> ko, bool strict)
+		internal T Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -268,7 +268,7 @@ partial class NewConstraintStub<T> : global::KnockOff.Tests.INewConstraintServic
 
 	T global::KnockOff.Tests.INewConstraintService<T>.Create()
 	{
-		return Create.Invoke(this, Strict);
+		return Create.Invoke(Strict);
 	}
 
 }

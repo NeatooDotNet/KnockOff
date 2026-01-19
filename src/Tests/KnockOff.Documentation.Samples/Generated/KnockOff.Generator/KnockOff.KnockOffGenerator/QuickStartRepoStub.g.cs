@@ -12,7 +12,7 @@ partial class QuickStartRepoStub : global::KnockOff.Documentation.Samples.Readme
 		internal global::KnockOff.Documentation.Samples.Readme.IQuickStartRepo? _source;
 
 		/// <summary>Delegate for GetUser.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? GetUserDelegate(QuickStartRepoStub ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.User? GetUserDelegate(int id);
 
 		private GetUserDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class QuickStartRepoStub : global::KnockOff.Documentation.Samples.Readme
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke(QuickStartRepoStub ko, bool strict, int id)
+		internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class QuickStartRepoStub : global::KnockOff.Documentation.Samples.Readme
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.Readme.IQuickStartRepo.GetUser(int id)
 	{
-		return GetUser.Invoke(this, Strict, id);
+		return GetUser.Invoke(Strict, id);
 	}
 
 }

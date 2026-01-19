@@ -12,7 +12,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		internal global::KnockOff.Documentation.Samples.Verification.IRepoVerify? _source;
 
 		/// <summary>Delegate for GetById.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(RepoVerifyStub ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(int id);
 
 		private GetByIdDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke(RepoVerifyStub ko, bool strict, int id)
+		internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -245,10 +245,10 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Verification.IRepoVerify? _source;
 
-		private global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User>? _onCall;
+		private global::System.Action<global::KnockOff.Documentation.Samples.User>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -268,7 +268,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.User> OnCall(global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User> callback)
+		public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.User> OnCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -280,13 +280,13 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User>> OnCallSequence(global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> OnCallSequence(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -294,21 +294,21 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RepoVerifyStub ko, bool strict, global::KnockOff.Documentation.Samples.User user)
+		internal void Invoke(bool strict, global::KnockOff.Documentation.Samples.User user)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(user);
 				_sequenceIndex++;
-				callback(ko, user);
+				callback(user);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(user);
-				_onCall(ko, user);
+				_onCall(user);
 				return;
 			}
 
@@ -418,7 +418,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>>
 		{
 			private readonly SaveInterceptor _interceptor;
 
@@ -438,7 +438,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User>> ThenCall(global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> ThenCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -459,7 +459,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RepoVerifyStub, global::KnockOff.Documentation.Samples.User>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -478,10 +478,10 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Verification.IRepoVerify? _source;
 
-		private global::System.Action<RepoVerifyStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<RepoVerifyStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -497,7 +497,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<RepoVerifyStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -509,13 +509,13 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<RepoVerifyStub>> OnCallSequence(global::System.Action<RepoVerifyStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<RepoVerifyStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -523,21 +523,21 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RepoVerifyStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -638,7 +638,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<RepoVerifyStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly RefreshInterceptor _interceptor;
 
@@ -658,7 +658,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RepoVerifyStub>> ThenCall(global::System.Action<RepoVerifyStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -679,7 +679,7 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RepoVerifyStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -746,17 +746,17 @@ partial class RepoVerifyStub : global::KnockOff.Documentation.Samples.Verificati
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.Verification.IRepoVerify.GetById(int id)
 	{
-		return GetById.Invoke(this, Strict, id);
+		return GetById.Invoke(Strict, id);
 	}
 
 	void global::KnockOff.Documentation.Samples.Verification.IRepoVerify.Save(global::KnockOff.Documentation.Samples.User user)
 	{
-		Save.Invoke(this, Strict, user);
+		Save.Invoke(Strict, user);
 	}
 
 	void global::KnockOff.Documentation.Samples.Verification.IRepoVerify.Refresh()
 	{
-		Refresh.Invoke(this, Strict);
+		Refresh.Invoke(Strict);
 	}
 
 }

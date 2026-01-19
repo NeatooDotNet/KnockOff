@@ -15,7 +15,7 @@ partial class FormattableStubTests
 			internal global::System.IFormattable? _source;
 
 			/// <summary>Delegate for ToString.</summary>
-			public delegate string ToStringDelegate(Stubs.IFormattable ko, string? format, global::System.IFormatProvider? formatProvider);
+			public delegate string ToStringDelegate(string? format, global::System.IFormatProvider? formatProvider);
 
 			private ToStringDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class FormattableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal string Invoke(Stubs.IFormattable ko, string? format, global::System.IFormatProvider? formatProvider)
+			internal string Invoke(bool strict, string? format, global::System.IFormatProvider? formatProvider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((format, formatProvider));
 					_sequenceIndex++;
-					return callback(ko, format, formatProvider);
+					return callback(format, formatProvider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((format, formatProvider));
-					return _onCall(ko, format, formatProvider);
+					return _onCall(format, formatProvider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((format, formatProvider));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToString");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToString");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToString(format, formatProvider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToString");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToString");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class FormattableStubTests
 
 			string global::System.IFormattable.ToString(string? format, global::System.IFormatProvider? formatProvider)
 			{
-				return ToString.Invoke(this, format, formatProvider);
+				return ToString.Invoke(Strict, format, formatProvider);
 			}
 
 			/// <summary>The global::System.IFormattable instance. Use for passing to code expecting the interface.</summary>

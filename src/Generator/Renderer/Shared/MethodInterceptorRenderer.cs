@@ -275,8 +275,7 @@ internal static class MethodInterceptorRenderer
 		InterceptorRenderOptions options,
 		string? signatureSuffix)
 	{
-		var ownerWithParams = GetOwnerWithParams(model);
-		var invokeParams = BuildInvokeParams(ownerWithParams, model.Parameters, options.IncludeStrictParameter);
+		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter);
 		var returnType = model.IsVoid ? "void" : model.ReturnType;
 
 		w.Line($"/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>");
@@ -388,8 +387,7 @@ internal static class MethodInterceptorRenderer
 		MethodOverloadSignature overload,
 		InterceptorRenderOptions options)
 	{
-		var ownerWithParams = GetOwnerWithParams(model);
-		var invokeParams = BuildInvokeParams(ownerWithParams, overload.Parameters, options.IncludeStrictParameter);
+		var invokeParams = BuildInvokeParams(overload.Parameters, options.IncludeStrictParameter);
 		var returnType = overload.IsVoid ? "void" : overload.ReturnType;
 
 		w.Line($"/// <summary>Invokes configured callback for {model.MethodName}({GetParamTypeList(overload.Parameters)}).</summary>");
@@ -888,9 +886,9 @@ internal static class MethodInterceptorRenderer
 		return string.Join(", ", parameters.Select(p => p.Type));
 	}
 
-	private static string BuildInvokeParams(string ownerClassName, EquatableArray<ParameterModel> parameters, bool includeStrict)
+	private static string BuildInvokeParams(EquatableArray<ParameterModel> parameters, bool includeStrict)
 	{
-		var parts = new List<string> { $"{ownerClassName} ko" };
+		var parts = new List<string>();
 		if (includeStrict)
 			parts.Add("bool strict");
 		foreach (var p in parameters)
@@ -902,7 +900,7 @@ internal static class MethodInterceptorRenderer
 
 	private static string BuildCallbackArgs(EquatableArray<ParameterModel> parameters)
 	{
-		var parts = new List<string> { "ko" };
+		var parts = new List<string>();
 		foreach (var p in parameters)
 		{
 			parts.Add($"{p.RefPrefix}{p.EscapedName}");

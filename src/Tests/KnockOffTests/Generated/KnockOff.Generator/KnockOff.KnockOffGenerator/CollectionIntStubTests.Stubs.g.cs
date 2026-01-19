@@ -19,7 +19,7 @@ partial class CollectionIntStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.ICollection, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class CollectionIntStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.ICollection, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -176,10 +176,10 @@ partial class CollectionIntStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<int>? _source;
 
-			private global::System.Action<Stubs.ICollection, int>? _onCall;
+			private global::System.Action<int>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.ICollection, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -199,7 +199,7 @@ partial class CollectionIntStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<Stubs.ICollection, int> callback)
+			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -211,13 +211,13 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection, int>> OnCallSequence(global::System.Action<Stubs.ICollection, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.ICollection, int> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -225,21 +225,21 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.ICollection ko, int item)
+			internal void Invoke(bool strict, int item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					callback(ko, item);
+					callback(item);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					_onCall(ko, item);
+					_onCall(item);
 					return;
 				}
 
@@ -247,14 +247,14 @@ partial class CollectionIntStubTests
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Add(item); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
 
@@ -349,7 +349,7 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection, int>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 			{
 				private readonly ICollection_AddInterceptor _interceptor;
 
@@ -369,7 +369,7 @@ partial class CollectionIntStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection, int>> ThenCall(global::System.Action<Stubs.ICollection, int> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -390,7 +390,7 @@ partial class CollectionIntStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection, int>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -409,10 +409,10 @@ partial class CollectionIntStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<int>? _source;
 
-			private global::System.Action<Stubs.ICollection>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.ICollection> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -428,7 +428,7 @@ partial class CollectionIntStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.ICollection> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -440,13 +440,13 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection>> OnCallSequence(global::System.Action<Stubs.ICollection> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.ICollection> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -454,35 +454,35 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.ICollection ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Clear");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Clear");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Clear(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
 
@@ -569,7 +569,7 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly ICollection_ClearInterceptor _interceptor;
 
@@ -589,7 +589,7 @@ partial class CollectionIntStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection>> ThenCall(global::System.Action<Stubs.ICollection> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -610,7 +610,7 @@ partial class CollectionIntStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -630,7 +630,7 @@ partial class CollectionIntStubTests
 			internal global::System.Collections.Generic.ICollection<int>? _source;
 
 			/// <summary>Delegate for Contains.</summary>
-			public delegate bool ContainsDelegate(Stubs.ICollection ko, int item);
+			public delegate bool ContainsDelegate(int item);
 
 			private ContainsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -681,34 +681,34 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.ICollection ko, int item)
+			internal bool Invoke(bool strict, int item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					return callback(ko, item);
+					return callback(item);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					return _onCall(ko, item);
+					return _onCall(item);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Contains");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Contains");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Contains(item);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 				return default!;
 			}
 
@@ -863,10 +863,10 @@ partial class CollectionIntStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<int>? _source;
 
-			private global::System.Action<Stubs.ICollection, int[], int>? _onCall;
+			private global::System.Action<int[], int>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.ICollection, int[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<int[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -886,7 +886,7 @@ partial class CollectionIntStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTrackingArgs<(int[] array, int arrayIndex)> OnCall(global::System.Action<Stubs.ICollection, int[], int> callback)
+			public global::KnockOff.IMethodTrackingArgs<(int[] array, int arrayIndex)> OnCall(global::System.Action<int[], int> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -898,13 +898,13 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection, int[], int>> OnCallSequence(global::System.Action<Stubs.ICollection, int[], int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int[], int>> OnCallSequence(global::System.Action<int[], int> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.ICollection, int[], int> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<int[], int> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -912,21 +912,21 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.ICollection ko, int[] array, int arrayIndex)
+			internal void Invoke(bool strict, int[] array, int arrayIndex)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((array, arrayIndex));
 					_sequenceIndex++;
-					callback(ko, array, arrayIndex);
+					callback(array, arrayIndex);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((array, arrayIndex));
-					_onCall(ko, array, arrayIndex);
+					_onCall(array, arrayIndex);
 					return;
 				}
 
@@ -934,14 +934,14 @@ partial class CollectionIntStubTests
 				_unconfiguredLastArgs = ((array, arrayIndex));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("CopyTo");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CopyTo");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 				return;
 			}
 
@@ -1036,7 +1036,7 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection, int[], int>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int[], int>>
 			{
 				private readonly ICollection_CopyToInterceptor _interceptor;
 
@@ -1056,7 +1056,7 @@ partial class CollectionIntStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection, int[], int>> ThenCall(global::System.Action<Stubs.ICollection, int[], int> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<int[], int>> ThenCall(global::System.Action<int[], int> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1077,7 +1077,7 @@ partial class CollectionIntStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ICollection, int[], int>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<int[], int>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1097,7 +1097,7 @@ partial class CollectionIntStubTests
 			internal global::System.Collections.Generic.ICollection<int>? _source;
 
 			/// <summary>Delegate for Remove.</summary>
-			public delegate bool RemoveDelegate(Stubs.ICollection ko, int item);
+			public delegate bool RemoveDelegate(int item);
 
 			private RemoveDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1148,34 +1148,34 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.ICollection ko, int item)
+			internal bool Invoke(bool strict, int item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					return callback(ko, item);
+					return callback(item);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					return _onCall(ko, item);
+					return _onCall(item);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Remove");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Remove");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Remove(item);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return default!;
 			}
 
@@ -1331,7 +1331,7 @@ partial class CollectionIntStubTests
 			internal global::System.Collections.Generic.IEnumerable<int>? _source;
 
 			/// <summary>Delegate for GetEnumerator.</summary>
-			public delegate global::System.Collections.Generic.IEnumerator<int> GetEnumeratorDelegate(Stubs.ICollection ko);
+			public delegate global::System.Collections.Generic.IEnumerator<int> GetEnumeratorDelegate();
 
 			private GetEnumeratorDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1378,33 +1378,33 @@ partial class CollectionIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IEnumerator<int> Invoke(Stubs.ICollection ko)
+			internal global::System.Collections.Generic.IEnumerator<int> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetEnumerator();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
 
@@ -1574,27 +1574,27 @@ partial class CollectionIntStubTests
 
 			void global::System.Collections.Generic.ICollection<int>.Add(int item)
 			{
-				Add.Invoke(this, item);
+				Add.Invoke(Strict, item);
 			}
 
 			void global::System.Collections.Generic.ICollection<int>.Clear()
 			{
-				Clear.Invoke(this);
+				Clear.Invoke(Strict);
 			}
 
 			bool global::System.Collections.Generic.ICollection<int>.Contains(int item)
 			{
-				return Contains.Invoke(this, item);
+				return Contains.Invoke(Strict, item);
 			}
 
 			void global::System.Collections.Generic.ICollection<int>.CopyTo(int[] array, int arrayIndex)
 			{
-				CopyTo.Invoke(this, array, arrayIndex);
+				CopyTo.Invoke(Strict, array, arrayIndex);
 			}
 
 			bool global::System.Collections.Generic.ICollection<int>.Remove(int item)
 			{
-				return Remove.Invoke(this, item);
+				return Remove.Invoke(Strict, item);
 			}
 
 			int global::System.Collections.Generic.ICollection<int>.Count
@@ -1602,7 +1602,7 @@ partial class CollectionIntStubTests
 				get
 				{
 					Count.RecordGet();
-					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count.OnGet is { } onGet) return onGet();
 					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<int>", "Count");
 					return Count.Value;
@@ -1614,7 +1614,7 @@ partial class CollectionIntStubTests
 				get
 				{
 					IsReadOnly.RecordGet();
-					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly.OnGet is { } onGet) return onGet();
 					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ICollection<int>", "IsReadOnly");
 					return IsReadOnly.Value;
@@ -1623,12 +1623,12 @@ partial class CollectionIntStubTests
 
 			global::System.Collections.Generic.IEnumerator<int> global::System.Collections.Generic.IEnumerable<int>.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			/// <summary>The global::System.Collections.Generic.ICollection<int> instance. Use for passing to code expecting the interface.</summary>

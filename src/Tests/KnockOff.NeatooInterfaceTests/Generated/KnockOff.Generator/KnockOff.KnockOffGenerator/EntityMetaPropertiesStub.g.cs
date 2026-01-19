@@ -19,7 +19,7 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityMetaPropertiesStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityMetaPropertiesStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityMetaPropertiesStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityMetaPropertiesStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -343,7 +343,7 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityMetaPropertiesStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -424,7 +424,7 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityMetaPropertiesStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -505,7 +505,7 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityMetaPropertiesStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -629,37 +629,37 @@ partial class EntityMetaPropertiesStub : global::Neatoo.IEntityMetaProperties, g
 
 	bool global::Neatoo.IEntityMetaProperties.IsChild
 	{
-		get { IsChild.RecordGet(); if (IsChild.OnGet is { } onGet) return onGet(this); if (IsChild._source is { } src) return src.IsChild; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild"); return IsChild.Value; }
+		get { IsChild.RecordGet(); if (IsChild.OnGet is { } onGet) return onGet(); if (IsChild._source is { } src) return src.IsChild; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild"); return IsChild.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsModified
 	{
-		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(this); if (IsModified._source is { } src) return src.IsModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified"); return IsModified.Value; }
+		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(); if (IsModified._source is { } src) return src.IsModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified"); return IsModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSelfModified
 	{
-		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(this); if (IsSelfModified._source is { } src) return src.IsSelfModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified"); return IsSelfModified.Value; }
+		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(); if (IsSelfModified._source is { } src) return src.IsSelfModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified"); return IsSelfModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsMarkedModified
 	{
-		get { IsMarkedModified.RecordGet(); if (IsMarkedModified.OnGet is { } onGet) return onGet(this); if (IsMarkedModified._source is { } src) return src.IsMarkedModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified"); return IsMarkedModified.Value; }
+		get { IsMarkedModified.RecordGet(); if (IsMarkedModified.OnGet is { } onGet) return onGet(); if (IsMarkedModified._source is { } src) return src.IsMarkedModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified"); return IsMarkedModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSavable
 	{
-		get { IsSavable.RecordGet(); if (IsSavable.OnGet is { } onGet) return onGet(this); if (IsSavable._source is { } src) return src.IsSavable; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable"); return IsSavable.Value; }
+		get { IsSavable.RecordGet(); if (IsSavable.OnGet is { } onGet) return onGet(); if (IsSavable._source is { } src) return src.IsSavable; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable"); return IsSavable.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsDeleted
 	{
-		get { IsDeleted.RecordGet(); if (IsDeleted.OnGet is { } onGet) return onGet(this); if (IsDeleted._source is { } src) return src.IsDeleted; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted"); return IsDeleted.Value; }
+		get { IsDeleted.RecordGet(); if (IsDeleted.OnGet is { } onGet) return onGet(); if (IsDeleted._source is { } src) return src.IsDeleted; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted"); return IsDeleted.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
 	{
-		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (IsNew._source is { } src) return src.IsNew; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew"); return IsNew.Value; }
+		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(); if (IsNew._source is { } src) return src.IsNew; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew"); return IsNew.Value; }
 	}
 
 }

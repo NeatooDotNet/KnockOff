@@ -57,7 +57,7 @@ public class PartialKeywordTests
     {
         // TroubleshootGoodStub compiles because it's partial
         var stub = new TroubleshootGoodStub();
-        stub.GetById.OnCall((ko, id) => new User { Id = id });
+        stub.GetById.OnCall((id) => new User { Id = id });
 
         ITroubleshootRepo repository = stub;
         var user = repository.GetById(1);
@@ -79,7 +79,7 @@ public partial class EmailServiceTests
         var stub = new Stubs.EmailService();
 
         // Configure the stub
-        stub.Send.OnCall((ko, to, subject) => true);
+        stub.Send.OnCall((to, subject) => true);
 
         // ERROR (commented out): Cannot pass stub directly
         // Method expects EmailService, not Stubs.EmailService
@@ -103,7 +103,7 @@ public partial class EmailServiceTests
     public void PassingStubObjectToMethod()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.OnCall((ko, to, subject) => true);
+        stub.Send.OnCall((to, subject) => true);
 
         // Pass stub.Object to method expecting EmailService
         UseEmailService(stub.Object);
@@ -129,12 +129,12 @@ public class OnCallSignatureTests
         // stub.GetByIdAsync.OnCall((id) => Task.FromResult<User?>(null));
 
         // CORRECT: Include ko as first parameter
-        stub.GetByIdAsync.OnCall((ko, id) =>
+        stub.GetByIdAsync.OnCall((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 
         // The ko parameter gives access to the stub instance
         // Useful for accessing other interceptors or state
-        stub.GetByIdAsync.OnCall((ko, id) =>
+        stub.GetByIdAsync.OnCall((id) =>
         {
             // Can access other interceptors via ko
             // ko is the stub instance itself
@@ -167,7 +167,7 @@ public class NoCallbackConfiguredTests
         Assert.Null(user);
 
         // For non-nullable string, configure explicitly:
-        stub.GetName.OnCall((ko) => "Configured Name");
+        stub.GetName.OnCall(() => "Configured Name");
         var name = repository.GetName();
         Assert.Equal("Configured Name", name);
     }
@@ -183,7 +183,7 @@ public class NoCallbackConfiguredTests
         Assert.Equal("localhost", config.Host);
 
         // Fix Option 2: Use OnGet for dynamic behavior
-        stub.Port.OnGet = (ko) => 8080;
+        stub.Port.OnGet = () => 8080;
         Assert.Equal(8080, config.Port);
     }
     #endregion
@@ -203,7 +203,7 @@ public class OnGetPriorityTests
         IConfigSvc config = stub;
 
         // Configure OnGet
-        stub.Host.OnGet = (ko) => "from-callback";
+        stub.Host.OnGet = () => "from-callback";
 
         // Access uses OnGet
         Assert.Equal("from-callback", config.Host);
@@ -239,7 +239,7 @@ public class OnGetPriorityTests
         Assert.Equal(80, config.Port);
 
         // OnGet overrides Value
-        stub.Port.OnGet = (ko) => 443;
+        stub.Port.OnGet = () => 443;
         Assert.Equal(443, config.Port);
 
         // Clear OnGet to use Value again

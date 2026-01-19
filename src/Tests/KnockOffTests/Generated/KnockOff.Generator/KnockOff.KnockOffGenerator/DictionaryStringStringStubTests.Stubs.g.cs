@@ -19,7 +19,7 @@ partial class DictionaryStringStringStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDictionary, global::System.Collections.Generic.ICollection<string>>? OnGet { get; set; }
+			public global::System.Func<global::System.Collections.Generic.ICollection<string>>? OnGet { get; set; }
 
 			private global::System.Collections.Generic.ICollection<string> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class DictionaryStringStringStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDictionary, global::System.Collections.Generic.ICollection<string>>? OnGet { get; set; }
+			public global::System.Func<global::System.Collections.Generic.ICollection<string>>? OnGet { get; set; }
 
 			private global::System.Collections.Generic.ICollection<string> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class DictionaryStringStringStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDictionary, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class DictionaryStringStringStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDictionary, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -345,9 +345,9 @@ partial class DictionaryStringStringStubTests
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
 
-			private global::System.Func<Stubs.IDictionary, string, string>? _onGet;
+			private global::System.Func<string, string>? _onGet;
 			/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>
-			public global::System.Func<Stubs.IDictionary, string, string>? OnGet
+			public global::System.Func<string, string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -359,9 +359,9 @@ partial class DictionaryStringStringStubTests
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (string Key, string Value)? LastSetEntry { get; private set; }
 
-			private global::System.Action<Stubs.IDictionary, string, string>? _onSet;
+			private global::System.Action<string, string>? _onSet;
 			/// <summary>Callback for setter. Setting this marks the indexer as configured.</summary>
-			public global::System.Action<Stubs.IDictionary, string, string>? OnSet
+			public global::System.Action<string, string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -452,7 +452,7 @@ partial class DictionaryStringStringStubTests
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for Add(string, string).</summary>
-			public delegate void AddDelegate_String_String_void(Stubs.IDictionary ko, string key, string @value);
+			public delegate void AddDelegate_String_String_void(string key, string @value);
 
 			private AddDelegate_String_String_void? _onCall_String_String_void;
 			private MethodTrackingImpl_String_String_void? _onCallTracking_String_String_void;
@@ -464,7 +464,7 @@ partial class DictionaryStringStringStubTests
 			private global::KnockOff.Times? _verifiableTimes_String_String_void;
 
 			/// <summary>Delegate for Add(global::System.Collections.Generic.KeyValuePair<string, string>).</summary>
-			public delegate void AddDelegate_Collections_Generic_KeyValuePair_string_string_void(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item);
+			public delegate void AddDelegate_Collections_Generic_KeyValuePair_string_string_void(global::System.Collections.Generic.KeyValuePair<string, string> item);
 
 			private AddDelegate_Collections_Generic_KeyValuePair_string_string_void? _onCall_Collections_Generic_KeyValuePair_string_string_void;
 			private MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_void? _onCallTracking_Collections_Generic_KeyValuePair_string_string_void;
@@ -534,68 +534,68 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Invokes configured callback for Add(string, string).</summary>
-			internal void Invoke_String_String_void(Stubs.IDictionary ko, string key, string @value)
+			internal void Invoke_String_String_void(bool strict, string key, string @value)
 			{
 				if (_sequence_String_String_void != null && _sequenceIndex_String_String_void < _sequence_String_String_void.Count)
 				{
 					var (callback, tracking) = _sequence_String_String_void[_sequenceIndex_String_String_void];
 					tracking.RecordCall((key, @value));
 					_sequenceIndex_String_String_void++;
-					callback(ko, key, @value);
+					callback(key, @value);
 					return;
 				}
 
 				if (_onCall_String_String_void != null && _onCallTracking_String_String_void != null)
 				{
 					_onCallTracking_String_String_void.RecordCall((key, @value));
-					_onCall_String_String_void(ko, key, @value);
+					_onCall_String_String_void(key, @value);
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_String_String_void != null && _sequenceIndex_String_String_void >= _sequence_String_String_void.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Add(key, @value); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
 
 			/// <summary>Invokes configured callback for Add(global::System.Collections.Generic.KeyValuePair<string, string>).</summary>
-			internal void Invoke_Collections_Generic_KeyValuePair_string_string_void(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item)
+			internal void Invoke_Collections_Generic_KeyValuePair_string_string_void(bool strict, global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				if (_sequence_Collections_Generic_KeyValuePair_string_string_void != null && _sequenceIndex_Collections_Generic_KeyValuePair_string_string_void < _sequence_Collections_Generic_KeyValuePair_string_string_void.Count)
 				{
 					var (callback, tracking) = _sequence_Collections_Generic_KeyValuePair_string_string_void[_sequenceIndex_Collections_Generic_KeyValuePair_string_string_void];
 					tracking.RecordCall(item);
 					_sequenceIndex_Collections_Generic_KeyValuePair_string_string_void++;
-					callback(ko, item);
+					callback(item);
 					return;
 				}
 
 				if (_onCall_Collections_Generic_KeyValuePair_string_string_void != null && _onCallTracking_Collections_Generic_KeyValuePair_string_string_void != null)
 				{
 					_onCallTracking_Collections_Generic_KeyValuePair_string_string_void.RecordCall(item);
-					_onCall_Collections_Generic_KeyValuePair_string_string_void(ko, item);
+					_onCall_Collections_Generic_KeyValuePair_string_string_void(item);
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Collections_Generic_KeyValuePair_string_string_void != null && _sequenceIndex_Collections_Generic_KeyValuePair_string_string_void >= _sequence_Collections_Generic_KeyValuePair_string_string_void.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Add(item); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
 
@@ -883,7 +883,7 @@ partial class DictionaryStringStringStubTests
 			internal global::System.Collections.Generic.IDictionary<string, string>? _source;
 
 			/// <summary>Delegate for ContainsKey.</summary>
-			public delegate bool ContainsKeyDelegate(Stubs.IDictionary ko, string key);
+			public delegate bool ContainsKeyDelegate(string key);
 
 			private ContainsKeyDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -934,34 +934,34 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IDictionary ko, string key)
+			internal bool Invoke(bool strict, string key)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(key);
 					_sequenceIndex++;
-					return callback(ko, key);
+					return callback(key);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(key);
-					return _onCall(ko, key);
+					return _onCall(key);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ContainsKey");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ContainsKey");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ContainsKey(key);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ContainsKey");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ContainsKey");
 				return default!;
 			}
 
@@ -1119,7 +1119,7 @@ partial class DictionaryStringStringStubTests
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for Remove(string).</summary>
-			public delegate bool RemoveDelegate_String_Boolean(Stubs.IDictionary ko, string key);
+			public delegate bool RemoveDelegate_String_Boolean(string key);
 
 			private RemoveDelegate_String_Boolean? _onCall_String_Boolean;
 			private MethodTrackingImpl_String_Boolean? _onCallTracking_String_Boolean;
@@ -1131,7 +1131,7 @@ partial class DictionaryStringStringStubTests
 			private global::KnockOff.Times? _verifiableTimes_String_Boolean;
 
 			/// <summary>Delegate for Remove(global::System.Collections.Generic.KeyValuePair<string, string>).</summary>
-			public delegate bool RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item);
+			public delegate bool RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean(global::System.Collections.Generic.KeyValuePair<string, string> item);
 
 			private RemoveDelegate_Collections_Generic_KeyValuePair_string_string_Boolean? _onCall_Collections_Generic_KeyValuePair_string_string_Boolean;
 			private MethodTrackingImpl_Collections_Generic_KeyValuePair_string_string_Boolean? _onCallTracking_Collections_Generic_KeyValuePair_string_string_Boolean;
@@ -1201,64 +1201,64 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Invokes configured callback for Remove(string).</summary>
-			internal bool Invoke_String_Boolean(Stubs.IDictionary ko, string key)
+			internal bool Invoke_String_Boolean(bool strict, string key)
 			{
 				if (_sequence_String_Boolean != null && _sequenceIndex_String_Boolean < _sequence_String_Boolean.Count)
 				{
 					var (callback, tracking) = _sequence_String_Boolean[_sequenceIndex_String_Boolean];
 					tracking.RecordCall(key);
 					_sequenceIndex_String_Boolean++;
-					return callback(ko, key);
+					return callback(key);
 				}
 
 				if (_onCall_String_Boolean != null && _onCallTracking_String_Boolean != null)
 				{
 					_onCallTracking_String_Boolean.RecordCall(key);
-					return _onCall_String_Boolean(ko, key);
+					return _onCall_String_Boolean(key);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_String_Boolean != null && _sequenceIndex_String_Boolean >= _sequence_String_Boolean.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Remove");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Remove");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Remove(key);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return default!;
 			}
 
 			/// <summary>Invokes configured callback for Remove(global::System.Collections.Generic.KeyValuePair<string, string>).</summary>
-			internal bool Invoke_Collections_Generic_KeyValuePair_string_string_Boolean(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item)
+			internal bool Invoke_Collections_Generic_KeyValuePair_string_string_Boolean(bool strict, global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				if (_sequence_Collections_Generic_KeyValuePair_string_string_Boolean != null && _sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean < _sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Count)
 				{
 					var (callback, tracking) = _sequence_Collections_Generic_KeyValuePair_string_string_Boolean[_sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean];
 					tracking.RecordCall(item);
 					_sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean++;
-					return callback(ko, item);
+					return callback(item);
 				}
 
 				if (_onCall_Collections_Generic_KeyValuePair_string_string_Boolean != null && _onCallTracking_Collections_Generic_KeyValuePair_string_string_Boolean != null)
 				{
 					_onCallTracking_Collections_Generic_KeyValuePair_string_string_Boolean.RecordCall(item);
-					return _onCall_Collections_Generic_KeyValuePair_string_string_Boolean(ko, item);
+					return _onCall_Collections_Generic_KeyValuePair_string_string_Boolean(item);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Collections_Generic_KeyValuePair_string_string_Boolean != null && _sequenceIndex_Collections_Generic_KeyValuePair_string_string_Boolean >= _sequence_Collections_Generic_KeyValuePair_string_string_Boolean.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Remove");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Remove");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Remove(item);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Remove");
 				return default!;
 			}
 
@@ -1546,7 +1546,7 @@ partial class DictionaryStringStringStubTests
 			internal global::System.Collections.Generic.IDictionary<string, string>? _source;
 
 			/// <summary>Delegate for TryGetValue.</summary>
-			public delegate bool TryGetValueDelegate(Stubs.IDictionary ko, string key, out string @value);
+			public delegate bool TryGetValueDelegate(string key, out string @value);
 
 			private TryGetValueDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1597,7 +1597,7 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IDictionary ko, string key, out string @value)
+			internal bool Invoke(bool strict, string key, out string @value)
 			{
 				@value = default!;
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
@@ -1605,27 +1605,27 @@ partial class DictionaryStringStringStubTests
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(key);
 					_sequenceIndex++;
-					return callback(ko, key, out @value);
+					return callback(key, out @value);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(key);
-					return _onCall(ko, key, out @value);
+					return _onCall(key, out @value);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("TryGetValue");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("TryGetValue");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.TryGetValue(key, out @value);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetValue");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetValue");
 				return default!;
 			}
 
@@ -1780,10 +1780,10 @@ partial class DictionaryStringStringStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>? _source;
 
-			private global::System.Action<Stubs.IDictionary>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -1799,7 +1799,7 @@ partial class DictionaryStringStringStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IDictionary> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -1811,13 +1811,13 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary>> OnCallSequence(global::System.Action<Stubs.IDictionary> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -1825,35 +1825,35 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IDictionary ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Clear");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Clear");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Clear(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Clear");
 				return;
 			}
 
@@ -1940,7 +1940,7 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IDictionary_ClearInterceptor _interceptor;
 
@@ -1960,7 +1960,7 @@ partial class DictionaryStringStringStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary>> ThenCall(global::System.Action<Stubs.IDictionary> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1981,7 +1981,7 @@ partial class DictionaryStringStringStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -2001,7 +2001,7 @@ partial class DictionaryStringStringStubTests
 			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>? _source;
 
 			/// <summary>Delegate for Contains.</summary>
-			public delegate bool ContainsDelegate(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item);
+			public delegate bool ContainsDelegate(global::System.Collections.Generic.KeyValuePair<string, string> item);
 
 			private ContainsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2052,34 +2052,34 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string> item)
+			internal bool Invoke(bool strict, global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					return callback(ko, item);
+					return callback(item);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					return _onCall(ko, item);
+					return _onCall(item);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Contains");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Contains");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Contains(item);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Contains");
 				return default!;
 			}
 
@@ -2234,10 +2234,10 @@ partial class DictionaryStringStringStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>? _source;
 
-			private global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>? _onCall;
+			private global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -2257,7 +2257,7 @@ partial class DictionaryStringStringStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTrackingArgs<(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)> OnCall(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback)
+			public global::KnockOff.IMethodTrackingArgs<(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)> OnCall(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -2269,13 +2269,13 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>> OnCallSequence(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int>> OnCallSequence(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -2283,21 +2283,21 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IDictionary ko, global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)
+			internal void Invoke(bool strict, global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((array, arrayIndex));
 					_sequenceIndex++;
-					callback(ko, array, arrayIndex);
+					callback(array, arrayIndex);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((array, arrayIndex));
-					_onCall(ko, array, arrayIndex);
+					_onCall(array, arrayIndex);
 					return;
 				}
 
@@ -2305,14 +2305,14 @@ partial class DictionaryStringStringStubTests
 				_unconfiguredLastArgs = ((array, arrayIndex));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("CopyTo");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CopyTo");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.CopyTo(array, arrayIndex); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CopyTo");
 				return;
 			}
 
@@ -2407,7 +2407,7 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int>>
 			{
 				private readonly IDictionary_CopyToInterceptor _interceptor;
 
@@ -2427,7 +2427,7 @@ partial class DictionaryStringStringStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>> ThenCall(global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int>> ThenCall(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -2448,7 +2448,7 @@ partial class DictionaryStringStringStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IDictionary, global::System.Collections.Generic.KeyValuePair<string, string>[], int>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.KeyValuePair<string, string>[], int>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -2468,7 +2468,7 @@ partial class DictionaryStringStringStubTests
 			internal global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, string>>? _source;
 
 			/// <summary>Delegate for GetEnumerator.</summary>
-			public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> GetEnumeratorDelegate(Stubs.IDictionary ko);
+			public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> GetEnumeratorDelegate();
 
 			private GetEnumeratorDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2515,33 +2515,33 @@ partial class DictionaryStringStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> Invoke(Stubs.IDictionary ko)
+			internal global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetEnumerator();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
 
@@ -2726,22 +2726,22 @@ partial class DictionaryStringStringStubTests
 
 			void global::System.Collections.Generic.IDictionary<string, string>.Add(string key, string value)
 			{
-				Add.Invoke_String_String_void(this, key, value);
+				Add.Invoke_String_String_void(Strict, key, value);
 			}
 
 			bool global::System.Collections.Generic.IDictionary<string, string>.ContainsKey(string key)
 			{
-				return ContainsKey.Invoke(this, key);
+				return ContainsKey.Invoke(Strict, key);
 			}
 
 			bool global::System.Collections.Generic.IDictionary<string, string>.Remove(string key)
 			{
-				return Remove.Invoke_String_Boolean(this, key);
+				return Remove.Invoke_String_Boolean(Strict, key);
 			}
 
 			bool global::System.Collections.Generic.IDictionary<string, string>.TryGetValue(string key, out string value)
 			{
-				return TryGetValue.Invoke(this, key, out value);
+				return TryGetValue.Invoke(Strict, key, out value);
 			}
 
 			string global::System.Collections.Generic.IDictionary<string, string>.this[string key]
@@ -2749,7 +2749,7 @@ partial class DictionaryStringStringStubTests
 				get
 				{
 					Indexer.RecordGet(key);
-					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (Indexer.OnGet is { } onGet) return onGet(key);
 					if (Indexer._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default!;
@@ -2757,7 +2757,7 @@ partial class DictionaryStringStringStubTests
 				set
 				{
 					Indexer.RecordSet(key, value);
-					if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; }
+					if (Indexer.OnSet is { } onSet) { onSet(key, value); return; }
 					if (Indexer._source is { } src) { src[key] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "this[]");
 					Indexer.Backing[key] = value;
@@ -2769,7 +2769,7 @@ partial class DictionaryStringStringStubTests
 				get
 				{
 					Keys.RecordGet();
-					if (Keys.OnGet is { } onGet) return onGet(this);
+					if (Keys.OnGet is { } onGet) return onGet();
 					if (Keys._source is { } src) return src.Keys;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "Keys");
 					return Keys.Value;
@@ -2781,7 +2781,7 @@ partial class DictionaryStringStringStubTests
 				get
 				{
 					Values.RecordGet();
-					if (Values.OnGet is { } onGet) return onGet(this);
+					if (Values.OnGet is { } onGet) return onGet();
 					if (Values._source is { } src) return src.Values;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, string>", "Values");
 					return Values.Value;
@@ -2790,27 +2790,27 @@ partial class DictionaryStringStringStubTests
 
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Add(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
-				Add.Invoke_Collections_Generic_KeyValuePair_string_string_void(this, item);
+				Add.Invoke_Collections_Generic_KeyValuePair_string_string_void(Strict, item);
 			}
 
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Clear()
 			{
-				Clear.Invoke(this);
+				Clear.Invoke(Strict);
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Contains(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
-				return Contains.Invoke(this, item);
+				return Contains.Invoke(Strict, item);
 			}
 
 			void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.CopyTo(global::System.Collections.Generic.KeyValuePair<string, string>[] array, int arrayIndex)
 			{
-				CopyTo.Invoke(this, array, arrayIndex);
+				CopyTo.Invoke(Strict, array, arrayIndex);
 			}
 
 			bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Remove(global::System.Collections.Generic.KeyValuePair<string, string> item)
 			{
-				return Remove.Invoke_Collections_Generic_KeyValuePair_string_string_Boolean(this, item);
+				return Remove.Invoke_Collections_Generic_KeyValuePair_string_string_Boolean(Strict, item);
 			}
 
 			int global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, string>>.Count
@@ -2818,7 +2818,7 @@ partial class DictionaryStringStringStubTests
 				get
 				{
 					Count.RecordGet();
-					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count.OnGet is { } onGet) return onGet();
 					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "Count");
 					return Count.Value;
@@ -2830,7 +2830,7 @@ partial class DictionaryStringStringStubTests
 				get
 				{
 					IsReadOnly.RecordGet();
-					if (IsReadOnly.OnGet is { } onGet) return onGet(this);
+					if (IsReadOnly.OnGet is { } onGet) return onGet();
 					if (IsReadOnly._source is { } src) return src.IsReadOnly;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, string>>", "IsReadOnly");
 					return IsReadOnly.Value;
@@ -2839,12 +2839,12 @@ partial class DictionaryStringStringStubTests
 
 			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, string>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, string>>.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			/// <summary>The global::System.Collections.Generic.IDictionary<string, string> instance. Use for passing to code expecting the interface.</summary>

@@ -19,7 +19,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IReadOnlyDictionary, global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
+			public global::System.Func<global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
 
 			private global::System.Collections.Generic.IEnumerable<string> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IReadOnlyDictionary, global::System.Collections.Generic.IEnumerable<int>>? OnGet { get; set; }
+			public global::System.Func<global::System.Collections.Generic.IEnumerable<int>>? OnGet { get; set; }
 
 			private global::System.Collections.Generic.IEnumerable<int> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IReadOnlyDictionary, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -264,9 +264,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
 
-			private global::System.Func<Stubs.IReadOnlyDictionary, string, int>? _onGet;
+			private global::System.Func<string, int>? _onGet;
 			/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>
-			public global::System.Func<Stubs.IReadOnlyDictionary, string, int>? OnGet
+			public global::System.Func<string, int>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -342,7 +342,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			internal global::System.Collections.Generic.IReadOnlyDictionary<string, int>? _source;
 
 			/// <summary>Delegate for ContainsKey.</summary>
-			public delegate bool ContainsKeyDelegate(Stubs.IReadOnlyDictionary ko, string key);
+			public delegate bool ContainsKeyDelegate(string key);
 
 			private ContainsKeyDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -393,34 +393,34 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IReadOnlyDictionary ko, string key)
+			internal bool Invoke(bool strict, string key)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(key);
 					_sequenceIndex++;
-					return callback(ko, key);
+					return callback(key);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(key);
-					return _onCall(ko, key);
+					return _onCall(key);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ContainsKey");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ContainsKey");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ContainsKey(key);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ContainsKey");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ContainsKey");
 				return default!;
 			}
 
@@ -576,7 +576,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			internal global::System.Collections.Generic.IReadOnlyDictionary<string, int>? _source;
 
 			/// <summary>Delegate for TryGetValue.</summary>
-			public delegate bool TryGetValueDelegate(Stubs.IReadOnlyDictionary ko, string key, out int @value);
+			public delegate bool TryGetValueDelegate(string key, out int @value);
 
 			private TryGetValueDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -627,7 +627,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IReadOnlyDictionary ko, string key, out int @value)
+			internal bool Invoke(bool strict, string key, out int @value)
 			{
 				@value = default!;
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
@@ -635,27 +635,27 @@ partial class ReadOnlyDictionaryStringIntStubTests
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(key);
 					_sequenceIndex++;
-					return callback(ko, key, out @value);
+					return callback(key, out @value);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(key);
-					return _onCall(ko, key, out @value);
+					return _onCall(key, out @value);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = key;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("TryGetValue");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("TryGetValue");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.TryGetValue(key, out @value);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetValue");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetValue");
 				return default!;
 			}
 
@@ -811,7 +811,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			internal global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
 
 			/// <summary>Delegate for GetEnumerator.</summary>
-			public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> GetEnumeratorDelegate(Stubs.IReadOnlyDictionary ko);
+			public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> GetEnumeratorDelegate();
 
 			private GetEnumeratorDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -858,33 +858,33 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> Invoke(Stubs.IReadOnlyDictionary ko)
+			internal global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetEnumerator");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetEnumerator();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetEnumerator");
 				throw new global::System.InvalidOperationException("No implementation provided for GetEnumerator. Configure via OnCall.");
 			}
 
@@ -1051,12 +1051,12 @@ partial class ReadOnlyDictionaryStringIntStubTests
 
 			bool global::System.Collections.Generic.IReadOnlyDictionary<string, int>.ContainsKey(string key)
 			{
-				return ContainsKey.Invoke(this, key);
+				return ContainsKey.Invoke(Strict, key);
 			}
 
 			bool global::System.Collections.Generic.IReadOnlyDictionary<string, int>.TryGetValue(string key, out int value)
 			{
-				return TryGetValue.Invoke(this, key, out value);
+				return TryGetValue.Invoke(Strict, key, out value);
 			}
 
 			int global::System.Collections.Generic.IReadOnlyDictionary<string, int>.this[string key]
@@ -1064,7 +1064,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				get
 				{
 					Indexer.RecordGet(key);
-					if (Indexer.OnGet is { } onGet) return onGet(this, key);
+					if (Indexer.OnGet is { } onGet) return onGet(key);
 					if (Indexer._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "this[]");
 					return Indexer.Backing.TryGetValue(key, out var v) ? v : default!;
@@ -1076,7 +1076,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				get
 				{
 					Keys.RecordGet();
-					if (Keys.OnGet is { } onGet) return onGet(this);
+					if (Keys.OnGet is { } onGet) return onGet();
 					if (Keys._source is { } src) return src.Keys;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "Keys");
 					return Keys.Value;
@@ -1088,7 +1088,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				get
 				{
 					Values.RecordGet();
-					if (Values.OnGet is { } onGet) return onGet(this);
+					if (Values.OnGet is { } onGet) return onGet();
 					if (Values._source is { } src) return src.Values;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyDictionary<string, int>", "Values");
 					return Values.Value;
@@ -1100,7 +1100,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 				get
 				{
 					Count.RecordGet();
-					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count.OnGet is { } onGet) return onGet();
 					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Count");
 					return Count.Value;
@@ -1109,12 +1109,12 @@ partial class ReadOnlyDictionaryStringIntStubTests
 
 			global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
 			{
-				return GetEnumerator.Invoke(this);
+				return GetEnumerator.Invoke(Strict);
 			}
 
 			/// <summary>The global::System.Collections.Generic.IReadOnlyDictionary<string, int> instance. Use for passing to code expecting the interface.</summary>

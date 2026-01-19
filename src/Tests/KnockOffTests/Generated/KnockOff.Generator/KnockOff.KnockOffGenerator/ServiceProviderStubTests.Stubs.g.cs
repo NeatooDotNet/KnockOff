@@ -15,7 +15,7 @@ partial class ServiceProviderStubTests
 			internal global::System.IServiceProvider? _source;
 
 			/// <summary>Delegate for GetService.</summary>
-			public delegate object? GetServiceDelegate(Stubs.IServiceProvider ko, global::System.Type serviceType);
+			public delegate object? GetServiceDelegate(global::System.Type serviceType);
 
 			private GetServiceDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class ServiceProviderStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal object? Invoke(Stubs.IServiceProvider ko, global::System.Type serviceType)
+			internal object? Invoke(bool strict, global::System.Type serviceType)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(serviceType);
 					_sequenceIndex++;
-					return callback(ko, serviceType);
+					return callback(serviceType);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(serviceType);
-					return _onCall(ko, serviceType);
+					return _onCall(serviceType);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = serviceType;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetService");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetService");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetService(serviceType);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetService");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetService");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class ServiceProviderStubTests
 
 			object? global::System.IServiceProvider.GetService(global::System.Type serviceType)
 			{
-				return GetService.Invoke(this, serviceType);
+				return GetService.Invoke(Strict, serviceType);
 			}
 
 			/// <summary>The global::System.IServiceProvider instance. Use for passing to code expecting the interface.</summary>

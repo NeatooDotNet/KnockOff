@@ -19,7 +19,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, global::Neatoo.IValidateBase?>? OnGet { get; set; }
+		public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
 		private global::Neatoo.IValidateBase? _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -343,7 +343,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -424,7 +424,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -505,7 +505,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -586,7 +586,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -667,7 +667,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -748,7 +748,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -829,7 +829,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -910,7 +910,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -991,7 +991,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1072,7 +1072,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<EntityListBaseOfTStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1152,7 +1152,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public int? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>? OnGet { get; set; }
+		public global::System.Func<int, global::Neatoo.IEntityBase>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -1161,7 +1161,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		public (int? Key, global::Neatoo.IEntityBase? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>? OnSet { get; set; }
+		public global::System.Action<int, global::Neatoo.IEntityBase>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
@@ -1257,10 +1257,10 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase>? _source;
 
-		private global::System.Action<EntityListBaseOfTStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1280,7 +1280,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<EntityListBaseOfTStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1292,13 +1292,13 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, int>> OnCallSequence(global::System.Action<EntityListBaseOfTStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1306,21 +1306,21 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityListBaseOfTStub ko, bool strict, int index)
+		internal void Invoke(bool strict, int index)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(index);
 				_sequenceIndex++;
-				callback(ko, index);
+				callback(index);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(index);
-				_onCall(ko, index);
+				_onCall(index);
 				return;
 			}
 
@@ -1430,7 +1430,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly RemoveAtInterceptor _interceptor;
 
@@ -1450,7 +1450,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, int>> ThenCall(global::System.Action<EntityListBaseOfTStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1471,7 +1471,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1491,7 +1491,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		internal global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>? _source;
 
 		/// <summary>Delegate for IndexOf.</summary>
-		public delegate int IndexOfDelegate(EntityListBaseOfTStub ko, global::Neatoo.IEntityBase item);
+		public delegate int IndexOfDelegate(global::Neatoo.IEntityBase item);
 
 		private IndexOfDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1542,20 +1542,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(EntityListBaseOfTStub ko, bool strict, global::Neatoo.IEntityBase item)
+		internal int Invoke(bool strict, global::Neatoo.IEntityBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -1724,10 +1724,10 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>? _source;
 
-		private global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>? _onCall;
+		private global::System.Action<int, global::Neatoo.IEntityBase>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int, global::Neatoo.IEntityBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1747,7 +1747,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(int? index, global::Neatoo.IEntityBase? item)> OnCall(global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase> callback)
+		public global::KnockOff.IMethodTrackingArgs<(int? index, global::Neatoo.IEntityBase? item)> OnCall(global::System.Action<int, global::Neatoo.IEntityBase> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1759,13 +1759,13 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>> OnCallSequence(global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IEntityBase>> OnCallSequence(global::System.Action<int, global::Neatoo.IEntityBase> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int, global::Neatoo.IEntityBase> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1773,21 +1773,21 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityListBaseOfTStub ko, bool strict, int index, global::Neatoo.IEntityBase item)
+		internal void Invoke(bool strict, int index, global::Neatoo.IEntityBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((index, item));
 				_sequenceIndex++;
-				callback(ko, index, item);
+				callback(index, item);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((index, item));
-				_onCall(ko, index, item);
+				_onCall(index, item);
 				return;
 			}
 
@@ -1897,7 +1897,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IEntityBase>>
 		{
 			private readonly InsertInterceptor _interceptor;
 
@@ -1917,7 +1917,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>> ThenCall(global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IEntityBase>> ThenCall(global::System.Action<int, global::Neatoo.IEntityBase> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1938,7 +1938,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, int, global::Neatoo.IEntityBase>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.IEntityBase>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1957,10 +1957,10 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>? _source;
 
-		private global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase>? _onCall;
+		private global::System.Action<global::Neatoo.IEntityBase>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IEntityBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1980,7 +1980,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::Neatoo.IEntityBase> OnCall(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase> callback)
+		public global::KnockOff.IMethodTracking<global::Neatoo.IEntityBase> OnCall(global::System.Action<global::Neatoo.IEntityBase> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1992,13 +1992,13 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase>> OnCallSequence(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IEntityBase>> OnCallSequence(global::System.Action<global::Neatoo.IEntityBase> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IEntityBase> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2006,21 +2006,21 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityListBaseOfTStub ko, bool strict, global::Neatoo.IEntityBase item)
+		internal void Invoke(bool strict, global::Neatoo.IEntityBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				callback(ko, item);
+				callback(item);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				_onCall(ko, item);
+				_onCall(item);
 				return;
 			}
 
@@ -2130,7 +2130,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IEntityBase>>
 		{
 			private readonly AddInterceptor _interceptor;
 
@@ -2150,7 +2150,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase>> ThenCall(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IEntityBase>> ThenCall(global::System.Action<global::Neatoo.IEntityBase> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2171,7 +2171,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IEntityBase>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2190,10 +2190,10 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>? _source;
 
-		private global::System.Action<EntityListBaseOfTStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2209,7 +2209,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityListBaseOfTStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2221,13 +2221,13 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> OnCallSequence(global::System.Action<EntityListBaseOfTStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2235,21 +2235,21 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityListBaseOfTStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -2350,7 +2350,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearInterceptor _interceptor;
 
@@ -2370,7 +2370,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> ThenCall(global::System.Action<EntityListBaseOfTStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2391,7 +2391,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2411,7 +2411,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>? _source;
 
 		/// <summary>Delegate for Contains.</summary>
-		public delegate bool ContainsDelegate(EntityListBaseOfTStub ko, global::Neatoo.IEntityBase item);
+		public delegate bool ContainsDelegate(global::Neatoo.IEntityBase item);
 
 		private ContainsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2462,20 +2462,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(EntityListBaseOfTStub ko, bool strict, global::Neatoo.IEntityBase item)
+		internal bool Invoke(bool strict, global::Neatoo.IEntityBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -2644,10 +2644,10 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>? _source;
 
-		private global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int>? _onCall;
+		private global::System.Action<global::Neatoo.IEntityBase[], int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IEntityBase[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2667,7 +2667,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.IEntityBase[]? array, int? arrayIndex)> OnCall(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int> callback)
+		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.IEntityBase[]? array, int? arrayIndex)> OnCall(global::System.Action<global::Neatoo.IEntityBase[], int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2679,13 +2679,13 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int>> OnCallSequence(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IEntityBase[], int>> OnCallSequence(global::System.Action<global::Neatoo.IEntityBase[], int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IEntityBase[], int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2693,21 +2693,21 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityListBaseOfTStub ko, bool strict, global::Neatoo.IEntityBase[] array, int arrayIndex)
+		internal void Invoke(bool strict, global::Neatoo.IEntityBase[] array, int arrayIndex)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((array, arrayIndex));
 				_sequenceIndex++;
-				callback(ko, array, arrayIndex);
+				callback(array, arrayIndex);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((array, arrayIndex));
-				_onCall(ko, array, arrayIndex);
+				_onCall(array, arrayIndex);
 				return;
 			}
 
@@ -2817,7 +2817,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IEntityBase[], int>>
 		{
 			private readonly CopyToInterceptor _interceptor;
 
@@ -2837,7 +2837,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int>> ThenCall(global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IEntityBase[], int>> ThenCall(global::System.Action<global::Neatoo.IEntityBase[], int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2858,7 +2858,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub, global::Neatoo.IEntityBase[], int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.IEntityBase[], int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2878,7 +2878,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>? _source;
 
 		/// <summary>Delegate for Remove.</summary>
-		public delegate bool RemoveDelegate(EntityListBaseOfTStub ko, global::Neatoo.IEntityBase item);
+		public delegate bool RemoveDelegate(global::Neatoo.IEntityBase item);
 
 		private RemoveDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2929,20 +2929,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(EntityListBaseOfTStub ko, bool strict, global::Neatoo.IEntityBase item)
+		internal bool Invoke(bool strict, global::Neatoo.IEntityBase item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -3114,7 +3114,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase(EntityListBaseOfTStub ko);
+		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase();
 
 		private GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase? _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase;
 		private MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase? _onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase;
@@ -3126,7 +3126,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator(EntityListBaseOfTStub ko);
+		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator();
 
 		private GetEnumeratorDelegate_NoParams_Collections_IEnumerator? _onCall_NoParams_Collections_IEnumerator;
 		private MethodTrackingImpl_NoParams_Collections_IEnumerator? _onCallTracking_NoParams_Collections_IEnumerator;
@@ -3196,20 +3196,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase(EntityListBaseOfTStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase(bool strict)
 		{
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase != null && _sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase < _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase[_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase != null && _onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase != null)
 			{
 				_onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase.RecordCall();
-				return _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase(ko);
+				return _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase();
 			}
 
 			_unconfiguredCallCount++;
@@ -3227,20 +3227,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(EntityListBaseOfTStub ko, bool strict)
+		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(bool strict)
 		{
 			if (_sequence_NoParams_Collections_IEnumerator != null && _sequenceIndex_NoParams_Collections_IEnumerator < _sequence_NoParams_Collections_IEnumerator.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_IEnumerator[_sequenceIndex_NoParams_Collections_IEnumerator];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_IEnumerator++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_IEnumerator != null && _onCallTracking_NoParams_Collections_IEnumerator != null)
 			{
 				_onCallTracking_NoParams_Collections_IEnumerator.RecordCall();
-				return _onCall_NoParams_Collections_IEnumerator(ko);
+				return _onCall_NoParams_Collections_IEnumerator();
 			}
 
 			_unconfiguredCallCount++;
@@ -3529,7 +3529,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for WaitForTasks().</summary>
-		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task(EntityListBaseOfTStub ko);
+		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task();
 
 		private WaitForTasksDelegate_NoParams_Threading_Tasks_Task? _onCall_NoParams_Threading_Tasks_Task;
 		private MethodTrackingImpl_NoParams_Threading_Tasks_Task? _onCallTracking_NoParams_Threading_Tasks_Task;
@@ -3541,7 +3541,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Threading_Tasks_Task;
 
 		/// <summary>Delegate for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(EntityListBaseOfTStub ko, global::System.Threading.CancellationToken token);
+		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(global::System.Threading.CancellationToken token);
 
 		private WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Threading_CancellationToken_Threading_Tasks_Task;
 		private MethodTrackingImpl_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task;
@@ -3611,20 +3611,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes configured callback for WaitForTasks().</summary>
-		internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(EntityListBaseOfTStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(bool strict)
 		{
 			if (_sequence_NoParams_Threading_Tasks_Task != null && _sequenceIndex_NoParams_Threading_Tasks_Task < _sequence_NoParams_Threading_Tasks_Task.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Threading_Tasks_Task[_sequenceIndex_NoParams_Threading_Tasks_Task];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Threading_Tasks_Task++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Threading_Tasks_Task != null && _onCallTracking_NoParams_Threading_Tasks_Task != null)
 			{
 				_onCallTracking_NoParams_Threading_Tasks_Task.RecordCall();
-				return _onCall_NoParams_Threading_Tasks_Task(ko);
+				return _onCall_NoParams_Threading_Tasks_Task();
 			}
 
 			_unconfiguredCallCount++;
@@ -3642,20 +3642,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes configured callback for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-		internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(EntityListBaseOfTStub ko, bool strict, global::System.Threading.CancellationToken token)
+		internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::System.Threading.CancellationToken token)
 		{
 			if (_sequence_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Threading_CancellationToken_Threading_Tasks_Task.Count)
 			{
 				var (callback, tracking) = _sequence_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task];
 				tracking.RecordCall(token);
 				_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task++;
-				return callback(ko, token);
+				return callback(token);
 			}
 
 			if (_onCall_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task != null)
 			{
 				_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task.RecordCall(token);
-				return _onCall_Threading_CancellationToken_Threading_Tasks_Task(ko, token);
+				return _onCall_Threading_CancellationToken_Threading_Tasks_Task(token);
 			}
 
 			_unconfiguredCallCount++;
@@ -3951,7 +3951,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(EntityListBaseOfTStub ko, string propertyName, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(string propertyName, global::System.Threading.CancellationToken? token);
 
 		private RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task? _onCall_String_Threading_CancellationToken_Threading_Tasks_Task;
 		private MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task;
@@ -3963,7 +3963,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		private global::KnockOff.Times? _verifiableTimes_String_Threading_CancellationToken_Threading_Tasks_Task;
 
 		/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(EntityListBaseOfTStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
 		private RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 		private MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
@@ -4033,20 +4033,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes configured callback for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-		internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(EntityListBaseOfTStub ko, bool strict, string propertyName, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(bool strict, string propertyName, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task < _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count)
 			{
 				var (callback, tracking) = _sequence_String_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task];
 				tracking.RecordCall((propertyName, token));
 				_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task++;
-				return callback(ko, propertyName, token);
+				return callback(propertyName, token);
 			}
 
 			if (_onCall_String_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task != null)
 			{
 				_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((propertyName, token));
-				return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(ko, propertyName, token);
+				return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(propertyName, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -4064,20 +4064,20 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes configured callback for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-		internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(EntityListBaseOfTStub ko, bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count)
 			{
 				var (callback, tracking) = _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task];
 				tracking.RecordCall((runRules, token));
 				_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task++;
-				return callback(ko, runRules, token);
+				return callback(runRules, token);
 			}
 
 			if (_onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null)
 			{
 				_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((runRules, token));
-				return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(ko, runRules, token);
+				return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(runRules, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -4377,10 +4377,10 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidateMetaProperties? _source;
 
-		private global::System.Action<EntityListBaseOfTStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -4396,7 +4396,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityListBaseOfTStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -4408,13 +4408,13 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> OnCallSequence(global::System.Action<EntityListBaseOfTStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -4422,21 +4422,21 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityListBaseOfTStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -4537,7 +4537,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearAllMessagesInterceptor _interceptor;
 
@@ -4557,7 +4557,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> ThenCall(global::System.Action<EntityListBaseOfTStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -4578,7 +4578,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -4597,10 +4597,10 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidateMetaProperties? _source;
 
-		private global::System.Action<EntityListBaseOfTStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -4616,7 +4616,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<EntityListBaseOfTStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -4628,13 +4628,13 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> OnCallSequence(global::System.Action<EntityListBaseOfTStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityListBaseOfTStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -4642,21 +4642,21 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityListBaseOfTStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -4757,7 +4757,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearSelfMessagesInterceptor _interceptor;
 
@@ -4777,7 +4777,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> ThenCall(global::System.Action<EntityListBaseOfTStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -4798,7 +4798,7 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityListBaseOfTStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -5710,128 +5710,128 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 	global::Neatoo.IValidateBase? global::Neatoo.IValidateListBase<global::Neatoo.IEntityBase>.Parent
 	{
-		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(this); if (Parent._source is { } src) return src.Parent; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Parent"); return Parent.Value; }
+		get { Parent.RecordGet(); if (Parent.OnGet is { } onGet) return onGet(); if (Parent._source is { } src) return src.Parent; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Parent"); return Parent.Value; }
 	}
 
 	int global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "IsReadOnly"); return IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsBusy
 	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy"); return IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsValid
 	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid"); return IsValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid"); return IsSelfValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsChild
 	{
-		get { IsChild.RecordGet(); if (IsChild.OnGet is { } onGet) return onGet(this); if (IsChild._source is { } src) return src.IsChild; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild"); return IsChild.Value; }
+		get { IsChild.RecordGet(); if (IsChild.OnGet is { } onGet) return onGet(); if (IsChild._source is { } src) return src.IsChild; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild"); return IsChild.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsModified
 	{
-		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(this); if (IsModified._source is { } src) return src.IsModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified"); return IsModified.Value; }
+		get { IsModified.RecordGet(); if (IsModified.OnGet is { } onGet) return onGet(); if (IsModified._source is { } src) return src.IsModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified"); return IsModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSelfModified
 	{
-		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(this); if (IsSelfModified._source is { } src) return src.IsSelfModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified"); return IsSelfModified.Value; }
+		get { IsSelfModified.RecordGet(); if (IsSelfModified.OnGet is { } onGet) return onGet(); if (IsSelfModified._source is { } src) return src.IsSelfModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified"); return IsSelfModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsMarkedModified
 	{
-		get { IsMarkedModified.RecordGet(); if (IsMarkedModified.OnGet is { } onGet) return onGet(this); if (IsMarkedModified._source is { } src) return src.IsMarkedModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified"); return IsMarkedModified.Value; }
+		get { IsMarkedModified.RecordGet(); if (IsMarkedModified.OnGet is { } onGet) return onGet(); if (IsMarkedModified._source is { } src) return src.IsMarkedModified; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified"); return IsMarkedModified.Value; }
 	}
 
 	bool global::Neatoo.IEntityMetaProperties.IsSavable
 	{
-		get { IsSavable.RecordGet(); if (IsSavable.OnGet is { } onGet) return onGet(this); if (IsSavable._source is { } src) return src.IsSavable; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable"); return IsSavable.Value; }
+		get { IsSavable.RecordGet(); if (IsSavable.OnGet is { } onGet) return onGet(); if (IsSavable._source is { } src) return src.IsSavable; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable"); return IsSavable.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsDeleted
 	{
-		get { IsDeleted.RecordGet(); if (IsDeleted.OnGet is { } onGet) return onGet(this); if (IsDeleted._source is { } src) return src.IsDeleted; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted"); return IsDeleted.Value; }
+		get { IsDeleted.RecordGet(); if (IsDeleted.OnGet is { } onGet) return onGet(); if (IsDeleted._source is { } src) return src.IsDeleted; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted"); return IsDeleted.Value; }
 	}
 
 	bool global::Neatoo.RemoteFactory.IFactorySaveMeta.IsNew
 	{
-		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(this); if (IsNew._source is { } src) return src.IsNew; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew"); return IsNew.Value; }
+		get { IsNew.RecordGet(); if (IsNew.OnGet is { } onGet) return onGet(); if (IsNew._source is { } src) return src.IsNew; if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew"); return IsNew.Value; }
 	}
 
 	global::Neatoo.IEntityBase global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Indexer._source is { } src) { src[index] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]"); Indexer.Backing[index] = value; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(index, value); return; } if (Indexer._source is { } src) { src[index] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase>", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 	void global::Neatoo.IEntityListBase<global::Neatoo.IEntityBase>.RemoveAt(int index)
 	{
-		RemoveAt.Invoke(this, Strict, index);
+		RemoveAt.Invoke(Strict, index);
 	}
 
 	int global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.IndexOf(global::Neatoo.IEntityBase item)
 	{
-		return IndexOf.Invoke(this, Strict, item);
+		return IndexOf.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.Insert(int index, global::Neatoo.IEntityBase item)
 	{
-		Insert.Invoke(this, Strict, index, item);
+		Insert.Invoke(Strict, index, item);
 	}
 
 	void global::System.Collections.Generic.IList<global::Neatoo.IEntityBase>.RemoveAt(int index)
 	{
-		RemoveAt.Invoke(this, Strict, index);
+		RemoveAt.Invoke(Strict, index);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Add(global::Neatoo.IEntityBase item)
 	{
-		Add.Invoke(this, Strict, item);
+		Add.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Clear()
 	{
-		Clear.Invoke(this, Strict);
+		Clear.Invoke(Strict);
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Contains(global::Neatoo.IEntityBase item)
 	{
-		return Contains.Invoke(this, Strict, item);
+		return Contains.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.CopyTo(global::Neatoo.IEntityBase[] array, int arrayIndex)
 	{
-		CopyTo.Invoke(this, Strict, array, arrayIndex);
+		CopyTo.Invoke(Strict, array, arrayIndex);
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>.Remove(global::Neatoo.IEntityBase item)
 	{
-		return Remove.Invoke(this, Strict, item);
+		return Remove.Invoke(Strict, item);
 	}
 
 	global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> global::System.Collections.Generic.IEnumerable<global::Neatoo.IEntityBase>.GetEnumerator()
 	{
-		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase(this, Strict);
+		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_IEntityBase(Strict);
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
@@ -5839,32 +5839,32 @@ partial class EntityListBaseOfTStub : global::Neatoo.IEntityListBase<global::Nea
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 	{
-		return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(this, Strict);
+		return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
 	{
-		return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(this, Strict, token);
+		return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(Strict, token);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 	{
-		return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(this, Strict, propertyName, token);
+		return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(Strict, propertyName, token);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
-		return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(this, Strict, runRules, token);
+		return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Strict, runRules, token);
 	}
 
 	void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 	{
-		ClearAllMessages.Invoke(this, Strict);
+		ClearAllMessages.Invoke(Strict);
 	}
 
 	void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 	{
-		ClearSelfMessages.Invoke(this, Strict);
+		ClearSelfMessages.Invoke(Strict);
 	}
 
 	event global::System.Collections.Specialized.NotifyCollectionChangedEventHandler? global::System.Collections.Specialized.INotifyCollectionChanged.CollectionChanged

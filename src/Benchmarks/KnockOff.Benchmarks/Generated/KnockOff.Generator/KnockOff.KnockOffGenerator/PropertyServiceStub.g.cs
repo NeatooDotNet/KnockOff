@@ -19,7 +19,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<PropertyServiceStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<PropertyServiceStub, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -122,7 +122,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<PropertyServiceStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -206,7 +206,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		public int? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<PropertyServiceStub, int>? OnSet { get; set; }
+		public global::System.Action<int>? OnSet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -301,18 +301,18 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 
 	string global::KnockOff.Benchmarks.Interfaces.IPropertyService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name"); Name.Value = value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IPropertyService.ReadOnlyValue
 	{
-		get { ReadOnlyValue.RecordGet(); if (ReadOnlyValue.OnGet is { } onGet) return onGet(this); if (ReadOnlyValue._source is { } src) return src.ReadOnlyValue; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "ReadOnlyValue"); return ReadOnlyValue.Value; }
+		get { ReadOnlyValue.RecordGet(); if (ReadOnlyValue.OnGet is { } onGet) return onGet(); if (ReadOnlyValue._source is { } src) return src.ReadOnlyValue; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "ReadOnlyValue"); return ReadOnlyValue.Value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IPropertyService.WriteOnlyValue
 	{
-		set { WriteOnlyValue.RecordSet(value); if (WriteOnlyValue.OnSet is { } onSet) { onSet(this, value); return; } if (WriteOnlyValue._source is { } src) { src.WriteOnlyValue = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "WriteOnlyValue"); WriteOnlyValue.Value = value; }
+		set { WriteOnlyValue.RecordSet(value); if (WriteOnlyValue.OnSet is { } onSet) { onSet(value); return; } if (WriteOnlyValue._source is { } src) { src.WriteOnlyValue = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "WriteOnlyValue"); WriteOnlyValue.Value = value; }
 	}
 
 }

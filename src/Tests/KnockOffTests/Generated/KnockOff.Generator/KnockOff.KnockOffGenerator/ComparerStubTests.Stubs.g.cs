@@ -15,7 +15,7 @@ partial class ComparerStubTests
 			internal global::System.Collections.IComparer? _source;
 
 			/// <summary>Delegate for Compare.</summary>
-			public delegate int CompareDelegate(Stubs.IComparer ko, object? x, object? y);
+			public delegate int CompareDelegate(object? x, object? y);
 
 			private CompareDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class ComparerStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IComparer ko, object? x, object? y)
+			internal int Invoke(bool strict, object? x, object? y)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((x, y));
 					_sequenceIndex++;
-					return callback(ko, x, y);
+					return callback(x, y);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((x, y));
-					return _onCall(ko, x, y);
+					return _onCall(x, y);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((x, y));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Compare");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Compare");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Compare(x, y);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Compare");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Compare");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class ComparerStubTests
 
 			int global::System.Collections.IComparer.Compare(object? x, object? y)
 			{
-				return Compare.Invoke(this, x, y);
+				return Compare.Invoke(Strict, x, y);
 			}
 
 			/// <summary>The global::System.Collections.IComparer instance. Use for passing to code expecting the interface.</summary>

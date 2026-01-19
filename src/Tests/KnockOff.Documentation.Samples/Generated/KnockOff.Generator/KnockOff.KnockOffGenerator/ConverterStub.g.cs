@@ -58,7 +58,7 @@ partial class ConverterStub : global::KnockOff.Documentation.Samples.GenericMeth
 		public sealed class ConvertTypedHandler<TSource, TTarget> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Convert.</summary>
-			public delegate TTarget ConvertDelegate(ConverterStub ko, TSource source);
+			public delegate TTarget ConvertDelegate(TSource source);
 
 			private ConvertDelegate? _onCall;
 
@@ -141,7 +141,7 @@ partial class ConverterStub : global::KnockOff.Documentation.Samples.GenericMeth
 	{
 		Convert.Of<TSource, TTarget>().RecordCall();
 		if (Convert.Of<TSource, TTarget>().Callback is { } callback)
-			return callback(this, source);
+			return callback(source);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Convert");
 		return SmartDefault<TTarget>("Convert");
 	}

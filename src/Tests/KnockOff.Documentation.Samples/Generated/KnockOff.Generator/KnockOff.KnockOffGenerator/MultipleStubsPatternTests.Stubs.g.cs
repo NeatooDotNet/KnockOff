@@ -15,7 +15,7 @@ partial class MultipleStubsPatternTests
 			internal global::KnockOff.Documentation.Samples.AttributeOptions.IAttrUserRepository? _source;
 
 			/// <summary>Delegate for GetById.</summary>
-			public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(Stubs.IAttrUserRepository ko, int id);
+			public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(int id);
 
 			private GetByIdDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::KnockOff.Documentation.Samples.User? Invoke(Stubs.IAttrUserRepository ko, int id)
+			internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(id);
 					_sequenceIndex++;
-					return callback(ko, id);
+					return callback(id);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(id);
-					return _onCall(ko, id);
+					return _onCall(id);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetById");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetById");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetById(id);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
 
@@ -248,10 +248,10 @@ partial class MultipleStubsPatternTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Documentation.Samples.AttributeOptions.IAttrUserRepository? _source;
 
-			private global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User>? _onCall;
+			private global::System.Action<global::KnockOff.Documentation.Samples.User>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -271,7 +271,7 @@ partial class MultipleStubsPatternTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.User> OnCall(global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User> callback)
+			public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.User> OnCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -283,13 +283,13 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User>> OnCallSequence(global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> OnCallSequence(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -297,21 +297,21 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IAttrUserRepository ko, global::KnockOff.Documentation.Samples.User user)
+			internal void Invoke(bool strict, global::KnockOff.Documentation.Samples.User user)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(user);
 					_sequenceIndex++;
-					callback(ko, user);
+					callback(user);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(user);
-					_onCall(ko, user);
+					_onCall(user);
 					return;
 				}
 
@@ -319,14 +319,14 @@ partial class MultipleStubsPatternTests
 				_unconfiguredLastArg = user;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Save");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Save");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(user); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
 
@@ -421,7 +421,7 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>>
 			{
 				private readonly IAttrUserRepository_SaveInterceptor _interceptor;
 
@@ -441,7 +441,7 @@ partial class MultipleStubsPatternTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User>> ThenCall(global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> ThenCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -462,7 +462,7 @@ partial class MultipleStubsPatternTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrUserRepository, global::KnockOff.Documentation.Samples.User>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -486,12 +486,12 @@ partial class MultipleStubsPatternTests
 
 			global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.AttributeOptions.IAttrUserRepository.GetById(int id)
 			{
-				return GetById.Invoke(this, id);
+				return GetById.Invoke(Strict, id);
 			}
 
 			void global::KnockOff.Documentation.Samples.AttributeOptions.IAttrUserRepository.Save(global::KnockOff.Documentation.Samples.User user)
 			{
-				Save.Invoke(this, user);
+				Save.Invoke(Strict, user);
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.AttributeOptions.IAttrUserRepository instance. Use for passing to code expecting the interface.</summary>
@@ -546,10 +546,10 @@ partial class MultipleStubsPatternTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Documentation.Samples.AttributeOptions.IAttrEmailService? _source;
 
-			private global::System.Action<Stubs.IAttrEmailService, string, string, string>? _onCall;
+			private global::System.Action<string, string, string>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IAttrEmailService, string, string, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<string, string, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -569,7 +569,7 @@ partial class MultipleStubsPatternTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTrackingArgs<(string to, string subject, string body)> OnCall(global::System.Action<Stubs.IAttrEmailService, string, string, string> callback)
+			public global::KnockOff.IMethodTrackingArgs<(string to, string subject, string body)> OnCall(global::System.Action<string, string, string> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -581,13 +581,13 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrEmailService, string, string, string>> OnCallSequence(global::System.Action<Stubs.IAttrEmailService, string, string, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string, string, string>> OnCallSequence(global::System.Action<string, string, string> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IAttrEmailService, string, string, string> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<string, string, string> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -595,21 +595,21 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IAttrEmailService ko, string to, string subject, string body)
+			internal void Invoke(bool strict, string to, string subject, string body)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((to, subject, body));
 					_sequenceIndex++;
-					callback(ko, to, subject, body);
+					callback(to, subject, body);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((to, subject, body));
-					_onCall(ko, to, subject, body);
+					_onCall(to, subject, body);
 					return;
 				}
 
@@ -617,14 +617,14 @@ partial class MultipleStubsPatternTests
 				_unconfiguredLastArgs = ((to, subject, body));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Send");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Send");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Send(to, subject, body); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Send");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Send");
 				return;
 			}
 
@@ -719,7 +719,7 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrEmailService, string, string, string>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string, string, string>>
 			{
 				private readonly IAttrEmailService_SendInterceptor _interceptor;
 
@@ -739,7 +739,7 @@ partial class MultipleStubsPatternTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrEmailService, string, string, string>> ThenCall(global::System.Action<Stubs.IAttrEmailService, string, string, string> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<string, string, string>> ThenCall(global::System.Action<string, string, string> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -760,7 +760,7 @@ partial class MultipleStubsPatternTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrEmailService, string, string, string>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<string, string, string>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -781,7 +781,7 @@ partial class MultipleStubsPatternTests
 
 			void global::KnockOff.Documentation.Samples.AttributeOptions.IAttrEmailService.Send(string to, string subject, string body)
 			{
-				Send.Invoke(this, to, subject, body);
+				Send.Invoke(Strict, to, subject, body);
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.AttributeOptions.IAttrEmailService instance. Use for passing to code expecting the interface.</summary>
@@ -833,10 +833,10 @@ partial class MultipleStubsPatternTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Documentation.Samples.AttributeOptions.IAttrLogger? _source;
 
-			private global::System.Action<Stubs.IAttrLogger, string>? _onCall;
+			private global::System.Action<string>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IAttrLogger, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -856,7 +856,7 @@ partial class MultipleStubsPatternTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<Stubs.IAttrLogger, string> callback)
+			public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -868,13 +868,13 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrLogger, string>> OnCallSequence(global::System.Action<Stubs.IAttrLogger, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IAttrLogger, string> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -882,21 +882,21 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IAttrLogger ko, string message)
+			internal void Invoke(bool strict, string message)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(message);
 					_sequenceIndex++;
-					callback(ko, message);
+					callback(message);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(message);
-					_onCall(ko, message);
+					_onCall(message);
 					return;
 				}
 
@@ -904,14 +904,14 @@ partial class MultipleStubsPatternTests
 				_unconfiguredLastArg = message;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Log");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Log");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Log(message); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Log");
 				return;
 			}
 
@@ -1006,7 +1006,7 @@ partial class MultipleStubsPatternTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrLogger, string>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 			{
 				private readonly IAttrLogger_LogInterceptor _interceptor;
 
@@ -1026,7 +1026,7 @@ partial class MultipleStubsPatternTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrLogger, string>> ThenCall(global::System.Action<Stubs.IAttrLogger, string> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1047,7 +1047,7 @@ partial class MultipleStubsPatternTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IAttrLogger, string>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1068,7 +1068,7 @@ partial class MultipleStubsPatternTests
 
 			void global::KnockOff.Documentation.Samples.AttributeOptions.IAttrLogger.Log(string message)
 			{
-				Log.Invoke(this, message);
+				Log.Invoke(Strict, message);
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.AttributeOptions.IAttrLogger instance. Use for passing to code expecting the interface.</summary>

@@ -18,7 +18,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<IndexerTestKnockOff, string, string>? OnGet { get; set; }
+		public global::System.Func<string, string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -27,7 +27,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		public (string? Key, string? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<IndexerTestKnockOff, string, string>? OnSet { get; set; }
+		public global::System.Action<string, string>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
@@ -130,7 +130,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		public int? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<IndexerTestKnockOff, int, int>? OnGet { get; set; }
+		public global::System.Func<int, int>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
@@ -264,13 +264,13 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 
 	string global::KnockOff.Tests.IIndexerTestService.this[string key]
 	{
-		get { Indexer.OfString.RecordGet(key); if (Indexer.OfString.OnGet is { } onGet) return onGet(this, key); if (Indexer.OfString._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); return Indexer.OfString.Backing.TryGetValue(key, out var v) ? v : default!; }
-		set { Indexer.OfString.RecordSet(key, value); if (Indexer.OfString.OnSet is { } onSet) { onSet(this, key, value); return; } if (Indexer.OfString._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); Indexer.OfString.Backing[key] = value; }
+		get { Indexer.OfString.RecordGet(key); if (Indexer.OfString.OnGet is { } onGet) return onGet(key); if (Indexer.OfString._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); return Indexer.OfString.Backing.TryGetValue(key, out var v) ? v : default!; }
+		set { Indexer.OfString.RecordSet(key, value); if (Indexer.OfString.OnSet is { } onSet) { onSet(key, value); return; } if (Indexer.OfString._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); Indexer.OfString.Backing[key] = value; }
 	}
 
 	int global::KnockOff.Tests.IIndexerTestService.this[int index]
 	{
-		get { Indexer.OfInt32.RecordGet(index); if (Indexer.OfInt32.OnGet is { } onGet) return onGet(this, index); if (Indexer.OfInt32._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); return Indexer.OfInt32.Backing.TryGetValue(index, out var v) ? v : default!; }
+		get { Indexer.OfInt32.RecordGet(index); if (Indexer.OfInt32.OnGet is { } onGet) return onGet(index); if (Indexer.OfInt32._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); return Indexer.OfInt32.Backing.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 }

@@ -58,7 +58,7 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 		public sealed class CreateEntityTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::KnockOff.Tests.IEntity, new()
 		{
 			/// <summary>Delegate for CreateEntity.</summary>
-			public delegate T CreateEntityDelegate(ConstrainedGenericServiceKnockOff ko);
+			public delegate T CreateEntityDelegate();
 
 			private CreateEntityDelegate? _onCall;
 
@@ -136,7 +136,7 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 		public sealed class SaveEntityTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : global::KnockOff.Tests.IEntity
 		{
 			/// <summary>Delegate for SaveEntity.</summary>
-			public delegate void SaveEntityDelegate(ConstrainedGenericServiceKnockOff ko, T entity);
+			public delegate void SaveEntityDelegate(T entity);
 
 			private SaveEntityDelegate? _onCall;
 
@@ -222,7 +222,7 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 	{
 		CreateEntity.Of<T>().RecordCall();
 		if (CreateEntity.Of<T>().Callback is { } callback)
-			return callback(this);
+			return callback();
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericService", "CreateEntity");
 		return SmartDefault<T>("CreateEntity");
 	}
@@ -231,7 +231,7 @@ partial class ConstrainedGenericServiceKnockOff : global::KnockOff.Tests.IConstr
 	{
 		SaveEntity.Of<T>().RecordCall();
 		if (SaveEntity.Of<T>().Callback is { } onCallCallback)
-		{ onCallCallback(this, entity); return; }
+		{ onCallCallback(entity); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConstrainedGenericService", "SaveEntity");
 	}
 

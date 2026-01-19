@@ -12,7 +12,7 @@ partial class EmailServiceStub : global::KnockOff.Documentation.Samples.Advanced
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.IEmailService? _source;
 
 		/// <summary>Delegate for Send.</summary>
-		public delegate bool SendDelegate(EmailServiceStub ko, string to, string message);
+		public delegate bool SendDelegate(string to, string message);
 
 		private SendDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class EmailServiceStub : global::KnockOff.Documentation.Samples.Advanced
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(EmailServiceStub ko, bool strict, string to, string message)
+		internal bool Invoke(bool strict, string to, string message)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((to, message));
 				_sequenceIndex++;
-				return callback(ko, to, message);
+				return callback(to, message);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((to, message));
-				return _onCall(ko, to, message);
+				return _onCall(to, message);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class EmailServiceStub : global::KnockOff.Documentation.Samples.Advanced
 
 	bool global::KnockOff.Documentation.Samples.AdvancedCallbacks.IEmailService.Send(string to, string message)
 	{
-		return Send.Invoke(this, Strict, to, message);
+		return Send.Invoke(Strict, to, message);
 	}
 
 }

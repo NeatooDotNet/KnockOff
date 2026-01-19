@@ -19,7 +19,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<RuleMessagesStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<RuleMessagesStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -180,7 +180,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		public int? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>? OnGet { get; set; }
+		public global::System.Func<int, global::Neatoo.Rules.IRuleMessage>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -189,7 +189,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		public (int? Key, global::Neatoo.Rules.IRuleMessage? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>? OnSet { get; set; }
+		public global::System.Action<int, global::Neatoo.Rules.IRuleMessage>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
@@ -288,7 +288,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Add(string, string).</summary>
-		public delegate void AddDelegate_String_String_void(RuleMessagesStub ko, string propertyName, string message);
+		public delegate void AddDelegate_String_String_void(string propertyName, string message);
 
 		private AddDelegate_String_String_void? _onCall_String_String_void;
 		private MethodTrackingImpl_String_String_void? _onCallTracking_String_String_void;
@@ -300,7 +300,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		private global::KnockOff.Times? _verifiableTimes_String_String_void;
 
 		/// <summary>Delegate for Add(global::Neatoo.Rules.IRuleMessage).</summary>
-		public delegate void AddDelegate_Neatoo_Rules_IRuleMessage_void(RuleMessagesStub ko, global::Neatoo.Rules.IRuleMessage item);
+		public delegate void AddDelegate_Neatoo_Rules_IRuleMessage_void(global::Neatoo.Rules.IRuleMessage item);
 
 		private AddDelegate_Neatoo_Rules_IRuleMessage_void? _onCall_Neatoo_Rules_IRuleMessage_void;
 		private MethodTrackingImpl_Neatoo_Rules_IRuleMessage_void? _onCallTracking_Neatoo_Rules_IRuleMessage_void;
@@ -370,21 +370,21 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes configured callback for Add(string, string).</summary>
-		internal void Invoke_String_String_void(RuleMessagesStub ko, bool strict, string propertyName, string message)
+		internal void Invoke_String_String_void(bool strict, string propertyName, string message)
 		{
 			if (_sequence_String_String_void != null && _sequenceIndex_String_String_void < _sequence_String_String_void.Count)
 			{
 				var (callback, tracking) = _sequence_String_String_void[_sequenceIndex_String_String_void];
 				tracking.RecordCall((propertyName, message));
 				_sequenceIndex_String_String_void++;
-				callback(ko, propertyName, message);
+				callback(propertyName, message);
 				return;
 			}
 
 			if (_onCall_String_String_void != null && _onCallTracking_String_String_void != null)
 			{
 				_onCallTracking_String_String_void.RecordCall((propertyName, message));
-				_onCall_String_String_void(ko, propertyName, message);
+				_onCall_String_String_void(propertyName, message);
 				return;
 			}
 
@@ -403,21 +403,21 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes configured callback for Add(global::Neatoo.Rules.IRuleMessage).</summary>
-		internal void Invoke_Neatoo_Rules_IRuleMessage_void(RuleMessagesStub ko, bool strict, global::Neatoo.Rules.IRuleMessage item)
+		internal void Invoke_Neatoo_Rules_IRuleMessage_void(bool strict, global::Neatoo.Rules.IRuleMessage item)
 		{
 			if (_sequence_Neatoo_Rules_IRuleMessage_void != null && _sequenceIndex_Neatoo_Rules_IRuleMessage_void < _sequence_Neatoo_Rules_IRuleMessage_void.Count)
 			{
 				var (callback, tracking) = _sequence_Neatoo_Rules_IRuleMessage_void[_sequenceIndex_Neatoo_Rules_IRuleMessage_void];
 				tracking.RecordCall(item);
 				_sequenceIndex_Neatoo_Rules_IRuleMessage_void++;
-				callback(ko, item);
+				callback(item);
 				return;
 			}
 
 			if (_onCall_Neatoo_Rules_IRuleMessage_void != null && _onCallTracking_Neatoo_Rules_IRuleMessage_void != null)
 			{
 				_onCallTracking_Neatoo_Rules_IRuleMessage_void.RecordCall(item);
-				_onCall_Neatoo_Rules_IRuleMessage_void(ko, item);
+				_onCall_Neatoo_Rules_IRuleMessage_void(item);
 				return;
 			}
 
@@ -719,7 +719,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		internal global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>? _source;
 
 		/// <summary>Delegate for IndexOf.</summary>
-		public delegate int IndexOfDelegate(RuleMessagesStub ko, global::Neatoo.Rules.IRuleMessage item);
+		public delegate int IndexOfDelegate(global::Neatoo.Rules.IRuleMessage item);
 
 		private IndexOfDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -770,20 +770,20 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(RuleMessagesStub ko, bool strict, global::Neatoo.Rules.IRuleMessage item)
+		internal int Invoke(bool strict, global::Neatoo.Rules.IRuleMessage item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -952,10 +952,10 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>? _source;
 
-		private global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>? _onCall;
+		private global::System.Action<int, global::Neatoo.Rules.IRuleMessage>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int, global::Neatoo.Rules.IRuleMessage> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -975,7 +975,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(int? index, global::Neatoo.Rules.IRuleMessage? item)> OnCall(global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage> callback)
+		public global::KnockOff.IMethodTrackingArgs<(int? index, global::Neatoo.Rules.IRuleMessage? item)> OnCall(global::System.Action<int, global::Neatoo.Rules.IRuleMessage> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -987,13 +987,13 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>> OnCallSequence(global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.Rules.IRuleMessage>> OnCallSequence(global::System.Action<int, global::Neatoo.Rules.IRuleMessage> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int, global::Neatoo.Rules.IRuleMessage> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1001,21 +1001,21 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RuleMessagesStub ko, bool strict, int index, global::Neatoo.Rules.IRuleMessage item)
+		internal void Invoke(bool strict, int index, global::Neatoo.Rules.IRuleMessage item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((index, item));
 				_sequenceIndex++;
-				callback(ko, index, item);
+				callback(index, item);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((index, item));
-				_onCall(ko, index, item);
+				_onCall(index, item);
 				return;
 			}
 
@@ -1125,7 +1125,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.Rules.IRuleMessage>>
 		{
 			private readonly InsertInterceptor _interceptor;
 
@@ -1145,7 +1145,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>> ThenCall(global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.Rules.IRuleMessage>> ThenCall(global::System.Action<int, global::Neatoo.Rules.IRuleMessage> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1166,7 +1166,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int, global::Neatoo.Rules.IRuleMessage>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int, global::Neatoo.Rules.IRuleMessage>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1185,10 +1185,10 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>? _source;
 
-		private global::System.Action<RuleMessagesStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1208,7 +1208,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<RuleMessagesStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1220,13 +1220,13 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int>> OnCallSequence(global::System.Action<RuleMessagesStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1234,21 +1234,21 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RuleMessagesStub ko, bool strict, int index)
+		internal void Invoke(bool strict, int index)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(index);
 				_sequenceIndex++;
-				callback(ko, index);
+				callback(index);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(index);
-				_onCall(ko, index);
+				_onCall(index);
 				return;
 			}
 
@@ -1358,7 +1358,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly RemoveAtInterceptor _interceptor;
 
@@ -1378,7 +1378,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int>> ThenCall(global::System.Action<RuleMessagesStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1399,7 +1399,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1418,10 +1418,10 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>? _source;
 
-		private global::System.Action<RuleMessagesStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1437,7 +1437,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<RuleMessagesStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1449,13 +1449,13 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub>> OnCallSequence(global::System.Action<RuleMessagesStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1463,21 +1463,21 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RuleMessagesStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -1578,7 +1578,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearInterceptor _interceptor;
 
@@ -1598,7 +1598,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub>> ThenCall(global::System.Action<RuleMessagesStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1619,7 +1619,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1639,7 +1639,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>? _source;
 
 		/// <summary>Delegate for Contains.</summary>
-		public delegate bool ContainsDelegate(RuleMessagesStub ko, global::Neatoo.Rules.IRuleMessage item);
+		public delegate bool ContainsDelegate(global::Neatoo.Rules.IRuleMessage item);
 
 		private ContainsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1690,20 +1690,20 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(RuleMessagesStub ko, bool strict, global::Neatoo.Rules.IRuleMessage item)
+		internal bool Invoke(bool strict, global::Neatoo.Rules.IRuleMessage item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -1872,10 +1872,10 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>? _source;
 
-		private global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int>? _onCall;
+		private global::System.Action<global::Neatoo.Rules.IRuleMessage[], int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.Rules.IRuleMessage[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1895,7 +1895,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.Rules.IRuleMessage[]? array, int? arrayIndex)> OnCall(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int> callback)
+		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.Rules.IRuleMessage[]? array, int? arrayIndex)> OnCall(global::System.Action<global::Neatoo.Rules.IRuleMessage[], int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1907,13 +1907,13 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int>> OnCallSequence(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.Rules.IRuleMessage[], int>> OnCallSequence(global::System.Action<global::Neatoo.Rules.IRuleMessage[], int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.Rules.IRuleMessage[], int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1921,21 +1921,21 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RuleMessagesStub ko, bool strict, global::Neatoo.Rules.IRuleMessage[] array, int arrayIndex)
+		internal void Invoke(bool strict, global::Neatoo.Rules.IRuleMessage[] array, int arrayIndex)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((array, arrayIndex));
 				_sequenceIndex++;
-				callback(ko, array, arrayIndex);
+				callback(array, arrayIndex);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((array, arrayIndex));
-				_onCall(ko, array, arrayIndex);
+				_onCall(array, arrayIndex);
 				return;
 			}
 
@@ -2045,7 +2045,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.Rules.IRuleMessage[], int>>
 		{
 			private readonly CopyToInterceptor _interceptor;
 
@@ -2065,7 +2065,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int>> ThenCall(global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.Rules.IRuleMessage[], int>> ThenCall(global::System.Action<global::Neatoo.Rules.IRuleMessage[], int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2086,7 +2086,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<RuleMessagesStub, global::Neatoo.Rules.IRuleMessage[], int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.Rules.IRuleMessage[], int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2106,7 +2106,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		internal global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>? _source;
 
 		/// <summary>Delegate for Remove.</summary>
-		public delegate bool RemoveDelegate(RuleMessagesStub ko, global::Neatoo.Rules.IRuleMessage item);
+		public delegate bool RemoveDelegate(global::Neatoo.Rules.IRuleMessage item);
 
 		private RemoveDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2157,20 +2157,20 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(RuleMessagesStub ko, bool strict, global::Neatoo.Rules.IRuleMessage item)
+		internal bool Invoke(bool strict, global::Neatoo.Rules.IRuleMessage item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -2342,7 +2342,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(RuleMessagesStub ko);
+		public delegate global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage();
 
 		private GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage? _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage;
 		private MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage? _onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage;
@@ -2354,7 +2354,7 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator(RuleMessagesStub ko);
+		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator();
 
 		private GetEnumeratorDelegate_NoParams_Collections_IEnumerator? _onCall_NoParams_Collections_IEnumerator;
 		private MethodTrackingImpl_NoParams_Collections_IEnumerator? _onCallTracking_NoParams_Collections_IEnumerator;
@@ -2424,20 +2424,20 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(RuleMessagesStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(bool strict)
 		{
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage != null && _sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage < _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage[_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage != null && _onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage != null)
 			{
 				_onCallTracking_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage.RecordCall();
-				return _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(ko);
+				return _onCall_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage();
 			}
 
 			_unconfiguredCallCount++;
@@ -2455,20 +2455,20 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(RuleMessagesStub ko, bool strict)
+		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(bool strict)
 		{
 			if (_sequence_NoParams_Collections_IEnumerator != null && _sequenceIndex_NoParams_Collections_IEnumerator < _sequence_NoParams_Collections_IEnumerator.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_IEnumerator[_sequenceIndex_NoParams_Collections_IEnumerator];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_IEnumerator++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_IEnumerator != null && _onCallTracking_NoParams_Collections_IEnumerator != null)
 			{
 				_onCallTracking_NoParams_Collections_IEnumerator.RecordCall();
-				return _onCall_NoParams_Collections_IEnumerator(ko);
+				return _onCall_NoParams_Collections_IEnumerator();
 			}
 
 			_unconfiguredCallCount++;
@@ -2928,68 +2928,68 @@ partial class RuleMessagesStub : global::Neatoo.Rules.IRuleMessages, global::Sys
 
 	int global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IsReadOnly"); return IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	global::Neatoo.Rules.IRuleMessage global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(this, index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
-		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(this, index, value); return; } if (Indexer._source is { } src) { src[index] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); Indexer.Backing[index] = value; }
+		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		set { Indexer.RecordSet(index, value); if (Indexer.OnSet is { } onSet) { onSet(index, value); return; } if (Indexer._source is { } src) { src[index] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage>", "this[]"); Indexer.Backing[index] = value; }
 	}
 
 	void global::Neatoo.Rules.IRuleMessages.Add(string propertyName, string message)
 	{
-		Add.Invoke_String_String_void(this, Strict, propertyName, message);
+		Add.Invoke_String_String_void(Strict, propertyName, message);
 	}
 
 	int global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.IndexOf(global::Neatoo.Rules.IRuleMessage item)
 	{
-		return IndexOf.Invoke(this, Strict, item);
+		return IndexOf.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.Insert(int index, global::Neatoo.Rules.IRuleMessage item)
 	{
-		Insert.Invoke(this, Strict, index, item);
+		Insert.Invoke(Strict, index, item);
 	}
 
 	void global::System.Collections.Generic.IList<global::Neatoo.Rules.IRuleMessage>.RemoveAt(int index)
 	{
-		RemoveAt.Invoke(this, Strict, index);
+		RemoveAt.Invoke(Strict, index);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Add(global::Neatoo.Rules.IRuleMessage item)
 	{
-		Add.Invoke_Neatoo_Rules_IRuleMessage_void(this, Strict, item);
+		Add.Invoke_Neatoo_Rules_IRuleMessage_void(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Clear()
 	{
-		Clear.Invoke(this, Strict);
+		Clear.Invoke(Strict);
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Contains(global::Neatoo.Rules.IRuleMessage item)
 	{
-		return Contains.Invoke(this, Strict, item);
+		return Contains.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.CopyTo(global::Neatoo.Rules.IRuleMessage[] array, int arrayIndex)
 	{
-		CopyTo.Invoke(this, Strict, array, arrayIndex);
+		CopyTo.Invoke(Strict, array, arrayIndex);
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::Neatoo.Rules.IRuleMessage>.Remove(global::Neatoo.Rules.IRuleMessage item)
 	{
-		return Remove.Invoke(this, Strict, item);
+		return Remove.Invoke(Strict, item);
 	}
 
 	global::System.Collections.Generic.IEnumerator<global::Neatoo.Rules.IRuleMessage> global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRuleMessage>.GetEnumerator()
 	{
-		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(this, Strict);
+		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Neatoo_Rules_IRuleMessage(Strict);
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()

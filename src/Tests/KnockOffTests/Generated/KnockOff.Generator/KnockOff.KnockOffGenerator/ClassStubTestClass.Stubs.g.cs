@@ -18,9 +18,9 @@ partial class ClassStubTestClass
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.SimpleService, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.SimpleService, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -32,9 +32,9 @@ partial class ClassStubTestClass
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.SimpleService, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.SimpleService, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -120,9 +120,9 @@ partial class ClassStubTestClass
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.SimpleService, int>? _onGet;
+			private global::System.Func<int>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.SimpleService, int>? OnGet
+			public global::System.Func<int>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -134,9 +134,9 @@ partial class ClassStubTestClass
 			/// <summary>The last value passed to the setter.</summary>
 			public int? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.SimpleService, int>? _onSet;
+			private global::System.Action<int>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.SimpleService, int>? OnSet
+			public global::System.Action<int>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -215,7 +215,7 @@ partial class ClassStubTestClass
 		/// <summary>Interceptor for SimpleService.DoWork.</summary>
 		public sealed class SimpleService_DoWorkInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Action<Stubs.SimpleService>? _onCall;
+			private global::System.Action? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -224,10 +224,10 @@ partial class ClassStubTestClass
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.SimpleService> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.SimpleService>? Callback => _onCall;
+			internal global::System.Action? Callback => _onCall;
 
 			public void RecordCall() { CallCount++; }
 
@@ -274,7 +274,7 @@ partial class ClassStubTestClass
 		/// <summary>Interceptor for SimpleService.Calculate.</summary>
 		public sealed class SimpleService_CalculateInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Func<Stubs.SimpleService, int, int>? _onCall;
+			private global::System.Func<int, int>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -286,10 +286,10 @@ partial class ClassStubTestClass
 			public int? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.SimpleService, int, int> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<int, int> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<Stubs.SimpleService, int, int>? Callback => _onCall;
+			internal global::System.Func<int, int>? Callback => _onCall;
 
 			public void RecordCall(int x) { CallCount++; LastCallArg = x; }
 
@@ -336,7 +336,7 @@ partial class ClassStubTestClass
 		/// <summary>Interceptor for SimpleService.Format.</summary>
 		public sealed class SimpleService_FormatInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Func<Stubs.SimpleService, string, int, string>? _onCall;
+			private global::System.Func<string, int, string>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -348,10 +348,10 @@ partial class ClassStubTestClass
 			public (string? input, int? count)? LastCallArgs { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.SimpleService, string, int, string> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<string, int, string> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<Stubs.SimpleService, string, int, string>? Callback => _onCall;
+			internal global::System.Func<string, int, string>? Callback => _onCall;
 
 			public void RecordCall(string input, int count) { CallCount++; LastCallArgs = (input, count); }
 
@@ -486,13 +486,13 @@ partial class ClassStubTestClass
 					get
 					{
 						_stub?.Name.RecordGet();
-						if (_stub?.Name.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Name.OnGet is { } onGet) return onGet();
 						return base.Name;
 					}
 					set
 					{
 						_stub?.Name.RecordSet(value);
-						if (_stub?.Name.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Name.OnSet is { } onSet) onSet(value);
 						else base.Name = value;
 					}
 				}
@@ -503,13 +503,13 @@ partial class ClassStubTestClass
 					get
 					{
 						_stub?.Value.RecordGet();
-						if (_stub?.Value.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Value.OnGet is { } onGet) return onGet();
 						return base.Value;
 					}
 					set
 					{
 						_stub?.Value.RecordSet(value);
-						if (_stub?.Value.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Value.OnSet is { } onSet) onSet(value);
 						else base.Value = value;
 					}
 				}
@@ -518,7 +518,7 @@ partial class ClassStubTestClass
 				public override void DoWork()
 				{
 					_stub?.DoWork.RecordCall();
-					if (_stub?.DoWork.Callback is { } onCall) { onCall(_stub); return; }
+					if (_stub?.DoWork.Callback is { } onCall) { onCall(); return; }
 					base.DoWork();
 				}
 
@@ -526,7 +526,7 @@ partial class ClassStubTestClass
 				public override int Calculate(int x)
 				{
 					_stub?.Calculate.RecordCall(x);
-					if (_stub?.Calculate.Callback is { } onCall) return onCall(_stub, x);
+					if (_stub?.Calculate.Callback is { } onCall) return onCall(x);
 					return base.Calculate(x);
 				}
 
@@ -534,7 +534,7 @@ partial class ClassStubTestClass
 				public override string Format(string input, int count)
 				{
 					_stub?.Format.RecordCall(input, count);
-					if (_stub?.Format.Callback is { } onCall) return onCall(_stub, input, count);
+					if (_stub?.Format.Callback is { } onCall) return onCall(input, count);
 					return base.Format(input, count);
 				}
 

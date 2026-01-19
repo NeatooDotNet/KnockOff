@@ -19,7 +19,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<DictionaryStringIntKnockOff, global::System.Collections.Generic.ICollection<string>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.ICollection<string>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.ICollection<string> _value = new global::System.Collections.Generic.List<string>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<DictionaryStringIntKnockOff, global::System.Collections.Generic.ICollection<int>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.ICollection<int>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.ICollection<int> _value = new global::System.Collections.Generic.List<int>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<DictionaryStringIntKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<DictionaryStringIntKnockOff, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -342,7 +342,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<DictionaryStringIntKnockOff, string, int>? OnGet { get; set; }
+		public global::System.Func<string, int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -351,7 +351,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		public (string? Key, int? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<DictionaryStringIntKnockOff, string, int>? OnSet { get; set; }
+		public global::System.Action<string, int>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
@@ -450,7 +450,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Add(string, int).</summary>
-		public delegate void AddDelegate_String_Int32_void(DictionaryStringIntKnockOff ko, string key, int @value);
+		public delegate void AddDelegate_String_Int32_void(string key, int @value);
 
 		private AddDelegate_String_Int32_void? _onCall_String_Int32_void;
 		private MethodTrackingImpl_String_Int32_void? _onCallTracking_String_Int32_void;
@@ -462,7 +462,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private global::KnockOff.Times? _verifiableTimes_String_Int32_void;
 
 		/// <summary>Delegate for Add(global::System.Collections.Generic.KeyValuePair<string, int>).</summary>
-		public delegate void AddDelegate_Collections_Generic_KeyValuePair_string_int_void(DictionaryStringIntKnockOff ko, global::System.Collections.Generic.KeyValuePair<string, int> item);
+		public delegate void AddDelegate_Collections_Generic_KeyValuePair_string_int_void(global::System.Collections.Generic.KeyValuePair<string, int> item);
 
 		private AddDelegate_Collections_Generic_KeyValuePair_string_int_void? _onCall_Collections_Generic_KeyValuePair_string_int_void;
 		private MethodTrackingImpl_Collections_Generic_KeyValuePair_string_int_void? _onCallTracking_Collections_Generic_KeyValuePair_string_int_void;
@@ -532,21 +532,21 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes configured callback for Add(string, int).</summary>
-		internal void Invoke_String_Int32_void(DictionaryStringIntKnockOff ko, bool strict, string key, int @value)
+		internal void Invoke_String_Int32_void(bool strict, string key, int @value)
 		{
 			if (_sequence_String_Int32_void != null && _sequenceIndex_String_Int32_void < _sequence_String_Int32_void.Count)
 			{
 				var (callback, tracking) = _sequence_String_Int32_void[_sequenceIndex_String_Int32_void];
 				tracking.RecordCall((key, @value));
 				_sequenceIndex_String_Int32_void++;
-				callback(ko, key, @value);
+				callback(key, @value);
 				return;
 			}
 
 			if (_onCall_String_Int32_void != null && _onCallTracking_String_Int32_void != null)
 			{
 				_onCallTracking_String_Int32_void.RecordCall((key, @value));
-				_onCall_String_Int32_void(ko, key, @value);
+				_onCall_String_Int32_void(key, @value);
 				return;
 			}
 
@@ -565,21 +565,21 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes configured callback for Add(global::System.Collections.Generic.KeyValuePair<string, int>).</summary>
-		internal void Invoke_Collections_Generic_KeyValuePair_string_int_void(DictionaryStringIntKnockOff ko, bool strict, global::System.Collections.Generic.KeyValuePair<string, int> item)
+		internal void Invoke_Collections_Generic_KeyValuePair_string_int_void(bool strict, global::System.Collections.Generic.KeyValuePair<string, int> item)
 		{
 			if (_sequence_Collections_Generic_KeyValuePair_string_int_void != null && _sequenceIndex_Collections_Generic_KeyValuePair_string_int_void < _sequence_Collections_Generic_KeyValuePair_string_int_void.Count)
 			{
 				var (callback, tracking) = _sequence_Collections_Generic_KeyValuePair_string_int_void[_sequenceIndex_Collections_Generic_KeyValuePair_string_int_void];
 				tracking.RecordCall(item);
 				_sequenceIndex_Collections_Generic_KeyValuePair_string_int_void++;
-				callback(ko, item);
+				callback(item);
 				return;
 			}
 
 			if (_onCall_Collections_Generic_KeyValuePair_string_int_void != null && _onCallTracking_Collections_Generic_KeyValuePair_string_int_void != null)
 			{
 				_onCallTracking_Collections_Generic_KeyValuePair_string_int_void.RecordCall(item);
-				_onCall_Collections_Generic_KeyValuePair_string_int_void(ko, item);
+				_onCall_Collections_Generic_KeyValuePair_string_int_void(item);
 				return;
 			}
 
@@ -881,7 +881,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		internal global::System.Collections.Generic.IDictionary<string, int>? _source;
 
 		/// <summary>Delegate for ContainsKey.</summary>
-		public delegate bool ContainsKeyDelegate(DictionaryStringIntKnockOff ko, string key);
+		public delegate bool ContainsKeyDelegate(string key);
 
 		private ContainsKeyDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -932,20 +932,20 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(DictionaryStringIntKnockOff ko, bool strict, string key)
+		internal bool Invoke(bool strict, string key)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(key);
 				_sequenceIndex++;
-				return callback(ko, key);
+				return callback(key);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(key);
-				return _onCall(ko, key);
+				return _onCall(key);
 			}
 
 			_unconfiguredCallCount++;
@@ -1117,7 +1117,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Remove(string).</summary>
-		public delegate bool RemoveDelegate_String_Boolean(DictionaryStringIntKnockOff ko, string key);
+		public delegate bool RemoveDelegate_String_Boolean(string key);
 
 		private RemoveDelegate_String_Boolean? _onCall_String_Boolean;
 		private MethodTrackingImpl_String_Boolean? _onCallTracking_String_Boolean;
@@ -1129,7 +1129,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private global::KnockOff.Times? _verifiableTimes_String_Boolean;
 
 		/// <summary>Delegate for Remove(global::System.Collections.Generic.KeyValuePair<string, int>).</summary>
-		public delegate bool RemoveDelegate_Collections_Generic_KeyValuePair_string_int_Boolean(DictionaryStringIntKnockOff ko, global::System.Collections.Generic.KeyValuePair<string, int> item);
+		public delegate bool RemoveDelegate_Collections_Generic_KeyValuePair_string_int_Boolean(global::System.Collections.Generic.KeyValuePair<string, int> item);
 
 		private RemoveDelegate_Collections_Generic_KeyValuePair_string_int_Boolean? _onCall_Collections_Generic_KeyValuePair_string_int_Boolean;
 		private MethodTrackingImpl_Collections_Generic_KeyValuePair_string_int_Boolean? _onCallTracking_Collections_Generic_KeyValuePair_string_int_Boolean;
@@ -1199,20 +1199,20 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes configured callback for Remove(string).</summary>
-		internal bool Invoke_String_Boolean(DictionaryStringIntKnockOff ko, bool strict, string key)
+		internal bool Invoke_String_Boolean(bool strict, string key)
 		{
 			if (_sequence_String_Boolean != null && _sequenceIndex_String_Boolean < _sequence_String_Boolean.Count)
 			{
 				var (callback, tracking) = _sequence_String_Boolean[_sequenceIndex_String_Boolean];
 				tracking.RecordCall(key);
 				_sequenceIndex_String_Boolean++;
-				return callback(ko, key);
+				return callback(key);
 			}
 
 			if (_onCall_String_Boolean != null && _onCallTracking_String_Boolean != null)
 			{
 				_onCallTracking_String_Boolean.RecordCall(key);
-				return _onCall_String_Boolean(ko, key);
+				return _onCall_String_Boolean(key);
 			}
 
 			_unconfiguredCallCount++;
@@ -1230,20 +1230,20 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes configured callback for Remove(global::System.Collections.Generic.KeyValuePair<string, int>).</summary>
-		internal bool Invoke_Collections_Generic_KeyValuePair_string_int_Boolean(DictionaryStringIntKnockOff ko, bool strict, global::System.Collections.Generic.KeyValuePair<string, int> item)
+		internal bool Invoke_Collections_Generic_KeyValuePair_string_int_Boolean(bool strict, global::System.Collections.Generic.KeyValuePair<string, int> item)
 		{
 			if (_sequence_Collections_Generic_KeyValuePair_string_int_Boolean != null && _sequenceIndex_Collections_Generic_KeyValuePair_string_int_Boolean < _sequence_Collections_Generic_KeyValuePair_string_int_Boolean.Count)
 			{
 				var (callback, tracking) = _sequence_Collections_Generic_KeyValuePair_string_int_Boolean[_sequenceIndex_Collections_Generic_KeyValuePair_string_int_Boolean];
 				tracking.RecordCall(item);
 				_sequenceIndex_Collections_Generic_KeyValuePair_string_int_Boolean++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall_Collections_Generic_KeyValuePair_string_int_Boolean != null && _onCallTracking_Collections_Generic_KeyValuePair_string_int_Boolean != null)
 			{
 				_onCallTracking_Collections_Generic_KeyValuePair_string_int_Boolean.RecordCall(item);
-				return _onCall_Collections_Generic_KeyValuePair_string_int_Boolean(ko, item);
+				return _onCall_Collections_Generic_KeyValuePair_string_int_Boolean(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -1544,7 +1544,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		internal global::System.Collections.Generic.IDictionary<string, int>? _source;
 
 		/// <summary>Delegate for TryGetValue.</summary>
-		public delegate bool TryGetValueDelegate(DictionaryStringIntKnockOff ko, string key, out int @value);
+		public delegate bool TryGetValueDelegate(string key, out int @value);
 
 		private TryGetValueDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1595,7 +1595,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(DictionaryStringIntKnockOff ko, bool strict, string key, out int @value)
+		internal bool Invoke(bool strict, string key, out int @value)
 		{
 			@value = default!;
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
@@ -1603,13 +1603,13 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(key);
 				_sequenceIndex++;
-				return callback(ko, key, out @value);
+				return callback(key, out @value);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(key);
-				return _onCall(ko, key, out @value);
+				return _onCall(key, out @value);
 			}
 
 			_unconfiguredCallCount++;
@@ -1778,10 +1778,10 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
 
-		private global::System.Action<DictionaryStringIntKnockOff>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<DictionaryStringIntKnockOff> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1797,7 +1797,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<DictionaryStringIntKnockOff> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1809,13 +1809,13 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<DictionaryStringIntKnockOff>> OnCallSequence(global::System.Action<DictionaryStringIntKnockOff> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<DictionaryStringIntKnockOff> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1823,21 +1823,21 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(DictionaryStringIntKnockOff ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -1938,7 +1938,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<DictionaryStringIntKnockOff>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearInterceptor _interceptor;
 
@@ -1958,7 +1958,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DictionaryStringIntKnockOff>> ThenCall(global::System.Action<DictionaryStringIntKnockOff> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1979,7 +1979,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DictionaryStringIntKnockOff>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1999,7 +1999,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
 
 		/// <summary>Delegate for Contains.</summary>
-		public delegate bool ContainsDelegate(DictionaryStringIntKnockOff ko, global::System.Collections.Generic.KeyValuePair<string, int> item);
+		public delegate bool ContainsDelegate(global::System.Collections.Generic.KeyValuePair<string, int> item);
 
 		private ContainsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2050,20 +2050,20 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(DictionaryStringIntKnockOff ko, bool strict, global::System.Collections.Generic.KeyValuePair<string, int> item)
+		internal bool Invoke(bool strict, global::System.Collections.Generic.KeyValuePair<string, int> item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				return callback(ko, item);
+				return callback(item);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				return _onCall(ko, item);
+				return _onCall(item);
 			}
 
 			_unconfiguredCallCount++;
@@ -2232,10 +2232,10 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>? _source;
 
-		private global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int>? _onCall;
+		private global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -2255,7 +2255,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(global::System.Collections.Generic.KeyValuePair<string, int>[]? array, int? arrayIndex)> OnCall(global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int> callback)
+		public global::KnockOff.IMethodTrackingArgs<(global::System.Collections.Generic.KeyValuePair<string, int>[]? array, int? arrayIndex)> OnCall(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -2267,13 +2267,13 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int>> OnCallSequence(global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int>> OnCallSequence(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -2281,21 +2281,21 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(DictionaryStringIntKnockOff ko, bool strict, global::System.Collections.Generic.KeyValuePair<string, int>[] array, int arrayIndex)
+		internal void Invoke(bool strict, global::System.Collections.Generic.KeyValuePair<string, int>[] array, int arrayIndex)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((array, arrayIndex));
 				_sequenceIndex++;
-				callback(ko, array, arrayIndex);
+				callback(array, arrayIndex);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((array, arrayIndex));
-				_onCall(ko, array, arrayIndex);
+				_onCall(array, arrayIndex);
 				return;
 			}
 
@@ -2405,7 +2405,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int>>
 		{
 			private readonly CopyToInterceptor _interceptor;
 
@@ -2425,7 +2425,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int>> ThenCall(global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int>> ThenCall(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -2446,7 +2446,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DictionaryStringIntKnockOff, global::System.Collections.Generic.KeyValuePair<string, int>[], int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -2468,7 +2468,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int(DictionaryStringIntKnockOff ko);
+		public delegate global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int();
 
 		private GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int? _onCall_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int;
 		private MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int? _onCallTracking_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int;
@@ -2480,7 +2480,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int;
 
 		/// <summary>Delegate for GetEnumerator().</summary>
-		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator(DictionaryStringIntKnockOff ko);
+		public delegate global::System.Collections.IEnumerator GetEnumeratorDelegate_NoParams_Collections_IEnumerator();
 
 		private GetEnumeratorDelegate_NoParams_Collections_IEnumerator? _onCall_NoParams_Collections_IEnumerator;
 		private MethodTrackingImpl_NoParams_Collections_IEnumerator? _onCallTracking_NoParams_Collections_IEnumerator;
@@ -2550,20 +2550,20 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> Invoke_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int(DictionaryStringIntKnockOff ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> Invoke_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int(bool strict)
 		{
 			if (_sequence_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int != null && _sequenceIndex_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int < _sequence_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int[_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int != null && _onCallTracking_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int != null)
 			{
 				_onCallTracking_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int.RecordCall();
-				return _onCall_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int(ko);
+				return _onCall_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int();
 			}
 
 			_unconfiguredCallCount++;
@@ -2581,20 +2581,20 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		}
 
 		/// <summary>Invokes configured callback for GetEnumerator().</summary>
-		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(DictionaryStringIntKnockOff ko, bool strict)
+		internal global::System.Collections.IEnumerator Invoke_NoParams_Collections_IEnumerator(bool strict)
 		{
 			if (_sequence_NoParams_Collections_IEnumerator != null && _sequenceIndex_NoParams_Collections_IEnumerator < _sequence_NoParams_Collections_IEnumerator.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_IEnumerator[_sequenceIndex_NoParams_Collections_IEnumerator];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_IEnumerator++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_IEnumerator != null && _onCallTracking_NoParams_Collections_IEnumerator != null)
 			{
 				_onCallTracking_NoParams_Collections_IEnumerator.RecordCall();
-				return _onCall_NoParams_Collections_IEnumerator(ko);
+				return _onCall_NoParams_Collections_IEnumerator();
 			}
 
 			_unconfiguredCallCount++;
@@ -3045,78 +3045,78 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 	global::System.Collections.Generic.ICollection<string> global::System.Collections.Generic.IDictionary<string, int>.Keys
 	{
-		get { Keys.RecordGet(); if (Keys.OnGet is { } onGet) return onGet(this); if (Keys._source is { } src) return src.Keys; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Keys"); return Keys.Value; }
+		get { Keys.RecordGet(); if (Keys.OnGet is { } onGet) return onGet(); if (Keys._source is { } src) return src.Keys; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Keys"); return Keys.Value; }
 	}
 
 	global::System.Collections.Generic.ICollection<int> global::System.Collections.Generic.IDictionary<string, int>.Values
 	{
-		get { Values.RecordGet(); if (Values.OnGet is { } onGet) return onGet(this); if (Values._source is { } src) return src.Values; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Values"); return Values.Value; }
+		get { Values.RecordGet(); if (Values.OnGet is { } onGet) return onGet(); if (Values._source is { } src) return src.Values; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "Values"); return Values.Value; }
 	}
 
 	int global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "Count"); return Count.Value; }
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "IsReadOnly"); return IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("KeyValuePair<string, int>>", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	int global::System.Collections.Generic.IDictionary<string, int>.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default!; }
-		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(this, key, value); return; } if (Indexer._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "this[]"); Indexer.Backing[key] = value; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default!; }
+		set { Indexer.RecordSet(key, value); if (Indexer.OnSet is { } onSet) { onSet(key, value); return; } if (Indexer._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IDictionary<string, int>", "this[]"); Indexer.Backing[key] = value; }
 	}
 
 	void global::System.Collections.Generic.IDictionary<string, int>.Add(string key, int @value)
 	{
-		Add.Invoke_String_Int32_void(this, Strict, key, @value);
+		Add.Invoke_String_Int32_void(Strict, key, @value);
 	}
 
 	bool global::System.Collections.Generic.IDictionary<string, int>.ContainsKey(string key)
 	{
-		return ContainsKey.Invoke(this, Strict, key);
+		return ContainsKey.Invoke(Strict, key);
 	}
 
 	bool global::System.Collections.Generic.IDictionary<string, int>.Remove(string key)
 	{
-		return Remove.Invoke_String_Boolean(this, Strict, key);
+		return Remove.Invoke_String_Boolean(Strict, key);
 	}
 
 	bool global::System.Collections.Generic.IDictionary<string, int>.TryGetValue(string key, out int @value)
 	{
-		return TryGetValue.Invoke(this, Strict, key, out @value);
+		return TryGetValue.Invoke(Strict, key, out @value);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Add(global::System.Collections.Generic.KeyValuePair<string, int> item)
 	{
-		Add.Invoke_Collections_Generic_KeyValuePair_string_int_void(this, Strict, item);
+		Add.Invoke_Collections_Generic_KeyValuePair_string_int_void(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Clear()
 	{
-		Clear.Invoke(this, Strict);
+		Clear.Invoke(Strict);
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Contains(global::System.Collections.Generic.KeyValuePair<string, int> item)
 	{
-		return Contains.Invoke(this, Strict, item);
+		return Contains.Invoke(Strict, item);
 	}
 
 	void global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.CopyTo(global::System.Collections.Generic.KeyValuePair<string, int>[] array, int arrayIndex)
 	{
-		CopyTo.Invoke(this, Strict, array, arrayIndex);
+		CopyTo.Invoke(Strict, array, arrayIndex);
 	}
 
 	bool global::System.Collections.Generic.ICollection<global::System.Collections.Generic.KeyValuePair<string, int>>.Remove(global::System.Collections.Generic.KeyValuePair<string, int> item)
 	{
-		return Remove.Invoke_Collections_Generic_KeyValuePair_string_int_Boolean(this, Strict, item);
+		return Remove.Invoke_Collections_Generic_KeyValuePair_string_int_Boolean(Strict, item);
 	}
 
 	global::System.Collections.Generic.IEnumerator<global::System.Collections.Generic.KeyValuePair<string, int>> global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, int>>.GetEnumerator()
 	{
-		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int(this, Strict);
+		return GetEnumerator.Invoke_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int(Strict);
 	}
 
 	global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()

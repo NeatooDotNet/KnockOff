@@ -19,7 +19,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ServiceWithInitPropsStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -92,10 +92,10 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Properties.IServiceWithInitProps? _source;
 
-		private global::System.Action<ServiceWithInitPropsStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ServiceWithInitPropsStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -111,7 +111,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ServiceWithInitPropsStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -123,13 +123,13 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ServiceWithInitPropsStub>> OnCallSequence(global::System.Action<ServiceWithInitPropsStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ServiceWithInitPropsStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -137,21 +137,21 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ServiceWithInitPropsStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -252,7 +252,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ServiceWithInitPropsStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly InitializeInterceptor _interceptor;
 
@@ -272,7 +272,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ServiceWithInitPropsStub>> ThenCall(global::System.Action<ServiceWithInitPropsStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -293,7 +293,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ServiceWithInitPropsStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -354,12 +354,12 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 
 	bool global::KnockOff.Documentation.Samples.Properties.IServiceWithInitProps.IsReady
 	{
-		get { IsReady.RecordGet(); if (IsReady.OnGet is { } onGet) return onGet(this); if (IsReady._source is { } src) return src.IsReady; if (Strict) throw global::KnockOff.StubException.NotConfigured("IServiceWithInitProps", "IsReady"); return IsReady.Value; }
+		get { IsReady.RecordGet(); if (IsReady.OnGet is { } onGet) return onGet(); if (IsReady._source is { } src) return src.IsReady; if (Strict) throw global::KnockOff.StubException.NotConfigured("IServiceWithInitProps", "IsReady"); return IsReady.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.Properties.IServiceWithInitProps.Initialize()
 	{
-		Initialize.Invoke(this, Strict);
+		Initialize.Invoke(Strict);
 	}
 
 }

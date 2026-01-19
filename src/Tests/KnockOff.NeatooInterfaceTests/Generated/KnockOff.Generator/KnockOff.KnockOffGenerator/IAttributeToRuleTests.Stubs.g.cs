@@ -64,7 +64,7 @@ partial class IAttributeToRuleTests
 			public sealed class GetRuleTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::Neatoo.IValidateBase
 			{
 				/// <summary>Delegate for GetRule.</summary>
-				public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(Stubs.IAttributeToRule ko, global::Neatoo.IPropertyInfo r, object? attribute);
+				public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(global::Neatoo.IPropertyInfo r, object? attribute);
 
 				private GetRuleDelegate? _onCall;
 
@@ -118,7 +118,7 @@ partial class IAttributeToRuleTests
 				var typedHandler = GetRule.Of<T>();
 				typedHandler.RecordCall(r, attribute);
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, r, attribute);
+					return onCallCallback(r, attribute);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttributeToRule", "GetRule");
 				return default!;
 			}

@@ -19,7 +19,7 @@ partial class IValidateMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class IValidateMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class IValidateMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateMetaProperties, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class IValidateMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IValidateMetaProperties, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
+			public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
 			private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -341,7 +341,7 @@ partial class IValidateMetaPropertiesTests
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for WaitForTasks().</summary>
-			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task(Stubs.IValidateMetaProperties ko);
+			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task();
 
 			private WaitForTasksDelegate_NoParams_Threading_Tasks_Task? _onCall_NoParams_Threading_Tasks_Task;
 			private MethodTrackingImpl_NoParams_Threading_Tasks_Task? _onCallTracking_NoParams_Threading_Tasks_Task;
@@ -353,7 +353,7 @@ partial class IValidateMetaPropertiesTests
 			private global::KnockOff.Times? _verifiableTimes_NoParams_Threading_Tasks_Task;
 
 			/// <summary>Delegate for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateMetaProperties ko, global::System.Threading.CancellationToken token);
+			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(global::System.Threading.CancellationToken token);
 
 			private WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task;
@@ -423,64 +423,64 @@ partial class IValidateMetaPropertiesTests
 			}
 
 			/// <summary>Invokes configured callback for WaitForTasks().</summary>
-			internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(Stubs.IValidateMetaProperties ko)
+			internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(bool strict)
 			{
 				if (_sequence_NoParams_Threading_Tasks_Task != null && _sequenceIndex_NoParams_Threading_Tasks_Task < _sequence_NoParams_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_NoParams_Threading_Tasks_Task[_sequenceIndex_NoParams_Threading_Tasks_Task];
 					tracking.RecordCall();
 					_sequenceIndex_NoParams_Threading_Tasks_Task++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall_NoParams_Threading_Tasks_Task != null && _onCallTracking_NoParams_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_NoParams_Threading_Tasks_Task.RecordCall();
-					return _onCall_NoParams_Threading_Tasks_Task(ko);
+					return _onCall_NoParams_Threading_Tasks_Task();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_NoParams_Threading_Tasks_Task != null && _sequenceIndex_NoParams_Threading_Tasks_Task >= _sequence_NoParams_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			/// <summary>Invokes configured callback for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateMetaProperties ko, global::System.Threading.CancellationToken token)
+			internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::System.Threading.CancellationToken token)
 			{
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall(token);
 					_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, token);
+					return callback(token);
 				}
 
 				if (_onCall_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task.RecordCall(token);
-					return _onCall_Threading_CancellationToken_Threading_Tasks_Task(ko, token);
+					return _onCall_Threading_CancellationToken_Threading_Tasks_Task(token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks(token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -763,7 +763,7 @@ partial class IValidateMetaPropertiesTests
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateMetaProperties ko, string propertyName, global::System.Threading.CancellationToken? token);
+			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(string propertyName, global::System.Threading.CancellationToken? token);
 
 			private RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task? _onCall_String_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task;
@@ -775,7 +775,7 @@ partial class IValidateMetaPropertiesTests
 			private global::KnockOff.Times? _verifiableTimes_String_Threading_CancellationToken_Threading_Tasks_Task;
 
 			/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateMetaProperties ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
+			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
 			private RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
@@ -845,64 +845,64 @@ partial class IValidateMetaPropertiesTests
 			}
 
 			/// <summary>Invokes configured callback for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateMetaProperties ko, string propertyName, global::System.Threading.CancellationToken? token)
+			internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(bool strict, string propertyName, global::System.Threading.CancellationToken? token)
 			{
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task < _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_String_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall((propertyName, token));
 					_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, propertyName, token);
+					return callback(propertyName, token);
 				}
 
 				if (_onCall_String_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((propertyName, token));
-					return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(ko, propertyName, token);
+					return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(propertyName, token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(propertyName, token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			/// <summary>Invokes configured callback for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IValidateMetaProperties ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+			internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall((runRules, token));
 					_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, runRules, token);
+					return callback(runRules, token);
 				}
 
 				if (_onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((runRules, token));
-					return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(ko, runRules, token);
+					return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(runRules, token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(runRules, token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -1189,10 +1189,10 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
-			private global::System.Action<Stubs.IValidateMetaProperties>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateMetaProperties> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -1208,7 +1208,7 @@ partial class IValidateMetaPropertiesTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IValidateMetaProperties> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -1220,13 +1220,13 @@ partial class IValidateMetaPropertiesTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateMetaProperties>> OnCallSequence(global::System.Action<Stubs.IValidateMetaProperties> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateMetaProperties> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -1234,35 +1234,35 @@ partial class IValidateMetaPropertiesTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateMetaProperties ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ClearAllMessages");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ClearAllMessages");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearAllMessages(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
 
@@ -1349,7 +1349,7 @@ partial class IValidateMetaPropertiesTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateMetaProperties>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IValidateMetaProperties_ClearAllMessagesInterceptor _interceptor;
 
@@ -1369,7 +1369,7 @@ partial class IValidateMetaPropertiesTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateMetaProperties>> ThenCall(global::System.Action<Stubs.IValidateMetaProperties> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1390,7 +1390,7 @@ partial class IValidateMetaPropertiesTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateMetaProperties>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1409,10 +1409,10 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
-			private global::System.Action<Stubs.IValidateMetaProperties>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateMetaProperties> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -1428,7 +1428,7 @@ partial class IValidateMetaPropertiesTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IValidateMetaProperties> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -1440,13 +1440,13 @@ partial class IValidateMetaPropertiesTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateMetaProperties>> OnCallSequence(global::System.Action<Stubs.IValidateMetaProperties> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IValidateMetaProperties> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -1454,35 +1454,35 @@ partial class IValidateMetaPropertiesTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IValidateMetaProperties ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ClearSelfMessages");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ClearSelfMessages");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearSelfMessages(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}
 
@@ -1569,7 +1569,7 @@ partial class IValidateMetaPropertiesTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateMetaProperties>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IValidateMetaProperties_ClearSelfMessagesInterceptor _interceptor;
 
@@ -1589,7 +1589,7 @@ partial class IValidateMetaPropertiesTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateMetaProperties>> ThenCall(global::System.Action<Stubs.IValidateMetaProperties> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1610,7 +1610,7 @@ partial class IValidateMetaPropertiesTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IValidateMetaProperties>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1652,32 +1652,32 @@ partial class IValidateMetaPropertiesTests
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 			{
-				return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(this);
+				return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(Strict);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
 			{
-				return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(this, token);
+				return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(Strict, token);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 			{
-				return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(this, propertyName, token);
+				return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(Strict, propertyName, token);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
-				return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(this, runRules, token);
+				return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Strict, runRules, token);
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 			{
-				ClearAllMessages.Invoke(this);
+				ClearAllMessages.Invoke(Strict);
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
-				ClearSelfMessages.Invoke(this);
+				ClearSelfMessages.Invoke(Strict);
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -1685,7 +1685,7 @@ partial class IValidateMetaPropertiesTests
 				get
 				{
 					IsBusy.RecordGet();
-					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (IsBusy.OnGet is { } onGet) return onGet();
 					if (IsBusy._source is { } src) return src.IsBusy;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
@@ -1697,7 +1697,7 @@ partial class IValidateMetaPropertiesTests
 				get
 				{
 					IsValid.RecordGet();
-					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (IsValid.OnGet is { } onGet) return onGet();
 					if (IsValid._source is { } src) return src.IsValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
@@ -1709,7 +1709,7 @@ partial class IValidateMetaPropertiesTests
 				get
 				{
 					IsSelfValid.RecordGet();
-					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (IsSelfValid.OnGet is { } onGet) return onGet();
 					if (IsSelfValid._source is { } src) return src.IsSelfValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
@@ -1721,7 +1721,7 @@ partial class IValidateMetaPropertiesTests
 				get
 				{
 					PropertyMessages.RecordGet();
-					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (PropertyMessages.OnGet is { } onGet) return onGet();
 					if (PropertyMessages._source is { } src) return src.PropertyMessages;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
@@ -1803,7 +1803,7 @@ partial class IValidateMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyMessage, global::Neatoo.IValidateProperty>? OnGet { get; set; }
+			public global::System.Func<global::Neatoo.IValidateProperty>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -1812,7 +1812,7 @@ partial class IValidateMetaPropertiesTests
 			public global::Neatoo.IValidateProperty? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IPropertyMessage, global::Neatoo.IValidateProperty>? OnSet { get; set; }
+			public global::System.Action<global::Neatoo.IValidateProperty>? OnSet { get; set; }
 
 			private global::Neatoo.IValidateProperty _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1906,7 +1906,7 @@ partial class IValidateMetaPropertiesTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyMessage, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -1915,7 +1915,7 @@ partial class IValidateMetaPropertiesTests
 			public string? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IPropertyMessage, string>? OnSet { get; set; }
+			public global::System.Action<string>? OnSet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -2012,7 +2012,7 @@ partial class IValidateMetaPropertiesTests
 				get
 				{
 					Property.RecordGet();
-					if (Property.OnGet is { } onGet) return onGet(this);
+					if (Property.OnGet is { } onGet) return onGet();
 					if (Property._source is { } src) return src.Property;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
 					return Property.Value;
@@ -2020,7 +2020,7 @@ partial class IValidateMetaPropertiesTests
 				set
 				{
 					Property.RecordSet(value);
-					if (Property.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Property.OnSet is { } onSet) { onSet(value); return; }
 					if (Property._source is { } src) { src.Property = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
 					Property.Value = value;
@@ -2032,7 +2032,7 @@ partial class IValidateMetaPropertiesTests
 				get
 				{
 					Message.RecordGet();
-					if (Message.OnGet is { } onGet) return onGet(this);
+					if (Message.OnGet is { } onGet) return onGet();
 					if (Message._source is { } src) return src.Message;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
 					return Message.Value;
@@ -2040,7 +2040,7 @@ partial class IValidateMetaPropertiesTests
 				set
 				{
 					Message.RecordSet(value);
-					if (Message.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Message.OnSet is { } onSet) { onSet(value); return; }
 					if (Message._source is { } src) { src.Message = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
 					Message.Value = value;

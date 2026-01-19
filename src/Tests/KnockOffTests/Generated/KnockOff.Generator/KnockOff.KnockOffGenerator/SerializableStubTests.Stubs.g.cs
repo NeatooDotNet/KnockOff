@@ -14,10 +14,10 @@ partial class SerializableStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Runtime.Serialization.ISerializable? _source;
 
-			private global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>? _onCall;
+			private global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -37,7 +37,7 @@ partial class SerializableStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTrackingArgs<(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context)> OnCall(global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> callback)
+			public global::KnockOff.IMethodTrackingArgs<(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context)> OnCall(global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -49,13 +49,13 @@ partial class SerializableStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>> OnCallSequence(global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>> OnCallSequence(global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -63,21 +63,21 @@ partial class SerializableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.ISerializable ko, global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context)
+			internal void Invoke(bool strict, global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((info, context));
 					_sequenceIndex++;
-					callback(ko, info, context);
+					callback(info, context);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((info, context));
-					_onCall(ko, info, context);
+					_onCall(info, context);
 					return;
 				}
 
@@ -85,14 +85,14 @@ partial class SerializableStubTests
 				_unconfiguredLastArgs = ((info, context));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetObjectData");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetObjectData");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.GetObjectData(info, context); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetObjectData");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetObjectData");
 				return;
 			}
 
@@ -187,7 +187,7 @@ partial class SerializableStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>>
 			{
 				private readonly ISerializable_GetObjectDataInterceptor _interceptor;
 
@@ -207,7 +207,7 @@ partial class SerializableStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>> ThenCall(global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>> ThenCall(global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -228,7 +228,7 @@ partial class SerializableStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISerializable, global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Runtime.Serialization.SerializationInfo, global::System.Runtime.Serialization.StreamingContext>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -249,7 +249,7 @@ partial class SerializableStubTests
 
 			void global::System.Runtime.Serialization.ISerializable.GetObjectData(global::System.Runtime.Serialization.SerializationInfo info, global::System.Runtime.Serialization.StreamingContext context)
 			{
-				GetObjectData.Invoke(this, info, context);
+				GetObjectData.Invoke(Strict, info, context);
 			}
 
 			/// <summary>The global::System.Runtime.Serialization.ISerializable instance. Use for passing to code expecting the interface.</summary>

@@ -15,7 +15,7 @@ partial class ObservableStringStubTests
 			internal global::System.IObservable<string>? _source;
 
 			/// <summary>Delegate for Subscribe.</summary>
-			public delegate global::System.IDisposable SubscribeDelegate(Stubs.IObservable ko, global::System.IObserver<string> observer);
+			public delegate global::System.IDisposable SubscribeDelegate(global::System.IObserver<string> observer);
 
 			private SubscribeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class ObservableStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.IDisposable Invoke(Stubs.IObservable ko, global::System.IObserver<string> observer)
+			internal global::System.IDisposable Invoke(bool strict, global::System.IObserver<string> observer)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(observer);
 					_sequenceIndex++;
-					return callback(ko, observer);
+					return callback(observer);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(observer);
-					return _onCall(ko, observer);
+					return _onCall(observer);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = observer;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Subscribe");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Subscribe");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Subscribe(observer);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Subscribe");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Subscribe");
 				throw new global::System.InvalidOperationException("No implementation provided for Subscribe. Configure via OnCall.");
 			}
 
@@ -250,7 +250,7 @@ partial class ObservableStringStubTests
 
 			global::System.IDisposable global::System.IObservable<string>.Subscribe(global::System.IObserver<string> observer)
 			{
-				return Subscribe.Invoke(this, observer);
+				return Subscribe.Invoke(Strict, observer);
 			}
 
 			/// <summary>The global::System.IObservable<string> instance. Use for passing to code expecting the interface.</summary>

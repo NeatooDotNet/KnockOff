@@ -19,7 +19,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ConfigSvcStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ConfigSvcStub, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -122,7 +122,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ConfigSvcStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -131,7 +131,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		public int? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ConfigSvcStub, int>? OnSet { get; set; }
+		public global::System.Action<int>? OnSet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -235,14 +235,14 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 
 	string global::KnockOff.Documentation.Samples.Troubleshooting.IConfigSvc.Host
 	{
-		get { Host.RecordGet(); if (Host.OnGet is { } onGet) return onGet(this); if (Host._source is { } src) return src.Host; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigSvc", "Host"); return Host.Value; }
-		set { Host.RecordSet(value); if (Host.OnSet is { } onSet) { onSet(this, value); return; } if (Host._source is { } src) { src.Host = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigSvc", "Host"); Host.Value = value; }
+		get { Host.RecordGet(); if (Host.OnGet is { } onGet) return onGet(); if (Host._source is { } src) return src.Host; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigSvc", "Host"); return Host.Value; }
+		set { Host.RecordSet(value); if (Host.OnSet is { } onSet) { onSet(value); return; } if (Host._source is { } src) { src.Host = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigSvc", "Host"); Host.Value = value; }
 	}
 
 	int global::KnockOff.Documentation.Samples.Troubleshooting.IConfigSvc.Port
 	{
-		get { Port.RecordGet(); if (Port.OnGet is { } onGet) return onGet(this); if (Port._source is { } src) return src.Port; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigSvc", "Port"); return Port.Value; }
-		set { Port.RecordSet(value); if (Port.OnSet is { } onSet) { onSet(this, value); return; } if (Port._source is { } src) { src.Port = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigSvc", "Port"); Port.Value = value; }
+		get { Port.RecordGet(); if (Port.OnGet is { } onGet) return onGet(); if (Port._source is { } src) return src.Port; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigSvc", "Port"); return Port.Value; }
+		set { Port.RecordSet(value); if (Port.OnSet is { } onSet) { onSet(value); return; } if (Port._source is { } src) { src.Port = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigSvc", "Port"); Port.Value = value; }
 	}
 
 }

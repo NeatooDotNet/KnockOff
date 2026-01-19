@@ -44,7 +44,7 @@ public void Verifiable_MarksForBatchVerification()
     var stub = new RepoVerifyStub();
 
     // Chain .Verifiable() to mark for batch verification
-    stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 
     IRepoVerify repository = stub;
     repository.GetById(42);
@@ -65,7 +65,7 @@ Verify a method was called exactly once.
 public void Verify_WithTimesOnce()
 {
     var stub = new RepoVerifyStub();
-    var tracking = stub.Save.OnCall((ko, user) => { });
+    var tracking = stub.Save.OnCall((user) => { });
 
     IRepoVerify repository = stub;
     repository.Save(new User { Id = 1 });
@@ -86,7 +86,7 @@ Verify a method was called a minimum number of times.
 public void Verify_WithTimesAtLeast()
 {
     var stub = new RepoVerifyStub();
-    var tracking = stub.Refresh.OnCall((ko) => { });
+    var tracking = stub.Refresh.OnCall(() => { });
 
     IRepoVerify repository = stub;
 
@@ -111,7 +111,7 @@ Verify a method was never invoked.
 public void Verify_WithTimesNever()
 {
     var stub = new RepoVerifyStub();
-    var tracking = stub.Refresh.OnCall((ko) => { });
+    var tracking = stub.Refresh.OnCall(() => { });
 
     IRepoVerify repository = stub;
     // Don't call Refresh
@@ -150,7 +150,7 @@ public void Verifiable_MarksForBatchVerification()
     var stub = new RepoVerifyStub();
 
     // Chain .Verifiable() to mark for batch verification
-    stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 
     IRepoVerify repository = stub;
     repository.GetById(42);
@@ -173,7 +173,7 @@ public void Verifiable_WithTimesConstraint()
     var stub = new RepoVerifyStub();
 
     // Mark with Times constraint for batch verification
-    stub.Refresh.OnCall((ko) => { }).Verifiable(Times.Exactly(2));
+    stub.Refresh.OnCall(() => { }).Verifiable(Times.Exactly(2));
 
     IRepoVerify repository = stub;
     repository.Refresh();
@@ -210,8 +210,8 @@ public void VerifyAll_ChecksAllConfiguredMembers()
     var stub = new RepoVerifyStub();
 
     // Configure multiple members (no need to mark Verifiable)
-    stub.GetById.OnCall((ko, id) => new User { Id = id });
-    stub.Save.OnCall((ko, user) => { });
+    stub.GetById.OnCall((id) => new User { Id = id });
+    stub.Save.OnCall((user) => { });
 
     IRepoVerify repository = stub;
     repository.GetById(1);
@@ -243,7 +243,7 @@ For argument inspection, use `LastCallArg` or `LastCallArgs` from the tracking o
 public void LastArg_VerifiesSingleParameter()
 {
     var stub = new RepoVerifyStub();
-    var tracking = stub.GetById.OnCall((ko, id) => new User { Id = id });
+    var tracking = stub.GetById.OnCall((id) => new User { Id = id });
 
     IRepoVerify repository = stub;
     repository.GetById(42);
@@ -262,7 +262,7 @@ public void LastArg_VerifiesSingleParameter()
 public void LastArgs_VerifiesMultipleParameters()
 {
     var stub = new SvcVerifyStub();
-    var tracking = stub.Update.OnCall((ko, id, name) => { });
+    var tracking = stub.Update.OnCall((id, name) => { });
 
     ISvcVerify service = stub;
     service.Update(42, "Alice");
@@ -290,7 +290,7 @@ public void OnCall_CapturesAllCallsToList()
 
     // Capture all calls to a list within the callback
     var calls = new List<int>();
-    var tracking = stub.GetById.OnCall((ko, id) =>
+    var tracking = stub.GetById.OnCall((id) =>
     {
         calls.Add(id);
         return new User { Id = id };
@@ -327,8 +327,8 @@ public void CallOrder_VerifiedWithCounter()
     var saveOrder = 0;
     var refreshOrder = 0;
 
-    var saveTracking = stub.Save.OnCall((ko, user) => saveOrder = ++order);
-    var refreshTracking = stub.Refresh.OnCall((ko) => refreshOrder = ++order);
+    var saveTracking = stub.Save.OnCall((user) => saveOrder = ++order);
+    var refreshTracking = stub.Refresh.OnCall(() => refreshOrder = ++order);
 
     IRepoVerify repository = stub;
 
@@ -358,9 +358,9 @@ public void CrossInterceptor_VerifyMultipleMethodsCalled()
     var stub = new RepoVerifyStub();
 
     // Mark all methods as verifiable
-    stub.GetById.OnCall((ko, id) => new User { Id = id }).Verifiable();
-    stub.Save.OnCall((ko, user) => { }).Verifiable();
-    stub.Refresh.OnCall((ko) => { }).Verifiable();
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+    stub.Save.OnCall((user) => { }).Verifiable();
+    stub.Refresh.OnCall(() => { }).Verifiable();
 
     IRepoVerify repository = stub;
 
@@ -417,19 +417,19 @@ public void CompleteVerification_AllTechniques()
     var getIdHistory = new List<int>();
 
     // Mark all methods as verifiable with specific constraints
-    var getTracking = stub.GetById.OnCall((ko, id) =>
+    var getTracking = stub.GetById.OnCall((id) =>
     {
         getIdHistory.Add(id);
         getOrder = ++order;
         return new User { Id = id, Name = $"User{id}" };
     }).Verifiable(Times.Exactly(2));
 
-    var saveTracking = stub.Save.OnCall((ko, user) =>
+    var saveTracking = stub.Save.OnCall((user) =>
     {
         saveOrder = ++order;
     }).Verifiable(Times.Once);
 
-    var refreshTracking = stub.Refresh.OnCall((ko) =>
+    var refreshTracking = stub.Refresh.OnCall(() =>
     {
         refreshOrder = ++order;
     }).Verifiable(Times.Once);

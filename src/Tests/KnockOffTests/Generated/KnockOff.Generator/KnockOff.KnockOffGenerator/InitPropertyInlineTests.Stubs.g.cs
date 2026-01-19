@@ -19,7 +19,7 @@ partial class InitPropertyInlineTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityWithInitProperty, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class InitPropertyInlineTests
 			public string? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IEntityWithInitProperty, string>? OnSet { get; set; }
+			public global::System.Action<string>? OnSet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class InitPropertyInlineTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDocumentWithMixedProperties, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -190,7 +190,7 @@ partial class InitPropertyInlineTests
 			public string? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDocumentWithMixedProperties, string>? OnSet { get; set; }
+			public global::System.Action<string>? OnSet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -281,7 +281,7 @@ partial class InitPropertyInlineTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDocumentWithMixedProperties, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -290,7 +290,7 @@ partial class InitPropertyInlineTests
 			public string? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IDocumentWithMixedProperties, string>? OnSet { get; set; }
+			public global::System.Action<string>? OnSet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -384,7 +384,7 @@ partial class InitPropertyInlineTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDocumentWithMixedProperties, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -485,7 +485,7 @@ partial class InitPropertyInlineTests
 				get
 				{
 					Title.RecordGet();
-					if (Title.OnGet is { } onGet) return onGet(this);
+					if (Title.OnGet is { } onGet) return onGet();
 					if (Title._source is { } src) return src.Title;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title");
 					return Title.Value;
@@ -493,7 +493,7 @@ partial class InitPropertyInlineTests
 				set
 				{
 					Title.RecordSet(value);
-					if (Title.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Title.OnSet is { } onSet) { onSet(value); return; }
 					if (Title._source is { } src) { src.Title = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Title");
 					Title.Value = value;
@@ -505,7 +505,7 @@ partial class InitPropertyInlineTests
 				get
 				{
 					Version.RecordGet();
-					if (Version.OnGet is { } onGet) return onGet(this);
+					if (Version.OnGet is { } onGet) return onGet();
 					if (Version._source is { } src) return src.Version;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDocumentWithMixedProperties", "Version");
 					return Version.Value;
@@ -571,7 +571,7 @@ partial class InitPropertyInlineTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.INullableInitProperty, string?>? OnGet { get; set; }
+			public global::System.Func<string?>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -580,7 +580,7 @@ partial class InitPropertyInlineTests
 			public string? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.INullableInitProperty, string?>? OnSet { get; set; }
+			public global::System.Action<string?>? OnSet { get; set; }
 
 			private string? _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>

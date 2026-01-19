@@ -11,10 +11,10 @@ partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.IDisposable? _source;
 
-		private global::System.Action<DisposableKnockOff>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<DisposableKnockOff> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -30,7 +30,7 @@ partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<DisposableKnockOff> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -42,13 +42,13 @@ partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<DisposableKnockOff>> OnCallSequence(global::System.Action<DisposableKnockOff> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<DisposableKnockOff> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -56,21 +56,21 @@ partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(DisposableKnockOff ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -171,7 +171,7 @@ partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<DisposableKnockOff>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly DisposeInterceptor _interceptor;
 
@@ -191,7 +191,7 @@ partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DisposableKnockOff>> ThenCall(global::System.Action<DisposableKnockOff> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -212,7 +212,7 @@ partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DisposableKnockOff>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -267,7 +267,7 @@ partial class DisposableKnockOff : global::System.IDisposable, global::KnockOff.
 
 	void global::System.IDisposable.Dispose()
 	{
-		Dispose.Invoke(this, Strict);
+		Dispose.Invoke(Strict);
 	}
 
 }

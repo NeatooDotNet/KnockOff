@@ -15,7 +15,7 @@ partial class FormatProviderStubTests
 			internal global::System.IFormatProvider? _source;
 
 			/// <summary>Delegate for GetFormat.</summary>
-			public delegate object? GetFormatDelegate(Stubs.IFormatProvider ko, global::System.Type? formatType);
+			public delegate object? GetFormatDelegate(global::System.Type? formatType);
 
 			private GetFormatDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class FormatProviderStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal object? Invoke(Stubs.IFormatProvider ko, global::System.Type? formatType)
+			internal object? Invoke(bool strict, global::System.Type? formatType)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(formatType);
 					_sequenceIndex++;
-					return callback(ko, formatType);
+					return callback(formatType);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(formatType);
-					return _onCall(ko, formatType);
+					return _onCall(formatType);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = formatType;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetFormat");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetFormat");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetFormat(formatType);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetFormat");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetFormat");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class FormatProviderStubTests
 
 			object? global::System.IFormatProvider.GetFormat(global::System.Type? formatType)
 			{
-				return GetFormat.Invoke(this, formatType);
+				return GetFormat.Invoke(Strict, formatType);
 			}
 
 			/// <summary>The global::System.IFormatProvider instance. Use for passing to code expecting the interface.</summary>

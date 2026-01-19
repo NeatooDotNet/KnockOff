@@ -19,7 +19,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AnotherTestRule, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AnotherTestRule, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AnotherTestRule, uint>? OnGet { get; set; }
+		public global::System.Func<uint>? OnGet { get; set; }
 
 		private uint _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -262,7 +262,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AnotherTestRule, global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> _value = new global::System.Collections.Generic.List<global::Neatoo.Rules.IRuleMessage>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -343,7 +343,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AnotherTestRule, global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> _value = new global::System.Collections.Generic.List<global::Neatoo.Rules.ITriggerProperty>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -417,7 +417,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		internal global::Neatoo.Rules.IRule? _source;
 
 		/// <summary>Delegate for RunRule.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> RunRuleDelegate(AnotherTestRule ko, global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> RunRuleDelegate(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token);
 
 		private RunRuleDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -468,20 +468,20 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> Invoke(AnotherTestRule ko, bool strict, global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> Invoke(bool strict, global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((target, token));
 				_sequenceIndex++;
-				return callback(ko, target, token);
+				return callback(target, token);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((target, token));
-				return _onCall(ko, target, token);
+				return _onCall(target, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -650,10 +650,10 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.Rules.IRule? _source;
 
-		private global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint>? _onCall;
+		private global::System.Action<global::Neatoo.Rules.IRuleManager, uint>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.Rules.IRuleManager, uint> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -673,7 +673,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex)> OnCall(global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint> callback)
+		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex)> OnCall(global::System.Action<global::Neatoo.Rules.IRuleManager, uint> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -685,13 +685,13 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint>> OnCallSequence(global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.Rules.IRuleManager, uint>> OnCallSequence(global::System.Action<global::Neatoo.Rules.IRuleManager, uint> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.Rules.IRuleManager, uint> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -699,21 +699,21 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(AnotherTestRule ko, bool strict, global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
+		internal void Invoke(bool strict, global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((ruleManager, uniqueIndex));
 				_sequenceIndex++;
-				callback(ko, ruleManager, uniqueIndex);
+				callback(ruleManager, uniqueIndex);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((ruleManager, uniqueIndex));
-				_onCall(ko, ruleManager, uniqueIndex);
+				_onCall(ruleManager, uniqueIndex);
 				return;
 			}
 
@@ -823,7 +823,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.Rules.IRuleManager, uint>>
 		{
 			private readonly OnRuleAddedInterceptor _interceptor;
 
@@ -843,7 +843,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint>> ThenCall(global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.Rules.IRuleManager, uint>> ThenCall(global::System.Action<global::Neatoo.Rules.IRuleManager, uint> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -864,7 +864,7 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<AnotherTestRule, global::Neatoo.Rules.IRuleManager, uint>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::Neatoo.Rules.IRuleManager, uint>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -955,37 +955,37 @@ partial class AnotherTestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 
 	bool global::Neatoo.Rules.IRule.Executed
 	{
-		get { Executed.RecordGet(); if (Executed.OnGet is { } onGet) return onGet(this); if (Executed._source is { } src) return src.Executed; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed"); return Executed.Value; }
+		get { Executed.RecordGet(); if (Executed.OnGet is { } onGet) return onGet(); if (Executed._source is { } src) return src.Executed; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Executed"); return Executed.Value; }
 	}
 
 	int global::Neatoo.Rules.IRule.RuleOrder
 	{
-		get { RuleOrder.RecordGet(); if (RuleOrder.OnGet is { } onGet) return onGet(this); if (RuleOrder._source is { } src) return src.RuleOrder; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder"); return RuleOrder.Value; }
+		get { RuleOrder.RecordGet(); if (RuleOrder.OnGet is { } onGet) return onGet(); if (RuleOrder._source is { } src) return src.RuleOrder; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "RuleOrder"); return RuleOrder.Value; }
 	}
 
 	uint global::Neatoo.Rules.IRule.UniqueIndex
 	{
-		get { UniqueIndex.RecordGet(); if (UniqueIndex.OnGet is { } onGet) return onGet(this); if (UniqueIndex._source is { } src) return src.UniqueIndex; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex"); return UniqueIndex.Value; }
+		get { UniqueIndex.RecordGet(); if (UniqueIndex.OnGet is { } onGet) return onGet(); if (UniqueIndex._source is { } src) return src.UniqueIndex; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "UniqueIndex"); return UniqueIndex.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage> global::Neatoo.Rules.IRule.Messages
 	{
-		get { Messages.RecordGet(); if (Messages.OnGet is { } onGet) return onGet(this); if (Messages._source is { } src) return src.Messages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages"); return Messages.Value; }
+		get { Messages.RecordGet(); if (Messages.OnGet is { } onGet) return onGet(); if (Messages._source is { } src) return src.Messages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "Messages"); return Messages.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty> global::Neatoo.Rules.IRule.TriggerProperties
 	{
-		get { TriggerProperties.RecordGet(); if (TriggerProperties.OnGet is { } onGet) return onGet(this); if (TriggerProperties._source is { } src) return src.TriggerProperties; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties"); return TriggerProperties.Value; }
+		get { TriggerProperties.RecordGet(); if (TriggerProperties.OnGet is { } onGet) return onGet(); if (TriggerProperties._source is { } src) return src.TriggerProperties; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRule", "TriggerProperties"); return TriggerProperties.Value; }
 	}
 
 	global::System.Threading.Tasks.Task<global::Neatoo.Rules.IRuleMessages> global::Neatoo.Rules.IRule.RunRule(global::Neatoo.IValidateBase target, global::System.Threading.CancellationToken? token)
 	{
-		return RunRule.Invoke(this, Strict, target, token);
+		return RunRule.Invoke(Strict, target, token);
 	}
 
 	void global::Neatoo.Rules.IRule.OnRuleAdded(global::Neatoo.Rules.IRuleManager ruleManager, uint uniqueIndex)
 	{
-		OnRuleAdded.Invoke(this, Strict, ruleManager, uniqueIndex);
+		OnRuleAdded.Invoke(Strict, ruleManager, uniqueIndex);
 	}
 
 }

@@ -12,7 +12,7 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IAsyncDefaultsService? _source;
 
 		/// <summary>Delegate for GetUserAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> GetUserAsyncDelegate(AsyncDefaultsServiceStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> GetUserAsyncDelegate(int id);
 
 		private GetUserAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(AsyncDefaultsServiceStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IAsyncDefaultsService? _source;
 
 		/// <summary>Delegate for GetCountAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<int> GetCountAsyncDelegate(AsyncDefaultsServiceStub ko);
+		public delegate global::System.Threading.Tasks.Task<int> GetCountAsyncDelegate();
 
 		private GetCountAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -293,20 +293,20 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<int> Invoke(AsyncDefaultsServiceStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task<int> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -467,7 +467,7 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IAsyncDefaultsService? _source;
 
 		/// <summary>Delegate for CompleteAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task CompleteAsyncDelegate(AsyncDefaultsServiceStub ko);
+		public delegate global::System.Threading.Tasks.Task CompleteAsyncDelegate();
 
 		private CompleteAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -514,20 +514,20 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(AsyncDefaultsServiceStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -688,7 +688,7 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IAsyncDefaultsService? _source;
 
 		/// <summary>Delegate for IsValidAsync.</summary>
-		public delegate global::System.Threading.Tasks.ValueTask<bool> IsValidAsyncDelegate(AsyncDefaultsServiceStub ko);
+		public delegate global::System.Threading.Tasks.ValueTask<bool> IsValidAsyncDelegate();
 
 		private IsValidAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -735,20 +735,20 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.ValueTask<bool> Invoke(AsyncDefaultsServiceStub ko, bool strict)
+		internal global::System.Threading.Tasks.ValueTask<bool> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -962,22 +962,22 @@ partial class AsyncDefaultsServiceStub : global::KnockOff.Documentation.Samples.
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> global::KnockOff.Documentation.Samples.SmartDefaults.IAsyncDefaultsService.GetUserAsync(int id)
 	{
-		return GetUserAsync.Invoke(this, Strict, id);
+		return GetUserAsync.Invoke(Strict, id);
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Documentation.Samples.SmartDefaults.IAsyncDefaultsService.GetCountAsync()
 	{
-		return GetCountAsync.Invoke(this, Strict);
+		return GetCountAsync.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.SmartDefaults.IAsyncDefaultsService.CompleteAsync()
 	{
-		return CompleteAsync.Invoke(this, Strict);
+		return CompleteAsync.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.ValueTask<bool> global::KnockOff.Documentation.Samples.SmartDefaults.IAsyncDefaultsService.IsValidAsync()
 	{
-		return IsValidAsync.Invoke(this, Strict);
+		return IsValidAsync.Invoke(Strict);
 	}
 
 }

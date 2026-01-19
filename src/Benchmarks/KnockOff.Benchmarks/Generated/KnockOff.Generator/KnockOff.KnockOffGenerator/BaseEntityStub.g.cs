@@ -19,7 +19,7 @@ partial class BaseEntityStub : global::KnockOff.Benchmarks.Interfaces.IBaseEntit
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<BaseEntityStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -106,7 +106,7 @@ partial class BaseEntityStub : global::KnockOff.Benchmarks.Interfaces.IBaseEntit
 
 	int global::KnockOff.Benchmarks.Interfaces.IBaseEntity.Id
 	{
-		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
 	}
 
 }

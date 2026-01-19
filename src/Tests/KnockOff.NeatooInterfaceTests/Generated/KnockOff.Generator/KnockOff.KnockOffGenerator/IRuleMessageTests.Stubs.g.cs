@@ -19,7 +19,7 @@ partial class IRuleMessageTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IRuleMessage, uint>? OnGet { get; set; }
+			public global::System.Func<uint>? OnGet { get; set; }
 
 			private uint _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class IRuleMessageTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IRuleMessage, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class IRuleMessageTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IRuleMessage, string?>? OnGet { get; set; }
+			public global::System.Func<string?>? OnGet { get; set; }
 
 			private string? _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -268,7 +268,7 @@ partial class IRuleMessageTests
 				get
 				{
 					RuleIndex.RecordGet();
-					if (RuleIndex.OnGet is { } onGet) return onGet(this);
+					if (RuleIndex.OnGet is { } onGet) return onGet();
 					if (RuleIndex._source is { } src) return src.RuleIndex;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex");
 					return RuleIndex.Value;
@@ -280,7 +280,7 @@ partial class IRuleMessageTests
 				get
 				{
 					PropertyName.RecordGet();
-					if (PropertyName.OnGet is { } onGet) return onGet(this);
+					if (PropertyName.OnGet is { } onGet) return onGet();
 					if (PropertyName._source is { } src) return src.PropertyName;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName");
 					return PropertyName.Value;
@@ -292,7 +292,7 @@ partial class IRuleMessageTests
 				get
 				{
 					Message.RecordGet();
-					if (Message.OnGet is { } onGet) return onGet(this);
+					if (Message.OnGet is { } onGet) return onGet();
 					if (Message._source is { } src) return src.Message;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message");
 					return Message.Value;

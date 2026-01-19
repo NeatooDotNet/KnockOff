@@ -54,7 +54,7 @@ public partial class IRequiredRuleTests
         var stub = new Stubs.IRequiredRule();
         IRequiredRule rule = stub;
 
-        stub.ErrorMessage.OnGet = (ko) => "Dynamic error message";
+        stub.ErrorMessage.OnGet = () => "Dynamic error message";
 
         Assert.Equal("Dynamic error message", rule.ErrorMessage);
     }
@@ -136,7 +136,7 @@ public partial class IRequiredRuleTests
         var validateStub = new ValidateBaseStubForRequiredRule();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule.OnCall((ko, target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.OnCall((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(validateStub, null);
 
@@ -152,7 +152,7 @@ public partial class IRequiredRuleTests
         var errorMessages = new RuleMessages();
         errorMessages.Add("Name", "Name is required.");
 
-        stub.RunRule.OnCall((ko, target, token) => Task.FromResult<IRuleMessages>(errorMessages));
+        stub.RunRule.OnCall((target, token) => Task.FromResult<IRuleMessages>(errorMessages));
 
         var validateStub = new ValidateBaseStubForRequiredRule();
         var result = await rule.RunRule(validateStub, null);

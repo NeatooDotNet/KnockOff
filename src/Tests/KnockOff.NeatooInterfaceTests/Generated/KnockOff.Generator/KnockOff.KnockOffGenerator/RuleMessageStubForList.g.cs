@@ -19,7 +19,7 @@ partial class RuleMessageStubForList : global::Neatoo.Rules.IRuleMessage, global
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<RuleMessageStubForList, uint>? OnGet { get; set; }
+		public global::System.Func<uint>? OnGet { get; set; }
 
 		private uint _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class RuleMessageStubForList : global::Neatoo.Rules.IRuleMessage, global
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<RuleMessageStubForList, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class RuleMessageStubForList : global::Neatoo.Rules.IRuleMessage, global
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<RuleMessageStubForList, string?>? OnGet { get; set; }
+		public global::System.Func<string?>? OnGet { get; set; }
 
 		private string? _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -276,17 +276,17 @@ partial class RuleMessageStubForList : global::Neatoo.Rules.IRuleMessage, global
 
 	uint global::Neatoo.Rules.IRuleMessage.RuleIndex
 	{
-		get { RuleIndex.RecordGet(); if (RuleIndex.OnGet is { } onGet) return onGet(this); if (RuleIndex._source is { } src) return src.RuleIndex; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex"); return RuleIndex.Value; }
+		get { RuleIndex.RecordGet(); if (RuleIndex.OnGet is { } onGet) return onGet(); if (RuleIndex._source is { } src) return src.RuleIndex; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex"); return RuleIndex.Value; }
 	}
 
 	string global::Neatoo.Rules.IRuleMessage.PropertyName
 	{
-		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (PropertyName._source is { } src) return src.PropertyName; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName"); return PropertyName.Value; }
+		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(); if (PropertyName._source is { } src) return src.PropertyName; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName"); return PropertyName.Value; }
 	}
 
 	string? global::Neatoo.Rules.IRuleMessage.Message
 	{
-		get { Message.RecordGet(); if (Message.OnGet is { } onGet) return onGet(this); if (Message._source is { } src) return src.Message; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message"); return Message.Value; }
+		get { Message.RecordGet(); if (Message.OnGet is { } onGet) return onGet(); if (Message._source is { } src) return src.Message; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message"); return Message.Value; }
 	}
 
 }

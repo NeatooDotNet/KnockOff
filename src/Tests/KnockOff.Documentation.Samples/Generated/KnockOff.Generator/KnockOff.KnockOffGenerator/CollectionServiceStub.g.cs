@@ -12,7 +12,7 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService? _source;
 
 		/// <summary>Delegate for GetUsers.</summary>
-		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.User> GetUsersDelegate(CollectionServiceStub ko);
+		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.User> GetUsersDelegate();
 
 		private GetUsersDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.User> Invoke(CollectionServiceStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.User> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -233,7 +233,7 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService? _source;
 
 		/// <summary>Delegate for GetTags.</summary>
-		public delegate global::System.Collections.Generic.IList<string> GetTagsDelegate(CollectionServiceStub ko);
+		public delegate global::System.Collections.Generic.IList<string> GetTagsDelegate();
 
 		private GetTagsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -280,20 +280,20 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IList<string> Invoke(CollectionServiceStub ko, bool strict)
+		internal global::System.Collections.Generic.IList<string> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -454,7 +454,7 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService? _source;
 
 		/// <summary>Delegate for GetIds.</summary>
-		public delegate global::System.Collections.Generic.IReadOnlyList<int> GetIdsDelegate(CollectionServiceStub ko);
+		public delegate global::System.Collections.Generic.IReadOnlyList<int> GetIdsDelegate();
 
 		private GetIdsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -501,20 +501,20 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IReadOnlyList<int> Invoke(CollectionServiceStub ko, bool strict)
+		internal global::System.Collections.Generic.IReadOnlyList<int> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -675,7 +675,7 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService? _source;
 
 		/// <summary>Delegate for GetMetadata.</summary>
-		public delegate global::System.Collections.Generic.IDictionary<string, string> GetMetadataDelegate(CollectionServiceStub ko);
+		public delegate global::System.Collections.Generic.IDictionary<string, string> GetMetadataDelegate();
 
 		private GetMetadataDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -722,20 +722,20 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IDictionary<string, string> Invoke(CollectionServiceStub ko, bool strict)
+		internal global::System.Collections.Generic.IDictionary<string, string> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -896,7 +896,7 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService? _source;
 
 		/// <summary>Delegate for GetUniqueKeys.</summary>
-		public delegate global::System.Collections.Generic.ISet<string> GetUniqueKeysDelegate(CollectionServiceStub ko);
+		public delegate global::System.Collections.Generic.ISet<string> GetUniqueKeysDelegate();
 
 		private GetUniqueKeysDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -943,20 +943,20 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.ISet<string> Invoke(CollectionServiceStub ko, bool strict)
+		internal global::System.Collections.Generic.ISet<string> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1176,27 +1176,27 @@ partial class CollectionServiceStub : global::KnockOff.Documentation.Samples.Sma
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Documentation.Samples.User> global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService.GetUsers()
 	{
-		return GetUsers.Invoke(this, Strict);
+		return GetUsers.Invoke(Strict);
 	}
 
 	global::System.Collections.Generic.IList<string> global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService.GetTags()
 	{
-		return GetTags.Invoke(this, Strict);
+		return GetTags.Invoke(Strict);
 	}
 
 	global::System.Collections.Generic.IReadOnlyList<int> global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService.GetIds()
 	{
-		return GetIds.Invoke(this, Strict);
+		return GetIds.Invoke(Strict);
 	}
 
 	global::System.Collections.Generic.IDictionary<string, string> global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService.GetMetadata()
 	{
-		return GetMetadata.Invoke(this, Strict);
+		return GetMetadata.Invoke(Strict);
 	}
 
 	global::System.Collections.Generic.ISet<string> global::KnockOff.Documentation.Samples.SmartDefaults.ICollectionService.GetUniqueKeys()
 	{
-		return GetUniqueKeys.Invoke(this, Strict);
+		return GetUniqueKeys.Invoke(Strict);
 	}
 
 }

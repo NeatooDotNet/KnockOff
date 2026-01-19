@@ -19,7 +19,7 @@ partial class OpenGenericInterfaceTest
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IOGRepository<T>, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -95,10 +95,10 @@ partial class OpenGenericInterfaceTest
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Tests.IOGRepository<T>? _source;
 
-			private global::System.Action<Stubs.IOGRepository<T>, T>? _onCall;
+			private global::System.Action<T>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IOGRepository<T>, T> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -118,7 +118,7 @@ partial class OpenGenericInterfaceTest
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<Stubs.IOGRepository<T>, T> callback)
+			public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<T> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -130,13 +130,13 @@ partial class OpenGenericInterfaceTest
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IOGRepository<T>, T>> OnCallSequence(global::System.Action<Stubs.IOGRepository<T>, T> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> OnCallSequence(global::System.Action<T> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IOGRepository<T>, T> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -144,21 +144,21 @@ partial class OpenGenericInterfaceTest
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IOGRepository<T> ko, T item)
+			internal void Invoke(bool strict, T item)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(item);
 					_sequenceIndex++;
-					callback(ko, item);
+					callback(item);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(item);
-					_onCall(ko, item);
+					_onCall(item);
 					return;
 				}
 
@@ -166,14 +166,14 @@ partial class OpenGenericInterfaceTest
 				_unconfiguredLastArg = item;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Add(item); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return;
 			}
 
@@ -268,7 +268,7 @@ partial class OpenGenericInterfaceTest
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IOGRepository<T>, T>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<T>>
 			{
 				private readonly IOGRepository_AddInterceptor<T> _interceptor;
 
@@ -288,7 +288,7 @@ partial class OpenGenericInterfaceTest
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IOGRepository<T>, T>> ThenCall(global::System.Action<Stubs.IOGRepository<T>, T> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<T>> ThenCall(global::System.Action<T> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -309,7 +309,7 @@ partial class OpenGenericInterfaceTest
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IOGRepository<T>, T>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<T>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -329,7 +329,7 @@ partial class OpenGenericInterfaceTest
 			internal global::KnockOff.Tests.IOGRepository<T>? _source;
 
 			/// <summary>Delegate for GetById.</summary>
-			public delegate T? GetByIdDelegate(Stubs.IOGRepository<T> ko, int id);
+			public delegate T? GetByIdDelegate(int id);
 
 			private GetByIdDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -380,34 +380,34 @@ partial class OpenGenericInterfaceTest
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal T? Invoke(Stubs.IOGRepository<T> ko, int id)
+			internal T? Invoke(bool strict, int id)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(id);
 					_sequenceIndex++;
-					return callback(ko, id);
+					return callback(id);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(id);
-					return _onCall(ko, id);
+					return _onCall(id);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetById");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetById");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetById(id);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
 
@@ -563,7 +563,7 @@ partial class OpenGenericInterfaceTest
 			internal global::KnockOff.Tests.IOGRepository<T>? _source;
 
 			/// <summary>Delegate for GetAll.</summary>
-			public delegate global::System.Collections.Generic.IEnumerable<T> GetAllDelegate(Stubs.IOGRepository<T> ko);
+			public delegate global::System.Collections.Generic.IEnumerable<T> GetAllDelegate();
 
 			private GetAllDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -610,33 +610,33 @@ partial class OpenGenericInterfaceTest
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IEnumerable<T> Invoke(Stubs.IOGRepository<T> ko)
+			internal global::System.Collections.Generic.IEnumerable<T> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetAll");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetAll");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetAll();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAll");
 				throw new global::System.InvalidOperationException("No implementation provided for GetAll. Configure via OnCall.");
 			}
 
@@ -797,7 +797,7 @@ partial class OpenGenericInterfaceTest
 				get
 				{
 					Count.RecordGet();
-					if (Count.OnGet is { } onGet) return onGet(this);
+					if (Count.OnGet is { } onGet) return onGet();
 					if (Count._source is { } src) return src.Count;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IOGRepository<T>", "Count");
 					return Count.Value;
@@ -806,17 +806,17 @@ partial class OpenGenericInterfaceTest
 
 			void global::KnockOff.Tests.IOGRepository<T>.Add(T item)
 			{
-				Add.Invoke(this, item);
+				Add.Invoke(Strict, item);
 			}
 
 			T? global::KnockOff.Tests.IOGRepository<T>.GetById(int id)
 			{
-				return GetById.Invoke(this, id);
+				return GetById.Invoke(Strict, id);
 			}
 
 			global::System.Collections.Generic.IEnumerable<T> global::KnockOff.Tests.IOGRepository<T>.GetAll()
 			{
-				return GetAll.Invoke(this);
+				return GetAll.Invoke(Strict);
 			}
 
 			/// <summary>The global::KnockOff.Tests.IOGRepository<T> instance. Use for passing to code expecting the interface.</summary>

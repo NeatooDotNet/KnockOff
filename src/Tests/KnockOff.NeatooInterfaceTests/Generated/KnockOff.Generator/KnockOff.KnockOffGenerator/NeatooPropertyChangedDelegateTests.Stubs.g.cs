@@ -21,7 +21,7 @@ partial class NeatooPropertyChangedDelegateTests
 			public global::Neatoo.NeatooPropertyChangedEventArgs? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.NeatooPropertyChanged, global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task>? OnCall { get; set; }
+			public global::System.Func<global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task>? OnCall { get; set; }
 
 			public void RecordCall(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) { CallCount++; LastCallArg = propertyNameBreadCrumbs; }
 
@@ -40,7 +40,7 @@ partial class NeatooPropertyChangedDelegateTests
 			private global::System.Threading.Tasks.Task Invoke(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs)
 			{
 				Interceptor.RecordCall(propertyNameBreadCrumbs);
-				if (Interceptor.OnCall is { } onCall) return onCall(this, propertyNameBreadCrumbs);
+				if (Interceptor.OnCall is { } onCall) return onCall(propertyNameBreadCrumbs);
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 

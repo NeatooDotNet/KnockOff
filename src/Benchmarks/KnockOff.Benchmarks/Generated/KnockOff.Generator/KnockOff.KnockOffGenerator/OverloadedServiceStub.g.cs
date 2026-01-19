@@ -14,7 +14,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(int).</summary>
-		public delegate void ProcessDelegate_Int32_void(OverloadedServiceStub ko, int @value);
+		public delegate void ProcessDelegate_Int32_void(int @value);
 
 		private ProcessDelegate_Int32_void? _onCall_Int32_void;
 		private MethodTrackingImpl_Int32_void? _onCallTracking_Int32_void;
@@ -26,7 +26,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private global::KnockOff.Times? _verifiableTimes_Int32_void;
 
 		/// <summary>Delegate for Process(string).</summary>
-		public delegate void ProcessDelegate_String_void(OverloadedServiceStub ko, string @value);
+		public delegate void ProcessDelegate_String_void(string @value);
 
 		private ProcessDelegate_String_void? _onCall_String_void;
 		private MethodTrackingImpl_String_void? _onCallTracking_String_void;
@@ -38,7 +38,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private global::KnockOff.Times? _verifiableTimes_String_void;
 
 		/// <summary>Delegate for Process(int, int).</summary>
-		public delegate void ProcessDelegate_Int32_Int32_void(OverloadedServiceStub ko, int a, int b);
+		public delegate void ProcessDelegate_Int32_Int32_void(int a, int b);
 
 		private ProcessDelegate_Int32_Int32_void? _onCall_Int32_Int32_void;
 		private MethodTrackingImpl_Int32_Int32_void? _onCallTracking_Int32_Int32_void;
@@ -134,21 +134,21 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		}
 
 		/// <summary>Invokes configured callback for Process(int).</summary>
-		internal void Invoke_Int32_void(OverloadedServiceStub ko, bool strict, int @value)
+		internal void Invoke_Int32_void(bool strict, int @value)
 		{
 			if (_sequence_Int32_void != null && _sequenceIndex_Int32_void < _sequence_Int32_void.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_void[_sequenceIndex_Int32_void];
 				tracking.RecordCall(@value);
 				_sequenceIndex_Int32_void++;
-				callback(ko, @value);
+				callback(@value);
 				return;
 			}
 
 			if (_onCall_Int32_void != null && _onCallTracking_Int32_void != null)
 			{
 				_onCallTracking_Int32_void.RecordCall(@value);
-				_onCall_Int32_void(ko, @value);
+				_onCall_Int32_void(@value);
 				return;
 			}
 
@@ -167,21 +167,21 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		}
 
 		/// <summary>Invokes configured callback for Process(string).</summary>
-		internal void Invoke_String_void(OverloadedServiceStub ko, bool strict, string @value)
+		internal void Invoke_String_void(bool strict, string @value)
 		{
 			if (_sequence_String_void != null && _sequenceIndex_String_void < _sequence_String_void.Count)
 			{
 				var (callback, tracking) = _sequence_String_void[_sequenceIndex_String_void];
 				tracking.RecordCall(@value);
 				_sequenceIndex_String_void++;
-				callback(ko, @value);
+				callback(@value);
 				return;
 			}
 
 			if (_onCall_String_void != null && _onCallTracking_String_void != null)
 			{
 				_onCallTracking_String_void.RecordCall(@value);
-				_onCall_String_void(ko, @value);
+				_onCall_String_void(@value);
 				return;
 			}
 
@@ -200,21 +200,21 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		}
 
 		/// <summary>Invokes configured callback for Process(int, int).</summary>
-		internal void Invoke_Int32_Int32_void(OverloadedServiceStub ko, bool strict, int a, int b)
+		internal void Invoke_Int32_Int32_void(bool strict, int a, int b)
 		{
 			if (_sequence_Int32_Int32_void != null && _sequenceIndex_Int32_Int32_void < _sequence_Int32_Int32_void.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_Int32_void[_sequenceIndex_Int32_Int32_void];
 				tracking.RecordCall((a, b));
 				_sequenceIndex_Int32_Int32_void++;
-				callback(ko, a, b);
+				callback(a, b);
 				return;
 			}
 
 			if (_onCall_Int32_Int32_void != null && _onCallTracking_Int32_Int32_void != null)
 			{
 				_onCallTracking_Int32_Int32_void.RecordCall((a, b));
-				_onCall_Int32_Int32_void(ko, a, b);
+				_onCall_Int32_Int32_void(a, b);
 				return;
 			}
 
@@ -643,7 +643,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Calculate(int).</summary>
-		public delegate int CalculateDelegate_Int32_Int32(OverloadedServiceStub ko, int @value);
+		public delegate int CalculateDelegate_Int32_Int32(int @value);
 
 		private CalculateDelegate_Int32_Int32? _onCall_Int32_Int32;
 		private MethodTrackingImpl_Int32_Int32? _onCallTracking_Int32_Int32;
@@ -655,7 +655,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private global::KnockOff.Times? _verifiableTimes_Int32_Int32;
 
 		/// <summary>Delegate for Calculate(int, int).</summary>
-		public delegate int CalculateDelegate_Int32_Int32_Int32(OverloadedServiceStub ko, int a, int b);
+		public delegate int CalculateDelegate_Int32_Int32_Int32(int a, int b);
 
 		private CalculateDelegate_Int32_Int32_Int32? _onCall_Int32_Int32_Int32;
 		private MethodTrackingImpl_Int32_Int32_Int32? _onCallTracking_Int32_Int32_Int32;
@@ -725,20 +725,20 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		}
 
 		/// <summary>Invokes configured callback for Calculate(int).</summary>
-		internal int Invoke_Int32_Int32(OverloadedServiceStub ko, bool strict, int @value)
+		internal int Invoke_Int32_Int32(bool strict, int @value)
 		{
 			if (_sequence_Int32_Int32 != null && _sequenceIndex_Int32_Int32 < _sequence_Int32_Int32.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_Int32[_sequenceIndex_Int32_Int32];
 				tracking.RecordCall(@value);
 				_sequenceIndex_Int32_Int32++;
-				return callback(ko, @value);
+				return callback(@value);
 			}
 
 			if (_onCall_Int32_Int32 != null && _onCallTracking_Int32_Int32 != null)
 			{
 				_onCallTracking_Int32_Int32.RecordCall(@value);
-				return _onCall_Int32_Int32(ko, @value);
+				return _onCall_Int32_Int32(@value);
 			}
 
 			_unconfiguredCallCount++;
@@ -756,20 +756,20 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		}
 
 		/// <summary>Invokes configured callback for Calculate(int, int).</summary>
-		internal int Invoke_Int32_Int32_Int32(OverloadedServiceStub ko, bool strict, int a, int b)
+		internal int Invoke_Int32_Int32_Int32(bool strict, int a, int b)
 		{
 			if (_sequence_Int32_Int32_Int32 != null && _sequenceIndex_Int32_Int32_Int32 < _sequence_Int32_Int32_Int32.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_Int32_Int32[_sequenceIndex_Int32_Int32_Int32];
 				tracking.RecordCall((a, b));
 				_sequenceIndex_Int32_Int32_Int32++;
-				return callback(ko, a, b);
+				return callback(a, b);
 			}
 
 			if (_onCall_Int32_Int32_Int32 != null && _onCallTracking_Int32_Int32_Int32 != null)
 			{
 				_onCallTracking_Int32_Int32_Int32.RecordCall((a, b));
-				return _onCall_Int32_Int32_Int32(ko, a, b);
+				return _onCall_Int32_Int32_Int32(a, b);
 			}
 
 			_unconfiguredCallCount++;
@@ -1111,27 +1111,27 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int @value)
 	{
-		Process.Invoke_Int32_void(this, Strict, @value);
+		Process.Invoke_Int32_void(Strict, @value);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(string @value)
 	{
-		Process.Invoke_String_void(this, Strict, @value);
+		Process.Invoke_String_void(Strict, @value);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int a, int b)
 	{
-		Process.Invoke_Int32_Int32_void(this, Strict, a, b);
+		Process.Invoke_Int32_Int32_void(Strict, a, b);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Calculate(int @value)
 	{
-		return Calculate.Invoke_Int32_Int32(this, Strict, @value);
+		return Calculate.Invoke_Int32_Int32(Strict, @value);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Calculate(int a, int b)
 	{
-		return Calculate.Invoke_Int32_Int32_Int32(this, Strict, a, b);
+		return Calculate.Invoke_Int32_Int32_Int32(Strict, a, b);
 	}
 
 }

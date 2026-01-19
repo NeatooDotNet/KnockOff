@@ -19,7 +19,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<GenericRepositoryStub<T>, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		public int? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<GenericRepositoryStub<T>, int>? OnSet { get; set; }
+		public global::System.Action<int>? OnSet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -115,7 +115,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		internal global::KnockOff.Tests.IGenericRepository<T>? _source;
 
 		/// <summary>Delegate for GetById.</summary>
-		public delegate T? GetByIdDelegate(GenericRepositoryStub<T> ko, int id);
+		public delegate T? GetByIdDelegate(int id);
 
 		private GetByIdDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -166,20 +166,20 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal T? Invoke(GenericRepositoryStub<T> ko, bool strict, int id)
+		internal T? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -348,10 +348,10 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.IGenericRepository<T>? _source;
 
-		private global::System.Action<GenericRepositoryStub<T>, T>? _onCall;
+		private global::System.Action<T>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<GenericRepositoryStub<T>, T> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -371,7 +371,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<GenericRepositoryStub<T>, T> callback)
+		public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<T> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -383,13 +383,13 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<GenericRepositoryStub<T>, T>> OnCallSequence(global::System.Action<GenericRepositoryStub<T>, T> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<T>> OnCallSequence(global::System.Action<T> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<GenericRepositoryStub<T>, T> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -397,21 +397,21 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(GenericRepositoryStub<T> ko, bool strict, T entity)
+		internal void Invoke(bool strict, T entity)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(entity);
 				_sequenceIndex++;
-				callback(ko, entity);
+				callback(entity);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(entity);
-				_onCall(ko, entity);
+				_onCall(entity);
 				return;
 			}
 
@@ -521,7 +521,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<GenericRepositoryStub<T>, T>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<T>>
 		{
 			private readonly SaveInterceptor _interceptor;
 
@@ -541,7 +541,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<GenericRepositoryStub<T>, T>> ThenCall(global::System.Action<GenericRepositoryStub<T>, T> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> ThenCall(global::System.Action<T> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -562,7 +562,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<GenericRepositoryStub<T>, T>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -582,7 +582,7 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		internal global::KnockOff.Tests.IGenericRepository<T>? _source;
 
 		/// <summary>Delegate for GetAll.</summary>
-		public delegate global::System.Collections.Generic.IEnumerable<T> GetAllDelegate(GenericRepositoryStub<T> ko);
+		public delegate global::System.Collections.Generic.IEnumerable<T> GetAllDelegate();
 
 		private GetAllDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -629,20 +629,20 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IEnumerable<T> Invoke(GenericRepositoryStub<T> ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerable<T> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -856,23 +856,23 @@ partial class GenericRepositoryStub<T> : global::KnockOff.Tests.IGenericReposito
 
 	int global::KnockOff.Tests.IGenericRepository<T>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); return Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Count._source is { } src) { src.Count = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); Count.Value = value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(value); return; } if (Count._source is { } src) { src.Count = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericRepository<T>", "Count"); Count.Value = value; }
 	}
 
 	T? global::KnockOff.Tests.IGenericRepository<T>.GetById(int id)
 	{
-		return GetById.Invoke(this, Strict, id);
+		return GetById.Invoke(Strict, id);
 	}
 
 	void global::KnockOff.Tests.IGenericRepository<T>.Save(T entity)
 	{
-		Save.Invoke(this, Strict, entity);
+		Save.Invoke(Strict, entity);
 	}
 
 	global::System.Collections.Generic.IEnumerable<T> global::KnockOff.Tests.IGenericRepository<T>.GetAll()
 	{
-		return GetAll.Invoke(this, Strict);
+		return GetAll.Invoke(Strict);
 	}
 
 }

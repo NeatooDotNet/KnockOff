@@ -100,7 +100,7 @@ public class DynamicGetterTests
         var stub = new TimeProviderPropsStub();
 
         // OnGet callback returns dynamic value on each access
-        stub.Timestamp.OnGet = (ko) => DateTime.UtcNow;
+        stub.Timestamp.OnGet = () => DateTime.UtcNow;
 
         ITimeProviderProps timeProvider = stub;
 
@@ -120,8 +120,8 @@ public class DynamicGetterTests
         var stub = new ServiceWithInitPropsStub();
 
         // OnGet checks if Initialize() was called via interceptor CallCount
-        stub.IsReady.OnGet = (ko) => stub.Initialize.CallCount > 0;
-        var initTracking = stub.Initialize.OnCall((ko) => { });
+        stub.IsReady.OnGet = () => stub.Initialize.CallCount > 0;
+        var initTracking = stub.Initialize.OnCall(() => { });
 
         IServiceWithInitProps service = stub;
 
@@ -148,7 +148,7 @@ public class SetterInterceptionTests
         var stub = new ConfigPropsStub();
 
         var setValues = new List<string>();
-        stub.Name.OnSet = (ko, value) => setValues.Add(value);
+        stub.Name.OnSet = (value) => setValues.Add(value);
 
         IConfigProps config = stub;
 
@@ -168,7 +168,7 @@ public class SetterInterceptionTests
         var stub = new ConfigPropsStub();
 
         // OnSet throws for invalid values
-        stub.Age.OnSet = (ko, value) =>
+        stub.Age.OnSet = (value) =>
         {
             if (value < 0)
                 throw new ArgumentException("Age cannot be negative");
@@ -231,17 +231,18 @@ public class PropertyVerificationTests
     {
         var stub = new ConfigPropsStub();
 
-        // Mark property get/set as verifiable
+        // Mark property as verifiable
         stub.Name.Value = "test";
-        stub.Name.MarkVerifiableGet();
-        stub.Age.MarkVerifiableSet();
+        stub.Name.Verifiable();
+        stub.Age.Verifiable();
 
         IConfigProps service = stub;
         _ = service.Name;
         service.Age = 42;
 
-        // Verify all marked properties
-        stub.Verify();
+        // Verify individually (standalone stubs verify at interceptor level)
+        stub.Name.Verify();
+        stub.Age.Verify();
     }
     #endregion
 }
@@ -295,7 +296,7 @@ public class PropertyPriorityTests
         stub.Name.Value = "initial";
 
         // Then set OnGet - it takes precedence
-        stub.Name.OnGet = (ko) => "dynamic";
+        stub.Name.OnGet = () => "dynamic";
 
         IConfigProps config = stub;
 
@@ -332,14 +333,14 @@ public class CompletePropertyExampleTests
         stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
         // OnGet: State-dependent behavior
-        stub.IsConnected.OnGet = (ko) => stub.Connect.CallCount > 0;
+        stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
 
         // OnSet: Track all values written
         var connectionStrings = new List<string>();
-        stub.ConnectionString.OnSet = (ko, value) => connectionStrings.Add(value);
+        stub.ConnectionString.OnSet = (value) => connectionStrings.Add(value);
 
         // Configure the Connect method
-        var connectTracking = stub.Connect.OnCall((ko) => { });
+        var connectTracking = stub.Connect.OnCall(() => { });
 
         IUserConfigComplete service = stub;
 

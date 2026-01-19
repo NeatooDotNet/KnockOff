@@ -68,7 +68,7 @@ public partial class InlineInterfacePatternTests
         // Generated stub: Stubs.IAttrUserRepository
         var stub = new Stubs.IAttrUserRepository();
 
-        stub.GetById.OnCall((ko, id) => new User { Id = id, Name = "Inline User" });
+        stub.GetById.OnCall((id) => new User { Id = id, Name = "Inline User" });
 
         IAttrUserRepository repository = stub;
         var user = repository.GetById(1);
@@ -113,12 +113,12 @@ public partial class InlineClassPatternTests
         // .Object property returns the stub as the base class type
         EmailServiceBase service = stub.Object;
 
-        // Can intercept virtual members
-        stub.Send.OnCall((ko, to, subject, body) => { });
+        // Can intercept virtual members and mark verifiable
+        stub.Send.OnCall((to, subject, body) => { }).Verifiable();
 
         service.Send("test@example.com", "Hello", "World");
 
-        Assert.True(stub.Send.WasCalled);
+        stub.Verify();
     }
 }
 ```
@@ -158,10 +158,10 @@ public partial class MultipleStubsPatternTests
         var emailService = new Stubs.IAttrEmailService();
         var logger = new Stubs.IAttrLogger();
 
-        // Configure each stub independently
-        userRepo.GetById.OnCall((ko, id) => new User { Id = id, Name = "Test" });
-        emailService.Send.OnCall((ko, to, subject, body) => { });
-        logger.Log.OnCall((ko, message) => { });
+        // Configure each stub independently with verifiable
+        userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        emailService.Send.OnCall((to, subject, body) => { }).Verifiable();
+        logger.Log.OnCall((message) => { }).Verifiable();
 
         // Use in tests
         IAttrUserRepository repo = userRepo;
@@ -172,9 +172,10 @@ public partial class MultipleStubsPatternTests
         email.Send("a@b.com", "Subject", "Body");
         log.Log("Test message");
 
-        Assert.True(userRepo.GetById.WasCalled);
-        Assert.True(emailService.Send.WasCalled);
-        Assert.True(logger.Log.WasCalled);
+        // Verify all stubs
+        userRepo.Verify();
+        emailService.Verify();
+        logger.Verify();
     }
 }
 ```

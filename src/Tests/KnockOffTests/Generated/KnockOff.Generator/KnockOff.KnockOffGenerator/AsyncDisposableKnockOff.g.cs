@@ -12,7 +12,7 @@ partial class AsyncDisposableKnockOff : global::System.IAsyncDisposable, global:
 		internal global::System.IAsyncDisposable? _source;
 
 		/// <summary>Delegate for DisposeAsync.</summary>
-		public delegate global::System.Threading.Tasks.ValueTask DisposeAsyncDelegate(AsyncDisposableKnockOff ko);
+		public delegate global::System.Threading.Tasks.ValueTask DisposeAsyncDelegate();
 
 		private DisposeAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class AsyncDisposableKnockOff : global::System.IAsyncDisposable, global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.ValueTask Invoke(AsyncDisposableKnockOff ko, bool strict)
+		internal global::System.Threading.Tasks.ValueTask Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -268,7 +268,7 @@ partial class AsyncDisposableKnockOff : global::System.IAsyncDisposable, global:
 
 	global::System.Threading.Tasks.ValueTask global::System.IAsyncDisposable.DisposeAsync()
 	{
-		return DisposeAsync.Invoke(this, Strict);
+		return DisposeAsync.Invoke(Strict);
 	}
 
 }

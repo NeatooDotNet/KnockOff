@@ -43,7 +43,7 @@ public void ClassStub_RequiresObjectProperty()
     var stub = new Stubs.EmailService();
 
     // Configure the stub
-    stub.Send.OnCall((ko, to, subject) => true);
+    stub.Send.OnCall((to, subject) => true);
 
     // ERROR (commented out): Cannot pass stub directly
     // Method expects EmailService, not Stubs.EmailService
@@ -67,7 +67,7 @@ private void UseEmailService(EmailService service)
 public void PassingStubObjectToMethod()
 {
     var stub = new Stubs.EmailService();
-    stub.Send.OnCall((ko, to, subject) => true);
+    stub.Send.OnCall((to, subject) => true);
 
     // Pass stub.Object to method expecting EmailService
     UseEmailService(stub.Object);
@@ -81,32 +81,32 @@ public void PassingStubObjectToMethod()
 
 ### Error: No overload matches delegate
 
-**Cause:** The OnCall callback signature is incorrect. The first parameter must always be the stub instance (`ko`).
+**Cause:** The OnCall callback signature doesn't match the method's parameters.
 
-All OnCall callbacks receive the stub instance as the first parameter, followed by any method parameters. This is the "ko parameter" that gives you access to the interceptor APIs.
+OnCall callbacks receive only the method's parameters - they do not receive the stub instance as a parameter.
 
-**Solution:** Include the stub instance as the first parameter in your OnCall signature.
+**Solution:** Ensure your callback signature matches the method parameters exactly.
 
 <!-- snippet: troubleshoot-oncall-signature -->
 ```cs
 [Fact]
-public void OnCallSignature_KoParameterFirst()
+public void OnCallSignature_MatchesMethodParams()
 {
     var stub = new TroubleshootRepoStub();
 
-    // ERROR (won't compile): Missing ko parameter
-    // stub.GetByIdAsync.OnCall((id) => Task.FromResult<User?>(null));
-
-    // CORRECT: Include ko as first parameter
-    stub.GetByIdAsync.OnCall((ko, id) =>
+    // CORRECT: Callback receives only the method parameter (id)
+    stub.GetByIdAsync.OnCall((id) =>
         Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 
-    // The ko parameter gives access to the stub instance
-    // Useful for accessing other interceptors or state
-    stub.GetByIdAsync.OnCall((ko, id) =>
+    // For methods with multiple parameters, include all of them
+    stub.FindAsync.OnCall((name, active) =>
+        Task.FromResult(new List<User>()));
+
+    // To access the stub inside a callback, use closure
+    stub.GetByIdAsync.OnCall((id) =>
     {
-        // Can access other interceptors via ko
-        // ko is the stub instance itself
+        // Access stub via closure (not a callback parameter)
+        var wasCached = stub.GetFromCache.WasCalled;
         return Task.FromResult<User?>(new User { Id = id });
     });
 }
@@ -143,7 +143,7 @@ public void MethodWithoutCallback_UsesSmartDefaults()
     Assert.Null(user);
 
     // For non-nullable string, configure explicitly:
-    stub.GetName.OnCall((ko) => "Configured Name");
+    stub.GetName.OnCall(() => "Configured Name");
     var name = repository.GetName();
     Assert.Equal("Configured Name", name);
 }
@@ -159,7 +159,7 @@ public void FixOptions_ForRequiredReturnValues()
     Assert.Equal("localhost", config.Host);
 
     // Fix Option 2: Use OnGet for dynamic behavior
-    stub.Port.OnGet = (ko) => 8080;
+    stub.Port.OnGet = () => 8080;
     Assert.Equal(8080, config.Port);
 }
 ```
@@ -186,7 +186,7 @@ public void Value_TakesPrecedence_WhenBothConfigured()
     IConfigSvc config = stub;
 
     // Configure OnGet
-    stub.Host.OnGet = (ko) => "from-callback";
+    stub.Host.OnGet = () => "from-callback";
 
     // Access uses OnGet
     Assert.Equal("from-callback", config.Host);
@@ -222,7 +222,7 @@ public void Understanding_Property_Priority()
     Assert.Equal(80, config.Port);
 
     // OnGet overrides Value
-    stub.Port.OnGet = (ko) => 443;
+    stub.Port.OnGet = () => 443;
     Assert.Equal(443, config.Port);
 
     // Clear OnGet to use Value again

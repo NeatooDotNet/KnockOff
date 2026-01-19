@@ -42,7 +42,7 @@ public class TaskMethodTests
         var stub = new AsyncUserSvcStub();
 
         // Use Task.FromResult to return a value synchronously
-        stub.GetUserAsync.OnCall((ko, id) =>
+        stub.GetUserAsync.OnCall((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 
         IAsyncUserSvc service = stub;
@@ -63,7 +63,7 @@ public class TaskMethodTests
         var updatedUsers = new List<User>();
 
         // Use Task.CompletedTask for async void methods
-        stub.UpdateUserAsync.OnCall((ko, user) =>
+        stub.UpdateUserAsync.OnCall((user) =>
         {
             updatedUsers.Add(user);
             return Task.CompletedTask;
@@ -91,7 +91,7 @@ public class ValueTaskMethodTests
         var stub = new AsyncUserSvcStub();
 
         // Create ValueTask directly with the value
-        stub.GetCachedUserAsync.OnCall((ko, id) =>
+        stub.GetCachedUserAsync.OnCall((id) =>
             new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
 
         IAsyncUserSvc service = stub;
@@ -117,7 +117,7 @@ public class AsyncDelayTests
         var stub = new AsyncUserSvcStub();
 
         // Use async lambda to simulate delay
-        var tracking = stub.GetUserAsync.OnCall(async (ko, id) =>
+        var tracking = stub.GetUserAsync.OnCall(async (id) =>
         {
             await Task.Delay(50); // Simulate network latency
             return new User { Id = id, Name = "Delayed" };
@@ -148,7 +148,7 @@ public class AsyncExceptionTests
         var stub = new AsyncUserSvcStub();
 
         // Return a faulted task using Task.FromException
-        var tracking = stub.GetUserAsync.OnCall((ko, id) =>
+        var tracking = stub.GetUserAsync.OnCall((id) =>
             Task.FromException<User?>(new NotFoundException($"User {id} not found")));
 
         IAsyncUserSvc service = stub;
@@ -166,7 +166,7 @@ public class AsyncExceptionTests
         var stub = new AsyncUserSvcStub();
 
         // Throw exception directly in the callback
-        var tracking = stub.GetUserAsync.OnCall((ko, id) =>
+        var tracking = stub.GetUserAsync.OnCall((id) =>
         {
             throw new NotFoundException($"User {id} not found");
         });
@@ -214,10 +214,10 @@ public class CompleteAsyncExampleTests
         var stub = new AsyncRepoStub();
 
         // Configure success case with Verifiable markers
-        stub.FindAsync.OnCall((ko, id) =>
+        stub.FindAsync.OnCall((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
 
-        stub.SaveAsync.OnCall((ko, user) => Task.CompletedTask).Verifiable();
+        stub.SaveAsync.OnCall((user) => Task.CompletedTask).Verifiable();
 
         var manager = new UserManager(stub);
 

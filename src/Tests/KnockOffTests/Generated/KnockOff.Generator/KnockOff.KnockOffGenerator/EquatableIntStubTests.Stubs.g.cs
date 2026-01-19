@@ -15,7 +15,7 @@ partial class EquatableIntStubTests
 			internal global::System.IEquatable<int>? _source;
 
 			/// <summary>Delegate for Equals.</summary>
-			public delegate bool EqualsDelegate(Stubs.IEquatable ko, int other);
+			public delegate bool EqualsDelegate(int other);
 
 			private EqualsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class EquatableIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IEquatable ko, int other)
+			internal bool Invoke(bool strict, int other)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(other);
 					_sequenceIndex++;
-					return callback(ko, other);
+					return callback(other);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(other);
-					return _onCall(ko, other);
+					return _onCall(other);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Equals");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Equals");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Equals(other);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class EquatableIntStubTests
 
 			bool global::System.IEquatable<int>.Equals(int other)
 			{
-				return Equals.Invoke(this, other);
+				return Equals.Invoke(Strict, other);
 			}
 
 			/// <summary>The global::System.IEquatable<int> instance. Use for passing to code expecting the interface.</summary>

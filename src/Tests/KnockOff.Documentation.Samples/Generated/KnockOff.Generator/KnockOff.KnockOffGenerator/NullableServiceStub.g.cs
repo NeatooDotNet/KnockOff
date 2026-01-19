@@ -12,7 +12,7 @@ partial class NullableServiceStub : global::KnockOff.Documentation.Samples.Smart
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.INullableService? _source;
 
 		/// <summary>Delegate for GetOptionalName.</summary>
-		public delegate string? GetOptionalNameDelegate(NullableServiceStub ko);
+		public delegate string? GetOptionalNameDelegate();
 
 		private GetOptionalNameDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class NullableServiceStub : global::KnockOff.Documentation.Samples.Smart
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string? Invoke(NullableServiceStub ko, bool strict)
+		internal string? Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -233,7 +233,7 @@ partial class NullableServiceStub : global::KnockOff.Documentation.Samples.Smart
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.INullableService? _source;
 
 		/// <summary>Delegate for FindUserById.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? FindUserByIdDelegate(NullableServiceStub ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.User? FindUserByIdDelegate(int id);
 
 		private FindUserByIdDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -284,20 +284,20 @@ partial class NullableServiceStub : global::KnockOff.Documentation.Samples.Smart
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke(NullableServiceStub ko, bool strict, int id)
+		internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -508,12 +508,12 @@ partial class NullableServiceStub : global::KnockOff.Documentation.Samples.Smart
 
 	string? global::KnockOff.Documentation.Samples.SmartDefaults.INullableService.GetOptionalName()
 	{
-		return GetOptionalName.Invoke(this, Strict);
+		return GetOptionalName.Invoke(Strict);
 	}
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.SmartDefaults.INullableService.FindUserById(int id)
 	{
-		return FindUserById.Invoke(this, Strict, id);
+		return FindUserById.Invoke(Strict, id);
 	}
 
 }

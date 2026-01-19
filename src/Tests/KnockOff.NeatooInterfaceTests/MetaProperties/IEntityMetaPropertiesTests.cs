@@ -155,7 +155,7 @@ public partial class IEntityMetaPropertiesTests
         IEntityMetaProperties meta = stub;
         var callbackExecuted = false;
 
-        stub.IsChild.OnGet = (ko) =>
+        stub.IsChild.OnGet = () =>
         {
             callbackExecuted = true;
             return true;
@@ -177,7 +177,7 @@ public partial class IEntityMetaPropertiesTests
         stub.IsModified.Value = true;
         stub.IsChild.Value = false;
 
-        stub.IsSavable.OnGet = (ko) =>
+        stub.IsSavable.OnGet = () =>
         {
             // Use stub values for computation
             return stub.IsModified.Value && !stub.IsChild.Value;

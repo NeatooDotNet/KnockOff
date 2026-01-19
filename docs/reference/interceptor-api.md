@@ -71,15 +71,15 @@ public void MethodInterceptor_CompleteApiDemonstration()
 {
     var stub = new ApiMethodRepoStub();
 
-    // Configure void method with OnCall
-    var saveTracking = stub.Save.OnCall((ko, user) => { });
+    // Configure void method with OnCall and mark verifiable
+    var saveTracking = stub.Save.OnCall((user) => { }).Verifiable();
 
-    // Configure return method with OnCall
-    var getTracking = stub.GetById.OnCall((ko, id) =>
-        new User { Id = id, Name = $"User{id}" });
+    // Configure return method with OnCall and mark verifiable
+    var getTracking = stub.GetById.OnCall((id) =>
+        new User { Id = id, Name = $"User{id}" }).Verifiable();
 
-    // Configure multi-parameter method
-    var updateTracking = stub.Update.OnCall((ko, id, name) => { });
+    // Configure multi-parameter method and mark verifiable
+    var updateTracking = stub.Update.OnCall((id, name) => { }).Verifiable();
 
     IApiMethodRepo repository = stub;
 
@@ -88,10 +88,8 @@ public void MethodInterceptor_CompleteApiDemonstration()
     var user = repository.GetById(42);
     repository.Update(1, "UpdatedName");
 
-    // Verify calls
-    saveTracking.Verify(Times.Once);
-    getTracking.Verify(Times.Once);
-    updateTracking.Verify(Times.Once);
+    // Verify all methods were called
+    stub.Verify();
 
     // Access last argument (single parameter) via tracking
     Assert.Equal(42, getTracking.LastArg);
@@ -166,28 +164,27 @@ public void PropertyInterceptor_CompleteApiDemonstration()
     var conn = repository.ConnectionString;
     Assert.Equal("Server=localhost", conn);
 
-    // Verify property was read
-    stub.ConnectionString.VerifyGet(Times.Once);
+    // GetCount tracks reads
+    Assert.Equal(1, stub.ConnectionString.GetCount);
 
     // Write property
     repository.ConnectionString = "Server=production";
 
-    // Verify property was written
-    stub.ConnectionString.VerifySet(Times.Once);
+    // SetCount tracks writes
+    Assert.Equal(1, stub.ConnectionString.SetCount);
 
     // LastSetValue captures what was written
     Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
 
     // OnGet replaces Value with callback return
-    // Note: OnGet takes the stub as first parameter (ko)
-    stub.Timeout.OnGet = (ko) => 30;
+    stub.Timeout.OnGet = () => 30;
     var timeout = repository.Timeout;
     Assert.Equal(30, timeout);
 
     // OnSet provides custom setter behavior
-    // Note: OnSet takes (ko, value) - does NOT automatically update Value
+    // Note: OnSet takes ((value) - does NOT automatically update Value
     var setWasCalled = false;
-    stub.Timeout.OnSet = (ko, val) =>
+    stub.Timeout.OnSet = ((val) =>
     {
         setWasCalled = true;
         // Manually update Value if needed:
@@ -268,15 +265,15 @@ public void IndexerInterceptor_CompleteApiDemonstration()
     Assert.Equal("Charlie", lastEntry.Value.Value?.Name);
 
     // OnGet overrides Backing lookup
-    // Note: OnGet takes (ko, key)
-    stub.Indexer.OnGet = (ko, k) => new User { Id = k, Name = "FromCallback" };
+    // Note: OnGet takes ((key)
+    stub.Indexer.OnGet = ((k) => new User { Id = k, Name = "FromCallback" };
     var fromCallback = repository[999];
     Assert.Equal("FromCallback", fromCallback?.Name);
 
     // OnSet overrides Backing storage
-    // Note: OnSet takes (ko, key, value) - does NOT automatically update Backing
+    // Note: OnSet takes ((key, value) - does NOT automatically update Backing
     var onSetCalled = false;
-    stub.Indexer.OnSet = (ko, k, v) =>
+    stub.Indexer.OnSet = ((k, v) =>
     {
         onSetCalled = true;
         // Manually update Backing if needed:
@@ -415,10 +412,10 @@ public void GenericMethodInterceptor_CompleteApiDemonstration()
     var stub = new ApiGenericRepoStub();
 
     // Configure OnCall for specific type arguments
-    stub.GetById.Of<User>().OnCall((ko, id) =>
+    var userTracking = stub.GetById.Of<User>().OnCall((id) =>
         new User { Id = id, Name = $"User{id}" });
 
-    stub.GetById.Of<Product>().OnCall((ko, id) =>
+    var productTracking = stub.GetById.Of<Product>().OnCall((id) =>
         new Product { Id = id, Name = $"Product{id}" });
 
     IApiGenericRepo repository = stub;
@@ -428,17 +425,13 @@ public void GenericMethodInterceptor_CompleteApiDemonstration()
     var product = repository.GetById<Product>(2);
     var user2 = repository.GetById<User>(3);
 
-    // Base-level tracking: TotalCallCount across all types
-    Assert.Equal(3, stub.GetById.TotalCallCount);
-    Assert.True(stub.GetById.WasCalled);
+    // Verify calls via tracking with Times
+    userTracking.Verify(Times.Exactly(2));
+    productTracking.Verify(Times.Once);
 
     // CalledTypeArguments lists all types used
     Assert.Contains(typeof(User), stub.GetById.CalledTypeArguments);
     Assert.Contains(typeof(Product), stub.GetById.CalledTypeArguments);
-
-    // Typed tracking via Of<T>()
-    Assert.Equal(2, stub.GetById.Of<User>().CallCount);
-    Assert.Equal(1, stub.GetById.Of<Product>().CallCount);
 
     // LastCallArg for specific type (captures the 'id' parameter)
     Assert.Equal(3, stub.GetById.Of<User>().LastCallArg);
@@ -446,12 +439,13 @@ public void GenericMethodInterceptor_CompleteApiDemonstration()
 
     // Reset typed tracking only
     stub.GetById.Of<User>().Reset();
-    Assert.Equal(0, stub.GetById.Of<User>().CallCount);
-    Assert.Equal(1, stub.GetById.Of<Product>().CallCount); // Preserved
+    stub.GetById.Of<User>().Verify(Times.Never);
+    productTracking.Verify(Times.Once); // Preserved
 
     // Reset all tracking
     stub.GetById.Reset();
-    Assert.Equal(0, stub.GetById.TotalCallCount);
+    stub.GetById.Of<User>().Verify(Times.Never);
+    stub.GetById.Of<Product>().Verify(Times.Never);
 }
 ```
 <!-- endSnippet -->

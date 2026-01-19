@@ -18,9 +18,9 @@ partial class OpenGenericClassTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.OGRepository<T>, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.OGRepository<T>, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -86,7 +86,7 @@ partial class OpenGenericClassTests
 		/// <summary>Interceptor for OGRepository.GetById.</summary>
 		public sealed class OGRepository_GetByIdInterceptor<T> : global::KnockOff.IMethodTracking where T : class
 		{
-			private global::System.Func<Stubs.OGRepository<T>, int, T?>? _onCall;
+			private global::System.Func<int, T?>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -98,10 +98,10 @@ partial class OpenGenericClassTests
 			public int? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.OGRepository<T>, int, T?> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<int, T?> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<Stubs.OGRepository<T>, int, T?>? Callback => _onCall;
+			internal global::System.Func<int, T?>? Callback => _onCall;
 
 			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
@@ -148,7 +148,7 @@ partial class OpenGenericClassTests
 		/// <summary>Interceptor for OGRepository.Save.</summary>
 		public sealed class OGRepository_SaveInterceptor<T> : global::KnockOff.IMethodTracking where T : class
 		{
-			private global::System.Action<Stubs.OGRepository<T>, T>? _onCall;
+			private global::System.Action<T>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -160,10 +160,10 @@ partial class OpenGenericClassTests
 			public T? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.OGRepository<T>, T> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<T> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.OGRepository<T>, T>? Callback => _onCall;
+			internal global::System.Action<T>? Callback => _onCall;
 
 			public void RecordCall(T entity) { CallCount++; LastCallArg = entity; }
 
@@ -278,7 +278,7 @@ partial class OpenGenericClassTests
 					get
 					{
 						_stub?.Name.RecordGet();
-						if (_stub?.Name.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Name.OnGet is { } onGet) return onGet();
 						return base.Name;
 					}
 				}
@@ -287,7 +287,7 @@ partial class OpenGenericClassTests
 				public override T? GetById(int id)
 				{
 					_stub?.GetById.RecordCall(id);
-					if (_stub?.GetById.Callback is { } onCall) return onCall(_stub, id);
+					if (_stub?.GetById.Callback is { } onCall) return onCall(id);
 					return default!;
 				}
 
@@ -295,7 +295,7 @@ partial class OpenGenericClassTests
 				public override void Save(T entity)
 				{
 					_stub?.Save.RecordCall(entity);
-					if (_stub?.Save.Callback is { } onCall) { onCall(_stub, entity); return; }
+					if (_stub?.Save.Callback is { } onCall) { onCall(entity); return; }
 				}
 
 			}
@@ -304,7 +304,7 @@ partial class OpenGenericClassTests
 		/// <summary>Interceptor for OGCache.Get.</summary>
 		public sealed class OGCache_GetInterceptor<TKey, TValue> : global::KnockOff.IMethodTracking where TKey : notnull where TValue : new()
 		{
-			private global::System.Func<Stubs.OGCache<TKey, TValue>, TKey, TValue>? _onCall;
+			private global::System.Func<TKey, TValue>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -316,10 +316,10 @@ partial class OpenGenericClassTests
 			public TKey? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.OGCache<TKey, TValue>, TKey, TValue> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<TKey, TValue> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<Stubs.OGCache<TKey, TValue>, TKey, TValue>? Callback => _onCall;
+			internal global::System.Func<TKey, TValue>? Callback => _onCall;
 
 			public void RecordCall(TKey key) { CallCount++; LastCallArg = key; }
 
@@ -366,7 +366,7 @@ partial class OpenGenericClassTests
 		/// <summary>Interceptor for OGCache.Set.</summary>
 		public sealed class OGCache_SetInterceptor<TKey, TValue> : global::KnockOff.IMethodTracking where TKey : notnull where TValue : new()
 		{
-			private global::System.Action<Stubs.OGCache<TKey, TValue>, TKey, TValue>? _onCall;
+			private global::System.Action<TKey, TValue>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -378,10 +378,10 @@ partial class OpenGenericClassTests
 			public (TKey? key, TValue? value)? LastCallArgs { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.OGCache<TKey, TValue>, TKey, TValue> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<TKey, TValue> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.OGCache<TKey, TValue>, TKey, TValue>? Callback => _onCall;
+			internal global::System.Action<TKey, TValue>? Callback => _onCall;
 
 			public void RecordCall(TKey key, TValue value) { CallCount++; LastCallArgs = (key, value); }
 
@@ -489,7 +489,7 @@ partial class OpenGenericClassTests
 				public override TValue Get(TKey key)
 				{
 					_stub?.Get.RecordCall(key);
-					if (_stub?.Get.Callback is { } onCall) return onCall(_stub, key);
+					if (_stub?.Get.Callback is { } onCall) return onCall(key);
 					return default!;
 				}
 
@@ -497,7 +497,7 @@ partial class OpenGenericClassTests
 				public override void Set(TKey key, TValue value)
 				{
 					_stub?.Set.RecordCall(key, value);
-					if (_stub?.Set.Callback is { } onCall) { onCall(_stub, key, value); return; }
+					if (_stub?.Set.Callback is { } onCall) { onCall(key, value); return; }
 				}
 
 			}

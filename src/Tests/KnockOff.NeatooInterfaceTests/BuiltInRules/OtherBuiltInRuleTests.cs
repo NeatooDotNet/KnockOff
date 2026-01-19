@@ -322,7 +322,7 @@ public partial class IRangeRuleTests
         var stub = new Stubs.IRangeRule();
         IRangeRule rule = stub;
 
-        stub.Minimum.OnGet = (ko) => 10.5m; // Decimal value
+        stub.Minimum.OnGet = () => 10.5m; // Decimal value
 
         Assert.Equal(10.5m, rule.Minimum);
     }
@@ -333,7 +333,7 @@ public partial class IRangeRuleTests
         var stub = new Stubs.IRangeRule();
         IRangeRule rule = stub;
 
-        stub.Maximum.OnGet = (ko) => DateTime.Today; // DateTime value
+        stub.Maximum.OnGet = () => DateTime.Today; // DateTime value
 
         Assert.Equal(DateTime.Today, rule.Maximum);
     }
@@ -400,7 +400,7 @@ public partial class IAttributeToRuleTests
         IAttributeToRule converter = stub;
 
         var ruleStub = new RuleStubForAttr();
-        stub.GetRule.Of<ValidateBaseStubForAttr>().OnCall((ko, propInfo, attr) => ruleStub);
+        stub.GetRule.Of<ValidateBaseStubForAttr>().OnCall((propInfo, attr) => ruleStub);
 
         var propertyInfoStub = new PropertyInfoStubForAttr();
         var result = converter.GetRule<ValidateBaseStubForAttr>(propertyInfoStub, null);
@@ -414,7 +414,7 @@ public partial class IAttributeToRuleTests
         var stub = new Stubs.IAttributeToRule();
         IAttributeToRule converter = stub;
 
-        stub.GetRule.Of<ValidateBaseStubForAttr>().OnCall((ko, propInfo, attr) => null);
+        stub.GetRule.Of<ValidateBaseStubForAttr>().OnCall((propInfo, attr) => null);
 
         var propertyInfoStub = new PropertyInfoStubForAttr();
         var result = converter.GetRule<ValidateBaseStubForAttr>(propertyInfoStub, new object());

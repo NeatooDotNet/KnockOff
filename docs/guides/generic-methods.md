@@ -32,7 +32,7 @@ public void ConfigureSingleType_WithOfT()
     var stub = new RepositoryStub();
 
     // Configure behavior for User type
-    stub.GetById.Of<User>().OnCall((ko, id) =>
+    stub.GetById.Of<User>().OnCall((id) =>
         new User { Id = id, Name = "Test User" });
 
     IRepository repository = stub;
@@ -55,10 +55,10 @@ public void ConfigureMultipleTypes_IndependentCallbacks()
     var stub = new RepositoryStub();
 
     // Configure different behavior for each type
-    stub.GetById.Of<User>().OnCall((ko, id) =>
+    stub.GetById.Of<User>().OnCall((id) =>
         new User { Id = id, Name = "User" });
 
-    stub.GetById.Of<Order>().OnCall((ko, id) =>
+    stub.GetById.Of<Order>().OnCall((id) =>
         new Order { Id = id, Amount = 99.99m });
 
     IRepository repository = stub;
@@ -83,7 +83,7 @@ public void VerifyTypedCalls_WithTimesConstraint()
 {
     var stub = new RepositoryStub();
 
-    var tracking = stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
+    var tracking = stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
 
     IRepository repository = stub;
 
@@ -106,8 +106,8 @@ public void VerifyAggregateCalls_VerifyPerType()
 {
     var stub = new RepositoryStub();
 
-    var userTracking = stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
-    var orderTracking = stub.GetById.Of<Order>().OnCall((ko, id) => new Order { Id = id });
+    var userTracking = stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
+    var orderTracking = stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
 
     IRepository repository = stub;
 
@@ -134,11 +134,11 @@ public void MultipleTypeParameters_OfT1T2()
     var stub = new ConverterStub();
 
     // Configure for string -> int conversion
-    stub.Convert.Of<string, int>().OnCall((ko, source) =>
+    stub.Convert.Of<string, int>().OnCall((source) =>
         int.Parse(source));
 
     // Configure for int -> string conversion
-    stub.Convert.Of<int, string>().OnCall((ko, source) =>
+    stub.Convert.Of<int, string>().OnCall((source) =>
         source.ToString());
 
     IConverter converter = stub;
@@ -163,8 +163,8 @@ public void CalledTypeArguments_TracksUsedTypes()
 {
     var stub = new RepositoryStub();
 
-    stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
-    stub.GetById.Of<Order>().OnCall((ko, id) => new Order { Id = id });
+    stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
+    stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
 
     IRepository repository = stub;
 
@@ -193,8 +193,8 @@ public void ResetTyped_ClearsOnlySpecificType()
 {
     var stub = new RepositoryStub();
 
-    stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
-    stub.GetById.Of<Order>().OnCall((ko, id) => new Order { Id = id });
+    stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
+    stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
 
     IRepository repository = stub;
 
@@ -219,8 +219,8 @@ public void ResetAll_ClearsAllTypeSpecificState()
 {
     var stub = new RepositoryStub();
 
-    stub.GetById.Of<User>().OnCall((ko, id) => new User { Id = id });
-    stub.GetById.Of<Order>().OnCall((ko, id) => new Order { Id = id });
+    stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
+    stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
 
     IRepository repository = stub;
 
@@ -248,17 +248,17 @@ public void Serializer_FullGenericWorkflow()
     var stub = new SerializerStub();
 
     // Configure Serialize for different types
-    var serializeUserTracking = stub.Serialize.Of<User>().OnCall((ko, obj) =>
+    var serializeUserTracking = stub.Serialize.Of<User>().OnCall((obj) =>
         $"{{\"Id\":{obj.Id},\"Name\":\"{obj.Name}\"}}");
 
-    var serializeOrderTracking = stub.Serialize.Of<Order>().OnCall((ko, obj) =>
+    var serializeOrderTracking = stub.Serialize.Of<Order>().OnCall((obj) =>
         $"{{\"Id\":{obj.Id},\"Amount\":{obj.Amount}}}");
 
     // Configure Deserialize
-    var deserializeUserTracking = stub.Deserialize.Of<User>().OnCall((ko, data) =>
+    var deserializeUserTracking = stub.Deserialize.Of<User>().OnCall((data) =>
         new User { Id = 1, Name = "Deserialized User" });
 
-    var deserializeOrderTracking = stub.Deserialize.Of<Order>().OnCall((ko, data) =>
+    var deserializeOrderTracking = stub.Deserialize.Of<Order>().OnCall((data) =>
         new Order { Id = 2, Amount = 50.00m });
 
     ISerializer serializer = stub;

@@ -12,7 +12,7 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 		internal global::KnockOff.Benchmarks.Interfaces.IParser? _source;
 
 		/// <summary>Delegate for TryParse.</summary>
-		public delegate bool TryParseDelegate(ParserStub ko, string input, out int result);
+		public delegate bool TryParseDelegate(string input, out int result);
 
 		private TryParseDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,7 +63,7 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(ParserStub ko, bool strict, string input, out int result)
+		internal bool Invoke(bool strict, string input, out int result)
 		{
 			result = default!;
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
@@ -71,13 +71,13 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(input);
 				_sequenceIndex++;
-				return callback(ko, input, out result);
+				return callback(input, out result);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(input);
-				return _onCall(ko, input, out result);
+				return _onCall(input, out result);
 			}
 
 			_unconfiguredCallCount++;
@@ -247,7 +247,7 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 		internal global::KnockOff.Benchmarks.Interfaces.IParser? _source;
 
 		/// <summary>Delegate for Increment.</summary>
-		public delegate void IncrementDelegate(ParserStub ko, ref int @value);
+		public delegate void IncrementDelegate(ref int @value);
 
 		private IncrementDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -298,21 +298,21 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ParserStub ko, bool strict, ref int @value)
+		internal void Invoke(bool strict, ref int @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(@value);
 				_sequenceIndex++;
-				callback(ko, ref @value);
+				callback(ref @value);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(@value);
-				_onCall(ko, ref @value);
+				_onCall(ref @value);
 				return;
 			}
 
@@ -524,12 +524,12 @@ partial class ParserStub : global::KnockOff.Benchmarks.Interfaces.IParser, globa
 
 	bool global::KnockOff.Benchmarks.Interfaces.IParser.TryParse(string input, out int result)
 	{
-		return TryParse.Invoke(this, Strict, input, out result);
+		return TryParse.Invoke(Strict, input, out result);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IParser.Increment(ref int @value)
 	{
-		Increment.Invoke(this, Strict, ref @value);
+		Increment.Invoke(Strict, ref @value);
 	}
 
 }

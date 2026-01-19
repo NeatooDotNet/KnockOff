@@ -11,10 +11,10 @@ partial class ContravariantStub<T> : global::KnockOff.Tests.IContravariantServic
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.IContravariantService<T>? _source;
 
-		private global::System.Action<ContravariantStub<T>, T>? _onCall;
+		private global::System.Action<T>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ContravariantStub<T>, T> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class ContravariantStub<T> : global::KnockOff.Tests.IContravariantServic
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<ContravariantStub<T>, T> callback)
+		public global::KnockOff.IMethodTracking<T> OnCall(global::System.Action<T> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class ContravariantStub<T> : global::KnockOff.Tests.IContravariantServic
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ContravariantStub<T>, T>> OnCallSequence(global::System.Action<ContravariantStub<T>, T> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<T>> OnCallSequence(global::System.Action<T> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ContravariantStub<T>, T> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<T> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class ContravariantStub<T> : global::KnockOff.Tests.IContravariantServic
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ContravariantStub<T> ko, bool strict, T item)
+		internal void Invoke(bool strict, T item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				callback(ko, item);
+				callback(item);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				_onCall(ko, item);
+				_onCall(item);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class ContravariantStub<T> : global::KnockOff.Tests.IContravariantServic
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ContravariantStub<T>, T>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<T>>
 		{
 			private readonly ProcessInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class ContravariantStub<T> : global::KnockOff.Tests.IContravariantServic
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ContravariantStub<T>, T>> ThenCall(global::System.Action<ContravariantStub<T>, T> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> ThenCall(global::System.Action<T> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,7 @@ partial class ContravariantStub<T> : global::KnockOff.Tests.IContravariantServic
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ContravariantStub<T>, T>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<T>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -280,7 +280,7 @@ partial class ContravariantStub<T> : global::KnockOff.Tests.IContravariantServic
 
 	void global::KnockOff.Tests.IContravariantService<T>.Process(T item)
 	{
-		Process.Invoke(this, Strict, item);
+		Process.Invoke(Strict, item);
 	}
 
 }

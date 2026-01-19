@@ -19,7 +19,7 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<LoggerKnockOff, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<LoggerKnockOff, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -114,10 +114,10 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.ILogger? _source;
 
-		private global::System.Action<LoggerKnockOff, string>? _onCall;
+		private global::System.Action<string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<LoggerKnockOff, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -137,7 +137,7 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<LoggerKnockOff, string> callback)
+		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -149,13 +149,13 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<LoggerKnockOff, string>> OnCallSequence(global::System.Action<LoggerKnockOff, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<LoggerKnockOff, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -163,21 +163,21 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(LoggerKnockOff ko, bool strict, string message)
+		internal void Invoke(bool strict, string message)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(message);
 				_sequenceIndex++;
-				callback(ko, message);
+				callback(message);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(message);
-				_onCall(ko, message);
+				_onCall(message);
 				return;
 			}
 
@@ -287,7 +287,7 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<LoggerKnockOff, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 		{
 			private readonly LogInterceptor _interceptor;
 
@@ -307,7 +307,7 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LoggerKnockOff, string>> ThenCall(global::System.Action<LoggerKnockOff, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -328,7 +328,7 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<LoggerKnockOff, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -389,13 +389,13 @@ partial class LoggerKnockOff : global::KnockOff.Tests.ILogger, global::KnockOff.
 
 	string global::KnockOff.Tests.ILogger.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ILogger", "Name"); Name.Value = value; }
 	}
 
 	void global::KnockOff.Tests.ILogger.Log(string message)
 	{
-		Log.Invoke(this, Strict, message);
+		Log.Invoke(Strict, message);
 	}
 
 }

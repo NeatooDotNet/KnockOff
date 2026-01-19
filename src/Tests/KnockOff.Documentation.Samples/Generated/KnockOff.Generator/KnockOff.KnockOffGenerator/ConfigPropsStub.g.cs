@@ -19,7 +19,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ConfigPropsStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ConfigPropsStub, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -122,7 +122,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ConfigPropsStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -131,7 +131,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		public int? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ConfigPropsStub, int>? OnSet { get; set; }
+		public global::System.Action<int>? OnSet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -235,14 +235,14 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 
 	string global::KnockOff.Documentation.Samples.Properties.IConfigProps.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigProps", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigProps", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigProps", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigProps", "Name"); Name.Value = value; }
 	}
 
 	int global::KnockOff.Documentation.Samples.Properties.IConfigProps.Age
 	{
-		get { Age.RecordGet(); if (Age.OnGet is { } onGet) return onGet(this); if (Age._source is { } src) return src.Age; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigProps", "Age"); return Age.Value; }
-		set { Age.RecordSet(value); if (Age.OnSet is { } onSet) { onSet(this, value); return; } if (Age._source is { } src) { src.Age = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigProps", "Age"); Age.Value = value; }
+		get { Age.RecordGet(); if (Age.OnGet is { } onGet) return onGet(); if (Age._source is { } src) return src.Age; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigProps", "Age"); return Age.Value; }
+		set { Age.RecordSet(value); if (Age.OnSet is { } onSet) { onSet(value); return; } if (Age._source is { } src) { src.Age = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IConfigProps", "Age"); Age.Value = value; }
 	}
 
 }

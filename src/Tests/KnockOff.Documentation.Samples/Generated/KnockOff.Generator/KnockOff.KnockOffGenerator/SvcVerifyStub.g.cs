@@ -11,10 +11,10 @@ partial class SvcVerifyStub : global::KnockOff.Documentation.Samples.Verificatio
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Verification.ISvcVerify? _source;
 
-		private global::System.Action<SvcVerifyStub, int, string>? _onCall;
+		private global::System.Action<int, string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SvcVerifyStub, int, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class SvcVerifyStub : global::KnockOff.Documentation.Samples.Verificatio
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(int? id, string? name)> OnCall(global::System.Action<SvcVerifyStub, int, string> callback)
+		public global::KnockOff.IMethodTrackingArgs<(int? id, string? name)> OnCall(global::System.Action<int, string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class SvcVerifyStub : global::KnockOff.Documentation.Samples.Verificatio
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SvcVerifyStub, int, string>> OnCallSequence(global::System.Action<SvcVerifyStub, int, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int, string>> OnCallSequence(global::System.Action<int, string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SvcVerifyStub, int, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int, string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class SvcVerifyStub : global::KnockOff.Documentation.Samples.Verificatio
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SvcVerifyStub ko, bool strict, int id, string name)
+		internal void Invoke(bool strict, int id, string name)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((id, name));
 				_sequenceIndex++;
-				callback(ko, id, name);
+				callback(id, name);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((id, name));
-				_onCall(ko, id, name);
+				_onCall(id, name);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class SvcVerifyStub : global::KnockOff.Documentation.Samples.Verificatio
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SvcVerifyStub, int, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int, string>>
 		{
 			private readonly UpdateInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class SvcVerifyStub : global::KnockOff.Documentation.Samples.Verificatio
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SvcVerifyStub, int, string>> ThenCall(global::System.Action<SvcVerifyStub, int, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int, string>> ThenCall(global::System.Action<int, string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,7 @@ partial class SvcVerifyStub : global::KnockOff.Documentation.Samples.Verificatio
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SvcVerifyStub, int, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int, string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -280,7 +280,7 @@ partial class SvcVerifyStub : global::KnockOff.Documentation.Samples.Verificatio
 
 	void global::KnockOff.Documentation.Samples.Verification.ISvcVerify.Update(int id, string name)
 	{
-		Update.Invoke(this, Strict, id, name);
+		Update.Invoke(Strict, id, name);
 	}
 
 }

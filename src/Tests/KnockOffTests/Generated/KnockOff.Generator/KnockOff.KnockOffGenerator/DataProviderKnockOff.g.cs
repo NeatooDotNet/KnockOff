@@ -19,7 +19,7 @@ partial class DataProviderKnockOff : global::KnockOff.Tests.IDataProvider, globa
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<DataProviderKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -149,7 +149,7 @@ partial class DataProviderKnockOff : global::KnockOff.Tests.IDataProvider, globa
 
 	int global::KnockOff.Tests.IDataProvider.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataProvider", "Count"); return Count.Value; }
 	}
 
 	string global::KnockOff.Tests.IDataProvider.GetData(int id)

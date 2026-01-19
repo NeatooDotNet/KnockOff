@@ -19,7 +19,7 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<KeyLookupKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 		public int? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<KeyLookupKnockOff, int>? OnSet { get; set; }
+		public global::System.Action<int>? OnSet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -171,8 +171,8 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 
 	int global::KnockOff.Tests.IKeyLookup.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Count._source is { } src) { src.Count = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(value); return; } if (Count._source is { } src) { src.Count = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
 	}
 
 	int global::KnockOff.Tests.IKeyLookup.GetData(string key)

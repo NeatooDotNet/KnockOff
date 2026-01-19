@@ -19,7 +19,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<SmartDefaultsKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<SmartDefaultsKnockOff, global::System.Collections.Generic.List<string>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.List<string>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.List<string> _value = new global::System.Collections.Generic.List<string>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -174,7 +174,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetInt.</summary>
-		public delegate int GetIntDelegate(SmartDefaultsKnockOff ko);
+		public delegate int GetIntDelegate();
 
 		private GetIntDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -221,20 +221,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -395,7 +395,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetBool.</summary>
-		public delegate bool GetBoolDelegate(SmartDefaultsKnockOff ko);
+		public delegate bool GetBoolDelegate();
 
 		private GetBoolDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -442,20 +442,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal bool Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -616,7 +616,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetDateTime.</summary>
-		public delegate global::System.DateTime GetDateTimeDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::System.DateTime GetDateTimeDelegate();
 
 		private GetDateTimeDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -663,20 +663,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.DateTime Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::System.DateTime Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -837,7 +837,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetNullableString.</summary>
-		public delegate string? GetNullableStringDelegate(SmartDefaultsKnockOff ko);
+		public delegate string? GetNullableStringDelegate();
 
 		private GetNullableStringDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -884,20 +884,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string? Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal string? Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1058,7 +1058,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetNullableEntity.</summary>
-		public delegate global::KnockOff.Tests.TestEntity? GetNullableEntityDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::KnockOff.Tests.TestEntity? GetNullableEntityDelegate();
 
 		private GetNullableEntityDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1105,20 +1105,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Tests.TestEntity? Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::KnockOff.Tests.TestEntity? Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1279,7 +1279,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetList.</summary>
-		public delegate global::System.Collections.Generic.List<string> GetListDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::System.Collections.Generic.List<string> GetListDelegate();
 
 		private GetListDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1326,20 +1326,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.List<string> Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::System.Collections.Generic.List<string> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1500,7 +1500,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetDictionary.</summary>
-		public delegate global::System.Collections.Generic.Dictionary<string, int> GetDictionaryDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::System.Collections.Generic.Dictionary<string, int> GetDictionaryDelegate();
 
 		private GetDictionaryDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1547,20 +1547,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.Dictionary<string, int> Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::System.Collections.Generic.Dictionary<string, int> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1721,7 +1721,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetEntity.</summary>
-		public delegate global::KnockOff.Tests.TestEntity GetEntityDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::KnockOff.Tests.TestEntity GetEntityDelegate();
 
 		private GetEntityDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1768,20 +1768,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Tests.TestEntity Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::KnockOff.Tests.TestEntity Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1942,7 +1942,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetIList.</summary>
-		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::System.Collections.Generic.IList<string> GetIListDelegate();
 
 		private GetIListDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1989,20 +1989,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IList<string> Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::System.Collections.Generic.IList<string> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -2163,7 +2163,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetString.</summary>
-		public delegate string GetStringDelegate(SmartDefaultsKnockOff ko);
+		public delegate string GetStringDelegate();
 
 		private GetStringDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2210,20 +2210,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -2384,7 +2384,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetDisposable.</summary>
-		public delegate global::System.IDisposable GetDisposableDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::System.IDisposable GetDisposableDelegate();
 
 		private GetDisposableDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2431,20 +2431,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.IDisposable Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::System.IDisposable Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -2605,7 +2605,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetIntAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<int> GetIntAsyncDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::System.Threading.Tasks.Task<int> GetIntAsyncDelegate();
 
 		private GetIntAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2652,20 +2652,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<int> Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::System.Threading.Tasks.Task<int> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -2826,7 +2826,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetListAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> GetListAsyncDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> GetListAsyncDelegate();
 
 		private GetListAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2873,20 +2873,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -3047,7 +3047,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.Tests.ISmartDefaultsService? _source;
 
 		/// <summary>Delegate for GetStringAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<string> GetStringAsyncDelegate(SmartDefaultsKnockOff ko);
+		public delegate global::System.Threading.Tasks.Task<string> GetStringAsyncDelegate();
 
 		private GetStringAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -3094,20 +3094,20 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<string> Invoke(SmartDefaultsKnockOff ko, bool strict)
+		internal global::System.Threading.Tasks.Task<string> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -3393,82 +3393,82 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 	int global::KnockOff.Tests.ISmartDefaultsService.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Count"); return Count.Value; }
 	}
 
 	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.Items
 	{
-		get { Items.RecordGet(); if (Items.OnGet is { } onGet) return onGet(this); if (Items._source is { } src) return src.Items; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Items"); return Items.Value; }
+		get { Items.RecordGet(); if (Items.OnGet is { } onGet) return onGet(); if (Items._source is { } src) return src.Items; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISmartDefaultsService", "Items"); return Items.Value; }
 	}
 
 	int global::KnockOff.Tests.ISmartDefaultsService.GetInt()
 	{
-		return GetInt.Invoke(this, Strict);
+		return GetInt.Invoke(Strict);
 	}
 
 	bool global::KnockOff.Tests.ISmartDefaultsService.GetBool()
 	{
-		return GetBool.Invoke(this, Strict);
+		return GetBool.Invoke(Strict);
 	}
 
 	global::System.DateTime global::KnockOff.Tests.ISmartDefaultsService.GetDateTime()
 	{
-		return GetDateTime.Invoke(this, Strict);
+		return GetDateTime.Invoke(Strict);
 	}
 
 	string? global::KnockOff.Tests.ISmartDefaultsService.GetNullableString()
 	{
-		return GetNullableString.Invoke(this, Strict);
+		return GetNullableString.Invoke(Strict);
 	}
 
 	global::KnockOff.Tests.TestEntity? global::KnockOff.Tests.ISmartDefaultsService.GetNullableEntity()
 	{
-		return GetNullableEntity.Invoke(this, Strict);
+		return GetNullableEntity.Invoke(Strict);
 	}
 
 	global::System.Collections.Generic.List<string> global::KnockOff.Tests.ISmartDefaultsService.GetList()
 	{
-		return GetList.Invoke(this, Strict);
+		return GetList.Invoke(Strict);
 	}
 
 	global::System.Collections.Generic.Dictionary<string, int> global::KnockOff.Tests.ISmartDefaultsService.GetDictionary()
 	{
-		return GetDictionary.Invoke(this, Strict);
+		return GetDictionary.Invoke(Strict);
 	}
 
 	global::KnockOff.Tests.TestEntity global::KnockOff.Tests.ISmartDefaultsService.GetEntity()
 	{
-		return GetEntity.Invoke(this, Strict);
+		return GetEntity.Invoke(Strict);
 	}
 
 	global::System.Collections.Generic.IList<string> global::KnockOff.Tests.ISmartDefaultsService.GetIList()
 	{
-		return GetIList.Invoke(this, Strict);
+		return GetIList.Invoke(Strict);
 	}
 
 	string global::KnockOff.Tests.ISmartDefaultsService.GetString()
 	{
-		return GetString.Invoke(this, Strict);
+		return GetString.Invoke(Strict);
 	}
 
 	global::System.IDisposable global::KnockOff.Tests.ISmartDefaultsService.GetDisposable()
 	{
-		return GetDisposable.Invoke(this, Strict);
+		return GetDisposable.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task<int> global::KnockOff.Tests.ISmartDefaultsService.GetIntAsync()
 	{
-		return GetIntAsync.Invoke(this, Strict);
+		return GetIntAsync.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task<global::System.Collections.Generic.List<string>> global::KnockOff.Tests.ISmartDefaultsService.GetListAsync()
 	{
-		return GetListAsync.Invoke(this, Strict);
+		return GetListAsync.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task<string> global::KnockOff.Tests.ISmartDefaultsService.GetStringAsync()
 	{
-		return GetStringAsync.Invoke(this, Strict);
+		return GetStringAsync.Invoke(Strict);
 	}
 
 }

@@ -12,7 +12,7 @@ partial class TroubleshootGoodStub : global::KnockOff.Documentation.Samples.Trou
 		internal global::KnockOff.Documentation.Samples.Troubleshooting.ITroubleshootRepo? _source;
 
 		/// <summary>Delegate for GetById.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(TroubleshootGoodStub ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(int id);
 
 		private GetByIdDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class TroubleshootGoodStub : global::KnockOff.Documentation.Samples.Trou
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke(TroubleshootGoodStub ko, bool strict, int id)
+		internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class TroubleshootGoodStub : global::KnockOff.Documentation.Samples.Trou
 		internal global::KnockOff.Documentation.Samples.Troubleshooting.ITroubleshootRepo? _source;
 
 		/// <summary>Delegate for GetByIdAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> GetByIdAsyncDelegate(TroubleshootGoodStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> GetByIdAsyncDelegate(int id);
 
 		private GetByIdAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -297,20 +297,20 @@ partial class TroubleshootGoodStub : global::KnockOff.Documentation.Samples.Trou
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(TroubleshootGoodStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -480,7 +480,7 @@ partial class TroubleshootGoodStub : global::KnockOff.Documentation.Samples.Trou
 		internal global::KnockOff.Documentation.Samples.Troubleshooting.ITroubleshootRepo? _source;
 
 		/// <summary>Delegate for GetName.</summary>
-		public delegate string GetNameDelegate(TroubleshootGoodStub ko);
+		public delegate string GetNameDelegate();
 
 		private GetNameDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -527,20 +527,20 @@ partial class TroubleshootGoodStub : global::KnockOff.Documentation.Samples.Trou
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(TroubleshootGoodStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -748,17 +748,17 @@ partial class TroubleshootGoodStub : global::KnockOff.Documentation.Samples.Trou
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.Troubleshooting.ITroubleshootRepo.GetById(int id)
 	{
-		return GetById.Invoke(this, Strict, id);
+		return GetById.Invoke(Strict, id);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> global::KnockOff.Documentation.Samples.Troubleshooting.ITroubleshootRepo.GetByIdAsync(int id)
 	{
-		return GetByIdAsync.Invoke(this, Strict, id);
+		return GetByIdAsync.Invoke(Strict, id);
 	}
 
 	string global::KnockOff.Documentation.Samples.Troubleshooting.ITroubleshootRepo.GetName()
 	{
-		return GetName.Invoke(this, Strict);
+		return GetName.Invoke(Strict);
 	}
 
 }

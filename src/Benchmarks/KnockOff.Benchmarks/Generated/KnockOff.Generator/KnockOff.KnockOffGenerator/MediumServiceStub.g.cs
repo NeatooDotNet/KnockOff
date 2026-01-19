@@ -11,10 +11,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
-		private global::System.Action<MediumServiceStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -30,7 +30,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<MediumServiceStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -42,13 +42,13 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub>> OnCallSequence(global::System.Action<MediumServiceStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -56,21 +56,21 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(MediumServiceStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -171,7 +171,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly Method1Interceptor _interceptor;
 
@@ -191,7 +191,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub>> ThenCall(global::System.Action<MediumServiceStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -212,7 +212,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -231,10 +231,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
-		private global::System.Action<MediumServiceStub, int>? _onCall;
+		private global::System.Action<int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -254,7 +254,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<MediumServiceStub, int> callback)
+		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -266,13 +266,13 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int>> OnCallSequence(global::System.Action<MediumServiceStub, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int>> OnCallSequence(global::System.Action<int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -280,21 +280,21 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(MediumServiceStub ko, bool strict, int param)
+		internal void Invoke(bool strict, int param)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(param);
 				_sequenceIndex++;
-				callback(ko, param);
+				callback(param);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(param);
-				_onCall(ko, param);
+				_onCall(param);
 				return;
 			}
 
@@ -404,7 +404,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int>>
 		{
 			private readonly Method2Interceptor _interceptor;
 
@@ -424,7 +424,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int>> ThenCall(global::System.Action<MediumServiceStub, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> ThenCall(global::System.Action<int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -445,7 +445,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -464,10 +464,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
-		private global::System.Action<MediumServiceStub, string>? _onCall;
+		private global::System.Action<string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -487,7 +487,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<MediumServiceStub, string> callback)
+		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -499,13 +499,13 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, string>> OnCallSequence(global::System.Action<MediumServiceStub, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -513,21 +513,21 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(MediumServiceStub ko, bool strict, string param)
+		internal void Invoke(bool strict, string param)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(param);
 				_sequenceIndex++;
-				callback(ko, param);
+				callback(param);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(param);
-				_onCall(ko, param);
+				_onCall(param);
 				return;
 			}
 
@@ -637,7 +637,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 		{
 			private readonly Method3Interceptor _interceptor;
 
@@ -657,7 +657,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, string>> ThenCall(global::System.Action<MediumServiceStub, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -678,7 +678,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -697,10 +697,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
-		private global::System.Action<MediumServiceStub, int, string>? _onCall;
+		private global::System.Action<int, string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -720,7 +720,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(int? a, string? b)> OnCall(global::System.Action<MediumServiceStub, int, string> callback)
+		public global::KnockOff.IMethodTrackingArgs<(int? a, string? b)> OnCall(global::System.Action<int, string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -732,13 +732,13 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int, string>> OnCallSequence(global::System.Action<MediumServiceStub, int, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int, string>> OnCallSequence(global::System.Action<int, string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int, string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -746,21 +746,21 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(MediumServiceStub ko, bool strict, int a, string b)
+		internal void Invoke(bool strict, int a, string b)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((a, b));
 				_sequenceIndex++;
-				callback(ko, a, b);
+				callback(a, b);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((a, b));
-				_onCall(ko, a, b);
+				_onCall(a, b);
 				return;
 			}
 
@@ -870,7 +870,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int, string>>
 		{
 			private readonly Method4Interceptor _interceptor;
 
@@ -890,7 +890,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int, string>> ThenCall(global::System.Action<MediumServiceStub, int, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int, string>> ThenCall(global::System.Action<int, string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -911,7 +911,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int, string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -930,10 +930,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
-		private global::System.Action<MediumServiceStub, int, int, int>? _onCall;
+		private global::System.Action<int, int, int>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int, int, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<int, int, int> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -953,7 +953,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b, int? c)> OnCall(global::System.Action<MediumServiceStub, int, int, int> callback)
+		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b, int? c)> OnCall(global::System.Action<int, int, int> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -965,13 +965,13 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int, int, int>> OnCallSequence(global::System.Action<MediumServiceStub, int, int, int> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<int, int, int>> OnCallSequence(global::System.Action<int, int, int> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<MediumServiceStub, int, int, int> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<int, int, int> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -979,21 +979,21 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(MediumServiceStub ko, bool strict, int a, int b, int c)
+		internal void Invoke(bool strict, int a, int b, int c)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((a, b, c));
 				_sequenceIndex++;
-				callback(ko, a, b, c);
+				callback(a, b, c);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((a, b, c));
-				_onCall(ko, a, b, c);
+				_onCall(a, b, c);
 				return;
 			}
 
@@ -1103,7 +1103,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int, int, int>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<int, int, int>>
 		{
 			private readonly Method5Interceptor _interceptor;
 
@@ -1123,7 +1123,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int, int, int>> ThenCall(global::System.Action<MediumServiceStub, int, int, int> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<int, int, int>> ThenCall(global::System.Action<int, int, int> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1144,7 +1144,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MediumServiceStub, int, int, int>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<int, int, int>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1164,7 +1164,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
 		/// <summary>Delegate for Method6.</summary>
-		public delegate int Method6Delegate(MediumServiceStub ko);
+		public delegate int Method6Delegate();
 
 		private Method6Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1211,20 +1211,20 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(MediumServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1385,7 +1385,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
 		/// <summary>Delegate for Method7.</summary>
-		public delegate string Method7Delegate(MediumServiceStub ko);
+		public delegate string Method7Delegate();
 
 		private Method7Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1432,20 +1432,20 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(MediumServiceStub ko, bool strict)
+		internal string Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1606,7 +1606,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
 		/// <summary>Delegate for Method8.</summary>
-		public delegate int Method8Delegate(MediumServiceStub ko, int param);
+		public delegate int Method8Delegate(int param);
 
 		private Method8Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1657,20 +1657,20 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(MediumServiceStub ko, bool strict, int param)
+		internal int Invoke(bool strict, int param)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(param);
 				_sequenceIndex++;
-				return callback(ko, param);
+				return callback(param);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(param);
-				return _onCall(ko, param);
+				return _onCall(param);
 			}
 
 			_unconfiguredCallCount++;
@@ -1840,7 +1840,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
 		/// <summary>Delegate for Method9.</summary>
-		public delegate string Method9Delegate(MediumServiceStub ko, string param);
+		public delegate string Method9Delegate(string param);
 
 		private Method9Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1891,20 +1891,20 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string Invoke(MediumServiceStub ko, bool strict, string param)
+		internal string Invoke(bool strict, string param)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(param);
 				_sequenceIndex++;
-				return callback(ko, param);
+				return callback(param);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(param);
-				return _onCall(ko, param);
+				return _onCall(param);
 			}
 
 			_unconfiguredCallCount++;
@@ -2074,7 +2074,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		internal global::KnockOff.Benchmarks.Interfaces.IMediumService? _source;
 
 		/// <summary>Delegate for Method10.</summary>
-		public delegate bool Method10Delegate(MediumServiceStub ko, int a, string b);
+		public delegate bool Method10Delegate(int a, string b);
 
 		private Method10Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2125,20 +2125,20 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(MediumServiceStub ko, bool strict, int a, string b)
+		internal bool Invoke(bool strict, int a, string b)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((a, b));
 				_sequenceIndex++;
-				return callback(ko, a, b);
+				return callback(a, b);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((a, b));
-				return _onCall(ko, a, b);
+				return _onCall(a, b);
 			}
 
 			_unconfiguredCallCount++;
@@ -2397,52 +2397,52 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method1()
 	{
-		Method1.Invoke(this, Strict);
+		Method1.Invoke(Strict);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method2(int param)
 	{
-		Method2.Invoke(this, Strict, param);
+		Method2.Invoke(Strict, param);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method3(string param)
 	{
-		Method3.Invoke(this, Strict, param);
+		Method3.Invoke(Strict, param);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method4(int a, string b)
 	{
-		Method4.Invoke(this, Strict, a, b);
+		Method4.Invoke(Strict, a, b);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IMediumService.Method5(int a, int b, int c)
 	{
-		Method5.Invoke(this, Strict, a, b, c);
+		Method5.Invoke(Strict, a, b, c);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IMediumService.Method6()
 	{
-		return Method6.Invoke(this, Strict);
+		return Method6.Invoke(Strict);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.IMediumService.Method7()
 	{
-		return Method7.Invoke(this, Strict);
+		return Method7.Invoke(Strict);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IMediumService.Method8(int param)
 	{
-		return Method8.Invoke(this, Strict, param);
+		return Method8.Invoke(Strict, param);
 	}
 
 	string global::KnockOff.Benchmarks.Interfaces.IMediumService.Method9(string param)
 	{
-		return Method9.Invoke(this, Strict, param);
+		return Method9.Invoke(Strict, param);
 	}
 
 	bool global::KnockOff.Benchmarks.Interfaces.IMediumService.Method10(int a, string b)
 	{
-		return Method10.Invoke(this, Strict, a, b);
+		return Method10.Invoke(Strict, a, b);
 	}
 
 }

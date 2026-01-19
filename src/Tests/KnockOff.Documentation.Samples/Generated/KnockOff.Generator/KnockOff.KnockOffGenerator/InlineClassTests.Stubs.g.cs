@@ -18,9 +18,9 @@ partial class InlineClassTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.UserServiceClass, bool>? _onGet;
+			private global::System.Func<bool>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.UserServiceClass, bool>? OnGet
+			public global::System.Func<bool>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -32,9 +32,9 @@ partial class InlineClassTests
 			/// <summary>The last value passed to the setter.</summary>
 			public bool? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.UserServiceClass, bool>? _onSet;
+			private global::System.Action<bool>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.UserServiceClass, bool>? OnSet
+			public global::System.Action<bool>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -113,7 +113,7 @@ partial class InlineClassTests
 		/// <summary>Interceptor for UserServiceClass.GetUser.</summary>
 		public sealed class UserServiceClass_GetUserInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Func<Stubs.UserServiceClass, int, global::KnockOff.Documentation.Samples.User?>? _onCall;
+			private global::System.Func<int, global::KnockOff.Documentation.Samples.User?>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -125,10 +125,10 @@ partial class InlineClassTests
 			public int? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.UserServiceClass, int, global::KnockOff.Documentation.Samples.User?> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<int, global::KnockOff.Documentation.Samples.User?> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<Stubs.UserServiceClass, int, global::KnockOff.Documentation.Samples.User?>? Callback => _onCall;
+			internal global::System.Func<int, global::KnockOff.Documentation.Samples.User?>? Callback => _onCall;
 
 			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
@@ -175,7 +175,7 @@ partial class InlineClassTests
 		/// <summary>Interceptor for UserServiceClass.SaveUser.</summary>
 		public sealed class UserServiceClass_SaveUserInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Action<Stubs.UserServiceClass, global::KnockOff.Documentation.Samples.User>? _onCall;
+			private global::System.Action<global::KnockOff.Documentation.Samples.User>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -187,10 +187,10 @@ partial class InlineClassTests
 			public global::KnockOff.Documentation.Samples.User? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.UserServiceClass, global::KnockOff.Documentation.Samples.User> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.UserServiceClass, global::KnockOff.Documentation.Samples.User>? Callback => _onCall;
+			internal global::System.Action<global::KnockOff.Documentation.Samples.User>? Callback => _onCall;
 
 			public void RecordCall(global::KnockOff.Documentation.Samples.User user) { CallCount++; LastCallArg = user; }
 
@@ -305,13 +305,13 @@ partial class InlineClassTests
 					get
 					{
 						_stub?.IsConnected.RecordGet();
-						if (_stub?.IsConnected.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.IsConnected.OnGet is { } onGet) return onGet();
 						return base.IsConnected;
 					}
 					set
 					{
 						_stub?.IsConnected.RecordSet(value);
-						if (_stub?.IsConnected.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.IsConnected.OnSet is { } onSet) onSet(value);
 						else base.IsConnected = value;
 					}
 				}
@@ -320,7 +320,7 @@ partial class InlineClassTests
 				public override global::KnockOff.Documentation.Samples.User? GetUser(int id)
 				{
 					_stub?.GetUser.RecordCall(id);
-					if (_stub?.GetUser.Callback is { } onCall) return onCall(_stub, id);
+					if (_stub?.GetUser.Callback is { } onCall) return onCall(id);
 					return base.GetUser(id);
 				}
 
@@ -328,7 +328,7 @@ partial class InlineClassTests
 				public override void SaveUser(global::KnockOff.Documentation.Samples.User user)
 				{
 					_stub?.SaveUser.RecordCall(user);
-					if (_stub?.SaveUser.Callback is { } onCall) { onCall(_stub, user); return; }
+					if (_stub?.SaveUser.Callback is { } onCall) { onCall(user); return; }
 					base.SaveUser(user);
 				}
 

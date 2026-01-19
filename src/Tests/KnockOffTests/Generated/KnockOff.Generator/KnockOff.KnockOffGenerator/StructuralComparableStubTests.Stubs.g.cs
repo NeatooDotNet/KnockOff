@@ -15,7 +15,7 @@ partial class StructuralComparableStubTests
 			internal global::System.Collections.IStructuralComparable? _source;
 
 			/// <summary>Delegate for CompareTo.</summary>
-			public delegate int CompareToDelegate(Stubs.IStructuralComparable ko, object? other, global::System.Collections.IComparer comparer);
+			public delegate int CompareToDelegate(object? other, global::System.Collections.IComparer comparer);
 
 			private CompareToDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class StructuralComparableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IStructuralComparable ko, object? other, global::System.Collections.IComparer comparer)
+			internal int Invoke(bool strict, object? other, global::System.Collections.IComparer comparer)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((other, comparer));
 					_sequenceIndex++;
-					return callback(ko, other, comparer);
+					return callback(other, comparer);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((other, comparer));
-					return _onCall(ko, other, comparer);
+					return _onCall(other, comparer);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((other, comparer));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("CompareTo");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CompareTo");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.CompareTo(other, comparer);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CompareTo");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CompareTo");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class StructuralComparableStubTests
 
 			int global::System.Collections.IStructuralComparable.CompareTo(object? other, global::System.Collections.IComparer comparer)
 			{
-				return CompareTo.Invoke(this, other, comparer);
+				return CompareTo.Invoke(Strict, other, comparer);
 			}
 
 			/// <summary>The global::System.Collections.IStructuralComparable instance. Use for passing to code expecting the interface.</summary>

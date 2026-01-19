@@ -26,10 +26,10 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService? _source;
 
-		private global::System.Action<FcBenchCacheServiceStub, string>? _onCall;
+		private global::System.Action<string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<FcBenchCacheServiceStub, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -49,7 +49,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<FcBenchCacheServiceStub, string> callback)
+		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -61,13 +61,13 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<FcBenchCacheServiceStub, string>> OnCallSequence(global::System.Action<FcBenchCacheServiceStub, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<FcBenchCacheServiceStub, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -75,21 +75,21 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(FcBenchCacheServiceStub ko, bool strict, string key)
+		internal void Invoke(bool strict, string key)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(key);
 				_sequenceIndex++;
-				callback(ko, key);
+				callback(key);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(key);
-				_onCall(ko, key);
+				_onCall(key);
 				return;
 			}
 
@@ -199,7 +199,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<FcBenchCacheServiceStub, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 		{
 			private readonly RemoveInterceptor _interceptor;
 
@@ -219,7 +219,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<FcBenchCacheServiceStub, string>> ThenCall(global::System.Action<FcBenchCacheServiceStub, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -240,7 +240,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<FcBenchCacheServiceStub, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -291,7 +291,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		public sealed class GetTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for Get.</summary>
-			public delegate T? GetDelegate(FcBenchCacheServiceStub ko, string key);
+			public delegate T? GetDelegate(string key);
 
 			private GetDelegate? _onCall;
 
@@ -372,7 +372,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		public sealed class SetTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for Set.</summary>
-			public delegate void SetDelegate(FcBenchCacheServiceStub ko, string key, T @value, global::System.TimeSpan expiration);
+			public delegate void SetDelegate(string key, T @value, global::System.TimeSpan expiration);
 
 			private SetDelegate? _onCall;
 
@@ -487,7 +487,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 	{
 		Get.Of<T>().RecordCall(key);
 		if (Get.Of<T>().Callback is { } callback)
-			return callback(this, key);
+			return callback(key);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchCacheService", "Get");
 		return default!;
 	}
@@ -496,13 +496,13 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 	{
 		Set.Of<T>().RecordCall(key);
 		if (Set.Of<T>().Callback is { } onCallCallback)
-		{ onCallCallback(this, key, @value, expiration); return; }
+		{ onCallCallback(key, @value, expiration); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IFcBenchCacheService", "Set");
 	}
 
 	void global::KnockOff.Benchmarks.Benchmarks.IFcBenchCacheService.Remove(string key)
 	{
-		Remove.Invoke(this, Strict, key);
+		Remove.Invoke(Strict, key);
 	}
 
 }

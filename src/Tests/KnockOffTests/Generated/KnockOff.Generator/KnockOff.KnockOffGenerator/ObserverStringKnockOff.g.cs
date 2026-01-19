@@ -11,10 +11,10 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.IObserver<string>? _source;
 
-		private global::System.Action<ObserverStringKnockOff>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -30,7 +30,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ObserverStringKnockOff> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -42,13 +42,13 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff>> OnCallSequence(global::System.Action<ObserverStringKnockOff> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -56,21 +56,21 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ObserverStringKnockOff ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -171,7 +171,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly OnCompletedInterceptor _interceptor;
 
@@ -191,7 +191,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff>> ThenCall(global::System.Action<ObserverStringKnockOff> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -212,7 +212,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -231,10 +231,10 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.IObserver<string>? _source;
 
-		private global::System.Action<ObserverStringKnockOff, global::System.Exception>? _onCall;
+		private global::System.Action<global::System.Exception>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff, global::System.Exception> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::System.Exception> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -254,7 +254,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::System.Exception> OnCall(global::System.Action<ObserverStringKnockOff, global::System.Exception> callback)
+		public global::KnockOff.IMethodTracking<global::System.Exception> OnCall(global::System.Action<global::System.Exception> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -266,13 +266,13 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff, global::System.Exception>> OnCallSequence(global::System.Action<ObserverStringKnockOff, global::System.Exception> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::System.Exception>> OnCallSequence(global::System.Action<global::System.Exception> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff, global::System.Exception> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Exception> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -280,21 +280,21 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ObserverStringKnockOff ko, bool strict, global::System.Exception error)
+		internal void Invoke(bool strict, global::System.Exception error)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(error);
 				_sequenceIndex++;
-				callback(ko, error);
+				callback(error);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(error);
-				_onCall(ko, error);
+				_onCall(error);
 				return;
 			}
 
@@ -404,7 +404,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff, global::System.Exception>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Exception>>
 		{
 			private readonly OnErrorInterceptor _interceptor;
 
@@ -424,7 +424,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff, global::System.Exception>> ThenCall(global::System.Action<ObserverStringKnockOff, global::System.Exception> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Exception>> ThenCall(global::System.Action<global::System.Exception> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -445,7 +445,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff, global::System.Exception>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Exception>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -464,10 +464,10 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::System.IObserver<string>? _source;
 
-		private global::System.Action<ObserverStringKnockOff, string>? _onCall;
+		private global::System.Action<string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -487,7 +487,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<ObserverStringKnockOff, string> callback)
+		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -499,13 +499,13 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff, string>> OnCallSequence(global::System.Action<ObserverStringKnockOff, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ObserverStringKnockOff, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -513,21 +513,21 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ObserverStringKnockOff ko, bool strict, string @value)
+		internal void Invoke(bool strict, string @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(@value);
 				_sequenceIndex++;
-				callback(ko, @value);
+				callback(@value);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(@value);
-				_onCall(ko, @value);
+				_onCall(@value);
 				return;
 			}
 
@@ -637,7 +637,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 		{
 			private readonly OnNextInterceptor _interceptor;
 
@@ -657,7 +657,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff, string>> ThenCall(global::System.Action<ObserverStringKnockOff, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -678,7 +678,7 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ObserverStringKnockOff, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -745,17 +745,17 @@ partial class ObserverStringKnockOff : global::System.IObserver<string>, global:
 
 	void global::System.IObserver<string>.OnCompleted()
 	{
-		OnCompleted.Invoke(this, Strict);
+		OnCompleted.Invoke(Strict);
 	}
 
 	void global::System.IObserver<string>.OnError(global::System.Exception error)
 	{
-		OnError.Invoke(this, Strict, error);
+		OnError.Invoke(Strict, error);
 	}
 
 	void global::System.IObserver<string>.OnNext(string @value)
 	{
-		OnNext.Invoke(this, Strict, @value);
+		OnNext.Invoke(Strict, @value);
 	}
 
 }

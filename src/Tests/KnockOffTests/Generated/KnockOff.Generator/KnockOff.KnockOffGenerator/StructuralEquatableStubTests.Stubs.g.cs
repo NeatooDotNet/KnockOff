@@ -15,7 +15,7 @@ partial class StructuralEquatableStubTests
 			internal global::System.Collections.IStructuralEquatable? _source;
 
 			/// <summary>Delegate for Equals.</summary>
-			public delegate bool EqualsDelegate(Stubs.IStructuralEquatable ko, object? other, global::System.Collections.IEqualityComparer comparer);
+			public delegate bool EqualsDelegate(object? other, global::System.Collections.IEqualityComparer comparer);
 
 			private EqualsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class StructuralEquatableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IStructuralEquatable ko, object? other, global::System.Collections.IEqualityComparer comparer)
+			internal bool Invoke(bool strict, object? other, global::System.Collections.IEqualityComparer comparer)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((other, comparer));
 					_sequenceIndex++;
-					return callback(ko, other, comparer);
+					return callback(other, comparer);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((other, comparer));
-					return _onCall(ko, other, comparer);
+					return _onCall(other, comparer);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((other, comparer));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Equals");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Equals");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Equals(other, comparer);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
 				return default!;
 			}
 
@@ -249,7 +249,7 @@ partial class StructuralEquatableStubTests
 			internal global::System.Collections.IStructuralEquatable? _source;
 
 			/// <summary>Delegate for GetHashCode.</summary>
-			public delegate int GetHashCodeDelegate(Stubs.IStructuralEquatable ko, global::System.Collections.IEqualityComparer comparer);
+			public delegate int GetHashCodeDelegate(global::System.Collections.IEqualityComparer comparer);
 
 			private GetHashCodeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -300,34 +300,34 @@ partial class StructuralEquatableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IStructuralEquatable ko, global::System.Collections.IEqualityComparer comparer)
+			internal int Invoke(bool strict, global::System.Collections.IEqualityComparer comparer)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(comparer);
 					_sequenceIndex++;
-					return callback(ko, comparer);
+					return callback(comparer);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(comparer);
-					return _onCall(ko, comparer);
+					return _onCall(comparer);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = comparer;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetHashCode");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetHashCode");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetHashCode(comparer);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetHashCode");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetHashCode");
 				return default!;
 			}
 
@@ -487,12 +487,12 @@ partial class StructuralEquatableStubTests
 
 			bool global::System.Collections.IStructuralEquatable.Equals(object? other, global::System.Collections.IEqualityComparer comparer)
 			{
-				return Equals.Invoke(this, other, comparer);
+				return Equals.Invoke(Strict, other, comparer);
 			}
 
 			int global::System.Collections.IStructuralEquatable.GetHashCode(global::System.Collections.IEqualityComparer comparer)
 			{
-				return GetHashCode.Invoke(this, comparer);
+				return GetHashCode.Invoke(Strict, comparer);
 			}
 
 			/// <summary>The global::System.Collections.IStructuralEquatable instance. Use for passing to code expecting the interface.</summary>

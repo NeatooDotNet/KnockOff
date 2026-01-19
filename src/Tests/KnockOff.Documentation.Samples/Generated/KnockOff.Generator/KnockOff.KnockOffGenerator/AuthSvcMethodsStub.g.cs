@@ -12,7 +12,7 @@ partial class AuthSvcMethodsStub : global::KnockOff.Documentation.Samples.Method
 		internal global::KnockOff.Documentation.Samples.Methods.IAuthSvcMethods? _source;
 
 		/// <summary>Delegate for ValidateCredentials.</summary>
-		public delegate bool ValidateCredentialsDelegate(AuthSvcMethodsStub ko, string username, string password);
+		public delegate bool ValidateCredentialsDelegate(string username, string password);
 
 		private ValidateCredentialsDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class AuthSvcMethodsStub : global::KnockOff.Documentation.Samples.Method
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(AuthSvcMethodsStub ko, bool strict, string username, string password)
+		internal bool Invoke(bool strict, string username, string password)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((username, password));
 				_sequenceIndex++;
-				return callback(ko, username, password);
+				return callback(username, password);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((username, password));
-				return _onCall(ko, username, password);
+				return _onCall(username, password);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class AuthSvcMethodsStub : global::KnockOff.Documentation.Samples.Method
 
 	bool global::KnockOff.Documentation.Samples.Methods.IAuthSvcMethods.ValidateCredentials(string username, string password)
 	{
-		return ValidateCredentials.Invoke(this, Strict, username, password);
+		return ValidateCredentials.Invoke(Strict, username, password);
 	}
 
 }

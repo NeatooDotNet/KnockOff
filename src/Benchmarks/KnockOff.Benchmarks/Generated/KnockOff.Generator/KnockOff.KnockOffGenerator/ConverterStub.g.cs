@@ -58,7 +58,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 		public sealed class ConvertTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Convert.</summary>
-			public delegate T ConvertDelegate(ConverterStub ko, object @value);
+			public delegate T ConvertDelegate(object @value);
 
 			private ConvertDelegate? _onCall;
 
@@ -139,7 +139,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 		public sealed class TransformTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Transform.</summary>
-			public delegate TOut TransformDelegate(ConverterStub ko, TIn input);
+			public delegate TOut TransformDelegate(TIn input);
 
 			private TransformDelegate? _onCall;
 
@@ -225,7 +225,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 	{
 		Convert.Of<T>().RecordCall(@value);
 		if (Convert.Of<T>().Callback is { } callback)
-			return callback(this, @value);
+			return callback(@value);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Convert");
 		return SmartDefault<T>("Convert");
 	}
@@ -234,7 +234,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 	{
 		Transform.Of<TIn, TOut>().RecordCall();
 		if (Transform.Of<TIn, TOut>().Callback is { } callback)
-			return callback(this, input);
+			return callback(input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Transform");
 		return SmartDefault<TOut>("Transform");
 	}

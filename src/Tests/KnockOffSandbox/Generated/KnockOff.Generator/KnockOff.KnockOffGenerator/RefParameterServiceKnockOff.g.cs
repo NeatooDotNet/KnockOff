@@ -12,7 +12,7 @@ partial class RefParameterServiceKnockOff : global::KnockOff.Sandbox.IRefParamet
 		internal global::KnockOff.Sandbox.IRefParameterService? _source;
 
 		/// <summary>Delegate for Increment.</summary>
-		public delegate void IncrementDelegate(RefParameterServiceKnockOff ko, ref int @value);
+		public delegate void IncrementDelegate(ref int @value);
 
 		private IncrementDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,21 +63,21 @@ partial class RefParameterServiceKnockOff : global::KnockOff.Sandbox.IRefParamet
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(RefParameterServiceKnockOff ko, bool strict, ref int @value)
+		internal void Invoke(bool strict, ref int @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(@value);
 				_sequenceIndex++;
-				callback(ko, ref @value);
+				callback(ref @value);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(@value);
-				_onCall(ko, ref @value);
+				_onCall(ref @value);
 				return;
 			}
 
@@ -248,7 +248,7 @@ partial class RefParameterServiceKnockOff : global::KnockOff.Sandbox.IRefParamet
 		internal global::KnockOff.Sandbox.IRefParameterService? _source;
 
 		/// <summary>Delegate for TryUpdate.</summary>
-		public delegate bool TryUpdateDelegate(RefParameterServiceKnockOff ko, string key, ref string @value);
+		public delegate bool TryUpdateDelegate(string key, ref string @value);
 
 		private TryUpdateDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -299,20 +299,20 @@ partial class RefParameterServiceKnockOff : global::KnockOff.Sandbox.IRefParamet
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(RefParameterServiceKnockOff ko, bool strict, string key, ref string @value)
+		internal bool Invoke(bool strict, string key, ref string @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((key, @value));
 				_sequenceIndex++;
-				return callback(ko, key, ref @value);
+				return callback(key, ref @value);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((key, @value));
-				return _onCall(ko, key, ref @value);
+				return _onCall(key, ref @value);
 			}
 
 			_unconfiguredCallCount++;
@@ -523,12 +523,12 @@ partial class RefParameterServiceKnockOff : global::KnockOff.Sandbox.IRefParamet
 
 	void global::KnockOff.Sandbox.IRefParameterService.Increment(ref int @value)
 	{
-		Increment.Invoke(this, Strict, ref @value);
+		Increment.Invoke(Strict, ref @value);
 	}
 
 	bool global::KnockOff.Sandbox.IRefParameterService.TryUpdate(string key, ref string @value)
 	{
-		return TryUpdate.Invoke(this, Strict, key, ref @value);
+		return TryUpdate.Invoke(Strict, key, ref @value);
 	}
 
 }

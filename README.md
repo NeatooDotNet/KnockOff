@@ -21,37 +21,20 @@ KnockOff uses Roslyn source generation to create reusable stub classes that live
 **Moq (runtime reflection):**
 
 <!-- snippet: readme-teaser-moq -->
-
-**KnockOff (compile-time):**
-
-<!-- snippet: readme-teaser-knockoff -->
-
----
-
-## Key Features
-
-- **Shared stubs**: Define once, reuse across all tests—each test customizes behavior as needed
-- **Per-test configuration**: Override default stub behavior in individual tests without affecting others
-- **Three stub patterns**: Stand-alone classes (`[KnockOff]`), inline interface stubs (`[KnockOff<IFoo>]`), and inline class stubs (`[KnockOff<SomeClass>]`)
-- **Interceptor API**: Configure behavior with `OnCall`, `OnGet`, `OnSet`, and `Value` properties
-- **Smart defaults**: Methods return `default(T)`, properties auto-initialize collections
-- **Source delegation**: Use `Source(T)` to delegate stub behavior to real implementations
-- **Zero reflection**: Generated code contains no runtime reflection
-- **Verification support**: Track call counts, inspect arguments, and assert call sequences
-
----
-
-## Quick Start
-
-### Installation
-
-<!-- snippet: readme-quickstart-install -->
 ```cs
-// Install KnockOff via .NET CLI:
-// dotnet add package KnockOff
-//
-// Or via Package Manager:
-// Install-Package KnockOff
+[Fact]
+public void Moq_RuntimeSetup()
+{
+    var mock = new Mock<IReadmeUserRepo>();
+    mock.Setup(x => x.GetUser(It.IsAny<int>()))
+        .Returns(new User { Id = 42, Name = "Test User" });
+
+    IReadmeUserRepo repository = mock.Object;
+    var user = repository.GetUser(42);
+
+    Assert.NotNull(user);
+    Assert.Equal("Test User", user.Name);
+}
 ```
 <!-- endSnippet -->
 
@@ -59,17 +42,14 @@ KnockOff uses Roslyn source generation to create reusable stub classes that live
 
 <!-- snippet: readme-quickstart-stub -->
 ```cs
-// 1. Define your interface
 public interface IQuickStartRepo
 {
     User? GetUser(int id);
 }
 
-// 2. Create a stub with [KnockOff] attribute
 [KnockOff]
 public partial class QuickStartRepoStub : IQuickStartRepo { }
 
-// 3. Use the stub in tests
 public class QuickStartCreateStubTests
 {
     [Fact]
@@ -77,7 +57,6 @@ public class QuickStartCreateStubTests
     {
         var stub = new QuickStartRepoStub();
 
-        // Stub is ready - implements IQuickStartRepo
         IQuickStartRepo repository = stub;
         Assert.NotNull(repository);
     }
@@ -94,8 +73,7 @@ public void ConfigureStub_WithOnCall()
 {
     var stub = new QuickStartRepoStub();
 
-    // Configure the GetUser method to return a specific user
-    stub.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Test User" });
+    stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test User" });
 
     IQuickStartRepo repository = stub;
     var user = repository.GetUser(42);
@@ -112,22 +90,17 @@ public void ConfigureStub_WithOnCall()
 <!-- snippet: readme-quickstart-verify -->
 ```cs
 [Fact]
-public void VerifyCalls_WithTracking()
+public void VerifyCalls_WithVerifiable()
 {
     var stub = new QuickStartRepoStub();
-    var tracking = stub.GetUser.OnCall((ko, id) => new User { Id = id, Name = "Test" });
+    stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
 
     IQuickStartRepo repository = stub;
 
-    // Call the method
     var user = repository.GetUser(42);
 
-    // Verify it was called
-    Assert.True(stub.GetUser.WasCalled);
-    Assert.Equal(1, stub.GetUser.CallCount);
-
-    // Verify the argument via tracking
-    Assert.Equal(42, tracking.LastArg);
+    // Verify() checks all members marked with .Verifiable()
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->

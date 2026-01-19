@@ -12,7 +12,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		internal global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>? _source;
 
 		/// <summary>Delegate for GetById.</summary>
-		public delegate global::KnockOff.Benchmarks.Interfaces.Entity? GetByIdDelegate(EntityRepositoryStub ko, int id);
+		public delegate global::KnockOff.Benchmarks.Interfaces.Entity? GetByIdDelegate(int id);
 
 		private GetByIdDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Benchmarks.Interfaces.Entity? Invoke(EntityRepositoryStub ko, bool strict, int id)
+		internal global::KnockOff.Benchmarks.Interfaces.Entity? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -245,10 +245,10 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>? _source;
 
-		private global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity>? _onCall;
+		private global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -268,7 +268,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::KnockOff.Benchmarks.Interfaces.Entity> OnCall(global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity> callback)
+		public global::KnockOff.IMethodTracking<global::KnockOff.Benchmarks.Interfaces.Entity> OnCall(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -280,13 +280,13 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity>> OnCallSequence(global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity>> OnCallSequence(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -294,21 +294,21 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(EntityRepositoryStub ko, bool strict, global::KnockOff.Benchmarks.Interfaces.Entity entity)
+		internal void Invoke(bool strict, global::KnockOff.Benchmarks.Interfaces.Entity entity)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(entity);
 				_sequenceIndex++;
-				callback(ko, entity);
+				callback(entity);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(entity);
-				_onCall(ko, entity);
+				_onCall(entity);
 				return;
 			}
 
@@ -418,7 +418,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity>>
 		{
 			private readonly SaveInterceptor _interceptor;
 
@@ -438,7 +438,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity>> ThenCall(global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity>> ThenCall(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -459,7 +459,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<EntityRepositoryStub, global::KnockOff.Benchmarks.Interfaces.Entity>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Benchmarks.Interfaces.Entity>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -479,7 +479,7 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		internal global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>? _source;
 
 		/// <summary>Delegate for GetAll.</summary>
-		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Entity> GetAllDelegate(EntityRepositoryStub ko);
+		public delegate global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Entity> GetAllDelegate();
 
 		private GetAllDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -526,20 +526,20 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Entity> Invoke(EntityRepositoryStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Entity> Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -747,17 +747,17 @@ partial class EntityRepositoryStub : global::KnockOff.Benchmarks.Interfaces.IRep
 
 	global::KnockOff.Benchmarks.Interfaces.Entity? global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.GetById(int id)
 	{
-		return GetById.Invoke(this, Strict, id);
+		return GetById.Invoke(Strict, id);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.Save(global::KnockOff.Benchmarks.Interfaces.Entity entity)
 	{
-		Save.Invoke(this, Strict, entity);
+		Save.Invoke(Strict, entity);
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Interfaces.Entity> global::KnockOff.Benchmarks.Interfaces.IRepository<global::KnockOff.Benchmarks.Interfaces.Entity>.GetAll()
 	{
-		return GetAll.Invoke(this, Strict);
+		return GetAll.Invoke(Strict);
 	}
 
 }

@@ -14,7 +14,7 @@ partial class FactoryWithMixedReturnTypesKnockOff : global::KnockOff.Tests.IFact
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Fetch(long).</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(FactoryWithMixedReturnTypesKnockOff ko, long id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(long id);
 
 		private FetchDelegate_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea? _onCall_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea;
 		private MethodTrackingImpl_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea? _onCallTracking_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea;
@@ -26,7 +26,7 @@ partial class FactoryWithMixedReturnTypesKnockOff : global::KnockOff.Tests.IFact
 		private global::KnockOff.Times? _verifiableTimes_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea;
 
 		/// <summary>Delegate for Fetch(global::KnockOff.Tests.SampleEntity).</summary>
-		public delegate global::KnockOff.Tests.ISampleArea FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(FactoryWithMixedReturnTypesKnockOff ko, global::KnockOff.Tests.SampleEntity entity);
+		public delegate global::KnockOff.Tests.ISampleArea FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(global::KnockOff.Tests.SampleEntity entity);
 
 		private FetchDelegate_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea? _onCall_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea;
 		private MethodTrackingImpl_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea? _onCallTracking_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea;
@@ -96,20 +96,20 @@ partial class FactoryWithMixedReturnTypesKnockOff : global::KnockOff.Tests.IFact
 		}
 
 		/// <summary>Invokes configured callback for Fetch(long).</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Invoke_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(FactoryWithMixedReturnTypesKnockOff ko, bool strict, long id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> Invoke_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(bool strict, long id)
 		{
 			if (_sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea != null && _sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea < _sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.Count)
 			{
 				var (callback, tracking) = _sequence_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea[_sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea];
 				tracking.RecordCall(id);
 				_sequenceIndex_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea != null && _onCallTracking_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea != null)
 			{
 				_onCallTracking_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea.RecordCall(id);
-				return _onCall_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(ko, id);
+				return _onCall_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -127,20 +127,20 @@ partial class FactoryWithMixedReturnTypesKnockOff : global::KnockOff.Tests.IFact
 		}
 
 		/// <summary>Invokes configured callback for Fetch(global::KnockOff.Tests.SampleEntity).</summary>
-		internal global::KnockOff.Tests.ISampleArea Invoke_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(FactoryWithMixedReturnTypesKnockOff ko, bool strict, global::KnockOff.Tests.SampleEntity entity)
+		internal global::KnockOff.Tests.ISampleArea Invoke_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(bool strict, global::KnockOff.Tests.SampleEntity entity)
 		{
 			if (_sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea != null && _sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea < _sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.Count)
 			{
 				var (callback, tracking) = _sequence_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea[_sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea];
 				tracking.RecordCall(entity);
 				_sequenceIndex_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea++;
-				return callback(ko, entity);
+				return callback(entity);
 			}
 
 			if (_onCall_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea != null && _onCallTracking_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea != null)
 			{
 				_onCallTracking_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea.RecordCall(entity);
-				return _onCall_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(ko, entity);
+				return _onCall_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(entity);
 			}
 
 			_unconfiguredCallCount++;
@@ -476,12 +476,12 @@ partial class FactoryWithMixedReturnTypesKnockOff : global::KnockOff.Tests.IFact
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleArea?> global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(long id)
 	{
-		return Fetch.Invoke_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(this, Strict, id);
+		return Fetch.Invoke_Int64_Threading_Tasks_Task_KnockOff_Tests_ISampleArea(Strict, id);
 	}
 
 	global::KnockOff.Tests.ISampleArea global::KnockOff.Tests.IFactoryWithMixedReturnTypes.Fetch(global::KnockOff.Tests.SampleEntity entity)
 	{
-		return Fetch.Invoke_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(this, Strict, entity);
+		return Fetch.Invoke_KnockOff_Tests_SampleEntity_KnockOff_Tests_ISampleArea(Strict, entity);
 	}
 
 }

@@ -12,7 +12,7 @@ partial class RetryServiceStub : global::KnockOff.Documentation.Samples.Advanced
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.IRetryService? _source;
 
 		/// <summary>Delegate for Attempt.</summary>
-		public delegate bool AttemptDelegate(RetryServiceStub ko);
+		public delegate bool AttemptDelegate();
 
 		private AttemptDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class RetryServiceStub : global::KnockOff.Documentation.Samples.Advanced
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(RetryServiceStub ko, bool strict)
+		internal bool Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -268,7 +268,7 @@ partial class RetryServiceStub : global::KnockOff.Documentation.Samples.Advanced
 
 	bool global::KnockOff.Documentation.Samples.AdvancedCallbacks.IRetryService.Attempt()
 	{
-		return Attempt.Invoke(this, Strict);
+		return Attempt.Invoke(Strict);
 	}
 
 }

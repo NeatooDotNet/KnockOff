@@ -12,7 +12,7 @@ partial class ComparableStringKnockOff : global::System.IComparable<string>, glo
 		internal global::System.IComparable<string>? _source;
 
 		/// <summary>Delegate for CompareTo.</summary>
-		public delegate int CompareToDelegate(ComparableStringKnockOff ko, string? other);
+		public delegate int CompareToDelegate(string? other);
 
 		private CompareToDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class ComparableStringKnockOff : global::System.IComparable<string>, glo
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(ComparableStringKnockOff ko, bool strict, string? other)
+		internal int Invoke(bool strict, string? other)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(other);
 				_sequenceIndex++;
-				return callback(ko, other);
+				return callback(other);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(other);
-				return _onCall(ko, other);
+				return _onCall(other);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class ComparableStringKnockOff : global::System.IComparable<string>, glo
 
 	int global::System.IComparable<string>.CompareTo(string? other)
 	{
-		return CompareTo.Invoke(this, Strict, other);
+		return CompareTo.Invoke(Strict, other);
 	}
 
 }

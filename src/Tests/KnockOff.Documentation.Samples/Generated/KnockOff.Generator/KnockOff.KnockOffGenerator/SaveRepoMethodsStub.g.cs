@@ -11,10 +11,10 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Methods.ISaveRepoMethods? _source;
 
-		private global::System.Action<SaveRepoMethodsStub, object>? _onCall;
+		private global::System.Action<object>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SaveRepoMethodsStub, object> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<object> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -34,7 +34,7 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<object> OnCall(global::System.Action<SaveRepoMethodsStub, object> callback)
+		public global::KnockOff.IMethodTracking<object> OnCall(global::System.Action<object> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -46,13 +46,13 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SaveRepoMethodsStub, object>> OnCallSequence(global::System.Action<SaveRepoMethodsStub, object> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<object>> OnCallSequence(global::System.Action<object> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SaveRepoMethodsStub, object> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<object> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -60,21 +60,21 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SaveRepoMethodsStub ko, bool strict, object entity)
+		internal void Invoke(bool strict, object entity)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(entity);
 				_sequenceIndex++;
-				callback(ko, entity);
+				callback(entity);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(entity);
-				_onCall(ko, entity);
+				_onCall(entity);
 				return;
 			}
 
@@ -184,7 +184,7 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SaveRepoMethodsStub, object>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<object>>
 		{
 			private readonly SaveInterceptor _interceptor;
 
@@ -204,7 +204,7 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SaveRepoMethodsStub, object>> ThenCall(global::System.Action<SaveRepoMethodsStub, object> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<object>> ThenCall(global::System.Action<object> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -225,7 +225,241 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SaveRepoMethodsStub, object>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<object>> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
+		}
+
+	}
+
+	/// <summary>Tracks and configures behavior for GetById.</summary>
+	public sealed class GetByIdInterceptor
+	{
+		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
+		internal global::KnockOff.Documentation.Samples.Methods.ISaveRepoMethods? _source;
+
+		/// <summary>Delegate for GetById.</summary>
+		public delegate global::KnockOff.Documentation.Samples.User GetByIdDelegate(int id);
+
+		private GetByIdDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(GetByIdDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		private int _unconfiguredCallCount;
+		private int? _unconfiguredLastArg;
+
+		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+
+		/// <summary>Whether this method was called at least once.</summary>
+		public bool WasCalled => CallCount > 0;
+
+		/// <summary>The argument from the last call (from most recently called registration).</summary>
+		public int? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+
+
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
+		public global::KnockOff.IMethodTracking<int> OnCall(GetByIdDelegate callback)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
+		}
+
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<GetByIdDelegate> OnCallSequence(GetByIdDelegate callback)
+		{
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(GetByIdDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
+			_sequenceIndex = 0;
+			return new MethodSequenceImpl(this);
+		}
+
+		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
+		internal global::KnockOff.Documentation.Samples.User Invoke(bool strict, int id)
+		{
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
+			{
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(id);
+				_sequenceIndex++;
+				return callback(id);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall(id);
+				return _onCall(id);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArg = id;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetById");
+				return new global::KnockOff.Documentation.Samples.User();
+			}
+
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.GetById(id);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
+			return new global::KnockOff.Documentation.Samples.User();
+		}
+
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
+		public void Reset()
+		{
+			_unconfiguredCallCount = 0;
+			_unconfiguredLastArg = default;
+			_source = null;
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
+			_sequenceIndex = 0;
+		}
+
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetById", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetById", global::KnockOff.Times.AtLeastOnce, CallCount);
+		}
+
+		/// <summary>Tracks invocations for this callback registration.</summary>
+		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<int>
+		{
+			private readonly GetByIdInterceptor _interceptor;
+
+			public MethodTrackingImpl(GetByIdInterceptor interceptor) => _interceptor = interceptor;
+
+			private int _lastArg = default!;
+
+			/// <summary>Number of times this callback was invoked.</summary>
+			public int CallCount { get; private set; }
+
+			/// <summary>True if CallCount > 0.</summary>
+			public bool WasCalled => CallCount > 0;
+
+			/// <summary>Last argument passed to this callback. Default if never called.</summary>
+			public int LastArg => _lastArg;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall(int id) { CallCount++; _lastArg = id; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
+		}
+
+		/// <summary>Sequence implementation for ThenCall chaining.</summary>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetByIdDelegate>
+		{
+			private readonly GetByIdInterceptor _interceptor;
+
+			public MethodSequenceImpl(GetByIdInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Total calls across all callbacks in sequence.</summary>
+			public int TotalCallCount
+			{
+				get
+				{
+					if (_interceptor._sequence == null) return 0;
+					var total = 0;
+					foreach (var (_, tracking) in _interceptor._sequence)
+						total += tracking.CallCount;
+					return total;
+				}
+			}
+
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<GetByIdDelegate> ThenCall(GetByIdDelegate callback)
+			{
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
+				return this;
+			}
+
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
+			{
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
+			}
+
+			/// <summary>Resets all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<GetByIdDelegate> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -241,6 +475,9 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 	/// <summary>Interceptor for Save.</summary>
 	public SaveInterceptor Save { get; } = new();
 
+	/// <summary>Interceptor for GetById.</summary>
+	public GetByIdInterceptor GetById { get; } = new();
+
 	/// <summary>When true, throws StubException for unconfigured member access.</summary>
 	public bool Strict { get; set; } = false;
 
@@ -253,6 +490,7 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 		if (Save.CheckVerification() is { } saveFailure) failures.Add(saveFailure);
+		if (GetById.CheckVerification() is { } getbyidFailure) failures.Add(getbyidFailure);
 
 		if (failures.Count > 0)
 			throw new global::KnockOff.VerificationException(failures);
@@ -264,6 +502,7 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 		if (Save.CheckVerificationAll() is { } saveFailure) failures.Add(saveFailure);
+		if (GetById.CheckVerificationAll() is { } getbyidFailure) failures.Add(getbyidFailure);
 
 		if (failures.Count > 0)
 			throw new global::KnockOff.VerificationException(failures);
@@ -276,11 +515,17 @@ partial class SaveRepoMethodsStub : global::KnockOff.Documentation.Samples.Metho
 	public void Source(global::KnockOff.Documentation.Samples.Methods.ISaveRepoMethods? source)
 	{
 		Save._source = source;
+		GetById._source = source;
 	}
 
 	void global::KnockOff.Documentation.Samples.Methods.ISaveRepoMethods.Save(object entity)
 	{
-		Save.Invoke(this, Strict, entity);
+		Save.Invoke(Strict, entity);
+	}
+
+	global::KnockOff.Documentation.Samples.User global::KnockOff.Documentation.Samples.Methods.ISaveRepoMethods.GetById(int id)
+	{
+		return GetById.Invoke(Strict, id);
 	}
 
 }

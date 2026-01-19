@@ -19,7 +19,7 @@ partial class ApiPropertyRepoStub : global::KnockOff.Documentation.Samples.Inter
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ApiPropertyRepoStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class ApiPropertyRepoStub : global::KnockOff.Documentation.Samples.Inter
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ApiPropertyRepoStub, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -122,7 +122,7 @@ partial class ApiPropertyRepoStub : global::KnockOff.Documentation.Samples.Inter
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ApiPropertyRepoStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -203,7 +203,7 @@ partial class ApiPropertyRepoStub : global::KnockOff.Documentation.Samples.Inter
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ApiPropertyRepoStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -212,7 +212,7 @@ partial class ApiPropertyRepoStub : global::KnockOff.Documentation.Samples.Inter
 		public int? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ApiPropertyRepoStub, int>? OnSet { get; set; }
+		public global::System.Action<int>? OnSet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -320,19 +320,19 @@ partial class ApiPropertyRepoStub : global::KnockOff.Documentation.Samples.Inter
 
 	string global::KnockOff.Documentation.Samples.InterceptorApi.IApiPropertyRepo.ConnectionString
 	{
-		get { ConnectionString.RecordGet(); if (ConnectionString.OnGet is { } onGet) return onGet(this); if (ConnectionString._source is { } src) return src.ConnectionString; if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "ConnectionString"); return ConnectionString.Value; }
-		set { ConnectionString.RecordSet(value); if (ConnectionString.OnSet is { } onSet) { onSet(this, value); return; } if (ConnectionString._source is { } src) { src.ConnectionString = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "ConnectionString"); ConnectionString.Value = value; }
+		get { ConnectionString.RecordGet(); if (ConnectionString.OnGet is { } onGet) return onGet(); if (ConnectionString._source is { } src) return src.ConnectionString; if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "ConnectionString"); return ConnectionString.Value; }
+		set { ConnectionString.RecordSet(value); if (ConnectionString.OnSet is { } onSet) { onSet(value); return; } if (ConnectionString._source is { } src) { src.ConnectionString = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "ConnectionString"); ConnectionString.Value = value; }
 	}
 
 	bool global::KnockOff.Documentation.Samples.InterceptorApi.IApiPropertyRepo.IsConnected
 	{
-		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (IsConnected._source is { } src) return src.IsConnected; if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "IsConnected"); return IsConnected.Value; }
+		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(); if (IsConnected._source is { } src) return src.IsConnected; if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "IsConnected"); return IsConnected.Value; }
 	}
 
 	int global::KnockOff.Documentation.Samples.InterceptorApi.IApiPropertyRepo.Timeout
 	{
-		get { Timeout.RecordGet(); if (Timeout.OnGet is { } onGet) return onGet(this); if (Timeout._source is { } src) return src.Timeout; if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "Timeout"); return Timeout.Value; }
-		set { Timeout.RecordSet(value); if (Timeout.OnSet is { } onSet) { onSet(this, value); return; } if (Timeout._source is { } src) { src.Timeout = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "Timeout"); Timeout.Value = value; }
+		get { Timeout.RecordGet(); if (Timeout.OnGet is { } onGet) return onGet(); if (Timeout._source is { } src) return src.Timeout; if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "Timeout"); return Timeout.Value; }
+		set { Timeout.RecordSet(value); if (Timeout.OnSet is { } onSet) { onSet(value); return; } if (Timeout._source is { } src) { src.Timeout = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiPropertyRepo", "Timeout"); Timeout.Value = value; }
 	}
 
 }

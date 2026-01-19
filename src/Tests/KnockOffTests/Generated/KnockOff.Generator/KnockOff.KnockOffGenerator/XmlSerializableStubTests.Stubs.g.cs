@@ -15,7 +15,7 @@ partial class XmlSerializableStubTests
 			internal global::System.Xml.Serialization.IXmlSerializable? _source;
 
 			/// <summary>Delegate for GetSchema.</summary>
-			public delegate global::System.Xml.Schema.XmlSchema? GetSchemaDelegate(Stubs.IXmlSerializable ko);
+			public delegate global::System.Xml.Schema.XmlSchema? GetSchemaDelegate();
 
 			private GetSchemaDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -62,33 +62,33 @@ partial class XmlSerializableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Xml.Schema.XmlSchema? Invoke(Stubs.IXmlSerializable ko)
+			internal global::System.Xml.Schema.XmlSchema? Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetSchema");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetSchema");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetSchema();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetSchema");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetSchema");
 				return default!;
 			}
 
@@ -235,10 +235,10 @@ partial class XmlSerializableStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Xml.Serialization.IXmlSerializable? _source;
 
-			private global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader>? _onCall;
+			private global::System.Action<global::System.Xml.XmlReader>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<global::System.Xml.XmlReader> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -258,7 +258,7 @@ partial class XmlSerializableStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<global::System.Xml.XmlReader> OnCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> callback)
+			public global::KnockOff.IMethodTracking<global::System.Xml.XmlReader> OnCall(global::System.Action<global::System.Xml.XmlReader> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -270,13 +270,13 @@ partial class XmlSerializableStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader>> OnCallSequence(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlReader>> OnCallSequence(global::System.Action<global::System.Xml.XmlReader> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Xml.XmlReader> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -284,21 +284,21 @@ partial class XmlSerializableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IXmlSerializable ko, global::System.Xml.XmlReader reader)
+			internal void Invoke(bool strict, global::System.Xml.XmlReader reader)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(reader);
 					_sequenceIndex++;
-					callback(ko, reader);
+					callback(reader);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(reader);
-					_onCall(ko, reader);
+					_onCall(reader);
 					return;
 				}
 
@@ -306,14 +306,14 @@ partial class XmlSerializableStubTests
 				_unconfiguredLastArg = reader;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ReadXml");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ReadXml");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ReadXml(reader); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ReadXml");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ReadXml");
 				return;
 			}
 
@@ -408,7 +408,7 @@ partial class XmlSerializableStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlReader>>
 			{
 				private readonly IXmlSerializable_ReadXmlInterceptor _interceptor;
 
@@ -428,7 +428,7 @@ partial class XmlSerializableStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader>> ThenCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlReader>> ThenCall(global::System.Action<global::System.Xml.XmlReader> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -449,7 +449,7 @@ partial class XmlSerializableStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlReader>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -468,10 +468,10 @@ partial class XmlSerializableStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Xml.Serialization.IXmlSerializable? _source;
 
-			private global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter>? _onCall;
+			private global::System.Action<global::System.Xml.XmlWriter>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<global::System.Xml.XmlWriter> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -491,7 +491,7 @@ partial class XmlSerializableStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<global::System.Xml.XmlWriter> OnCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> callback)
+			public global::KnockOff.IMethodTracking<global::System.Xml.XmlWriter> OnCall(global::System.Action<global::System.Xml.XmlWriter> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -503,13 +503,13 @@ partial class XmlSerializableStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter>> OnCallSequence(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlWriter>> OnCallSequence(global::System.Action<global::System.Xml.XmlWriter> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Xml.XmlWriter> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -517,21 +517,21 @@ partial class XmlSerializableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IXmlSerializable ko, global::System.Xml.XmlWriter writer)
+			internal void Invoke(bool strict, global::System.Xml.XmlWriter writer)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(writer);
 					_sequenceIndex++;
-					callback(ko, writer);
+					callback(writer);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(writer);
-					_onCall(ko, writer);
+					_onCall(writer);
 					return;
 				}
 
@@ -539,14 +539,14 @@ partial class XmlSerializableStubTests
 				_unconfiguredLastArg = writer;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("WriteXml");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("WriteXml");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.WriteXml(writer); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WriteXml");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WriteXml");
 				return;
 			}
 
@@ -641,7 +641,7 @@ partial class XmlSerializableStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlWriter>>
 			{
 				private readonly IXmlSerializable_WriteXmlInterceptor _interceptor;
 
@@ -661,7 +661,7 @@ partial class XmlSerializableStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter>> ThenCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlWriter>> ThenCall(global::System.Action<global::System.Xml.XmlWriter> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -682,7 +682,7 @@ partial class XmlSerializableStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlWriter>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -709,17 +709,17 @@ partial class XmlSerializableStubTests
 
 			global::System.Xml.Schema.XmlSchema? global::System.Xml.Serialization.IXmlSerializable.GetSchema()
 			{
-				return GetSchema.Invoke(this);
+				return GetSchema.Invoke(Strict);
 			}
 
 			void global::System.Xml.Serialization.IXmlSerializable.ReadXml(global::System.Xml.XmlReader reader)
 			{
-				ReadXml.Invoke(this, reader);
+				ReadXml.Invoke(Strict, reader);
 			}
 
 			void global::System.Xml.Serialization.IXmlSerializable.WriteXml(global::System.Xml.XmlWriter writer)
 			{
-				WriteXml.Invoke(this, writer);
+				WriteXml.Invoke(Strict, writer);
 			}
 
 			/// <summary>The global::System.Xml.Serialization.IXmlSerializable instance. Use for passing to code expecting the interface.</summary>

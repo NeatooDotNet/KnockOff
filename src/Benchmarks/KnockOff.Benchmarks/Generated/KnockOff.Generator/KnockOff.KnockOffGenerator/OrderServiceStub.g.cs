@@ -12,7 +12,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		internal global::KnockOff.Benchmarks.Interfaces.IOrderService? _source;
 
 		/// <summary>Delegate for GetOrder.</summary>
-		public delegate global::KnockOff.Benchmarks.Interfaces.Order GetOrderDelegate(OrderServiceStub ko, int id);
+		public delegate global::KnockOff.Benchmarks.Interfaces.Order GetOrderDelegate(int id);
 
 		private GetOrderDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Benchmarks.Interfaces.Order Invoke(OrderServiceStub ko, bool strict, int id)
+		internal global::KnockOff.Benchmarks.Interfaces.Order Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		internal global::KnockOff.Benchmarks.Interfaces.IOrderService? _source;
 
 		/// <summary>Delegate for ValidateOrder.</summary>
-		public delegate bool ValidateOrderDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
+		public delegate bool ValidateOrderDelegate(global::KnockOff.Benchmarks.Interfaces.Order order);
 
 		private ValidateOrderDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -297,20 +297,20 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(OrderServiceStub ko, bool strict, global::KnockOff.Benchmarks.Interfaces.Order order)
+		internal bool Invoke(bool strict, global::KnockOff.Benchmarks.Interfaces.Order order)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(order);
 				_sequenceIndex++;
-				return callback(ko, order);
+				return callback(order);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(order);
-				return _onCall(ko, order);
+				return _onCall(order);
 			}
 
 			_unconfiguredCallCount++;
@@ -480,7 +480,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		internal global::KnockOff.Benchmarks.Interfaces.IOrderService? _source;
 
 		/// <summary>Delegate for CalculateTotal.</summary>
-		public delegate decimal CalculateTotalDelegate(OrderServiceStub ko, global::KnockOff.Benchmarks.Interfaces.Order order);
+		public delegate decimal CalculateTotalDelegate(global::KnockOff.Benchmarks.Interfaces.Order order);
 
 		private CalculateTotalDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -531,20 +531,20 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal decimal Invoke(OrderServiceStub ko, bool strict, global::KnockOff.Benchmarks.Interfaces.Order order)
+		internal decimal Invoke(bool strict, global::KnockOff.Benchmarks.Interfaces.Order order)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(order);
 				_sequenceIndex++;
-				return callback(ko, order);
+				return callback(order);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(order);
-				return _onCall(ko, order);
+				return _onCall(order);
 			}
 
 			_unconfiguredCallCount++;
@@ -713,10 +713,10 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IOrderService? _source;
 
-		private global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order>? _onCall;
+		private global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -736,7 +736,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::KnockOff.Benchmarks.Interfaces.Order> OnCall(global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order> callback)
+		public global::KnockOff.IMethodTracking<global::KnockOff.Benchmarks.Interfaces.Order> OnCall(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -748,13 +748,13 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order>> OnCallSequence(global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order>> OnCallSequence(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -762,21 +762,21 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(OrderServiceStub ko, bool strict, global::KnockOff.Benchmarks.Interfaces.Order order)
+		internal void Invoke(bool strict, global::KnockOff.Benchmarks.Interfaces.Order order)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(order);
 				_sequenceIndex++;
-				callback(ko, order);
+				callback(order);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(order);
-				_onCall(ko, order);
+				_onCall(order);
 				return;
 			}
 
@@ -886,7 +886,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order>>
 		{
 			private readonly SaveOrderInterceptor _interceptor;
 
@@ -906,7 +906,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order>> ThenCall(global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order>> ThenCall(global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -927,7 +927,7 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<OrderServiceStub, global::KnockOff.Benchmarks.Interfaces.Order>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Benchmarks.Interfaces.Order>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1000,22 +1000,22 @@ partial class OrderServiceStub : global::KnockOff.Benchmarks.Interfaces.IOrderSe
 
 	global::KnockOff.Benchmarks.Interfaces.Order global::KnockOff.Benchmarks.Interfaces.IOrderService.GetOrder(int id)
 	{
-		return GetOrder.Invoke(this, Strict, id);
+		return GetOrder.Invoke(Strict, id);
 	}
 
 	bool global::KnockOff.Benchmarks.Interfaces.IOrderService.ValidateOrder(global::KnockOff.Benchmarks.Interfaces.Order order)
 	{
-		return ValidateOrder.Invoke(this, Strict, order);
+		return ValidateOrder.Invoke(Strict, order);
 	}
 
 	decimal global::KnockOff.Benchmarks.Interfaces.IOrderService.CalculateTotal(global::KnockOff.Benchmarks.Interfaces.Order order)
 	{
-		return CalculateTotal.Invoke(this, Strict, order);
+		return CalculateTotal.Invoke(Strict, order);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IOrderService.SaveOrder(global::KnockOff.Benchmarks.Interfaces.Order order)
 	{
-		SaveOrder.Invoke(this, Strict, order);
+		SaveOrder.Invoke(Strict, order);
 	}
 
 }

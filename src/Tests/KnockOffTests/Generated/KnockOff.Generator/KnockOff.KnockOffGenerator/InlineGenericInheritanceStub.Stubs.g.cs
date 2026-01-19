@@ -12,7 +12,7 @@ partial class InlineGenericInheritanceStub
 		public sealed class ISampleValidationRule_Execute1Interceptor
 		{
 			/// <summary>Delegate for Execute1.</summary>
-			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Execute1Delegate(Stubs.ISampleValidationRule ko, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token);
+			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Execute1Delegate(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token);
 
 			private Execute1Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -63,31 +63,31 @@ partial class InlineGenericInheritanceStub
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke(Stubs.ISampleValidationRule ko, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
+			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke(bool strict, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((target, token));
 					_sequenceIndex++;
-					return callback(ko, target, token);
+					return callback(target, token);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((target, token));
-					return _onCall(ko, target, token);
+					return _onCall(target, token);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((target, token));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Execute1");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Execute1");
 					return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleResult>(default!);
 				}
 
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Execute1");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute1");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleResult>(default!);
 			}
 
@@ -239,7 +239,7 @@ partial class InlineGenericInheritanceStub
 		public sealed class ISampleValidationRule_Execute2Interceptor
 		{
 			/// <summary>Delegate for Execute2.</summary>
-			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Execute2Delegate(Stubs.ISampleValidationRule ko, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token);
+			public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Execute2Delegate(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token);
 
 			private Execute2Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -290,31 +290,31 @@ partial class InlineGenericInheritanceStub
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke(Stubs.ISampleValidationRule ko, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
+			internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke(bool strict, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((target, token));
 					_sequenceIndex++;
-					return callback(ko, target, token);
+					return callback(target, token);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((target, token));
-					return _onCall(ko, target, token);
+					return _onCall(target, token);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((target, token));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Execute2");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Execute2");
 					return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleResult>(default!);
 				}
 
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Execute2");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Execute2");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Tests.ISampleResult>(default!);
 			}
 
@@ -473,12 +473,12 @@ partial class InlineGenericInheritanceStub
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>.Execute(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
 			{
-				return Execute1.Invoke(this, target, token);
+				return Execute1.Invoke(Strict, target, token);
 			}
 
 			global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule.Execute(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
 			{
-				return Execute2.Invoke(this, target, token);
+				return Execute2.Invoke(Strict, target, token);
 			}
 
 			/// <summary>The global::KnockOff.Tests.ISampleValidationRule instance. Use for passing to code expecting the interface.</summary>

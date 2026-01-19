@@ -12,7 +12,7 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IValueTypeService? _source;
 
 		/// <summary>Delegate for GetCount.</summary>
-		public delegate int GetCountDelegate(ValueTypeServiceStub ko);
+		public delegate int GetCountDelegate();
 
 		private GetCountDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(ValueTypeServiceStub ko, bool strict)
+		internal int Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -233,7 +233,7 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IValueTypeService? _source;
 
 		/// <summary>Delegate for IsEnabled.</summary>
-		public delegate bool IsEnabledDelegate(ValueTypeServiceStub ko);
+		public delegate bool IsEnabledDelegate();
 
 		private IsEnabledDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -280,20 +280,20 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(ValueTypeServiceStub ko, bool strict)
+		internal bool Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -454,7 +454,7 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IValueTypeService? _source;
 
 		/// <summary>Delegate for GetRate.</summary>
-		public delegate decimal GetRateDelegate(ValueTypeServiceStub ko);
+		public delegate decimal GetRateDelegate();
 
 		private GetRateDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -501,20 +501,20 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal decimal Invoke(ValueTypeServiceStub ko, bool strict)
+		internal decimal Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -675,7 +675,7 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IValueTypeService? _source;
 
 		/// <summary>Delegate for GetTimestamp.</summary>
-		public delegate global::System.DateTime GetTimestampDelegate(ValueTypeServiceStub ko);
+		public delegate global::System.DateTime GetTimestampDelegate();
 
 		private GetTimestampDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -722,20 +722,20 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.DateTime Invoke(ValueTypeServiceStub ko, bool strict)
+		internal global::System.DateTime Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -949,22 +949,22 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 
 	int global::KnockOff.Documentation.Samples.SmartDefaults.IValueTypeService.GetCount()
 	{
-		return GetCount.Invoke(this, Strict);
+		return GetCount.Invoke(Strict);
 	}
 
 	bool global::KnockOff.Documentation.Samples.SmartDefaults.IValueTypeService.IsEnabled()
 	{
-		return IsEnabled.Invoke(this, Strict);
+		return IsEnabled.Invoke(Strict);
 	}
 
 	decimal global::KnockOff.Documentation.Samples.SmartDefaults.IValueTypeService.GetRate()
 	{
-		return GetRate.Invoke(this, Strict);
+		return GetRate.Invoke(Strict);
 	}
 
 	global::System.DateTime global::KnockOff.Documentation.Samples.SmartDefaults.IValueTypeService.GetTimestamp()
 	{
-		return GetTimestamp.Invoke(this, Strict);
+		return GetTimestamp.Invoke(Strict);
 	}
 
 }

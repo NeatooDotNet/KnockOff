@@ -19,7 +19,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, object?>? OnGet { get; set; }
+		public global::System.Func<object?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -109,7 +109,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public object? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ValidatePropertyStub, object?>? OnSet { get; set; }
+		public global::System.Action<object?>? OnSet { get; set; }
 
 		private object? _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -203,7 +203,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, global::System.Threading.Tasks.Task>? OnGet { get; set; }
+		public global::System.Func<global::System.Threading.Tasks.Task>? OnGet { get; set; }
 
 		private global::System.Threading.Tasks.Task _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -284,7 +284,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -365,7 +365,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -446,7 +446,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, global::System.Type>? OnGet { get; set; }
+		public global::System.Func<global::System.Type>? OnGet { get; set; }
 
 		private global::System.Type _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -527,7 +527,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, string?>? OnGet { get; set; }
+		public global::System.Func<string?>? OnGet { get; set; }
 
 		private string? _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -608,7 +608,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -689,7 +689,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -770,7 +770,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ValidatePropertyStub, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
+		public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
 		private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -844,7 +844,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		internal global::Neatoo.IValidateProperty? _source;
 
 		/// <summary>Delegate for SetValue.</summary>
-		public delegate global::System.Threading.Tasks.Task SetValueDelegate(ValidatePropertyStub ko, object? newValue);
+		public delegate global::System.Threading.Tasks.Task SetValueDelegate(object? newValue);
 
 		private SetValueDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -895,20 +895,20 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(ValidatePropertyStub ko, bool strict, object? newValue)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, object? newValue)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(newValue);
 				_sequenceIndex++;
-				return callback(ko, newValue);
+				return callback(newValue);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(newValue);
-				return _onCall(ko, newValue);
+				return _onCall(newValue);
 			}
 
 			_unconfiguredCallCount++;
@@ -1077,10 +1077,10 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
 
-		private global::System.Action<ValidatePropertyStub, long>? _onCall;
+		private global::System.Action<long>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, long> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<long> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1100,7 +1100,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<long> OnCall(global::System.Action<ValidatePropertyStub, long> callback)
+		public global::KnockOff.IMethodTracking<long> OnCall(global::System.Action<long> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1112,13 +1112,13 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> OnCallSequence(global::System.Action<ValidatePropertyStub, long> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<long>> OnCallSequence(global::System.Action<long> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, long> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<long> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1126,21 +1126,21 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidatePropertyStub ko, bool strict, long id)
+		internal void Invoke(bool strict, long id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				callback(ko, id);
+				callback(id);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				_onCall(ko, id);
+				_onCall(id);
 				return;
 			}
 
@@ -1250,7 +1250,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<long>>
 		{
 			private readonly AddMarkedBusyInterceptor _interceptor;
 
@@ -1270,7 +1270,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> ThenCall(global::System.Action<ValidatePropertyStub, long> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<long>> ThenCall(global::System.Action<long> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1291,7 +1291,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<long>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1310,10 +1310,10 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
 
-		private global::System.Action<ValidatePropertyStub, long>? _onCall;
+		private global::System.Action<long>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, long> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<long> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1333,7 +1333,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<long> OnCall(global::System.Action<ValidatePropertyStub, long> callback)
+		public global::KnockOff.IMethodTracking<long> OnCall(global::System.Action<long> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1345,13 +1345,13 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> OnCallSequence(global::System.Action<ValidatePropertyStub, long> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<long>> OnCallSequence(global::System.Action<long> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, long> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<long> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1359,21 +1359,21 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidatePropertyStub ko, bool strict, long id)
+		internal void Invoke(bool strict, long id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				callback(ko, id);
+				callback(id);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				_onCall(ko, id);
+				_onCall(id);
 				return;
 			}
 
@@ -1483,7 +1483,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<long>>
 		{
 			private readonly RemoveMarkedBusyInterceptor _interceptor;
 
@@ -1503,7 +1503,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> ThenCall(global::System.Action<ValidatePropertyStub, long> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<long>> ThenCall(global::System.Action<long> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1524,7 +1524,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, long>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<long>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1543,10 +1543,10 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
 
-		private global::System.Action<ValidatePropertyStub, object?>? _onCall;
+		private global::System.Action<object?>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, object?> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<object?> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -1566,7 +1566,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<object?> OnCall(global::System.Action<ValidatePropertyStub, object?> callback)
+		public global::KnockOff.IMethodTracking<object?> OnCall(global::System.Action<object?> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -1578,13 +1578,13 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, object?>> OnCallSequence(global::System.Action<ValidatePropertyStub, object?> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<object?>> OnCallSequence(global::System.Action<object?> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ValidatePropertyStub, object?> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<object?> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -1592,21 +1592,21 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ValidatePropertyStub ko, bool strict, object? @value)
+		internal void Invoke(bool strict, object? @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(@value);
 				_sequenceIndex++;
-				callback(ko, @value);
+				callback(@value);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(@value);
-				_onCall(ko, @value);
+				_onCall(@value);
 				return;
 			}
 
@@ -1716,7 +1716,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, object?>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<object?>>
 		{
 			private readonly LoadValueInterceptor _interceptor;
 
@@ -1736,7 +1736,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, object?>> ThenCall(global::System.Action<ValidatePropertyStub, object?> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<object?>> ThenCall(global::System.Action<object?> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -1757,7 +1757,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ValidatePropertyStub, object?>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<object?>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -1777,7 +1777,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		internal global::Neatoo.IValidateProperty? _source;
 
 		/// <summary>Delegate for WaitForTasks.</summary>
-		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate(ValidatePropertyStub ko);
+		public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate();
 
 		private WaitForTasksDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -1824,20 +1824,20 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(ValidatePropertyStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -1998,7 +1998,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		internal global::Neatoo.IValidateProperty? _source;
 
 		/// <summary>Delegate for GetAwaiter.</summary>
-		public delegate global::System.Runtime.CompilerServices.TaskAwaiter GetAwaiterDelegate(ValidatePropertyStub ko);
+		public delegate global::System.Runtime.CompilerServices.TaskAwaiter GetAwaiterDelegate();
 
 		private GetAwaiterDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2045,20 +2045,20 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Runtime.CompilerServices.TaskAwaiter Invoke(ValidatePropertyStub ko, bool strict)
+		internal global::System.Runtime.CompilerServices.TaskAwaiter Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -2219,7 +2219,7 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		internal global::Neatoo.IValidateProperty? _source;
 
 		/// <summary>Delegate for RunRules.</summary>
-		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(ValidatePropertyStub ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task RunRulesDelegate(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
 		private RunRulesDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -2270,20 +2270,20 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(ValidatePropertyStub ko, bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((runRules, token));
 				_sequenceIndex++;
-				return callback(ko, runRules, token);
+				return callback(runRules, token);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((runRules, token));
-				return _onCall(ko, runRules, token);
+				return _onCall(runRules, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -2844,88 +2844,88 @@ partial class ValidatePropertyStub : global::Neatoo.IValidateProperty, global::S
 
 	string global::Neatoo.IValidateProperty.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Name"); return Name.Value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Name"); return Name.Value; }
 	}
 
 	object? global::Neatoo.IValidateProperty.Value
 	{
-		get { Value.RecordGet(); if (Value.OnGet is { } onGet) return onGet(this); if (Value._source is { } src) return src.Value; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Value"); return Value.Value; }
-		set { Value.RecordSet(value); if (Value.OnSet is { } onSet) { onSet(this, value); return; } if (Value._source is { } src) { src.Value = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Value"); Value.Value = value; }
+		get { Value.RecordGet(); if (Value.OnGet is { } onGet) return onGet(); if (Value._source is { } src) return src.Value; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Value"); return Value.Value; }
+		set { Value.RecordSet(value); if (Value.OnSet is { } onSet) { onSet(value); return; } if (Value._source is { } src) { src.Value = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Value"); Value.Value = value; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.Task
 	{
-		get { Task.RecordGet(); if (Task.OnGet is { } onGet) return onGet(this); if (Task._source is { } src) return src.Task; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Task"); return Task.Value; }
+		get { Task.RecordGet(); if (Task.OnGet is { } onGet) return onGet(); if (Task._source is { } src) return src.Task; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Task"); return Task.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsBusy
 	{
-		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(this); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsBusy"); return IsBusy.Value; }
+		get { IsBusy.RecordGet(); if (IsBusy.OnGet is { } onGet) return onGet(); if (IsBusy._source is { } src) return src.IsBusy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsBusy"); return IsBusy.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsReadOnly
 	{
-		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(this); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsReadOnly"); return IsReadOnly.Value; }
+		get { IsReadOnly.RecordGet(); if (IsReadOnly.OnGet is { } onGet) return onGet(); if (IsReadOnly._source is { } src) return src.IsReadOnly; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsReadOnly"); return IsReadOnly.Value; }
 	}
 
 	global::System.Type global::Neatoo.IValidateProperty.Type
 	{
-		get { Type.RecordGet(); if (Type.OnGet is { } onGet) return onGet(this); if (Type._source is { } src) return src.Type; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Type"); return Type.Value; }
+		get { Type.RecordGet(); if (Type.OnGet is { } onGet) return onGet(); if (Type._source is { } src) return src.Type; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "Type"); return Type.Value; }
 	}
 
 	string? global::Neatoo.IValidateProperty.StringValue
 	{
-		get { StringValue.RecordGet(); if (StringValue.OnGet is { } onGet) return onGet(this); if (StringValue._source is { } src) return src.StringValue; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "StringValue"); return StringValue.Value; }
+		get { StringValue.RecordGet(); if (StringValue.OnGet is { } onGet) return onGet(); if (StringValue._source is { } src) return src.StringValue; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "StringValue"); return StringValue.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsSelfValid
 	{
-		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(this); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsSelfValid"); return IsSelfValid.Value; }
+		get { IsSelfValid.RecordGet(); if (IsSelfValid.OnGet is { } onGet) return onGet(); if (IsSelfValid._source is { } src) return src.IsSelfValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsSelfValid"); return IsSelfValid.Value; }
 	}
 
 	bool global::Neatoo.IValidateProperty.IsValid
 	{
-		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(this); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsValid"); return IsValid.Value; }
+		get { IsValid.RecordGet(); if (IsValid.OnGet is { } onGet) return onGet(); if (IsValid._source is { } src) return src.IsValid; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "IsValid"); return IsValid.Value; }
 	}
 
 	global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateProperty.PropertyMessages
 	{
-		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(this); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "PropertyMessages"); return PropertyMessages.Value; }
+		get { PropertyMessages.RecordGet(); if (PropertyMessages.OnGet is { } onGet) return onGet(); if (PropertyMessages._source is { } src) return src.PropertyMessages; if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateProperty", "PropertyMessages"); return PropertyMessages.Value; }
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.SetValue(object? newValue)
 	{
-		return SetValue.Invoke(this, Strict, newValue);
+		return SetValue.Invoke(Strict, newValue);
 	}
 
 	void global::Neatoo.IValidateProperty.AddMarkedBusy(long id)
 	{
-		AddMarkedBusy.Invoke(this, Strict, id);
+		AddMarkedBusy.Invoke(Strict, id);
 	}
 
 	void global::Neatoo.IValidateProperty.RemoveMarkedBusy(long id)
 	{
-		RemoveMarkedBusy.Invoke(this, Strict, id);
+		RemoveMarkedBusy.Invoke(Strict, id);
 	}
 
 	void global::Neatoo.IValidateProperty.LoadValue(object? @value)
 	{
-		LoadValue.Invoke(this, Strict, @value);
+		LoadValue.Invoke(Strict, @value);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.WaitForTasks()
 	{
-		return WaitForTasks.Invoke(this, Strict);
+		return WaitForTasks.Invoke(Strict);
 	}
 
 	global::System.Runtime.CompilerServices.TaskAwaiter global::Neatoo.IValidateProperty.GetAwaiter()
 	{
-		return GetAwaiter.Invoke(this, Strict);
+		return GetAwaiter.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::Neatoo.IValidateProperty.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 	{
-		return RunRules.Invoke(this, Strict, runRules, token);
+		return RunRules.Invoke(Strict, runRules, token);
 	}
 
 	event global::System.ComponentModel.PropertyChangedEventHandler? global::System.ComponentModel.INotifyPropertyChanged.PropertyChanged

@@ -12,7 +12,7 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 		internal global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>? _source;
 
 		/// <summary>Delegate for Get.</summary>
-		public delegate TValue GetDelegate(GenericKeyValueStoreStub<TKey, TValue> ko, TKey key);
+		public delegate TValue GetDelegate(TKey key);
 
 		private GetDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal TValue Invoke(GenericKeyValueStoreStub<TKey, TValue> ko, bool strict, TKey key)
+		internal TValue Invoke(bool strict, TKey key)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(key);
 				_sequenceIndex++;
-				return callback(ko, key);
+				return callback(key);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(key);
-				return _onCall(ko, key);
+				return _onCall(key);
 			}
 
 			_unconfiguredCallCount++;
@@ -245,10 +245,10 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>? _source;
 
-		private global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue>? _onCall;
+		private global::System.Action<TKey, TValue>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<TKey, TValue> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -268,7 +268,7 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(TKey? key, TValue? @value)> OnCall(global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue> callback)
+		public global::KnockOff.IMethodTrackingArgs<(TKey? key, TValue? @value)> OnCall(global::System.Action<TKey, TValue> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -280,13 +280,13 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue>> OnCallSequence(global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<TKey, TValue>> OnCallSequence(global::System.Action<TKey, TValue> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<TKey, TValue> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -294,21 +294,21 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(GenericKeyValueStoreStub<TKey, TValue> ko, bool strict, TKey key, TValue @value)
+		internal void Invoke(bool strict, TKey key, TValue @value)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((key, @value));
 				_sequenceIndex++;
-				callback(ko, key, @value);
+				callback(key, @value);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((key, @value));
-				_onCall(ko, key, @value);
+				_onCall(key, @value);
 				return;
 			}
 
@@ -418,7 +418,7 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<TKey, TValue>>
 		{
 			private readonly SetInterceptor _interceptor;
 
@@ -438,7 +438,7 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue>> ThenCall(global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<TKey, TValue>> ThenCall(global::System.Action<TKey, TValue> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -459,7 +459,7 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<GenericKeyValueStoreStub<TKey, TValue>, TKey, TValue>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<TKey, TValue>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -520,12 +520,12 @@ partial class GenericKeyValueStoreStub<TKey, TValue> : global::KnockOff.Tests.IG
 
 	TValue global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>.Get(TKey key)
 	{
-		return Get.Invoke(this, Strict, key);
+		return Get.Invoke(Strict, key);
 	}
 
 	void global::KnockOff.Tests.IGenericKeyValueStore<TKey, TValue>.Set(TKey key, TValue @value)
 	{
-		Set.Invoke(this, Strict, key, @value);
+		Set.Invoke(Strict, key, @value);
 	}
 
 }

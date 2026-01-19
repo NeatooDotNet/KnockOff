@@ -14,7 +14,7 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Execute(global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?).</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(SampleValidationRuleKnockOff ko, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token);
 
 		private ExecuteDelegate_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult? _onCall_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
 		private MethodTrackingImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult? _onCallTracking_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
@@ -26,7 +26,7 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 		private global::KnockOff.Times? _verifiableTimes_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
 
 		/// <summary>Delegate for Execute(global::KnockOff.Tests.ISampleRuleTarget, global::System.Threading.CancellationToken?).</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(SampleValidationRuleKnockOff ko, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token);
 
 		private ExecuteDelegate_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult? _onCall_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
 		private MethodTrackingImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult? _onCallTracking_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
@@ -96,20 +96,20 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 		}
 
 		/// <summary>Invokes configured callback for Execute(global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?).</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(SampleValidationRuleKnockOff ko, bool strict, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(bool strict, global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult != null && _sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult < _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count)
 			{
 				var (callback, tracking) = _sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult[_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult];
 				tracking.RecordCall((target, token));
 				_sequenceIndex_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult++;
-				return callback(ko, target, token);
+				return callback(target, token);
 			}
 
 			if (_onCall_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult != null && _onCallTracking_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult != null)
 			{
 				_onCallTracking_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.RecordCall((target, token));
-				return _onCall_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(ko, target, token);
+				return _onCall_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(target, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -127,20 +127,20 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 		}
 
 		/// <summary>Invokes configured callback for Execute(global::KnockOff.Tests.ISampleRuleTarget, global::System.Threading.CancellationToken?).</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(SampleValidationRuleKnockOff ko, bool strict, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> Invoke_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(bool strict, global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
 		{
 			if (_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult != null && _sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult < _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.Count)
 			{
 				var (callback, tracking) = _sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult[_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult];
 				tracking.RecordCall((target, token));
 				_sequenceIndex_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult++;
-				return callback(ko, target, token);
+				return callback(target, token);
 			}
 
 			if (_onCall_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult != null && _onCallTracking_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult != null)
 			{
 				_onCallTracking_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult.RecordCall((target, token));
-				return _onCall_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(ko, target, token);
+				return _onCall_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(target, token);
 			}
 
 			_unconfiguredCallCount++;
@@ -490,12 +490,12 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule<global::KnockOff.Tests.ISampleTarget>.Execute(global::KnockOff.Tests.ISampleTarget target, global::System.Threading.CancellationToken? token)
 	{
-		return Execute.Invoke_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(this, Strict, target, token);
+		return Execute.Invoke_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(Strict, target, token);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Tests.ISampleResult> global::KnockOff.Tests.ISampleRule.Execute(global::KnockOff.Tests.ISampleRuleTarget target, global::System.Threading.CancellationToken? token)
 	{
-		return Execute.Invoke_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(this, Strict, target, token);
+		return Execute.Invoke_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(Strict, target, token);
 	}
 
 }

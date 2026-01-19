@@ -19,7 +19,7 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<TimestampedEntityStub, global::System.DateTime>? OnGet { get; set; }
+		public global::System.Func<global::System.DateTime>? OnGet { get; set; }
 
 		private global::System.DateTime _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -100,7 +100,7 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<TimestampedEntityStub, global::System.DateTime?>? OnGet { get; set; }
+		public global::System.Func<global::System.DateTime?>? OnGet { get; set; }
 
 		private global::System.DateTime? _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -181,7 +181,7 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<TimestampedEntityStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -285,17 +285,17 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 
 	global::System.DateTime global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(this); if (CreatedAt._source is { } src) return src.CreatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "CreatedAt"); return CreatedAt.Value; }
+		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(); if (CreatedAt._source is { } src) return src.CreatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "CreatedAt"); return CreatedAt.Value; }
 	}
 
 	global::System.DateTime? global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity.UpdatedAt
 	{
-		get { UpdatedAt.RecordGet(); if (UpdatedAt.OnGet is { } onGet) return onGet(this); if (UpdatedAt._source is { } src) return src.UpdatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "UpdatedAt"); return UpdatedAt.Value; }
+		get { UpdatedAt.RecordGet(); if (UpdatedAt.OnGet is { } onGet) return onGet(); if (UpdatedAt._source is { } src) return src.UpdatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITimestampedEntity", "UpdatedAt"); return UpdatedAt.Value; }
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IBaseEntity.Id
 	{
-		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
 	}
 
 }

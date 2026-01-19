@@ -19,7 +19,7 @@ partial class UserConfigPropsStub : global::KnockOff.Documentation.Samples.Prope
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<UserConfigPropsStub, global::KnockOff.Documentation.Samples.User?>? OnGet { get; set; }
+		public global::System.Func<global::KnockOff.Documentation.Samples.User?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class UserConfigPropsStub : global::KnockOff.Documentation.Samples.Prope
 		public global::KnockOff.Documentation.Samples.User? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<UserConfigPropsStub, global::KnockOff.Documentation.Samples.User?>? OnSet { get; set; }
+		public global::System.Action<global::KnockOff.Documentation.Samples.User?>? OnSet { get; set; }
 
 		private global::KnockOff.Documentation.Samples.User? _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -122,7 +122,7 @@ partial class UserConfigPropsStub : global::KnockOff.Documentation.Samples.Prope
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<UserConfigPropsStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -131,7 +131,7 @@ partial class UserConfigPropsStub : global::KnockOff.Documentation.Samples.Prope
 		public int? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<UserConfigPropsStub, int>? OnSet { get; set; }
+		public global::System.Action<int>? OnSet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -225,7 +225,7 @@ partial class UserConfigPropsStub : global::KnockOff.Documentation.Samples.Prope
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<UserConfigPropsStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -234,7 +234,7 @@ partial class UserConfigPropsStub : global::KnockOff.Documentation.Samples.Prope
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<UserConfigPropsStub, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -342,20 +342,20 @@ partial class UserConfigPropsStub : global::KnockOff.Documentation.Samples.Prope
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.Properties.IUserConfigProps.CurrentUser
 	{
-		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(this); if (CurrentUser._source is { } src) return src.CurrentUser; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "CurrentUser"); return CurrentUser.Value; }
-		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(this, value); return; } if (CurrentUser._source is { } src) { src.CurrentUser = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "CurrentUser"); CurrentUser.Value = value; }
+		get { CurrentUser.RecordGet(); if (CurrentUser.OnGet is { } onGet) return onGet(); if (CurrentUser._source is { } src) return src.CurrentUser; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "CurrentUser"); return CurrentUser.Value; }
+		set { CurrentUser.RecordSet(value); if (CurrentUser.OnSet is { } onSet) { onSet(value); return; } if (CurrentUser._source is { } src) { src.CurrentUser = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "CurrentUser"); CurrentUser.Value = value; }
 	}
 
 	int global::KnockOff.Documentation.Samples.Properties.IUserConfigProps.UserId
 	{
-		get { UserId.RecordGet(); if (UserId.OnGet is { } onGet) return onGet(this); if (UserId._source is { } src) return src.UserId; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "UserId"); return UserId.Value; }
-		set { UserId.RecordSet(value); if (UserId.OnSet is { } onSet) { onSet(this, value); return; } if (UserId._source is { } src) { src.UserId = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "UserId"); UserId.Value = value; }
+		get { UserId.RecordGet(); if (UserId.OnGet is { } onGet) return onGet(); if (UserId._source is { } src) return src.UserId; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "UserId"); return UserId.Value; }
+		set { UserId.RecordSet(value); if (UserId.OnSet is { } onSet) { onSet(value); return; } if (UserId._source is { } src) { src.UserId = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "UserId"); UserId.Value = value; }
 	}
 
 	string global::KnockOff.Documentation.Samples.Properties.IUserConfigProps.Email
 	{
-		get { Email.RecordGet(); if (Email.OnGet is { } onGet) return onGet(this); if (Email._source is { } src) return src.Email; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "Email"); return Email.Value; }
-		set { Email.RecordSet(value); if (Email.OnSet is { } onSet) { onSet(this, value); return; } if (Email._source is { } src) { src.Email = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "Email"); Email.Value = value; }
+		get { Email.RecordGet(); if (Email.OnGet is { } onGet) return onGet(); if (Email._source is { } src) return src.Email; if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "Email"); return Email.Value; }
+		set { Email.RecordSet(value); if (Email.OnSet is { } onSet) { onSet(value); return; } if (Email._source is { } src) { src.Email = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IUserConfigProps", "Email"); Email.Value = value; }
 	}
 
 }

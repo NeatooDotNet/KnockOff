@@ -404,7 +404,7 @@ internal static class FlatRenderer
 			w.Line();
 
 			w.Line("/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>");
-			w.Line($"public global::System.Func<{className}, {prop.ReturnType}>? OnGet {{ get; set; }}");
+			w.Line($"public global::System.Func<{prop.ReturnType}>? OnGet {{ get; set; }}");
 			w.Line();
 		}
 
@@ -419,7 +419,7 @@ internal static class FlatRenderer
 			w.Line();
 
 			w.Line("/// <summary>Callback invoked when the setter is accessed.</summary>");
-			w.Line($"public global::System.Action<{className}, {prop.ReturnType}>? OnSet {{ get; set; }}");
+			w.Line($"public global::System.Action<{prop.ReturnType}>? OnSet {{ get; set; }}");
 			w.Line();
 		}
 
@@ -660,7 +660,7 @@ internal static class FlatRenderer
 				w.Line();
 
 				w.Line("/// <summary>Callback invoked when the getter is accessed.</summary>");
-				w.Line($"public global::System.Func<{className}, {indexer.KeyType}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
+				w.Line($"public global::System.Func<{indexer.KeyType}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
 				w.Line();
 			}
 
@@ -675,7 +675,7 @@ internal static class FlatRenderer
 				w.Line();
 
 				w.Line("/// <summary>Callback invoked when the setter is accessed.</summary>");
-				w.Line($"public global::System.Action<{className}, {indexer.KeyType}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
+				w.Line($"public global::System.Action<{indexer.KeyType}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
 				w.Line();
 			}
 
@@ -950,10 +950,10 @@ internal static class FlatRenderer
 
 	private static void RenderInvokeMethod(CodeWriter w, FlatMethodModel method, string className)
 	{
-		// Build parameter list for Invoke (includes strict parameter)
+		// Build parameter list for Invoke (includes strict parameter, no stub parameter)
 		var invokeParams = method.Parameters.Count > 0
-			? $"{className} ko, bool strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"))
-			: $"{className} ko, bool strict";
+			? "bool strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"))
+			: "bool strict";
 
 		var returnType = method.IsVoid ? "void" : method.ReturnType;
 
@@ -1005,8 +1005,8 @@ internal static class FlatRenderer
 
 			// Invoke callback
 			var callbackArgs = method.Parameters.Count > 0
-				? "ko, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
-				: "ko";
+				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+				: "";
 
 			if (method.IsVoid)
 				w.Line($"callback({callbackArgs});");
@@ -1218,9 +1218,9 @@ internal static class FlatRenderer
 			{
 				var suffix = GetSignatureSuffix(method);
 
-				// Delegate
+				// Delegate (no stub parameter)
 				w.Line($"/// <summary>Delegate for {method.MethodName}({GetParamTypeList(method)}).</summary>");
-				w.Line($"public delegate {(method.IsVoid ? "void" : method.ReturnType)} {method.MethodName}Delegate_{suffix}({className} ko{(method.Parameters.Count > 0 ? ", " : "")}{method.ParameterDeclarations});");
+				w.Line($"public delegate {(method.IsVoid ? "void" : method.ReturnType)} {method.MethodName}Delegate_{suffix}({method.ParameterDeclarations});");
 				w.Line();
 
 				// Sequence list
@@ -1359,8 +1359,8 @@ internal static class FlatRenderer
 	{
 		var suffix = GetSignatureSuffix(method);
 		var invokeParams = method.Parameters.Count > 0
-			? $"{className} ko, bool strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"))
-			: $"{className} ko, bool strict";
+			? "bool strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"))
+			: "bool strict";
 		var returnType = method.IsVoid ? "void" : method.ReturnType;
 
 		w.Line($"/// <summary>Invokes configured callback for {method.MethodName}({GetParamTypeList(method)}).</summary>");
@@ -1406,8 +1406,8 @@ internal static class FlatRenderer
 			w.Line();
 
 			var callbackArgs = method.Parameters.Count > 0
-				? "ko, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
-				: "ko";
+				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+				: "";
 
 			if (method.IsVoid)
 				w.Line($"callback({callbackArgs});");
@@ -2330,14 +2330,14 @@ internal static class FlatRenderer
 				// Priority chain: OnGet/OnSet > Source > Strict > Value
 				if (prop.HasGetter)
 				{
-					w.Line($"get {{ {prop.InterceptorName}.RecordGet(); if ({prop.InterceptorName}.OnGet is {{ }} onGet) return onGet(this); if ({prop.InterceptorName}._source is {{ }} src) return src.{prop.MemberName}; if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); return {prop.InterceptorName}.Value; }}");
+					w.Line($"get {{ {prop.InterceptorName}.RecordGet(); if ({prop.InterceptorName}.OnGet is {{ }} onGet) return onGet(); if ({prop.InterceptorName}._source is {{ }} src) return src.{prop.MemberName}; if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); return {prop.InterceptorName}.Value; }}");
 				}
 
 				if (prop.HasSetter)
 				{
 					if (prop.SetterPragmaDisable != null)
 						w.Append(prop.SetterPragmaDisable);
-					w.Line($"set {{ {prop.InterceptorName}.RecordSet(value); if ({prop.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(this, value); return; }} if ({prop.InterceptorName}._source is {{ }} src) {{ src.{prop.MemberName} = value; return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); {prop.InterceptorName}.Value = value; }}");
+					w.Line($"set {{ {prop.InterceptorName}.RecordSet(value); if ({prop.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(value); return; }} if ({prop.InterceptorName}._source is {{ }} src) {{ src.{prop.MemberName} = value; return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); {prop.InterceptorName}.Value = value; }}");
 					if (prop.SetterPragmaRestore != null)
 						w.Line(prop.SetterPragmaRestore);
 				}
@@ -2386,12 +2386,12 @@ internal static class FlatRenderer
 			// Priority chain: OnGet/OnSet > Source > Strict > Backing
 			if (indexer.HasGetter)
 			{
-				w.Line($"get {{ {accessExpr}.RecordGet({indexer.KeyParamName}); if ({accessExpr}.OnGet is {{ }} onGet) return onGet(this, {indexer.KeyParamName}); if ({accessExpr}._source is {{ }} src) return src[{indexer.KeyParamName}]; if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); return {accessExpr}.Backing.TryGetValue({indexer.KeyParamName}, out var v) ? v : {indexer.DefaultExpression}; }}");
+				w.Line($"get {{ {accessExpr}.RecordGet({indexer.KeyParamName}); if ({accessExpr}.OnGet is {{ }} onGet) return onGet({indexer.KeyParamName}); if ({accessExpr}._source is {{ }} src) return src[{indexer.KeyParamName}]; if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); return {accessExpr}.Backing.TryGetValue({indexer.KeyParamName}, out var v) ? v : {indexer.DefaultExpression}; }}");
 			}
 
 			if (indexer.HasSetter)
 			{
-				w.Line($"set {{ {accessExpr}.RecordSet({indexer.KeyParamName}, value); if ({accessExpr}.OnSet is {{ }} onSet) {{ onSet(this, {indexer.KeyParamName}, value); return; }} if ({accessExpr}._source is {{ }} src) {{ src[{indexer.KeyParamName}] = value; return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); {accessExpr}.Backing[{indexer.KeyParamName}] = value; }}");
+				w.Line($"set {{ {accessExpr}.RecordSet({indexer.KeyParamName}, value); if ({accessExpr}.OnSet is {{ }} onSet) {{ onSet({indexer.KeyParamName}, value); return; }} if ({accessExpr}._source is {{ }} src) {{ src[{indexer.KeyParamName}] = value; return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); {accessExpr}.Backing[{indexer.KeyParamName}] = value; }}");
 			}
 		}
 		w.Line();
@@ -2432,10 +2432,10 @@ internal static class FlatRenderer
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
 		using (w.Braces())
 		{
-			// Build invoke args (includes Strict)
+			// Build invoke args (includes Strict, no stub parameter)
 			var invokeArgs = method.Parameters.Count > 0
-				? "this, Strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
-				: "this, Strict";
+				? "Strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+				: "Strict";
 
 			if (method.IsVoid)
 				w.Line($"{method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");
@@ -2482,10 +2482,10 @@ internal static class FlatRenderer
 			// Record the call
 			w.Line($"{interceptorAccess}.RecordCall({method.RecordCallArgs});");
 
-			// Build onCall args
+			// Build onCall args (no stub parameter)
 			var onCallArgs = method.Parameters.Count > 0
-				? "this, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
-				: "this";
+				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+				: "";
 
 			if (method.IsVoid)
 			{

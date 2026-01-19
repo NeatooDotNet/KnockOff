@@ -14,10 +14,10 @@ partial class InlineStubs
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Benchmarks.Interfaces.ISimpleService? _source;
 
-			private global::System.Action<Stubs.ISimpleService>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.ISimpleService> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -33,7 +33,7 @@ partial class InlineStubs
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.ISimpleService> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -45,13 +45,13 @@ partial class InlineStubs
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISimpleService>> OnCallSequence(global::System.Action<Stubs.ISimpleService> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.ISimpleService> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -59,35 +59,35 @@ partial class InlineStubs
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.ISimpleService ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("DoWork");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("DoWork");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.DoWork(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoWork");
 				return;
 			}
 
@@ -174,7 +174,7 @@ partial class InlineStubs
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISimpleService>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly ISimpleService_DoWorkInterceptor _interceptor;
 
@@ -194,7 +194,7 @@ partial class InlineStubs
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISimpleService>> ThenCall(global::System.Action<Stubs.ISimpleService> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -215,7 +215,7 @@ partial class InlineStubs
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISimpleService>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -236,7 +236,7 @@ partial class InlineStubs
 
 			void global::KnockOff.Benchmarks.Interfaces.ISimpleService.DoWork()
 			{
-				DoWork.Invoke(this);
+				DoWork.Invoke(Strict);
 			}
 
 			/// <summary>The global::KnockOff.Benchmarks.Interfaces.ISimpleService instance. Use for passing to code expecting the interface.</summary>
@@ -289,7 +289,7 @@ partial class InlineStubs
 			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 			/// <summary>Delegate for Add.</summary>
-			public delegate int AddDelegate(Stubs.ICalculator ko, int a, int b);
+			public delegate int AddDelegate(int a, int b);
 
 			private AddDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -340,34 +340,34 @@ partial class InlineStubs
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.ICalculator ko, int a, int b)
+			internal int Invoke(bool strict, int a, int b)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((a, b));
 					_sequenceIndex++;
-					return callback(ko, a, b);
+					return callback(a, b);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((a, b));
-					return _onCall(ko, a, b);
+					return _onCall(a, b);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Add(a, b);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
 				return default!;
 			}
 
@@ -523,7 +523,7 @@ partial class InlineStubs
 			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 			/// <summary>Delegate for Subtract.</summary>
-			public delegate int SubtractDelegate(Stubs.ICalculator ko, int a, int b);
+			public delegate int SubtractDelegate(int a, int b);
 
 			private SubtractDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -574,34 +574,34 @@ partial class InlineStubs
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.ICalculator ko, int a, int b)
+			internal int Invoke(bool strict, int a, int b)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((a, b));
 					_sequenceIndex++;
-					return callback(ko, a, b);
+					return callback(a, b);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((a, b));
-					return _onCall(ko, a, b);
+					return _onCall(a, b);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Subtract");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Subtract");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Subtract(a, b);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Subtract");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Subtract");
 				return default!;
 			}
 
@@ -757,7 +757,7 @@ partial class InlineStubs
 			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 			/// <summary>Delegate for Multiply.</summary>
-			public delegate int MultiplyDelegate(Stubs.ICalculator ko, int a, int b);
+			public delegate int MultiplyDelegate(int a, int b);
 
 			private MultiplyDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -808,34 +808,34 @@ partial class InlineStubs
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.ICalculator ko, int a, int b)
+			internal int Invoke(bool strict, int a, int b)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((a, b));
 					_sequenceIndex++;
-					return callback(ko, a, b);
+					return callback(a, b);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((a, b));
-					return _onCall(ko, a, b);
+					return _onCall(a, b);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Multiply");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Multiply");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Multiply(a, b);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Multiply");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Multiply");
 				return default!;
 			}
 
@@ -991,7 +991,7 @@ partial class InlineStubs
 			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 			/// <summary>Delegate for Divide.</summary>
-			public delegate double DivideDelegate(Stubs.ICalculator ko, double a, double b);
+			public delegate double DivideDelegate(double a, double b);
 
 			private DivideDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1042,34 +1042,34 @@ partial class InlineStubs
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal double Invoke(Stubs.ICalculator ko, double a, double b)
+			internal double Invoke(bool strict, double a, double b)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((a, b));
 					_sequenceIndex++;
-					return callback(ko, a, b);
+					return callback(a, b);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((a, b));
-					return _onCall(ko, a, b);
+					return _onCall(a, b);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((a, b));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Divide");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Divide");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Divide(a, b);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Divide");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Divide");
 				return default!;
 			}
 
@@ -1225,7 +1225,7 @@ partial class InlineStubs
 			internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 			/// <summary>Delegate for Square.</summary>
-			public delegate int SquareDelegate(Stubs.ICalculator ko, int x);
+			public delegate int SquareDelegate(int x);
 
 			private SquareDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1276,34 +1276,34 @@ partial class InlineStubs
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.ICalculator ko, int x)
+			internal int Invoke(bool strict, int x)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(x);
 					_sequenceIndex++;
-					return callback(ko, x);
+					return callback(x);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(x);
-					return _onCall(ko, x);
+					return _onCall(x);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = x;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Square");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Square");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Square(x);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Square");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Square");
 				return default!;
 			}
 
@@ -1472,27 +1472,27 @@ partial class InlineStubs
 
 			int global::KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
 			{
-				return Add.Invoke(this, a, b);
+				return Add.Invoke(Strict, a, b);
 			}
 
 			int global::KnockOff.Benchmarks.Interfaces.ICalculator.Subtract(int a, int b)
 			{
-				return Subtract.Invoke(this, a, b);
+				return Subtract.Invoke(Strict, a, b);
 			}
 
 			int global::KnockOff.Benchmarks.Interfaces.ICalculator.Multiply(int a, int b)
 			{
-				return Multiply.Invoke(this, a, b);
+				return Multiply.Invoke(Strict, a, b);
 			}
 
 			double global::KnockOff.Benchmarks.Interfaces.ICalculator.Divide(double a, double b)
 			{
-				return Divide.Invoke(this, a, b);
+				return Divide.Invoke(Strict, a, b);
 			}
 
 			int global::KnockOff.Benchmarks.Interfaces.ICalculator.Square(int x)
 			{
-				return Square.Invoke(this, x);
+				return Square.Invoke(Strict, x);
 			}
 
 			/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICalculator instance. Use for passing to code expecting the interface.</summary>
@@ -1561,7 +1561,7 @@ partial class InlineStubs
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyService, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -1570,7 +1570,7 @@ partial class InlineStubs
 			public string? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IPropertyService, string>? OnSet { get; set; }
+			public global::System.Action<string>? OnSet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1664,7 +1664,7 @@ partial class InlineStubs
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyService, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1748,7 +1748,7 @@ partial class InlineStubs
 			public int? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.IPropertyService, int>? OnSet { get; set; }
+			public global::System.Action<int>? OnSet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1835,7 +1835,7 @@ partial class InlineStubs
 				get
 				{
 					Name.RecordGet();
-					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name.OnGet is { } onGet) return onGet();
 					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name");
 					return Name.Value;
@@ -1843,7 +1843,7 @@ partial class InlineStubs
 				set
 				{
 					Name.RecordSet(value);
-					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Name.OnSet is { } onSet) { onSet(value); return; }
 					if (Name._source is { } src) { src.Name = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "Name");
 					Name.Value = value;
@@ -1855,7 +1855,7 @@ partial class InlineStubs
 				get
 				{
 					ReadOnlyValue.RecordGet();
-					if (ReadOnlyValue.OnGet is { } onGet) return onGet(this);
+					if (ReadOnlyValue.OnGet is { } onGet) return onGet();
 					if (ReadOnlyValue._source is { } src) return src.ReadOnlyValue;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "ReadOnlyValue");
 					return ReadOnlyValue.Value;
@@ -1867,7 +1867,7 @@ partial class InlineStubs
 				set
 				{
 					WriteOnlyValue.RecordSet(value);
-					if (WriteOnlyValue.OnSet is { } onSet) { onSet(this, value); return; }
+					if (WriteOnlyValue.OnSet is { } onSet) { onSet(value); return; }
 					if (WriteOnlyValue._source is { } src) { src.WriteOnlyValue = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyService", "WriteOnlyValue");
 					WriteOnlyValue.Value = value;

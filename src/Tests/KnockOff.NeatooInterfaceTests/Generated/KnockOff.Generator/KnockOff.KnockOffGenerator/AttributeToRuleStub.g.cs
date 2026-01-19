@@ -58,7 +58,7 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 		public sealed class GetRuleTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::Neatoo.IValidateBase
 		{
 			/// <summary>Delegate for GetRule.</summary>
-			public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(AttributeToRuleStub ko, global::Neatoo.IPropertyInfo r, object? attribute);
+			public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(global::Neatoo.IPropertyInfo r, object? attribute);
 
 			private GetRuleDelegate? _onCall;
 
@@ -144,7 +144,7 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 	{
 		GetRule.Of<T>().RecordCall(r, attribute);
 		if (GetRule.Of<T>().Callback is { } callback)
-			return callback(this, r, attribute);
+			return callback(r, attribute);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttributeToRule", "GetRule");
 		return default!;
 	}

@@ -14,7 +14,7 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Find().</summary>
-		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User> FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(SearchRepoStub ko);
+		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User> FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User();
 
 		private FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User? _onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
 		private MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User? _onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
@@ -26,7 +26,7 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
 
 		/// <summary>Delegate for Find(int).</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? FindDelegate_Int32_KnockOff_Documentation_Samples_User(SearchRepoStub ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.User? FindDelegate_Int32_KnockOff_Documentation_Samples_User(int id);
 
 		private FindDelegate_Int32_KnockOff_Documentation_Samples_User? _onCall_Int32_KnockOff_Documentation_Samples_User;
 		private MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User? _onCallTracking_Int32_KnockOff_Documentation_Samples_User;
@@ -38,7 +38,7 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		private global::KnockOff.Times? _verifiableTimes_Int32_KnockOff_Documentation_Samples_User;
 
 		/// <summary>Delegate for Find(string).</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? FindDelegate_String_KnockOff_Documentation_Samples_User(SearchRepoStub ko, string name);
+		public delegate global::KnockOff.Documentation.Samples.User? FindDelegate_String_KnockOff_Documentation_Samples_User(string name);
 
 		private FindDelegate_String_KnockOff_Documentation_Samples_User? _onCall_String_KnockOff_Documentation_Samples_User;
 		private MethodTrackingImpl_String_KnockOff_Documentation_Samples_User? _onCallTracking_String_KnockOff_Documentation_Samples_User;
@@ -134,20 +134,20 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		}
 
 		/// <summary>Invokes configured callback for Find().</summary>
-		internal global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User> Invoke_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(SearchRepoStub ko, bool strict)
+		internal global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User> Invoke_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(bool strict)
 		{
 			if (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null && _sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User < _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Count)
 			{
 				var (callback, tracking) = _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User[_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User];
 				tracking.RecordCall();
 				_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null && _onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null)
 			{
 				_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.RecordCall();
-				return _onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(ko);
+				return _onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User();
 			}
 
 			_unconfiguredCallCount++;
@@ -165,20 +165,20 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		}
 
 		/// <summary>Invokes configured callback for Find(int).</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke_Int32_KnockOff_Documentation_Samples_User(SearchRepoStub ko, bool strict, int id)
+		internal global::KnockOff.Documentation.Samples.User? Invoke_Int32_KnockOff_Documentation_Samples_User(bool strict, int id)
 		{
 			if (_sequence_Int32_KnockOff_Documentation_Samples_User != null && _sequenceIndex_Int32_KnockOff_Documentation_Samples_User < _sequence_Int32_KnockOff_Documentation_Samples_User.Count)
 			{
 				var (callback, tracking) = _sequence_Int32_KnockOff_Documentation_Samples_User[_sequenceIndex_Int32_KnockOff_Documentation_Samples_User];
 				tracking.RecordCall(id);
 				_sequenceIndex_Int32_KnockOff_Documentation_Samples_User++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall_Int32_KnockOff_Documentation_Samples_User != null && _onCallTracking_Int32_KnockOff_Documentation_Samples_User != null)
 			{
 				_onCallTracking_Int32_KnockOff_Documentation_Samples_User.RecordCall(id);
-				return _onCall_Int32_KnockOff_Documentation_Samples_User(ko, id);
+				return _onCall_Int32_KnockOff_Documentation_Samples_User(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -196,20 +196,20 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		}
 
 		/// <summary>Invokes configured callback for Find(string).</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke_String_KnockOff_Documentation_Samples_User(SearchRepoStub ko, bool strict, string name)
+		internal global::KnockOff.Documentation.Samples.User? Invoke_String_KnockOff_Documentation_Samples_User(bool strict, string name)
 		{
 			if (_sequence_String_KnockOff_Documentation_Samples_User != null && _sequenceIndex_String_KnockOff_Documentation_Samples_User < _sequence_String_KnockOff_Documentation_Samples_User.Count)
 			{
 				var (callback, tracking) = _sequence_String_KnockOff_Documentation_Samples_User[_sequenceIndex_String_KnockOff_Documentation_Samples_User];
 				tracking.RecordCall(name);
 				_sequenceIndex_String_KnockOff_Documentation_Samples_User++;
-				return callback(ko, name);
+				return callback(name);
 			}
 
 			if (_onCall_String_KnockOff_Documentation_Samples_User != null && _onCallTracking_String_KnockOff_Documentation_Samples_User != null)
 			{
 				_onCallTracking_String_KnockOff_Documentation_Samples_User.RecordCall(name);
-				return _onCall_String_KnockOff_Documentation_Samples_User(ko, name);
+				return _onCall_String_KnockOff_Documentation_Samples_User(name);
 			}
 
 			_unconfiguredCallCount++;
@@ -663,17 +663,17 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 	global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User> global::KnockOff.Documentation.Samples.Methods.ISearchRepo.Find()
 	{
-		return Find.Invoke_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(this, Strict);
+		return Find.Invoke_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(Strict);
 	}
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.Methods.ISearchRepo.Find(int id)
 	{
-		return Find.Invoke_Int32_KnockOff_Documentation_Samples_User(this, Strict, id);
+		return Find.Invoke_Int32_KnockOff_Documentation_Samples_User(Strict, id);
 	}
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.Methods.ISearchRepo.Find(string name)
 	{
-		return Find.Invoke_String_KnockOff_Documentation_Samples_User(this, Strict, name);
+		return Find.Invoke_String_KnockOff_Documentation_Samples_User(Strict, name);
 	}
 
 }

@@ -27,7 +27,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int value) =>
+		var tracking = knockOff.Increment.OnCall((ref int value) =>
 		{
 			value++; // Modify the ref param
 		});
@@ -46,7 +46,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int value) =>
+		knockOff.Increment.OnCall((ref int value) =>
 		{
 			value = value * 2; // Double the value
 		});
@@ -63,7 +63,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		var tracking = knockOff.TryUpdate.OnCall((RefParameterServiceKnockOff ko, string key, ref string value) =>
+		var tracking = knockOff.TryUpdate.OnCall((string key, ref string value) =>
 		{
 			if (key == "valid")
 			{
@@ -92,7 +92,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int value) => { value++; });
+		var tracking = knockOff.Increment.OnCall((ref int value) => { value++; });
 
 		int v1 = 1, v2 = 2, v3 = 3;
 		service.Increment(ref v1);
@@ -115,7 +115,7 @@ public class RefParameterTests
 		IRefParameterService service = knockOff;
 
 		// Increment is a void method - no callback required, but we need to set one to track
-		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int value) => { });
+		var tracking = knockOff.Increment.OnCall((ref int value) => { });
 		int val = 100;
 		service.Increment(ref val);
 
@@ -132,7 +132,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int v) => { });
+		var tracking = knockOff.Increment.OnCall((ref int v) => { });
 
 		int x = 1;
 		service.Increment(ref x);
@@ -152,7 +152,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		knockOff.TryUpdate.OnCall((RefParameterServiceKnockOff ko, string key, ref string value) =>
+		knockOff.TryUpdate.OnCall((string key, ref string value) =>
 		{
 			if (key == "modify")
 			{
@@ -175,7 +175,7 @@ public class RefParameterTests
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
-		var tracking = knockOff.Increment.OnCall((RefParameterServiceKnockOff ko, ref int v) => { });
+		var tracking = knockOff.Increment.OnCall((ref int v) => { });
 
 		Assert.False(tracking.WasCalled);
 

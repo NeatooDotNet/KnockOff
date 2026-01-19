@@ -12,7 +12,7 @@ partial class OrderServiceStub : global::KnockOff.Documentation.Samples.Advanced
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.IOrderService? _source;
 
 		/// <summary>Delegate for PlaceOrder.</summary>
-		public delegate int PlaceOrderDelegate(OrderServiceStub ko, global::KnockOff.Documentation.Samples.Order order);
+		public delegate int PlaceOrderDelegate(global::KnockOff.Documentation.Samples.Order order);
 
 		private PlaceOrderDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class OrderServiceStub : global::KnockOff.Documentation.Samples.Advanced
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(OrderServiceStub ko, bool strict, global::KnockOff.Documentation.Samples.Order order)
+		internal int Invoke(bool strict, global::KnockOff.Documentation.Samples.Order order)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(order);
 				_sequenceIndex++;
-				return callback(ko, order);
+				return callback(order);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(order);
-				return _onCall(ko, order);
+				return _onCall(order);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class OrderServiceStub : global::KnockOff.Documentation.Samples.Advanced
 
 	int global::KnockOff.Documentation.Samples.AdvancedCallbacks.IOrderService.PlaceOrder(global::KnockOff.Documentation.Samples.Order order)
 	{
-		return PlaceOrder.Invoke(this, Strict, order);
+		return PlaceOrder.Invoke(Strict, order);
 	}
 
 }

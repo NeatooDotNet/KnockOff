@@ -19,7 +19,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<TriggerPropertyOfTStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -93,7 +93,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		internal global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>? _source;
 
 		/// <summary>Delegate for GetValue.</summary>
-		public delegate object? GetValueDelegate(TriggerPropertyOfTStub ko, global::Neatoo.IValidateBase target);
+		public delegate object? GetValueDelegate(global::Neatoo.IValidateBase target);
 
 		private GetValueDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -144,20 +144,20 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal object? Invoke(TriggerPropertyOfTStub ko, bool strict, global::Neatoo.IValidateBase target)
+		internal object? Invoke(bool strict, global::Neatoo.IValidateBase target)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(target);
 				_sequenceIndex++;
-				return callback(ko, target);
+				return callback(target);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(target);
-				return _onCall(ko, target);
+				return _onCall(target);
 			}
 
 			_unconfiguredCallCount++;
@@ -327,7 +327,7 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		internal global::Neatoo.Rules.ITriggerProperty? _source;
 
 		/// <summary>Delegate for IsMatch.</summary>
-		public delegate bool IsMatchDelegate(TriggerPropertyOfTStub ko, string propertyName);
+		public delegate bool IsMatchDelegate(string propertyName);
 
 		private IsMatchDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -378,20 +378,20 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(TriggerPropertyOfTStub ko, bool strict, string propertyName)
+		internal bool Invoke(bool strict, string propertyName)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(propertyName);
 				_sequenceIndex++;
-				return callback(ko, propertyName);
+				return callback(propertyName);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(propertyName);
-				return _onCall(ko, propertyName);
+				return _onCall(propertyName);
 			}
 
 			_unconfiguredCallCount++;
@@ -617,17 +617,17 @@ partial class TriggerPropertyOfTStub : global::Neatoo.Rules.ITriggerProperty<glo
 
 	string global::Neatoo.Rules.ITriggerProperty.PropertyName
 	{
-		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (PropertyName._source is { } src) return src.PropertyName; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName"); return PropertyName.Value; }
+		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(); if (PropertyName._source is { } src) return src.PropertyName; if (Strict) throw global::KnockOff.StubException.NotConfigured("ITriggerProperty", "PropertyName"); return PropertyName.Value; }
 	}
 
 	object? global::Neatoo.Rules.ITriggerProperty<global::Neatoo.IValidateBase>.GetValue(global::Neatoo.IValidateBase target)
 	{
-		return GetValue.Invoke(this, Strict, target);
+		return GetValue.Invoke(Strict, target);
 	}
 
 	bool global::Neatoo.Rules.ITriggerProperty.IsMatch(string propertyName)
 	{
-		return IsMatch.Invoke(this, Strict, propertyName);
+		return IsMatch.Invoke(Strict, propertyName);
 	}
 
 }

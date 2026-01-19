@@ -19,7 +19,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<SampleKnockOff, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<SampleKnockOff, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -114,10 +114,10 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.ISampleService? _source;
 
-		private global::System.Action<SampleKnockOff>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SampleKnockOff> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -133,7 +133,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<SampleKnockOff> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -145,13 +145,13 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SampleKnockOff>> OnCallSequence(global::System.Action<SampleKnockOff> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SampleKnockOff> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -159,21 +159,21 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SampleKnockOff ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -274,7 +274,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SampleKnockOff>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly DoSomethingInterceptor _interceptor;
 
@@ -294,7 +294,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SampleKnockOff>> ThenCall(global::System.Action<SampleKnockOff> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -315,7 +315,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SampleKnockOff>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -334,10 +334,10 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Tests.ISampleService? _source;
 
-		private global::System.Action<SampleKnockOff, string, int, bool>? _onCall;
+		private global::System.Action<string, int, bool>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<SampleKnockOff, string, int, bool> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string, int, bool> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -357,7 +357,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTrackingArgs<(string? name, int? @value, bool? flag)> OnCall(global::System.Action<SampleKnockOff, string, int, bool> callback)
+		public global::KnockOff.IMethodTrackingArgs<(string? name, int? @value, bool? flag)> OnCall(global::System.Action<string, int, bool> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -369,13 +369,13 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<SampleKnockOff, string, int, bool>> OnCallSequence(global::System.Action<SampleKnockOff, string, int, bool> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string, int, bool>> OnCallSequence(global::System.Action<string, int, bool> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<SampleKnockOff, string, int, bool> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string, int, bool> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -383,21 +383,21 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(SampleKnockOff ko, bool strict, string name, int @value, bool flag)
+		internal void Invoke(bool strict, string name, int @value, bool flag)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((name, @value, flag));
 				_sequenceIndex++;
-				callback(ko, name, @value, flag);
+				callback(name, @value, flag);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((name, @value, flag));
-				_onCall(ko, name, @value, flag);
+				_onCall(name, @value, flag);
 				return;
 			}
 
@@ -507,7 +507,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<SampleKnockOff, string, int, bool>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string, int, bool>>
 		{
 			private readonly CalculateInterceptor _interceptor;
 
@@ -527,7 +527,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SampleKnockOff, string, int, bool>> ThenCall(global::System.Action<SampleKnockOff, string, int, bool> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string, int, bool>> ThenCall(global::System.Action<string, int, bool> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -548,7 +548,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<SampleKnockOff, string, int, bool>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string, int, bool>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -568,7 +568,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		internal global::KnockOff.Tests.ISampleService? _source;
 
 		/// <summary>Delegate for GetOptional.</summary>
-		public delegate string? GetOptionalDelegate(SampleKnockOff ko);
+		public delegate string? GetOptionalDelegate();
 
 		private GetOptionalDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -615,20 +615,20 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string? Invoke(SampleKnockOff ko, bool strict)
+		internal string? Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -885,13 +885,13 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 
 	string global::KnockOff.Tests.ISampleService.Name
 	{
-		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(this); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); return Name.Value; }
-		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(this, value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); Name.Value = value; }
+		get { Name.RecordGet(); if (Name.OnGet is { } onGet) return onGet(); if (Name._source is { } src) return src.Name; if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); return Name.Value; }
+		set { Name.RecordSet(value); if (Name.OnSet is { } onSet) { onSet(value); return; } if (Name._source is { } src) { src.Name = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("ISampleService", "Name"); Name.Value = value; }
 	}
 
 	void global::KnockOff.Tests.ISampleService.DoSomething()
 	{
-		DoSomething.Invoke(this, Strict);
+		DoSomething.Invoke(Strict);
 	}
 
 	int global::KnockOff.Tests.ISampleService.GetValue(int input)
@@ -902,12 +902,12 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 
 	void global::KnockOff.Tests.ISampleService.Calculate(string name, int @value, bool flag)
 	{
-		Calculate.Invoke(this, Strict, name, @value, flag);
+		Calculate.Invoke(Strict, name, @value, flag);
 	}
 
 	string? global::KnockOff.Tests.ISampleService.GetOptional()
 	{
-		return GetOptional.Invoke(this, Strict);
+		return GetOptional.Invoke(Strict);
 	}
 
 }

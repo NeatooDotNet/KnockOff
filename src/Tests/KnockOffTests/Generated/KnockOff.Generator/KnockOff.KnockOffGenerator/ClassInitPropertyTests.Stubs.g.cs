@@ -18,9 +18,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithVirtualInit, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithVirtualInit, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -32,9 +32,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithVirtualInit, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithVirtualInit, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -171,13 +171,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Id.RecordGet();
-						if (_stub?.Id.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Id.OnGet is { } onGet) return onGet();
 						return base.Id;
 					}
 					init
 					{
 						_stub?.Id.RecordSet(value);
-						if (_stub?.Id.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Id.OnSet is { } onSet) onSet(value);
 						else base.Id = value;
 					}
 				}
@@ -195,9 +195,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithAbstractInit, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithAbstractInit, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -209,9 +209,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithAbstractInit, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithAbstractInit, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -348,13 +348,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Id.RecordGet();
-						if (_stub?.Id.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Id.OnGet is { } onGet) return onGet();
 						return default!;
 					}
 					init
 					{
 						_stub?.Id.RecordSet(value);
-						if (_stub?.Id.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Id.OnSet is { } onSet) onSet(value);
 					}
 				}
 
@@ -371,9 +371,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithMixedInit, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithMixedInit, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -385,9 +385,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithMixedInit, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithMixedInit, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -473,9 +473,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithMixedInit, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithMixedInit, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -487,9 +487,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithMixedInit, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithMixedInit, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -575,9 +575,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithMixedInit, int>? _onGet;
+			private global::System.Func<int>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithMixedInit, int>? OnGet
+			public global::System.Func<int>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -589,9 +589,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public int? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithMixedInit, int>? _onSet;
+			private global::System.Action<int>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithMixedInit, int>? OnSet
+			public global::System.Action<int>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -738,13 +738,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Id.RecordGet();
-						if (_stub?.Id.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Id.OnGet is { } onGet) return onGet();
 						return base.Id;
 					}
 					init
 					{
 						_stub?.Id.RecordSet(value);
-						if (_stub?.Id.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Id.OnSet is { } onSet) onSet(value);
 						else base.Id = value;
 					}
 				}
@@ -755,13 +755,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Name.RecordGet();
-						if (_stub?.Name.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Name.OnGet is { } onGet) return onGet();
 						return base.Name;
 					}
 					set
 					{
 						_stub?.Name.RecordSet(value);
-						if (_stub?.Name.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Name.OnSet is { } onSet) onSet(value);
 						else base.Name = value;
 					}
 				}
@@ -772,13 +772,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Version.RecordGet();
-						if (_stub?.Version.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Version.OnGet is { } onGet) return onGet();
 						return default!;
 					}
 					init
 					{
 						_stub?.Version.RecordSet(value);
-						if (_stub?.Version.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Version.OnSet is { } onSet) onSet(value);
 					}
 				}
 
@@ -795,9 +795,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithRequiredProperty, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithRequiredProperty, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -809,9 +809,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithRequiredProperty, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithRequiredProperty, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -951,13 +951,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Id.RecordGet();
-						if (_stub?.Id.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Id.OnGet is { } onGet) return onGet();
 						return base.Id;
 					}
 					set
 					{
 						_stub?.Id.RecordSet(value);
-						if (_stub?.Id.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Id.OnSet is { } onSet) onSet(value);
 						else base.Id = value;
 					}
 				}
@@ -976,9 +976,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithRequiredInit, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithRequiredInit, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -990,9 +990,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithRequiredInit, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithRequiredInit, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -1132,13 +1132,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Id.RecordGet();
-						if (_stub?.Id.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Id.OnGet is { } onGet) return onGet();
 						return base.Id;
 					}
 					init
 					{
 						_stub?.Id.RecordSet(value);
-						if (_stub?.Id.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Id.OnSet is { } onSet) onSet(value);
 						else base.Id = value;
 					}
 				}
@@ -1157,9 +1157,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithMultipleRequired, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithMultipleRequired, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -1171,9 +1171,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithMultipleRequired, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithMultipleRequired, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -1259,9 +1259,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithMultipleRequired, string>? _onGet;
+			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithMultipleRequired, string>? OnGet
+			public global::System.Func<string>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -1273,9 +1273,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithMultipleRequired, string>? _onSet;
+			private global::System.Action<string>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithMultipleRequired, string>? OnSet
+			public global::System.Action<string>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -1361,9 +1361,9 @@ partial class ClassInitPropertyTests
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			private global::System.Func<Stubs.EntityBaseWithMultipleRequired, int>? _onGet;
+			private global::System.Func<int>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<Stubs.EntityBaseWithMultipleRequired, int>? OnGet
+			public global::System.Func<int>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -1375,9 +1375,9 @@ partial class ClassInitPropertyTests
 			/// <summary>The last value passed to the setter.</summary>
 			public int? LastSetValue { get; private set; }
 
-			private global::System.Action<Stubs.EntityBaseWithMultipleRequired, int>? _onSet;
+			private global::System.Action<int>? _onSet;
 			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<Stubs.EntityBaseWithMultipleRequired, int>? OnSet
+			public global::System.Action<int>? OnSet
 			{
 				get => _onSet;
 				set { _onSet = value; if (value != null) _configured = true; }
@@ -1528,13 +1528,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Id.RecordGet();
-						if (_stub?.Id.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Id.OnGet is { } onGet) return onGet();
 						return base.Id;
 					}
 					init
 					{
 						_stub?.Id.RecordSet(value);
-						if (_stub?.Id.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Id.OnSet is { } onSet) onSet(value);
 						else base.Id = value;
 					}
 				}
@@ -1545,13 +1545,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Name.RecordGet();
-						if (_stub?.Name.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Name.OnGet is { } onGet) return onGet();
 						return base.Name;
 					}
 					set
 					{
 						_stub?.Name.RecordSet(value);
-						if (_stub?.Name.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Name.OnSet is { } onSet) onSet(value);
 						else base.Name = value;
 					}
 				}
@@ -1562,13 +1562,13 @@ partial class ClassInitPropertyTests
 					get
 					{
 						_stub?.Version.RecordGet();
-						if (_stub?.Version.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Version.OnGet is { } onGet) return onGet();
 						return base.Version;
 					}
 					set
 					{
 						_stub?.Version.RecordSet(value);
-						if (_stub?.Version.OnSet is { } onSet) onSet(_stub, value);
+						if (_stub?.Version.OnSet is { } onSet) onSet(value);
 						else base.Version = value;
 					}
 				}

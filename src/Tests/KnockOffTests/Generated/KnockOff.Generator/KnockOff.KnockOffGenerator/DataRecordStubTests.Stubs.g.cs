@@ -19,7 +19,7 @@ partial class DataRecordStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IDataRecord, int>? OnGet { get; set; }
+			public global::System.Func<int>? OnGet { get; set; }
 
 			private int _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -102,9 +102,9 @@ partial class DataRecordStubTests
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }
 
-			private global::System.Func<Stubs.IDataRecord, int, object>? _onGet;
+			private global::System.Func<int, object>? _onGet;
 			/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>
-			public global::System.Func<Stubs.IDataRecord, int, object>? OnGet
+			public global::System.Func<int, object>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -186,9 +186,9 @@ partial class DataRecordStubTests
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
 
-			private global::System.Func<Stubs.IDataRecord, string, object>? _onGet;
+			private global::System.Func<string, object>? _onGet;
 			/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>
-			public global::System.Func<Stubs.IDataRecord, string, object>? OnGet
+			public global::System.Func<string, object>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -264,7 +264,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetBoolean.</summary>
-			public delegate bool GetBooleanDelegate(Stubs.IDataRecord ko, int i);
+			public delegate bool GetBooleanDelegate(int i);
 
 			private GetBooleanDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -315,34 +315,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IDataRecord ko, int i)
+			internal bool Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetBoolean");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetBoolean");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetBoolean(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetBoolean");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetBoolean");
 				return default!;
 			}
 
@@ -498,7 +498,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetByte.</summary>
-			public delegate byte GetByteDelegate(Stubs.IDataRecord ko, int i);
+			public delegate byte GetByteDelegate(int i);
 
 			private GetByteDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -549,34 +549,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal byte Invoke(Stubs.IDataRecord ko, int i)
+			internal byte Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetByte");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetByte");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetByte(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetByte");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByte");
 				return default!;
 			}
 
@@ -732,7 +732,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetBytes.</summary>
-			public delegate long GetBytesDelegate(Stubs.IDataRecord ko, int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length);
+			public delegate long GetBytesDelegate(int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length);
 
 			private GetBytesDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -783,34 +783,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal long Invoke(Stubs.IDataRecord ko, int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)
+			internal long Invoke(bool strict, int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((i, fieldOffset, buffer, bufferoffset, length));
 					_sequenceIndex++;
-					return callback(ko, i, fieldOffset, buffer, bufferoffset, length);
+					return callback(i, fieldOffset, buffer, bufferoffset, length);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((i, fieldOffset, buffer, bufferoffset, length));
-					return _onCall(ko, i, fieldOffset, buffer, bufferoffset, length);
+					return _onCall(i, fieldOffset, buffer, bufferoffset, length);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((i, fieldOffset, buffer, bufferoffset, length));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetBytes");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetBytes");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetBytes");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetBytes");
 				return default!;
 			}
 
@@ -966,7 +966,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetChar.</summary>
-			public delegate char GetCharDelegate(Stubs.IDataRecord ko, int i);
+			public delegate char GetCharDelegate(int i);
 
 			private GetCharDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1017,34 +1017,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal char Invoke(Stubs.IDataRecord ko, int i)
+			internal char Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetChar");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetChar");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetChar(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetChar");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetChar");
 				return default!;
 			}
 
@@ -1200,7 +1200,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetChars.</summary>
-			public delegate long GetCharsDelegate(Stubs.IDataRecord ko, int i, long fieldoffset, char[]? buffer, int bufferoffset, int length);
+			public delegate long GetCharsDelegate(int i, long fieldoffset, char[]? buffer, int bufferoffset, int length);
 
 			private GetCharsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1251,34 +1251,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal long Invoke(Stubs.IDataRecord ko, int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)
+			internal long Invoke(bool strict, int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((i, fieldoffset, buffer, bufferoffset, length));
 					_sequenceIndex++;
-					return callback(ko, i, fieldoffset, buffer, bufferoffset, length);
+					return callback(i, fieldoffset, buffer, bufferoffset, length);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((i, fieldoffset, buffer, bufferoffset, length));
-					return _onCall(ko, i, fieldoffset, buffer, bufferoffset, length);
+					return _onCall(i, fieldoffset, buffer, bufferoffset, length);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((i, fieldoffset, buffer, bufferoffset, length));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetChars");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetChars");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetChars(i, fieldoffset, buffer, bufferoffset, length);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetChars");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetChars");
 				return default!;
 			}
 
@@ -1434,7 +1434,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetData.</summary>
-			public delegate global::System.Data.IDataReader GetDataDelegate(Stubs.IDataRecord ko, int i);
+			public delegate global::System.Data.IDataReader GetDataDelegate(int i);
 
 			private GetDataDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1485,34 +1485,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Data.IDataReader Invoke(Stubs.IDataRecord ko, int i)
+			internal global::System.Data.IDataReader Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetData");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetData");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetData(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetData");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetData");
 				throw new global::System.InvalidOperationException("No implementation provided for GetData. Configure via OnCall.");
 			}
 
@@ -1668,7 +1668,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetDataTypeName.</summary>
-			public delegate string GetDataTypeNameDelegate(Stubs.IDataRecord ko, int i);
+			public delegate string GetDataTypeNameDelegate(int i);
 
 			private GetDataTypeNameDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1719,34 +1719,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal string Invoke(Stubs.IDataRecord ko, int i)
+			internal string Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetDataTypeName");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetDataTypeName");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetDataTypeName(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetDataTypeName");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDataTypeName");
 				return default!;
 			}
 
@@ -1902,7 +1902,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetDateTime.</summary>
-			public delegate global::System.DateTime GetDateTimeDelegate(Stubs.IDataRecord ko, int i);
+			public delegate global::System.DateTime GetDateTimeDelegate(int i);
 
 			private GetDateTimeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1953,34 +1953,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.DateTime Invoke(Stubs.IDataRecord ko, int i)
+			internal global::System.DateTime Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetDateTime");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetDateTime");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetDateTime(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetDateTime");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDateTime");
 				return default!;
 			}
 
@@ -2136,7 +2136,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetDecimal.</summary>
-			public delegate decimal GetDecimalDelegate(Stubs.IDataRecord ko, int i);
+			public delegate decimal GetDecimalDelegate(int i);
 
 			private GetDecimalDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2187,34 +2187,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal decimal Invoke(Stubs.IDataRecord ko, int i)
+			internal decimal Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetDecimal");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetDecimal");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetDecimal(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetDecimal");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDecimal");
 				return default!;
 			}
 
@@ -2370,7 +2370,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetDouble.</summary>
-			public delegate double GetDoubleDelegate(Stubs.IDataRecord ko, int i);
+			public delegate double GetDoubleDelegate(int i);
 
 			private GetDoubleDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2421,34 +2421,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal double Invoke(Stubs.IDataRecord ko, int i)
+			internal double Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetDouble");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetDouble");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetDouble(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetDouble");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetDouble");
 				return default!;
 			}
 
@@ -2604,7 +2604,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetFieldType.</summary>
-			public delegate global::System.Type GetFieldTypeDelegate(Stubs.IDataRecord ko, int i);
+			public delegate global::System.Type GetFieldTypeDelegate(int i);
 
 			private GetFieldTypeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2655,34 +2655,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Type Invoke(Stubs.IDataRecord ko, int i)
+			internal global::System.Type Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetFieldType");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetFieldType");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetFieldType(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetFieldType");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetFieldType");
 				return default!;
 			}
 
@@ -2838,7 +2838,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetFloat.</summary>
-			public delegate float GetFloatDelegate(Stubs.IDataRecord ko, int i);
+			public delegate float GetFloatDelegate(int i);
 
 			private GetFloatDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2889,34 +2889,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal float Invoke(Stubs.IDataRecord ko, int i)
+			internal float Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetFloat");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetFloat");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetFloat(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetFloat");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetFloat");
 				return default!;
 			}
 
@@ -3072,7 +3072,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetGuid.</summary>
-			public delegate global::System.Guid GetGuidDelegate(Stubs.IDataRecord ko, int i);
+			public delegate global::System.Guid GetGuidDelegate(int i);
 
 			private GetGuidDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -3123,34 +3123,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Guid Invoke(Stubs.IDataRecord ko, int i)
+			internal global::System.Guid Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetGuid");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetGuid");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetGuid(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetGuid");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetGuid");
 				return default!;
 			}
 
@@ -3306,7 +3306,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetInt16.</summary>
-			public delegate short GetInt16Delegate(Stubs.IDataRecord ko, int i);
+			public delegate short GetInt16Delegate(int i);
 
 			private GetInt16Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -3357,34 +3357,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal short Invoke(Stubs.IDataRecord ko, int i)
+			internal short Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetInt16");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetInt16");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetInt16(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt16");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt16");
 				return default!;
 			}
 
@@ -3540,7 +3540,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetInt32.</summary>
-			public delegate int GetInt32Delegate(Stubs.IDataRecord ko, int i);
+			public delegate int GetInt32Delegate(int i);
 
 			private GetInt32Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -3591,34 +3591,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IDataRecord ko, int i)
+			internal int Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetInt32");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetInt32");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetInt32(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt32");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt32");
 				return default!;
 			}
 
@@ -3774,7 +3774,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetInt64.</summary>
-			public delegate long GetInt64Delegate(Stubs.IDataRecord ko, int i);
+			public delegate long GetInt64Delegate(int i);
 
 			private GetInt64Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -3825,34 +3825,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal long Invoke(Stubs.IDataRecord ko, int i)
+			internal long Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetInt64");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetInt64");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetInt64(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt64");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetInt64");
 				return default!;
 			}
 
@@ -4008,7 +4008,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetName.</summary>
-			public delegate string GetNameDelegate(Stubs.IDataRecord ko, int i);
+			public delegate string GetNameDelegate(int i);
 
 			private GetNameDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -4059,34 +4059,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal string Invoke(Stubs.IDataRecord ko, int i)
+			internal string Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetName");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetName");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetName(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetName");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetName");
 				return default!;
 			}
 
@@ -4242,7 +4242,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetOrdinal.</summary>
-			public delegate int GetOrdinalDelegate(Stubs.IDataRecord ko, string name);
+			public delegate int GetOrdinalDelegate(string name);
 
 			private GetOrdinalDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -4293,34 +4293,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IDataRecord ko, string name)
+			internal int Invoke(bool strict, string name)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(name);
 					_sequenceIndex++;
-					return callback(ko, name);
+					return callback(name);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(name);
-					return _onCall(ko, name);
+					return _onCall(name);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = name;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetOrdinal");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetOrdinal");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetOrdinal(name);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetOrdinal");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetOrdinal");
 				return default!;
 			}
 
@@ -4476,7 +4476,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetString.</summary>
-			public delegate string GetStringDelegate(Stubs.IDataRecord ko, int i);
+			public delegate string GetStringDelegate(int i);
 
 			private GetStringDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -4527,34 +4527,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal string Invoke(Stubs.IDataRecord ko, int i)
+			internal string Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetString");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetString");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetString(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetString");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetString");
 				return default!;
 			}
 
@@ -4710,7 +4710,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetValue.</summary>
-			public delegate object GetValueDelegate(Stubs.IDataRecord ko, int i);
+			public delegate object GetValueDelegate(int i);
 
 			private GetValueDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -4761,34 +4761,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal object Invoke(Stubs.IDataRecord ko, int i)
+			internal object Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetValue");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetValue");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetValue(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
 				return default!;
 			}
 
@@ -4944,7 +4944,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for GetValues.</summary>
-			public delegate int GetValuesDelegate(Stubs.IDataRecord ko, object[] values);
+			public delegate int GetValuesDelegate(object[] values);
 
 			private GetValuesDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -4995,34 +4995,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IDataRecord ko, object[] values)
+			internal int Invoke(bool strict, object[] values)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(values);
 					_sequenceIndex++;
-					return callback(ko, values);
+					return callback(values);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(values);
-					return _onCall(ko, values);
+					return _onCall(values);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = values;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetValues");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetValues");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetValues(values);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetValues");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetValues");
 				return default!;
 			}
 
@@ -5178,7 +5178,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Delegate for IsDBNull.</summary>
-			public delegate bool IsDBNullDelegate(Stubs.IDataRecord ko, int i);
+			public delegate bool IsDBNullDelegate(int i);
 
 			private IsDBNullDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -5229,34 +5229,34 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IDataRecord ko, int i)
+			internal bool Invoke(bool strict, int i)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(i);
 					_sequenceIndex++;
-					return callback(ko, i);
+					return callback(i);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(i);
-					return _onCall(ko, i);
+					return _onCall(i);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = i;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("IsDBNull");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsDBNull");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.IsDBNull(i);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "IsDBNull");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsDBNull");
 				return default!;
 			}
 
@@ -5485,112 +5485,112 @@ partial class DataRecordStubTests
 
 			bool global::System.Data.IDataRecord.GetBoolean(int i)
 			{
-				return GetBoolean.Invoke(this, i);
+				return GetBoolean.Invoke(Strict, i);
 			}
 
 			byte global::System.Data.IDataRecord.GetByte(int i)
 			{
-				return GetByte.Invoke(this, i);
+				return GetByte.Invoke(Strict, i);
 			}
 
 			long global::System.Data.IDataRecord.GetBytes(int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)
 			{
-				return GetBytes.Invoke(this, i, fieldOffset, buffer, bufferoffset, length);
+				return GetBytes.Invoke(Strict, i, fieldOffset, buffer, bufferoffset, length);
 			}
 
 			char global::System.Data.IDataRecord.GetChar(int i)
 			{
-				return GetChar.Invoke(this, i);
+				return GetChar.Invoke(Strict, i);
 			}
 
 			long global::System.Data.IDataRecord.GetChars(int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)
 			{
-				return GetChars.Invoke(this, i, fieldoffset, buffer, bufferoffset, length);
+				return GetChars.Invoke(Strict, i, fieldoffset, buffer, bufferoffset, length);
 			}
 
 			global::System.Data.IDataReader global::System.Data.IDataRecord.GetData(int i)
 			{
-				return GetData.Invoke(this, i);
+				return GetData.Invoke(Strict, i);
 			}
 
 			string global::System.Data.IDataRecord.GetDataTypeName(int i)
 			{
-				return GetDataTypeName.Invoke(this, i);
+				return GetDataTypeName.Invoke(Strict, i);
 			}
 
 			global::System.DateTime global::System.Data.IDataRecord.GetDateTime(int i)
 			{
-				return GetDateTime.Invoke(this, i);
+				return GetDateTime.Invoke(Strict, i);
 			}
 
 			decimal global::System.Data.IDataRecord.GetDecimal(int i)
 			{
-				return GetDecimal.Invoke(this, i);
+				return GetDecimal.Invoke(Strict, i);
 			}
 
 			double global::System.Data.IDataRecord.GetDouble(int i)
 			{
-				return GetDouble.Invoke(this, i);
+				return GetDouble.Invoke(Strict, i);
 			}
 
 			global::System.Type global::System.Data.IDataRecord.GetFieldType(int i)
 			{
-				return GetFieldType.Invoke(this, i);
+				return GetFieldType.Invoke(Strict, i);
 			}
 
 			float global::System.Data.IDataRecord.GetFloat(int i)
 			{
-				return GetFloat.Invoke(this, i);
+				return GetFloat.Invoke(Strict, i);
 			}
 
 			global::System.Guid global::System.Data.IDataRecord.GetGuid(int i)
 			{
-				return GetGuid.Invoke(this, i);
+				return GetGuid.Invoke(Strict, i);
 			}
 
 			short global::System.Data.IDataRecord.GetInt16(int i)
 			{
-				return GetInt16.Invoke(this, i);
+				return GetInt16.Invoke(Strict, i);
 			}
 
 			int global::System.Data.IDataRecord.GetInt32(int i)
 			{
-				return GetInt32.Invoke(this, i);
+				return GetInt32.Invoke(Strict, i);
 			}
 
 			long global::System.Data.IDataRecord.GetInt64(int i)
 			{
-				return GetInt64.Invoke(this, i);
+				return GetInt64.Invoke(Strict, i);
 			}
 
 			string global::System.Data.IDataRecord.GetName(int i)
 			{
-				return GetName.Invoke(this, i);
+				return GetName.Invoke(Strict, i);
 			}
 
 			int global::System.Data.IDataRecord.GetOrdinal(string name)
 			{
-				return GetOrdinal.Invoke(this, name);
+				return GetOrdinal.Invoke(Strict, name);
 			}
 
 			string global::System.Data.IDataRecord.GetString(int i)
 			{
-				return GetString.Invoke(this, i);
+				return GetString.Invoke(Strict, i);
 			}
 
 			object global::System.Data.IDataRecord.GetValue(int i)
 			{
-				return GetValue.Invoke(this, i);
+				return GetValue.Invoke(Strict, i);
 			}
 
 			int global::System.Data.IDataRecord.GetValues(object[] values)
 			{
-				return GetValues.Invoke(this, values);
+				return GetValues.Invoke(Strict, values);
 			}
 
 			bool global::System.Data.IDataRecord.IsDBNull(int i)
 			{
-				return IsDBNull.Invoke(this, i);
+				return IsDBNull.Invoke(Strict, i);
 			}
 
 			int global::System.Data.IDataRecord.FieldCount
@@ -5598,7 +5598,7 @@ partial class DataRecordStubTests
 				get
 				{
 					FieldCount.RecordGet();
-					if (FieldCount.OnGet is { } onGet) return onGet(this);
+					if (FieldCount.OnGet is { } onGet) return onGet();
 					if (FieldCount._source is { } src) return src.FieldCount;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "FieldCount");
 					return FieldCount.Value;
@@ -5610,7 +5610,7 @@ partial class DataRecordStubTests
 				get
 				{
 					IndexerInt32.RecordGet(i);
-					if (IndexerInt32.OnGet is { } onGet) return onGet(this, i);
+					if (IndexerInt32.OnGet is { } onGet) return onGet(i);
 					if (IndexerInt32._source is { } src) return src[i];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
 					return IndexerInt32.Backing.TryGetValue(i, out var v) ? v : new object();
@@ -5622,7 +5622,7 @@ partial class DataRecordStubTests
 				get
 				{
 					IndexerString.RecordGet(name);
-					if (IndexerString.OnGet is { } onGet) return onGet(this, name);
+					if (IndexerString.OnGet is { } onGet) return onGet(name);
 					if (IndexerString._source is { } src) return src[name];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
 					return IndexerString.Backing.TryGetValue(name, out var v) ? v : new object();

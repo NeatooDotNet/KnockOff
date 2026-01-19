@@ -66,7 +66,7 @@ public class InlineStubTests
 	public void InlineStub_OnCall_ReturnsCustomValue()
 	{
 		var stub = new InlineTestClass.Stubs.ISimpleService();
-		stub.GetValue.OnCall((ko, x) => x * 10);
+		stub.GetValue.OnCall((x) => x * 10);
 
 		ISimpleService service = stub;
 		var result = service.GetValue(5);
@@ -79,7 +79,7 @@ public class InlineStubTests
 	{
 		var stub = new InlineTestClass.Stubs.ISimpleService();
 		stub.Name.Value = "Default";
-		stub.Name.OnGet = (ko) => "Override";
+		stub.Name.OnGet = () => "Override";
 
 		ISimpleService service = stub;
 		var name = service.Name;
@@ -91,7 +91,7 @@ public class InlineStubTests
 	public void InlineStub_Reset_ClearsState()
 	{
 		var stub = new InlineTestClass.Stubs.ISimpleService();
-		stub.GetValue.OnCall((ko, x) => 100);
+		stub.GetValue.OnCall((x) => 100);
 
 		ISimpleService service = stub;
 		service.GetValue(1);
@@ -191,7 +191,7 @@ public class InlineStubTests
 		IGenericMethodService service = stub;
 
 		var expected = new TestEntity { Id = 42, Name = "Test" };
-		stub.Create.Of<TestEntity>().OnCall((ko) => expected);
+		stub.Create.Of<TestEntity>().OnCall(() => expected);
 
 		var result = service.Create<TestEntity>();
 
@@ -219,7 +219,7 @@ public class InlineStubTests
 		IGenericMethodService service = stub;
 
 		// Set up OnCall for int->string since string has no parameterless ctor
-		stub.Convert.Of<int, string>().OnCall((ko, i) => i.ToString());
+		stub.Convert.Of<int, string>().OnCall((i) => i.ToString());
 
 		service.Convert<string, int>("hello");
 		service.Convert<int, string>(42);
@@ -343,7 +343,7 @@ public class DelegateStubTests
 	{
 		var stub = new DelegateInlineTest.Stubs.VoidOneParamDelegate();
 		string? captured = null;
-		stub.Interceptor.OnCall = (ko, msg) => captured = msg;
+		stub.Interceptor.OnCall = (msg) => captured = msg;
 
 		VoidOneParamDelegate del = stub;
 		del("test message");
@@ -367,7 +367,7 @@ public class DelegateStubTests
 	public void DelegateStub_ReturnOneParam_OnCall()
 	{
 		var stub = new DelegateInlineTest.Stubs.ReturnOneParamDelegate();
-		stub.Interceptor.OnCall = (ko, x) => x * 10;
+		stub.Interceptor.OnCall = (x) => x * 10;
 
 		ReturnOneParamDelegate del = stub;
 		var result = del(5);
@@ -393,7 +393,7 @@ public class DelegateStubTests
 	public void DelegateStub_MultiParam_OnCall()
 	{
 		var stub = new DelegateInlineTest.Stubs.MultiParamDelegate();
-		stub.Interceptor.OnCall = (ko, name, age) => $"{name} is {age} years old";
+		stub.Interceptor.OnCall = (name, age) => $"{name} is {age} years old";
 
 		MultiParamDelegate del = stub;
 		var result = del("Bob", 25);
@@ -405,7 +405,7 @@ public class DelegateStubTests
 	public void DelegateStub_Reset_ClearsState()
 	{
 		var stub = new DelegateInlineTest.Stubs.VoidOneParamDelegate();
-		stub.Interceptor.OnCall = (ko, msg) => { };
+		stub.Interceptor.OnCall = (msg) => { };
 
 		VoidOneParamDelegate del = stub;
 		del("test");
@@ -422,7 +422,7 @@ public class DelegateStubTests
 	public void DelegateStub_ImplicitConversion()
 	{
 		var stub = new DelegateInlineTest.Stubs.ReturnOneParamDelegate();
-		stub.Interceptor.OnCall = (ko, x) => x + 1;
+		stub.Interceptor.OnCall = (x) => x + 1;
 
 		// Implicit conversion
 		ReturnOneParamDelegate del = stub;
@@ -435,7 +435,7 @@ public class DelegateStubTests
 	public void DelegateStub_ClosedGeneric_NoParam_Works()
 	{
 		var stub = new GenericDelegateInlineTest.Stubs.Factory();
-		stub.Interceptor.OnCall = (ko) => "generated value";
+		stub.Interceptor.OnCall = () => "generated value";
 
 		Factory<string> del = stub;
 		var result = del();
@@ -449,7 +449,7 @@ public class DelegateStubTests
 	public void DelegateStub_ClosedGeneric_WithParam_Works()
 	{
 		var stub = new GenericDelegateInlineTest.Stubs.Converter();
-		stub.Interceptor.OnCall = (ko, input) => $"Value: {input}";
+		stub.Interceptor.OnCall = (input) => $"Value: {input}";
 
 		Converter<int, string> del = stub;
 		var result = del(42);
@@ -462,7 +462,7 @@ public class DelegateStubTests
 	public void DelegateStub_ClosedGeneric_Reset_Works()
 	{
 		var stub = new GenericDelegateInlineTest.Stubs.Converter();
-		stub.Interceptor.OnCall = (ko, x) => "test";
+		stub.Interceptor.OnCall = (x) => "test";
 
 		Converter<int, string> del = stub;
 		del(1);
@@ -742,7 +742,7 @@ public class ClassStubTests
 	public void ClassStub_Property_TracksGetter()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Name.OnGet = (ko) => "Intercepted";
+		stub.Name.OnGet = () => "Intercepted";
 
 		var name = stub.Object.Name;
 
@@ -801,7 +801,7 @@ public class ClassStubTests
 	public void ClassStub_Method_OnCall_ReturnsCustomValue()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Calculate.OnCall((ko, x) => x * 10);
+		stub.Calculate.OnCall((x) => x * 10);
 
 		var result = stub.Object.Calculate(5);
 
@@ -835,7 +835,7 @@ public class ClassStubTests
 	public void ClassStub_Reset_ClearsState()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Calculate.OnCall((ko, x) => 100);
+		stub.Calculate.OnCall((x) => 100);
 
 		stub.Object.Calculate(1);
 		stub.Object.Calculate(2);
@@ -868,7 +868,7 @@ public class ClassStubTests
 	public void ClassStub_Substitutability_PassToMethod()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService("SubstitutedName");
-		stub.Calculate.OnCall((ko, x) => x * 100);
+		stub.Calculate.OnCall((x) => x * 100);
 
 		// Pass the stub.Object to a method expecting SimpleService
 		var result = ProcessService(stub.Object);
@@ -911,7 +911,7 @@ public class AbstractClassStubTests
 	public void AbstractStub_Property_ReturnsCallback_WhenSet()
 	{
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
-		stub.ConnectionString.OnGet = (ko) => "Server=test";
+		stub.ConnectionString.OnGet = () => "Server=test";
 
 		var connectionString = stub.Object.ConnectionString;
 
@@ -944,7 +944,7 @@ public class AbstractClassStubTests
 	public void AbstractStub_ReturningMethod_ReturnsCallback_WhenSet()
 	{
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
-		stub.Execute.OnCall((ko, cmd) => cmd.Length);
+		stub.Execute.OnCall((cmd) => cmd.Length);
 
 		var result = stub.Object.Execute("SELECT 1");
 

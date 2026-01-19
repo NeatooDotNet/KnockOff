@@ -41,7 +41,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
-		var tracking = stub.Save.OnCall((ko, entity) => { });
+		var tracking = stub.Save.OnCall((entity) => { });
 		IGenericRepository<User> repo = stub;
 
 		// Act
@@ -58,7 +58,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
-		var tracking = stub.Save.OnCall((ko, entity) => { });
+		var tracking = stub.Save.OnCall((entity) => { });
 		IGenericRepository<User> repo = stub;
 		var user = new User { Id = 42, Name = "Test" };
 
@@ -80,33 +80,13 @@ public class GenericStandaloneStubTests
 		var stub = new GenericRepositoryStub<User>();
 		IGenericRepository<User> repo = stub;
 		var expected = new User { Id = 123, Name = "Found" };
-		stub.GetById.OnCall((ko, id) => expected);
+		stub.GetById.OnCall((id) => expected);
 
 		// Act
 		var result = repo.GetById(123);
 
 		// Assert
 		Assert.Same(expected, result);
-	}
-
-	[Fact]
-	public void GenericStandaloneStub_OnCall_ReceivesKnockOffInstance()
-	{
-		// Arrange
-		var stub = new GenericRepositoryStub<User>();
-		IGenericRepository<User> repo = stub;
-		GenericRepositoryStub<User>? capturedKo = null;
-		stub.GetById.OnCall((ko, id) =>
-		{
-			capturedKo = ko;
-			return null;
-		});
-
-		// Act
-		repo.GetById(1);
-
-		// Assert
-		Assert.Same(stub, capturedKo);
 	}
 
 	#endregion
@@ -147,7 +127,7 @@ public class GenericStandaloneStubTests
 			new() { Id = 1, Name = "User1" },
 			new() { Id = 2, Name = "User2" }
 		};
-		stub.GetAll.OnCall((ko) => users);
+		stub.GetAll.OnCall(() => users);
 
 		// Act
 		var result = repo.GetAll();
@@ -181,7 +161,7 @@ public class GenericStandaloneStubTests
 		// Arrange
 		var stub = new GenericKeyValueStoreStub<string, int>();
 		IGenericKeyValueStore<string, int> store = stub;
-		var tracking = stub.Get.OnCall((ko, key) => 42);
+		var tracking = stub.Get.OnCall((key) => 42);
 
 		// Act
 		var result = store.Get("answer");
@@ -215,7 +195,7 @@ public class GenericStandaloneStubTests
 		var stub = new ConstrainedRepositoryStub<User>();
 		IConstrainedRepository<User> repo = stub;
 		var user = new User { Id = 1 };
-		var tracking = stub.Save.OnCall((ko, entity) => { });
+		var tracking = stub.Save.OnCall((entity) => { });
 
 		// Act
 		repo.Save(user);
@@ -248,7 +228,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
-		var tracking = stub.GetById.OnCall((ko, id) => null);
+		var tracking = stub.GetById.OnCall((id) => null);
 		IGenericRepository<User> repo = stub;
 		repo.GetById(1);
 		repo.GetById(2);

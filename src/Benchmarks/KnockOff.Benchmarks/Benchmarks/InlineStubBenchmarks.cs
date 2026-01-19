@@ -49,11 +49,11 @@ public class InlineStubInvocationBenchmarks
         _moqCalc = moqCalc.Object;
 
         var standAloneCalc = new CalculatorStub();
-        standAloneCalc.Add.OnCall((ko, a, b) => a + b);
+        standAloneCalc.Add.OnCall((a, b) => a + b);
         _standAloneCalc = standAloneCalc;
 
         var inlineCalc = new InlineStubs.Stubs.ICalculator();
-        inlineCalc.Add.OnCall((stub, a, b) => a + b);
+        inlineCalc.Add.OnCall((a, b) => a + b);
         _inlineCalc = inlineCalc;
     }
 
@@ -96,8 +96,8 @@ public class InlineStubSetupBenchmarks
     public CalculatorStub StandAlone_SetupCalculator()
     {
         var stub = new CalculatorStub();
-        stub.Add.OnCall((ko, a, b) => a + b);
-        stub.Subtract.OnCall((ko, a, b) => a - b);
+        stub.Add.OnCall((a, b) => a + b);
+        stub.Subtract.OnCall((a, b) => a - b);
         return stub;
     }
 
@@ -105,8 +105,8 @@ public class InlineStubSetupBenchmarks
     public InlineStubs.Stubs.ICalculator Inline_SetupCalculator()
     {
         var stub = new InlineStubs.Stubs.ICalculator();
-        stub.Add.OnCall((s, a, b) => a + b);
-        stub.Subtract.OnCall((s, a, b) => a - b);
+        stub.Add.OnCall((a, b) => a + b);
+        stub.Subtract.OnCall((a, b) => a - b);
         return stub;
     }
 }

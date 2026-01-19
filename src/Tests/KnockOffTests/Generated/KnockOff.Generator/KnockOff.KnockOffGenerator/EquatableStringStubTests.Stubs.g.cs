@@ -15,7 +15,7 @@ partial class EquatableStringStubTests
 			internal global::System.IEquatable<string>? _source;
 
 			/// <summary>Delegate for Equals.</summary>
-			public delegate bool EqualsDelegate(Stubs.IEquatable ko, string? other);
+			public delegate bool EqualsDelegate(string? other);
 
 			private EqualsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class EquatableStringStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IEquatable ko, string? other)
+			internal bool Invoke(bool strict, string? other)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(other);
 					_sequenceIndex++;
-					return callback(ko, other);
+					return callback(other);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(other);
-					return _onCall(ko, other);
+					return _onCall(other);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Equals");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Equals");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Equals(other);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Equals");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class EquatableStringStubTests
 
 			bool global::System.IEquatable<string>.Equals(string? other)
 			{
-				return Equals.Invoke(this, other);
+				return Equals.Invoke(Strict, other);
 			}
 
 			/// <summary>The global::System.IEquatable<string> instance. Use for passing to code expecting the interface.</summary>

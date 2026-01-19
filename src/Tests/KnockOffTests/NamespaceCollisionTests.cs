@@ -13,7 +13,7 @@ public class NamespaceCollisionTests
 		// Arrange: Create a stub for an interface in a namespace that collides with a type name
 		// The stub is in DomainModel.Tests namespace where DomainModel.Person shadows the Person namespace
 		var stub = new DomainModel.Tests.PersonDbContextKnockOff();
-		var tracking = stub.SavePerson.OnCall((ko, person) => { });
+		var tracking = stub.SavePerson.OnCall((person) => { });
 		global::Person.Ef.IPersonDbContext service = stub;
 
 		// Act
@@ -29,7 +29,7 @@ public class NamespaceCollisionTests
 		// Arrange: Test inline stub pattern with namespace collision
 		var stub = new DomainModel.Tests.NamespaceCollisionInlineTests.Stubs.IPersonDbContext();
 		// Inline stubs use OnCall as a property
-		stub.SavePerson.OnCall((ko, person) => { });
+		stub.SavePerson.OnCall((person) => { });
 		global::Person.Ef.IPersonDbContext service = stub;
 
 		// Act

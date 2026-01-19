@@ -11,7 +11,7 @@ partial class EmailServiceTests
 		/// <summary>Interceptor for EmailService.Send.</summary>
 		public sealed class EmailService_SendInterceptor : global::KnockOff.IMethodTracking
 		{
-			private global::System.Func<Stubs.EmailService, string, string, bool>? _onCall;
+			private global::System.Func<string, string, bool>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -23,10 +23,10 @@ partial class EmailServiceTests
 			public (string? to, string? subject)? LastCallArgs { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.EmailService, string, string, bool> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<string, string, bool> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<Stubs.EmailService, string, string, bool>? Callback => _onCall;
+			internal global::System.Func<string, string, bool>? Callback => _onCall;
 
 			public void RecordCall(string to, string subject) { CallCount++; LastCallArgs = (to, subject); }
 
@@ -129,7 +129,7 @@ partial class EmailServiceTests
 				public override bool Send(string to, string subject)
 				{
 					_stub?.Send.RecordCall(to, subject);
-					if (_stub?.Send.Callback is { } onCall) return onCall(_stub, to, subject);
+					if (_stub?.Send.Callback is { } onCall) return onCall(to, subject);
 					return base.Send(to, subject);
 				}
 

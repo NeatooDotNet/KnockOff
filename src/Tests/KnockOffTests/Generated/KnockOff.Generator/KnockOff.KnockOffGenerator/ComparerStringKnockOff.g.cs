@@ -12,7 +12,7 @@ partial class ComparerStringKnockOff : global::System.Collections.Generic.ICompa
 		internal global::System.Collections.Generic.IComparer<string>? _source;
 
 		/// <summary>Delegate for Compare.</summary>
-		public delegate int CompareDelegate(ComparerStringKnockOff ko, string? x, string? y);
+		public delegate int CompareDelegate(string? x, string? y);
 
 		private CompareDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class ComparerStringKnockOff : global::System.Collections.Generic.ICompa
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(ComparerStringKnockOff ko, bool strict, string? x, string? y)
+		internal int Invoke(bool strict, string? x, string? y)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall((x, y));
 				_sequenceIndex++;
-				return callback(ko, x, y);
+				return callback(x, y);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall((x, y));
-				return _onCall(ko, x, y);
+				return _onCall(x, y);
 			}
 
 			_unconfiguredCallCount++;
@@ -281,7 +281,7 @@ partial class ComparerStringKnockOff : global::System.Collections.Generic.ICompa
 
 	int global::System.Collections.Generic.IComparer<string>.Compare(string? x, string? y)
 	{
-		return Compare.Invoke(this, Strict, x, y);
+		return Compare.Invoke(Strict, x, y);
 	}
 
 }

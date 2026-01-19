@@ -19,7 +19,7 @@ partial class InlineStubTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEmailSvc, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -95,10 +95,10 @@ partial class InlineStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Documentation.Samples.GettingStarted.IEmailSvc? _source;
 
-			private global::System.Action<Stubs.IEmailSvc, string, string, string>? _onCall;
+			private global::System.Action<string, string, string>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IEmailSvc, string, string, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<string, string, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -118,7 +118,7 @@ partial class InlineStubTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTrackingArgs<(string to, string subject, string body)> OnCall(global::System.Action<Stubs.IEmailSvc, string, string, string> callback)
+			public global::KnockOff.IMethodTrackingArgs<(string to, string subject, string body)> OnCall(global::System.Action<string, string, string> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -130,13 +130,13 @@ partial class InlineStubTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEmailSvc, string, string, string>> OnCallSequence(global::System.Action<Stubs.IEmailSvc, string, string, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string, string, string>> OnCallSequence(global::System.Action<string, string, string> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IEmailSvc, string, string, string> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<string, string, string> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -144,21 +144,21 @@ partial class InlineStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IEmailSvc ko, string to, string subject, string body)
+			internal void Invoke(bool strict, string to, string subject, string body)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((to, subject, body));
 					_sequenceIndex++;
-					callback(ko, to, subject, body);
+					callback(to, subject, body);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((to, subject, body));
-					_onCall(ko, to, subject, body);
+					_onCall(to, subject, body);
 					return;
 				}
 
@@ -166,14 +166,14 @@ partial class InlineStubTests
 				_unconfiguredLastArgs = ((to, subject, body));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Send");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Send");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Send(to, subject, body); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Send");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Send");
 				return;
 			}
 
@@ -268,7 +268,7 @@ partial class InlineStubTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEmailSvc, string, string, string>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string, string, string>>
 			{
 				private readonly IEmailSvc_SendInterceptor _interceptor;
 
@@ -288,7 +288,7 @@ partial class InlineStubTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEmailSvc, string, string, string>> ThenCall(global::System.Action<Stubs.IEmailSvc, string, string, string> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<string, string, string>> ThenCall(global::System.Action<string, string, string> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -309,7 +309,7 @@ partial class InlineStubTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEmailSvc, string, string, string>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<string, string, string>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -333,7 +333,7 @@ partial class InlineStubTests
 
 			void global::KnockOff.Documentation.Samples.GettingStarted.IEmailSvc.Send(string to, string subject, string body)
 			{
-				Send.Invoke(this, to, subject, body);
+				Send.Invoke(Strict, to, subject, body);
 			}
 
 			bool global::KnockOff.Documentation.Samples.GettingStarted.IEmailSvc.IsConfigured
@@ -341,7 +341,7 @@ partial class InlineStubTests
 				get
 				{
 					IsConfigured.RecordGet();
-					if (IsConfigured.OnGet is { } onGet) return onGet(this);
+					if (IsConfigured.OnGet is { } onGet) return onGet();
 					if (IsConfigured._source is { } src) return src.IsConfigured;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEmailSvc", "IsConfigured");
 					return IsConfigured.Value;

@@ -24,7 +24,7 @@ partial class IPropertyInfoTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyInfo, global::System.Reflection.PropertyInfo>? OnGet { get; set; }
+			public global::System.Func<global::System.Reflection.PropertyInfo>? OnGet { get; set; }
 
 			private global::System.Reflection.PropertyInfo _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -105,7 +105,7 @@ partial class IPropertyInfoTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyInfo, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -186,7 +186,7 @@ partial class IPropertyInfoTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyInfo, global::System.Type>? OnGet { get; set; }
+			public global::System.Func<global::System.Type>? OnGet { get; set; }
 
 			private global::System.Type _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -267,7 +267,7 @@ partial class IPropertyInfoTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyInfo, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -348,7 +348,7 @@ partial class IPropertyInfoTests
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IPropertyInfo, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -425,7 +425,7 @@ partial class IPropertyInfoTests
 			internal global::Neatoo.IPropertyInfo? _source;
 
 			/// <summary>Delegate for GetCustomAttributes.</summary>
-			public delegate global::System.Collections.Generic.IEnumerable<global::System.Attribute> GetCustomAttributesDelegate(Stubs.IPropertyInfo ko);
+			public delegate global::System.Collections.Generic.IEnumerable<global::System.Attribute> GetCustomAttributesDelegate();
 
 			private GetCustomAttributesDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -472,33 +472,33 @@ partial class IPropertyInfoTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Collections.Generic.IEnumerable<global::System.Attribute> Invoke(Stubs.IPropertyInfo ko)
+			internal global::System.Collections.Generic.IEnumerable<global::System.Attribute> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetCustomAttributes");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetCustomAttributes");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetCustomAttributes();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetCustomAttributes");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetCustomAttributes");
 				throw new global::System.InvalidOperationException("No implementation provided for GetCustomAttributes. Configure via OnCall.");
 			}
 
@@ -690,7 +690,7 @@ partial class IPropertyInfoTests
 			public sealed class GetCustomAttributeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : global::System.Attribute
 			{
 				/// <summary>Delegate for GetCustomAttribute.</summary>
-				public delegate T? GetCustomAttributeDelegate(Stubs.IPropertyInfo ko);
+				public delegate T? GetCustomAttributeDelegate();
 
 				private GetCustomAttributeDelegate? _onCall;
 
@@ -759,14 +759,14 @@ partial class IPropertyInfoTests
 				var typedHandler = GetCustomAttribute.Of<T>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this);
+					return onCallCallback();
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "GetCustomAttribute");
 				return default!;
 			}
 
 			global::System.Collections.Generic.IEnumerable<global::System.Attribute> global::Neatoo.IPropertyInfo.GetCustomAttributes()
 			{
-				return GetCustomAttributes.Invoke(this);
+				return GetCustomAttributes.Invoke(Strict);
 			}
 
 			global::System.Reflection.PropertyInfo global::Neatoo.IPropertyInfo.PropertyInfo
@@ -774,7 +774,7 @@ partial class IPropertyInfoTests
 				get
 				{
 					PropertyInfo.RecordGet();
-					if (PropertyInfo.OnGet is { } onGet) return onGet(this);
+					if (PropertyInfo.OnGet is { } onGet) return onGet();
 					if (PropertyInfo._source is { } src) return src.PropertyInfo;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "PropertyInfo");
 					return PropertyInfo.Value;
@@ -786,7 +786,7 @@ partial class IPropertyInfoTests
 				get
 				{
 					Name.RecordGet();
-					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name.OnGet is { } onGet) return onGet();
 					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Name");
 					return Name.Value;
@@ -798,7 +798,7 @@ partial class IPropertyInfoTests
 				get
 				{
 					Type.RecordGet();
-					if (Type.OnGet is { } onGet) return onGet(this);
+					if (Type.OnGet is { } onGet) return onGet();
 					if (Type._source is { } src) return src.Type;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Type");
 					return Type.Value;
@@ -810,7 +810,7 @@ partial class IPropertyInfoTests
 				get
 				{
 					Key.RecordGet();
-					if (Key.OnGet is { } onGet) return onGet(this);
+					if (Key.OnGet is { } onGet) return onGet();
 					if (Key._source is { } src) return src.Key;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "Key");
 					return Key.Value;
@@ -822,7 +822,7 @@ partial class IPropertyInfoTests
 				get
 				{
 					IsPrivateSetter.RecordGet();
-					if (IsPrivateSetter.OnGet is { } onGet) return onGet(this);
+					if (IsPrivateSetter.OnGet is { } onGet) return onGet();
 					if (IsPrivateSetter._source is { } src) return src.IsPrivateSetter;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyInfo", "IsPrivateSetter");
 					return IsPrivateSetter.Value;

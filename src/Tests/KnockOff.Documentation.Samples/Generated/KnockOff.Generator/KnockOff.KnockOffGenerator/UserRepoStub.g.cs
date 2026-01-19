@@ -12,7 +12,7 @@ partial class UserRepoStub : global::KnockOff.Documentation.Samples.GettingStart
 		internal global::KnockOff.Documentation.Samples.GettingStarted.IUserRepo? _source;
 
 		/// <summary>Delegate for GetById.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(UserRepoStub ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(int id);
 
 		private GetByIdDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class UserRepoStub : global::KnockOff.Documentation.Samples.GettingStart
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke(UserRepoStub ko, bool strict, int id)
+		internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class UserRepoStub : global::KnockOff.Documentation.Samples.GettingStart
 		internal global::KnockOff.Documentation.Samples.GettingStarted.IUserRepo? _source;
 
 		/// <summary>Delegate for SaveUser.</summary>
-		public delegate bool SaveUserDelegate(UserRepoStub ko, global::KnockOff.Documentation.Samples.User user);
+		public delegate bool SaveUserDelegate(global::KnockOff.Documentation.Samples.User user);
 
 		private SaveUserDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -297,20 +297,20 @@ partial class UserRepoStub : global::KnockOff.Documentation.Samples.GettingStart
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(UserRepoStub ko, bool strict, global::KnockOff.Documentation.Samples.User user)
+		internal bool Invoke(bool strict, global::KnockOff.Documentation.Samples.User user)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(user);
 				_sequenceIndex++;
-				return callback(ko, user);
+				return callback(user);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(user);
-				return _onCall(ko, user);
+				return _onCall(user);
 			}
 
 			_unconfiguredCallCount++;
@@ -521,12 +521,12 @@ partial class UserRepoStub : global::KnockOff.Documentation.Samples.GettingStart
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.GettingStarted.IUserRepo.GetById(int id)
 	{
-		return GetById.Invoke(this, Strict, id);
+		return GetById.Invoke(Strict, id);
 	}
 
 	bool global::KnockOff.Documentation.Samples.GettingStarted.IUserRepo.SaveUser(global::KnockOff.Documentation.Samples.User user)
 	{
-		return SaveUser.Invoke(this, Strict, user);
+		return SaveUser.Invoke(Strict, user);
 	}
 
 }

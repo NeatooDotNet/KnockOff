@@ -19,7 +19,7 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<ConnectionStub, bool>? OnGet { get; set; }
+		public global::System.Func<bool>? OnGet { get; set; }
 
 		private bool _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -92,10 +92,10 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.AdvancedCallbacks.IConnection? _source;
 
-		private global::System.Action<ConnectionStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<ConnectionStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -111,7 +111,7 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<ConnectionStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -123,13 +123,13 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<ConnectionStub>> OnCallSequence(global::System.Action<ConnectionStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<ConnectionStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -137,21 +137,21 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(ConnectionStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -252,7 +252,7 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<ConnectionStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ConnectInterceptor _interceptor;
 
@@ -272,7 +272,7 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ConnectionStub>> ThenCall(global::System.Action<ConnectionStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -293,7 +293,7 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<ConnectionStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -354,12 +354,12 @@ partial class ConnectionStub : global::KnockOff.Documentation.Samples.AdvancedCa
 
 	bool global::KnockOff.Documentation.Samples.AdvancedCallbacks.IConnection.IsConnected
 	{
-		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(this); if (IsConnected._source is { } src) return src.IsConnected; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConnection", "IsConnected"); return IsConnected.Value; }
+		get { IsConnected.RecordGet(); if (IsConnected.OnGet is { } onGet) return onGet(); if (IsConnected._source is { } src) return src.IsConnected; if (Strict) throw global::KnockOff.StubException.NotConfigured("IConnection", "IsConnected"); return IsConnected.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.AdvancedCallbacks.IConnection.Connect()
 	{
-		Connect.Invoke(this, Strict);
+		Connect.Invoke(Strict);
 	}
 
 }

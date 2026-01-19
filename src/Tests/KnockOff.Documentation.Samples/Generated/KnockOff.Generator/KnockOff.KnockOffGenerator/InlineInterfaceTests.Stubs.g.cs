@@ -15,7 +15,7 @@ partial class InlineInterfaceTests
 			internal global::KnockOff.Documentation.Samples.Patterns.IUserRepoInline? _source;
 
 			/// <summary>Delegate for GetById.</summary>
-			public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(Stubs.IUserRepoInline ko, int id);
+			public delegate global::KnockOff.Documentation.Samples.User? GetByIdDelegate(int id);
 
 			private GetByIdDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class InlineInterfaceTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::KnockOff.Documentation.Samples.User? Invoke(Stubs.IUserRepoInline ko, int id)
+			internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(id);
 					_sequenceIndex++;
-					return callback(ko, id);
+					return callback(id);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(id);
-					return _onCall(ko, id);
+					return _onCall(id);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = id;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetById");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetById");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetById(id);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetById");
 				return default!;
 			}
 
@@ -248,10 +248,10 @@ partial class InlineInterfaceTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Documentation.Samples.Patterns.IUserRepoInline? _source;
 
-			private global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User>? _onCall;
+			private global::System.Action<global::KnockOff.Documentation.Samples.User>? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -271,7 +271,7 @@ partial class InlineInterfaceTests
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.User> OnCall(global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User> callback)
+			public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.User> OnCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -283,13 +283,13 @@ partial class InlineInterfaceTests
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User>> OnCallSequence(global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> OnCallSequence(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -297,21 +297,21 @@ partial class InlineInterfaceTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IUserRepoInline ko, global::KnockOff.Documentation.Samples.User user)
+			internal void Invoke(bool strict, global::KnockOff.Documentation.Samples.User user)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(user);
 					_sequenceIndex++;
-					callback(ko, user);
+					callback(user);
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(user);
-					_onCall(ko, user);
+					_onCall(user);
 					return;
 				}
 
@@ -319,14 +319,14 @@ partial class InlineInterfaceTests
 				_unconfiguredLastArg = user;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Save");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Save");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Save(user); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return;
 			}
 
@@ -421,7 +421,7 @@ partial class InlineInterfaceTests
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>>
 			{
 				private readonly IUserRepoInline_SaveInterceptor _interceptor;
 
@@ -441,7 +441,7 @@ partial class InlineInterfaceTests
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User>> ThenCall(global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> ThenCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -462,7 +462,7 @@ partial class InlineInterfaceTests
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IUserRepoInline, global::KnockOff.Documentation.Samples.User>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -486,12 +486,12 @@ partial class InlineInterfaceTests
 
 			global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.Patterns.IUserRepoInline.GetById(int id)
 			{
-				return GetById.Invoke(this, id);
+				return GetById.Invoke(Strict, id);
 			}
 
 			void global::KnockOff.Documentation.Samples.Patterns.IUserRepoInline.Save(global::KnockOff.Documentation.Samples.User user)
 			{
-				Save.Invoke(this, user);
+				Save.Invoke(Strict, user);
 			}
 
 			/// <summary>The global::KnockOff.Documentation.Samples.Patterns.IUserRepoInline instance. Use for passing to code expecting the interface.</summary>

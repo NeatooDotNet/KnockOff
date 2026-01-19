@@ -19,7 +19,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<DataStoreStub, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -92,10 +92,10 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.SourceDelegation.IDataStore? _source;
 
-		private global::System.Action<DataStoreStub, string>? _onCall;
+		private global::System.Action<string>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<DataStoreStub, string> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -115,7 +115,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<DataStoreStub, string> callback)
+		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -127,13 +127,13 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<DataStoreStub, string>> OnCallSequence(global::System.Action<DataStoreStub, string> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<string>> OnCallSequence(global::System.Action<string> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<DataStoreStub, string> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -141,21 +141,21 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(DataStoreStub ko, bool strict, string item)
+		internal void Invoke(bool strict, string item)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(item);
 				_sequenceIndex++;
-				callback(ko, item);
+				callback(item);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(item);
-				_onCall(ko, item);
+				_onCall(item);
 				return;
 			}
 
@@ -265,7 +265,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<DataStoreStub, string>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<string>>
 		{
 			private readonly AddInterceptor _interceptor;
 
@@ -285,7 +285,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DataStoreStub, string>> ThenCall(global::System.Action<DataStoreStub, string> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> ThenCall(global::System.Action<string> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -306,7 +306,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DataStoreStub, string>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<string>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -326,7 +326,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		internal global::KnockOff.Documentation.Samples.SourceDelegation.IDataStore? _source;
 
 		/// <summary>Delegate for Get.</summary>
-		public delegate string? GetDelegate(DataStoreStub ko, int index);
+		public delegate string? GetDelegate(int index);
 
 		private GetDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -377,20 +377,20 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal string? Invoke(DataStoreStub ko, bool strict, int index)
+		internal string? Invoke(bool strict, int index)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(index);
 				_sequenceIndex++;
-				return callback(ko, index);
+				return callback(index);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(index);
-				return _onCall(ko, index);
+				return _onCall(index);
 			}
 
 			_unconfiguredCallCount++;
@@ -559,10 +559,10 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.SourceDelegation.IDataStore? _source;
 
-		private global::System.Action<DataStoreStub>? _onCall;
+		private global::System.Action? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<DataStoreStub> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -578,7 +578,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking OnCall(global::System.Action<DataStoreStub> callback)
+		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -590,13 +590,13 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<DataStoreStub>> OnCallSequence(global::System.Action<DataStoreStub> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<DataStoreStub> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -604,21 +604,21 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(DataStoreStub ko, bool strict)
+		internal void Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				callback(ko);
+				callback();
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				_onCall(ko);
+				_onCall();
 				return;
 			}
 
@@ -719,7 +719,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<DataStoreStub>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 		{
 			private readonly ClearInterceptor _interceptor;
 
@@ -739,7 +739,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DataStoreStub>> ThenCall(global::System.Action<DataStoreStub> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -760,7 +760,7 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<DataStoreStub>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -833,22 +833,22 @@ partial class DataStoreStub : global::KnockOff.Documentation.Samples.SourceDeleg
 
 	int global::KnockOff.Documentation.Samples.SourceDelegation.IDataStore.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataStore", "Count"); return Count.Value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataStore", "Count"); return Count.Value; }
 	}
 
 	void global::KnockOff.Documentation.Samples.SourceDelegation.IDataStore.Add(string item)
 	{
-		Add.Invoke(this, Strict, item);
+		Add.Invoke(Strict, item);
 	}
 
 	string? global::KnockOff.Documentation.Samples.SourceDelegation.IDataStore.Get(int index)
 	{
-		return Get.Invoke(this, Strict, index);
+		return Get.Invoke(Strict, index);
 	}
 
 	void global::KnockOff.Documentation.Samples.SourceDelegation.IDataStore.Clear()
 	{
-		Clear.Invoke(this, Strict);
+		Clear.Invoke(Strict);
 	}
 
 }

@@ -15,7 +15,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for GetTypeCode.</summary>
-			public delegate global::System.TypeCode GetTypeCodeDelegate(Stubs.IConvertible ko);
+			public delegate global::System.TypeCode GetTypeCodeDelegate();
 
 			private GetTypeCodeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -62,33 +62,33 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.TypeCode Invoke(Stubs.IConvertible ko)
+			internal global::System.TypeCode Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetTypeCode");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetTypeCode");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetTypeCode();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetTypeCode");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetTypeCode");
 				return default!;
 			}
 
@@ -236,7 +236,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToBoolean.</summary>
-			public delegate bool ToBooleanDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate bool ToBooleanDelegate(global::System.IFormatProvider? provider);
 
 			private ToBooleanDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -287,34 +287,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal bool Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToBoolean");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToBoolean");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToBoolean(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToBoolean");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToBoolean");
 				return default!;
 			}
 
@@ -470,7 +470,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToByte.</summary>
-			public delegate byte ToByteDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate byte ToByteDelegate(global::System.IFormatProvider? provider);
 
 			private ToByteDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -521,34 +521,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal byte Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal byte Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToByte");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToByte");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToByte(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToByte");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToByte");
 				return default!;
 			}
 
@@ -704,7 +704,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToChar.</summary>
-			public delegate char ToCharDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate char ToCharDelegate(global::System.IFormatProvider? provider);
 
 			private ToCharDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -755,34 +755,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal char Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal char Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToChar");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToChar");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToChar(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToChar");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToChar");
 				return default!;
 			}
 
@@ -938,7 +938,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToDateTime.</summary>
-			public delegate global::System.DateTime ToDateTimeDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate global::System.DateTime ToDateTimeDelegate(global::System.IFormatProvider? provider);
 
 			private ToDateTimeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -989,34 +989,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.DateTime Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal global::System.DateTime Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToDateTime");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToDateTime");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToDateTime(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToDateTime");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToDateTime");
 				return default!;
 			}
 
@@ -1172,7 +1172,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToDecimal.</summary>
-			public delegate decimal ToDecimalDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate decimal ToDecimalDelegate(global::System.IFormatProvider? provider);
 
 			private ToDecimalDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1223,34 +1223,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal decimal Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal decimal Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToDecimal");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToDecimal");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToDecimal(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToDecimal");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToDecimal");
 				return default!;
 			}
 
@@ -1406,7 +1406,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToDouble.</summary>
-			public delegate double ToDoubleDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate double ToDoubleDelegate(global::System.IFormatProvider? provider);
 
 			private ToDoubleDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1457,34 +1457,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal double Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal double Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToDouble");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToDouble");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToDouble(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToDouble");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToDouble");
 				return default!;
 			}
 
@@ -1640,7 +1640,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToInt16.</summary>
-			public delegate short ToInt16Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate short ToInt16Delegate(global::System.IFormatProvider? provider);
 
 			private ToInt16Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1691,34 +1691,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal short Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal short Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToInt16");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToInt16");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToInt16(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt16");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt16");
 				return default!;
 			}
 
@@ -1874,7 +1874,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToInt32.</summary>
-			public delegate int ToInt32Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate int ToInt32Delegate(global::System.IFormatProvider? provider);
 
 			private ToInt32Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1925,34 +1925,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal int Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToInt32");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToInt32");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToInt32(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt32");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt32");
 				return default!;
 			}
 
@@ -2108,7 +2108,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToInt64.</summary>
-			public delegate long ToInt64Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate long ToInt64Delegate(global::System.IFormatProvider? provider);
 
 			private ToInt64Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2159,34 +2159,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal long Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal long Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToInt64");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToInt64");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToInt64(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt64");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToInt64");
 				return default!;
 			}
 
@@ -2342,7 +2342,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToSByte.</summary>
-			public delegate sbyte ToSByteDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate sbyte ToSByteDelegate(global::System.IFormatProvider? provider);
 
 			private ToSByteDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2393,34 +2393,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal sbyte Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal sbyte Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToSByte");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToSByte");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToSByte(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToSByte");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToSByte");
 				return default!;
 			}
 
@@ -2576,7 +2576,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToSingle.</summary>
-			public delegate float ToSingleDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate float ToSingleDelegate(global::System.IFormatProvider? provider);
 
 			private ToSingleDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2627,34 +2627,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal float Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal float Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToSingle");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToSingle");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToSingle(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToSingle");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToSingle");
 				return default!;
 			}
 
@@ -2810,7 +2810,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToString.</summary>
-			public delegate string ToStringDelegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate string ToStringDelegate(global::System.IFormatProvider? provider);
 
 			private ToStringDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2861,34 +2861,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal string Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal string Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToString");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToString");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToString(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToString");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToString");
 				return default!;
 			}
 
@@ -3044,7 +3044,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToType.</summary>
-			public delegate object ToTypeDelegate(Stubs.IConvertible ko, global::System.Type conversionType, global::System.IFormatProvider? provider);
+			public delegate object ToTypeDelegate(global::System.Type conversionType, global::System.IFormatProvider? provider);
 
 			private ToTypeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -3095,34 +3095,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal object Invoke(Stubs.IConvertible ko, global::System.Type conversionType, global::System.IFormatProvider? provider)
+			internal object Invoke(bool strict, global::System.Type conversionType, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall((conversionType, provider));
 					_sequenceIndex++;
-					return callback(ko, conversionType, provider);
+					return callback(conversionType, provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall((conversionType, provider));
-					return _onCall(ko, conversionType, provider);
+					return _onCall(conversionType, provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArgs = ((conversionType, provider));
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToType");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToType");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToType(conversionType, provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToType");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToType");
 				return default!;
 			}
 
@@ -3278,7 +3278,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToUInt16.</summary>
-			public delegate ushort ToUInt16Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate ushort ToUInt16Delegate(global::System.IFormatProvider? provider);
 
 			private ToUInt16Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -3329,34 +3329,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal ushort Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal ushort Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToUInt16");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToUInt16");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToUInt16(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt16");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt16");
 				return default!;
 			}
 
@@ -3512,7 +3512,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToUInt32.</summary>
-			public delegate uint ToUInt32Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate uint ToUInt32Delegate(global::System.IFormatProvider? provider);
 
 			private ToUInt32Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -3563,34 +3563,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal uint Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal uint Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToUInt32");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToUInt32");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToUInt32(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt32");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt32");
 				return default!;
 			}
 
@@ -3746,7 +3746,7 @@ partial class ConvertibleStubTests
 			internal global::System.IConvertible? _source;
 
 			/// <summary>Delegate for ToUInt64.</summary>
-			public delegate ulong ToUInt64Delegate(Stubs.IConvertible ko, global::System.IFormatProvider? provider);
+			public delegate ulong ToUInt64Delegate(global::System.IFormatProvider? provider);
 
 			private ToUInt64Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -3797,34 +3797,34 @@ partial class ConvertibleStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal ulong Invoke(Stubs.IConvertible ko, global::System.IFormatProvider? provider)
+			internal ulong Invoke(bool strict, global::System.IFormatProvider? provider)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(provider);
 					_sequenceIndex++;
-					return callback(ko, provider);
+					return callback(provider);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(provider);
-					return _onCall(ko, provider);
+					return _onCall(provider);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = provider;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ToUInt64");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ToUInt64");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.ToUInt64(provider);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt64");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ToUInt64");
 				return default!;
 			}
 
@@ -4029,87 +4029,87 @@ partial class ConvertibleStubTests
 
 			global::System.TypeCode global::System.IConvertible.GetTypeCode()
 			{
-				return GetTypeCode.Invoke(this);
+				return GetTypeCode.Invoke(Strict);
 			}
 
 			bool global::System.IConvertible.ToBoolean(global::System.IFormatProvider? provider)
 			{
-				return ToBoolean.Invoke(this, provider);
+				return ToBoolean.Invoke(Strict, provider);
 			}
 
 			byte global::System.IConvertible.ToByte(global::System.IFormatProvider? provider)
 			{
-				return ToByte.Invoke(this, provider);
+				return ToByte.Invoke(Strict, provider);
 			}
 
 			char global::System.IConvertible.ToChar(global::System.IFormatProvider? provider)
 			{
-				return ToChar.Invoke(this, provider);
+				return ToChar.Invoke(Strict, provider);
 			}
 
 			global::System.DateTime global::System.IConvertible.ToDateTime(global::System.IFormatProvider? provider)
 			{
-				return ToDateTime.Invoke(this, provider);
+				return ToDateTime.Invoke(Strict, provider);
 			}
 
 			decimal global::System.IConvertible.ToDecimal(global::System.IFormatProvider? provider)
 			{
-				return ToDecimal.Invoke(this, provider);
+				return ToDecimal.Invoke(Strict, provider);
 			}
 
 			double global::System.IConvertible.ToDouble(global::System.IFormatProvider? provider)
 			{
-				return ToDouble.Invoke(this, provider);
+				return ToDouble.Invoke(Strict, provider);
 			}
 
 			short global::System.IConvertible.ToInt16(global::System.IFormatProvider? provider)
 			{
-				return ToInt16.Invoke(this, provider);
+				return ToInt16.Invoke(Strict, provider);
 			}
 
 			int global::System.IConvertible.ToInt32(global::System.IFormatProvider? provider)
 			{
-				return ToInt32.Invoke(this, provider);
+				return ToInt32.Invoke(Strict, provider);
 			}
 
 			long global::System.IConvertible.ToInt64(global::System.IFormatProvider? provider)
 			{
-				return ToInt64.Invoke(this, provider);
+				return ToInt64.Invoke(Strict, provider);
 			}
 
 			sbyte global::System.IConvertible.ToSByte(global::System.IFormatProvider? provider)
 			{
-				return ToSByte.Invoke(this, provider);
+				return ToSByte.Invoke(Strict, provider);
 			}
 
 			float global::System.IConvertible.ToSingle(global::System.IFormatProvider? provider)
 			{
-				return ToSingle.Invoke(this, provider);
+				return ToSingle.Invoke(Strict, provider);
 			}
 
 			string global::System.IConvertible.ToString(global::System.IFormatProvider? provider)
 			{
-				return ToString.Invoke(this, provider);
+				return ToString.Invoke(Strict, provider);
 			}
 
 			object global::System.IConvertible.ToType(global::System.Type conversionType, global::System.IFormatProvider? provider)
 			{
-				return ToType.Invoke(this, conversionType, provider);
+				return ToType.Invoke(Strict, conversionType, provider);
 			}
 
 			ushort global::System.IConvertible.ToUInt16(global::System.IFormatProvider? provider)
 			{
-				return ToUInt16.Invoke(this, provider);
+				return ToUInt16.Invoke(Strict, provider);
 			}
 
 			uint global::System.IConvertible.ToUInt32(global::System.IFormatProvider? provider)
 			{
-				return ToUInt32.Invoke(this, provider);
+				return ToUInt32.Invoke(Strict, provider);
 			}
 
 			ulong global::System.IConvertible.ToUInt64(global::System.IFormatProvider? provider)
 			{
-				return ToUInt64.Invoke(this, provider);
+				return ToUInt64.Invoke(Strict, provider);
 			}
 
 			/// <summary>The global::System.IConvertible instance. Use for passing to code expecting the interface.</summary>

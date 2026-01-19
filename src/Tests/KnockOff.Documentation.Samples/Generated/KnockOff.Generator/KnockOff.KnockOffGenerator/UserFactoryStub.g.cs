@@ -12,7 +12,7 @@ partial class UserFactoryStub : global::KnockOff.Documentation.Samples.SmartDefa
 		internal global::KnockOff.Documentation.Samples.SmartDefaults.IUserFactory? _source;
 
 		/// <summary>Delegate for GetUser.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User GetUserDelegate(UserFactoryStub ko);
+		public delegate global::KnockOff.Documentation.Samples.User GetUserDelegate();
 
 		private GetUserDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -59,20 +59,20 @@ partial class UserFactoryStub : global::KnockOff.Documentation.Samples.SmartDefa
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User Invoke(UserFactoryStub ko, bool strict)
+		internal global::KnockOff.Documentation.Samples.User Invoke(bool strict)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall();
 				_sequenceIndex++;
-				return callback(ko);
+				return callback();
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall();
-				return _onCall(ko);
+				return _onCall();
 			}
 
 			_unconfiguredCallCount++;
@@ -268,7 +268,7 @@ partial class UserFactoryStub : global::KnockOff.Documentation.Samples.SmartDefa
 
 	global::KnockOff.Documentation.Samples.User global::KnockOff.Documentation.Samples.SmartDefaults.IUserFactory.GetUser()
 	{
-		return GetUser.Invoke(this, Strict);
+		return GetUser.Invoke(Strict);
 	}
 
 }

@@ -15,7 +15,7 @@ partial class ComparableIntStubTests
 			internal global::System.IComparable<int>? _source;
 
 			/// <summary>Delegate for CompareTo.</summary>
-			public delegate int CompareToDelegate(Stubs.IComparable ko, int other);
+			public delegate int CompareToDelegate(int other);
 
 			private CompareToDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class ComparableIntStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IComparable ko, int other)
+			internal int Invoke(bool strict, int other)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(other);
 					_sequenceIndex++;
-					return callback(ko, other);
+					return callback(other);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(other);
-					return _onCall(ko, other);
+					return _onCall(other);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = other;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("CompareTo");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CompareTo");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.CompareTo(other);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CompareTo");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CompareTo");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class ComparableIntStubTests
 
 			int global::System.IComparable<int>.CompareTo(int other)
 			{
-				return CompareTo.Invoke(this, other);
+				return CompareTo.Invoke(Strict, other);
 			}
 
 			/// <summary>The global::System.IComparable<int> instance. Use for passing to code expecting the interface.</summary>

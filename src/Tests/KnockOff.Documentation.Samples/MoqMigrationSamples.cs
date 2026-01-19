@@ -87,7 +87,7 @@ public class SetupMethodKnockOffTests
         var stub = new MoqUserRepoStub();
         var testUser = new User { Id = 42, Name = "Alice" };
 
-        stub.GetUser.OnCall((ko, id) => testUser);
+        stub.GetUser.OnCall((id) => testUser);
 
         IMoqUserRepo repository = stub;
         var user = repository.GetUser(42);
@@ -167,7 +167,7 @@ public class VerifyCallsKnockOffTests
         var stub = new MoqUserRepoStub();
 
         // Mark method as verifiable during setup
-        stub.SaveUser.OnCall((ko, user) => { }).Verifiable();
+        stub.SaveUser.OnCall((user) => { }).Verifiable();
 
         IMoqUserRepo repository = stub;
         repository.SaveUser(new User { Id = 1, Name = "Bob" });
@@ -214,7 +214,7 @@ public class AsyncMethodKnockOffTests
         var stub = new MoqUserRepoStub();
         var testUser = new User { Id = 42, Name = "Alice" };
 
-        stub.GetUserAsync.OnCall((ko, id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 
         IMoqUserRepo repository = stub;
         var user = await repository.GetUserAsync(42);
@@ -261,7 +261,7 @@ public class CallbackKnockOffTests
         var stub = new MoqUserRepoStub();
         var savedUsers = new List<User>();
 
-        stub.SaveUser.OnCall((ko, user) =>
+        stub.SaveUser.OnCall((user) =>
         {
             savedUsers.Add(user);
         });
@@ -311,7 +311,7 @@ public class ArgumentMatchingKnockOffTests
     {
         var stub = new MoqUserRepoStub();
 
-        stub.GetUser.OnCall((ko, id) =>
+        stub.GetUser.OnCall((id) =>
             id > 0 ? new User { Id = id, Name = "Valid User" } : null);
 
         IMoqUserRepo repository = stub;
@@ -410,7 +410,7 @@ public class CompleteKnockOffTests
     {
         var user = new User { Id = 1, Name = "Alice" };
         // Similar to Moq: Setup + Verifiable
-        _stub.GetUserAsync.OnCall((ko, id) => Task.FromResult<User?>(user)).Verifiable();
+        _stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
 
         var result = await _service.GetUserAsync(1);
 
@@ -423,7 +423,7 @@ public class CompleteKnockOffTests
     public void SaveUser_CallsRepository()
     {
         User? savedUser = null;
-        var tracking = _stub.SaveUser.OnCall((ko, user) =>
+        var tracking = _stub.SaveUser.OnCall((user) =>
         {
             savedUser = user;
         }).Verifiable();

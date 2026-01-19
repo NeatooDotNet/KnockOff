@@ -18,7 +18,7 @@ partial class ApiIndexerRepoStub : global::KnockOff.Documentation.Samples.Interc
 		public int? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<ApiIndexerRepoStub, int, global::KnockOff.Documentation.Samples.User?>? OnGet { get; set; }
+		public global::System.Func<int, global::KnockOff.Documentation.Samples.User?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -27,7 +27,7 @@ partial class ApiIndexerRepoStub : global::KnockOff.Documentation.Samples.Interc
 		public (int? Key, global::KnockOff.Documentation.Samples.User? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<ApiIndexerRepoStub, int, global::KnockOff.Documentation.Samples.User?>? OnSet { get; set; }
+		public global::System.Action<int, global::KnockOff.Documentation.Samples.User?>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(int? id) { GetCount++; LastGetKey = id; }
@@ -137,8 +137,8 @@ partial class ApiIndexerRepoStub : global::KnockOff.Documentation.Samples.Interc
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.InterceptorApi.IApiIndexerRepo.this[int id]
 	{
-		get { Indexer.RecordGet(id); if (Indexer.OnGet is { } onGet) return onGet(this, id); if (Indexer._source is { } src) return src[id]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiIndexerRepo", "this[]"); return Indexer.Backing.TryGetValue(id, out var v) ? v : default; }
-		set { Indexer.RecordSet(id, value); if (Indexer.OnSet is { } onSet) { onSet(this, id, value); return; } if (Indexer._source is { } src) { src[id] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiIndexerRepo", "this[]"); Indexer.Backing[id] = value; }
+		get { Indexer.RecordGet(id); if (Indexer.OnGet is { } onGet) return onGet(id); if (Indexer._source is { } src) return src[id]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiIndexerRepo", "this[]"); return Indexer.Backing.TryGetValue(id, out var v) ? v : default; }
+		set { Indexer.RecordSet(id, value); if (Indexer.OnSet is { } onSet) { onSet(id, value); return; } if (Indexer._source is { } src) { src[id] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IApiIndexerRepo", "this[]"); Indexer.Backing[id] = value; }
 	}
 
 }

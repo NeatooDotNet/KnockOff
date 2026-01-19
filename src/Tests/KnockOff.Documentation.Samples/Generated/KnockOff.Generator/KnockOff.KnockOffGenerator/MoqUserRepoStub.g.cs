@@ -19,7 +19,7 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<MoqUserRepoStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -28,7 +28,7 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<MoqUserRepoStub, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
 		private string _value = "";
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -115,7 +115,7 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		internal global::KnockOff.Documentation.Samples.MoqMigration.IMoqUserRepo? _source;
 
 		/// <summary>Delegate for GetUser.</summary>
-		public delegate global::KnockOff.Documentation.Samples.User? GetUserDelegate(MoqUserRepoStub ko, int id);
+		public delegate global::KnockOff.Documentation.Samples.User? GetUserDelegate(int id);
 
 		private GetUserDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -166,20 +166,20 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::KnockOff.Documentation.Samples.User? Invoke(MoqUserRepoStub ko, bool strict, int id)
+		internal global::KnockOff.Documentation.Samples.User? Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -349,7 +349,7 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		internal global::KnockOff.Documentation.Samples.MoqMigration.IMoqUserRepo? _source;
 
 		/// <summary>Delegate for GetUserAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> GetUserAsyncDelegate(MoqUserRepoStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> GetUserAsyncDelegate(int id);
 
 		private GetUserAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -400,20 +400,20 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(MoqUserRepoStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -582,10 +582,10 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.MoqMigration.IMoqUserRepo? _source;
 
-		private global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User>? _onCall;
+		private global::System.Action<global::KnockOff.Documentation.Samples.User>? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
-		private global::System.Collections.Generic.List<(global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
+		private global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
 		private bool _isVerifiable;
@@ -605,7 +605,7 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-		public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.User> OnCall(global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User> callback)
+		public global::KnockOff.IMethodTracking<global::KnockOff.Documentation.Samples.User> OnCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 		{
 			_sequence = null;
 			_sequenceIndex = 0;
@@ -617,13 +617,13 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IMethodSequence<global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User>> OnCallSequence(global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User> callback)
+		public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> OnCallSequence(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 		{
 			_onCall = null;
 			_onCallTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
-			_sequence = new global::System.Collections.Generic.List<(global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>();
+			_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::KnockOff.Documentation.Samples.User> Callback, MethodTrackingImpl Tracking)>();
 			var tracking = new MethodTrackingImpl(this);
 			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
@@ -631,21 +631,21 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal void Invoke(MoqUserRepoStub ko, bool strict, global::KnockOff.Documentation.Samples.User user)
+		internal void Invoke(bool strict, global::KnockOff.Documentation.Samples.User user)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(user);
 				_sequenceIndex++;
-				callback(ko, user);
+				callback(user);
 				return;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(user);
-				_onCall(ko, user);
+				_onCall(user);
 				return;
 			}
 
@@ -755,7 +755,7 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
-		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User>>
+		private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>>
 		{
 			private readonly SaveUserInterceptor _interceptor;
 
@@ -775,7 +775,7 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 			}
 
 			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User>> ThenCall(global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> ThenCall(global::System.Action<global::KnockOff.Documentation.Samples.User> callback)
 			{
 				var tracking = new MethodTrackingImpl(_interceptor);
 				_interceptor._sequence!.Add((callback, tracking));
@@ -796,7 +796,7 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 			public void Reset() => _interceptor.Reset();
 
 			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<MoqUserRepoStub, global::KnockOff.Documentation.Samples.User>> Verifiable()
+			public global::KnockOff.IMethodSequence<global::System.Action<global::KnockOff.Documentation.Samples.User>> Verifiable()
 			{
 				_interceptor._isVerifiable = true;
 				_interceptor._verifiableTimes = null;
@@ -869,23 +869,23 @@ partial class MoqUserRepoStub : global::KnockOff.Documentation.Samples.MoqMigrat
 
 	string global::KnockOff.Documentation.Samples.MoqMigration.IMoqUserRepo.ConnectionString
 	{
-		get { ConnectionString.RecordGet(); if (ConnectionString.OnGet is { } onGet) return onGet(this); if (ConnectionString._source is { } src) return src.ConnectionString; if (Strict) throw global::KnockOff.StubException.NotConfigured("IMoqUserRepo", "ConnectionString"); return ConnectionString.Value; }
-		set { ConnectionString.RecordSet(value); if (ConnectionString.OnSet is { } onSet) { onSet(this, value); return; } if (ConnectionString._source is { } src) { src.ConnectionString = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMoqUserRepo", "ConnectionString"); ConnectionString.Value = value; }
+		get { ConnectionString.RecordGet(); if (ConnectionString.OnGet is { } onGet) return onGet(); if (ConnectionString._source is { } src) return src.ConnectionString; if (Strict) throw global::KnockOff.StubException.NotConfigured("IMoqUserRepo", "ConnectionString"); return ConnectionString.Value; }
+		set { ConnectionString.RecordSet(value); if (ConnectionString.OnSet is { } onSet) { onSet(value); return; } if (ConnectionString._source is { } src) { src.ConnectionString = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IMoqUserRepo", "ConnectionString"); ConnectionString.Value = value; }
 	}
 
 	global::KnockOff.Documentation.Samples.User? global::KnockOff.Documentation.Samples.MoqMigration.IMoqUserRepo.GetUser(int id)
 	{
-		return GetUser.Invoke(this, Strict, id);
+		return GetUser.Invoke(Strict, id);
 	}
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> global::KnockOff.Documentation.Samples.MoqMigration.IMoqUserRepo.GetUserAsync(int id)
 	{
-		return GetUserAsync.Invoke(this, Strict, id);
+		return GetUserAsync.Invoke(Strict, id);
 	}
 
 	void global::KnockOff.Documentation.Samples.MoqMigration.IMoqUserRepo.SaveUser(global::KnockOff.Documentation.Samples.User user)
 	{
-		SaveUser.Invoke(this, Strict, user);
+		SaveUser.Invoke(Strict, user);
 	}
 
 }

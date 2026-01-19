@@ -15,7 +15,7 @@ partial class ComparableStubTests
 			internal global::System.IComparable? _source;
 
 			/// <summary>Delegate for CompareTo.</summary>
-			public delegate int CompareToDelegate(Stubs.IComparable ko, object? obj);
+			public delegate int CompareToDelegate(object? obj);
 
 			private CompareToDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -66,34 +66,34 @@ partial class ComparableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.IComparable ko, object? obj)
+			internal int Invoke(bool strict, object? obj)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(obj);
 					_sequenceIndex++;
-					return callback(ko, obj);
+					return callback(obj);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(obj);
-					return _onCall(ko, obj);
+					return _onCall(obj);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = obj;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("CompareTo");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CompareTo");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.CompareTo(obj);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "CompareTo");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CompareTo");
 				return default!;
 			}
 
@@ -250,7 +250,7 @@ partial class ComparableStubTests
 
 			int global::System.IComparable.CompareTo(object? obj)
 			{
-				return CompareTo.Invoke(this, obj);
+				return CompareTo.Invoke(Strict, obj);
 			}
 
 			/// <summary>The global::System.IComparable instance. Use for passing to code expecting the interface.</summary>

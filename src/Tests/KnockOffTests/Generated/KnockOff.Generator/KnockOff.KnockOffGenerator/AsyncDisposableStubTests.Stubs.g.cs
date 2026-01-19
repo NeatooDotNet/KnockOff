@@ -15,7 +15,7 @@ partial class AsyncDisposableStubTests
 			internal global::System.IAsyncDisposable? _source;
 
 			/// <summary>Delegate for DisposeAsync.</summary>
-			public delegate global::System.Threading.Tasks.ValueTask DisposeAsyncDelegate(Stubs.IAsyncDisposable ko);
+			public delegate global::System.Threading.Tasks.ValueTask DisposeAsyncDelegate();
 
 			private DisposeAsyncDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -62,33 +62,33 @@ partial class AsyncDisposableStubTests
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Threading.Tasks.ValueTask Invoke(Stubs.IAsyncDisposable ko)
+			internal global::System.Threading.Tasks.ValueTask Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("DisposeAsync");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("DisposeAsync");
 					return default;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.DisposeAsync();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DisposeAsync");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DisposeAsync");
 				return default;
 			}
 
@@ -237,7 +237,7 @@ partial class AsyncDisposableStubTests
 
 			global::System.Threading.Tasks.ValueTask global::System.IAsyncDisposable.DisposeAsync()
 			{
-				return DisposeAsync.Invoke(this);
+				return DisposeAsync.Invoke(Strict);
 			}
 
 			/// <summary>The global::System.IAsyncDisposable instance. Use for passing to code expecting the interface.</summary>

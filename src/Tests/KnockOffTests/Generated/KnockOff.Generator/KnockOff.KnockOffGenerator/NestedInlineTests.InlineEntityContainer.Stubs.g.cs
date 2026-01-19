@@ -21,7 +21,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, global::Neatoo.IValidateBase?>? OnGet { get; set; }
+			public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
 			private global::Neatoo.IValidateBase? _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -102,7 +102,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
+			public global::System.Func<global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
 
 			private global::System.Collections.Generic.IEnumerable<string> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -183,7 +183,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, global::Neatoo.IValidateBase?>? OnGet { get; set; }
+			public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
 
 			private global::Neatoo.IValidateBase? _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -264,7 +264,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -345,7 +345,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -426,7 +426,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -507,7 +507,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -588,7 +588,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
+			public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
 
 			private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -669,7 +669,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -750,7 +750,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -831,7 +831,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -912,7 +912,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -993,7 +993,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1074,7 +1074,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1155,7 +1155,7 @@ partial class InlineEntityContainer
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IEntityBase, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
@@ -1238,9 +1238,9 @@ partial class InlineEntityContainer
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
 
-			private global::System.Func<Stubs.IEntityBase, string, global::Neatoo.IEntityProperty>? _onGet;
+			private global::System.Func<string, global::Neatoo.IEntityProperty>? _onGet;
 			/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>
-			public global::System.Func<Stubs.IEntityBase, string, global::Neatoo.IEntityProperty>? OnGet
+			public global::System.Func<string, global::Neatoo.IEntityProperty>? OnGet
 			{
 				get => _onGet;
 				set { _onGet = value; if (value != null) _configured = true; }
@@ -1315,10 +1315,10 @@ partial class InlineEntityContainer
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::Neatoo.IEntityBase? _source;
 
-			private global::System.Action<Stubs.IEntityBase>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -1334,7 +1334,7 @@ partial class InlineEntityContainer
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IEntityBase> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -1346,13 +1346,13 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> OnCallSequence(global::System.Action<Stubs.IEntityBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -1360,35 +1360,35 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IEntityBase ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Delete");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Delete");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.Delete(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Delete");
 				return;
 			}
 
@@ -1475,7 +1475,7 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IEntityBase_DeleteInterceptor _interceptor;
 
@@ -1495,7 +1495,7 @@ partial class InlineEntityContainer
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> ThenCall(global::System.Action<Stubs.IEntityBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1516,7 +1516,7 @@ partial class InlineEntityContainer
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1535,10 +1535,10 @@ partial class InlineEntityContainer
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::Neatoo.IEntityBase? _source;
 
-			private global::System.Action<Stubs.IEntityBase>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -1554,7 +1554,7 @@ partial class InlineEntityContainer
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IEntityBase> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -1566,13 +1566,13 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> OnCallSequence(global::System.Action<Stubs.IEntityBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -1580,35 +1580,35 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IEntityBase ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("UnDelete");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("UnDelete");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.UnDelete(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "UnDelete");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "UnDelete");
 				return;
 			}
 
@@ -1695,7 +1695,7 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IEntityBase_UnDeleteInterceptor _interceptor;
 
@@ -1715,7 +1715,7 @@ partial class InlineEntityContainer
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> ThenCall(global::System.Action<Stubs.IEntityBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -1736,7 +1736,7 @@ partial class InlineEntityContainer
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -1756,7 +1756,7 @@ partial class InlineEntityContainer
 			internal global::Neatoo.IEntityBase? _source;
 
 			/// <summary>Delegate for Save.</summary>
-			public delegate global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> SaveDelegate(Stubs.IEntityBase ko);
+			public delegate global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> SaveDelegate();
 
 			private SaveDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -1803,33 +1803,33 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> Invoke(Stubs.IEntityBase ko)
+			internal global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					return _onCall(ko);
+					return _onCall();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("Save");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Save");
 					return global::System.Threading.Tasks.Task.FromResult<global::Neatoo.IEntityBase>(default!);
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.Save();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Save");
 				return global::System.Threading.Tasks.Task.FromResult<global::Neatoo.IEntityBase>(default!);
 			}
 
@@ -1977,7 +1977,7 @@ partial class InlineEntityContainer
 			internal global::Neatoo.IValidateBase? _source;
 
 			/// <summary>Delegate for GetProperty.</summary>
-			public delegate global::Neatoo.IValidateProperty GetPropertyDelegate(Stubs.IEntityBase ko, string propertyName);
+			public delegate global::Neatoo.IValidateProperty GetPropertyDelegate(string propertyName);
 
 			private GetPropertyDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2028,34 +2028,34 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::Neatoo.IValidateProperty Invoke(Stubs.IEntityBase ko, string propertyName)
+			internal global::Neatoo.IValidateProperty Invoke(bool strict, string propertyName)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(propertyName);
 					_sequenceIndex++;
-					return callback(ko, propertyName);
+					return callback(propertyName);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(propertyName);
-					return _onCall(ko, propertyName);
+					return _onCall(propertyName);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("GetProperty");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetProperty");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.GetProperty(propertyName);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetProperty");
 				return default!;
 			}
 
@@ -2211,7 +2211,7 @@ partial class InlineEntityContainer
 			internal global::Neatoo.IValidateBase? _source;
 
 			/// <summary>Delegate for TryGetProperty.</summary>
-			public delegate bool TryGetPropertyDelegate(Stubs.IEntityBase ko, string propertyName, out global::Neatoo.IValidateProperty validateProperty);
+			public delegate bool TryGetPropertyDelegate(string propertyName, out global::Neatoo.IValidateProperty validateProperty);
 
 			private TryGetPropertyDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
@@ -2262,7 +2262,7 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal bool Invoke(Stubs.IEntityBase ko, string propertyName, out global::Neatoo.IValidateProperty validateProperty)
+			internal bool Invoke(bool strict, string propertyName, out global::Neatoo.IValidateProperty validateProperty)
 			{
 				validateProperty = default!;
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
@@ -2270,27 +2270,27 @@ partial class InlineEntityContainer
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall(propertyName);
 					_sequenceIndex++;
-					return callback(ko, propertyName, out validateProperty);
+					return callback(propertyName, out validateProperty);
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall(propertyName);
-					return _onCall(ko, propertyName, out validateProperty);
+					return _onCall(propertyName, out validateProperty);
 				}
 
 				_unconfiguredCallCount++;
 				_unconfiguredLastArg = propertyName;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("TryGetProperty");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("TryGetProperty");
 					return default!;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.TryGetProperty(propertyName, out validateProperty);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetProperty");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "TryGetProperty");
 				return default!;
 			}
 
@@ -2448,7 +2448,7 @@ partial class InlineEntityContainer
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for WaitForTasks().</summary>
-			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task(Stubs.IEntityBase ko);
+			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_NoParams_Threading_Tasks_Task();
 
 			private WaitForTasksDelegate_NoParams_Threading_Tasks_Task? _onCall_NoParams_Threading_Tasks_Task;
 			private MethodTrackingImpl_NoParams_Threading_Tasks_Task? _onCallTracking_NoParams_Threading_Tasks_Task;
@@ -2460,7 +2460,7 @@ partial class InlineEntityContainer
 			private global::KnockOff.Times? _verifiableTimes_NoParams_Threading_Tasks_Task;
 
 			/// <summary>Delegate for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IEntityBase ko, global::System.Threading.CancellationToken token);
+			public delegate global::System.Threading.Tasks.Task WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task(global::System.Threading.CancellationToken token);
 
 			private WaitForTasksDelegate_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task;
@@ -2530,64 +2530,64 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes configured callback for WaitForTasks().</summary>
-			internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(Stubs.IEntityBase ko)
+			internal global::System.Threading.Tasks.Task Invoke_NoParams_Threading_Tasks_Task(bool strict)
 			{
 				if (_sequence_NoParams_Threading_Tasks_Task != null && _sequenceIndex_NoParams_Threading_Tasks_Task < _sequence_NoParams_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_NoParams_Threading_Tasks_Task[_sequenceIndex_NoParams_Threading_Tasks_Task];
 					tracking.RecordCall();
 					_sequenceIndex_NoParams_Threading_Tasks_Task++;
-					return callback(ko);
+					return callback();
 				}
 
 				if (_onCall_NoParams_Threading_Tasks_Task != null && _onCallTracking_NoParams_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_NoParams_Threading_Tasks_Task.RecordCall();
-					return _onCall_NoParams_Threading_Tasks_Task(ko);
+					return _onCall_NoParams_Threading_Tasks_Task();
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_NoParams_Threading_Tasks_Task != null && _sequenceIndex_NoParams_Threading_Tasks_Task >= _sequence_NoParams_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks();
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			/// <summary>Invokes configured callback for WaitForTasks(global::System.Threading.CancellationToken).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IEntityBase ko, global::System.Threading.CancellationToken token)
+			internal global::System.Threading.Tasks.Task Invoke_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::System.Threading.CancellationToken token)
 			{
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall(token);
 					_sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, token);
+					return callback(token);
 				}
 
 				if (_onCall_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task.RecordCall(token);
-					return _onCall_Threading_CancellationToken_Threading_Tasks_Task(ko, token);
+					return _onCall_Threading_CancellationToken_Threading_Tasks_Task(token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("WaitForTasks");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.WaitForTasks(token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WaitForTasks");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -2870,7 +2870,7 @@ partial class InlineEntityContainer
 			private int _unconfiguredCallCount;
 
 			/// <summary>Delegate for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IEntityBase ko, string propertyName, global::System.Threading.CancellationToken? token);
+			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task(string propertyName, global::System.Threading.CancellationToken? token);
 
 			private RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task? _onCall_String_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_String_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task;
@@ -2882,7 +2882,7 @@ partial class InlineEntityContainer
 			private global::KnockOff.Times? _verifiableTimes_String_Threading_CancellationToken_Threading_Tasks_Task;
 
 			/// <summary>Delegate for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IEntityBase ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
+			public delegate global::System.Threading.Tasks.Task RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token);
 
 			private RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 			private MethodTrackingImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task? _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
@@ -2952,64 +2952,64 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes configured callback for RunRules(string, global::System.Threading.CancellationToken?).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IEntityBase ko, string propertyName, global::System.Threading.CancellationToken? token)
+			internal global::System.Threading.Tasks.Task Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(bool strict, string propertyName, global::System.Threading.CancellationToken? token)
 			{
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task < _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_String_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall((propertyName, token));
 					_sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, propertyName, token);
+					return callback(propertyName, token);
 				}
 
 				if (_onCall_String_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((propertyName, token));
-					return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(ko, propertyName, token);
+					return _onCall_String_Threading_CancellationToken_Threading_Tasks_Task(propertyName, token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_String_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_String_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(propertyName, token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
 			/// <summary>Invokes configured callback for RunRules(global::Neatoo.RunRulesFlag, global::System.Threading.CancellationToken?).</summary>
-			internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Stubs.IEntityBase ko, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
+			internal global::System.Threading.Tasks.Task Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(bool strict, global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task < _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
 					var (callback, tracking) = _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task[_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task];
 					tracking.RecordCall((runRules, token));
 					_sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task++;
-					return callback(ko, runRules, token);
+					return callback(runRules, token);
 				}
 
 				if (_onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null)
 				{
 					_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.RecordCall((runRules, token));
-					return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(ko, runRules, token);
+					return _onCall_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(runRules, token);
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task != null && _sequenceIndex_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task >= _sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("RunRules");
 					return global::System.Threading.Tasks.Task.CompletedTask;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) return src.RunRules(runRules, token);
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "RunRules");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
@@ -3296,10 +3296,10 @@ partial class InlineEntityContainer
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
-			private global::System.Action<Stubs.IEntityBase>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -3315,7 +3315,7 @@ partial class InlineEntityContainer
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IEntityBase> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -3327,13 +3327,13 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> OnCallSequence(global::System.Action<Stubs.IEntityBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -3341,35 +3341,35 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IEntityBase ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ClearAllMessages");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ClearAllMessages");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearAllMessages(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearAllMessages");
 				return;
 			}
 
@@ -3456,7 +3456,7 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IEntityBase_ClearAllMessagesInterceptor _interceptor;
 
@@ -3476,7 +3476,7 @@ partial class InlineEntityContainer
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> ThenCall(global::System.Action<Stubs.IEntityBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -3497,7 +3497,7 @@ partial class InlineEntityContainer
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -3516,10 +3516,10 @@ partial class InlineEntityContainer
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
-			private global::System.Action<Stubs.IEntityBase>? _onCall;
+			private global::System.Action? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
-			private global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityBase> Callback, MethodTrackingImpl Tracking)>? _sequence;
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
 			private bool _isVerifiable;
@@ -3535,7 +3535,7 @@ partial class InlineEntityContainer
 
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.IEntityBase> callback)
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
 				_sequence = null;
 				_sequenceIndex = 0;
@@ -3547,13 +3547,13 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> OnCallSequence(global::System.Action<Stubs.IEntityBase> callback)
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
 				_onCall = null;
 				_onCallTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
-				_sequence = new global::System.Collections.Generic.List<(global::System.Action<Stubs.IEntityBase> Callback, MethodTrackingImpl Tracking)>();
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
 				var tracking = new MethodTrackingImpl(this);
 				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
@@ -3561,35 +3561,35 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IEntityBase ko)
+			internal void Invoke(bool strict)
 			{
 				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
 					var (callback, tracking) = _sequence[_sequenceIndex];
 					tracking.RecordCall();
 					_sequenceIndex++;
-					callback(ko);
+					callback();
 					return;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
 				{
 					_onCallTracking.RecordCall();
-					_onCall(ko);
+					_onCall();
 					return;
 				}
 
 				_unconfiguredCallCount++;
 				if (_sequence != null && _sequenceIndex >= _sequence.Count)
 				{
-					if (ko.Strict) throw global::KnockOff.StubException.SequenceExhausted("ClearSelfMessages");
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ClearSelfMessages");
 					return;
 				}
 
 				#pragma warning disable CS8601, SYSLIB0050
 				if (_source is { } src) { src.ClearSelfMessages(); return; }
 				#pragma warning restore CS8601, SYSLIB0050
-				if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ClearSelfMessages");
 				return;
 			}
 
@@ -3676,7 +3676,7 @@ partial class InlineEntityContainer
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly IEntityBase_ClearSelfMessagesInterceptor _interceptor;
 
@@ -3696,7 +3696,7 @@ partial class InlineEntityContainer
 				}
 
 				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> ThenCall(global::System.Action<Stubs.IEntityBase> callback)
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
 					var tracking = new MethodTrackingImpl(_interceptor);
 					_interceptor._sequence!.Add((callback, tracking));
@@ -3717,7 +3717,7 @@ partial class InlineEntityContainer
 				public void Reset() => _interceptor.Reset();
 
 				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IEntityBase>> Verifiable()
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
 				{
 					_interceptor._isVerifiable = true;
 					_interceptor._verifiableTimes = null;
@@ -4010,17 +4010,17 @@ partial class InlineEntityContainer
 
 			void global::Neatoo.IEntityBase.Delete()
 			{
-				Delete.Invoke(this);
+				Delete.Invoke(Strict);
 			}
 
 			void global::Neatoo.IEntityBase.UnDelete()
 			{
-				UnDelete.Invoke(this);
+				UnDelete.Invoke(Strict);
 			}
 
 			global::System.Threading.Tasks.Task<global::Neatoo.IEntityBase> global::Neatoo.IEntityBase.Save()
 			{
-				return Save.Invoke(this);
+				return Save.Invoke(Strict);
 			}
 
 			global::Neatoo.IValidateBase? global::Neatoo.IEntityBase.Root
@@ -4028,7 +4028,7 @@ partial class InlineEntityContainer
 				get
 				{
 					Root.RecordGet();
-					if (Root.OnGet is { } onGet) return onGet(this);
+					if (Root.OnGet is { } onGet) return onGet();
 					if (Root._source is { } src) return src.Root;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "Root");
 					return Root.Value;
@@ -4040,7 +4040,7 @@ partial class InlineEntityContainer
 				get
 				{
 					ModifiedProperties.RecordGet();
-					if (ModifiedProperties.OnGet is { } onGet) return onGet(this);
+					if (ModifiedProperties.OnGet is { } onGet) return onGet();
 					if (ModifiedProperties._source is { } src) return src.ModifiedProperties;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "ModifiedProperties");
 					return ModifiedProperties.Value;
@@ -4052,7 +4052,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IndexerString.RecordGet(propertyName);
-					if (IndexerString.OnGet is { } onGet) return onGet(this, propertyName);
+					if (IndexerString.OnGet is { } onGet) return onGet(propertyName);
 					if (IndexerString._source is { } src) return src[propertyName];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "this[]");
 					return IndexerString.Backing.TryGetValue(propertyName, out var v) ? v : default!;
@@ -4061,12 +4061,12 @@ partial class InlineEntityContainer
 
 			global::Neatoo.IValidateProperty global::Neatoo.IValidateBase.GetProperty(string propertyName)
 			{
-				return GetProperty.Invoke(this, propertyName);
+				return GetProperty.Invoke(Strict, propertyName);
 			}
 
 			bool global::Neatoo.IValidateBase.TryGetProperty(string propertyName, out global::Neatoo.IValidateProperty validateProperty)
 			{
-				return TryGetProperty.Invoke(this, propertyName, out validateProperty);
+				return TryGetProperty.Invoke(Strict, propertyName, out validateProperty);
 			}
 
 			global::Neatoo.IValidateBase? global::Neatoo.IValidateBase.Parent
@@ -4074,7 +4074,7 @@ partial class InlineEntityContainer
 				get
 				{
 					Parent.RecordGet();
-					if (Parent.OnGet is { } onGet) return onGet(this);
+					if (Parent.OnGet is { } onGet) return onGet();
 					if (Parent._source is { } src) return src.Parent;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "Parent");
 					return Parent.Value;
@@ -4086,7 +4086,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsPaused.RecordGet();
-					if (IsPaused.OnGet is { } onGet) return onGet(this);
+					if (IsPaused.OnGet is { } onGet) return onGet();
 					if (IsPaused._source is { } src) return src.IsPaused;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "IsPaused");
 					return IsPaused.Value;
@@ -4098,7 +4098,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IndexerString.RecordGet(propertyName);
-					if (IndexerString.OnGet is { } onGet) return onGet(this, propertyName);
+					if (IndexerString.OnGet is { } onGet) return onGet(propertyName);
 					if (IndexerString._source is { } src) return src[propertyName];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]");
 					return IndexerString.Backing.TryGetValue(propertyName, out var v) ? v : default!;
@@ -4107,32 +4107,32 @@ partial class InlineEntityContainer
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks()
 			{
-				return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(this);
+				return WaitForTasks.Invoke_NoParams_Threading_Tasks_Task(Strict);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.WaitForTasks(global::System.Threading.CancellationToken token)
 			{
-				return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(this, token);
+				return WaitForTasks.Invoke_Threading_CancellationToken_Threading_Tasks_Task(Strict, token);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(string propertyName, global::System.Threading.CancellationToken? token)
 			{
-				return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(this, propertyName, token);
+				return RunRules.Invoke_String_Threading_CancellationToken_Threading_Tasks_Task(Strict, propertyName, token);
 			}
 
 			global::System.Threading.Tasks.Task global::Neatoo.IValidateMetaProperties.RunRules(global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token)
 			{
-				return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(this, runRules, token);
+				return RunRules.Invoke_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(Strict, runRules, token);
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearAllMessages()
 			{
-				ClearAllMessages.Invoke(this);
+				ClearAllMessages.Invoke(Strict);
 			}
 
 			void global::Neatoo.IValidateMetaProperties.ClearSelfMessages()
 			{
-				ClearSelfMessages.Invoke(this);
+				ClearSelfMessages.Invoke(Strict);
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
@@ -4140,7 +4140,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsBusy.RecordGet();
-					if (IsBusy.OnGet is { } onGet) return onGet(this);
+					if (IsBusy.OnGet is { } onGet) return onGet();
 					if (IsBusy._source is { } src) return src.IsBusy;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
 					return IsBusy.Value;
@@ -4152,7 +4152,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsValid.RecordGet();
-					if (IsValid.OnGet is { } onGet) return onGet(this);
+					if (IsValid.OnGet is { } onGet) return onGet();
 					if (IsValid._source is { } src) return src.IsValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
 					return IsValid.Value;
@@ -4164,7 +4164,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsSelfValid.RecordGet();
-					if (IsSelfValid.OnGet is { } onGet) return onGet(this);
+					if (IsSelfValid.OnGet is { } onGet) return onGet();
 					if (IsSelfValid._source is { } src) return src.IsSelfValid;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
 					return IsSelfValid.Value;
@@ -4176,7 +4176,7 @@ partial class InlineEntityContainer
 				get
 				{
 					PropertyMessages.RecordGet();
-					if (PropertyMessages.OnGet is { } onGet) return onGet(this);
+					if (PropertyMessages.OnGet is { } onGet) return onGet();
 					if (PropertyMessages._source is { } src) return src.PropertyMessages;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
 					return PropertyMessages.Value;
@@ -4188,7 +4188,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsChild.RecordGet();
-					if (IsChild.OnGet is { } onGet) return onGet(this);
+					if (IsChild.OnGet is { } onGet) return onGet();
 					if (IsChild._source is { } src) return src.IsChild;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsChild");
 					return IsChild.Value;
@@ -4200,7 +4200,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsModified.RecordGet();
-					if (IsModified.OnGet is { } onGet) return onGet(this);
+					if (IsModified.OnGet is { } onGet) return onGet();
 					if (IsModified._source is { } src) return src.IsModified;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsModified");
 					return IsModified.Value;
@@ -4212,7 +4212,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsSelfModified.RecordGet();
-					if (IsSelfModified.OnGet is { } onGet) return onGet(this);
+					if (IsSelfModified.OnGet is { } onGet) return onGet();
 					if (IsSelfModified._source is { } src) return src.IsSelfModified;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSelfModified");
 					return IsSelfModified.Value;
@@ -4224,7 +4224,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsMarkedModified.RecordGet();
-					if (IsMarkedModified.OnGet is { } onGet) return onGet(this);
+					if (IsMarkedModified.OnGet is { } onGet) return onGet();
 					if (IsMarkedModified._source is { } src) return src.IsMarkedModified;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsMarkedModified");
 					return IsMarkedModified.Value;
@@ -4236,7 +4236,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsSavable.RecordGet();
-					if (IsSavable.OnGet is { } onGet) return onGet(this);
+					if (IsSavable.OnGet is { } onGet) return onGet();
 					if (IsSavable._source is { } src) return src.IsSavable;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityMetaProperties", "IsSavable");
 					return IsSavable.Value;
@@ -4248,7 +4248,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsDeleted.RecordGet();
-					if (IsDeleted.OnGet is { } onGet) return onGet(this);
+					if (IsDeleted.OnGet is { } onGet) return onGet();
 					if (IsDeleted._source is { } src) return src.IsDeleted;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsDeleted");
 					return IsDeleted.Value;
@@ -4260,7 +4260,7 @@ partial class InlineEntityContainer
 				get
 				{
 					IsNew.RecordGet();
-					if (IsNew.OnGet is { } onGet) return onGet(this);
+					if (IsNew.OnGet is { } onGet) return onGet();
 					if (IsNew._source is { } src) return src.IsNew;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IFactorySaveMeta", "IsNew");
 					return IsNew.Value;

@@ -12,7 +12,7 @@ partial class AsyncUserSvcStub : global::KnockOff.Documentation.Samples.Async.IA
 		internal global::KnockOff.Documentation.Samples.Async.IAsyncUserSvc? _source;
 
 		/// <summary>Delegate for GetUserAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> GetUserAsyncDelegate(AsyncUserSvcStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> GetUserAsyncDelegate(int id);
 
 		private GetUserAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -63,20 +63,20 @@ partial class AsyncUserSvcStub : global::KnockOff.Documentation.Samples.Async.IA
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(AsyncUserSvcStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -246,7 +246,7 @@ partial class AsyncUserSvcStub : global::KnockOff.Documentation.Samples.Async.IA
 		internal global::KnockOff.Documentation.Samples.Async.IAsyncUserSvc? _source;
 
 		/// <summary>Delegate for UpdateUserAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task UpdateUserAsyncDelegate(AsyncUserSvcStub ko, global::KnockOff.Documentation.Samples.User user);
+		public delegate global::System.Threading.Tasks.Task UpdateUserAsyncDelegate(global::KnockOff.Documentation.Samples.User user);
 
 		private UpdateUserAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -297,20 +297,20 @@ partial class AsyncUserSvcStub : global::KnockOff.Documentation.Samples.Async.IA
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(AsyncUserSvcStub ko, bool strict, global::KnockOff.Documentation.Samples.User user)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, global::KnockOff.Documentation.Samples.User user)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(user);
 				_sequenceIndex++;
-				return callback(ko, user);
+				return callback(user);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(user);
-				return _onCall(ko, user);
+				return _onCall(user);
 			}
 
 			_unconfiguredCallCount++;
@@ -480,7 +480,7 @@ partial class AsyncUserSvcStub : global::KnockOff.Documentation.Samples.Async.IA
 		internal global::KnockOff.Documentation.Samples.Async.IAsyncUserSvc? _source;
 
 		/// <summary>Delegate for GetCachedUserAsync.</summary>
-		public delegate global::System.Threading.Tasks.ValueTask<global::KnockOff.Documentation.Samples.User?> GetCachedUserAsyncDelegate(AsyncUserSvcStub ko, int id);
+		public delegate global::System.Threading.Tasks.ValueTask<global::KnockOff.Documentation.Samples.User?> GetCachedUserAsyncDelegate(int id);
 
 		private GetCachedUserAsyncDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
@@ -531,20 +531,20 @@ partial class AsyncUserSvcStub : global::KnockOff.Documentation.Samples.Async.IA
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.ValueTask<global::KnockOff.Documentation.Samples.User?> Invoke(AsyncUserSvcStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.ValueTask<global::KnockOff.Documentation.Samples.User?> Invoke(bool strict, int id)
 		{
 			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
 				var (callback, tracking) = _sequence[_sequenceIndex];
 				tracking.RecordCall(id);
 				_sequenceIndex++;
-				return callback(ko, id);
+				return callback(id);
 			}
 
 			if (_onCall != null && _onCallTracking != null)
 			{
 				_onCallTracking.RecordCall(id);
-				return _onCall(ko, id);
+				return _onCall(id);
 			}
 
 			_unconfiguredCallCount++;
@@ -761,17 +761,17 @@ partial class AsyncUserSvcStub : global::KnockOff.Documentation.Samples.Async.IA
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Documentation.Samples.User?> global::KnockOff.Documentation.Samples.Async.IAsyncUserSvc.GetUserAsync(int id)
 	{
-		return GetUserAsync.Invoke(this, Strict, id);
+		return GetUserAsync.Invoke(Strict, id);
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Documentation.Samples.Async.IAsyncUserSvc.UpdateUserAsync(global::KnockOff.Documentation.Samples.User user)
 	{
-		return UpdateUserAsync.Invoke(this, Strict, user);
+		return UpdateUserAsync.Invoke(Strict, user);
 	}
 
 	global::System.Threading.Tasks.ValueTask<global::KnockOff.Documentation.Samples.User?> global::KnockOff.Documentation.Samples.Async.IAsyncUserSvc.GetCachedUserAsync(int id)
 	{
-		return GetCachedUserAsync.Invoke(this, Strict, id);
+		return GetCachedUserAsync.Invoke(Strict, id);
 	}
 
 }
