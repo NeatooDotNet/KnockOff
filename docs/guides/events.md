@@ -1,0 +1,224 @@
+# Working with Events
+
+KnockOff generates event interceptors that let you raise events from your test stubs and verify subscription behavior. Event interceptors support `EventHandler`, `EventHandler<T>`, `Action`, `Action<T>`, and custom delegate types.
+
+---
+
+## Raising Events
+
+### EventHandler and EventHandler&lt;T&gt;
+
+For standard event handler delegates, use the `Raise(sender, args)` method with two parameters.
+
+<!-- snippet: events-raise-eventhandler -->
+```cs
+[Fact]
+public void Raise_EventHandler_NotifiesSubscribers()
+{
+    var stub = new EventPubStub();
+
+    DataEventArgs? receivedArgs = null;
+
+    // Subscribe to the event through the interface
+    IEventPub publisher = stub;
+    publisher.DataReceived += (sender, args) =>
+    {
+        receivedArgs = args;
+    };
+
+    // Raise the event using the interceptor
+    var eventArgs = new DataEventArgs { Data = "Test Data" };
+    stub.DataReceived.Raise(stub, eventArgs);
+
+    Assert.NotNull(receivedArgs);
+    Assert.Equal("Test Data", receivedArgs.Data);
+}
+```
+<!-- endSnippet -->
+
+### Action and Action&lt;T&gt;
+
+For Action-based events, use the `Raise(arg)` method with a single parameter matching the action's argument type.
+
+<!-- snippet: events-raise-action -->
+```cs
+[Fact]
+public void Raise_Action_NotifiesSubscribers()
+{
+    var stub = new EventPubStub();
+
+    string? receivedStatus = null;
+
+    IEventPub publisher = stub;
+    publisher.StatusChanged += status => receivedStatus = status;
+
+    // Raise Action<T> event with single argument
+    stub.StatusChanged.Raise("Connected");
+
+    Assert.Equal("Connected", receivedStatus);
+}
+```
+<!-- endSnippet -->
+
+---
+
+## Verifying Subscriptions
+
+### Checking for Subscribers
+
+Use `HasSubscribers` to verify whether any handlers are currently subscribed to an event.
+
+<!-- snippet: events-verify-subscribe -->
+```cs
+[Fact]
+public void HasSubscribers_VerifiesActiveSubscriptions()
+{
+    var stub = new EventSubStub();
+
+    IEventSub subscriber = stub;
+
+    // Initially no subscribers
+    Assert.False(stub.OnCompleted.HasSubscribers);
+
+    // Subscribe a handler
+    subscriber.OnCompleted += (sender, args) => { };
+
+    // Now has subscribers
+    Assert.True(stub.OnCompleted.HasSubscribers);
+}
+```
+<!-- endSnippet -->
+
+### Counting Add Operations
+
+Use `AddCount` to track how many times handlers have been added to the event.
+
+<!-- snippet: events-verify-addcount -->
+```cs
+[Fact]
+public void AddCount_TracksSubscriptionOperations()
+{
+    var stub = new EventSubStub();
+
+    IEventSub subscriber = stub;
+
+    subscriber.OnCompleted += (sender, args) => { };
+    subscriber.OnCompleted += (sender, args) => { };
+
+    // AddCount tracks subscribe operations
+    Assert.Equal(2, stub.OnCompleted.AddCount);
+}
+```
+<!-- endSnippet -->
+
+---
+
+## Verifying Unsubscriptions
+
+Use `RemoveCount` to verify how many times handlers have been unsubscribed from the event.
+
+<!-- snippet: events-verify-unsubscribe -->
+```cs
+[Fact]
+public void RemoveCount_TracksUnsubscribeOperations()
+{
+    var stub = new EventSubStub();
+
+    IEventSub subscriber = stub;
+
+    EventHandler handler = (sender, args) => { };
+
+    subscriber.OnCompleted += handler;
+    subscriber.OnCompleted -= handler;
+
+    // RemoveCount tracks unsubscribe operations
+    Assert.Equal(1, stub.OnCompleted.RemoveCount);
+}
+```
+<!-- endSnippet -->
+
+---
+
+## Resetting Events
+
+The `Reset()` method clears subscription counts but **does not** remove active subscribers. Use this to reset verification state between test phases while preserving event handlers.
+
+<!-- snippet: events-reset -->
+```cs
+[Fact]
+public void Reset_ClearsCountsAndSubscribers()
+{
+    var stub = new EventSubStub();
+
+    IEventSub subscriber = stub;
+
+    EventHandler handler = (sender, args) => { };
+    subscriber.OnCompleted += handler;
+
+    Assert.Equal(1, stub.OnCompleted.AddCount);
+    Assert.True(stub.OnCompleted.HasSubscribers);
+
+    // Reset clears counts and subscribers
+    stub.OnCompleted.Reset();
+
+    // Counts are cleared
+    Assert.Equal(0, stub.OnCompleted.AddCount);
+
+    // Subscribers are also cleared
+    Assert.False(stub.OnCompleted.HasSubscribers);
+}
+```
+<!-- endSnippet -->
+
+**Important**: `Reset()` only clears tracking counters. If you need to verify subscription state after reset, use `HasSubscribers` to confirm handlers are still attached.
+
+---
+
+## Complete Example
+
+This example demonstrates the full event interceptor workflow: subscribing handlers, raising events, verifying counts, and checking subscription state.
+
+<!-- snippet: events-complete-example -->
+```cs
+[Fact]
+public void Event_FullWorkflow_SubscribeRaiseUnsubscribe()
+{
+    var stub = new EventPubStub();
+
+    DataEventArgs? receivedArgs = null;
+    int raiseCount = 0;
+
+    EventHandler<DataEventArgs> handler = (sender, args) =>
+    {
+        receivedArgs = args;
+        raiseCount++;
+    };
+
+    IEventPub publisher = stub;
+
+    // Subscribe and verify
+    publisher.DataReceived += handler;
+    Assert.Equal(1, stub.DataReceived.AddCount);
+    Assert.True(stub.DataReceived.HasSubscribers);
+
+    // Raise the event
+    var eventArgs = new DataEventArgs { Data = "Test" };
+    stub.DataReceived.Raise(stub, eventArgs);
+    Assert.Equal(1, raiseCount);
+    Assert.Equal("Test", receivedArgs?.Data);
+
+    // Unsubscribe and verify
+    publisher.DataReceived -= handler;
+    Assert.Equal(1, stub.DataReceived.RemoveCount);
+    Assert.False(stub.DataReceived.HasSubscribers);
+}
+```
+<!-- endSnippet -->
+
+---
+
+## Next Steps
+
+- Learn about [method interceptors](methods.md) for verifying method calls
+- Explore [property interceptors](properties.md) for property access tracking
+- Review [interceptor API reference](../reference/interceptor-api.md) for all available members
