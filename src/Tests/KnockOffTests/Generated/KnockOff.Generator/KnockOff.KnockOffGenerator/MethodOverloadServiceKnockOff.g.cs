@@ -16,23 +16,41 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		/// <summary>Delegate for Format(string).</summary>
 		public delegate string FormatDelegate_String_String(MethodOverloadServiceKnockOff ko, string input);
 
-		private readonly global::System.Collections.Generic.List<(FormatDelegate_String_String Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_String Tracking)> _sequence_String_String = new();
+		private FormatDelegate_String_String? _onCall_String_String;
+		private MethodTrackingImpl_String_String? _onCallTracking_String_String;
+
+		private global::System.Collections.Generic.List<(FormatDelegate_String_String Callback, MethodTrackingImpl_String_String Tracking)>? _sequence_String_String;
 		private int _sequenceIndex_String_String;
+
+		private bool _isVerifiable_String_String;
+		private global::KnockOff.Times? _verifiableTimes_String_String;
 
 		/// <summary>Delegate for Format(string, bool).</summary>
 		public delegate string FormatDelegate_String_Boolean_String(MethodOverloadServiceKnockOff ko, string input, bool uppercase);
 
-		private readonly global::System.Collections.Generic.List<(FormatDelegate_String_Boolean_String Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_Boolean_String Tracking)> _sequence_String_Boolean_String = new();
+		private FormatDelegate_String_Boolean_String? _onCall_String_Boolean_String;
+		private MethodTrackingImpl_String_Boolean_String? _onCallTracking_String_Boolean_String;
+
+		private global::System.Collections.Generic.List<(FormatDelegate_String_Boolean_String Callback, MethodTrackingImpl_String_Boolean_String Tracking)>? _sequence_String_Boolean_String;
 		private int _sequenceIndex_String_Boolean_String;
+
+		private bool _isVerifiable_String_Boolean_String;
+		private global::KnockOff.Times? _verifiableTimes_String_Boolean_String;
 
 		/// <summary>Delegate for Format(string, int).</summary>
 		public delegate string FormatDelegate_String_Int32_String(MethodOverloadServiceKnockOff ko, string input, int maxLength);
 
-		private readonly global::System.Collections.Generic.List<(FormatDelegate_String_Int32_String Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_Int32_String Tracking)> _sequence_String_Int32_String = new();
+		private FormatDelegate_String_Int32_String? _onCall_String_Int32_String;
+		private MethodTrackingImpl_String_Int32_String? _onCallTracking_String_Int32_String;
+
+		private global::System.Collections.Generic.List<(FormatDelegate_String_Int32_String Callback, MethodTrackingImpl_String_Int32_String Tracking)>? _sequence_String_Int32_String;
 		private int _sequenceIndex_String_Int32_String;
 
+		private bool _isVerifiable_String_Int32_String;
+		private global::KnockOff.Times? _verifiableTimes_String_Int32_String;
+
 		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + _sequence_String_String.Sum(s => s.Tracking.CallCount) + _sequence_String_Boolean_String.Sum(s => s.Tracking.CallCount) + _sequence_String_Int32_String.Sum(s => s.Tracking.CallCount);
+		public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_String?.CallCount ?? 0) + (_sequence_String_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Boolean_String?.CallCount ?? 0) + (_sequence_String_Boolean_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_String?.CallCount ?? 0) + (_sequence_String_Int32_String?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -40,19 +58,25 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		/// <summary>Configures callback for Format(string). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(FormatDelegate_String_String callback)
 		{
-			var tracking = new MethodTrackingImpl_String_String();
-			_sequence_String_String.Clear();
-			_sequence_String_String.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_String_String = null;
 			_sequenceIndex_String_String = 0;
-			return tracking;
+			_isVerifiable_String_String = false;
+			_verifiableTimes_String_String = null;
+			_onCall_String_String = callback;
+			_onCallTracking_String_String = new MethodTrackingImpl_String_String(this);
+			return _onCallTracking_String_String;
 		}
 
-		/// <summary>Configures callback for Format(string) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<FormatDelegate_String_String> OnCall(FormatDelegate_String_String callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Format(string). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<FormatDelegate_String_String> OnCallSequence(FormatDelegate_String_String callback)
 		{
-			var tracking = new MethodTrackingImpl_String_String();
-			_sequence_String_String.Clear();
-			_sequence_String_String.Add((callback, times, tracking));
+			_onCall_String_String = null;
+			_onCallTracking_String_String = null;
+			_isVerifiable_String_String = false;
+			_verifiableTimes_String_String = null;
+			_sequence_String_String = new global::System.Collections.Generic.List<(FormatDelegate_String_String Callback, MethodTrackingImpl_String_String Tracking)>();
+			var tracking = new MethodTrackingImpl_String_String(this);
+			_sequence_String_String.Add((callback, tracking));
 			_sequenceIndex_String_String = 0;
 			return new MethodSequenceImpl_String_String(this);
 		}
@@ -60,19 +84,25 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		/// <summary>Configures callback for Format(string, bool). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(string? input, bool? uppercase)> OnCall(FormatDelegate_String_Boolean_String callback)
 		{
-			var tracking = new MethodTrackingImpl_String_Boolean_String();
-			_sequence_String_Boolean_String.Clear();
-			_sequence_String_Boolean_String.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_String_Boolean_String = null;
 			_sequenceIndex_String_Boolean_String = 0;
-			return tracking;
+			_isVerifiable_String_Boolean_String = false;
+			_verifiableTimes_String_Boolean_String = null;
+			_onCall_String_Boolean_String = callback;
+			_onCallTracking_String_Boolean_String = new MethodTrackingImpl_String_Boolean_String(this);
+			return _onCallTracking_String_Boolean_String;
 		}
 
-		/// <summary>Configures callback for Format(string, bool) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<FormatDelegate_String_Boolean_String> OnCall(FormatDelegate_String_Boolean_String callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Format(string, bool). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<FormatDelegate_String_Boolean_String> OnCallSequence(FormatDelegate_String_Boolean_String callback)
 		{
-			var tracking = new MethodTrackingImpl_String_Boolean_String();
-			_sequence_String_Boolean_String.Clear();
-			_sequence_String_Boolean_String.Add((callback, times, tracking));
+			_onCall_String_Boolean_String = null;
+			_onCallTracking_String_Boolean_String = null;
+			_isVerifiable_String_Boolean_String = false;
+			_verifiableTimes_String_Boolean_String = null;
+			_sequence_String_Boolean_String = new global::System.Collections.Generic.List<(FormatDelegate_String_Boolean_String Callback, MethodTrackingImpl_String_Boolean_String Tracking)>();
+			var tracking = new MethodTrackingImpl_String_Boolean_String(this);
+			_sequence_String_Boolean_String.Add((callback, tracking));
 			_sequenceIndex_String_Boolean_String = 0;
 			return new MethodSequenceImpl_String_Boolean_String(this);
 		}
@@ -80,19 +110,25 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		/// <summary>Configures callback for Format(string, int). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(string? input, int? maxLength)> OnCall(FormatDelegate_String_Int32_String callback)
 		{
-			var tracking = new MethodTrackingImpl_String_Int32_String();
-			_sequence_String_Int32_String.Clear();
-			_sequence_String_Int32_String.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_String_Int32_String = null;
 			_sequenceIndex_String_Int32_String = 0;
-			return tracking;
+			_isVerifiable_String_Int32_String = false;
+			_verifiableTimes_String_Int32_String = null;
+			_onCall_String_Int32_String = callback;
+			_onCallTracking_String_Int32_String = new MethodTrackingImpl_String_Int32_String(this);
+			return _onCallTracking_String_Int32_String;
 		}
 
-		/// <summary>Configures callback for Format(string, int) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<FormatDelegate_String_Int32_String> OnCall(FormatDelegate_String_Int32_String callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Format(string, int). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<FormatDelegate_String_Int32_String> OnCallSequence(FormatDelegate_String_Int32_String callback)
 		{
-			var tracking = new MethodTrackingImpl_String_Int32_String();
-			_sequence_String_Int32_String.Clear();
-			_sequence_String_Int32_String.Add((callback, times, tracking));
+			_onCall_String_Int32_String = null;
+			_onCallTracking_String_Int32_String = null;
+			_isVerifiable_String_Int32_String = false;
+			_verifiableTimes_String_Int32_String = null;
+			_sequence_String_Int32_String = new global::System.Collections.Generic.List<(FormatDelegate_String_Int32_String Callback, MethodTrackingImpl_String_Int32_String Tracking)>();
+			var tracking = new MethodTrackingImpl_String_Int32_String(this);
+			_sequence_String_Int32_String.Add((callback, tracking));
 			_sequenceIndex_String_Int32_String = 0;
 			return new MethodSequenceImpl_String_Int32_String(this);
 		}
@@ -100,139 +136,182 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		/// <summary>Invokes configured callback for Format(string).</summary>
 		internal string Invoke_String_String(MethodOverloadServiceKnockOff ko, bool strict, string input)
 		{
-			if (_sequence_String_String.Count == 0)
+			if (_sequence_String_String != null && _sequenceIndex_String_String < _sequence_String_String.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Format(input);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
-				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
+				var (callback, tracking) = _sequence_String_String[_sequenceIndex_String_String];
+				tracking.RecordCall(input);
+				_sequenceIndex_String_String++;
+				return callback(ko, input);
 			}
 
-			var (callback, times, tracking) = _sequence_String_String[_sequenceIndex_String_String];
-			tracking.RecordCall(input);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
+			if (_onCall_String_String != null && _onCallTracking_String_String != null)
 			{
-				if (_sequenceIndex_String_String < _sequence_String_String.Count - 1)
-					_sequenceIndex_String_String++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Format");
+				_onCallTracking_String_String.RecordCall(input);
+				return _onCall_String_String(ko, input);
 			}
 
-			return callback(ko, input);
+			_unconfiguredCallCount++;
+			if (_sequence_String_String != null && _sequenceIndex_String_String >= _sequence_String_String.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Format");
+				return default!;
+			}
+
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Format(input);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
+			throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 		}
 
 		/// <summary>Invokes configured callback for Format(string, bool).</summary>
 		internal string Invoke_String_Boolean_String(MethodOverloadServiceKnockOff ko, bool strict, string input, bool uppercase)
 		{
-			if (_sequence_String_Boolean_String.Count == 0)
+			if (_sequence_String_Boolean_String != null && _sequenceIndex_String_Boolean_String < _sequence_String_Boolean_String.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Format(input, uppercase);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
-				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
+				var (callback, tracking) = _sequence_String_Boolean_String[_sequenceIndex_String_Boolean_String];
+				tracking.RecordCall((input, uppercase));
+				_sequenceIndex_String_Boolean_String++;
+				return callback(ko, input, uppercase);
 			}
 
-			var (callback, times, tracking) = _sequence_String_Boolean_String[_sequenceIndex_String_Boolean_String];
-			tracking.RecordCall((input, uppercase));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
+			if (_onCall_String_Boolean_String != null && _onCallTracking_String_Boolean_String != null)
 			{
-				if (_sequenceIndex_String_Boolean_String < _sequence_String_Boolean_String.Count - 1)
-					_sequenceIndex_String_Boolean_String++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Format");
+				_onCallTracking_String_Boolean_String.RecordCall((input, uppercase));
+				return _onCall_String_Boolean_String(ko, input, uppercase);
 			}
 
-			return callback(ko, input, uppercase);
+			_unconfiguredCallCount++;
+			if (_sequence_String_Boolean_String != null && _sequenceIndex_String_Boolean_String >= _sequence_String_Boolean_String.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Format");
+				return default!;
+			}
+
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Format(input, uppercase);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
+			throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 		}
 
 		/// <summary>Invokes configured callback for Format(string, int).</summary>
 		internal string Invoke_String_Int32_String(MethodOverloadServiceKnockOff ko, bool strict, string input, int maxLength)
 		{
-			if (_sequence_String_Int32_String.Count == 0)
+			if (_sequence_String_Int32_String != null && _sequenceIndex_String_Int32_String < _sequence_String_Int32_String.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Format(input, maxLength);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
-				throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
+				var (callback, tracking) = _sequence_String_Int32_String[_sequenceIndex_String_Int32_String];
+				tracking.RecordCall((input, maxLength));
+				_sequenceIndex_String_Int32_String++;
+				return callback(ko, input, maxLength);
 			}
 
-			var (callback, times, tracking) = _sequence_String_Int32_String[_sequenceIndex_String_Int32_String];
-			tracking.RecordCall((input, maxLength));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
+			if (_onCall_String_Int32_String != null && _onCallTracking_String_Int32_String != null)
 			{
-				if (_sequenceIndex_String_Int32_String < _sequence_String_Int32_String.Count - 1)
-					_sequenceIndex_String_Int32_String++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Format");
+				_onCallTracking_String_Int32_String.RecordCall((input, maxLength));
+				return _onCall_String_Int32_String(ko, input, maxLength);
 			}
 
-			return callback(ko, input, maxLength);
+			_unconfiguredCallCount++;
+			if (_sequence_String_Int32_String != null && _sequenceIndex_String_Int32_String >= _sequence_String_Int32_String.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Format");
+				return default!;
+			}
+
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Format(input, maxLength);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
+			throw new global::System.InvalidOperationException("No implementation provided for Format. Configure via OnCall.");
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence_String_String)
-				tracking.Reset();
+			_onCallTracking_String_String?.Reset();
+			if (_sequence_String_String != null)
+			{
+				foreach (var (_, tracking) in _sequence_String_String)
+					tracking.Reset();
+			}
 			_sequenceIndex_String_String = 0;
-			foreach (var (_, _, tracking) in _sequence_String_Boolean_String)
-				tracking.Reset();
+			_onCallTracking_String_Boolean_String?.Reset();
+			if (_sequence_String_Boolean_String != null)
+			{
+				foreach (var (_, tracking) in _sequence_String_Boolean_String)
+					tracking.Reset();
+			}
 			_sequenceIndex_String_Boolean_String = 0;
-			foreach (var (_, _, tracking) in _sequence_String_Int32_String)
-				tracking.Reset();
+			_onCallTracking_String_Int32_String?.Reset();
+			if (_sequence_String_Int32_String != null)
+			{
+				foreach (var (_, tracking) in _sequence_String_Int32_String)
+					tracking.Reset();
+			}
 			_sequenceIndex_String_Int32_String = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether any overload was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable_String_String || _isVerifiable_String_Boolean_String || _isVerifiable_String_Int32_String;
+
+		/// <summary>Whether any overload has been configured.</summary>
+		internal bool IsConfigured => _onCall_String_String != null || (_sequence_String_String?.Count ?? 0) > 0 || _onCall_String_Boolean_String != null || (_sequence_String_Boolean_String?.Count ?? 0) > 0 || _onCall_String_Int32_String != null || (_sequence_String_Int32_String?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - checks all verifiable overloads.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence_String_String)
+			if (_isVerifiable_String_String)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_String_String ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_String_String?.CallCount ?? 0) + (_sequence_String_String?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Format", times, count);
 			}
-			foreach (var (_, times, tracking) in _sequence_String_Boolean_String)
+			if (_isVerifiable_String_Boolean_String)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_String_Boolean_String ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_String_Boolean_String?.CallCount ?? 0) + (_sequence_String_Boolean_String?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Format", times, count);
 			}
-			foreach (var (_, times, tracking) in _sequence_String_Int32_String)
+			if (_isVerifiable_String_Int32_String)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_String_Int32_String ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_String_Int32_String?.CallCount ?? 0) + (_sequence_String_Int32_String?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Format", times, count);
 			}
-			return true;
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks all configured overloads.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (_onCall_String_String != null || (_sequence_String_String?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_String_String?.CallCount ?? 0) + (_sequence_String_String?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Format", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			if (_onCall_String_Boolean_String != null || (_sequence_String_Boolean_String?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_String_Boolean_String?.CallCount ?? 0) + (_sequence_String_Boolean_String?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Format", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			if (_onCall_String_Int32_String != null || (_sequence_String_Int32_String?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_String_Int32_String?.CallCount ?? 0) + (_sequence_String_Int32_String?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Format", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			return null;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_String : global::KnockOff.IMethodTracking<string>
 		{
+			private readonly FormatInterceptor _interceptor;
+
+			public MethodTrackingImpl_String_String(FormatInterceptor interceptor) => _interceptor = interceptor;
+
 			private string _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -249,11 +328,44 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable()
+			{
+				_interceptor._isVerifiable_String_String = true;
+				_interceptor._verifiableTimes_String_String = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_String_String = true;
+				_interceptor._verifiableTimes_String_String = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_Boolean_String : global::KnockOff.IMethodTrackingArgs<(string? input, bool? uppercase)>
 		{
+			private readonly FormatInterceptor _interceptor;
+
+			public MethodTrackingImpl_String_Boolean_String(FormatInterceptor interceptor) => _interceptor = interceptor;
+
 			private (string? input, bool? uppercase) _lastArgs;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -270,11 +382,44 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(string? input, bool? uppercase)> Verifiable()
+			{
+				_interceptor._isVerifiable_String_Boolean_String = true;
+				_interceptor._verifiableTimes_String_Boolean_String = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(string? input, bool? uppercase)> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_String_Boolean_String = true;
+				_interceptor._verifiableTimes_String_Boolean_String = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_Int32_String : global::KnockOff.IMethodTrackingArgs<(string? input, int? maxLength)>
 		{
+			private readonly FormatInterceptor _interceptor;
+
+			public MethodTrackingImpl_String_Int32_String(FormatInterceptor interceptor) => _interceptor = interceptor;
+
 			private (string? input, int? maxLength) _lastArgs;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -291,6 +436,35 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(string? input, int? maxLength)> Verifiable()
+			{
+				_interceptor._isVerifiable_String_Int32_String = true;
+				_interceptor._verifiableTimes_String_Int32_String = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(string? input, int? maxLength)> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_String_Int32_String = true;
+				_interceptor._verifiableTimes_String_Int32_String = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -305,34 +479,45 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 			{
 				get
 				{
+					if (_interceptor._sequence_String_String == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_String_String)
+					foreach (var (_, tracking) in _interceptor._sequence_String_String)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<FormatDelegate_String_String> ThenCall(FormatDelegate_String_String callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<FormatDelegate_String_String> ThenCall(FormatDelegate_String_String callback)
 			{
-				var tracking = new MethodTrackingImpl_String_String();
-				_interceptor._sequence_String_String.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_String_String(_interceptor);
+				_interceptor._sequence_String_String!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_String_String)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_String_String == null) return;
+				var sequenceLength = _interceptor._sequence_String_String.Count;
+				var completedCount = _interceptor._sequenceIndex_String_String;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<FormatDelegate_String_String> Verifiable()
+			{
+				_interceptor._isVerifiable_String_String = true;
+				_interceptor._verifiableTimes_String_String = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -347,34 +532,45 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 			{
 				get
 				{
+					if (_interceptor._sequence_String_Boolean_String == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_String_Boolean_String)
+					foreach (var (_, tracking) in _interceptor._sequence_String_Boolean_String)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<FormatDelegate_String_Boolean_String> ThenCall(FormatDelegate_String_Boolean_String callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<FormatDelegate_String_Boolean_String> ThenCall(FormatDelegate_String_Boolean_String callback)
 			{
-				var tracking = new MethodTrackingImpl_String_Boolean_String();
-				_interceptor._sequence_String_Boolean_String.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_String_Boolean_String(_interceptor);
+				_interceptor._sequence_String_Boolean_String!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_String_Boolean_String)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_String_Boolean_String == null) return;
+				var sequenceLength = _interceptor._sequence_String_Boolean_String.Count;
+				var completedCount = _interceptor._sequenceIndex_String_Boolean_String;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<FormatDelegate_String_Boolean_String> Verifiable()
+			{
+				_interceptor._isVerifiable_String_Boolean_String = true;
+				_interceptor._verifiableTimes_String_Boolean_String = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -389,34 +585,45 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 			{
 				get
 				{
+					if (_interceptor._sequence_String_Int32_String == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_String_Int32_String)
+					foreach (var (_, tracking) in _interceptor._sequence_String_Int32_String)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<FormatDelegate_String_Int32_String> ThenCall(FormatDelegate_String_Int32_String callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<FormatDelegate_String_Int32_String> ThenCall(FormatDelegate_String_Int32_String callback)
 			{
-				var tracking = new MethodTrackingImpl_String_Int32_String();
-				_interceptor._sequence_String_Int32_String.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_String_Int32_String(_interceptor);
+				_interceptor._sequence_String_Int32_String!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_String_Int32_String)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_String_Int32_String == null) return;
+				var sequenceLength = _interceptor._sequence_String_Int32_String.Count;
+				var completedCount = _interceptor._sequenceIndex_String_Int32_String;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<FormatDelegate_String_Int32_String> Verifiable()
+			{
+				_interceptor._isVerifiable_String_Int32_String = true;
+				_interceptor._verifiableTimes_String_Int32_String = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -430,19 +637,26 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 	/// <summary>The global::KnockOffTests.IMethodOverloadService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOffTests.IMethodOverloadService Object => this;
 
-	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
-	public bool Verify()
+	/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+	public void Verify()
 	{
-		var result = true;
-		result &= Format.Verify();
-		return result;
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (Format.CheckVerification() is { } formatFailure) failures.Add(formatFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
-	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
 	public void VerifyAll()
 	{
-		if (!Verify())
-			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (Format.CheckVerificationAll() is { } formatFailure) failures.Add(formatFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
 	// Source(T) methods for interface delegation

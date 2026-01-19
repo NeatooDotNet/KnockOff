@@ -38,21 +38,23 @@ This aligns KnockOff more closely with Moq's verification patterns while maintai
 
 ## Tasks
 
-- [ ] Update `Times` struct (remove `Forever`, keep verification-only constraints)
-- [ ] Update `IMethodTracking` interface (add `Verifiable()`, change `Verify()` signature)
-- [ ] Update `IMethodSequence` interface (remove `Times` from `ThenCall`, add `Verifiable()`)
-- [ ] Update `VerificationException` to support aggregate failures
-- [ ] Update `MethodInterceptorRenderer` for new OnCall/ThenCall signatures
-- [ ] Update `MethodInterceptorRenderer` for new Verify/Verifiable methods
-- [ ] Update property interceptor generation (add Value tracking, Verifiable)
-- [ ] Update user-defined method interceptors (add Verifiable with Times)
-- [ ] Update stub-level Verify/VerifyAll generation
-- [ ] Update FlatRenderer for all three patterns
-- [ ] Update InlineRenderer for all three patterns
-- [ ] Update ClassRenderer for all three patterns
-- [ ] Update existing tests for new API
-- [ ] Add new tests for Verifiable() behavior
-- [ ] Update documentation and migration guide
+- [x] Update `Times` struct (remove `Forever`, keep verification-only constraints)
+- [x] Update `IMethodTracking` interface (add `Verifiable()`, change `Verify()` signature)
+- [x] Update `IMethodSequence` interface (remove `Times` from `ThenCall`, add `Verifiable()`)
+- [x] Update `VerificationException` to support aggregate failures
+- [x] Update `MethodInterceptorRenderer` for new OnCall/ThenCall signatures
+- [x] Update `MethodInterceptorRenderer` for new Verify/Verifiable methods
+- [x] Update property interceptor generation (add Value tracking, Verifiable)
+- [x] Update user-defined method interceptors (add Verifiable with Times)
+- [x] Update stub-level Verify/VerifyAll generation
+- [x] Update FlatRenderer for all three patterns
+- [x] Update InlineRenderer for all three patterns
+- [x] Update ClassRenderer for all three patterns
+- [x] Update existing tests for new API
+- [x] Add new tests for Verifiable() behavior
+- [ ] Update documentation and migration guide (will be done as part of a documentation rewrite)
+- [x] Update event interceptor generation (add Verifiable)
+- [x] Update indexer interceptor generation (add Verifiable)
 
 ---
 
@@ -87,6 +89,29 @@ This aligns KnockOff more closely with Moq's verification patterns while maintai
 - Clarified OnCall() clears `_isVerifiable` (new config replaces old)
 - Clarified generic method tracking: `_isVerifiable` lives on typed handler (per-instantiation)
 - Added stub type name to verification error messages
+
+**2026-01-18:** Core implementation completed:
+- Times struct updated (removed Forever, added Validate() method)
+- IMethodTracking interface updated with Verify() throwing, Verifiable() fluent methods
+- IMethodSequence interface updated with Verify() throwing, Verifiable() fluent, no Times in ThenCall
+- VerificationException and VerificationFailure classes created for aggregate failures
+- MethodInterceptorRenderer completely rewritten with new OnCall/OnCallSequence pattern
+- FlatRenderer.RenderVerifyMethods updated to use CheckVerification/CheckVerificationAll
+- InlineRenderer stub-level methods updated
+- ClassRenderer updated
+- All existing tests updated for new API (TimesTests, SequencingTests, VerificationTests)
+- All 601 tests passing
+
+Remaining work:
+- Documentation update
+
+**2026-01-18:** Property, event, and indexer interceptor verification completed:
+- Property interceptors: VerifyGet()/VerifySet()/Verify() with Times overloads, Verifiable()
+- Event interceptors: VerifyAdd()/VerifyRemove()/Verify() with Times overloads, Verifiable()
+- Indexer interceptors: Same pattern as properties
+- All interceptors now have CheckVerification()/CheckVerificationAll() internal methods
+- Container classes (IndexerContainer, GenericMethodHandler) aggregate verification
+- All 601 tests passing
 
 ---
 

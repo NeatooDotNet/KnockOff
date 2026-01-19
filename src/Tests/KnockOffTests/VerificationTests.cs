@@ -4,91 +4,49 @@ using Xunit;
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for KnockOff's three-level verification system:
-/// Level 2 - Method interceptor Verify()
-/// Level 3 - Stub-level Verify() and VerifyAll()
-///
-/// Level 1 (Times.Verify()) is tested in TimesTests.cs.
+/// Tests for KnockOff's verification system:
+/// - IMethodTracking.Verify() / Verify(Times) - throws VerificationException if not satisfied
+/// - IMethodSequence.Verify() - throws VerificationException if sequence incomplete
+/// - Stub.Verify() - verifies all Verifiable() marked items
+/// - Stub.VerifyAll() - verifies all configured items were called at least once
 /// </summary>
 public class VerificationTests
 {
-    #region Level 2: Method Interceptor Verify() - Basic Verification
+    #region IMethodTracking.Verify() - Individual Tracking Verification
 
     [Fact]
-    public void MethodInterceptor_Verify_ReturnsTrue_WhenNoCallbacksConfigured()
+    public void MethodTracking_Verify_SucceedsWhenCalled()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        // No OnCall configured
-
-        // Assert
-        Assert.True(stub.Add.Verify());
-    }
-
-    [Fact]
-    public void MethodInterceptor_Verify_ReturnsTrue_WhenForeverConstraintCalled()
-    {
-        // Arrange
-        var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b); // Implicit Times.Forever
+        var tracking = stub.Add.OnCall((ko, a, b) => a + b);
 
         // Act
         ISequenceTestService svc = stub;
         svc.Add(1, 2);
 
-        // Assert
-        Assert.True(stub.Add.Verify());
+        // Assert - Should not throw
+        tracking.Verify();
     }
 
     [Fact]
-    public void MethodInterceptor_Verify_ReturnsFalse_WhenForeverConstraintNotCalled()
+    public void MethodTracking_Verify_ThrowsWhenNotCalled()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b); // Implicit Times.Forever
+        var tracking = stub.Add.OnCall((ko, a, b) => a + b);
         // Don't call the method
 
-        // Assert
-        Assert.False(stub.Add.Verify());
-    }
-
-    #endregion
-
-    #region Level 2: Method Interceptor Verify() - Exact Count Verification
-
-    [Fact]
-    public void MethodInterceptor_Verify_ReturnsTrue_WhenOnceConstraintSatisfied()
-    {
-        // Arrange
-        var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-
-        // Act
-        ISequenceTestService svc = stub;
-        svc.Add(1, 2);
-
-        // Assert
-        Assert.True(stub.Add.Verify());
+        // Act & Assert
+        Assert.Throws<VerificationException>(() => tracking.Verify());
     }
 
     [Fact]
-    public void MethodInterceptor_Verify_ReturnsFalse_WhenOnceConstraintNotCalled()
+    public void MethodTracking_VerifyWithTimes_SucceedsWhenCountMatches()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-        // Don't call the method
-
-        // Assert
-        Assert.False(stub.Add.Verify());
-    }
-
-    [Fact]
-    public void MethodInterceptor_Verify_ReturnsTrue_WhenExactlyNConstraintSatisfied()
-    {
-        // Arrange
-        var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Exactly(3));
+        var tracking = stub.Add.OnCall((ko, a, b) => a + b);
 
         // Act
         ISequenceTestService svc = stub;
@@ -96,147 +54,195 @@ public class VerificationTests
         svc.Add(2, 3);
         svc.Add(3, 4);
 
-        // Assert
-        Assert.True(stub.Add.Verify());
+        // Assert - Should not throw
+        tracking.Verify(Times.Exactly(3));
+    }
+
+    [Fact]
+    public void MethodTracking_VerifyWithTimes_ThrowsWhenCountDoesNotMatch()
+    {
+        // Arrange
+        var stub = new SequenceTestKnockOff();
+        var tracking = stub.Add.OnCall((ko, a, b) => a + b);
+
+        // Act
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);
+
+        // Assert - Expected exactly 3 but called 1
+        Assert.Throws<VerificationException>(() => tracking.Verify(Times.Exactly(3)));
+    }
+
+    [Fact]
+    public void MethodTracking_Verify_WorksWithVoidMethods()
+    {
+        // Arrange
+        var stub = new SequenceTestKnockOff();
+        var tracking = stub.DoWork.OnCall(ko => { });
+
+        // Act
+        ISequenceTestService svc = stub;
+        svc.DoWork();
+
+        // Assert - Should not throw
+        tracking.Verify();
     }
 
     #endregion
 
-    #region Level 2: Method Interceptor Verify() - Sequence Verification
+    #region IMethodSequence.Verify() - Sequence Completion Verification
 
     [Fact]
-    public void MethodInterceptor_Verify_ReturnsTrue_WhenAllSequenceConstraintsSatisfied()
+    public void MethodSequence_Verify_SucceedsWhenComplete()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add
-            .OnCall((ko, a, b) => 100, Times.Once)
-            .ThenCall((ko, a, b) => 200, Times.Once);
+        var sequence = stub.Add
+            .OnCallSequence((ko, a, b) => 100)
+            .ThenCall((ko, a, b) => 200);
 
         // Act
         ISequenceTestService svc = stub;
         svc.Add(1, 2); // First callback
         svc.Add(3, 4); // Second callback
 
-        // Assert
-        Assert.True(stub.Add.Verify());
+        // Assert - Should not throw
+        sequence.Verify();
     }
 
     [Fact]
-    public void MethodInterceptor_Verify_ReturnsFalse_WhenFirstConstraintNotSatisfied()
+    public void MethodSequence_Verify_ThrowsWhenIncomplete()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add
-            .OnCall((ko, a, b) => 100, Times.Twice)
-            .ThenCall((ko, a, b) => 200, Times.Once);
+        var sequence = stub.Add
+            .OnCallSequence((ko, a, b) => 100)
+            .ThenCall((ko, a, b) => 200);
 
         // Act
         ISequenceTestService svc = stub;
-        svc.Add(1, 2); // Only called once, but Twice was expected
+        svc.Add(1, 2); // Only first callback
 
         // Assert
-        Assert.False(stub.Add.Verify());
+        Assert.Throws<VerificationException>(() => sequence.Verify());
     }
 
     [Fact]
-    public void MethodInterceptor_Verify_ReturnsFalse_WhenLastConstraintNotSatisfied()
+    public void MethodSequence_Verify_ThrowsWhenNeverCalled()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add
-            .OnCall((ko, a, b) => 100, Times.Once)
-            .ThenCall((ko, a, b) => 200, Times.Once);
+        var sequence = stub.Add
+            .OnCallSequence((ko, a, b) => 100)
+            .ThenCall((ko, a, b) => 200);
 
-        // Act
-        ISequenceTestService svc = stub;
-        svc.Add(1, 2); // Only first callback called
+        // Act - Don't call anything
 
         // Assert
-        Assert.False(stub.Add.Verify());
+        Assert.Throws<VerificationException>(() => sequence.Verify());
     }
 
     #endregion
 
-    #region Level 2: Method Interceptor Verify() - Void Methods
+    #region Verifiable() - Marking for Stub.Verify()
 
     [Fact]
-    public void MethodInterceptor_Verify_WorksWithVoidMethods()
+    public void Verifiable_MarksForStubVerify()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.DoWork.OnCall(ko => { }, Times.Once);
+        stub.Add.OnCall((ko, a, b) => a + b).Verifiable();
+        // Don't call the method
 
-        // Act
-        ISequenceTestService svc = stub;
-        svc.DoWork();
-
-        // Assert
-        Assert.True(stub.DoWork.Verify());
-    }
-
-    #endregion
-
-    #region Level 2: Method Interceptor Verify() - Reset Interaction
-
-    [Fact]
-    public void MethodInterceptor_Verify_ReturnsFalse_AfterReset_WhenConstraintNoLongerSatisfied()
-    {
-        // Arrange
-        var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-
-        // Act - Call, verify (true), then reset
-        ISequenceTestService svc = stub;
-        svc.Add(1, 2);
-        Assert.True(stub.Add.Verify()); // Satisfied before reset
-
-        stub.Add.Reset();
-
-        // Assert - After reset, constraint is no longer satisfied
-        Assert.False(stub.Add.Verify());
+        // Act & Assert - Stub.Verify() should fail because the verifiable wasn't called
+        Assert.Throws<VerificationException>(() => stub.Verify());
     }
 
     [Fact]
-    public void MethodInterceptor_Verify_ReturnsTrue_AfterReset_WhenRecalled()
+    public void Verifiable_SucceedsWhenCalled()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
+        stub.Add.OnCall((ko, a, b) => a + b).Verifiable();
 
         // Act
         ISequenceTestService svc = stub;
         svc.Add(1, 2);
-        stub.Add.Reset();
-        svc.Add(1, 2); // Call again after reset
+
+        // Assert - Should not throw
+        stub.Verify();
+    }
+
+    [Fact]
+    public void Verifiable_WithTimes_VerifiesWithConstraint()
+    {
+        // Arrange
+        var stub = new SequenceTestKnockOff();
+        stub.Add.OnCall((ko, a, b) => a + b).Verifiable(Times.Exactly(2));
+
+        // Act
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);
+        // Only called once but expected twice
 
         // Assert
-        Assert.True(stub.Add.Verify());
+        Assert.Throws<VerificationException>(() => stub.Verify());
+    }
+
+    [Fact]
+    public void NonVerifiable_NotCheckedByStubVerify()
+    {
+        // Arrange
+        var stub = new SequenceTestKnockOff();
+        stub.Add.OnCall((ko, a, b) => a + b); // No .Verifiable()
+        // Don't call the method
+
+        // Assert - Stub.Verify() should pass because nothing is marked verifiable
+        stub.Verify(); // Should not throw
+    }
+
+    [Fact]
+    public void MixedVerifiable_OnlyChecksMarkedOnes()
+    {
+        // Arrange
+        var stub = new SequenceTestKnockOff();
+        stub.Add.OnCall((ko, a, b) => a + b).Verifiable();
+        stub.DoWork.OnCall(ko => { }); // Not marked verifiable
+        stub.GetMessage.OnCall((ko, name) => name); // Not marked verifiable
+
+        // Act
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2); // Call the verifiable one
+        // Don't call DoWork or GetMessage
+
+        // Assert - Should pass because only Add is verifiable and it was called
+        stub.Verify(); // Should not throw
     }
 
     #endregion
 
-    #region Level 3: Stub Verify() - Returns Bool
+    #region Stub.Verify() - Verifiable Items Only
 
     [Fact]
-    public void StubVerify_ReturnsTrue_WhenNoMethodsConfigured()
+    public void StubVerify_SucceedsWhenNoVerifiables()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        // No callbacks configured on any method
+        stub.Add.OnCall((ko, a, b) => a + b); // No .Verifiable()
+        // Don't call any methods
 
-        // Assert
-        Assert.True(stub.Verify());
+        // Assert - No verifiables means nothing to check
+        stub.Verify(); // Should not throw
     }
 
     [Fact]
-    public void StubVerify_ReturnsTrue_WhenAllMethodsSatisfied()
+    public void StubVerify_SucceedsWhenAllVerifiablesSatisfied()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-        stub.DoWork.OnCall(ko => { }, Times.Once);
-        stub.GetMessage.OnCall((ko, name) => $"Hello {name}", Times.Once);
+        stub.Add.OnCall((ko, a, b) => a + b).Verifiable();
+        stub.DoWork.OnCall(ko => { }).Verifiable();
+        stub.GetMessage.OnCall((ko, name) => $"Hello {name}").Verifiable();
 
         // Act
         ISequenceTestService svc = stub;
@@ -244,18 +250,18 @@ public class VerificationTests
         svc.DoWork();
         svc.GetMessage("Test");
 
-        // Assert
-        Assert.True(stub.Verify());
+        // Assert - Should not throw
+        stub.Verify();
     }
 
     [Fact]
-    public void StubVerify_ReturnsFalse_WhenOneMethodFails()
+    public void StubVerify_ThrowsWhenOneVerifiableFails()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-        stub.DoWork.OnCall(ko => { }, Times.Once);
-        stub.GetMessage.OnCall((ko, name) => $"Hello {name}", Times.Once);
+        stub.Add.OnCall((ko, a, b) => a + b).Verifiable();
+        stub.DoWork.OnCall(ko => { }).Verifiable();
+        stub.GetMessage.OnCall((ko, name) => $"Hello {name}").Verifiable();
 
         // Act - Satisfy Add and DoWork, but not GetMessage
         ISequenceTestService svc = stub;
@@ -264,76 +270,96 @@ public class VerificationTests
         // Don't call GetMessage
 
         // Assert
-        Assert.False(stub.Verify());
+        Assert.Throws<VerificationException>(() => stub.Verify());
     }
 
     [Fact]
-    public void StubVerify_ReturnsFalse_WhenAllMethodsFail()
+    public void StubVerify_ThrowsWhenAllVerifiablesFail()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-        stub.DoWork.OnCall(ko => { }, Times.Once);
-        stub.GetMessage.OnCall((ko, name) => $"Hello {name}", Times.Once);
+        stub.Add.OnCall((ko, a, b) => a + b).Verifiable();
+        stub.DoWork.OnCall(ko => { }).Verifiable();
+        stub.GetMessage.OnCall((ko, name) => $"Hello {name}").Verifiable();
         // Don't call any methods
 
         // Assert
-        Assert.False(stub.Verify());
-    }
-
-    [Fact]
-    public void StubVerify_ReturnsTrue_WhenMixedConfiguredAndUnconfigured()
-    {
-        // Arrange
-        var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-        // DoWork and GetMessage not configured
-
-        // Act
-        ISequenceTestService svc = stub;
-        svc.Add(1, 2);
-
-        // Assert - Unconfigured methods should pass verification
-        Assert.True(stub.Verify());
+        Assert.Throws<VerificationException>(() => stub.Verify());
     }
 
     #endregion
 
-    #region Level 3: Stub VerifyAll() - Throws Exception
+    #region Stub.VerifyAll() - All Configured Items
 
     [Fact]
-    public void StubVerifyAll_DoesNotThrow_WhenAllSatisfied()
+    public void StubVerifyAll_SucceedsWhenNoCallbacksConfigured()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
+        // No callbacks configured on any method
+
+        // Assert - Nothing configured means nothing to verify
+        stub.VerifyAll(); // Should not throw
+    }
+
+    [Fact]
+    public void StubVerifyAll_SucceedsWhenAllConfiguredCalled()
+    {
+        // Arrange
+        var stub = new SequenceTestKnockOff();
+        stub.Add.OnCall((ko, a, b) => a + b);
+        stub.DoWork.OnCall(ko => { });
+        stub.GetMessage.OnCall((ko, name) => $"Hello {name}");
 
         // Act
         ISequenceTestService svc = stub;
         svc.Add(1, 2);
+        svc.DoWork();
+        svc.GetMessage("Test");
 
         // Assert - Should not throw
         stub.VerifyAll();
     }
 
     [Fact]
-    public void StubVerifyAll_ThrowsVerificationException_WhenFails()
+    public void StubVerifyAll_ThrowsWhenOneConfiguredNotCalled()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-        // Don't call the method
+        stub.Add.OnCall((ko, a, b) => a + b);
+        stub.DoWork.OnCall(ko => { });
+        stub.GetMessage.OnCall((ko, name) => $"Hello {name}");
 
-        // Act & Assert
+        // Act - Satisfy Add and DoWork, but not GetMessage
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);
+        svc.DoWork();
+        // Don't call GetMessage
+
+        // Assert
         Assert.Throws<VerificationException>(() => stub.VerifyAll());
     }
 
     [Fact]
-    public void StubVerifyAll_ExceptionMessage_ContainsExpectedText()
+    public void StubVerifyAll_ThrowsWhenAllConfiguredNotCalled()
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
+        stub.Add.OnCall((ko, a, b) => a + b);
+        stub.DoWork.OnCall(ko => { });
+        stub.GetMessage.OnCall((ko, name) => $"Hello {name}");
+        // Don't call any methods
+
+        // Assert
+        Assert.Throws<VerificationException>(() => stub.VerifyAll());
+    }
+
+    [Fact]
+    public void StubVerifyAll_ExceptionContainsFailureInfo()
+    {
+        // Arrange
+        var stub = new SequenceTestKnockOff();
+        stub.Add.OnCall((ko, a, b) => a + b);
         // Don't call the method
 
         // Act
@@ -345,115 +371,158 @@ public class VerificationTests
 
     #endregion
 
-    #region Level 3: Overloaded Methods
+    #region Reset Interaction
 
     [Fact]
-    public void StubVerify_ReturnsTrue_WithOverloadedMethods_AllOverloadsSatisfied()
+    public void MethodTracking_Verify_AfterReset_RequiresNewCalls()
     {
         // Arrange
-        var stub = new OverloadTestKnockOff();
-        stub.Format.OnCall((ko, input) => input.ToUpper(), Times.Once);
-        stub.Format.OnCall(
-            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)
-            ((ko, input, uppercase) => uppercase ? input.ToUpper() : input),
-            Times.Once);
-        stub.Format.OnCall(
-            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Int32_String)
-            ((ko, input, maxLength) => input.Substring(0, Math.Min(input.Length, maxLength))),
-            Times.Once);
+        var stub = new SequenceTestKnockOff();
+        var tracking = stub.Add.OnCall((ko, a, b) => a + b);
 
-        // Act
-        IOverloadTestService svc = stub;
-        svc.Format("hello");
-        svc.Format("world", true);
-        svc.Format("testing", 4);
+        // Act - Call, verify (passes), then reset
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);
+        tracking.Verify(); // Should pass
 
-        // Assert
-        Assert.True(stub.Verify());
+        stub.Add.Reset();
+
+        // Assert - After reset, requires a new call
+        Assert.Throws<VerificationException>(() => tracking.Verify());
     }
 
     [Fact]
-    public void StubVerify_ReturnsFalse_WithOverloadedMethods_OneOverloadNotSatisfied()
+    public void MethodTracking_Verify_AfterResetAndRecall_Succeeds()
     {
         // Arrange
-        var stub = new OverloadTestKnockOff();
-        stub.Format.OnCall((ko, input) => input.ToUpper(), Times.Once);
-        stub.Format.OnCall(
-            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)
-            ((ko, input, uppercase) => uppercase ? input.ToUpper() : input),
-            Times.Once);
-        stub.Format.OnCall(
-            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Int32_String)
-            ((ko, input, maxLength) => input.Substring(0, Math.Min(input.Length, maxLength))),
-            Times.Once);
+        var stub = new SequenceTestKnockOff();
+        var tracking = stub.Add.OnCall((ko, a, b) => a + b);
 
-        // Act - Satisfy only two overloads
-        IOverloadTestService svc = stub;
-        svc.Format("hello");
-        svc.Format("world", true);
-        // Don't call Format(string, int)
+        // Act
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);
+        stub.Add.Reset();
+        svc.Add(1, 2); // Call again after reset
 
-        // Assert
-        Assert.False(stub.Verify());
+        // Assert - Should not throw
+        tracking.Verify();
     }
 
     [Fact]
-    public void StubVerify_ReturnsTrue_WithOverloadedMethods_SomeUnconfigured()
+    public void Verifiable_PreservedAcrossReset()
     {
         // Arrange
-        var stub = new OverloadTestKnockOff();
-        stub.Format.OnCall((ko, input) => input.ToUpper(), Times.Once);
-        // Other overloads not configured
+        var stub = new SequenceTestKnockOff();
+        stub.Add.OnCall((ko, a, b) => a + b).Verifiable();
 
         // Act
-        IOverloadTestService svc = stub;
-        svc.Format("hello");
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);
+        stub.Verify(); // Should pass
 
-        // Assert - Unconfigured overloads should pass verification
-        Assert.True(stub.Verify());
+        stub.Add.Reset();
+
+        // Assert - Verifiable marking should be preserved, but needs new call
+        Assert.Throws<VerificationException>(() => stub.Verify());
+
+        svc.Add(1, 2); // Call again
+        stub.Verify(); // Should pass again
     }
 
     #endregion
 
-    #region Edge Cases and Boundary Conditions
+    #region Overloaded Methods
 
     [Fact]
-    public void Verify_BeforeAnyCalls_WithForeverConstraint_ReturnsFalse()
+    public void VerifyAll_WithOverloads_SucceedsWhenAllConfiguredCalled()
     {
         // Arrange
-        var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b); // Implicit Times.Forever
-        // Don't call the method
+        var stub = new OverloadTestKnockOff();
+        stub.Format.OnCall((ko, input) => input.ToUpper());
+        stub.Format.OnCall(
+            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)
+            ((ko, input, uppercase) => uppercase ? input.ToUpper() : input));
 
-        // Assert - Forever requires at least one call
-        Assert.False(stub.Add.Verify());
+        // Act
+        IOverloadTestService svc = stub;
+        svc.Format("hello");
+        svc.Format("world", true);
+
+        // Assert - Should not throw
+        stub.VerifyAll();
     }
 
     [Fact]
-    public void Verify_BeforeAnyCalls_WithNoConstraints_ReturnsTrue()
+    public void VerifyAll_WithOverloads_ThrowsWhenOneNotCalled()
     {
         // Arrange
-        var stub = new SequenceTestKnockOff();
-        // No callbacks configured
+        var stub = new OverloadTestKnockOff();
+        stub.Format.OnCall((ko, input) => input.ToUpper());
+        stub.Format.OnCall(
+            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)
+            ((ko, input, uppercase) => uppercase ? input.ToUpper() : input));
 
-        // Assert - No constraints means verification passes
-        Assert.True(stub.Verify());
+        // Act - Only call one overload
+        IOverloadTestService svc = stub;
+        svc.Format("hello");
+        // Don't call Format(string, bool)
+
+        // Assert
+        Assert.Throws<VerificationException>(() => stub.VerifyAll());
     }
 
     [Fact]
-    public void Verify_WithExactlyZero_BehavesLikeNever()
+    public void Verify_WithOverloads_OnlyChecksVerifiable()
     {
-        // Times.Exactly(0) should behave the same as Times.Never
+        // Arrange
+        var stub = new OverloadTestKnockOff();
+        stub.Format.OnCall((ko, input) => input.ToUpper()).Verifiable();
+        stub.Format.OnCall(
+            (OverloadTestKnockOff.FormatInterceptor.FormatDelegate_String_Boolean_String)
+            ((ko, input, uppercase) => uppercase ? input.ToUpper() : input));
+        // Second overload not marked verifiable
+
+        // Act
+        IOverloadTestService svc = stub;
+        svc.Format("hello"); // Call only the verifiable one
+
+        // Assert - Should pass because only the single-param overload is verifiable
+        stub.Verify(); // Should not throw
+    }
+
+    #endregion
+
+    #region Edge Cases
+
+    [Fact]
+    public void Times_Validate_ExactlyZeroBehavesLikeNever()
+    {
         var exactlyZero = Times.Exactly(0);
         var never = Times.Never;
 
         // Both should return true when not called
-        Assert.True(exactlyZero.Verify(0));
-        Assert.True(never.Verify(0));
+        Assert.True(exactlyZero.Validate(0));
+        Assert.True(never.Validate(0));
 
         // Both should return false when called
-        Assert.False(exactlyZero.Verify(1));
-        Assert.False(never.Verify(1));
+        Assert.False(exactlyZero.Validate(1));
+        Assert.False(never.Validate(1));
+    }
+
+    [Fact]
+    public void VerifyAll_WithStrictMode_StillVerifiesCorrectly()
+    {
+        // Arrange
+        var stub = new SequenceTestKnockOff();
+        stub.Strict = true;
+        stub.Add.OnCall((ko, a, b) => a + b);
+
+        // Act
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);
+
+        // Assert - Strict mode should not affect VerifyAll()
+        stub.VerifyAll(); // Should not throw
     }
 
     [Fact]
@@ -461,40 +530,24 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
+        var tracking = stub.Add.OnCall((ko, a, b) => a + b);
         ISequenceTestService svc = stub;
 
         // Act & Assert - Multiple reset cycles
         svc.Add(1, 2);
-        Assert.True(stub.Add.Verify());
+        tracking.Verify();
 
         stub.Add.Reset();
-        Assert.False(stub.Add.Verify());
+        Assert.Throws<VerificationException>(() => tracking.Verify());
 
         svc.Add(1, 2);
-        Assert.True(stub.Add.Verify());
+        tracking.Verify();
 
         stub.Add.Reset();
-        Assert.False(stub.Add.Verify());
+        Assert.Throws<VerificationException>(() => tracking.Verify());
 
         svc.Add(1, 2);
-        Assert.True(stub.Add.Verify());
-    }
-
-    [Fact]
-    public void StubVerify_WithStrictMode_StillVerifiesCorrectly()
-    {
-        // Arrange
-        var stub = new SequenceTestKnockOff();
-        stub.Strict = true;
-        stub.Add.OnCall((ko, a, b) => a + b, Times.Once);
-
-        // Act
-        ISequenceTestService svc = stub;
-        svc.Add(1, 2);
-
-        // Assert - Strict mode should not affect Verify()
-        Assert.True(stub.Verify());
+        tracking.Verify();
     }
 
     #endregion

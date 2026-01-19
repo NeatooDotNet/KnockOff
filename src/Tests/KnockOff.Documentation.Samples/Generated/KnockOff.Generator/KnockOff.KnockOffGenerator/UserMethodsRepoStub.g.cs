@@ -24,6 +24,25 @@ partial class UserMethodsRepoStub : global::KnockOff.Documentation.Samples.UserM
 
 		/// <summary>Resets tracking state.</summary>
 		public void Reset() { CallCount = 0; _lastArg = default!; }
+
+		/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+		}
+
+		/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public global::KnockOff.IMethodTracking<int> Verifiable() => this;
+
+		/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times) => this;
+
+		global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+		global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 	}
 
 	/// <summary>Tracks calls to IsActive (user-defined implementation).</summary>
@@ -45,6 +64,25 @@ partial class UserMethodsRepoStub : global::KnockOff.Documentation.Samples.UserM
 
 		/// <summary>Resets tracking state.</summary>
 		public void Reset() { CallCount = 0; _lastArg = default!; }
+
+		/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+		}
+
+		/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public global::KnockOff.IMethodTracking<int> Verifiable() => this;
+
+		/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times) => this;
+
+		global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+		global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 	}
 
 	/// <summary>Tracks calls to GetBalance (user-defined implementation).</summary>
@@ -66,6 +104,25 @@ partial class UserMethodsRepoStub : global::KnockOff.Documentation.Samples.UserM
 
 		/// <summary>Resets tracking state.</summary>
 		public void Reset() { CallCount = 0; _lastArg = default!; }
+
+		/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+		}
+
+		/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public global::KnockOff.IMethodTracking<int> Verifiable() => this;
+
+		/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times) => this;
+
+		global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+		global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 	}
 
 	/// <summary>Interceptor for GetUserById.</summary>

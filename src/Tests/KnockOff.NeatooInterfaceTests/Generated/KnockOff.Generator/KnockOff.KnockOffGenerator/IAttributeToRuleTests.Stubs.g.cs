@@ -47,6 +47,19 @@ partial class IAttributeToRuleTests
 				_typedHandlers.Clear();
 			}
 
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("GetRule", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
+			}
+
 			/// <summary>Typed handler for GetRule with specific type arguments.</summary>
 			public sealed class GetRuleTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::Neatoo.IValidateBase
 			{
@@ -75,6 +88,22 @@ partial class IAttributeToRuleTests
 
 				/// <summary>Resets all tracking state.</summary>
 				public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -132,6 +161,28 @@ partial class IAttributeToRuleTests
 				throw new global::System.InvalidOperationException(
 					$"No implementation provided for {methodName}<{type.Name}>. " +
 					$"Set the handler's OnCall.");
+			}
+
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (GetRule.CheckVerification() is { } getruleFailure) failures.Add(getruleFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (GetRule.CheckVerificationAll() is { } getruleFailure) failures.Add(getruleFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
 			}
 
 		}

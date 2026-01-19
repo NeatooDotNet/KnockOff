@@ -150,14 +150,7 @@ For each stub, KnockOff generates:
 2. **Interceptor classes** - Per-member classes that track calls, arguments, and return values
 3. **Container properties** - Interface-named properties that provide access to interceptors (e.g., `IUserRepository`)
 
-### Debugging Generated Code
-
-You can step into generated code during debugging:
-- Set breakpoints in generated files
-- Inspect interceptor state during test execution
-- View call counts and captured arguments
-
-The generated code is readable C# that mirrors your interface structure.
+The generated code is readable C# that mirrors your interface structure. You can review it in the `Generated/` folder to understand how KnockOff implements your stub.
 
 ## Next Steps
 

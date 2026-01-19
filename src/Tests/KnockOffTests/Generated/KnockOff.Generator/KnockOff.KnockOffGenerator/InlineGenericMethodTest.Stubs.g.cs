@@ -47,6 +47,19 @@ partial class InlineGenericMethodTest
 				_typedHandlers.Clear();
 			}
 
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Create", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
+			}
+
 			/// <summary>Typed handler for Create with specific type arguments.</summary>
 			public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : new()
 			{
@@ -72,6 +85,22 @@ partial class InlineGenericMethodTest
 
 				/// <summary>Resets all tracking state.</summary>
 				public void Reset() { CallCount = 0; _onCall = null; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -109,6 +138,19 @@ partial class InlineGenericMethodTest
 				_typedHandlers.Clear();
 			}
 
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Process", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
+			}
+
 			/// <summary>Typed handler for Process with specific type arguments.</summary>
 			public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
@@ -134,6 +176,22 @@ partial class InlineGenericMethodTest
 
 				/// <summary>Resets all tracking state.</summary>
 				public void Reset() { CallCount = 0; _onCall = null; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -171,6 +229,19 @@ partial class InlineGenericMethodTest
 				_typedHandlers.Clear();
 			}
 
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Deserialize", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
+			}
+
 			/// <summary>Typed handler for Deserialize with specific type arguments.</summary>
 			public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
@@ -199,6 +270,22 @@ partial class InlineGenericMethodTest
 
 				/// <summary>Resets all tracking state.</summary>
 				public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -236,6 +323,19 @@ partial class InlineGenericMethodTest
 				_typedHandlers.Clear();
 			}
 
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Convert", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
+			}
+
 			/// <summary>Typed handler for Convert with specific type arguments.</summary>
 			public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
@@ -261,6 +361,22 @@ partial class InlineGenericMethodTest
 
 				/// <summary>Resets all tracking state.</summary>
 				public void Reset() { CallCount = 0; _onCall = null; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -298,6 +414,19 @@ partial class InlineGenericMethodTest
 				_typedHandlers.Clear();
 			}
 
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Find", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
+			}
+
 			/// <summary>Typed handler for Find with specific type arguments.</summary>
 			public sealed class FindTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 			{
@@ -326,6 +455,22 @@ partial class InlineGenericMethodTest
 
 				/// <summary>Resets all tracking state.</summary>
 				public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -363,6 +508,19 @@ partial class InlineGenericMethodTest
 				_typedHandlers.Clear();
 			}
 
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Transfer", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
+			}
+
 			/// <summary>Typed handler for Transfer with specific type arguments.</summary>
 			public sealed class TransferTypedHandler<TSource, TDest> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
@@ -388,6 +546,22 @@ partial class InlineGenericMethodTest
 
 				/// <summary>Resets all tracking state.</summary>
 				public void Reset() { CallCount = 0; _onCall = null; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -508,6 +682,38 @@ partial class InlineGenericMethodTest
 				throw new global::System.InvalidOperationException(
 					$"No implementation provided for {methodName}<{type.Name}>. " +
 					$"Set the handler's OnCall.");
+			}
+
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Create.CheckVerification() is { } createFailure) failures.Add(createFailure);
+				if (Process.CheckVerification() is { } processFailure) failures.Add(processFailure);
+				if (Deserialize.CheckVerification() is { } deserializeFailure) failures.Add(deserializeFailure);
+				if (Convert.CheckVerification() is { } convertFailure) failures.Add(convertFailure);
+				if (Find.CheckVerification() is { } findFailure) failures.Add(findFailure);
+				if (Transfer.CheckVerification() is { } transferFailure) failures.Add(transferFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Create.CheckVerificationAll() is { } createFailure) failures.Add(createFailure);
+				if (Process.CheckVerificationAll() is { } processFailure) failures.Add(processFailure);
+				if (Deserialize.CheckVerificationAll() is { } deserializeFailure) failures.Add(deserializeFailure);
+				if (Convert.CheckVerificationAll() is { } convertFailure) failures.Add(convertFailure);
+				if (Find.CheckVerificationAll() is { } findFailure) failures.Add(findFailure);
+				if (Transfer.CheckVerificationAll() is { } transferFailure) failures.Add(transferFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
 			}
 
 		}

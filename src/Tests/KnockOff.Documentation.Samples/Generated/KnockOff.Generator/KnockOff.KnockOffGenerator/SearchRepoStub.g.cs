@@ -16,23 +16,41 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		/// <summary>Delegate for Find().</summary>
 		public delegate global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User> FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(SearchRepoStub ko);
 
-		private readonly global::System.Collections.Generic.List<(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User Callback, global::KnockOff.Times Times, MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User Tracking)> _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = new();
+		private FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User? _onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
+		private MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User? _onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
+
+		private global::System.Collections.Generic.List<(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User Callback, MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User Tracking)>? _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
 		private int _sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
+
+		private bool _isVerifiable_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
+		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
 
 		/// <summary>Delegate for Find(int).</summary>
 		public delegate global::KnockOff.Documentation.Samples.User? FindDelegate_Int32_KnockOff_Documentation_Samples_User(SearchRepoStub ko, int id);
 
-		private readonly global::System.Collections.Generic.List<(FindDelegate_Int32_KnockOff_Documentation_Samples_User Callback, global::KnockOff.Times Times, MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User Tracking)> _sequence_Int32_KnockOff_Documentation_Samples_User = new();
+		private FindDelegate_Int32_KnockOff_Documentation_Samples_User? _onCall_Int32_KnockOff_Documentation_Samples_User;
+		private MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User? _onCallTracking_Int32_KnockOff_Documentation_Samples_User;
+
+		private global::System.Collections.Generic.List<(FindDelegate_Int32_KnockOff_Documentation_Samples_User Callback, MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User Tracking)>? _sequence_Int32_KnockOff_Documentation_Samples_User;
 		private int _sequenceIndex_Int32_KnockOff_Documentation_Samples_User;
+
+		private bool _isVerifiable_Int32_KnockOff_Documentation_Samples_User;
+		private global::KnockOff.Times? _verifiableTimes_Int32_KnockOff_Documentation_Samples_User;
 
 		/// <summary>Delegate for Find(string).</summary>
 		public delegate global::KnockOff.Documentation.Samples.User? FindDelegate_String_KnockOff_Documentation_Samples_User(SearchRepoStub ko, string name);
 
-		private readonly global::System.Collections.Generic.List<(FindDelegate_String_KnockOff_Documentation_Samples_User Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_KnockOff_Documentation_Samples_User Tracking)> _sequence_String_KnockOff_Documentation_Samples_User = new();
+		private FindDelegate_String_KnockOff_Documentation_Samples_User? _onCall_String_KnockOff_Documentation_Samples_User;
+		private MethodTrackingImpl_String_KnockOff_Documentation_Samples_User? _onCallTracking_String_KnockOff_Documentation_Samples_User;
+
+		private global::System.Collections.Generic.List<(FindDelegate_String_KnockOff_Documentation_Samples_User Callback, MethodTrackingImpl_String_KnockOff_Documentation_Samples_User Tracking)>? _sequence_String_KnockOff_Documentation_Samples_User;
 		private int _sequenceIndex_String_KnockOff_Documentation_Samples_User;
 
+		private bool _isVerifiable_String_KnockOff_Documentation_Samples_User;
+		private global::KnockOff.Times? _verifiableTimes_String_KnockOff_Documentation_Samples_User;
+
 		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Sum(s => s.Tracking.CallCount) + _sequence_Int32_KnockOff_Documentation_Samples_User.Sum(s => s.Tracking.CallCount) + _sequence_String_KnockOff_Documentation_Samples_User.Sum(s => s.Tracking.CallCount);
+		public int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_Int32_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_String_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -40,19 +58,25 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		/// <summary>Configures callback for Find(). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User callback)
 		{
-			var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User();
-			_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Clear();
-			_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = null;
 			_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = 0;
-			return tracking;
+			_isVerifiable_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = false;
+			_verifiableTimes_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = null;
+			_onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = callback;
+			_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = new MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(this);
+			return _onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
 		}
 
-		/// <summary>Configures callback for Find() with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User> OnCall(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Find(). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User> OnCallSequence(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User callback)
 		{
-			var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User();
-			_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Clear();
-			_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Add((callback, times, tracking));
+			_onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = null;
+			_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = null;
+			_isVerifiable_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = false;
+			_verifiableTimes_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = null;
+			_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = new global::System.Collections.Generic.List<(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User Callback, MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User Tracking)>();
+			var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(this);
+			_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Add((callback, tracking));
 			_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = 0;
 			return new MethodSequenceImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(this);
 		}
@@ -60,19 +84,25 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		/// <summary>Configures callback for Find(int). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(FindDelegate_Int32_KnockOff_Documentation_Samples_User callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User();
-			_sequence_Int32_KnockOff_Documentation_Samples_User.Clear();
-			_sequence_Int32_KnockOff_Documentation_Samples_User.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_Int32_KnockOff_Documentation_Samples_User = null;
 			_sequenceIndex_Int32_KnockOff_Documentation_Samples_User = 0;
-			return tracking;
+			_isVerifiable_Int32_KnockOff_Documentation_Samples_User = false;
+			_verifiableTimes_Int32_KnockOff_Documentation_Samples_User = null;
+			_onCall_Int32_KnockOff_Documentation_Samples_User = callback;
+			_onCallTracking_Int32_KnockOff_Documentation_Samples_User = new MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User(this);
+			return _onCallTracking_Int32_KnockOff_Documentation_Samples_User;
 		}
 
-		/// <summary>Configures callback for Find(int) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<FindDelegate_Int32_KnockOff_Documentation_Samples_User> OnCall(FindDelegate_Int32_KnockOff_Documentation_Samples_User callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Find(int). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<FindDelegate_Int32_KnockOff_Documentation_Samples_User> OnCallSequence(FindDelegate_Int32_KnockOff_Documentation_Samples_User callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User();
-			_sequence_Int32_KnockOff_Documentation_Samples_User.Clear();
-			_sequence_Int32_KnockOff_Documentation_Samples_User.Add((callback, times, tracking));
+			_onCall_Int32_KnockOff_Documentation_Samples_User = null;
+			_onCallTracking_Int32_KnockOff_Documentation_Samples_User = null;
+			_isVerifiable_Int32_KnockOff_Documentation_Samples_User = false;
+			_verifiableTimes_Int32_KnockOff_Documentation_Samples_User = null;
+			_sequence_Int32_KnockOff_Documentation_Samples_User = new global::System.Collections.Generic.List<(FindDelegate_Int32_KnockOff_Documentation_Samples_User Callback, MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User Tracking)>();
+			var tracking = new MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User(this);
+			_sequence_Int32_KnockOff_Documentation_Samples_User.Add((callback, tracking));
 			_sequenceIndex_Int32_KnockOff_Documentation_Samples_User = 0;
 			return new MethodSequenceImpl_Int32_KnockOff_Documentation_Samples_User(this);
 		}
@@ -80,19 +110,25 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		/// <summary>Configures callback for Find(string). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(FindDelegate_String_KnockOff_Documentation_Samples_User callback)
 		{
-			var tracking = new MethodTrackingImpl_String_KnockOff_Documentation_Samples_User();
-			_sequence_String_KnockOff_Documentation_Samples_User.Clear();
-			_sequence_String_KnockOff_Documentation_Samples_User.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_String_KnockOff_Documentation_Samples_User = null;
 			_sequenceIndex_String_KnockOff_Documentation_Samples_User = 0;
-			return tracking;
+			_isVerifiable_String_KnockOff_Documentation_Samples_User = false;
+			_verifiableTimes_String_KnockOff_Documentation_Samples_User = null;
+			_onCall_String_KnockOff_Documentation_Samples_User = callback;
+			_onCallTracking_String_KnockOff_Documentation_Samples_User = new MethodTrackingImpl_String_KnockOff_Documentation_Samples_User(this);
+			return _onCallTracking_String_KnockOff_Documentation_Samples_User;
 		}
 
-		/// <summary>Configures callback for Find(string) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<FindDelegate_String_KnockOff_Documentation_Samples_User> OnCall(FindDelegate_String_KnockOff_Documentation_Samples_User callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Find(string). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<FindDelegate_String_KnockOff_Documentation_Samples_User> OnCallSequence(FindDelegate_String_KnockOff_Documentation_Samples_User callback)
 		{
-			var tracking = new MethodTrackingImpl_String_KnockOff_Documentation_Samples_User();
-			_sequence_String_KnockOff_Documentation_Samples_User.Clear();
-			_sequence_String_KnockOff_Documentation_Samples_User.Add((callback, times, tracking));
+			_onCall_String_KnockOff_Documentation_Samples_User = null;
+			_onCallTracking_String_KnockOff_Documentation_Samples_User = null;
+			_isVerifiable_String_KnockOff_Documentation_Samples_User = false;
+			_verifiableTimes_String_KnockOff_Documentation_Samples_User = null;
+			_sequence_String_KnockOff_Documentation_Samples_User = new global::System.Collections.Generic.List<(FindDelegate_String_KnockOff_Documentation_Samples_User Callback, MethodTrackingImpl_String_KnockOff_Documentation_Samples_User Tracking)>();
+			var tracking = new MethodTrackingImpl_String_KnockOff_Documentation_Samples_User(this);
+			_sequence_String_KnockOff_Documentation_Samples_User.Add((callback, tracking));
 			_sequenceIndex_String_KnockOff_Documentation_Samples_User = 0;
 			return new MethodSequenceImpl_String_KnockOff_Documentation_Samples_User(this);
 		}
@@ -100,139 +136,182 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		/// <summary>Invokes configured callback for Find().</summary>
 		internal global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User> Invoke_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(SearchRepoStub ko, bool strict)
 		{
-			if (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Count == 0)
+			if (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null && _sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User < _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Find();
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
+				var (callback, tracking) = _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User[_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User];
+				tracking.RecordCall();
+				_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User++;
+				return callback(ko);
+			}
+
+			if (_onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null && _onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null)
+			{
+				_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.RecordCall();
+				return _onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(ko);
+			}
+
+			_unconfiguredCallCount++;
+			if (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null && _sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User >= _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Find");
 				return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User>();
 			}
 
-			var (callback, times, tracking) = _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User[_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User];
-			tracking.RecordCall();
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User < _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Count - 1)
-					_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Find");
-			}
-
-			return callback(ko);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Find();
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
+			return new global::System.Collections.Generic.List<global::KnockOff.Documentation.Samples.User>();
 		}
 
 		/// <summary>Invokes configured callback for Find(int).</summary>
 		internal global::KnockOff.Documentation.Samples.User? Invoke_Int32_KnockOff_Documentation_Samples_User(SearchRepoStub ko, bool strict, int id)
 		{
-			if (_sequence_Int32_KnockOff_Documentation_Samples_User.Count == 0)
+			if (_sequence_Int32_KnockOff_Documentation_Samples_User != null && _sequenceIndex_Int32_KnockOff_Documentation_Samples_User < _sequence_Int32_KnockOff_Documentation_Samples_User.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Find(id);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
+				var (callback, tracking) = _sequence_Int32_KnockOff_Documentation_Samples_User[_sequenceIndex_Int32_KnockOff_Documentation_Samples_User];
+				tracking.RecordCall(id);
+				_sequenceIndex_Int32_KnockOff_Documentation_Samples_User++;
+				return callback(ko, id);
+			}
+
+			if (_onCall_Int32_KnockOff_Documentation_Samples_User != null && _onCallTracking_Int32_KnockOff_Documentation_Samples_User != null)
+			{
+				_onCallTracking_Int32_KnockOff_Documentation_Samples_User.RecordCall(id);
+				return _onCall_Int32_KnockOff_Documentation_Samples_User(ko, id);
+			}
+
+			_unconfiguredCallCount++;
+			if (_sequence_Int32_KnockOff_Documentation_Samples_User != null && _sequenceIndex_Int32_KnockOff_Documentation_Samples_User >= _sequence_Int32_KnockOff_Documentation_Samples_User.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Find");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence_Int32_KnockOff_Documentation_Samples_User[_sequenceIndex_Int32_KnockOff_Documentation_Samples_User];
-			tracking.RecordCall(id);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex_Int32_KnockOff_Documentation_Samples_User < _sequence_Int32_KnockOff_Documentation_Samples_User.Count - 1)
-					_sequenceIndex_Int32_KnockOff_Documentation_Samples_User++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Find");
-			}
-
-			return callback(ko, id);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Find(id);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
+			return default!;
 		}
 
 		/// <summary>Invokes configured callback for Find(string).</summary>
 		internal global::KnockOff.Documentation.Samples.User? Invoke_String_KnockOff_Documentation_Samples_User(SearchRepoStub ko, bool strict, string name)
 		{
-			if (_sequence_String_KnockOff_Documentation_Samples_User.Count == 0)
+			if (_sequence_String_KnockOff_Documentation_Samples_User != null && _sequenceIndex_String_KnockOff_Documentation_Samples_User < _sequence_String_KnockOff_Documentation_Samples_User.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Find(name);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
+				var (callback, tracking) = _sequence_String_KnockOff_Documentation_Samples_User[_sequenceIndex_String_KnockOff_Documentation_Samples_User];
+				tracking.RecordCall(name);
+				_sequenceIndex_String_KnockOff_Documentation_Samples_User++;
+				return callback(ko, name);
+			}
+
+			if (_onCall_String_KnockOff_Documentation_Samples_User != null && _onCallTracking_String_KnockOff_Documentation_Samples_User != null)
+			{
+				_onCallTracking_String_KnockOff_Documentation_Samples_User.RecordCall(name);
+				return _onCall_String_KnockOff_Documentation_Samples_User(ko, name);
+			}
+
+			_unconfiguredCallCount++;
+			if (_sequence_String_KnockOff_Documentation_Samples_User != null && _sequenceIndex_String_KnockOff_Documentation_Samples_User >= _sequence_String_KnockOff_Documentation_Samples_User.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Find");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence_String_KnockOff_Documentation_Samples_User[_sequenceIndex_String_KnockOff_Documentation_Samples_User];
-			tracking.RecordCall(name);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex_String_KnockOff_Documentation_Samples_User < _sequence_String_KnockOff_Documentation_Samples_User.Count - 1)
-					_sequenceIndex_String_KnockOff_Documentation_Samples_User++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Find");
-			}
-
-			return callback(ko, name);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Find(name);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Find");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User)
-				tracking.Reset();
+			_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Reset();
+			if (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null)
+			{
+				foreach (var (_, tracking) in _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User)
+					tracking.Reset();
+			}
 			_sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = 0;
-			foreach (var (_, _, tracking) in _sequence_Int32_KnockOff_Documentation_Samples_User)
-				tracking.Reset();
+			_onCallTracking_Int32_KnockOff_Documentation_Samples_User?.Reset();
+			if (_sequence_Int32_KnockOff_Documentation_Samples_User != null)
+			{
+				foreach (var (_, tracking) in _sequence_Int32_KnockOff_Documentation_Samples_User)
+					tracking.Reset();
+			}
 			_sequenceIndex_Int32_KnockOff_Documentation_Samples_User = 0;
-			foreach (var (_, _, tracking) in _sequence_String_KnockOff_Documentation_Samples_User)
-				tracking.Reset();
+			_onCallTracking_String_KnockOff_Documentation_Samples_User?.Reset();
+			if (_sequence_String_KnockOff_Documentation_Samples_User != null)
+			{
+				foreach (var (_, tracking) in _sequence_String_KnockOff_Documentation_Samples_User)
+					tracking.Reset();
+			}
 			_sequenceIndex_String_KnockOff_Documentation_Samples_User = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether any overload was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User || _isVerifiable_Int32_KnockOff_Documentation_Samples_User || _isVerifiable_String_KnockOff_Documentation_Samples_User;
+
+		/// <summary>Whether any overload has been configured.</summary>
+		internal bool IsConfigured => _onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null || (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Count ?? 0) > 0 || _onCall_Int32_KnockOff_Documentation_Samples_User != null || (_sequence_Int32_KnockOff_Documentation_Samples_User?.Count ?? 0) > 0 || _onCall_String_KnockOff_Documentation_Samples_User != null || (_sequence_String_KnockOff_Documentation_Samples_User?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - checks all verifiable overloads.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User)
+			if (_isVerifiable_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Find", times, count);
 			}
-			foreach (var (_, times, tracking) in _sequence_Int32_KnockOff_Documentation_Samples_User)
+			if (_isVerifiable_Int32_KnockOff_Documentation_Samples_User)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_Int32_KnockOff_Documentation_Samples_User ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_Int32_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_Int32_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Find", times, count);
 			}
-			foreach (var (_, times, tracking) in _sequence_String_KnockOff_Documentation_Samples_User)
+			if (_isVerifiable_String_KnockOff_Documentation_Samples_User)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_String_KnockOff_Documentation_Samples_User ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_String_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_String_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Find", times, count);
 			}
-			return true;
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks all configured overloads.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (_onCall_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User != null || (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Find", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			if (_onCall_Int32_KnockOff_Documentation_Samples_User != null || (_sequence_Int32_KnockOff_Documentation_Samples_User?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_Int32_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_Int32_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Find", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			if (_onCall_String_KnockOff_Documentation_Samples_User != null || (_sequence_String_KnockOff_Documentation_Samples_User?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_String_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_String_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Find", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			return null;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User : global::KnockOff.IMethodTracking
 		{
+			private readonly FindInterceptor _interceptor;
+
+			public MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(FindInterceptor interceptor) => _interceptor = interceptor;
+
 
 			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
@@ -245,11 +324,41 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable()
+			{
+				_interceptor._isVerifiable_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = times;
+				return this;
+			}
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User : global::KnockOff.IMethodTracking<int>
 		{
+			private readonly FindInterceptor _interceptor;
+
+			public MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User(FindInterceptor interceptor) => _interceptor = interceptor;
+
 			private int _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -266,11 +375,44 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_Int32_KnockOff_Documentation_Samples_User = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_Int32_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_Int32_KnockOff_Documentation_Samples_User = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_KnockOff_Documentation_Samples_User : global::KnockOff.IMethodTracking<string>
 		{
+			private readonly FindInterceptor _interceptor;
+
+			public MethodTrackingImpl_String_KnockOff_Documentation_Samples_User(FindInterceptor interceptor) => _interceptor = interceptor;
+
 			private string _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -287,6 +429,35 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable()
+			{
+				_interceptor._isVerifiable_String_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_String_KnockOff_Documentation_Samples_User = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_String_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_String_KnockOff_Documentation_Samples_User = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -301,34 +472,45 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 			{
 				get
 				{
+					if (_interceptor._sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User)
+					foreach (var (_, tracking) in _interceptor._sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User> ThenCall(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User> ThenCall(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User callback)
 			{
-				var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User();
-				_interceptor._sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(_interceptor);
+				_interceptor._sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User == null) return;
+				var sequenceLength = _interceptor._sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User.Count;
+				var completedCount = _interceptor._sequenceIndex_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User> Verifiable()
+			{
+				_interceptor._isVerifiable_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -343,34 +525,45 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 			{
 				get
 				{
+					if (_interceptor._sequence_Int32_KnockOff_Documentation_Samples_User == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_Int32_KnockOff_Documentation_Samples_User)
+					foreach (var (_, tracking) in _interceptor._sequence_Int32_KnockOff_Documentation_Samples_User)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<FindDelegate_Int32_KnockOff_Documentation_Samples_User> ThenCall(FindDelegate_Int32_KnockOff_Documentation_Samples_User callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<FindDelegate_Int32_KnockOff_Documentation_Samples_User> ThenCall(FindDelegate_Int32_KnockOff_Documentation_Samples_User callback)
 			{
-				var tracking = new MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User();
-				_interceptor._sequence_Int32_KnockOff_Documentation_Samples_User.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_Int32_KnockOff_Documentation_Samples_User(_interceptor);
+				_interceptor._sequence_Int32_KnockOff_Documentation_Samples_User!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_Int32_KnockOff_Documentation_Samples_User)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_Int32_KnockOff_Documentation_Samples_User == null) return;
+				var sequenceLength = _interceptor._sequence_Int32_KnockOff_Documentation_Samples_User.Count;
+				var completedCount = _interceptor._sequenceIndex_Int32_KnockOff_Documentation_Samples_User;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<FindDelegate_Int32_KnockOff_Documentation_Samples_User> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_Int32_KnockOff_Documentation_Samples_User = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -385,34 +578,45 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 			{
 				get
 				{
+					if (_interceptor._sequence_String_KnockOff_Documentation_Samples_User == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_String_KnockOff_Documentation_Samples_User)
+					foreach (var (_, tracking) in _interceptor._sequence_String_KnockOff_Documentation_Samples_User)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<FindDelegate_String_KnockOff_Documentation_Samples_User> ThenCall(FindDelegate_String_KnockOff_Documentation_Samples_User callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<FindDelegate_String_KnockOff_Documentation_Samples_User> ThenCall(FindDelegate_String_KnockOff_Documentation_Samples_User callback)
 			{
-				var tracking = new MethodTrackingImpl_String_KnockOff_Documentation_Samples_User();
-				_interceptor._sequence_String_KnockOff_Documentation_Samples_User.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_String_KnockOff_Documentation_Samples_User(_interceptor);
+				_interceptor._sequence_String_KnockOff_Documentation_Samples_User!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_String_KnockOff_Documentation_Samples_User)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_String_KnockOff_Documentation_Samples_User == null) return;
+				var sequenceLength = _interceptor._sequence_String_KnockOff_Documentation_Samples_User.Count;
+				var completedCount = _interceptor._sequenceIndex_String_KnockOff_Documentation_Samples_User;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<FindDelegate_String_KnockOff_Documentation_Samples_User> Verifiable()
+			{
+				_interceptor._isVerifiable_String_KnockOff_Documentation_Samples_User = true;
+				_interceptor._verifiableTimes_String_KnockOff_Documentation_Samples_User = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -426,19 +630,26 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 	/// <summary>The global::KnockOff.Documentation.Samples.Methods.ISearchRepo instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Documentation.Samples.Methods.ISearchRepo Object => this;
 
-	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
-	public bool Verify()
+	/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+	public void Verify()
 	{
-		var result = true;
-		result &= Find.Verify();
-		return result;
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (Find.CheckVerification() is { } findFailure) failures.Add(findFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
-	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
 	public void VerifyAll()
 	{
-		if (!Verify())
-			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (Find.CheckVerificationAll() is { } findFailure) failures.Add(findFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
 	// Source(T) methods for interface delegation

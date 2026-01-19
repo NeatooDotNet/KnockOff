@@ -111,6 +111,19 @@ Before writing documentation:
 4. Note any existing documentation patterns to maintain
 5. Identify the three usage patterns if applicable (per project CLAUDE.md)
 
+## KnockOff-Specific Messaging
+
+### The Core Value Proposition
+The biggest value of KnockOff is **shared stubs that can be used across the entire project yet still modified and verified in each test**. This is the primary message to emphasize in documentation.
+
+### What NOT to Mention
+Avoid these claims as they are either inaccurate or not meaningful differentiators:
+
+- **Compile-time safety vs Moq** - Moq is also compile-safe. Do not claim KnockOff catches errors Moq misses.
+- **Stepping through generated code** - Only mention this in detailed source generation discussions, not as a general benefit.
+- **Avoiding CastleDynamic proxy** - Do not mention debugging benefits of avoiding the proxy.
+- **Factory pattern** - KnockOff is not really a factory; avoid this framing.
+
 ## Output Quality Standards
 
 - Use active voice: "Create a stub" not "A stub can be created"

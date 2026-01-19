@@ -193,7 +193,57 @@ internal static class InlineRenderer
             RenderSmartDefaultMethod(w);
         }
 
+        // Verify and VerifyAll methods
+        RenderInlineVerifyMethods(w, iface);
+
         w.Line("\t\t}");
+        w.Line();
+    }
+
+    private static void RenderInlineVerifyMethods(CodeWriter w, InlineInterfaceStubModel iface)
+    {
+        // Get unique interceptor property names (the actual property names on the stub class)
+        var interceptorPropertyNames = iface.InterceptorProperties
+            .Select(p => p.PropertyName)
+            .Distinct()
+            .ToList();
+
+        // Verify method - checks only .Verifiable() items, throws if any fail
+        w.Line("\t\t\t/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>");
+        w.Line("\t\t\tpublic void Verify()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tvar failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();");
+        w.Line();
+
+        // Check all interceptors (methods and properties share the same pattern)
+        foreach (var name in interceptorPropertyNames)
+        {
+            w.Line($"\t\t\t\tif ({name}.CheckVerification() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
+        }
+
+        w.Line();
+        w.Line("\t\t\t\tif (failures.Count > 0)");
+        w.Line("\t\t\t\t\tthrow new global::KnockOff.VerificationException(failures);");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // VerifyAll method - checks ALL configured members, throws if any fail
+        w.Line("\t\t\t/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>");
+        w.Line("\t\t\tpublic void VerifyAll()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tvar failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();");
+        w.Line();
+
+        // Check all configured interceptors
+        foreach (var name in interceptorPropertyNames)
+        {
+            w.Line($"\t\t\t\tif ({name}.CheckVerificationAll() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
+        }
+
+        w.Line();
+        w.Line("\t\t\t\tif (failures.Count > 0)");
+        w.Line("\t\t\t\t\tthrow new global::KnockOff.VerificationException(failures);");
+        w.Line("\t\t\t}");
         w.Line();
     }
 
@@ -205,6 +255,12 @@ internal static class InlineRenderer
         w.Line($"\t\t/// <summary>Interceptor for {stubClassName}.{prop.PropertyName}.</summary>");
         w.Line($"\t\tpublic sealed class {prop.InterceptorClassName}{typeParamList}{constraintClause}");
         w.Line("\t\t{");
+
+        // Verifiable state
+        w.Line("\t\t\tprivate bool _isVerifiable;");
+        w.Line("\t\t\tprivate global::KnockOff.Times? _verifiableTimes;");
+        w.Line("\t\t\tprivate bool _valueSet;");
+        w.Line();
 
         if (prop.HasGetter)
         {
@@ -229,9 +285,14 @@ internal static class InlineRenderer
             w.Line();
         }
 
-        // Value property
-        w.Line($"\t\t\t/// <summary>Value returned by getter when OnGet is not set.</summary>");
-        w.Line($"\t\t\tpublic {prop.ReturnType} Value {{ get; set; }} = default!;");
+        // Value property with backing field - setting Value marks the property as configured
+        w.Line($"\t\t\tprivate {prop.ReturnType} _value = default!;");
+        w.Line($"\t\t\t/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>");
+        w.Line($"\t\t\tpublic {prop.ReturnType} Value");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tget => _value;");
+        w.Line("\t\t\t\tset { _value = value; _valueSet = true; }");
+        w.Line("\t\t\t}");
         w.Line();
 
         // Source field for Source(T) feature - skip for init-only properties
@@ -256,14 +317,105 @@ internal static class InlineRenderer
             w.Line();
         }
 
-        // Reset method
-        w.Line("\t\t\t/// <summary>Resets all tracking state.</summary>");
+        // Reset method - clears counts but preserves verifiable marking
+        w.Line("\t\t\t/// <summary>Resets tracking state but preserves verifiable marking.</summary>");
         var resetParts = new List<string>();
         if (prop.HasGetter) resetParts.Add("GetCount = 0; OnGet = null;");
         if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default; OnSet = null;");
-        resetParts.Add("Value = default!;");
+        resetParts.Add("_value = default!; _valueSet = false;");
         if (!string.IsNullOrEmpty(prop.DeclaringInterface) && !prop.IsInitOnly) resetParts.Add("_source = null;");
         w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
+        w.Line();
+
+        // Verifiable methods (fluent)
+        w.Line($"\t\t\t/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line($"\t\t\tpublic {prop.InterceptorClassName}{typeParamList} Verifiable() {{ _isVerifiable = true; _verifiableTimes = null; return this; }}");
+        w.Line();
+        w.Line($"\t\t\t/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"\t\t\tpublic {prop.InterceptorClassName}{typeParamList} Verifiable(global::KnockOff.Times times) {{ _isVerifiable = true; _verifiableTimes = times; return this; }}");
+        w.Line();
+
+        // Verify methods - throw on failure
+        // Build total count expression based on available accessors
+        var totalCountExpr = prop.HasGetter && prop.HasSetter
+            ? "GetCount + SetCount"
+            : (prop.HasGetter ? "GetCount" : "SetCount");
+
+        w.Line("\t\t\t/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\tpublic void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\tpublic void Verify(global::KnockOff.Times times)");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
+        w.Line("\t\t\t\tif (!times.Validate(totalCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName}\", times, totalCount));");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // VerifyGet methods
+        if (prop.HasGetter)
+        {
+            w.Line("\t\t\t/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>");
+            w.Line("\t\t\tpublic void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);");
+            w.Line();
+
+            w.Line("\t\t\t/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+            w.Line("\t\t\tpublic void VerifyGet(global::KnockOff.Times times)");
+            w.Line("\t\t\t{");
+            w.Line("\t\t\t\tif (!times.Validate(GetCount))");
+            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName} (get)\", times, GetCount));");
+            w.Line("\t\t\t}");
+            w.Line();
+        }
+
+        // VerifySet methods
+        if (prop.HasSetter)
+        {
+            w.Line("\t\t\t/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>");
+            w.Line("\t\t\tpublic void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);");
+            w.Line();
+
+            w.Line("\t\t\t/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+            w.Line("\t\t\tpublic void VerifySet(global::KnockOff.Times times)");
+            w.Line("\t\t\t{");
+            w.Line("\t\t\t\tif (!times.Validate(SetCount))");
+            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName} (set)\", times, SetCount));");
+            w.Line("\t\t\t}");
+            w.Line();
+        }
+
+        // Internal verification support for stub-level Verify/VerifyAll
+        w.Line("\t\t\t/// <summary>Whether this property was marked with Verifiable().</summary>");
+        w.Line("\t\t\tinternal bool IsVerifiable => _isVerifiable;");
+        w.Line();
+
+        // IsConfigured - Value set OR OnGet/OnSet callback registered
+        var isConfiguredParts = new List<string> { "_valueSet" };
+        if (prop.HasGetter) isConfiguredParts.Add("OnGet != null");
+        if (prop.HasSetter) isConfiguredParts.Add("OnSet != null");
+        w.Line("\t\t\t/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>");
+        w.Line($"\t\t\tinternal bool IsConfigured => {string.Join(" || ", isConfiguredParts)};");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerification()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!_isVerifiable) return null;");
+        w.Line("\t\t\t\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
+        w.Line($"\t\t\t\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{prop.PropertyName}\", times, totalCount);");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!IsConfigured) return null;");
+        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
+        w.Line($"\t\t\t\treturn totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{prop.PropertyName}\", global::KnockOff.Times.AtLeastOnce, totalCount);");
+        w.Line("\t\t\t}");
 
         w.Line("\t\t}");
         w.Line();
@@ -278,6 +430,12 @@ internal static class InlineRenderer
         w.Line($"\t\tpublic sealed class {indexer.InterceptorClassName}{typeParamList}{constraintClause}");
         w.Line("\t\t{");
 
+        // Verifiable state
+        w.Line("\t\t\tprivate bool _isVerifiable;");
+        w.Line("\t\t\tprivate global::KnockOff.Times? _verifiableTimes;");
+        w.Line("\t\t\tprivate bool _configured;");
+        w.Line();
+
         if (indexer.HasGetter)
         {
             w.Line("\t\t\t/// <summary>Number of times the getter was accessed.</summary>");
@@ -286,8 +444,13 @@ internal static class InlineRenderer
             w.Line($"\t\t\t/// <summary>The last key used to access the getter.</summary>");
             w.Line($"\t\t\tpublic {indexer.NullableKeyType} LastGetKey {{ get; private set; }}");
             w.Line();
-            w.Line($"\t\t\t/// <summary>Callback for getter.</summary>");
-            w.Line($"\t\t\tpublic global::System.Func<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
+            w.Line($"\t\t\tprivate global::System.Func<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? _onGet;");
+            w.Line($"\t\t\t/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>");
+            w.Line($"\t\t\tpublic global::System.Func<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? OnGet");
+            w.Line("\t\t\t{");
+            w.Line("\t\t\t\tget => _onGet;");
+            w.Line("\t\t\t\tset { _onGet = value; if (value != null) _configured = true; }");
+            w.Line("\t\t\t}");
             w.Line();
         }
 
@@ -299,8 +462,13 @@ internal static class InlineRenderer
             w.Line($"\t\t\t/// <summary>The last key-value pair passed to the setter.</summary>");
             w.Line($"\t\t\tpublic ({indexer.KeyType} Key, {indexer.ReturnType} Value)? LastSetEntry {{ get; private set; }}");
             w.Line();
-            w.Line($"\t\t\t/// <summary>Callback for setter.</summary>");
-            w.Line($"\t\t\tpublic global::System.Action<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
+            w.Line($"\t\t\tprivate global::System.Action<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? _onSet;");
+            w.Line($"\t\t\t/// <summary>Callback for setter. Setting this marks the indexer as configured.</summary>");
+            w.Line($"\t\t\tpublic global::System.Action<{indexer.StubClassName}, {indexer.ParameterTypes}, {indexer.ReturnType}>? OnSet");
+            w.Line("\t\t\t{");
+            w.Line("\t\t\t\tget => _onSet;");
+            w.Line("\t\t\t\tset { _onSet = value; if (value != null) _configured = true; }");
+            w.Line("\t\t\t}");
             w.Line();
         }
 
@@ -331,13 +499,101 @@ internal static class InlineRenderer
             w.Line();
         }
 
-        // Reset method
-        w.Line("\t\t\t/// <summary>Resets all tracking state.</summary>");
+        // Reset method - clears counts but preserves verifiable marking
+        w.Line("\t\t\t/// <summary>Resets tracking state but preserves verifiable marking.</summary>");
         var resetParts = new List<string>();
-        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default; OnGet = null;");
-        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default; OnSet = null;");
+        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default; _onGet = null;");
+        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default; _onSet = null;");
+        resetParts.Add("_configured = false;");
         if (!string.IsNullOrEmpty(indexer.DeclaringInterface)) resetParts.Add("_source = null;");
         w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
+        w.Line();
+
+        // Build total count expression based on available accessors
+        var totalCountExpr = indexer.HasGetter && indexer.HasSetter
+            ? "GetCount + SetCount"
+            : (indexer.HasGetter ? "GetCount" : "SetCount");
+
+        // Verifiable methods (fluent)
+        w.Line($"\t\t\t/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line($"\t\t\tpublic {indexer.InterceptorClassName}{typeParamList} Verifiable() {{ _isVerifiable = true; _verifiableTimes = null; return this; }}");
+        w.Line();
+        w.Line($"\t\t\t/// <summary>Marks this indexer for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"\t\t\tpublic {indexer.InterceptorClassName}{typeParamList} Verifiable(global::KnockOff.Times times) {{ _isVerifiable = true; _verifiableTimes = times; return this; }}");
+        w.Line();
+
+        // Verify methods - throw on failure
+        w.Line("\t\t\t/// <summary>Verifies the indexer was accessed at least once. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\tpublic void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\tpublic void Verify(global::KnockOff.Times times)");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
+        w.Line("\t\t\t\tif (!times.Validate(totalCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", times, totalCount));");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // VerifyGet methods
+        if (indexer.HasGetter)
+        {
+            w.Line("\t\t\t/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>");
+            w.Line("\t\t\tpublic void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);");
+            w.Line();
+
+            w.Line("\t\t\t/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+            w.Line("\t\t\tpublic void VerifyGet(global::KnockOff.Times times)");
+            w.Line("\t\t\t{");
+            w.Line("\t\t\t\tif (!times.Validate(GetCount))");
+            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (get)\", times, GetCount));");
+            w.Line("\t\t\t}");
+            w.Line();
+        }
+
+        // VerifySet methods
+        if (indexer.HasSetter)
+        {
+            w.Line("\t\t\t/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>");
+            w.Line("\t\t\tpublic void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);");
+            w.Line();
+
+            w.Line("\t\t\t/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+            w.Line("\t\t\tpublic void VerifySet(global::KnockOff.Times times)");
+            w.Line("\t\t\t{");
+            w.Line("\t\t\t\tif (!times.Validate(SetCount))");
+            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (set)\", times, SetCount));");
+            w.Line("\t\t\t}");
+            w.Line();
+        }
+
+        // Internal verification support for stub-level Verify/VerifyAll
+        w.Line("\t\t\t/// <summary>Whether this indexer was marked with Verifiable().</summary>");
+        w.Line("\t\t\tinternal bool IsVerifiable => _isVerifiable;");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Whether this indexer has been configured (callbacks registered).</summary>");
+        w.Line("\t\t\tinternal bool IsConfigured => _configured;");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerification()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!_isVerifiable) return null;");
+        w.Line("\t\t\t\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
+        w.Line($"\t\t\t\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", times, totalCount);");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!IsConfigured) return null;");
+        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
+        w.Line($"\t\t\t\treturn totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", global::KnockOff.Times.AtLeastOnce, totalCount);");
+        w.Line("\t\t\t}");
 
         w.Line("\t\t}");
         w.Line();
@@ -391,6 +647,24 @@ internal static class InlineRenderer
         w.Line("\t\t\t\tforeach (var handler in _typedHandlers.Values.Cast<IResettable>())");
         w.Line("\t\t\t\t\thandler.Reset();");
         w.Line("\t\t\t\t_typedHandlers.Clear();");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // Internal verification support for stub-level Verify/VerifyAll
+        // Generic method handlers aggregate verification from all typed handlers
+        w.Line("\t\t\tinternal bool IsVerifiable => false; // Generic handlers are not individually verifiable");
+        w.Line("\t\t\tinternal bool IsConfigured => _typedHandlers.Count > 0;");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!IsConfigured) return null;");
+        w.Line($"\t\t\t\treturn TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{handler.MethodName}\", global::KnockOff.Times.AtLeastOnce, TotalCallCount);");
         w.Line("\t\t\t}");
         w.Line();
 
@@ -483,6 +757,28 @@ internal static class InlineRenderer
         {
             w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }");
         }
+        w.Line();
+
+        // Verify methods - new API throws VerificationException
+        w.Line("\t\t\t\t/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\t\tpublic void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line("\t\t\t\t/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\t\tpublic void Verify(global::KnockOff.Times times)");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\tif (!times.Validate(CallCount))");
+        w.Line("\t\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, CallCount));");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Verifiable methods
+        w.Line("\t\t\t\t/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line("\t\t\t\tpublic global::KnockOff.IMethodTracking Verifiable() => this;");
+        w.Line();
+
+        w.Line("\t\t\t\t/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+        w.Line("\t\t\t\tpublic global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;");
 
         w.Line("\t\t\t}");
     }
@@ -512,7 +808,96 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic void RecordRemove({evt.DelegateType}? handler) {{ RemoveCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Remove(Handler, handler); }}");
         w.Line();
         w.Line("\t\t\t/// <summary>Resets all tracking state.</summary>");
-        w.Line("\t\t\tpublic void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }");
+        w.Line("\t\t\tpublic void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; _isVerifiable = false; _verifiableTimes = null; }");
+        w.Line();
+
+        // Verification API for events
+        w.Line("\t\t\tprivate bool _isVerifiable;");
+        w.Line("\t\t\tprivate global::KnockOff.Times? _verifiableTimes;");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies the event was subscribed to at least once.</summary>");
+        w.Line("\t\t\tpublic void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies the event subscription count matches the Times constraint.</summary>");
+        w.Line("\t\t\tpublic void VerifyAdd(global::KnockOff.Times times)");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!times.Validate(AddCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' add verification failed: expected {{times}}, but was called {{AddCount}} time(s).\");");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies the event was unsubscribed at least once.</summary>");
+        w.Line("\t\t\tpublic void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>");
+        w.Line("\t\t\tpublic void VerifyRemove(global::KnockOff.Times times)");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!times.Validate(RemoveCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' remove verification failed: expected {{times}}, but was called {{RemoveCount}} time(s).\");");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>");
+        w.Line("\t\t\tpublic void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies the total event access count matches the Times constraint.</summary>");
+        w.Line("\t\t\tpublic void Verify(global::KnockOff.Times times)");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tvar totalCount = AddCount + RemoveCount;");
+        w.Line("\t\t\t\tif (!times.Validate(totalCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' verification failed: expected {{times}}, but was called {{totalCount}} time(s).\");");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Marks this event for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line($"\t\t\tpublic {evt.InterceptorClassName}{typeParamList} Verifiable()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\t_isVerifiable = true;");
+        w.Line("\t\t\t\t_verifiableTimes = global::KnockOff.Times.AtLeastOnce;");
+        w.Line("\t\t\t\treturn this;");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"\t\t\tpublic {evt.InterceptorClassName}{typeParamList} Verifiable(global::KnockOff.Times times)");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\t_isVerifiable = true;");
+        w.Line("\t\t\t\t_verifiableTimes = times;");
+        w.Line("\t\t\t\treturn this;");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // Internal verification methods for stub-level Verify()/VerifyAll()
+        w.Line("\t\t\tinternal bool IsVerifiable => _isVerifiable;");
+        w.Line("\t\t\tinternal bool IsConfigured => Handler != null;");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerification()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!_isVerifiable) return null;");
+        w.Line("\t\t\t\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line("\t\t\t\tvar totalCount = AddCount + RemoveCount;");
+        w.Line("\t\t\t\tif (!times.Validate(totalCount))");
+        w.Line($"\t\t\t\t\treturn new global::KnockOff.VerificationFailure(\"{evt.EventName}\", times, totalCount);");
+        w.Line("\t\t\t\treturn null;");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!IsConfigured && !_isVerifiable) return null;");
+        w.Line("\t\t\t\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line("\t\t\t\tvar totalCount = AddCount + RemoveCount;");
+        w.Line("\t\t\t\tif (!times.Validate(totalCount))");
+        w.Line($"\t\t\t\t\treturn new global::KnockOff.VerificationFailure(\"{evt.EventName}\", times, totalCount);");
+        w.Line("\t\t\t\treturn null;");
+        w.Line("\t\t\t}");
 
         w.Line("\t\t}");
         w.Line();

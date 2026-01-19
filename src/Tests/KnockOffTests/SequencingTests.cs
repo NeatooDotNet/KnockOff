@@ -64,62 +64,63 @@ public class SequencingTests
     }
 
     [Fact]
-    public void OnCall_WithTimes_AdvancesToNext()
+    public void OnCallSequence_AdvancesAfterEachCall()
     {
         var stub = new SequenceTestKnockOff();
         stub.Add
-            .OnCall((ko, a, b) => 100, Times.Once)
-            .ThenCall((ko, a, b) => 200, Times.Forever);
+            .OnCallSequence((ko, a, b) => 100)
+            .ThenCall((ko, a, b) => 200)
+            .ThenCall((ko, a, b) => 300);
 
         ISequenceTestService svc = stub;
         Assert.Equal(100, svc.Add(1, 2));  // First call - uses first callback
         Assert.Equal(200, svc.Add(1, 2));  // Second call - advances to second
-        Assert.Equal(200, svc.Add(1, 2));  // Third call - stays on Forever
+        Assert.Equal(300, svc.Add(1, 2));  // Third call - advances to third
     }
 
     [Fact]
-    public void OnCall_WithTimesTwice_AdvancesAfterTwo()
+    public void OnCallSequence_TwoCallbacks_BothExecute()
     {
         var stub = new SequenceTestKnockOff();
         stub.Add
-            .OnCall((ko, a, b) => 100, Times.Twice)
-            .ThenCall((ko, a, b) => 200, Times.Forever);
+            .OnCallSequence((ko, a, b) => 100)
+            .ThenCall((ko, a, b) => 200);
 
         ISequenceTestService svc = stub;
         Assert.Equal(100, svc.Add(0, 0));  // First
-        Assert.Equal(100, svc.Add(0, 0));  // Second (still first callback)
-        Assert.Equal(200, svc.Add(0, 0));  // Third (advances)
-        Assert.Equal(200, svc.Add(0, 0));  // Fourth (repeats)
+        Assert.Equal(200, svc.Add(0, 0));  // Second
     }
 
     [Fact]
-    public void OnCall_WithExactly_AdvancesAfterCount()
+    public void ExhaustedSequence_InStrictMode_Throws()
     {
         var stub = new SequenceTestKnockOff();
+        stub.Strict = true;
         stub.Add
-            .OnCall((ko, a, b) => 1, Times.Exactly(3))
-            .ThenCall((ko, a, b) => 2, Times.Forever);
-
-        ISequenceTestService svc = stub;
-        Assert.Equal(1, svc.Add(0, 0));
-        Assert.Equal(1, svc.Add(0, 0));
-        Assert.Equal(1, svc.Add(0, 0));
-        Assert.Equal(2, svc.Add(0, 0));  // Advances after 3
-    }
-
-    [Fact]
-    public void ExhaustedSequence_Throws()
-    {
-        var stub = new SequenceTestKnockOff();
-        stub.Add
-            .OnCall((ko, a, b) => 100, Times.Once)
-            .ThenCall((ko, a, b) => 200, Times.Once);
+            .OnCallSequence((ko, a, b) => 100)
+            .ThenCall((ko, a, b) => 200);
 
         ISequenceTestService svc = stub;
         svc.Add(1, 2);  // First - OK
         svc.Add(1, 2);  // Second - OK
 
-        Assert.Throws<StubException>(() => svc.Add(1, 2));  // Third - exhausted
+        Assert.Throws<StubException>(() => svc.Add(1, 2));  // Third - exhausted in strict mode
+    }
+
+    [Fact]
+    public void ExhaustedSequence_InNonStrictMode_ReturnsDefault()
+    {
+        var stub = new SequenceTestKnockOff();
+        stub.Strict = false;
+        stub.Add
+            .OnCallSequence((ko, a, b) => 100)
+            .ThenCall((ko, a, b) => 200);
+
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);  // First - OK
+        svc.Add(1, 2);  // Second - OK
+
+        Assert.Equal(0, svc.Add(1, 2));  // Third - exhausted, returns default in non-strict
     }
 
     [Fact]
@@ -152,32 +153,33 @@ public class SequencingTests
     }
 
     [Fact]
-    public void Sequence_Verify_ReturnsTrueWhenSatisfied()
+    public void Sequence_Verify_SucceedsWhenComplete()
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCall((ko, a, b) => 1, Times.Once)
-            .ThenCall((ko, a, b) => 2, Times.Once);
+            .OnCallSequence((ko, a, b) => 1)
+            .ThenCall((ko, a, b) => 2);
 
         ISequenceTestService svc = stub;
         svc.Add(0, 0);
         svc.Add(0, 0);
 
-        Assert.True(sequence.Verify());
+        // Should not throw - sequence completed
+        sequence.Verify();
     }
 
     [Fact]
-    public void Sequence_Verify_ReturnsFalseWhenNotSatisfied()
+    public void Sequence_Verify_ThrowsWhenIncomplete()
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCall((ko, a, b) => 1, Times.Twice)
-            .ThenCall((ko, a, b) => 2, Times.Once);
+            .OnCallSequence((ko, a, b) => 1)
+            .ThenCall((ko, a, b) => 2);
 
         ISequenceTestService svc = stub;
-        svc.Add(0, 0);  // Only called once, but Twice was expected
+        svc.Add(0, 0);  // Only called once, but two callbacks in sequence
 
-        Assert.False(sequence.Verify());
+        Assert.Throws<VerificationException>(() => sequence.Verify());
     }
 
     [Fact]
@@ -185,8 +187,9 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCall((ko, a, b) => 1, Times.Twice)
-            .ThenCall((ko, a, b) => 2, Times.Forever);
+            .OnCallSequence((ko, a, b) => 1)
+            .ThenCall((ko, a, b) => 2)
+            .ThenCall((ko, a, b) => 3);
 
         ISequenceTestService svc = stub;
         svc.Add(0, 0);
@@ -201,8 +204,8 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCall((ko, a, b) => 1, Times.Once)
-            .ThenCall((ko, a, b) => 2, Times.Forever);
+            .OnCallSequence((ko, a, b) => 1)
+            .ThenCall((ko, a, b) => 2);
 
         ISequenceTestService svc = stub;
         svc.Add(0, 0);

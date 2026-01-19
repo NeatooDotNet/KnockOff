@@ -1,6 +1,6 @@
 # Migrating from Moq to KnockOff
 
-Switching from Moq to KnockOff means moving from runtime reflection to compile-time source generation. You gain compile-time safety, debuggability, and performance—while trading Moq's runtime flexibility for a simpler, more explicit API.
+Switching from Moq to KnockOff means moving from per-test mock setup to reusable stub classes. You gain the ability to share stubs across tests while still customizing behavior per-test—while trading Moq's runtime flexibility for source-generated, explicit stub implementations.
 
 This guide walks you through the migration step-by-step, with side-by-side comparisons and a complete before/after example.
 

@@ -29,7 +29,82 @@ partial class EventSourceStub : global::KnockOff.Benchmarks.Interfaces.IEventSou
 		public void Raise(object? sender, string e) => _handler?.Invoke(sender, e);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the event was subscribed to at least once.</summary>
+		public void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
+		public void VerifyAdd(global::KnockOff.Times times)
+		{
+			if (!times.Validate(AddCount))
+				throw new global::KnockOff.VerificationException($"Event 'MessageReceived' add verification failed: expected {times}, but was called {AddCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was unsubscribed at least once.</summary>
+		public void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
+		public void VerifyRemove(global::KnockOff.Times times)
+		{
+			if (!times.Validate(RemoveCount))
+				throw new global::KnockOff.VerificationException($"Event 'MessageReceived' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Event 'MessageReceived' verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public MessageReceivedInterceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public MessageReceivedInterceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => _handler != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("MessageReceived", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("MessageReceived", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Interceptor for ValueChanged event.</summary>
@@ -56,7 +131,82 @@ partial class EventSourceStub : global::KnockOff.Benchmarks.Interfaces.IEventSou
 		public void Raise(int obj) => _handler?.Invoke(obj);
 
 		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; _isVerifiable = false; _verifiableTimes = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the event was subscribed to at least once.</summary>
+		public void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
+		public void VerifyAdd(global::KnockOff.Times times)
+		{
+			if (!times.Validate(AddCount))
+				throw new global::KnockOff.VerificationException($"Event 'ValueChanged' add verification failed: expected {times}, but was called {AddCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was unsubscribed at least once.</summary>
+		public void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
+		public void VerifyRemove(global::KnockOff.Times times)
+		{
+			if (!times.Validate(RemoveCount))
+				throw new global::KnockOff.VerificationException($"Event 'ValueChanged' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Event 'ValueChanged' verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public ValueChangedInterceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public ValueChangedInterceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => _handler != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("ValueChanged", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("ValueChanged", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Interceptor for MessageReceived event.</summary>
