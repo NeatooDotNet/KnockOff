@@ -13,7 +13,7 @@ Currently `Reset()` clears both tracking state AND callbacks. This may not match
 ## Current Behavior
 
 ```csharp
-knockOff.GetUser.OnCall = (ko, id) => new User { Id = id };
+knockOff.GetUser.OnCall = ((id) => new User { Id = id };
 service.GetUser(1);
 service.GetUser(2);
 

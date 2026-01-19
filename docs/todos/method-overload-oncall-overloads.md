@@ -379,8 +379,8 @@ Properties don't have overloads, so no collision problem. Keep simple assignment
 
 ```csharp
 stub.Name.Value = "test";              // Backing value
-stub.Name.OnGet = (ko) => "computed";  // Callback (assignment)
-stub.Name.OnSet = (ko, v) => { };      // Setter callback
+stub.Name.OnGet = () => "computed";  // Callback (assignment)
+stub.Name.OnSet = ((v) => { };      // Setter callback
 
 // Tracking directly on interceptor
 stub.Name.GetCount;
@@ -397,14 +397,14 @@ Indexers CAN have overloads (different key types), but use `OfXxx` pattern for s
 ```csharp
 // Always use OfXxx, even with single indexer
 stub.Indexer.OfInt32.Backing[0] = "preset";
-stub.Indexer.OfInt32.OnGet = (ko, i) => items[i];
-stub.Indexer.OfInt32.OnSet = (ko, i, v) => { };
+stub.Indexer.OfInt32.OnGet = ((i) => items[i];
+stub.Indexer.OfInt32.OnSet = ((i, v) => { };
 stub.Indexer.OfInt32.GetCount;
 stub.Indexer.OfInt32.LastGetKey;
 
 // Add string indexer later - OfInt32 unchanged!
 stub.Indexer.OfString.Backing["key"] = "value";
-stub.Indexer.OfString.OnGet = (ko, k) => dict[k];
+stub.Indexer.OfString.OnGet = ((k) => dict[k];
 ```
 
 **Key insight:** `OfXxx` name based on key type, not count. Adding indexers doesn't break existing code.

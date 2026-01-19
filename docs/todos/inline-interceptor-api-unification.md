@@ -13,7 +13,7 @@ Standalone stubs and inline stubs have different APIs for methods, despite the d
 
 | Stub Type  | OnCall Syntax | Tracking Access |
 |------------|---------------|-----------------|
-| **Standalone** | `var tracking = stub.Method.OnCall((ko) => ...)` | Via returned tracking object |
+| **Standalone** | `var tracking = stub.Method.OnCall(() => ...)` | Via returned tracking object |
 | **Inline** | `stub.Method.OnCall = (ko) => ...` | Direct: `stub.Method.CallCount` |
 
 The interceptor API redesign (completed for standalone in PR #4) was **partially implemented**:
@@ -165,13 +165,13 @@ stub.Indexer.OfString.GetCount
 **Regular Methods:**
 ```csharp
 // Callback returns tracking
-var tracking = stub.Method.OnCall((ko, x) => x * 2);
+var tracking = stub.Method.OnCall((x) => x * 2);
 Assert.Equal(1, tracking.CallCount);
 
 // Sequencing with Times
 stub.Method
-    .OnCall((ko, x) => 100, Times.Once)
-    .ThenCall((ko, x) => 200, Times.Forever);
+    .OnCall((x) => 100, Times.Once)
+    .ThenCall(((x) => 200, Times.Forever);
 
 // Verification
 stub.Method.Verify();
@@ -180,7 +180,7 @@ stub.Verify();  // Whole stub
 
 **Generic Methods:**
 ```csharp
-var tracking = stub.Create.Of<User>().OnCall((ko) => new User());
+var tracking = stub.Create.Of<User>().OnCall(() => new User());
 tracking.CallCount;
 tracking.LastArg;
 ```
@@ -188,15 +188,15 @@ tracking.LastArg;
 **Indexers:**
 ```csharp
 stub.Indexer.OfInt32.Backing[0] = "preset";
-stub.Indexer.OfInt32.OnGet = (ko, i) => items[i];
+stub.Indexer.OfInt32.OnGet = ((i) => items[i];
 stub.Indexer.OfInt32.GetCount;
-stub.Indexer.OfString.OnGet = (ko, k) => dict[k];
+stub.Indexer.OfString.OnGet = ((k) => dict[k];
 ```
 
 **Properties (unchanged):**
 ```csharp
 stub.Name.Value = "test";
-stub.Name.OnGet = (ko) => "computed";
+stub.Name.OnGet = () => "computed";
 stub.Name.GetCount;
 ```
 
@@ -214,7 +214,7 @@ This is a **major breaking change**. Migration:
 
 | Old API | New API |
 |---------|---------|
-| `stub.Method.OnCall = (ko) => ...` | `var t = stub.Method.OnCall((ko) => ...)` |
+| `stub.Method.OnCall = (ko) => ...` | `var t = stub.Method.OnCall(() => ...)` |
 | `stub.Method.CallCount` | `tracking.CallCount` |
 | `stub.Method0.CallCount` (overloads) | `tracking.CallCount` (compiler resolves) |
 | `stub.Create.Of<T>().OnCall = ...` | `var t = stub.Create.Of<T>().OnCall(...)` |
@@ -301,6 +301,6 @@ docs/
 ### Breaking Changes Applied
 | Old API | New API |
 |---------|---------|
-| `stub.Method.OnCall = (ko) => ...` | `var t = stub.Method.OnCall((ko) => ...)` |
+| `stub.Method.OnCall = (ko) => ...` | `var t = stub.Method.OnCall(() => ...)` |
 | `stub.Method.CallCount` | `stub.Method.CallCount` or `tracking.CallCount` |
 | `stub.Create.Of<T>().OnCall = ...` | `var t = stub.Create.Of<T>().OnCall(...)` |

@@ -25,10 +25,10 @@ private Stubs.ITreatmentStepList CreateStepListStub()
     var steps = new List<ITreatmentStep>();
 
     // Wire up the list to use the backing list
-    listStub.AddStep.OnCall = (ko, step) => steps.Add(step);
+    listStub.AddStep.OnCall = ((step) => steps.Add(step);
     listStub.GetEnumerator.OnCall = (ko) => steps.GetEnumerator();
-    listStub.Count.OnGet = (ko) => steps.Count;
-    listStub.Indexer.OnGet = (ko, idx) => steps[idx];
+    listStub.Count.OnGet = () => steps.Count;
+    listStub.Indexer.OnGet = ((idx) => steps[idx];
     listStub.Clear.OnCall = (ko) => steps.Clear();
 
     return listStub;

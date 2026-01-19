@@ -135,8 +135,8 @@ Where `.Verifiable()` can be called depends on whether methods are user-defined 
 When `stub.Verify()` is called, it verifies ALL type instantiations that were marked `.Verifiable()`:
 
 ```csharp
-stub.Get.Of<User>().OnCall((ko, id) => user).Verifiable();
-stub.Get.Of<Order>().OnCall((ko, id) => order).Verifiable();
+stub.Get.Of<User>().OnCall((id) => user).Verifiable();
+stub.Get.Of<Order>().OnCall((id) => order).Verifiable();
 stub.Verify();  // Checks BOTH User and Order instantiations
 ```
 
@@ -197,8 +197,8 @@ Indexer interceptors support the same verification API as property interceptors:
 For generic methods, `_isVerifiable` lives on the **typed handler** (`CreateTypedHandler<T>`), not on the interceptor class. This allows per-instantiation marking:
 
 ```csharp
-stub.Deserialize.Of<User>().OnCall((ko, json) => user).Verifiable();
-stub.Deserialize.Of<Order>().OnCall((ko, json) => order);  // Not verifiable
+stub.Deserialize.Of<User>().OnCall((json) => user).Verifiable();
+stub.Deserialize.Of<Order>().OnCall((json) => order);  // Not verifiable
 stub.Verify();  // Only checks User instantiation
 ```
 
@@ -328,7 +328,7 @@ public interface IMethodTrackingArgs<TArgs> : IMethodTracking
 
 This enables:
 ```csharp
-var tracking = stub.GetUser.OnCall((ko, id) => user).Verifiable();
+var tracking = stub.GetUser.OnCall((id) => user).Verifiable();
 var lastId = tracking.LastArg;  // Still has access to LastArg
 ```
 
@@ -343,7 +343,7 @@ Setting `Source()` has no effect on verification. Only explicitly marked `.Verif
 
 ```csharp
 stub.Source(realImplementation);  // Provides fallback behavior
-stub.GetUser.OnCall((ko, id) => user).Verifiable();  // This is what we're testing
+stub.GetUser.OnCall((id) => user).Verifiable();  // This is what we're testing
 
 // Later...
 stub.Verify();  // Only checks the OnCall().Verifiable() - Source() is ignored
@@ -821,7 +821,7 @@ public void VerifyAll()
 
 ```csharp
 // Setup - OnCall() repeats indefinitely, returns IMethodTracking
-var tracking = stub.GetUser.OnCall((ko, id) => user);
+var tracking = stub.GetUser.OnCall((id) => user);
 
 // Execute
 var result = sut.GetUserById(1);
@@ -837,8 +837,8 @@ tracking.Verify(Times.Once);
 
 ```csharp
 // Mark as verifiable - works with both OnCall and OnCallSequence
-stub.GetUser.OnCall((ko, id) => user).Verifiable();
-stub.Save.OnCall((ko, entity) => entity).Verifiable();
+stub.GetUser.OnCall((id) => user).Verifiable();
+stub.Save.OnCall((entity) => entity).Verifiable();
 
 // Execute
 sut.DoWork();
@@ -852,9 +852,9 @@ stub.Verify();  // Throws if GetUser or Save not called
 ```csharp
 // OnCallSequence() for ThenCall chaining - each callback runs once
 stub.GetUser
-    .OnCallSequence((ko, id) => user1)
-    .ThenCall((ko, id) => user2)
-    .ThenCall((ko, id) => user3)
+    .OnCallSequence(((id) => user1)
+    .ThenCall(((id) => user2)
+    .ThenCall(((id) => user3)
     .Verifiable();
 
 // First call returns user1, second user2, third user3
@@ -900,7 +900,7 @@ stub.Verify();  // Throws if Save not called exactly twice
 
 ```csharp
 // Configure stub
-stub.GetUser.OnCall((ko, id) => user);
+stub.GetUser.OnCall((id) => user);
 stub.Name.Value = "Test";
 
 // Execute
