@@ -16,6 +16,36 @@ Key concept: A class marked with `[KnockOff]` that implements an interface will 
 
 **ON CODE-REVIEW** Check that plans in the PR are linked to a single todo in their plan markdown
 
+## Plan Mode and Project Todos
+
+**When plan mode completes:**
+1. Plan mode creates the design document through brainstorming conversation
+2. Plan mode then uses project-todos skill to:
+   - Create a todo in docs/todos/ capturing the user request
+   - Create a plan in docs/plans/ with the design content
+   - Link them together
+   - Set todo status: "In Progress"
+   - Set plan status: "Draft (Architect)"
+
+**After plan mode creates todo+plan:**
+- Automatically invoke knockoff-architect agent to enhance the plan
+- Architect reviews, adds KnockOff-specific architecture, completes verification checklist
+- Architect hands off to knockoff-developer for review
+- Developer reviews and either raises concerns or creates implementation contract
+- After user approval, developer implements with milestone verification
+
+**The automatic pipeline:**
+```
+Plan Mode → knockoff-architect → knockoff-developer → Implementation
+```
+
+This creates a seamless flow: brainstorming → formalization → architectural design → implementation planning → implementation.
+
+**Key verification gates:**
+- Architect must complete 7-item verification checklist before handoff
+- Developer must create implementation contract before coding
+- Developer must provide evidence (test output, code snippets) before completion
+
 ## Design Principles
 
 **CRITICAL: All designs, features, and changes MUST work for all three patterns:**
