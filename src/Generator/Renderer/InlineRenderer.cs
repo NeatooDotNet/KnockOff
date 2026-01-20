@@ -115,6 +115,15 @@ internal static class InlineRenderer
             RenderIndexerInterceptorClass(w, indexer, iface.StubClassName);
         }
 
+        // Render container classes for multi-indexer groups
+        foreach (var group in iface.IndexerGroups)
+        {
+            if (group.Indexers.Count > 1)
+            {
+                RenderIndexerContainerClass(w, group);
+            }
+        }
+
         // Use shared renderer for method interceptors
         // Set indent level for nested class context (inside partial class and Stubs class)
         var methodTypeParams = FormatTypeParameterList(iface.TypeParameters);
@@ -593,6 +602,73 @@ internal static class InlineRenderer
         w.Line("\t\t\t\tif (!IsConfigured) return null;");
         w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
         w.Line($"\t\t\t\treturn totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", global::KnockOff.Times.AtLeastOnce, totalCount);");
+        w.Line("\t\t\t}");
+
+        w.Line("\t\t}");
+        w.Line();
+    }
+
+    private static void RenderIndexerContainerClass(CodeWriter w, InlineIndexerGroup group)
+    {
+        // Deduplicate by KeyTypeFriendlyName - same key type shares the same interceptor in container
+        var uniqueByKeyType = group.Indexers
+            .GroupBy(i => i.KeyTypeFriendlyName)
+            .Select(g => g.First())
+            .ToList();
+
+        w.Line($"\t\t/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>");
+        w.Line($"\t\tpublic sealed class {group.ContainerClassName}");
+        w.Line("\t\t{");
+
+        // Of{KeyType} properties (container owns its interceptors)
+        foreach (var indexer in uniqueByKeyType)
+        {
+            w.Line($"\t\t\t/// <summary>Gets the interceptor for indexer with {indexer.KeyTypeFriendlyName} key type.</summary>");
+            w.Line($"\t\t\tpublic {indexer.InterceptorClassName}{indexer.TypeParameterList} Of{indexer.KeyTypeFriendlyName} {{ get; }} = new();");
+            w.Line();
+        }
+
+        // Reset method (resets all)
+        w.Line("\t\t\t/// <summary>Resets all indexer interceptors.</summary>");
+        w.Line("\t\t\tpublic void Reset()");
+        w.Line("\t\t\t{");
+        foreach (var indexer in uniqueByKeyType)
+        {
+            w.Line($"\t\t\t\tOf{indexer.KeyTypeFriendlyName}.Reset();");
+        }
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // Internal verification support for stub-level Verify/VerifyAll
+        // Container aggregates verification from all indexer interceptors
+        w.Line("\t\t\tinternal bool IsVerifiable => false; // Container is not individually verifiable");
+
+        // Check if any contained interceptor is configured
+        var isConfiguredParts = uniqueByKeyType.Select(i => $"Of{i.KeyTypeFriendlyName}.IsConfigured").ToList();
+        w.Line($"\t\t\tinternal bool IsConfigured => {string.Join(" || ", isConfiguredParts)};");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerification()");
+        w.Line("\t\t\t{");
+        // Container returns first failure from any contained interceptor
+        foreach (var indexer in uniqueByKeyType)
+        {
+            w.Line($"\t\t\t\tif (Of{indexer.KeyTypeFriendlyName}.CheckVerification() is {{ }} failure{indexer.KeyTypeFriendlyName}) return failure{indexer.KeyTypeFriendlyName};");
+        }
+        w.Line("\t\t\t\treturn null;");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
+        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line("\t\t\t{");
+        // Container returns first failure from any contained interceptor
+        foreach (var indexer in uniqueByKeyType)
+        {
+            w.Line($"\t\t\t\tif (Of{indexer.KeyTypeFriendlyName}.CheckVerificationAll() is {{ }} failure{indexer.KeyTypeFriendlyName}) return failure{indexer.KeyTypeFriendlyName};");
+        }
+        w.Line("\t\t\t\treturn null;");
         w.Line("\t\t\t}");
 
         w.Line("\t\t}");

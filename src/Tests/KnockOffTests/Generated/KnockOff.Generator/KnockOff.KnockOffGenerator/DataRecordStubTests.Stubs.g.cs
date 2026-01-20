@@ -257,6 +257,42 @@ partial class DataRecordStubTests
 			}
 		}
 
+		/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>
+		public sealed class IndexerContainer
+		{
+			/// <summary>Gets the interceptor for indexer with Int32 key type.</summary>
+			public IDataRecord_IndexerInt32Interceptor OfInt32 { get; } = new();
+
+			/// <summary>Gets the interceptor for indexer with String key type.</summary>
+			public IDataRecord_IndexerStringInterceptor OfString { get; } = new();
+
+			/// <summary>Resets all indexer interceptors.</summary>
+			public void Reset()
+			{
+				OfInt32.Reset();
+				OfString.Reset();
+			}
+
+			internal bool IsVerifiable => false; // Container is not individually verifiable
+			internal bool IsConfigured => OfInt32.IsConfigured || OfString.IsConfigured;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (OfInt32.CheckVerification() is { } failureInt32) return failureInt32;
+				if (OfString.CheckVerification() is { } failureString) return failureString;
+				return null;
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (OfInt32.CheckVerificationAll() is { } failureInt32) return failureInt32;
+				if (OfString.CheckVerificationAll() is { } failureString) return failureString;
+				return null;
+			}
+		}
+
 		/// <summary>Tracks and configures behavior for GetBoolean.</summary>
 		public sealed class IDataRecord_GetBooleanInterceptor
 		{
@@ -5411,11 +5447,8 @@ partial class DataRecordStubTests
 			/// <summary>Interceptor for FieldCount.</summary>
 			public IDataRecord_FieldCountInterceptor FieldCount { get; } = new();
 
-			/// <summary>Interceptor for IndexerInt32.</summary>
-			public IDataRecord_IndexerInt32Interceptor IndexerInt32 { get; } = new();
-
-			/// <summary>Interceptor for IndexerString.</summary>
-			public IDataRecord_IndexerStringInterceptor IndexerString { get; } = new();
+			/// <summary>Container for indexer interceptors. Access via .OfXxx.</summary>
+			public IndexerContainer Indexer { get; } = new();
 
 			/// <summary>Interceptor for GetBoolean.</summary>
 			public IDataRecord_GetBooleanInterceptor GetBoolean { get; } = new();
@@ -5609,11 +5642,11 @@ partial class DataRecordStubTests
 			{
 				get
 				{
-					IndexerInt32.RecordGet(i);
-					if (IndexerInt32.OnGet is { } onGet) return onGet(i);
-					if (IndexerInt32._source is { } src) return src[i];
+					Indexer.OfInt32.RecordGet(i);
+					if (Indexer.OfInt32.OnGet is { } onGet) return onGet(i);
+					if (Indexer.OfInt32._source is { } src) return src[i];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
-					return IndexerInt32.Backing.TryGetValue(i, out var v) ? v : new object();
+					return Indexer.OfInt32.Backing.TryGetValue(i, out var v) ? v : new object();
 				}
 			}
 
@@ -5621,11 +5654,11 @@ partial class DataRecordStubTests
 			{
 				get
 				{
-					IndexerString.RecordGet(name);
-					if (IndexerString.OnGet is { } onGet) return onGet(name);
-					if (IndexerString._source is { } src) return src[name];
+					Indexer.OfString.RecordGet(name);
+					if (Indexer.OfString.OnGet is { } onGet) return onGet(name);
+					if (Indexer.OfString._source is { } src) return src[name];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
-					return IndexerString.Backing.TryGetValue(name, out var v) ? v : new object();
+					return Indexer.OfString.Backing.TryGetValue(name, out var v) ? v : new object();
 				}
 			}
 
@@ -5646,8 +5679,8 @@ partial class DataRecordStubTests
 			public void Source(global::System.Data.IDataRecord? source)
 			{
 				FieldCount._source = source;
-				IndexerInt32._source = source;
-				IndexerString._source = source;
+				Indexer.OfInt32._source = source;
+				Indexer.OfString._source = source;
 				GetBoolean._source = source;
 				GetByte._source = source;
 				GetBytes._source = source;
@@ -5678,8 +5711,7 @@ partial class DataRecordStubTests
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 				if (FieldCount.CheckVerification() is { } fieldcountFailure) failures.Add(fieldcountFailure);
-				if (IndexerInt32.CheckVerification() is { } indexerint32Failure) failures.Add(indexerint32Failure);
-				if (IndexerString.CheckVerification() is { } indexerstringFailure) failures.Add(indexerstringFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (GetBoolean.CheckVerification() is { } getbooleanFailure) failures.Add(getbooleanFailure);
 				if (GetByte.CheckVerification() is { } getbyteFailure) failures.Add(getbyteFailure);
 				if (GetBytes.CheckVerification() is { } getbytesFailure) failures.Add(getbytesFailure);
@@ -5713,8 +5745,7 @@ partial class DataRecordStubTests
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 				if (FieldCount.CheckVerificationAll() is { } fieldcountFailure) failures.Add(fieldcountFailure);
-				if (IndexerInt32.CheckVerificationAll() is { } indexerint32Failure) failures.Add(indexerint32Failure);
-				if (IndexerString.CheckVerificationAll() is { } indexerstringFailure) failures.Add(indexerstringFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (GetBoolean.CheckVerificationAll() is { } getbooleanFailure) failures.Add(getbooleanFailure);
 				if (GetByte.CheckVerificationAll() is { } getbyteFailure) failures.Add(getbyteFailure);
 				if (GetBytes.CheckVerificationAll() is { } getbytesFailure) failures.Add(getbytesFailure);

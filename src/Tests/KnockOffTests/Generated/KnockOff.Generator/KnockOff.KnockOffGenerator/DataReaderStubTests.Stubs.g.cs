@@ -500,6 +500,42 @@ partial class DataReaderStubTests
 			}
 		}
 
+		/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>
+		public sealed class IndexerContainer
+		{
+			/// <summary>Gets the interceptor for indexer with Int32 key type.</summary>
+			public IDataReader_IndexerInt32Interceptor OfInt32 { get; } = new();
+
+			/// <summary>Gets the interceptor for indexer with String key type.</summary>
+			public IDataReader_IndexerStringInterceptor OfString { get; } = new();
+
+			/// <summary>Resets all indexer interceptors.</summary>
+			public void Reset()
+			{
+				OfInt32.Reset();
+				OfString.Reset();
+			}
+
+			internal bool IsVerifiable => false; // Container is not individually verifiable
+			internal bool IsConfigured => OfInt32.IsConfigured || OfString.IsConfigured;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (OfInt32.CheckVerification() is { } failureInt32) return failureInt32;
+				if (OfString.CheckVerification() is { } failureString) return failureString;
+				return null;
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (OfInt32.CheckVerificationAll() is { } failureInt32) return failureInt32;
+				if (OfString.CheckVerificationAll() is { } failureString) return failureString;
+				return null;
+			}
+		}
+
 		/// <summary>Tracks and configures behavior for Close.</summary>
 		public sealed class IDataReader_CloseInterceptor
 		{
@@ -6766,11 +6802,8 @@ partial class DataReaderStubTests
 			/// <summary>Interceptor for FieldCount.</summary>
 			public IDataReader_FieldCountInterceptor FieldCount { get; } = new();
 
-			/// <summary>Interceptor for IndexerInt32.</summary>
-			public IDataReader_IndexerInt32Interceptor IndexerInt32 { get; } = new();
-
-			/// <summary>Interceptor for IndexerString.</summary>
-			public IDataReader_IndexerStringInterceptor IndexerString { get; } = new();
+			/// <summary>Container for indexer interceptors. Access via .OfXxx.</summary>
+			public IndexerContainer Indexer { get; } = new();
 
 			/// <summary>Interceptor for Close.</summary>
 			public IDataReader_CloseInterceptor Close { get; } = new();
@@ -7035,11 +7068,11 @@ partial class DataReaderStubTests
 			{
 				get
 				{
-					IndexerInt32.RecordGet(i);
-					if (IndexerInt32.OnGet is { } onGet) return onGet(i);
-					if (IndexerInt32._source is { } src) return src[i];
+					Indexer.OfInt32.RecordGet(i);
+					if (Indexer.OfInt32.OnGet is { } onGet) return onGet(i);
+					if (Indexer.OfInt32._source is { } src) return src[i];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
-					return IndexerInt32.Backing.TryGetValue(i, out var v) ? v : new object();
+					return Indexer.OfInt32.Backing.TryGetValue(i, out var v) ? v : new object();
 				}
 			}
 
@@ -7047,11 +7080,11 @@ partial class DataReaderStubTests
 			{
 				get
 				{
-					IndexerString.RecordGet(name);
-					if (IndexerString.OnGet is { } onGet) return onGet(name);
-					if (IndexerString._source is { } src) return src[name];
+					Indexer.OfString.RecordGet(name);
+					if (Indexer.OfString.OnGet is { } onGet) return onGet(name);
+					if (Indexer.OfString._source is { } src) return src[name];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IDataRecord", "this[]");
-					return IndexerString.Backing.TryGetValue(name, out var v) ? v : new object();
+					return Indexer.OfString.Backing.TryGetValue(name, out var v) ? v : new object();
 				}
 			}
 
@@ -7080,8 +7113,8 @@ partial class DataReaderStubTests
 				IsClosed._source = source;
 				RecordsAffected._source = source;
 				FieldCount._source = source;
-				IndexerInt32._source = source;
-				IndexerString._source = source;
+				Indexer.OfInt32._source = source;
+				Indexer.OfString._source = source;
 				Close._source = source;
 				GetSchemaTable._source = source;
 				NextResult._source = source;
@@ -7118,8 +7151,8 @@ partial class DataReaderStubTests
 				IsClosed._source = null;
 				RecordsAffected._source = null;
 				FieldCount._source = source;
-				IndexerInt32._source = source;
-				IndexerString._source = source;
+				Indexer.OfInt32._source = source;
+				Indexer.OfString._source = source;
 				Close._source = null;
 				GetSchemaTable._source = null;
 				NextResult._source = null;
@@ -7156,8 +7189,8 @@ partial class DataReaderStubTests
 				IsClosed._source = null;
 				RecordsAffected._source = null;
 				FieldCount._source = null;
-				IndexerInt32._source = null;
-				IndexerString._source = null;
+				Indexer.OfInt32._source = null;
+				Indexer.OfString._source = null;
 				Close._source = null;
 				GetSchemaTable._source = null;
 				NextResult._source = null;
@@ -7196,8 +7229,7 @@ partial class DataReaderStubTests
 				if (IsClosed.CheckVerification() is { } isclosedFailure) failures.Add(isclosedFailure);
 				if (RecordsAffected.CheckVerification() is { } recordsaffectedFailure) failures.Add(recordsaffectedFailure);
 				if (FieldCount.CheckVerification() is { } fieldcountFailure) failures.Add(fieldcountFailure);
-				if (IndexerInt32.CheckVerification() is { } indexerint32Failure) failures.Add(indexerint32Failure);
-				if (IndexerString.CheckVerification() is { } indexerstringFailure) failures.Add(indexerstringFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Close.CheckVerification() is { } closeFailure) failures.Add(closeFailure);
 				if (GetSchemaTable.CheckVerification() is { } getschematableFailure) failures.Add(getschematableFailure);
 				if (NextResult.CheckVerification() is { } nextresultFailure) failures.Add(nextresultFailure);
@@ -7239,8 +7271,7 @@ partial class DataReaderStubTests
 				if (IsClosed.CheckVerificationAll() is { } isclosedFailure) failures.Add(isclosedFailure);
 				if (RecordsAffected.CheckVerificationAll() is { } recordsaffectedFailure) failures.Add(recordsaffectedFailure);
 				if (FieldCount.CheckVerificationAll() is { } fieldcountFailure) failures.Add(fieldcountFailure);
-				if (IndexerInt32.CheckVerificationAll() is { } indexerint32Failure) failures.Add(indexerint32Failure);
-				if (IndexerString.CheckVerificationAll() is { } indexerstringFailure) failures.Add(indexerstringFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Close.CheckVerificationAll() is { } closeFailure) failures.Add(closeFailure);
 				if (GetSchemaTable.CheckVerificationAll() is { } getschematableFailure) failures.Add(getschematableFailure);
 				if (NextResult.CheckVerificationAll() is { } nextresultFailure) failures.Add(nextresultFailure);

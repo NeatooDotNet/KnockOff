@@ -2541,9 +2541,6 @@ partial class MultipleInlineTests
 			/// <summary>Interceptor for IsPaused.</summary>
 			public IValidateBase_IsPausedInterceptor IsPaused { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IValidateBase_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for IsBusy.</summary>
 			public IValidateBase_IsBusyInterceptor IsBusy { get; } = new();
 
@@ -2555,6 +2552,9 @@ partial class MultipleInlineTests
 
 			/// <summary>Interceptor for PropertyMessages.</summary>
 			public IValidateBase_PropertyMessagesInterceptor PropertyMessages { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IValidateBase_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for GetProperty.</summary>
 			public IValidateBase_GetPropertyInterceptor GetProperty { get; } = new();
@@ -2826,11 +2826,11 @@ partial class MultipleInlineTests
 
 				if (Parent.CheckVerification() is { } parentFailure) failures.Add(parentFailure);
 				if (IsPaused.CheckVerification() is { } ispausedFailure) failures.Add(ispausedFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IsBusy.CheckVerification() is { } isbusyFailure) failures.Add(isbusyFailure);
 				if (IsValid.CheckVerification() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (IsSelfValid.CheckVerification() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (PropertyMessages.CheckVerification() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (GetProperty.CheckVerification() is { } getpropertyFailure) failures.Add(getpropertyFailure);
 				if (TryGetProperty.CheckVerification() is { } trygetpropertyFailure) failures.Add(trygetpropertyFailure);
 				if (WaitForTasks.CheckVerification() is { } waitfortasksFailure) failures.Add(waitfortasksFailure);
@@ -2851,11 +2851,11 @@ partial class MultipleInlineTests
 
 				if (Parent.CheckVerificationAll() is { } parentFailure) failures.Add(parentFailure);
 				if (IsPaused.CheckVerificationAll() is { } ispausedFailure) failures.Add(ispausedFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IsBusy.CheckVerificationAll() is { } isbusyFailure) failures.Add(isbusyFailure);
 				if (IsValid.CheckVerificationAll() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (IsSelfValid.CheckVerificationAll() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (PropertyMessages.CheckVerificationAll() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (GetProperty.CheckVerificationAll() is { } getpropertyFailure) failures.Add(getpropertyFailure);
 				if (TryGetProperty.CheckVerificationAll() is { } trygetpropertyFailure) failures.Add(trygetpropertyFailure);
 				if (WaitForTasks.CheckVerificationAll() is { } waitfortasksFailure) failures.Add(waitfortasksFailure);

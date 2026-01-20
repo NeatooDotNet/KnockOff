@@ -2608,9 +2608,6 @@ partial class ListStubTests
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IList_IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IList_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IList_CountInterceptor Count { get; } = new();
 
@@ -2619,6 +2616,9 @@ partial class ListStubTests
 
 			/// <summary>Interceptor for SyncRoot.</summary>
 			public IList_SyncRootInterceptor SyncRoot { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IList_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Add.</summary>
 			public IList_AddInterceptor Add { get; } = new();
@@ -2852,10 +2852,10 @@ partial class ListStubTests
 
 				if (IsFixedSize.CheckVerification() is { } isfixedsizeFailure) failures.Add(isfixedsizeFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsSynchronized.CheckVerification() is { } issynchronizedFailure) failures.Add(issynchronizedFailure);
 				if (SyncRoot.CheckVerification() is { } syncrootFailure) failures.Add(syncrootFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
 				if (Clear.CheckVerification() is { } clearFailure) failures.Add(clearFailure);
 				if (Contains.CheckVerification() is { } containsFailure) failures.Add(containsFailure);
@@ -2877,10 +2877,10 @@ partial class ListStubTests
 
 				if (IsFixedSize.CheckVerificationAll() is { } isfixedsizeFailure) failures.Add(isfixedsizeFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsSynchronized.CheckVerificationAll() is { } issynchronizedFailure) failures.Add(issynchronizedFailure);
 				if (SyncRoot.CheckVerificationAll() is { } syncrootFailure) failures.Add(syncrootFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
 				if (Clear.CheckVerificationAll() is { } clearFailure) failures.Add(clearFailure);
 				if (Contains.CheckVerificationAll() is { } containsFailure) failures.Add(containsFailure);

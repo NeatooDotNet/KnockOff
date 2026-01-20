@@ -3933,9 +3933,6 @@ partial class InlineEntityContainer
 			/// <summary>Interceptor for ModifiedProperties.</summary>
 			public IEntityBase_ModifiedPropertiesInterceptor ModifiedProperties { get; } = new();
 
-			/// <summary>Interceptor for IndexerString.</summary>
-			public IEntityBase_IndexerStringInterceptor IndexerString { get; } = new();
-
 			/// <summary>Interceptor for Parent.</summary>
 			public IEntityBase_ParentInterceptor Parent { get; } = new();
 
@@ -3974,6 +3971,9 @@ partial class InlineEntityContainer
 
 			/// <summary>Interceptor for IsNew.</summary>
 			public IEntityBase_IsNewInterceptor IsNew { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IEntityBase_IndexerStringInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Delete.</summary>
 			public IEntityBase_DeleteInterceptor Delete { get; } = new();
@@ -4051,11 +4051,11 @@ partial class InlineEntityContainer
 			{
 				get
 				{
-					IndexerString.RecordGet(propertyName);
-					if (IndexerString.OnGet is { } onGet) return onGet(propertyName);
-					if (IndexerString._source is { } src) return src[propertyName];
+					Indexer.RecordGet(propertyName);
+					if (Indexer.OnGet is { } onGet) return onGet(propertyName);
+					if (Indexer._source is { } src) return src[propertyName];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IEntityBase", "this[]");
-					return IndexerString.Backing.TryGetValue(propertyName, out var v) ? v : default!;
+					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
 
@@ -4097,11 +4097,11 @@ partial class InlineEntityContainer
 			{
 				get
 				{
-					IndexerString.RecordGet(propertyName);
-					if (IndexerString.OnGet is { } onGet) return onGet(propertyName);
-					if (IndexerString._source is { } src) return src[propertyName];
+					Indexer.RecordGet(propertyName);
+					if (Indexer.OnGet is { } onGet) return onGet(propertyName);
+					if (Indexer._source is { } src) return src[propertyName];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateBase", "this[]");
-					return IndexerString.Backing.TryGetValue(propertyName, out var v) ? v : default!;
+					return Indexer.Backing.TryGetValue(propertyName, out var v) ? v : default!;
 				}
 			}
 
@@ -4310,7 +4310,7 @@ partial class InlineEntityContainer
 				IsSavable._source = source;
 				IsDeleted._source = source;
 				IsNew._source = source;
-				IndexerString._source = source;
+				Indexer._source = source;
 				Delete._source = source;
 				UnDelete._source = source;
 				Save._source = source;
@@ -4340,7 +4340,7 @@ partial class InlineEntityContainer
 				IsSavable._source = null;
 				IsDeleted._source = null;
 				IsNew._source = null;
-				IndexerString._source = null;
+				Indexer._source = null;
 				Delete._source = null;
 				UnDelete._source = null;
 				Save._source = null;
@@ -4370,7 +4370,7 @@ partial class InlineEntityContainer
 				IsSavable._source = null;
 				IsDeleted._source = null;
 				IsNew._source = null;
-				IndexerString._source = null;
+				Indexer._source = null;
 				Delete._source = null;
 				UnDelete._source = null;
 				Save._source = null;
@@ -4400,7 +4400,7 @@ partial class InlineEntityContainer
 				IsSavable._source = null;
 				IsDeleted._source = null;
 				IsNew._source = null;
-				IndexerString._source = null;
+				Indexer._source = null;
 				Delete._source = null;
 				UnDelete._source = null;
 				Save._source = null;
@@ -4430,7 +4430,7 @@ partial class InlineEntityContainer
 				IsSavable._source = null;
 				IsDeleted._source = null;
 				IsNew._source = null;
-				IndexerString._source = null;
+				Indexer._source = null;
 				Delete._source = null;
 				UnDelete._source = null;
 				Save._source = null;
@@ -4460,7 +4460,7 @@ partial class InlineEntityContainer
 				IsSavable._source = null;
 				IsDeleted._source = null;
 				IsNew._source = null;
-				IndexerString._source = null;
+				Indexer._source = null;
 				Delete._source = null;
 				UnDelete._source = null;
 				Save._source = null;
@@ -4490,7 +4490,7 @@ partial class InlineEntityContainer
 				IsSavable._source = source;
 				IsDeleted._source = null;
 				IsNew._source = null;
-				IndexerString._source = null;
+				Indexer._source = null;
 				Delete._source = null;
 				UnDelete._source = null;
 				Save._source = null;
@@ -4520,7 +4520,7 @@ partial class InlineEntityContainer
 				IsSavable._source = null;
 				IsDeleted._source = source;
 				IsNew._source = source;
-				IndexerString._source = null;
+				Indexer._source = null;
 				Delete._source = null;
 				UnDelete._source = null;
 				Save._source = null;
@@ -4539,7 +4539,6 @@ partial class InlineEntityContainer
 
 				if (Root.CheckVerification() is { } rootFailure) failures.Add(rootFailure);
 				if (ModifiedProperties.CheckVerification() is { } modifiedpropertiesFailure) failures.Add(modifiedpropertiesFailure);
-				if (IndexerString.CheckVerification() is { } indexerstringFailure) failures.Add(indexerstringFailure);
 				if (Parent.CheckVerification() is { } parentFailure) failures.Add(parentFailure);
 				if (IsPaused.CheckVerification() is { } ispausedFailure) failures.Add(ispausedFailure);
 				if (IsBusy.CheckVerification() is { } isbusyFailure) failures.Add(isbusyFailure);
@@ -4553,6 +4552,7 @@ partial class InlineEntityContainer
 				if (IsSavable.CheckVerification() is { } issavableFailure) failures.Add(issavableFailure);
 				if (IsDeleted.CheckVerification() is { } isdeletedFailure) failures.Add(isdeletedFailure);
 				if (IsNew.CheckVerification() is { } isnewFailure) failures.Add(isnewFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Delete.CheckVerification() is { } deleteFailure) failures.Add(deleteFailure);
 				if (UnDelete.CheckVerification() is { } undeleteFailure) failures.Add(undeleteFailure);
 				if (Save.CheckVerification() is { } saveFailure) failures.Add(saveFailure);
@@ -4576,7 +4576,6 @@ partial class InlineEntityContainer
 
 				if (Root.CheckVerificationAll() is { } rootFailure) failures.Add(rootFailure);
 				if (ModifiedProperties.CheckVerificationAll() is { } modifiedpropertiesFailure) failures.Add(modifiedpropertiesFailure);
-				if (IndexerString.CheckVerificationAll() is { } indexerstringFailure) failures.Add(indexerstringFailure);
 				if (Parent.CheckVerificationAll() is { } parentFailure) failures.Add(parentFailure);
 				if (IsPaused.CheckVerificationAll() is { } ispausedFailure) failures.Add(ispausedFailure);
 				if (IsBusy.CheckVerificationAll() is { } isbusyFailure) failures.Add(isbusyFailure);
@@ -4590,6 +4589,7 @@ partial class InlineEntityContainer
 				if (IsSavable.CheckVerificationAll() is { } issavableFailure) failures.Add(issavableFailure);
 				if (IsDeleted.CheckVerificationAll() is { } isdeletedFailure) failures.Add(isdeletedFailure);
 				if (IsNew.CheckVerificationAll() is { } isnewFailure) failures.Add(isnewFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Delete.CheckVerificationAll() is { } deleteFailure) failures.Add(deleteFailure);
 				if (UnDelete.CheckVerificationAll() is { } undeleteFailure) failures.Add(undeleteFailure);
 				if (Save.CheckVerificationAll() is { } saveFailure) failures.Add(saveFailure);
