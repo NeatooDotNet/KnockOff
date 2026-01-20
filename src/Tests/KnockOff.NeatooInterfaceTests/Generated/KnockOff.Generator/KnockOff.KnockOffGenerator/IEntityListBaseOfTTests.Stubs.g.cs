@@ -4916,9 +4916,6 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Interceptor for Parent.</summary>
 			public IEntityListBase_ParentInterceptor Parent { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IEntityListBase_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IEntityListBase_CountInterceptor Count { get; } = new();
 
@@ -4957,6 +4954,9 @@ partial class IEntityListBaseOfTTests
 
 			/// <summary>Interceptor for IsNew.</summary>
 			public IEntityListBase_IsNewInterceptor IsNew { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IEntityListBase_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for RemoveAt.</summary>
 			public IEntityListBase_RemoveAtInterceptor RemoveAt { get; } = new();
@@ -5745,7 +5745,6 @@ partial class IEntityListBaseOfTTests
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 				if (Parent.CheckVerification() is { } parentFailure) failures.Add(parentFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
 				if (IsBusy.CheckVerification() is { } isbusyFailure) failures.Add(isbusyFailure);
@@ -5759,6 +5758,7 @@ partial class IEntityListBaseOfTTests
 				if (IsSavable.CheckVerification() is { } issavableFailure) failures.Add(issavableFailure);
 				if (IsDeleted.CheckVerification() is { } isdeletedFailure) failures.Add(isdeletedFailure);
 				if (IsNew.CheckVerification() is { } isnewFailure) failures.Add(isnewFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (RemoveAt.CheckVerification() is { } removeatFailure) failures.Add(removeatFailure);
 				if (IndexOf.CheckVerification() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerification() is { } insertFailure) failures.Add(insertFailure);
@@ -5786,7 +5786,6 @@ partial class IEntityListBaseOfTTests
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 				if (Parent.CheckVerificationAll() is { } parentFailure) failures.Add(parentFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
 				if (IsBusy.CheckVerificationAll() is { } isbusyFailure) failures.Add(isbusyFailure);
@@ -5800,6 +5799,7 @@ partial class IEntityListBaseOfTTests
 				if (IsSavable.CheckVerificationAll() is { } issavableFailure) failures.Add(issavableFailure);
 				if (IsDeleted.CheckVerificationAll() is { } isdeletedFailure) failures.Add(isdeletedFailure);
 				if (IsNew.CheckVerificationAll() is { } isnewFailure) failures.Add(isnewFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (RemoveAt.CheckVerificationAll() is { } removeatFailure) failures.Add(removeatFailure);
 				if (IndexOf.CheckVerificationAll() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerificationAll() is { } insertFailure) failures.Add(insertFailure);

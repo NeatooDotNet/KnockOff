@@ -2559,14 +2559,14 @@ partial class IRuleMessagesTests
 		/// <summary>Stub implementation of global::Neatoo.Rules.IRuleMessages.</summary>
 		public class IRuleMessages : global::Neatoo.Rules.IRuleMessages, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IRuleMessages_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IRuleMessages_CountInterceptor Count { get; } = new();
 
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IRuleMessages_IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IRuleMessages_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Add.</summary>
 			public IRuleMessages_AddInterceptor Add { get; } = new();
@@ -2797,9 +2797,9 @@ partial class IRuleMessagesTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
 				if (IndexOf.CheckVerification() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerification() is { } insertFailure) failures.Add(insertFailure);
@@ -2819,9 +2819,9 @@ partial class IRuleMessagesTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
 				if (IndexOf.CheckVerificationAll() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerificationAll() is { } insertFailure) failures.Add(insertFailure);

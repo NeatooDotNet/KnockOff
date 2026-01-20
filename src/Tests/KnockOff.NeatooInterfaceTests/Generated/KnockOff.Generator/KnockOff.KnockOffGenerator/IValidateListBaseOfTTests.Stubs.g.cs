@@ -4349,9 +4349,6 @@ partial class IValidateListBaseOfTTests
 			/// <summary>Interceptor for Parent.</summary>
 			public IValidateListBase_ParentInterceptor Parent { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IValidateListBase_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IValidateListBase_CountInterceptor Count { get; } = new();
 
@@ -4369,6 +4366,9 @@ partial class IValidateListBaseOfTTests
 
 			/// <summary>Interceptor for PropertyMessages.</summary>
 			public IValidateListBase_PropertyMessagesInterceptor PropertyMessages { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IValidateListBase_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for IndexOf.</summary>
 			public IValidateListBase_IndexOfInterceptor IndexOf { get; } = new();
@@ -4899,13 +4899,13 @@ partial class IValidateListBaseOfTTests
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 				if (Parent.CheckVerification() is { } parentFailure) failures.Add(parentFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
 				if (IsBusy.CheckVerification() is { } isbusyFailure) failures.Add(isbusyFailure);
 				if (IsValid.CheckVerification() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (IsSelfValid.CheckVerification() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (PropertyMessages.CheckVerification() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IndexOf.CheckVerification() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerification() is { } insertFailure) failures.Add(insertFailure);
 				if (RemoveAt.CheckVerification() is { } removeatFailure) failures.Add(removeatFailure);
@@ -4933,13 +4933,13 @@ partial class IValidateListBaseOfTTests
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 				if (Parent.CheckVerificationAll() is { } parentFailure) failures.Add(parentFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
 				if (IsBusy.CheckVerificationAll() is { } isbusyFailure) failures.Add(isbusyFailure);
 				if (IsValid.CheckVerificationAll() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (IsSelfValid.CheckVerificationAll() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (PropertyMessages.CheckVerificationAll() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IndexOf.CheckVerificationAll() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerificationAll() is { } insertFailure) failures.Add(insertFailure);
 				if (RemoveAt.CheckVerificationAll() is { } removeatFailure) failures.Add(removeatFailure);

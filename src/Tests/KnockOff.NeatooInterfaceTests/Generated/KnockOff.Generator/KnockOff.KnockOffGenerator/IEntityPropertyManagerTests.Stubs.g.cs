@@ -3205,9 +3205,6 @@ partial class IEntityPropertyManagerTests
 			/// <summary>Interceptor for IsBusy.</summary>
 			public IEntityPropertyManager_IsBusyInterceptor IsBusy { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IEntityPropertyManager_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for IsSelfValid.</summary>
 			public IEntityPropertyManager_IsSelfValidInterceptor IsSelfValid { get; } = new();
 
@@ -3219,6 +3216,9 @@ partial class IEntityPropertyManagerTests
 
 			/// <summary>Interceptor for IsPaused.</summary>
 			public IEntityPropertyManager_IsPausedInterceptor IsPaused { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IEntityPropertyManager_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for MarkSelfUnmodified.</summary>
 			public IEntityPropertyManager_MarkSelfUnmodifiedInterceptor MarkSelfUnmodified { get; } = new();
@@ -3544,11 +3544,11 @@ partial class IEntityPropertyManagerTests
 				if (IsSelfModified.CheckVerification() is { } isselfmodifiedFailure) failures.Add(isselfmodifiedFailure);
 				if (ModifiedProperties.CheckVerification() is { } modifiedpropertiesFailure) failures.Add(modifiedpropertiesFailure);
 				if (IsBusy.CheckVerification() is { } isbusyFailure) failures.Add(isbusyFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IsSelfValid.CheckVerification() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (IsValid.CheckVerification() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (PropertyMessages.CheckVerification() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
 				if (IsPaused.CheckVerification() is { } ispausedFailure) failures.Add(ispausedFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (MarkSelfUnmodified.CheckVerification() is { } markselfunmodifiedFailure) failures.Add(markselfunmodifiedFailure);
 				if (WaitForTasks.CheckVerification() is { } waitfortasksFailure) failures.Add(waitfortasksFailure);
 				if (HasProperty.CheckVerification() is { } haspropertyFailure) failures.Add(haspropertyFailure);
@@ -3575,11 +3575,11 @@ partial class IEntityPropertyManagerTests
 				if (IsSelfModified.CheckVerificationAll() is { } isselfmodifiedFailure) failures.Add(isselfmodifiedFailure);
 				if (ModifiedProperties.CheckVerificationAll() is { } modifiedpropertiesFailure) failures.Add(modifiedpropertiesFailure);
 				if (IsBusy.CheckVerificationAll() is { } isbusyFailure) failures.Add(isbusyFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IsSelfValid.CheckVerificationAll() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (IsValid.CheckVerificationAll() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (PropertyMessages.CheckVerificationAll() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
 				if (IsPaused.CheckVerificationAll() is { } ispausedFailure) failures.Add(ispausedFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (MarkSelfUnmodified.CheckVerificationAll() is { } markselfunmodifiedFailure) failures.Add(markselfunmodifiedFailure);
 				if (WaitForTasks.CheckVerificationAll() is { } waitfortasksFailure) failures.Add(waitfortasksFailure);
 				if (HasProperty.CheckVerificationAll() is { } haspropertyFailure) failures.Add(haspropertyFailure);

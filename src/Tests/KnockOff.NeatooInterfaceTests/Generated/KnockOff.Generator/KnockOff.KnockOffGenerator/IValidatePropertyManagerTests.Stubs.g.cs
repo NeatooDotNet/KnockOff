@@ -2733,9 +2733,6 @@ partial class IValidatePropertyManagerTests
 			/// <summary>Interceptor for IsBusy.</summary>
 			public IValidatePropertyManager_IsBusyInterceptor IsBusy { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IValidatePropertyManager_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for IsSelfValid.</summary>
 			public IValidatePropertyManager_IsSelfValidInterceptor IsSelfValid { get; } = new();
 
@@ -2747,6 +2744,9 @@ partial class IValidatePropertyManagerTests
 
 			/// <summary>Interceptor for IsPaused.</summary>
 			public IValidatePropertyManager_IsPausedInterceptor IsPaused { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IValidatePropertyManager_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for WaitForTasks.</summary>
 			public IValidatePropertyManager_WaitForTasksInterceptor WaitForTasks { get; } = new();
@@ -2989,11 +2989,11 @@ partial class IValidatePropertyManagerTests
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 				if (IsBusy.CheckVerification() is { } isbusyFailure) failures.Add(isbusyFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IsSelfValid.CheckVerification() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (IsValid.CheckVerification() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (PropertyMessages.CheckVerification() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
 				if (IsPaused.CheckVerification() is { } ispausedFailure) failures.Add(ispausedFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (WaitForTasks.CheckVerification() is { } waitfortasksFailure) failures.Add(waitfortasksFailure);
 				if (HasProperty.CheckVerification() is { } haspropertyFailure) failures.Add(haspropertyFailure);
 				if (GetProperty.CheckVerification() is { } getpropertyFailure) failures.Add(getpropertyFailure);
@@ -3016,11 +3016,11 @@ partial class IValidatePropertyManagerTests
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
 				if (IsBusy.CheckVerificationAll() is { } isbusyFailure) failures.Add(isbusyFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IsSelfValid.CheckVerificationAll() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (IsValid.CheckVerificationAll() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (PropertyMessages.CheckVerificationAll() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
 				if (IsPaused.CheckVerificationAll() is { } ispausedFailure) failures.Add(ispausedFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (WaitForTasks.CheckVerificationAll() is { } waitfortasksFailure) failures.Add(waitfortasksFailure);
 				if (HasProperty.CheckVerificationAll() is { } haspropertyFailure) failures.Add(haspropertyFailure);
 				if (GetProperty.CheckVerificationAll() is { } getpropertyFailure) failures.Add(getpropertyFailure);

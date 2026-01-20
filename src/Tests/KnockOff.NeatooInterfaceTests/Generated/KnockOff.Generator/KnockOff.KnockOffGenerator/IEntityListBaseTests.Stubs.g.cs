@@ -5249,9 +5249,6 @@ partial class IEntityListBaseTests
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IEntityListBase_IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IEntityListBase_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IEntityListBase_CountInterceptor Count { get; } = new();
 
@@ -5293,6 +5290,9 @@ partial class IEntityListBaseTests
 
 			/// <summary>Interceptor for IsNew.</summary>
 			public IEntityListBase_IsNewInterceptor IsNew { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IEntityListBase_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Add.</summary>
 			public IEntityListBase_AddInterceptor Add { get; } = new();
@@ -6137,7 +6137,6 @@ partial class IEntityListBaseTests
 				if (Parent.CheckVerification() is { } parentFailure) failures.Add(parentFailure);
 				if (IsFixedSize.CheckVerification() is { } isfixedsizeFailure) failures.Add(isfixedsizeFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsSynchronized.CheckVerification() is { } issynchronizedFailure) failures.Add(issynchronizedFailure);
 				if (SyncRoot.CheckVerification() is { } syncrootFailure) failures.Add(syncrootFailure);
@@ -6152,6 +6151,7 @@ partial class IEntityListBaseTests
 				if (IsSavable.CheckVerification() is { } issavableFailure) failures.Add(issavableFailure);
 				if (IsDeleted.CheckVerification() is { } isdeletedFailure) failures.Add(isdeletedFailure);
 				if (IsNew.CheckVerification() is { } isnewFailure) failures.Add(isnewFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
 				if (Clear.CheckVerification() is { } clearFailure) failures.Add(clearFailure);
 				if (Contains.CheckVerification() is { } containsFailure) failures.Add(containsFailure);
@@ -6182,7 +6182,6 @@ partial class IEntityListBaseTests
 				if (Parent.CheckVerificationAll() is { } parentFailure) failures.Add(parentFailure);
 				if (IsFixedSize.CheckVerificationAll() is { } isfixedsizeFailure) failures.Add(isfixedsizeFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsSynchronized.CheckVerificationAll() is { } issynchronizedFailure) failures.Add(issynchronizedFailure);
 				if (SyncRoot.CheckVerificationAll() is { } syncrootFailure) failures.Add(syncrootFailure);
@@ -6197,6 +6196,7 @@ partial class IEntityListBaseTests
 				if (IsSavable.CheckVerificationAll() is { } issavableFailure) failures.Add(issavableFailure);
 				if (IsDeleted.CheckVerificationAll() is { } isdeletedFailure) failures.Add(isdeletedFailure);
 				if (IsNew.CheckVerificationAll() is { } isnewFailure) failures.Add(isnewFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
 				if (Clear.CheckVerificationAll() is { } clearFailure) failures.Add(clearFailure);
 				if (Contains.CheckVerificationAll() is { } containsFailure) failures.Add(containsFailure);

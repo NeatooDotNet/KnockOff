@@ -55,8 +55,8 @@ partial class InlineIndexerTestClass
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::KnockOff.Tests.IMultiIndexerService? _source;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; SetCount = 0; LastSetEntry = default; _onSet = null; _configured = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IMultiIndexerService_IndexerStringInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -149,8 +149,8 @@ partial class InlineIndexerTestClass
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::KnockOff.Tests.IMultiIndexerService? _source;
 
-			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; _configured = false; _source = null; }
+			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IMultiIndexerService_IndexerInt32Interceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }

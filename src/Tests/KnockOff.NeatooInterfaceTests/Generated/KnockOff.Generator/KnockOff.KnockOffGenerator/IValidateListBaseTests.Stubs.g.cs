@@ -4598,9 +4598,6 @@ partial class IValidateListBaseTests
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IValidateListBase_IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IValidateListBase_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IValidateListBase_CountInterceptor Count { get; } = new();
 
@@ -4621,6 +4618,9 @@ partial class IValidateListBaseTests
 
 			/// <summary>Interceptor for PropertyMessages.</summary>
 			public IValidateListBase_PropertyMessagesInterceptor PropertyMessages { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IValidateListBase_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Add.</summary>
 			public IValidateListBase_AddInterceptor Add { get; } = new();
@@ -5185,7 +5185,6 @@ partial class IValidateListBaseTests
 				if (Parent.CheckVerification() is { } parentFailure) failures.Add(parentFailure);
 				if (IsFixedSize.CheckVerification() is { } isfixedsizeFailure) failures.Add(isfixedsizeFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsSynchronized.CheckVerification() is { } issynchronizedFailure) failures.Add(issynchronizedFailure);
 				if (SyncRoot.CheckVerification() is { } syncrootFailure) failures.Add(syncrootFailure);
@@ -5193,6 +5192,7 @@ partial class IValidateListBaseTests
 				if (IsValid.CheckVerification() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (IsSelfValid.CheckVerification() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (PropertyMessages.CheckVerification() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
 				if (Clear.CheckVerification() is { } clearFailure) failures.Add(clearFailure);
 				if (Contains.CheckVerification() is { } containsFailure) failures.Add(containsFailure);
@@ -5222,7 +5222,6 @@ partial class IValidateListBaseTests
 				if (Parent.CheckVerificationAll() is { } parentFailure) failures.Add(parentFailure);
 				if (IsFixedSize.CheckVerificationAll() is { } isfixedsizeFailure) failures.Add(isfixedsizeFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsSynchronized.CheckVerificationAll() is { } issynchronizedFailure) failures.Add(issynchronizedFailure);
 				if (SyncRoot.CheckVerificationAll() is { } syncrootFailure) failures.Add(syncrootFailure);
@@ -5230,6 +5229,7 @@ partial class IValidateListBaseTests
 				if (IsValid.CheckVerificationAll() is { } isvalidFailure) failures.Add(isvalidFailure);
 				if (IsSelfValid.CheckVerificationAll() is { } isselfvalidFailure) failures.Add(isselfvalidFailure);
 				if (PropertyMessages.CheckVerificationAll() is { } propertymessagesFailure) failures.Add(propertymessagesFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
 				if (Clear.CheckVerificationAll() is { } clearFailure) failures.Add(clearFailure);
 				if (Contains.CheckVerificationAll() is { } containsFailure) failures.Add(containsFailure);
