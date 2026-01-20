@@ -2,6 +2,13 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
+**Date:** 2026-01-19
+**Related Todo:** [Implement Unified Agent Workflow](../todos/unified-agent-workflow.md)
+**Status:** Ready for Implementation
+**Last Updated:** 2026-01-19
+
+---
+
 **Goal:** Implement the unified agent workflow integrating plan mode, knockoff-architect, knockoff-developer, and project-todos skill for systematic, complete implementations.
 
 **Architecture:** Enhance existing skill and agent markdown files with new sections defining workflow behavior, verification checklists, and handoff mechanisms. No new code files required - purely documentation and process changes.

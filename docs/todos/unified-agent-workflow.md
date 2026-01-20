@@ -24,6 +24,7 @@ Formalize the integration between Claude Code plan mode, knockoff-architect agen
 ## Plans
 
 - [Unified Agent Workflow Design](../plans/unified-agent-workflow.md)
+- [Unified Agent Workflow Implementation Plan](../plans/2026-01-19-unified-agent-workflow-implementation.md)
 
 ---
 
@@ -41,6 +42,8 @@ Formalize the integration between Claude Code plan mode, knockoff-architect agen
 ## Progress Log
 
 **2026-01-19**: Created todo and linked to design plan. Ready to begin implementation.
+
+**2026-01-19**: Created detailed implementation plan with 6 tasks broken into bite-sized steps.
 
 ---
 
