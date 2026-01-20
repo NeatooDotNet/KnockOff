@@ -37,8 +37,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (GetAttributeTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -62,8 +61,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private GetAttributeDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -115,8 +113,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (GetOrDefaultTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -140,8 +137,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private GetOrDefaultDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -193,8 +189,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (TransformTypedHandler<TInput, TResult>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -218,8 +213,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private TransformDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -271,8 +265,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (GetValueTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -296,8 +289,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private GetValueDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>The 'index' argument from the most recent call.</summary>
 			public int? LastCallArg { get; private set; }
@@ -352,8 +344,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (FindServiceTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -377,8 +368,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private FindServiceDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;

@@ -11,8 +11,7 @@ partial class OpenGenericDelegateTests
 		/// <summary>Interceptor for OGFactory delegate.</summary>
 		public sealed class OGFactoryInterceptor<T>
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -49,8 +48,7 @@ partial class OpenGenericDelegateTests
 		/// <summary>Interceptor for OGConverter delegate.</summary>
 		public sealed class OGConverterInterceptor<TIn, TOut, TResult> where TResult : class
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;

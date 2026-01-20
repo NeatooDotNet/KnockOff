@@ -30,8 +30,7 @@ partial class InlineGenericMethodTest
 				return (CreateTypedHandler<T>)handler;
 			}
 
-			/// <summary>Total number of calls across all type arguments.</summary>
-			public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>True if this method was called with any type argument.</summary>
 			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
@@ -67,8 +66,7 @@ partial class InlineGenericMethodTest
 
 				private CreateDelegate? _onCall;
 
-				/// <summary>Number of times this method was called with these type arguments.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -120,8 +118,7 @@ partial class InlineGenericMethodTest
 				return (ProcessTypedHandler<T>)handler;
 			}
 
-			/// <summary>Total number of calls across all type arguments.</summary>
-			public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>True if this method was called with any type argument.</summary>
 			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
@@ -157,8 +154,7 @@ partial class InlineGenericMethodTest
 
 				private ProcessDelegate? _onCall;
 
-				/// <summary>Number of times this method was called with these type arguments.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -210,8 +206,7 @@ partial class InlineGenericMethodTest
 				return (DeserializeTypedHandler<T>)handler;
 			}
 
-			/// <summary>Total number of calls across all type arguments.</summary>
-			public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>True if this method was called with any type argument.</summary>
 			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
@@ -247,8 +242,7 @@ partial class InlineGenericMethodTest
 
 				private DeserializeDelegate? _onCall;
 
-				/// <summary>Number of times this method was called with these type arguments.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
 				/// <summary>The 'json' argument from the most recent call.</summary>
 				public string? LastCallArg { get; private set; }
@@ -303,8 +297,7 @@ partial class InlineGenericMethodTest
 				return (ConvertTypedHandler<TIn, TOut>)handler;
 			}
 
-			/// <summary>Total number of calls across all type arguments.</summary>
-			public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>True if this method was called with any type argument.</summary>
 			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
@@ -340,8 +333,7 @@ partial class InlineGenericMethodTest
 
 				private ConvertDelegate? _onCall;
 
-				/// <summary>Number of times this method was called with these type arguments.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -393,8 +385,7 @@ partial class InlineGenericMethodTest
 				return (FindTypedHandler<T>)handler;
 			}
 
-			/// <summary>Total number of calls across all type arguments.</summary>
-			public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>True if this method was called with any type argument.</summary>
 			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
@@ -430,8 +421,7 @@ partial class InlineGenericMethodTest
 
 				private FindDelegate? _onCall;
 
-				/// <summary>Number of times this method was called with these type arguments.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
 				/// <summary>The 'id' argument from the most recent call.</summary>
 				public int? LastCallArg { get; private set; }
@@ -486,8 +476,7 @@ partial class InlineGenericMethodTest
 				return (TransferTypedHandler<TSource, TDest>)handler;
 			}
 
-			/// <summary>Total number of calls across all type arguments.</summary>
-			public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>True if this method was called with any type argument.</summary>
 			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
@@ -523,8 +512,7 @@ partial class InlineGenericMethodTest
 
 				private TransferDelegate? _onCall;
 
-				/// <summary>Number of times this method was called with these type arguments.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;

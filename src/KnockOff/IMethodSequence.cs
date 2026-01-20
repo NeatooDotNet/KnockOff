@@ -7,9 +7,6 @@ namespace KnockOff;
 /// </summary>
 public interface IMethodSequence
 {
-    /// <summary>Total calls across all callbacks in sequence.</summary>
-    int TotalCallCount { get; }
-
     /// <summary>
     /// Verifies the entire sequence was executed (all callbacks invoked).
     /// Throws VerificationException if sequence incomplete.

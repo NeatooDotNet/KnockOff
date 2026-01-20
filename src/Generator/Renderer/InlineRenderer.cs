@@ -703,9 +703,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t}");
         w.Line();
 
-        // Aggregate tracking
-        w.Line("\t\t\t/// <summary>Total number of calls across all type arguments.</summary>");
-        w.Line("\t\t\tpublic int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
+        // Aggregate tracking (internal - use WasCalled or Verify for public API)
+        w.Line("\t\t\tinternal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
         w.Line();
         w.Line("\t\t\t/// <summary>True if this method was called with any type argument.</summary>");
         w.Line("\t\t\tpublic bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);");
@@ -763,9 +762,8 @@ internal static class InlineRenderer
         w.Line($"\t\t\t\tprivate {handler.MethodName}Delegate? _onCall;");
         w.Line();
 
-        // CallCount
-        w.Line("\t\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
-        w.Line("\t\t\t\tpublic int CallCount { get; private set; }");
+        // CallCount (internal - use WasCalled or Verify for public API)
+        w.Line("\t\t\t\tinternal int CallCount { get; private set; }");
         w.Line();
 
         // LastCallArg/LastCallArgs
@@ -1257,8 +1255,7 @@ internal static class InlineRenderer
         w.Line("\t\t{");
 
         // CallCount and WasCalled
-        w.Line("\t\t\t/// <summary>Number of times this delegate was invoked.</summary>");
-        w.Line("\t\t\tpublic int CallCount { get; private set; }");
+        w.Line("\t\t\tinternal int CallCount { get; private set; }");
         w.Line();
         w.Line("\t\t\t/// <summary>Whether this delegate was invoked at least once.</summary>");
         w.Line("\t\t\tpublic bool WasCalled => CallCount > 0;");

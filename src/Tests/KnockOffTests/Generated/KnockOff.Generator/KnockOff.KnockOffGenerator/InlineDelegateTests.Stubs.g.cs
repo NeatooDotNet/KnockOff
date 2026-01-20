@@ -11,8 +11,7 @@ partial class InlineDelegateTests
 		/// <summary>Interceptor for NeatooPropertyChanged delegate.</summary>
 		public sealed class NeatooPropertyChangedInterceptor
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;

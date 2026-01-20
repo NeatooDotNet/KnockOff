@@ -1,6 +1,6 @@
 # Remove CallCount from Public API
 
-**Status:** Not Started
+**Status:** In Progress
 **Priority:** Medium
 **Created:** 2026-01-19
 **Last Updated:** 2026-01-19
@@ -53,6 +53,8 @@ Callback patterns using `CallCount` for state (e.g., `stub.Connect.CallCount > 0
 ---
 
 ## Plans
+
+- [Remove CallCount Implementation Plan](../plans/remove-callcount-implementation.md)
 
 ---
 

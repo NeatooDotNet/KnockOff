@@ -38,8 +38,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 		private int _unconfiguredCallCount;
 		private string? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -153,10 +152,9 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -205,8 +203,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 
 			public MethodSequenceImpl(RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -270,8 +267,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 			return (GetTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -295,8 +291,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 
 			private GetDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>The 'key' argument from the most recent call.</summary>
 			public string? LastCallArg { get; private set; }
@@ -351,8 +346,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 			return (SetTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -376,8 +370,7 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 
 			private SetDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>The 'key' argument from the most recent call.</summary>
 			public string? LastCallArg { get; private set; }

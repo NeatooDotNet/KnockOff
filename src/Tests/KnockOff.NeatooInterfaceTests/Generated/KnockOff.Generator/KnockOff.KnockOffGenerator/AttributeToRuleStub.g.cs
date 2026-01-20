@@ -37,8 +37,7 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 			return (GetRuleTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -62,8 +61,7 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 
 			private GetRuleDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>The arguments from the most recent call.</summary>
 			public (global::Neatoo.IPropertyInfo? r, object? attribute)? LastCallArgs { get; private set; }

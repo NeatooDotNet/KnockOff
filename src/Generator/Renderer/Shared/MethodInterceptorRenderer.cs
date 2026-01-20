@@ -655,13 +655,12 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// CallCount property
-			w.Line("/// <summary>Number of times this callback was invoked.</summary>");
-			w.Line("public int CallCount { get; private set; }");
+			// CallCount property (internal - use WasCalled or Verify(Times) for public API)
+			w.Line("internal int CallCount { get; private set; }");
 			w.Line();
 
 			// WasCalled property
-			w.Line("/// <summary>True if CallCount > 0.</summary>");
+			w.Line("/// <summary>True if callback was invoked at least once.</summary>");
 			w.Line("public bool WasCalled => CallCount > 0;");
 			w.Line();
 
@@ -806,9 +805,8 @@ internal static class MethodInterceptorRenderer
 			w.Line($"public {className}({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
-			// TotalCallCount
-			w.Line("/// <summary>Total calls across all callbacks in sequence.</summary>");
-			w.Line("public int TotalCallCount");
+			// TotalCallCount (internal - use Verify() to check sequence completion)
+			w.Line("internal int TotalCallCount");
 			using (w.Braces())
 			{
 				w.Line("get");
@@ -922,9 +920,8 @@ internal static class MethodInterceptorRenderer
 		string? lastArgType,
 		string? lastArgsType)
 	{
-		// CallCount - total across OnCall + sequence + unconfigured
-		w.Line("/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>");
-		w.Line("public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }");
+		// CallCount - total across OnCall + sequence + unconfigured (internal - use WasCalled or Verify(Times) for public API)
+		w.Line("internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }");
 		w.Line();
 
 		// WasCalled
@@ -964,8 +961,8 @@ internal static class MethodInterceptorRenderer
 			$"(_onCallTracking_{o.SignatureSuffix}?.CallCount ?? 0) + (_sequence_{o.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)");
 		var sumExpr = "_unconfiguredCallCount + " + string.Join(" + ", sumParts);
 
-		w.Line("/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>");
-		w.Line($"public int CallCount => {sumExpr};");
+		// Internal - use WasCalled or Verify(Times) for public API
+		w.Line($"internal int CallCount => {sumExpr};");
 		w.Line();
 
 		w.Line("/// <summary>Whether this method was called at least once (any overload).</summary>");

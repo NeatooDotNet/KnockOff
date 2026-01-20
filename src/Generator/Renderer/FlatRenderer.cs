@@ -1697,9 +1697,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// Aggregate tracking
-			w.Line("/// <summary>Total number of calls across all type arguments.</summary>");
-			w.Line("public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);");
+			// Aggregate tracking (internal - use WasCalled or Verify for public API)
+			w.Line("internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);");
 			w.Line();
 			w.Line("/// <summary>True if this method was called with any type argument.</summary>");
 			w.Line("public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);");
@@ -1739,9 +1738,8 @@ internal static class FlatRenderer
 			w.Line($"private {handler.MethodName}Delegate? _onCall;");
 			w.Line();
 
-			// CallCount
-			w.Line("/// <summary>Number of times this method was called with these type arguments.</summary>");
-			w.Line("public int CallCount { get; private set; }");
+			// CallCount (internal - use WasCalled or Verify for public API)
+			w.Line("internal int CallCount { get; private set; }");
 			w.Line();
 
 			// LastCallArg/LastCallArgs
