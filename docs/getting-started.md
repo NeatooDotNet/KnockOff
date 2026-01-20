@@ -1,147 +1,162 @@
-# Getting Started
+# Getting Started with KnockOff
 
-This guide walks you through creating your first KnockOff stub and using it in tests.
+KnockOff is a Roslyn Source Generator that creates unit test stubs at compile time. Unlike runtime mocking frameworks, KnockOff generates explicit implementations you can read, debug, and configure using partial classes.
+
+## Prerequisites
+
+- .NET 8.0 SDK or later
+- A test framework (xUnit, NUnit, MSTest)
+- Your favorite C# IDE (Visual Studio, Rider, VS Code)
 
 ## Installation
 
-```bash
-dotnet add package KnockOff
-```
+Add the KnockOff package to your test project:
 
-Or add to your `.csproj`:
-
-```xml
-<PackageReference Include="KnockOff" Version="10.0.0" />
-```
-
-## Your First Stub
-
-### 1. Define an Interface
-
-<!-- snippet: getting-started-interface-definition -->
+<!-- snippet: getting-started-install -->
 ```cs
-public interface IEmailService
-{
-    void SendEmail(string to, string subject, string body);
-    bool IsConnected { get; }
-}
+// Add KnockOff to your test project via CLI:
+// dotnet add package KnockOff
+
+// Or add to your .csproj:
+// <PackageReference Include="KnockOff" Version="10.23.0" />
 ```
 <!-- endSnippet -->
 
-### 2. Create a Stub
+## Your First Stub - Stand-Alone Pattern
 
-Create a partial class with `[KnockOff]` that implements your interface:
+The stand-alone pattern uses the `[KnockOff]` attribute on a partial class that implements your test interface.
 
-<!-- snippet: getting-started-stub-class -->
+### Define the Stub
+
+First, define a test interface and create a partial class that implements it:
+
+<!-- snippet: getting-started-standalone-define -->
 ```cs
+// Define the interface you want to stub
+public interface IUserRepo
+{
+    User? GetById(int id);
+    bool SaveUser(User user);
+}
+
+// Create a partial class with [KnockOff] attribute
 [KnockOff]
-public partial class EmailServiceKnockOff : IEmailService
+public partial class UserRepoStub : IUserRepo
 {
-    // That's it! The generator creates the implementation.
+    // No implementations needed - the generator creates them
 }
 ```
 <!-- endSnippet -->
 
-The generator creates:
-- Interface implementations for all members
-- Interceptor properties for tracking and callbacks
-- Backing fields for properties
+When you build, KnockOff generates:
+- Explicit interface implementations for all members
+- Interceptor objects for tracking calls and configuring behavior
+- Properties named after your interface (e.g., `IUserRepository`) for accessing interceptors
 
-### 3. Use in Tests
+### Use the Stub in Tests
 
-```csharp
+Configure and verify stub behavior through the generated interceptors:
+
+<!-- snippet: getting-started-standalone-use -->
+```cs
 [Fact]
-public void NotificationService_SendsEmail_WhenUserRegisters()
+public void SaveUser_WhenCalled_TracksInvocation()
 {
-    // Arrange
-    var stub = new EmailServiceKnockOff();
-    var service = new NotificationService(stub);
+    // Arrange - create the stub
+    var stub = new UserRepoStub();
 
-    // Act
-    service.NotifyRegistration("user@example.com");
+    // Configure method behavior using OnCall
+    // Chain .Verifiable() to mark for batch verification
+    stub.SaveUser.OnCall((user) => true).Verifiable();
 
-    // Assert
-    Assert.True(stub.SendEmail.WasCalled);
-    Assert.Equal("user@example.com", stub.SendEmail.LastCallArgs?.to);
+    // Act - use through the interface
+    IUserRepo repository = stub;
+    var result = repository.SaveUser(new User { Id = 1, Name = "Alice" });
+
+    // Assert - Verify() checks all members marked with .Verifiable()
+    Assert.True(result);
+    stub.Verify();
 }
 ```
+<!-- endSnippet -->
 
-## Configuring Behavior
+## Your First Stub - Inline Pattern
 
-### Return Values
+The inline pattern generates the entire stub class for you using `[KnockOff<TInterface>]`.
 
-Set `OnCall` to return values:
+### Define the Stub
 
-```csharp
-stub.GetUser.OnCall = (ko, id) => new User { Id = id, Name = "Test" };
+Mark your test class with the inline attribute:
+
+<!-- snippet: getting-started-inline-define -->
+```cs
+// Add [KnockOff<T>] attribute to your test class
+[KnockOff<IEmailSvc>]
+public partial class InlineStubTests
+{
+    // The source generator creates Stubs.IEmailSvc for you
+}
 ```
+<!-- endSnippet -->
 
-### Properties
+KnockOff generates a nested `Stubs` class containing your stub implementation.
 
-Set `Value` for simple property returns:
+### Use the Stub in Tests
 
-```csharp
-stub.IsConnected.Value = true;
-stub.Name.Value = "TestService";
+Instantiate and configure the generated stub:
+
+<!-- snippet: getting-started-inline-use -->
+```cs
+[Fact]
+public void Send_WhenCalled_TracksMessage()
+{
+    // Arrange - instantiate the generated stub
+    var stub = new Stubs.IEmailSvc();
+
+    // Configure behavior and mark as verifiable
+    // OnCall returns a tracking object for argument access
+    var tracking = stub.Send.OnCall((to, subject, body) => { }).Verifiable();
+
+    // Act - use through the interface
+    IEmailSvc emailService = stub;
+    emailService.Send("user@example.com", "Welcome", "Hello!");
+
+    // Assert - Verify() checks method was called
+    stub.Verify();
+    // Access last arguments from tracking
+    var args = tracking.LastArgs;
+    Assert.Equal("user@example.com", args.to);
+}
 ```
+<!-- endSnippet -->
 
-Or use `OnGet` for dynamic behavior:
+## Understanding Generated Code
 
-```csharp
-stub.CurrentTime.OnGet = (ko) => DateTime.UtcNow;
-```
+### Where to Find Generated Files
 
-### Throwing Exceptions
+KnockOff outputs generated code to your project's `Generated/` folder. You can view these files in your IDE:
 
-```csharp
-stub.SaveAsync.OnCall = (ko, entity) =>
-    throw new InvalidOperationException("Connection lost");
-```
+- **Visual Studio**: Expand Dependencies → Analyzers → KnockOff.SourceGenerator
+- **Rider**: Navigate to the Generated folder in the project structure
+- **File System**: `obj/{Configuration}/{TargetFramework}/generated/KnockOff.SourceGenerator/`
 
-## Verification
+Generated files are also committed to source control (in the `Generated/` folder) so you can track changes in diffs and PRs.
 
-### Methods
+### What Gets Generated
 
-```csharp
-Assert.True(stub.SendEmail.WasCalled);
-Assert.Equal(3, stub.SendEmail.CallCount);
-Assert.Equal("user@example.com", stub.SendEmail.LastCallArgs?.to);
-```
+For each stub, KnockOff generates:
 
-### Properties
+1. **Explicit interface implementations** - Every interface member is implemented explicitly
+2. **Interceptor classes** - Per-member classes that track calls, arguments, and return values
+3. **Container properties** - Interface-named properties that provide access to interceptors (e.g., `IUserRepository`)
 
-```csharp
-Assert.Equal(2, stub.IsConnected.GetCount);
-Assert.Equal(1, stub.Name.SetCount);
-Assert.Equal("NewValue", stub.Name.LastSetValue);
-```
-
-## Resetting State
-
-Clear tracking and callbacks:
-
-```csharp
-stub.SendEmail.Reset();  // CallCount = 0, OnCall = null
-```
-
-## Viewing Generated Code
-
-To see what the generator creates:
-
-```xml
-<PropertyGroup>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
-</PropertyGroup>
-```
-
-Generated files appear in `Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/`.
+The generated code is readable C# that mirrors your interface structure. You can review it in the `Generated/` folder to understand how KnockOff implements your stub.
 
 ## Next Steps
 
-- [Why KnockOff?](why-knockoff/) — Understand the design philosophy
-- [Stub Patterns](guides/stub-patterns.md) — Standalone vs inline vs delegate stubs
-- [Methods Guide](guides/methods.md) — Async, overloads, generics
-- [Properties Guide](guides/properties.md) — Properties, indexers, init/required
-- [Verification Guide](guides/verification.md) — Tracking and assertions
-- [KnockOff vs Moq](knockoff-vs-moq.md) — Detailed comparison
+Now that you've created your first stubs, explore more features:
+
+- **[Stub Patterns](guides/stub-patterns.md)** - Learn about all three stub patterns (Stand-Alone, Inline Interface, Inline Class)
+- **[Methods](guides/methods.md)** - Configure method behavior with OnCall, track arguments, handle async methods
+- **[Properties](guides/properties.md)** - Use OnGet/OnSet for properties, track access, configure backing values
+- **[Interceptor API Reference](reference/interceptor-api.md)** - Complete reference for the interceptor API

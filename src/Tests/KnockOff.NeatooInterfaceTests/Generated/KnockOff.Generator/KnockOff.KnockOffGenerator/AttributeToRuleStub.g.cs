@@ -58,7 +58,7 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 		public sealed class GetRuleTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::Neatoo.IValidateBase
 		{
 			/// <summary>Delegate for GetRule.</summary>
-			public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(AttributeToRuleStub ko, global::Neatoo.IPropertyInfo r, object? attribute);
+			public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(global::Neatoo.IPropertyInfo r, object? attribute);
 
 			private GetRuleDelegate? _onCall;
 
@@ -82,6 +82,22 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -128,7 +144,7 @@ partial class AttributeToRuleStub : global::Neatoo.Rules.Rules.IAttributeToRule,
 	{
 		GetRule.Of<T>().RecordCall(r, attribute);
 		if (GetRule.Of<T>().Callback is { } callback)
-			return callback(this, r, attribute);
+			return callback(r, attribute);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttributeToRule", "GetRule");
 		return default!;
 	}

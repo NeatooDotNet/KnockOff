@@ -12,101 +12,131 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Add.</summary>
-		public delegate int AddDelegate(CalculatorStub ko, int a, int b);
+		public delegate int AddDelegate(int a, int b);
 
-		private readonly global::System.Collections.Generic.List<(AddDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private AddDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(AddDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private (int? a, int? b)? _unconfiguredLastArgs;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (int? a, int? b)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (int? a, int? b)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> OnCall(AddDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<AddDelegate> OnCall(AddDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<AddDelegate> OnCallSequence(AddDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(AddDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(CalculatorStub ko, bool strict, int a, int b)
+		internal int Invoke(bool strict, int a, int b)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArgs = ((a, b));
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Add(a, b);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall((a, b));
+				_sequenceIndex++;
+				return callback(a, b);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall((a, b));
+				return _onCall(a, b);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArgs = ((a, b));
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Add");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall((a, b));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Add");
-			}
-
-			return callback(ko, a, b);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Add(a, b);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Add");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Add", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Add", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
 		{
+			private readonly AddInterceptor _interceptor;
+
+			public MethodTrackingImpl(AddInterceptor interceptor) => _interceptor = interceptor;
+
 			private (int? a, int? b) _lastArgs;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -123,6 +153,35 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -137,34 +196,45 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<AddDelegate> ThenCall(AddDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<AddDelegate> ThenCall(AddDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<AddDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -176,101 +246,131 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Subtract.</summary>
-		public delegate int SubtractDelegate(CalculatorStub ko, int a, int b);
+		public delegate int SubtractDelegate(int a, int b);
 
-		private readonly global::System.Collections.Generic.List<(SubtractDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private SubtractDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(SubtractDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private (int? a, int? b)? _unconfiguredLastArgs;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (int? a, int? b)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (int? a, int? b)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> OnCall(SubtractDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<SubtractDelegate> OnCall(SubtractDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<SubtractDelegate> OnCallSequence(SubtractDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(SubtractDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(CalculatorStub ko, bool strict, int a, int b)
+		internal int Invoke(bool strict, int a, int b)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArgs = ((a, b));
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Subtract(a, b);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Subtract");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall((a, b));
+				_sequenceIndex++;
+				return callback(a, b);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall((a, b));
+				return _onCall(a, b);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArgs = ((a, b));
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Subtract");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall((a, b));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Subtract");
-			}
-
-			return callback(ko, a, b);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Subtract(a, b);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Subtract");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Subtract", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Subtract", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
 		{
+			private readonly SubtractInterceptor _interceptor;
+
+			public MethodTrackingImpl(SubtractInterceptor interceptor) => _interceptor = interceptor;
+
 			private (int? a, int? b) _lastArgs;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -287,6 +387,35 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -301,34 +430,45 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<SubtractDelegate> ThenCall(SubtractDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<SubtractDelegate> ThenCall(SubtractDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<SubtractDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -340,101 +480,131 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Multiply.</summary>
-		public delegate int MultiplyDelegate(CalculatorStub ko, int a, int b);
+		public delegate int MultiplyDelegate(int a, int b);
 
-		private readonly global::System.Collections.Generic.List<(MultiplyDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private MultiplyDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(MultiplyDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private (int? a, int? b)? _unconfiguredLastArgs;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (int? a, int? b)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (int? a, int? b)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> OnCall(MultiplyDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<MultiplyDelegate> OnCall(MultiplyDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<MultiplyDelegate> OnCallSequence(MultiplyDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(MultiplyDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(CalculatorStub ko, bool strict, int a, int b)
+		internal int Invoke(bool strict, int a, int b)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArgs = ((a, b));
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Multiply(a, b);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Multiply");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall((a, b));
+				_sequenceIndex++;
+				return callback(a, b);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall((a, b));
+				return _onCall(a, b);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArgs = ((a, b));
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Multiply");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall((a, b));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Multiply");
-			}
-
-			return callback(ko, a, b);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Multiply(a, b);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Multiply");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Multiply", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Multiply", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
 		{
+			private readonly MultiplyInterceptor _interceptor;
+
+			public MethodTrackingImpl(MultiplyInterceptor interceptor) => _interceptor = interceptor;
+
 			private (int? a, int? b) _lastArgs;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -451,6 +621,35 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -465,34 +664,45 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<MultiplyDelegate> ThenCall(MultiplyDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<MultiplyDelegate> ThenCall(MultiplyDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<MultiplyDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -504,101 +714,131 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Divide.</summary>
-		public delegate double DivideDelegate(CalculatorStub ko, double a, double b);
+		public delegate double DivideDelegate(double a, double b);
 
-		private readonly global::System.Collections.Generic.List<(DivideDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private DivideDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(DivideDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private (double? a, double? b)? _unconfiguredLastArgs;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (double? a, double? b)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (double? a, double? b)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(double? a, double? b)> OnCall(DivideDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<DivideDelegate> OnCall(DivideDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<DivideDelegate> OnCallSequence(DivideDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(DivideDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal double Invoke(CalculatorStub ko, bool strict, double a, double b)
+		internal double Invoke(bool strict, double a, double b)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArgs = ((a, b));
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Divide(a, b);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Divide");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall((a, b));
+				_sequenceIndex++;
+				return callback(a, b);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall((a, b));
+				return _onCall(a, b);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArgs = ((a, b));
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Divide");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall((a, b));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Divide");
-			}
-
-			return callback(ko, a, b);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Divide(a, b);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Divide");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArgs = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Divide", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Divide", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(double? a, double? b)>
 		{
+			private readonly DivideInterceptor _interceptor;
+
+			public MethodTrackingImpl(DivideInterceptor interceptor) => _interceptor = interceptor;
+
 			private (double? a, double? b) _lastArgs;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -615,6 +855,35 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(double? a, double? b)> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(double? a, double? b)> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -629,34 +898,45 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<DivideDelegate> ThenCall(DivideDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<DivideDelegate> ThenCall(DivideDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<DivideDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -668,101 +948,131 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 		internal global::KnockOff.Benchmarks.Interfaces.ICalculator? _source;
 
 		/// <summary>Delegate for Square.</summary>
-		public delegate int SquareDelegate(CalculatorStub ko, int x);
+		public delegate int SquareDelegate(int x);
 
-		private readonly global::System.Collections.Generic.List<(SquareDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private SquareDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(SquareDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private int? _unconfiguredLastArg;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public int? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(SquareDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<SquareDelegate> OnCall(SquareDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<SquareDelegate> OnCallSequence(SquareDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(SquareDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal int Invoke(CalculatorStub ko, bool strict, int x)
+		internal int Invoke(bool strict, int x)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArg = x;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Square(x);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Square");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(x);
+				_sequenceIndex++;
+				return callback(x);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall(x);
+				return _onCall(x);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArg = x;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Square");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall(x);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Square");
-			}
-
-			return callback(ko, x);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Square(x);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Square");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Square", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Square", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<int>
 		{
+			private readonly SquareInterceptor _interceptor;
+
+			public MethodTrackingImpl(SquareInterceptor interceptor) => _interceptor = interceptor;
+
 			private int _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -779,6 +1089,35 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -793,34 +1132,45 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<SquareDelegate> ThenCall(SquareDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<SquareDelegate> ThenCall(SquareDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<SquareDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -846,23 +1196,34 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.ICalculator instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.ICalculator Object => this;
 
-	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
-	public bool Verify()
+	/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+	public void Verify()
 	{
-		var result = true;
-		result &= Add.Verify();
-		result &= Subtract.Verify();
-		result &= Multiply.Verify();
-		result &= Divide.Verify();
-		result &= Square.Verify();
-		return result;
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
+		if (Subtract.CheckVerification() is { } subtractFailure) failures.Add(subtractFailure);
+		if (Multiply.CheckVerification() is { } multiplyFailure) failures.Add(multiplyFailure);
+		if (Divide.CheckVerification() is { } divideFailure) failures.Add(divideFailure);
+		if (Square.CheckVerification() is { } squareFailure) failures.Add(squareFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
-	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
 	public void VerifyAll()
 	{
-		if (!Verify())
-			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
+		if (Subtract.CheckVerificationAll() is { } subtractFailure) failures.Add(subtractFailure);
+		if (Multiply.CheckVerificationAll() is { } multiplyFailure) failures.Add(multiplyFailure);
+		if (Divide.CheckVerificationAll() is { } divideFailure) failures.Add(divideFailure);
+		if (Square.CheckVerificationAll() is { } squareFailure) failures.Add(squareFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
 	// Source(T) methods for interface delegation
@@ -880,27 +1241,27 @@ partial class CalculatorStub : global::KnockOff.Benchmarks.Interfaces.ICalculato
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Add(int a, int b)
 	{
-		return Add.Invoke(this, Strict, a, b);
+		return Add.Invoke(Strict, a, b);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Subtract(int a, int b)
 	{
-		return Subtract.Invoke(this, Strict, a, b);
+		return Subtract.Invoke(Strict, a, b);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Multiply(int a, int b)
 	{
-		return Multiply.Invoke(this, Strict, a, b);
+		return Multiply.Invoke(Strict, a, b);
 	}
 
 	double global::KnockOff.Benchmarks.Interfaces.ICalculator.Divide(double a, double b)
 	{
-		return Divide.Invoke(this, Strict, a, b);
+		return Divide.Invoke(Strict, a, b);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.ICalculator.Square(int x)
 	{
-		return Square.Invoke(this, Strict, x);
+		return Square.Invoke(Strict, x);
 	}
 
 }

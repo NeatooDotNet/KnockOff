@@ -15,101 +15,131 @@ partial class CustomFormatterStubTests
 			internal global::System.ICustomFormatter? _source;
 
 			/// <summary>Delegate for Format.</summary>
-			public delegate string FormatDelegate(Stubs.ICustomFormatter ko, string? format, object? arg, global::System.IFormatProvider? formatProvider);
+			public delegate string FormatDelegate(string? format, object? arg, global::System.IFormatProvider? formatProvider);
 
-			private readonly global::System.Collections.Generic.List<(FormatDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private FormatDelegate? _onCall;
+			private MethodTrackingImpl? _onCallTracking;
+
+			private global::System.Collections.Generic.List<(FormatDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
 			private int _unconfiguredCallCount;
 			private (string? format, object? arg, global::System.IFormatProvider? formatProvider)? _unconfiguredLastArgs;
 
 			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
-			public (string? format, object? arg, global::System.IFormatProvider? formatProvider)? LastCallArgs { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+			public (string? format, object? arg, global::System.IFormatProvider? formatProvider)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
-			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTrackingArgs<(string? format, object? arg, global::System.IFormatProvider? formatProvider)> OnCall(FormatDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequence = null;
 				_sequenceIndex = 0;
-				return tracking;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = callback;
+				_onCallTracking = new MethodTrackingImpl(this);
+				return _onCallTracking;
 			}
 
-			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-			public global::KnockOff.IMethodSequence<FormatDelegate> OnCall(FormatDelegate callback, global::KnockOff.Times times)
+			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<FormatDelegate> OnCallSequence(FormatDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, times, tracking));
+				_onCall = null;
+				_onCallTracking = null;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_sequence = new global::System.Collections.Generic.List<(FormatDelegate Callback, MethodTrackingImpl Tracking)>();
+				var tracking = new MethodTrackingImpl(this);
+				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
 				return new MethodSequenceImpl(this);
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal string Invoke(Stubs.ICustomFormatter ko, string? format, object? arg, global::System.IFormatProvider? formatProvider)
+			internal string Invoke(bool strict, string? format, object? arg, global::System.IFormatProvider? formatProvider)
 			{
-				if (_sequence.Count == 0)
+				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
-					_unconfiguredCallCount++;
-					_unconfiguredLastArgs = ((format, arg, formatProvider));
-					#pragma warning disable CS8601, SYSLIB0050
-					if (_source is { } src) return src.Format(format, arg, formatProvider);
-					#pragma warning restore CS8601, SYSLIB0050
-					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
+					var (callback, tracking) = _sequence[_sequenceIndex];
+					tracking.RecordCall((format, arg, formatProvider));
+					_sequenceIndex++;
+					return callback(format, arg, formatProvider);
+				}
+
+				if (_onCall != null && _onCallTracking != null)
+				{
+					_onCallTracking.RecordCall((format, arg, formatProvider));
+					return _onCall(format, arg, formatProvider);
+				}
+
+				_unconfiguredCallCount++;
+				_unconfiguredLastArgs = ((format, arg, formatProvider));
+				if (_sequence != null && _sequenceIndex >= _sequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Format");
 					return default!;
 				}
 
-				var (callback, times, tracking) = _sequence[_sequenceIndex];
-				tracking.RecordCall((format, arg, formatProvider));
-
-				if (!times.IsForever && tracking.CallCount >= times.Count)
-				{
-					if (_sequenceIndex < _sequence.Count - 1)
-						_sequenceIndex++;
-					else if (tracking.CallCount > times.Count)
-						throw global::KnockOff.StubException.SequenceExhausted("Format");
-				}
-
-				return callback(ko, format, arg, formatProvider);
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.Format(format, arg, formatProvider);
+				#pragma warning restore CS8601, SYSLIB0050
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Format");
+				return default!;
 			}
 
-			/// <summary>Resets all tracking state.</summary>
+			/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArgs = default;
 				_source = null;
-				foreach (var (_, _, tracking) in _sequence)
-					tracking.Reset();
+				_onCallTracking?.Reset();
+				if (_sequence != null)
+				{
+					foreach (var (_, tracking) in _sequence)
+						tracking.Reset();
+				}
 				_sequenceIndex = 0;
 			}
 
-			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-			public bool Verify()
+			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				foreach (var (_, times, tracking) in _sequence)
-				{
-					if (times.IsForever)
-					{
-						if (!tracking.WasCalled)
-							return false;
-					}
-					else if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Format", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Format", global::KnockOff.Times.AtLeastOnce, CallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
 			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTrackingArgs<(string? format, object? arg, global::System.IFormatProvider? formatProvider)>
 			{
+				private readonly ICustomFormatter_FormatInterceptor _interceptor;
+
+				public MethodTrackingImpl(ICustomFormatter_FormatInterceptor interceptor) => _interceptor = interceptor;
+
 				private (string? format, object? arg, global::System.IFormatProvider? formatProvider) _lastArgs;
 
 				/// <summary>Number of times this callback was invoked.</summary>
@@ -126,6 +156,35 @@ partial class CustomFormatterStubTests
 
 				/// <summary>Resets tracking state.</summary>
 				public void Reset() { CallCount = 0; _lastArgs = default; }
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTrackingArgs<(string? format, object? arg, global::System.IFormatProvider? formatProvider)> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTrackingArgs<(string? format, object? arg, global::System.IFormatProvider? formatProvider)> Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = times;
+					return this;
+				}
+
+				global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+				global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -140,34 +199,45 @@ partial class CustomFormatterStubTests
 				{
 					get
 					{
+						if (_interceptor._sequence == null) return 0;
 						var total = 0;
-						foreach (var (_, _, tracking) in _interceptor._sequence)
+						foreach (var (_, tracking) in _interceptor._sequence)
 							total += tracking.CallCount;
 						return total;
 					}
 				}
 
-				/// <summary>Add another callback to the sequence.</summary>
-				public global::KnockOff.IMethodSequence<FormatDelegate> ThenCall(FormatDelegate callback, global::KnockOff.Times times)
+				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IMethodSequence<FormatDelegate> ThenCall(FormatDelegate callback)
 				{
-					var tracking = new MethodTrackingImpl();
-					_interceptor._sequence.Add((callback, times, tracking));
+					var tracking = new MethodTrackingImpl(_interceptor);
+					_interceptor._sequence!.Add((callback, tracking));
 					return this;
 				}
 
-				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-				public bool Verify()
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
 				{
-					foreach (var (_, times, tracking) in _interceptor._sequence)
-					{
-						if (!times.Verify(tracking.CallCount))
-							return false;
-					}
-					return true;
+					if (_interceptor._sequence == null) return;
+					var sequenceLength = _interceptor._sequence.Count;
+					var completedCount = _interceptor._sequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 				}
 
-				/// <summary>Reset all tracking in the sequence.</summary>
+				/// <summary>Resets all tracking in the sequence.</summary>
 				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodSequence<FormatDelegate> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 			}
 
 		}
@@ -180,7 +250,7 @@ partial class CustomFormatterStubTests
 
 			string global::System.ICustomFormatter.Format(string? format, object? arg, global::System.IFormatProvider? formatProvider)
 			{
-				return Format.Invoke(this, format, arg, formatProvider);
+				return Format.Invoke(Strict, format, arg, formatProvider);
 			}
 
 			/// <summary>The global::System.ICustomFormatter instance. Use for passing to code expecting the interface.</summary>
@@ -200,6 +270,28 @@ partial class CustomFormatterStubTests
 			public void Source(global::System.ICustomFormatter? source)
 			{
 				Format._source = source;
+			}
+
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Format.CheckVerification() is { } formatFailure) failures.Add(formatFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Format.CheckVerificationAll() is { } formatFailure) failures.Add(formatFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
 			}
 
 		}

@@ -87,6 +87,9 @@ internal static class ClassRenderer
         w.Line($"{indent1}}}");
         w.Line();
 
+        // Verify and VerifyAll methods
+        RenderClassVerifyMethods(w, cls, indent1, indent2);
+
         // Nested Impl class
         RenderImplClass(w, cls, indent1, indent2, indent3, indent4);
 
@@ -104,13 +107,24 @@ internal static class ClassRenderer
         w.Line($"{indent}public sealed class {prop.InterceptorClassName}{prop.TypeParameterList}{prop.ConstraintClauses}");
         w.Line($"{indent}{{");
 
+        // Verifiable state
+        w.Line($"{indent1}private bool _isVerifiable;");
+        w.Line($"{indent1}private global::KnockOff.Times? _verifiableTimes;");
+        w.Line($"{indent1}private bool _configured;");
+        w.Line();
+
         if (prop.HasGetter)
         {
             w.Line($"{indent1}/// <summary>Number of times the getter was accessed.</summary>");
             w.Line($"{indent1}public int GetCount {{ get; private set; }}");
             w.Line();
-            w.Line($"{indent1}/// <summary>Callback for getter. If set, returns its value instead of base.</summary>");
-            w.Line($"{indent1}public global::System.Func<{prop.StubClassName}, {prop.ReturnType}>? OnGet {{ get; set; }}");
+            w.Line($"{indent1}private global::System.Func<{prop.ReturnType}>? _onGet;");
+            w.Line($"{indent1}/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>");
+            w.Line($"{indent1}public global::System.Func<{prop.ReturnType}>? OnGet");
+            w.Line($"{indent1}{{");
+            w.Line($"{indent1}\tget => _onGet;");
+            w.Line($"{indent1}\tset {{ _onGet = value; if (value != null) _configured = true; }}");
+            w.Line($"{indent1}}}");
             w.Line();
         }
 
@@ -122,8 +136,13 @@ internal static class ClassRenderer
             w.Line($"{indent1}/// <summary>The last value passed to the setter.</summary>");
             w.Line($"{indent1}public {prop.NullableReturnType} LastSetValue {{ get; private set; }}");
             w.Line();
-            w.Line($"{indent1}/// <summary>Callback for setter. If set, called instead of base.</summary>");
-            w.Line($"{indent1}public global::System.Action<{prop.StubClassName}, {prop.ReturnType}>? OnSet {{ get; set; }}");
+            w.Line($"{indent1}private global::System.Action<{prop.ReturnType}>? _onSet;");
+            w.Line($"{indent1}/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>");
+            w.Line($"{indent1}public global::System.Action<{prop.ReturnType}>? OnSet");
+            w.Line($"{indent1}{{");
+            w.Line($"{indent1}\tget => _onSet;");
+            w.Line($"{indent1}\tset {{ _onSet = value; if (value != null) _configured = true; }}");
+            w.Line($"{indent1}}}");
             w.Line();
         }
 
@@ -141,12 +160,101 @@ internal static class ClassRenderer
             w.Line();
         }
 
-        // Reset method
-        w.Line($"{indent1}/// <summary>Resets all tracking state.</summary>");
+        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet) and verifiable marking
+        w.Line($"{indent1}/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>");
         var resetParts = new List<string>();
-        if (prop.HasGetter) resetParts.Add("GetCount = 0; OnGet = null;");
-        if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default; OnSet = null;");
+        if (prop.HasGetter) resetParts.Add("GetCount = 0;");
+        if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default;");
         w.Line($"{indent1}public void Reset() {{ {string.Join(" ", resetParts)} }}");
+        w.Line();
+
+        // Verifiable methods (fluent)
+        w.Line($"{indent1}/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public {prop.InterceptorClassName}{prop.TypeParameterList} Verifiable() {{ _isVerifiable = true; _verifiableTimes = null; return this; }}");
+        w.Line();
+        w.Line($"{indent1}/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public {prop.InterceptorClassName}{prop.TypeParameterList} Verifiable(global::KnockOff.Times times) {{ _isVerifiable = true; _verifiableTimes = times; return this; }}");
+        w.Line();
+
+        // Build total count expression based on available accessors
+        var totalCountExpr = prop.HasGetter && prop.HasSetter
+            ? "GetCount + SetCount"
+            : (prop.HasGetter ? "GetCount" : "SetCount");
+
+        // Verify methods - throw on failure
+        w.Line($"{indent1}/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify(global::KnockOff.Times times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tvar totalCount = {totalCountExpr};");
+        w.Line($"{indent1}\tif (!times.Validate(totalCount))");
+        w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName}\", times, totalCount));");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // VerifyGet methods
+        if (prop.HasGetter)
+        {
+            w.Line($"{indent1}/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>");
+            w.Line($"{indent1}public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);");
+            w.Line();
+
+            w.Line($"{indent1}/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+            w.Line($"{indent1}public void VerifyGet(global::KnockOff.Times times)");
+            w.Line($"{indent1}{{");
+            w.Line($"{indent1}\tif (!times.Validate(GetCount))");
+            w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName} (get)\", times, GetCount));");
+            w.Line($"{indent1}}}");
+            w.Line();
+        }
+
+        // VerifySet methods
+        if (prop.HasSetter)
+        {
+            w.Line($"{indent1}/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>");
+            w.Line($"{indent1}public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);");
+            w.Line();
+
+            w.Line($"{indent1}/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+            w.Line($"{indent1}public void VerifySet(global::KnockOff.Times times)");
+            w.Line($"{indent1}{{");
+            w.Line($"{indent1}\tif (!times.Validate(SetCount))");
+            w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName} (set)\", times, SetCount));");
+            w.Line($"{indent1}}}");
+            w.Line();
+        }
+
+        // Internal verification support for stub-level Verify/VerifyAll
+        w.Line($"{indent1}/// <summary>Whether this property was marked with Verifiable().</summary>");
+        w.Line($"{indent1}internal bool IsVerifiable => _isVerifiable;");
+        w.Line();
+
+        // IsConfigured - OnGet/OnSet callback registered
+        var isConfiguredParts = new List<string> { "_configured" };
+        w.Line($"{indent1}/// <summary>Whether this property has been configured (callbacks registered).</summary>");
+        w.Line($"{indent1}internal bool IsConfigured => {string.Join(" || ", isConfiguredParts)};");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerification()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!_isVerifiable) return null;");
+        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\tvar totalCount = {totalCountExpr};");
+        w.Line($"{indent1}\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{prop.PropertyName}\", times, totalCount);");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!IsConfigured) return null;");
+        w.Line($"{indent1}\tvar totalCount = {totalCountExpr};");
+        w.Line($"{indent1}\treturn totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{prop.PropertyName}\", global::KnockOff.Times.AtLeastOnce, totalCount);");
+        w.Line($"{indent1}}}");
 
         w.Line($"{indent}}}");
         w.Line();
@@ -174,7 +282,7 @@ internal static class ClassRenderer
             var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => p.Trim().Split(' ')[0]).ToArray();
             var paramList = string.Join(", ", paramTypes);
             w.Line($"{indent1}/// <summary>Callback for getter.</summary>");
-            w.Line($"{indent1}public global::System.Func<{indexer.StubClassName}, {paramList}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
+            w.Line($"{indent1}public global::System.Func<{paramList}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
             w.Line();
         }
 
@@ -192,7 +300,7 @@ internal static class ClassRenderer
             var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => p.Trim().Split(' ')[0]).ToArray();
             var paramList = string.Join(", ", paramTypes);
             w.Line($"{indent1}/// <summary>Callback for setter.</summary>");
-            w.Line($"{indent1}public global::System.Action<{indexer.StubClassName}, {paramList}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
+            w.Line($"{indent1}public global::System.Action<{paramList}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
             w.Line();
         }
 
@@ -221,11 +329,11 @@ internal static class ClassRenderer
         w.Line($"{indent1}public global::System.Collections.Generic.Dictionary<{singleKeyType}, {indexer.ReturnType}> Backing {{ get; }} = new();");
         w.Line();
 
-        // Reset method
-        w.Line($"{indent1}/// <summary>Resets all tracking state.</summary>");
+        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing)
+        w.Line($"{indent1}/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing).</summary>");
         var resetParts = new List<string>();
-        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default; OnGet = null;");
-        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default; OnSet = null;");
+        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default;");
+        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default;");
         // Note: Backing dictionary is intentionally NOT cleared
         w.Line($"{indent1}public void Reset() {{ {string.Join(" ", resetParts)} }}");
 
@@ -292,7 +400,8 @@ internal static class ClassRenderer
         w.Line("}");
         w.Line();
 
-        // Reset method
+        // Reset method - clears tracking state but preserves configuration (OnCall)
+        w.Line($"{indent1}/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
         w.Append($"{indent1}public void Reset() {{ CallCount = 0; ");
         if (method.LastCallArgType != null)
         {
@@ -302,7 +411,56 @@ internal static class ClassRenderer
         {
             w.Append("LastCallArgs = default; ");
         }
-        w.Line("_onCall = null; }");
+        w.Line("}");
+        w.Line();
+
+        // Verify methods - new API throws VerificationException
+        w.Line($"{indent1}/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify(global::KnockOff.Times times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!times.Validate(CallCount))");
+        w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, CallCount));");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // Verifiable state fields
+        w.Line($"{indent1}private bool _isVerifiable;");
+        w.Line($"{indent1}private global::KnockOff.Times? _verifiableTimes;");
+        w.Line();
+
+        // Verifiable methods
+        w.Line($"{indent1}/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public global::KnockOff.IMethodTracking Verifiable() {{ _isVerifiable = true; _verifiableTimes = null; return this; }}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) {{ _isVerifiable = true; _verifiableTimes = times; return this; }}");
+        w.Line();
+
+        // Internal verification support for stub-level Verify/VerifyAll
+        w.Line($"{indent1}internal bool IsVerifiable => _isVerifiable;");
+        w.Line($"{indent1}internal bool IsConfigured => _onCall != null;");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerification()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!_isVerifiable) return null;");
+        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\treturn times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure(\"{method.MethodName}\", times, CallCount);");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!IsConfigured) return null;");
+        w.Line($"{indent1}\treturn CallCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{method.MethodName}\", global::KnockOff.Times.AtLeastOnce, CallCount);");
+        w.Line($"{indent1}}}");
 
         w.Line($"{indent}}}");
         w.Line();
@@ -331,8 +489,93 @@ internal static class ClassRenderer
         w.Line($"{indent1}/// <summary>Records an event unsubscription.</summary>");
         w.Line($"{indent1}public void RecordRemove({evt.DelegateType}? handler) {{ RemoveCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Remove(Handler, handler); }}");
         w.Line();
-        w.Line($"{indent1}/// <summary>Resets all tracking state.</summary>");
+        w.Line($"{indent1}/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>");
         w.Line($"{indent1}public void Reset() {{ AddCount = 0; RemoveCount = 0; Handler = null; }}");
+        w.Line();
+
+        // Verification API for events
+        w.Line($"{indent1}private bool _isVerifiable;");
+        w.Line($"{indent1}private global::KnockOff.Times? _verifiableTimes;");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies the event was subscribed to at least once.</summary>");
+        w.Line($"{indent1}public void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies the event subscription count matches the Times constraint.</summary>");
+        w.Line($"{indent1}public void VerifyAdd(global::KnockOff.Times times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!times.Validate(AddCount))");
+        w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' add verification failed: expected {{times}}, but was called {{AddCount}} time(s).\");");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies the event was unsubscribed at least once.</summary>");
+        w.Line($"{indent1}public void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>");
+        w.Line($"{indent1}public void VerifyRemove(global::KnockOff.Times times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!times.Validate(RemoveCount))");
+        w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' remove verification failed: expected {{times}}, but was called {{RemoveCount}} time(s).\");");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>");
+        w.Line($"{indent1}public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies the total event access count matches the Times constraint.</summary>");
+        w.Line($"{indent1}public void Verify(global::KnockOff.Times times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tvar totalCount = AddCount + RemoveCount;");
+        w.Line($"{indent1}\tif (!times.Validate(totalCount))");
+        w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' verification failed: expected {{times}}, but was called {{totalCount}} time(s).\");");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Marks this event for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public {evt.InterceptorClassName}{evt.TypeParameterList} Verifiable()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\t_isVerifiable = true;");
+        w.Line($"{indent1}\t_verifiableTimes = global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\treturn this;");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public {evt.InterceptorClassName}{evt.TypeParameterList} Verifiable(global::KnockOff.Times times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\t_isVerifiable = true;");
+        w.Line($"{indent1}\t_verifiableTimes = times;");
+        w.Line($"{indent1}\treturn this;");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // Internal verification methods for stub-level Verify()/VerifyAll()
+        w.Line($"{indent1}internal bool IsVerifiable => _isVerifiable;");
+        w.Line($"{indent1}internal bool IsConfigured => Handler != null;");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerification()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!_isVerifiable) return null;");
+        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\tvar totalCount = AddCount + RemoveCount;");
+        w.Line($"{indent1}\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{evt.EventName}\", times, totalCount);");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!IsConfigured && !_isVerifiable) return null;");
+        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\tvar totalCount = AddCount + RemoveCount;");
+        w.Line($"{indent1}\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{evt.EventName}\", times, totalCount);");
+        w.Line($"{indent1}}}");
 
         w.Line($"{indent}}}");
         w.Line();
@@ -355,6 +598,53 @@ internal static class ClassRenderer
         {
             w.Line($"{indent}\tObject = new Impl(this, {ctor.BaseCallArguments});");
         }
+        w.Line($"{indent}}}");
+        w.Line();
+    }
+
+    private static void RenderClassVerifyMethods(CodeWriter w, InlineClassStubModel cls, string indent, string indent1)
+    {
+        // Get unique interceptor property names (the actual property names on the stub class)
+        var interceptorPropertyNames = cls.InterceptorProperties
+            .Select(p => p.PropertyName)
+            .Distinct()
+            .ToList();
+
+        // Verify method - checks only .Verifiable() items, throws if any fail
+        w.Line($"{indent}/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>");
+        w.Line($"{indent}public void Verify()");
+        w.Line($"{indent}{{");
+        w.Line($"{indent1}var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();");
+        w.Line();
+
+        // Check all interceptors (methods and properties share the same pattern)
+        foreach (var name in interceptorPropertyNames)
+        {
+            w.Line($"{indent1}if ({name}.CheckVerification() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
+        }
+
+        w.Line();
+        w.Line($"{indent1}if (failures.Count > 0)");
+        w.Line($"{indent1}\tthrow new global::KnockOff.VerificationException(failures);");
+        w.Line($"{indent}}}");
+        w.Line();
+
+        // VerifyAll method - checks ALL configured members, throws if any fail
+        w.Line($"{indent}/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>");
+        w.Line($"{indent}public void VerifyAll()");
+        w.Line($"{indent}{{");
+        w.Line($"{indent1}var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();");
+        w.Line();
+
+        // Check all configured interceptors
+        foreach (var name in interceptorPropertyNames)
+        {
+            w.Line($"{indent1}if ({name}.CheckVerificationAll() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
+        }
+
+        w.Line();
+        w.Line($"{indent1}if (failures.Count > 0)");
+        w.Line($"{indent1}\tthrow new global::KnockOff.VerificationException(failures);");
         w.Line($"{indent}}}");
         w.Line();
     }
@@ -465,7 +755,7 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             // Handle calls from base constructor when _stub is null
             w.Line($"{indent2}_stub?.{prop.PropertyName}.RecordGet();");
-            w.Line($"{indent2}if (_stub?.{prop.PropertyName}.OnGet is {{ }} onGet) return onGet(_stub);");
+            w.Line($"{indent2}if (_stub?.{prop.PropertyName}.OnGet is {{ }} onGet) return onGet();");
             if (prop.IsAbstract)
             {
                 w.Line($"{indent2}return default!;");
@@ -484,7 +774,7 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             // Handle calls from base constructor when _stub is null
             w.Line($"{indent2}_stub?.{prop.PropertyName}.RecordSet(value);");
-            w.Line($"{indent2}if (_stub?.{prop.PropertyName}.OnSet is {{ }} onSet) onSet(_stub, value);");
+            w.Line($"{indent2}if (_stub?.{prop.PropertyName}.OnSet is {{ }} onSet) onSet(value);");
             if (!prop.IsAbstract)
             {
                 w.Line($"{indent2}else base.{prop.PropertyName} = value;");
@@ -510,7 +800,7 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             // Handle calls from base constructor when _stub is null
             w.Line($"{indent2}_stub?.{indexer.IndexerName}.RecordGet({indexer.ArgumentList});");
-            w.Line($"{indent2}if (_stub?.{indexer.IndexerName}.OnGet is {{ }} onGet) return onGet(_stub, {indexer.ArgumentList});");
+            w.Line($"{indent2}if (_stub?.{indexer.IndexerName}.OnGet is {{ }} onGet) return onGet({indexer.ArgumentList});");
             if (indexer.IsAbstract)
             {
                 var defaultExpr = indexer.IsNullable ? "default" : GetDefaultForType(indexer.ReturnType, indexer.DefaultStrategy, indexer.ConcreteTypeForNew);
@@ -530,7 +820,7 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             // Handle calls from base constructor when _stub is null
             w.Line($"{indent2}_stub?.{indexer.IndexerName}.RecordSet({indexer.ArgumentList}, value);");
-            w.Line($"{indent2}if (_stub?.{indexer.IndexerName}.OnSet is {{ }} onSet) onSet(_stub, {indexer.ArgumentList}, value);");
+            w.Line($"{indent2}if (_stub?.{indexer.IndexerName}.OnSet is {{ }} onSet) onSet({indexer.ArgumentList}, value);");
             if (indexer.IsAbstract)
             {
                 w.Line($"{indent2}else if (_stub is not null) _stub.{indexer.IndexerName}.Backing[{indexer.KeyExpression}] = value;");

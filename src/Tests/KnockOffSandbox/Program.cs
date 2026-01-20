@@ -24,7 +24,7 @@ Console.WriteLine();
 
 // Test void method with no params - uses OnCall API
 Console.WriteLine("Void Method (no params):");
-var doWorkTracking = knockOff.DoWork.OnCall((ko) => { });
+var doWorkTracking = knockOff.DoWork.OnCall(() => { });
 service.DoWork();
 Console.WriteLine($"  DoWork.WasCalled: {doWorkTracking.WasCalled}");
 Console.WriteLine($"  DoWork.CallCount: {doWorkTracking.CallCount}");
@@ -43,7 +43,7 @@ Console.WriteLine();
 
 // Test method with multiple params - uses OnCall API
 Console.WriteLine("Method with multiple params:");
-var processTracking = knockOff.Process.OnCall((ko, id, count, urgent) => { });
+var processTracking = knockOff.Process.OnCall((id, count, urgent) => { });
 service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 

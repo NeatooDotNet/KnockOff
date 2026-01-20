@@ -14,25 +14,43 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Process(int).</summary>
-		public delegate void ProcessDelegate_Int32_void(OverloadedServiceStub ko, int @value);
+		public delegate void ProcessDelegate_Int32_void(int @value);
 
-		private readonly global::System.Collections.Generic.List<(ProcessDelegate_Int32_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_Int32_void Tracking)> _sequence_Int32_void = new();
+		private ProcessDelegate_Int32_void? _onCall_Int32_void;
+		private MethodTrackingImpl_Int32_void? _onCallTracking_Int32_void;
+
+		private global::System.Collections.Generic.List<(ProcessDelegate_Int32_void Callback, MethodTrackingImpl_Int32_void Tracking)>? _sequence_Int32_void;
 		private int _sequenceIndex_Int32_void;
 
-		/// <summary>Delegate for Process(string).</summary>
-		public delegate void ProcessDelegate_String_void(OverloadedServiceStub ko, string @value);
+		private bool _isVerifiable_Int32_void;
+		private global::KnockOff.Times? _verifiableTimes_Int32_void;
 
-		private readonly global::System.Collections.Generic.List<(ProcessDelegate_String_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_String_void Tracking)> _sequence_String_void = new();
+		/// <summary>Delegate for Process(string).</summary>
+		public delegate void ProcessDelegate_String_void(string @value);
+
+		private ProcessDelegate_String_void? _onCall_String_void;
+		private MethodTrackingImpl_String_void? _onCallTracking_String_void;
+
+		private global::System.Collections.Generic.List<(ProcessDelegate_String_void Callback, MethodTrackingImpl_String_void Tracking)>? _sequence_String_void;
 		private int _sequenceIndex_String_void;
 
-		/// <summary>Delegate for Process(int, int).</summary>
-		public delegate void ProcessDelegate_Int32_Int32_void(OverloadedServiceStub ko, int a, int b);
+		private bool _isVerifiable_String_void;
+		private global::KnockOff.Times? _verifiableTimes_String_void;
 
-		private readonly global::System.Collections.Generic.List<(ProcessDelegate_Int32_Int32_void Callback, global::KnockOff.Times Times, MethodTrackingImpl_Int32_Int32_void Tracking)> _sequence_Int32_Int32_void = new();
+		/// <summary>Delegate for Process(int, int).</summary>
+		public delegate void ProcessDelegate_Int32_Int32_void(int a, int b);
+
+		private ProcessDelegate_Int32_Int32_void? _onCall_Int32_Int32_void;
+		private MethodTrackingImpl_Int32_Int32_void? _onCallTracking_Int32_Int32_void;
+
+		private global::System.Collections.Generic.List<(ProcessDelegate_Int32_Int32_void Callback, MethodTrackingImpl_Int32_Int32_void Tracking)>? _sequence_Int32_Int32_void;
 		private int _sequenceIndex_Int32_Int32_void;
 
+		private bool _isVerifiable_Int32_Int32_void;
+		private global::KnockOff.Times? _verifiableTimes_Int32_Int32_void;
+
 		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + _sequence_Int32_void.Sum(s => s.Tracking.CallCount) + _sequence_String_void.Sum(s => s.Tracking.CallCount) + _sequence_Int32_Int32_void.Sum(s => s.Tracking.CallCount);
+		public int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_void?.CallCount ?? 0) + (_sequence_Int32_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -40,19 +58,25 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		/// <summary>Configures callback for Process(int). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(ProcessDelegate_Int32_void callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_void();
-			_sequence_Int32_void.Clear();
-			_sequence_Int32_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_Int32_void = null;
 			_sequenceIndex_Int32_void = 0;
-			return tracking;
+			_isVerifiable_Int32_void = false;
+			_verifiableTimes_Int32_void = null;
+			_onCall_Int32_void = callback;
+			_onCallTracking_Int32_void = new MethodTrackingImpl_Int32_void(this);
+			return _onCallTracking_Int32_void;
 		}
 
-		/// <summary>Configures callback for Process(int) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_void> OnCall(ProcessDelegate_Int32_void callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Process(int). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_void> OnCallSequence(ProcessDelegate_Int32_void callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_void();
-			_sequence_Int32_void.Clear();
-			_sequence_Int32_void.Add((callback, times, tracking));
+			_onCall_Int32_void = null;
+			_onCallTracking_Int32_void = null;
+			_isVerifiable_Int32_void = false;
+			_verifiableTimes_Int32_void = null;
+			_sequence_Int32_void = new global::System.Collections.Generic.List<(ProcessDelegate_Int32_void Callback, MethodTrackingImpl_Int32_void Tracking)>();
+			var tracking = new MethodTrackingImpl_Int32_void(this);
+			_sequence_Int32_void.Add((callback, tracking));
 			_sequenceIndex_Int32_void = 0;
 			return new MethodSequenceImpl_Int32_void(this);
 		}
@@ -60,19 +84,25 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		/// <summary>Configures callback for Process(string). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(ProcessDelegate_String_void callback)
 		{
-			var tracking = new MethodTrackingImpl_String_void();
-			_sequence_String_void.Clear();
-			_sequence_String_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_String_void = null;
 			_sequenceIndex_String_void = 0;
-			return tracking;
+			_isVerifiable_String_void = false;
+			_verifiableTimes_String_void = null;
+			_onCall_String_void = callback;
+			_onCallTracking_String_void = new MethodTrackingImpl_String_void(this);
+			return _onCallTracking_String_void;
 		}
 
-		/// <summary>Configures callback for Process(string) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> OnCall(ProcessDelegate_String_void callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Process(string). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> OnCallSequence(ProcessDelegate_String_void callback)
 		{
-			var tracking = new MethodTrackingImpl_String_void();
-			_sequence_String_void.Clear();
-			_sequence_String_void.Add((callback, times, tracking));
+			_onCall_String_void = null;
+			_onCallTracking_String_void = null;
+			_isVerifiable_String_void = false;
+			_verifiableTimes_String_void = null;
+			_sequence_String_void = new global::System.Collections.Generic.List<(ProcessDelegate_String_void Callback, MethodTrackingImpl_String_void Tracking)>();
+			var tracking = new MethodTrackingImpl_String_void(this);
+			_sequence_String_void.Add((callback, tracking));
 			_sequenceIndex_String_void = 0;
 			return new MethodSequenceImpl_String_void(this);
 		}
@@ -80,159 +110,214 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		/// <summary>Configures callback for Process(int, int). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> OnCall(ProcessDelegate_Int32_Int32_void callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_Int32_void();
-			_sequence_Int32_Int32_void.Clear();
-			_sequence_Int32_Int32_void.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_Int32_Int32_void = null;
 			_sequenceIndex_Int32_Int32_void = 0;
-			return tracking;
+			_isVerifiable_Int32_Int32_void = false;
+			_verifiableTimes_Int32_Int32_void = null;
+			_onCall_Int32_Int32_void = callback;
+			_onCallTracking_Int32_Int32_void = new MethodTrackingImpl_Int32_Int32_void(this);
+			return _onCallTracking_Int32_Int32_void;
 		}
 
-		/// <summary>Configures callback for Process(int, int) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_Int32_void> OnCall(ProcessDelegate_Int32_Int32_void callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Process(int, int). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_Int32_void> OnCallSequence(ProcessDelegate_Int32_Int32_void callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_Int32_void();
-			_sequence_Int32_Int32_void.Clear();
-			_sequence_Int32_Int32_void.Add((callback, times, tracking));
+			_onCall_Int32_Int32_void = null;
+			_onCallTracking_Int32_Int32_void = null;
+			_isVerifiable_Int32_Int32_void = false;
+			_verifiableTimes_Int32_Int32_void = null;
+			_sequence_Int32_Int32_void = new global::System.Collections.Generic.List<(ProcessDelegate_Int32_Int32_void Callback, MethodTrackingImpl_Int32_Int32_void Tracking)>();
+			var tracking = new MethodTrackingImpl_Int32_Int32_void(this);
+			_sequence_Int32_Int32_void.Add((callback, tracking));
 			_sequenceIndex_Int32_Int32_void = 0;
 			return new MethodSequenceImpl_Int32_Int32_void(this);
 		}
 
 		/// <summary>Invokes configured callback for Process(int).</summary>
-		internal void Invoke_Int32_void(OverloadedServiceStub ko, bool strict, int @value)
+		internal void Invoke_Int32_void(bool strict, int @value)
 		{
-			if (_sequence_Int32_void.Count == 0)
+			if (_sequence_Int32_void != null && _sequenceIndex_Int32_void < _sequence_Int32_void.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) { src.Process(@value); return; }
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
+				var (callback, tracking) = _sequence_Int32_void[_sequenceIndex_Int32_void];
+				tracking.RecordCall(@value);
+				_sequenceIndex_Int32_void++;
+				callback(@value);
 				return;
 			}
 
-			var (callback, times, tracking) = _sequence_Int32_void[_sequenceIndex_Int32_void];
-			tracking.RecordCall(@value);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
+			if (_onCall_Int32_void != null && _onCallTracking_Int32_void != null)
 			{
-				if (_sequenceIndex_Int32_void < _sequence_Int32_void.Count - 1)
-					_sequenceIndex_Int32_void++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Process");
+				_onCallTracking_Int32_void.RecordCall(@value);
+				_onCall_Int32_void(@value);
+				return;
 			}
 
-			callback(ko, @value);
+			_unconfiguredCallCount++;
+			if (_sequence_Int32_void != null && _sequenceIndex_Int32_void >= _sequence_Int32_void.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Process");
+				return;
+			}
+
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) { src.Process(@value); return; }
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
+			return;
 		}
 
 		/// <summary>Invokes configured callback for Process(string).</summary>
-		internal void Invoke_String_void(OverloadedServiceStub ko, bool strict, string @value)
+		internal void Invoke_String_void(bool strict, string @value)
 		{
-			if (_sequence_String_void.Count == 0)
+			if (_sequence_String_void != null && _sequenceIndex_String_void < _sequence_String_void.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) { src.Process(@value); return; }
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
+				var (callback, tracking) = _sequence_String_void[_sequenceIndex_String_void];
+				tracking.RecordCall(@value);
+				_sequenceIndex_String_void++;
+				callback(@value);
 				return;
 			}
 
-			var (callback, times, tracking) = _sequence_String_void[_sequenceIndex_String_void];
-			tracking.RecordCall(@value);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
+			if (_onCall_String_void != null && _onCallTracking_String_void != null)
 			{
-				if (_sequenceIndex_String_void < _sequence_String_void.Count - 1)
-					_sequenceIndex_String_void++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Process");
+				_onCallTracking_String_void.RecordCall(@value);
+				_onCall_String_void(@value);
+				return;
 			}
 
-			callback(ko, @value);
+			_unconfiguredCallCount++;
+			if (_sequence_String_void != null && _sequenceIndex_String_void >= _sequence_String_void.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Process");
+				return;
+			}
+
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) { src.Process(@value); return; }
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
+			return;
 		}
 
 		/// <summary>Invokes configured callback for Process(int, int).</summary>
-		internal void Invoke_Int32_Int32_void(OverloadedServiceStub ko, bool strict, int a, int b)
+		internal void Invoke_Int32_Int32_void(bool strict, int a, int b)
 		{
-			if (_sequence_Int32_Int32_void.Count == 0)
+			if (_sequence_Int32_Int32_void != null && _sequenceIndex_Int32_Int32_void < _sequence_Int32_Int32_void.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) { src.Process(a, b); return; }
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
+				var (callback, tracking) = _sequence_Int32_Int32_void[_sequenceIndex_Int32_Int32_void];
+				tracking.RecordCall((a, b));
+				_sequenceIndex_Int32_Int32_void++;
+				callback(a, b);
 				return;
 			}
 
-			var (callback, times, tracking) = _sequence_Int32_Int32_void[_sequenceIndex_Int32_Int32_void];
-			tracking.RecordCall((a, b));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
+			if (_onCall_Int32_Int32_void != null && _onCallTracking_Int32_Int32_void != null)
 			{
-				if (_sequenceIndex_Int32_Int32_void < _sequence_Int32_Int32_void.Count - 1)
-					_sequenceIndex_Int32_Int32_void++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Process");
+				_onCallTracking_Int32_Int32_void.RecordCall((a, b));
+				_onCall_Int32_Int32_void(a, b);
+				return;
 			}
 
-			callback(ko, a, b);
+			_unconfiguredCallCount++;
+			if (_sequence_Int32_Int32_void != null && _sequenceIndex_Int32_Int32_void >= _sequence_Int32_Int32_void.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Process");
+				return;
+			}
+
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) { src.Process(a, b); return; }
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Process");
+			return;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence_Int32_void)
-				tracking.Reset();
+			_onCallTracking_Int32_void?.Reset();
+			if (_sequence_Int32_void != null)
+			{
+				foreach (var (_, tracking) in _sequence_Int32_void)
+					tracking.Reset();
+			}
 			_sequenceIndex_Int32_void = 0;
-			foreach (var (_, _, tracking) in _sequence_String_void)
-				tracking.Reset();
+			_onCallTracking_String_void?.Reset();
+			if (_sequence_String_void != null)
+			{
+				foreach (var (_, tracking) in _sequence_String_void)
+					tracking.Reset();
+			}
 			_sequenceIndex_String_void = 0;
-			foreach (var (_, _, tracking) in _sequence_Int32_Int32_void)
-				tracking.Reset();
+			_onCallTracking_Int32_Int32_void?.Reset();
+			if (_sequence_Int32_Int32_void != null)
+			{
+				foreach (var (_, tracking) in _sequence_Int32_Int32_void)
+					tracking.Reset();
+			}
 			_sequenceIndex_Int32_Int32_void = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether any overload was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable_Int32_void || _isVerifiable_String_void || _isVerifiable_Int32_Int32_void;
+
+		/// <summary>Whether any overload has been configured.</summary>
+		internal bool IsConfigured => _onCall_Int32_void != null || (_sequence_Int32_void?.Count ?? 0) > 0 || _onCall_String_void != null || (_sequence_String_void?.Count ?? 0) > 0 || _onCall_Int32_Int32_void != null || (_sequence_Int32_Int32_void?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - checks all verifiable overloads.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence_Int32_void)
+			if (_isVerifiable_Int32_void)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_Int32_void ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Process", times, count);
 			}
-			foreach (var (_, times, tracking) in _sequence_String_void)
+			if (_isVerifiable_String_void)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_String_void ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Process", times, count);
 			}
-			foreach (var (_, times, tracking) in _sequence_Int32_Int32_void)
+			if (_isVerifiable_Int32_Int32_void)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_Int32_Int32_void ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_Int32_Int32_void?.CallCount ?? 0) + (_sequence_Int32_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Process", times, count);
 			}
-			return true;
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks all configured overloads.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (_onCall_Int32_void != null || (_sequence_Int32_void?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Process", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			if (_onCall_String_void != null || (_sequence_String_void?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Process", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			if (_onCall_Int32_Int32_void != null || (_sequence_Int32_Int32_void?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_Int32_Int32_void?.CallCount ?? 0) + (_sequence_Int32_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Process", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			return null;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_Int32_void : global::KnockOff.IMethodTracking<int>
 		{
+			private readonly ProcessInterceptor _interceptor;
+
+			public MethodTrackingImpl_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
+
 			private int _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -249,11 +334,44 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_void = true;
+				_interceptor._verifiableTimes_Int32_void = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_Int32_void = true;
+				_interceptor._verifiableTimes_Int32_void = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_String_void : global::KnockOff.IMethodTracking<string>
 		{
+			private readonly ProcessInterceptor _interceptor;
+
+			public MethodTrackingImpl_String_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
+
 			private string _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -270,11 +388,44 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable()
+			{
+				_interceptor._isVerifiable_String_void = true;
+				_interceptor._verifiableTimes_String_void = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_String_void = true;
+				_interceptor._verifiableTimes_String_void = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_Int32_Int32_void : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
 		{
+			private readonly ProcessInterceptor _interceptor;
+
+			public MethodTrackingImpl_Int32_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
+
 			private (int? a, int? b) _lastArgs;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -291,6 +442,35 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_Int32_void = true;
+				_interceptor._verifiableTimes_Int32_Int32_void = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_Int32_Int32_void = true;
+				_interceptor._verifiableTimes_Int32_Int32_void = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -305,34 +485,45 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			{
 				get
 				{
+					if (_interceptor._sequence_Int32_void == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_Int32_void)
+					foreach (var (_, tracking) in _interceptor._sequence_Int32_void)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_void> ThenCall(ProcessDelegate_Int32_void callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_void> ThenCall(ProcessDelegate_Int32_void callback)
 			{
-				var tracking = new MethodTrackingImpl_Int32_void();
-				_interceptor._sequence_Int32_void.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_Int32_void(_interceptor);
+				_interceptor._sequence_Int32_void!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_Int32_void)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_Int32_void == null) return;
+				var sequenceLength = _interceptor._sequence_Int32_void.Count;
+				var completedCount = _interceptor._sequenceIndex_Int32_void;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_void> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_void = true;
+				_interceptor._verifiableTimes_Int32_void = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -347,34 +538,45 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			{
 				get
 				{
+					if (_interceptor._sequence_String_void == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_String_void)
+					foreach (var (_, tracking) in _interceptor._sequence_String_void)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> ThenCall(ProcessDelegate_String_void callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> ThenCall(ProcessDelegate_String_void callback)
 			{
-				var tracking = new MethodTrackingImpl_String_void();
-				_interceptor._sequence_String_void.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_String_void(_interceptor);
+				_interceptor._sequence_String_void!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_String_void)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_String_void == null) return;
+				var sequenceLength = _interceptor._sequence_String_void.Count;
+				var completedCount = _interceptor._sequenceIndex_String_void;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<ProcessDelegate_String_void> Verifiable()
+			{
+				_interceptor._isVerifiable_String_void = true;
+				_interceptor._verifiableTimes_String_void = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -389,34 +591,45 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			{
 				get
 				{
+					if (_interceptor._sequence_Int32_Int32_void == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_Int32_Int32_void)
+					foreach (var (_, tracking) in _interceptor._sequence_Int32_Int32_void)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_Int32_void> ThenCall(ProcessDelegate_Int32_Int32_void callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_Int32_void> ThenCall(ProcessDelegate_Int32_Int32_void callback)
 			{
-				var tracking = new MethodTrackingImpl_Int32_Int32_void();
-				_interceptor._sequence_Int32_Int32_void.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_Int32_Int32_void(_interceptor);
+				_interceptor._sequence_Int32_Int32_void!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_Int32_Int32_void)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_Int32_Int32_void == null) return;
+				var sequenceLength = _interceptor._sequence_Int32_Int32_void.Count;
+				var completedCount = _interceptor._sequenceIndex_Int32_Int32_void;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<ProcessDelegate_Int32_Int32_void> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_Int32_void = true;
+				_interceptor._verifiableTimes_Int32_Int32_void = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -430,19 +643,31 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private int _unconfiguredCallCount;
 
 		/// <summary>Delegate for Calculate(int).</summary>
-		public delegate int CalculateDelegate_Int32_Int32(OverloadedServiceStub ko, int @value);
+		public delegate int CalculateDelegate_Int32_Int32(int @value);
 
-		private readonly global::System.Collections.Generic.List<(CalculateDelegate_Int32_Int32 Callback, global::KnockOff.Times Times, MethodTrackingImpl_Int32_Int32 Tracking)> _sequence_Int32_Int32 = new();
+		private CalculateDelegate_Int32_Int32? _onCall_Int32_Int32;
+		private MethodTrackingImpl_Int32_Int32? _onCallTracking_Int32_Int32;
+
+		private global::System.Collections.Generic.List<(CalculateDelegate_Int32_Int32 Callback, MethodTrackingImpl_Int32_Int32 Tracking)>? _sequence_Int32_Int32;
 		private int _sequenceIndex_Int32_Int32;
 
-		/// <summary>Delegate for Calculate(int, int).</summary>
-		public delegate int CalculateDelegate_Int32_Int32_Int32(OverloadedServiceStub ko, int a, int b);
+		private bool _isVerifiable_Int32_Int32;
+		private global::KnockOff.Times? _verifiableTimes_Int32_Int32;
 
-		private readonly global::System.Collections.Generic.List<(CalculateDelegate_Int32_Int32_Int32 Callback, global::KnockOff.Times Times, MethodTrackingImpl_Int32_Int32_Int32 Tracking)> _sequence_Int32_Int32_Int32 = new();
+		/// <summary>Delegate for Calculate(int, int).</summary>
+		public delegate int CalculateDelegate_Int32_Int32_Int32(int a, int b);
+
+		private CalculateDelegate_Int32_Int32_Int32? _onCall_Int32_Int32_Int32;
+		private MethodTrackingImpl_Int32_Int32_Int32? _onCallTracking_Int32_Int32_Int32;
+
+		private global::System.Collections.Generic.List<(CalculateDelegate_Int32_Int32_Int32 Callback, MethodTrackingImpl_Int32_Int32_Int32 Tracking)>? _sequence_Int32_Int32_Int32;
 		private int _sequenceIndex_Int32_Int32_Int32;
 
+		private bool _isVerifiable_Int32_Int32_Int32;
+		private global::KnockOff.Times? _verifiableTimes_Int32_Int32_Int32;
+
 		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + _sequence_Int32_Int32.Sum(s => s.Tracking.CallCount) + _sequence_Int32_Int32_Int32.Sum(s => s.Tracking.CallCount);
+		public int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -450,19 +675,25 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		/// <summary>Configures callback for Calculate(int). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(CalculateDelegate_Int32_Int32 callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_Int32();
-			_sequence_Int32_Int32.Clear();
-			_sequence_Int32_Int32.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_Int32_Int32 = null;
 			_sequenceIndex_Int32_Int32 = 0;
-			return tracking;
+			_isVerifiable_Int32_Int32 = false;
+			_verifiableTimes_Int32_Int32 = null;
+			_onCall_Int32_Int32 = callback;
+			_onCallTracking_Int32_Int32 = new MethodTrackingImpl_Int32_Int32(this);
+			return _onCallTracking_Int32_Int32;
 		}
 
-		/// <summary>Configures callback for Calculate(int) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32> OnCall(CalculateDelegate_Int32_Int32 callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Calculate(int). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32> OnCallSequence(CalculateDelegate_Int32_Int32 callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_Int32();
-			_sequence_Int32_Int32.Clear();
-			_sequence_Int32_Int32.Add((callback, times, tracking));
+			_onCall_Int32_Int32 = null;
+			_onCallTracking_Int32_Int32 = null;
+			_isVerifiable_Int32_Int32 = false;
+			_verifiableTimes_Int32_Int32 = null;
+			_sequence_Int32_Int32 = new global::System.Collections.Generic.List<(CalculateDelegate_Int32_Int32 Callback, MethodTrackingImpl_Int32_Int32 Tracking)>();
+			var tracking = new MethodTrackingImpl_Int32_Int32(this);
+			_sequence_Int32_Int32.Add((callback, tracking));
 			_sequenceIndex_Int32_Int32 = 0;
 			return new MethodSequenceImpl_Int32_Int32(this);
 		}
@@ -470,119 +701,159 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		/// <summary>Configures callback for Calculate(int, int). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> OnCall(CalculateDelegate_Int32_Int32_Int32 callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_Int32_Int32();
-			_sequence_Int32_Int32_Int32.Clear();
-			_sequence_Int32_Int32_Int32.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence_Int32_Int32_Int32 = null;
 			_sequenceIndex_Int32_Int32_Int32 = 0;
-			return tracking;
+			_isVerifiable_Int32_Int32_Int32 = false;
+			_verifiableTimes_Int32_Int32_Int32 = null;
+			_onCall_Int32_Int32_Int32 = callback;
+			_onCallTracking_Int32_Int32_Int32 = new MethodTrackingImpl_Int32_Int32_Int32(this);
+			return _onCallTracking_Int32_Int32_Int32;
 		}
 
-		/// <summary>Configures callback for Calculate(int, int) with Times constraint.</summary>
-		public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32_Int32> OnCall(CalculateDelegate_Int32_Int32_Int32 callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence for Calculate(int, int). Returns sequence for ThenCall chaining.</summary>
+		public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32_Int32> OnCallSequence(CalculateDelegate_Int32_Int32_Int32 callback)
 		{
-			var tracking = new MethodTrackingImpl_Int32_Int32_Int32();
-			_sequence_Int32_Int32_Int32.Clear();
-			_sequence_Int32_Int32_Int32.Add((callback, times, tracking));
+			_onCall_Int32_Int32_Int32 = null;
+			_onCallTracking_Int32_Int32_Int32 = null;
+			_isVerifiable_Int32_Int32_Int32 = false;
+			_verifiableTimes_Int32_Int32_Int32 = null;
+			_sequence_Int32_Int32_Int32 = new global::System.Collections.Generic.List<(CalculateDelegate_Int32_Int32_Int32 Callback, MethodTrackingImpl_Int32_Int32_Int32 Tracking)>();
+			var tracking = new MethodTrackingImpl_Int32_Int32_Int32(this);
+			_sequence_Int32_Int32_Int32.Add((callback, tracking));
 			_sequenceIndex_Int32_Int32_Int32 = 0;
 			return new MethodSequenceImpl_Int32_Int32_Int32(this);
 		}
 
 		/// <summary>Invokes configured callback for Calculate(int).</summary>
-		internal int Invoke_Int32_Int32(OverloadedServiceStub ko, bool strict, int @value)
+		internal int Invoke_Int32_Int32(bool strict, int @value)
 		{
-			if (_sequence_Int32_Int32.Count == 0)
+			if (_sequence_Int32_Int32 != null && _sequenceIndex_Int32_Int32 < _sequence_Int32_Int32.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Calculate(@value);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
+				var (callback, tracking) = _sequence_Int32_Int32[_sequenceIndex_Int32_Int32];
+				tracking.RecordCall(@value);
+				_sequenceIndex_Int32_Int32++;
+				return callback(@value);
+			}
+
+			if (_onCall_Int32_Int32 != null && _onCallTracking_Int32_Int32 != null)
+			{
+				_onCallTracking_Int32_Int32.RecordCall(@value);
+				return _onCall_Int32_Int32(@value);
+			}
+
+			_unconfiguredCallCount++;
+			if (_sequence_Int32_Int32 != null && _sequenceIndex_Int32_Int32 >= _sequence_Int32_Int32.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Calculate");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence_Int32_Int32[_sequenceIndex_Int32_Int32];
-			tracking.RecordCall(@value);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex_Int32_Int32 < _sequence_Int32_Int32.Count - 1)
-					_sequenceIndex_Int32_Int32++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Calculate");
-			}
-
-			return callback(ko, @value);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Calculate(@value);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
+			return default!;
 		}
 
 		/// <summary>Invokes configured callback for Calculate(int, int).</summary>
-		internal int Invoke_Int32_Int32_Int32(OverloadedServiceStub ko, bool strict, int a, int b)
+		internal int Invoke_Int32_Int32_Int32(bool strict, int a, int b)
 		{
-			if (_sequence_Int32_Int32_Int32.Count == 0)
+			if (_sequence_Int32_Int32_Int32 != null && _sequenceIndex_Int32_Int32_Int32 < _sequence_Int32_Int32_Int32.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Calculate(a, b);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
+				var (callback, tracking) = _sequence_Int32_Int32_Int32[_sequenceIndex_Int32_Int32_Int32];
+				tracking.RecordCall((a, b));
+				_sequenceIndex_Int32_Int32_Int32++;
+				return callback(a, b);
+			}
+
+			if (_onCall_Int32_Int32_Int32 != null && _onCallTracking_Int32_Int32_Int32 != null)
+			{
+				_onCallTracking_Int32_Int32_Int32.RecordCall((a, b));
+				return _onCall_Int32_Int32_Int32(a, b);
+			}
+
+			_unconfiguredCallCount++;
+			if (_sequence_Int32_Int32_Int32 != null && _sequenceIndex_Int32_Int32_Int32 >= _sequence_Int32_Int32_Int32.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Calculate");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence_Int32_Int32_Int32[_sequenceIndex_Int32_Int32_Int32];
-			tracking.RecordCall((a, b));
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex_Int32_Int32_Int32 < _sequence_Int32_Int32_Int32.Count - 1)
-					_sequenceIndex_Int32_Int32_Int32++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Calculate");
-			}
-
-			return callback(ko, a, b);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Calculate(a, b);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Calculate");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence_Int32_Int32)
-				tracking.Reset();
+			_onCallTracking_Int32_Int32?.Reset();
+			if (_sequence_Int32_Int32 != null)
+			{
+				foreach (var (_, tracking) in _sequence_Int32_Int32)
+					tracking.Reset();
+			}
 			_sequenceIndex_Int32_Int32 = 0;
-			foreach (var (_, _, tracking) in _sequence_Int32_Int32_Int32)
-				tracking.Reset();
+			_onCallTracking_Int32_Int32_Int32?.Reset();
+			if (_sequence_Int32_Int32_Int32 != null)
+			{
+				foreach (var (_, tracking) in _sequence_Int32_Int32_Int32)
+					tracking.Reset();
+			}
 			_sequenceIndex_Int32_Int32_Int32 = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether any overload was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable_Int32_Int32 || _isVerifiable_Int32_Int32_Int32;
+
+		/// <summary>Whether any overload has been configured.</summary>
+		internal bool IsConfigured => _onCall_Int32_Int32 != null || (_sequence_Int32_Int32?.Count ?? 0) > 0 || _onCall_Int32_Int32_Int32 != null || (_sequence_Int32_Int32_Int32?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - checks all verifiable overloads.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence_Int32_Int32)
+			if (_isVerifiable_Int32_Int32)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_Int32_Int32 ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Calculate", times, count);
 			}
-			foreach (var (_, times, tracking) in _sequence_Int32_Int32_Int32)
+			if (_isVerifiable_Int32_Int32_Int32)
 			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
+				var times = _verifiableTimes_Int32_Int32_Int32 ?? global::KnockOff.Times.AtLeastOnce;
+				var count = (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!times.Validate(count)) return new global::KnockOff.VerificationFailure("Calculate", times, count);
 			}
-			return true;
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks all configured overloads.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (_onCall_Int32_Int32 != null || (_sequence_Int32_Int32?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Calculate", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			if (_onCall_Int32_Int32_Int32 != null || (_sequence_Int32_Int32_Int32?.Count ?? 0) > 0)
+			{
+				var count = (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
+				if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure("Calculate", global::KnockOff.Times.AtLeastOnce, count);
+			}
+			return null;
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_Int32_Int32 : global::KnockOff.IMethodTracking<int>
 		{
+			private readonly CalculateInterceptor _interceptor;
+
+			public MethodTrackingImpl_Int32_Int32(CalculateInterceptor interceptor) => _interceptor = interceptor;
+
 			private int _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -599,11 +870,44 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_Int32 = true;
+				_interceptor._verifiableTimes_Int32_Int32 = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_Int32_Int32 = true;
+				_interceptor._verifiableTimes_Int32_Int32 = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl_Int32_Int32_Int32 : global::KnockOff.IMethodTrackingArgs<(int? a, int? b)>
 		{
+			private readonly CalculateInterceptor _interceptor;
+
+			public MethodTrackingImpl_Int32_Int32_Int32(CalculateInterceptor interceptor) => _interceptor = interceptor;
+
 			private (int? a, int? b) _lastArgs;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -620,6 +924,35 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArgs = default; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_Int32_Int32 = true;
+				_interceptor._verifiableTimes_Int32_Int32_Int32 = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int? a, int? b)> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable_Int32_Int32_Int32 = true;
+				_interceptor._verifiableTimes_Int32_Int32_Int32 = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -634,34 +967,45 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			{
 				get
 				{
+					if (_interceptor._sequence_Int32_Int32 == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_Int32_Int32)
+					foreach (var (_, tracking) in _interceptor._sequence_Int32_Int32)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32> ThenCall(CalculateDelegate_Int32_Int32 callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32> ThenCall(CalculateDelegate_Int32_Int32 callback)
 			{
-				var tracking = new MethodTrackingImpl_Int32_Int32();
-				_interceptor._sequence_Int32_Int32.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_Int32_Int32(_interceptor);
+				_interceptor._sequence_Int32_Int32!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_Int32_Int32)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_Int32_Int32 == null) return;
+				var sequenceLength = _interceptor._sequence_Int32_Int32.Count;
+				var completedCount = _interceptor._sequenceIndex_Int32_Int32;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_Int32 = true;
+				_interceptor._verifiableTimes_Int32_Int32 = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -676,34 +1020,45 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			{
 				get
 				{
+					if (_interceptor._sequence_Int32_Int32_Int32 == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence_Int32_Int32_Int32)
+					foreach (var (_, tracking) in _interceptor._sequence_Int32_Int32_Int32)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32_Int32> ThenCall(CalculateDelegate_Int32_Int32_Int32 callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32_Int32> ThenCall(CalculateDelegate_Int32_Int32_Int32 callback)
 			{
-				var tracking = new MethodTrackingImpl_Int32_Int32_Int32();
-				_interceptor._sequence_Int32_Int32_Int32.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl_Int32_Int32_Int32(_interceptor);
+				_interceptor._sequence_Int32_Int32_Int32!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence_Int32_Int32_Int32)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence_Int32_Int32_Int32 == null) return;
+				var sequenceLength = _interceptor._sequence_Int32_Int32_Int32.Count;
+				var completedCount = _interceptor._sequenceIndex_Int32_Int32_Int32;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<CalculateDelegate_Int32_Int32_Int32> Verifiable()
+			{
+				_interceptor._isVerifiable_Int32_Int32_Int32 = true;
+				_interceptor._verifiableTimes_Int32_Int32_Int32 = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -720,20 +1075,28 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 	/// <summary>The global::KnockOff.Benchmarks.Interfaces.IOverloadedService instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Interfaces.IOverloadedService Object => this;
 
-	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
-	public bool Verify()
+	/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+	public void Verify()
 	{
-		var result = true;
-		result &= Process.Verify();
-		result &= Calculate.Verify();
-		return result;
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (Process.CheckVerification() is { } processFailure) failures.Add(processFailure);
+		if (Calculate.CheckVerification() is { } calculateFailure) failures.Add(calculateFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
-	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
 	public void VerifyAll()
 	{
-		if (!Verify())
-			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (Process.CheckVerificationAll() is { } processFailure) failures.Add(processFailure);
+		if (Calculate.CheckVerificationAll() is { } calculateFailure) failures.Add(calculateFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
 	// Source(T) methods for interface delegation
@@ -748,27 +1111,27 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int @value)
 	{
-		Process.Invoke_Int32_void(this, Strict, @value);
+		Process.Invoke_Int32_void(Strict, @value);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(string @value)
 	{
-		Process.Invoke_String_void(this, Strict, @value);
+		Process.Invoke_String_void(Strict, @value);
 	}
 
 	void global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Process(int a, int b)
 	{
-		Process.Invoke_Int32_Int32_void(this, Strict, a, b);
+		Process.Invoke_Int32_Int32_void(Strict, a, b);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Calculate(int @value)
 	{
-		return Calculate.Invoke_Int32_Int32(this, Strict, @value);
+		return Calculate.Invoke_Int32_Int32(Strict, @value);
 	}
 
 	int global::KnockOff.Benchmarks.Interfaces.IOverloadedService.Calculate(int a, int b)
 	{
-		return Calculate.Invoke_Int32_Int32_Int32(this, Strict, a, b);
+		return Calculate.Invoke_Int32_Int32_Int32(Strict, a, b);
 	}
 
 }

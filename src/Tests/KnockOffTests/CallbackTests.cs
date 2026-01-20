@@ -12,10 +12,9 @@ public class CallbackTests
 		ISampleService service = knockOff;
 
 		var callbackInvoked = false;
-		var tracking = knockOff.DoSomething.OnCall((ko) =>
+		var tracking = knockOff.DoSomething.OnCall(() =>
 		{
 			callbackInvoked = true;
-			Assert.Same(knockOff, ko);
 		});
 
 		service.DoSomething();
@@ -49,7 +48,7 @@ public class CallbackTests
 		string? capturedName = null;
 		int? capturedValue = null;
 		bool? capturedFlag = null;
-		var tracking = knockOff.Calculate.OnCall((ko, name, value, flag) =>
+		var tracking = knockOff.Calculate.OnCall((name, value, flag) =>
 		{
 			capturedName = name;
 			capturedValue = value;
@@ -67,7 +66,7 @@ public class CallbackTests
 	public void OnCall_CanAccessOtherInterceptorState()
 	{
 		var knockOff = new SampleKnockOff();
-		var doSomethingTracking = knockOff.DoSomething.OnCall(ko => { });
+		var doSomethingTracking = knockOff.DoSomething.OnCall(() => { });
 		ISampleService service = knockOff;
 
 		service.DoSomething();
@@ -85,7 +84,7 @@ public class CallbackTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.Name.OnGet = (ko) => "FromCallback";
+		knockOff.Name.OnGet = () => "FromCallback";
 
 		var result = service.Name;
 
@@ -100,7 +99,7 @@ public class CallbackTests
 		ISampleService service = knockOff;
 
 		string? capturedValue = null;
-		knockOff.Name.OnSet = (ko, value) =>
+		knockOff.Name.OnSet = (value) =>
 		{
 			capturedValue = value;
 		};
@@ -124,7 +123,7 @@ public class CallbackTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.OnCall((ko) => "callback value");
+		var tracking = knockOff.GetOptional.OnCall(() => "callback value");
 
 		var resultBefore = service.GetOptional();
 		Assert.Equal("callback value", resultBefore);
@@ -164,7 +163,7 @@ public class CallbackTests
 		IRepository<User> repo = knockOff;
 
 		var mockUser = new User { Id = 42, Name = "MockUser" };
-		var tracking = knockOff.GetById.OnCall((ko, id) =>
+		var tracking = knockOff.GetById.OnCall((id) =>
 		{
 			if (id == 42) return mockUser;
 			return null;
@@ -182,7 +181,7 @@ public class CallbackTests
 		var knockOff = new AuditableEntityKnockOff();
 		IBaseEntity entity = knockOff;
 
-		knockOff.Id.OnGet = (ko) => 999;
+		knockOff.Id.OnGet = () => 999;
 
 		var result = entity.Id;
 

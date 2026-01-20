@@ -12,101 +12,131 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
 
 		/// <summary>Delegate for GetByIdAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> GetByIdAsyncDelegate(FcBenchProductRepositoryStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> GetByIdAsyncDelegate(int id);
 
-		private readonly global::System.Collections.Generic.List<(GetByIdAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private GetByIdAsyncDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(GetByIdAsyncDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private int? _unconfiguredLastArg;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public int? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(GetByIdAsyncDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<GetByIdAsyncDelegate> OnCall(GetByIdAsyncDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<GetByIdAsyncDelegate> OnCallSequence(GetByIdAsyncDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(GetByIdAsyncDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> Invoke(FcBenchProductRepositoryStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> Invoke(bool strict, int id)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArg = id;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.GetByIdAsync(id);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(id);
+				_sequenceIndex++;
+				return callback(id);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall(id);
+				return _onCall(id);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArg = id;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetByIdAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?>(default!);
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall(id);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("GetByIdAsync");
-			}
-
-			return callback(ko, id);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.GetByIdAsync(id);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetByIdAsync");
+			return global::System.Threading.Tasks.Task.FromResult<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?>(default!);
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetByIdAsync", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetByIdAsync", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<int>
 		{
+			private readonly GetByIdAsyncInterceptor _interceptor;
+
+			public MethodTrackingImpl(GetByIdAsyncInterceptor interceptor) => _interceptor = interceptor;
+
 			private int _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -123,6 +153,35 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -137,34 +196,45 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<GetByIdAsyncDelegate> ThenCall(GetByIdAsyncDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<GetByIdAsyncDelegate> ThenCall(GetByIdAsyncDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<GetByIdAsyncDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -176,95 +246,125 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
 
 		/// <summary>Delegate for GetAllAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> GetAllAsyncDelegate(FcBenchProductRepositoryStub ko);
+		public delegate global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> GetAllAsyncDelegate();
 
-		private readonly global::System.Collections.Generic.List<(GetAllAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private GetAllAsyncDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(GetAllAsyncDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetAllAsyncDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<GetAllAsyncDelegate> OnCall(GetAllAsyncDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<GetAllAsyncDelegate> OnCallSequence(GetAllAsyncDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(GetAllAsyncDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> Invoke(FcBenchProductRepositoryStub ko, bool strict)
+		internal global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> Invoke(bool strict)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.GetAllAsync();
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAllAsync");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+				_sequenceIndex++;
+				return callback();
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall();
+				return _onCall();
+			}
+
+			_unconfiguredCallCount++;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetAllAsync");
 				return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>>(new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>());
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall();
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("GetAllAsync");
-			}
-
-			return callback(ko);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.GetAllAsync();
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetAllAsync");
+			return global::System.Threading.Tasks.Task.FromResult<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>>(new global::System.Collections.Generic.List<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>());
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetAllAsync", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetAllAsync", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
+			private readonly GetAllAsyncInterceptor _interceptor;
+
+			public MethodTrackingImpl(GetAllAsyncInterceptor interceptor) => _interceptor = interceptor;
+
 
 			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
@@ -277,6 +377,32 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -291,34 +417,45 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<GetAllAsyncDelegate> ThenCall(GetAllAsyncDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<GetAllAsyncDelegate> ThenCall(GetAllAsyncDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<GetAllAsyncDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -330,101 +467,131 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
 
 		/// <summary>Delegate for SaveAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(FcBenchProductRepositoryStub ko, global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product);
+		public delegate global::System.Threading.Tasks.Task SaveAsyncDelegate(global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product);
 
-		private readonly global::System.Collections.Generic.List<(SaveAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private SaveAsyncDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(SaveAsyncDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct? _unconfiguredLastArg;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct> OnCall(SaveAsyncDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<SaveAsyncDelegate> OnCall(SaveAsyncDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<SaveAsyncDelegate> OnCallSequence(SaveAsyncDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(SaveAsyncDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(FcBenchProductRepositoryStub ko, bool strict, global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArg = product;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.SaveAsync(product);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(product);
+				_sequenceIndex++;
+				return callback(product);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall(product);
+				return _onCall(product);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArg = product;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("SaveAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall(product);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("SaveAsync");
-			}
-
-			return callback(ko, product);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.SaveAsync(product);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "SaveAsync");
+			return global::System.Threading.Tasks.Task.CompletedTask;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("SaveAsync", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("SaveAsync", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>
 		{
+			private readonly SaveAsyncInterceptor _interceptor;
+
+			public MethodTrackingImpl(SaveAsyncInterceptor interceptor) => _interceptor = interceptor;
+
 			private global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -441,6 +608,35 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -455,34 +651,45 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<SaveAsyncDelegate> ThenCall(SaveAsyncDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<SaveAsyncDelegate> ThenCall(SaveAsyncDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<SaveAsyncDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -494,101 +701,131 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 		internal global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository? _source;
 
 		/// <summary>Delegate for DeleteAsync.</summary>
-		public delegate global::System.Threading.Tasks.Task DeleteAsyncDelegate(FcBenchProductRepositoryStub ko, int id);
+		public delegate global::System.Threading.Tasks.Task DeleteAsyncDelegate(int id);
 
-		private readonly global::System.Collections.Generic.List<(DeleteAsyncDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private DeleteAsyncDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(DeleteAsyncDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private int? _unconfiguredLastArg;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public int? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(DeleteAsyncDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<DeleteAsyncDelegate> OnCall(DeleteAsyncDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<DeleteAsyncDelegate> OnCallSequence(DeleteAsyncDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(DeleteAsyncDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Threading.Tasks.Task Invoke(FcBenchProductRepositoryStub ko, bool strict, int id)
+		internal global::System.Threading.Tasks.Task Invoke(bool strict, int id)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArg = id;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.DeleteAsync(id);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DeleteAsync");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(id);
+				_sequenceIndex++;
+				return callback(id);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall(id);
+				return _onCall(id);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArg = id;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("DeleteAsync");
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall(id);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("DeleteAsync");
-			}
-
-			return callback(ko, id);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.DeleteAsync(id);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "DeleteAsync");
+			return global::System.Threading.Tasks.Task.CompletedTask;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("DeleteAsync", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("DeleteAsync", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<int>
 		{
+			private readonly DeleteAsyncInterceptor _interceptor;
+
+			public MethodTrackingImpl(DeleteAsyncInterceptor interceptor) => _interceptor = interceptor;
+
 			private int _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -605,6 +842,35 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -619,34 +885,45 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<DeleteAsyncDelegate> ThenCall(DeleteAsyncDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<DeleteAsyncDelegate> ThenCall(DeleteAsyncDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<DeleteAsyncDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -669,22 +946,32 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 	/// <summary>The global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository instance. Use for passing to code expecting the interface.</summary>
 	public global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository Object => this;
 
-	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
-	public bool Verify()
+	/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+	public void Verify()
 	{
-		var result = true;
-		result &= GetByIdAsync.Verify();
-		result &= GetAllAsync.Verify();
-		result &= SaveAsync.Verify();
-		result &= DeleteAsync.Verify();
-		return result;
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (GetByIdAsync.CheckVerification() is { } getbyidasyncFailure) failures.Add(getbyidasyncFailure);
+		if (GetAllAsync.CheckVerification() is { } getallasyncFailure) failures.Add(getallasyncFailure);
+		if (SaveAsync.CheckVerification() is { } saveasyncFailure) failures.Add(saveasyncFailure);
+		if (DeleteAsync.CheckVerification() is { } deleteasyncFailure) failures.Add(deleteasyncFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
-	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
 	public void VerifyAll()
 	{
-		if (!Verify())
-			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (GetByIdAsync.CheckVerificationAll() is { } getbyidasyncFailure) failures.Add(getbyidasyncFailure);
+		if (GetAllAsync.CheckVerificationAll() is { } getallasyncFailure) failures.Add(getallasyncFailure);
+		if (SaveAsync.CheckVerificationAll() is { } saveasyncFailure) failures.Add(saveasyncFailure);
+		if (DeleteAsync.CheckVerificationAll() is { } deleteasyncFailure) failures.Add(deleteasyncFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
 	// Source(T) methods for interface delegation
@@ -701,22 +988,22 @@ partial class FcBenchProductRepositoryStub : global::KnockOff.Benchmarks.Benchma
 
 	global::System.Threading.Tasks.Task<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct?> global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.GetByIdAsync(int id)
 	{
-		return GetByIdAsync.Invoke(this, Strict, id);
+		return GetByIdAsync.Invoke(Strict, id);
 	}
 
 	global::System.Threading.Tasks.Task<global::System.Collections.Generic.IEnumerable<global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct>> global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.GetAllAsync()
 	{
-		return GetAllAsync.Invoke(this, Strict);
+		return GetAllAsync.Invoke(Strict);
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.SaveAsync(global::KnockOff.Benchmarks.Benchmarks.FcBenchProduct product)
 	{
-		return SaveAsync.Invoke(this, Strict, product);
+		return SaveAsync.Invoke(Strict, product);
 	}
 
 	global::System.Threading.Tasks.Task global::KnockOff.Benchmarks.Benchmarks.IFcBenchProductRepository.DeleteAsync(int id)
 	{
-		return DeleteAsync.Invoke(this, Strict, id);
+		return DeleteAsync.Invoke(Strict, id);
 	}
 
 }

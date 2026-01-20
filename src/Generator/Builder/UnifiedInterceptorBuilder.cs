@@ -117,11 +117,8 @@ internal static class UnifiedInterceptorBuilder
 	{
 		var suffix = GetSignatureSuffix(sig.Parameters, sig.ReturnType);
 		var delegateName = $"{methodName}Delegate_{suffix}";
-		var ownerWithParams = string.IsNullOrEmpty(ownerTypeParameters)
-			? ownerClassName
-			: $"{ownerClassName}{ownerTypeParameters}";
 
-		var delegateParamList = BuildDelegateParamList(ownerWithParams, sig.Parameters);
+		var delegateParamList = BuildDelegateParamList(sig.Parameters);
 		var delegateSignature = sig.IsVoid
 			? $"public delegate void {delegateName}({delegateParamList});"
 			: $"public delegate {sig.ReturnType} {delegateName}({delegateParamList});";
@@ -270,15 +267,11 @@ internal static class UnifiedInterceptorBuilder
 			return $"{methodName}Delegate?";
 		}
 
-		var ownerWithParams = string.IsNullOrEmpty(ownerTypeParameters)
-			? ownerClassName
-			: $"{ownerClassName}{ownerTypeParameters}";
-
 		if (sig.Parameters.Count == 0)
-			return $"global::System.Action<{ownerWithParams}>?";
+			return "global::System.Action?";
 
 		var paramTypes = string.Join(", ", sig.Parameters.Select(p => p.Type));
-		return $"global::System.Action<{ownerWithParams}, {paramTypes}>?";
+		return $"global::System.Action<{paramTypes}>?";
 	}
 
 	/// <summary>
@@ -293,21 +286,17 @@ internal static class UnifiedInterceptorBuilder
 		if (!NeedsCustomDelegate(sig))
 			return null;
 
-		var ownerWithParams = string.IsNullOrEmpty(ownerTypeParameters)
-			? ownerClassName
-			: $"{ownerClassName}{ownerTypeParameters}";
-
 		var delegateName = $"{methodName}Delegate";
-		var delegateParamList = BuildDelegateParamList(ownerWithParams, sig.Parameters);
+		var delegateParamList = BuildDelegateParamList(sig.Parameters);
 
 		return sig.IsVoid
 			? $"public delegate void {delegateName}({delegateParamList});"
 			: $"public delegate {sig.ReturnType} {delegateName}({delegateParamList});";
 	}
 
-	private static string BuildDelegateParamList(string ownerClassName, EquatableArray<ParameterModel> parameters)
+	private static string BuildDelegateParamList(EquatableArray<ParameterModel> parameters)
 	{
-		var parts = new List<string> { $"{ownerClassName} ko" };
+		var parts = new List<string>();
 		foreach (var p in parameters)
 		{
 			parts.Add($"{p.RefPrefix}{p.Type} {p.EscapedName}");

@@ -18,7 +18,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<IndexerTestKnockOff, string, string>? OnGet { get; set; }
+		public global::System.Func<string, string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -27,7 +27,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		public (string? Key, string? Value)? LastSetEntry { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<IndexerTestKnockOff, string, string>? OnSet { get; set; }
+		public global::System.Action<string, string>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
@@ -38,8 +38,83 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<string, string> Backing { get; } = new();
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; SetCount = 0; LastSetEntry = null; OnSet = null; _source = null; }
+		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = null; _source = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the indexer getter was accessed at least once.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the indexer getter access count matches the Times constraint.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {GetCount} time(s).");
+		}
+
+		/// <summary>Verifies the indexer setter was accessed at least once.</summary>
+		public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the indexer setter access count matches the Times constraint.</summary>
+		public void VerifySet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(SetCount))
+				throw new global::KnockOff.VerificationException($"Indexer setter verification failed: expected {times}, but was called {SetCount} time(s).");
+		}
+
+		/// <summary>Verifies the indexer was accessed at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total indexer access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount + SetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Indexer verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public IndexerStringInterceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this indexer for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public IndexerStringInterceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => OnGet != null || OnSet != null || Backing.Count > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount + SetCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount + SetCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for indexer.</summary>
@@ -55,7 +130,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		public int? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<IndexerTestKnockOff, int, int>? OnGet { get; set; }
+		public global::System.Func<int, int>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
@@ -63,8 +138,73 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
+		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the indexer getter was accessed at least once.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the indexer getter access count matches the Times constraint.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {GetCount} time(s).");
+		}
+
+		/// <summary>Verifies the indexer was accessed at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total indexer access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Indexer verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public IndexerInt32Interceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this indexer for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public IndexerInt32Interceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => OnGet != null || Backing.Count > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>
@@ -81,6 +221,25 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		{
 			OfString.Reset();
 			OfInt32.Reset();
+		}
+
+		internal bool IsVerifiable => false; // Container is not individually verifiable
+		internal bool IsConfigured => OfString.IsConfigured || OfInt32.IsConfigured;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (OfString.CheckVerification() is { } failureString) return failureString;
+			if (OfInt32.CheckVerification() is { } failureInt32) return failureInt32;
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (OfString.CheckVerificationAll() is { } failureString) return failureString;
+			if (OfInt32.CheckVerificationAll() is { } failureInt32) return failureInt32;
+			return null;
 		}
 	}
 
@@ -105,13 +264,13 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 
 	string global::KnockOff.Tests.IIndexerTestService.this[string key]
 	{
-		get { Indexer.OfString.RecordGet(key); if (Indexer.OfString.OnGet is { } onGet) return onGet(this, key); if (Indexer.OfString._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); return Indexer.OfString.Backing.TryGetValue(key, out var v) ? v : default!; }
-		set { Indexer.OfString.RecordSet(key, value); if (Indexer.OfString.OnSet is { } onSet) { onSet(this, key, value); return; } if (Indexer.OfString._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); Indexer.OfString.Backing[key] = value; }
+		get { Indexer.OfString.RecordGet(key); if (Indexer.OfString.OnGet is { } onGet) return onGet(key); if (Indexer.OfString._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); return Indexer.OfString.Backing.TryGetValue(key, out var v) ? v : default!; }
+		set { Indexer.OfString.RecordSet(key, value); if (Indexer.OfString.OnSet is { } onSet) { onSet(key, value); return; } if (Indexer.OfString._source is { } src) { src[key] = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); Indexer.OfString.Backing[key] = value; }
 	}
 
 	int global::KnockOff.Tests.IIndexerTestService.this[int index]
 	{
-		get { Indexer.OfInt32.RecordGet(index); if (Indexer.OfInt32.OnGet is { } onGet) return onGet(this, index); if (Indexer.OfInt32._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); return Indexer.OfInt32.Backing.TryGetValue(index, out var v) ? v : default!; }
+		get { Indexer.OfInt32.RecordGet(index); if (Indexer.OfInt32.OnGet is { } onGet) return onGet(index); if (Indexer.OfInt32._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IIndexerTestService", "this[]"); return Indexer.OfInt32.Backing.TryGetValue(index, out var v) ? v : default!; }
 	}
 
 }

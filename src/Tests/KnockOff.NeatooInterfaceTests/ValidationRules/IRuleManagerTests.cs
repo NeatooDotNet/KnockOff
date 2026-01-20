@@ -62,7 +62,7 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         string? capturedPropertyName = null;
 
-        stub.RunRules.OnCall((ko, propOrFlag, token) =>
+        stub.RunRules.OnCall((propOrFlag, token) =>
         {
             capturedPropertyName = propOrFlag?.ToString();
             return Task.CompletedTask;
@@ -91,7 +91,7 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         CancellationToken? capturedToken = null;
 
-        stub.RunRules.OnCall((Stubs.IRuleManager_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((ko, prop, token) =>
+        stub.RunRules.OnCall((Stubs.IRuleManager_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
         {
             capturedToken = token;
             return Task.CompletedTask;
@@ -127,7 +127,7 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         IRule? capturedRule = null;
 
-        stub.RunRule.OnCall ((ko, rule, token) =>
+        stub.RunRule.OnCall ((rule, token) =>
         {
             capturedRule = rule;
             return Task.CompletedTask;
@@ -336,7 +336,7 @@ public class IRuleManagerStandaloneTests
         IRuleManager ruleManager = stub;
 
         var rules = new List<IRule>();
-        stub.Rules.OnGet = (ko) => rules;
+        stub.Rules.OnGet = () => rules;
 
         Assert.Same(rules, ruleManager.Rules);
     }
@@ -348,7 +348,7 @@ public class IRuleManagerStandaloneTests
         IRuleManager ruleManager = stub;
 
         // Configure callback to enable tracking (string overload)
-        var tracking = stub.RunRules.OnCall((RuleManagerStub ko, string propertyName, CancellationToken? token) => Task.CompletedTask);
+        var tracking = stub.RunRules.OnCall((string propertyName, CancellationToken? token) => Task.CompletedTask);
 
         await ruleManager.RunRules("Property", null);
 

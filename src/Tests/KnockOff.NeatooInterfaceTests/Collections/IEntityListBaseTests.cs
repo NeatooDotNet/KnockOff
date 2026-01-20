@@ -274,7 +274,7 @@ public class IEntityListBaseStandaloneTests
         IEntityListBase list = stub;
 
         var rootStub = new ValidateBaseStubForEntityList();
-        stub.Root.OnGet = (ko) => rootStub;
+        stub.Root.OnGet = () => rootStub;
 
         Assert.Same(rootStub, list.Root);
     }
@@ -353,7 +353,7 @@ public partial class IEntityListBaseOfTTests
         IEntityListBase<IEntityBase> list = stub;
 
         var itemStub = new EntityBaseStubForListT();
-        stub.Indexer.OnGet = (ko, index) => itemStub;
+        stub.Indexer.OnGet = (index) => itemStub;
 
         _ = list[0];
 
@@ -403,7 +403,7 @@ public partial class IEntityListBaseOfTTests
         IEntityListBase<IEntityBase> list = stub;
 
         var itemStub = new EntityBaseStubForListT();
-        stub.Contains.OnCall((ko, item) => true);
+        stub.Contains.OnCall((item) => true);
 
         var result = list.Contains(itemStub);
 

@@ -39,19 +39,31 @@ partial class IAttributeToRuleTests
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
+			}
+
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("GetRule", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Typed handler for GetRule with specific type arguments.</summary>
 			public sealed class GetRuleTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class, global::Neatoo.IValidateBase
 			{
 				/// <summary>Delegate for GetRule.</summary>
-				public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(Stubs.IAttributeToRule ko, global::Neatoo.IPropertyInfo r, object? attribute);
+				public delegate global::Neatoo.Rules.IRule? GetRuleDelegate(global::Neatoo.IPropertyInfo r, object? attribute);
 
 				private GetRuleDelegate? _onCall;
 
@@ -73,8 +85,24 @@ partial class IAttributeToRuleTests
 				/// <summary>Records a method call.</summary>
 				public void RecordCall(global::Neatoo.IPropertyInfo r, object? attribute) { CallCount++; LastCallArgs = (r, attribute); }
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; LastCallArgs = default; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -89,7 +117,7 @@ partial class IAttributeToRuleTests
 				var typedHandler = GetRule.Of<T>();
 				typedHandler.RecordCall(r, attribute);
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, r, attribute);
+					return onCallCallback(r, attribute);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IAttributeToRule", "GetRule");
 				return default!;
 			}
@@ -132,6 +160,28 @@ partial class IAttributeToRuleTests
 				throw new global::System.InvalidOperationException(
 					$"No implementation provided for {methodName}<{type.Name}>. " +
 					$"Set the handler's OnCall.");
+			}
+
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (GetRule.CheckVerification() is { } getruleFailure) failures.Add(getruleFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (GetRule.CheckVerificationAll() is { } getruleFailure) failures.Add(getruleFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
 			}
 
 		}

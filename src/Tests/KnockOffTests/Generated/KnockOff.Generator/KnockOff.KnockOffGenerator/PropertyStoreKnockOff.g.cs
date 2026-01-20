@@ -18,7 +18,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		public string? LastGetKey { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<PropertyStoreKnockOff, string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
+		public global::System.Func<string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
@@ -26,8 +26,73 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> Backing { get; } = new();
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; OnGet = null; _source = null; }
+		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the indexer getter was accessed at least once.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the indexer getter access count matches the Times constraint.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {GetCount} time(s).");
+		}
+
+		/// <summary>Verifies the indexer was accessed at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total indexer access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Indexer verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public IndexerInterceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this indexer for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public IndexerInterceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => OnGet != null || Backing.Count > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>
@@ -50,7 +115,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 
 	global::KnockOff.Tests.PropertyInfo? global::KnockOff.Tests.IPropertyStore.this[string key]
 	{
-		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(this, key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
+		get { Indexer.RecordGet(key); if (Indexer.OnGet is { } onGet) return onGet(key); if (Indexer._source is { } src) return src[key]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyStore", "this[]"); return Indexer.Backing.TryGetValue(key, out var v) ? v : default; }
 	}
 
 }

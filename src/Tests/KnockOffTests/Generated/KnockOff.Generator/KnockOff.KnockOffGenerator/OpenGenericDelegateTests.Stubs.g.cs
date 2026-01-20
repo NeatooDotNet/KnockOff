@@ -18,11 +18,12 @@ partial class OpenGenericDelegateTests
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.OGFactory<T>, T>? OnCall { get; set; }
+			public global::System.Func<T>? OnCall { get; set; }
 
 			public void RecordCall() { CallCount++; }
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.OGFactory<T> delegate.</summary>
@@ -37,7 +38,7 @@ partial class OpenGenericDelegateTests
 			private T Invoke()
 			{
 				Interceptor.RecordCall();
-				if (Interceptor.OnCall is { } onCall) return onCall(this);
+				if (Interceptor.OnCall is { } onCall) return onCall();
 				return default!;
 			}
 
@@ -58,11 +59,12 @@ partial class OpenGenericDelegateTests
 			public TIn? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.OGConverter<TIn, TOut, TResult>, TIn, TResult>? OnCall { get; set; }
+			public global::System.Func<TIn, TResult>? OnCall { get; set; }
 
 			public void RecordCall(TIn input) { CallCount++; LastCallArg = input; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.OGConverter<TIn, TOut, TResult> delegate.</summary>
@@ -77,7 +79,7 @@ partial class OpenGenericDelegateTests
 			private TResult Invoke(TIn input)
 			{
 				Interceptor.RecordCall(input);
-				if (Interceptor.OnCall is { } onCall) return onCall(this, input);
+				if (Interceptor.OnCall is { } onCall) return onCall(input);
 				return default!;
 			}
 

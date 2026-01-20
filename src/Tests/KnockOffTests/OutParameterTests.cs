@@ -29,7 +29,7 @@ public class OutParameterTests
 		IOutParameterService service = knockOff;
 
 		// Set callback to provide return value
-		var tracking = knockOff.TryGetValue.OnCall((OutParameterServiceKnockOff ko, string key, out string? value) =>
+		var tracking = knockOff.TryGetValue.OnCall((string key, out string? value) =>
 		{
 			value = "found";
 			return true;
@@ -49,7 +49,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		knockOff.TryGetValue.OnCall((OutParameterServiceKnockOff ko, string key, out string? value) =>
+		knockOff.TryGetValue.OnCall((string key, out string? value) =>
 		{
 			if (key == "exists")
 			{
@@ -77,7 +77,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		var tracking = knockOff.TryParse.OnCall((OutParameterServiceKnockOff ko, string input, out int result) =>
+		var tracking = knockOff.TryParse.OnCall((string input, out int result) =>
 		{
 			if (int.TryParse(input, out result))
 				return true;
@@ -105,7 +105,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		var tracking = knockOff.GetData.OnCall((OutParameterServiceKnockOff ko, out string name, out int count) =>
+		var tracking = knockOff.GetData.OnCall((out string name, out int count) =>
 		{
 			name = "TestName";
 			count = 100;
@@ -126,7 +126,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		knockOff.GetData.OnCall((OutParameterServiceKnockOff ko, out string name, out int count) =>
+		knockOff.GetData.OnCall((out string name, out int count) =>
 		{
 			name = "Product";
 			count = 42;
@@ -158,7 +158,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		var tracking = knockOff.TryGetValue.OnCall((OutParameterServiceKnockOff ko, string key, out string? value) => { value = "x"; return true; });
+		var tracking = knockOff.TryGetValue.OnCall((string key, out string? value) => { value = "x"; return true; });
 
 		service.TryGetValue("key1", out _);
 		service.TryGetValue("key2", out _);
@@ -177,7 +177,7 @@ public class OutParameterTests
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;
 
-		var tracking = knockOff.TryParse.OnCall((OutParameterServiceKnockOff ko, string input, out int result) => { result = 0; return false; });
+		var tracking = knockOff.TryParse.OnCall((string input, out int result) => { result = 0; return false; });
 
 		service.TryParse("first", out _);
 		service.TryParse("second", out _);

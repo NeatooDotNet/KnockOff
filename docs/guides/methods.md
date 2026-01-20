@@ -1,278 +1,337 @@
-# Methods
+# Method Interceptors
 
-This guide covers stubbing methods: void, return values, async, overloads, and generics.
+Method interceptors track calls, capture arguments, and configure return values for interface methods in your stub. Each method on the stubbed interface gets a corresponding interceptor property that provides verification and configuration capabilities.
 
-## Basic Methods
+**Critical concept**: The `OnCall` callback signature always includes the stub instance as the first parameter, followed by the method's parameters. This gives you access to stub state during callback execution.
+
+---
+
+## Configuring Method Behavior
 
 ### Void Methods
 
-<!-- snippet: methods-void-no-params -->
+Configure void methods using `OnCall` with an `Action<TStub>`:
+
+<!-- snippet: methods-oncall-void -->
 ```cs
-public interface IMethodService
+[Fact]
+public void VoidMethod_ConfiguredWithOnCall()
 {
-    void Initialize();
+    var stub = new LogSvcMethodsStub();
+
+    // OnCall for void methods uses Action<TStub, ...params>
+    var logged = new List<string>();
+    var tracking = stub.LogMessage.OnCall((message) =>
+    {
+        logged.Add(message);
+    });
+
+    ILogSvcMethods logger = stub;
+    logger.LogMessage("Hello, World!");
+
+    Assert.Single(logged);
+    Assert.Equal("Hello, World!", logged[0]);
+    Assert.True(tracking.WasCalled);
 }
-
-[KnockOff]
-public partial class MethodServiceKnockOff : IMethodService { }
-```
-<!-- endSnippet -->
-
-Configure with `OnCall`:
-
-<!-- snippet: methods-void-callbacks -->
-```cs
-// No parameters
-serviceKnockOff.Initialize.OnCall = (ko) =>
-{
-    // Custom initialization logic
-};
-
-// Single parameter
-loggerKnockOff.Log.OnCall = (ko, message) =>
-{
-    Console.WriteLine($"Logged: {message}");
-};
-
-// Multiple parameters
-loggerKnockOff.LogError.OnCall = (ko, message, ex) =>
-{
-    Console.WriteLine($"Error: {message} - {ex.Message}");
-};
 ```
 <!-- endSnippet -->
 
 ### Methods with Return Values
 
-<!-- snippet: methods-return-callbacks -->
+Configure methods that return values using `OnCall` with a `Func<TStub, T, R>`:
+
+<!-- snippet: methods-oncall-return -->
 ```cs
-// No parameters
-knockOff.Count.OnCall = (ko) => 42;
-
-// Single parameter
-knockOff.GetById.OnCall = (ko, id) => new MethodUser { Id = id };
-```
-<!-- endSnippet -->
-
-### User-Defined Defaults
-
-Define protected methods for consistent behavior across tests:
-
-<!-- snippet: methods-user-defined -->
-```cs
-[KnockOff]
-public partial class MethodUserDefinedKnockOff : IMethodUserDefined
+[Fact]
+public void MethodWithReturn_ConfiguredWithOnCall()
 {
-    protected MethodUser? GetById(int id) => new MethodUser { Id = id, Name = "Default" };
+    var stub = new LogSvcMethodsStub();
 
-    protected int Count() => 100;
+    // OnCall callback receives the method parameters
+    var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
+
+    ILogSvcMethods logger = stub;
+    var name = logger.GetUserName(42);
+
+    Assert.Equal("TestUser", name);
+    Assert.True(tracking.WasCalled);
 }
 ```
 <!-- endSnippet -->
 
-Callbacks override user methods when set.
+Notice the stub instance is the first parameter, followed by the method's `userId` parameter.
 
-## Argument Tracking
+### Methods with Multiple Parameters
 
-### Single Parameter
+Methods with multiple parameters include all parameters after the stub instance:
 
-<!-- snippet: methods-single-param -->
+<!-- snippet: methods-oncall-multi-param -->
 ```cs
-service.GetUser(42);
-
-// Tracking - single parameter uses raw type (not a tuple)
-int? lastId = knockOff.GetUser.LastCallArg;  // 42, not (42,)
-```
-<!-- endSnippet -->
-
-### Multiple Parameters
-
-<!-- snippet: methods-multiple-params -->
-```cs
-service.Process("test", 42, true);
-
-// Tracking - named tuple with original parameter names
-var args = knockOff.Process.LastCallArgs;
-var name = args?.name;   // "test"
-var value = args?.value; // 42
-var flag = args?.flag;   // true
-```
-<!-- endSnippet -->
-
-## Async Methods
-
-KnockOff supports `Task`, `Task<T>`, `ValueTask`, and `ValueTask<T>`.
-
-### Default Behavior
-
-Without callbacks, async methods return completed tasks with default values:
-
-<!-- snippet: async-methods-default-behavior -->
-```cs
-await repo.InitializeAsync();       // Completes immediately
-var user = await repo.GetByIdAsync(1);  // Returns null (default)
-var count = await repo.CountAsync();    // Returns 0 (default)
-```
-<!-- endSnippet -->
-
-### Task Callbacks
-
-<!-- snippet: async-methods-task-callbacks -->
-```cs
-// Task (void equivalent)
-knockOff.InitializeAsync.OnCall = (ko) =>
+[Fact]
+public void MethodWithMultipleParams_AllAvailableInOnCall()
 {
-    // Custom logic
-    return Task.CompletedTask;
-};
+    var stub = new AuthSvcMethodsStub();
 
-// Task<T>
-knockOff.GetByIdAsync.OnCall = (ko, id) =>
-    Task.FromResult<AsyncUser?>(new AsyncUser { Id = id, Name = "Mocked" });
-```
-<!-- endSnippet -->
+    // All method parameters are passed to the callback
+    var tracking = stub.ValidateCredentials.OnCall((username, password) =>
+        username == "admin" && password == "secret");
 
-### ValueTask Callbacks
+    IAuthSvcMethods auth = stub;
 
-<!-- snippet: async-methods-valuetask-callbacks -->
-```cs
-// ValueTask<T>
-knockOff.CountAsync.OnCall = (ko) => new ValueTask<int>(100);
-```
-<!-- endSnippet -->
+    Assert.True(auth.ValidateCredentials("admin", "secret"));
+    Assert.False(auth.ValidateCredentials("user", "wrong"));
 
-### Simulating Delays
-
-<!-- snippet: async-methods-simulating-delays -->
-```cs
-knockOff.GetByIdAsync.OnCall = async (ko, id) =>
-{
-    await Task.Delay(100);  // Simulate network latency
-    return new AsyncUser { Id = id };
-};
-```
-<!-- endSnippet -->
-
-### Simulating Failures
-
-<!-- snippet: async-methods-simulating-failures-usage -->
-```cs
-// Faulted task
-knockOff.SaveAsync.OnCall = (ko, entity) =>
-    Task.FromException<int>(new InvalidOperationException("Connection lost"));
-
-// Or throw directly in callback
-knockOff.SaveAsync.OnCall = (ko, entity) =>
-{
-    throw new InvalidOperationException("Connection lost");
-};
-```
-<!-- endSnippet -->
-
-## Method Overloads
-
-Overloaded methods get numbered interceptors:
-
-```csharp
-public interface IProcessor
-{
-    void Process(string data);               // Process1
-    void Process(string data, int priority); // Process2
+    // Verify exactly 2 calls were made
+    tracking.Verify(Times.Exactly(2));
 }
-
-// Each overload has its own interceptor
-stub.Process1.OnCall = (ko, data) => { };
-stub.Process2.OnCall = (ko, data, priority) => { };
-
-// Verify specific overload
-Assert.Equal(1, stub.Process2.CallCount);
 ```
+<!-- endSnippet -->
 
-Methods without overloads don't get numeric suffixes.
+---
 
-## Generic Methods
+## Verifying Method Calls
 
-```csharp
-public interface ISerializer
+### Using Verify()
+
+The recommended approach is to call `.Verify()` on the tracking object returned by `OnCall`:
+
+<!-- snippet: methods-verify-wascalled -->
+```cs
+[Fact]
+public void Verify_VerifiesMethodInvocation()
 {
-    T Deserialize<T>(string json);
+    var stub = new SaveRepoMethodsStub();
+    stub.Save.OnCall((entity) => { }).Verifiable();
+
+    ISaveRepoMethods repository = stub;
+    repository.Save(new User { Id = 1 });
+
+    // Verify() checks all members marked with .Verifiable()
+    stub.Verify();
 }
-
-// Use .Of<T>() to access type-specific interceptors
-stub.Deserialize.Of<User>().OnCall = (ko, json) => new User { Name = "Test" };
-stub.Deserialize.Of<Order>().OnCall = (ko, json) => new Order { Id = 1 };
-
-Assert.Equal(1, stub.Deserialize.Of<User>().CallCount);
 ```
+<!-- endSnippet -->
 
-## Common Patterns
+### Verifying Call Frequency
 
-### Conditional Returns
+Use `Times` to specify exact call count requirements:
 
-<!-- snippet: methods-conditional-returns -->
+<!-- snippet: methods-verify-callcount -->
 ```cs
-knockOff.GetById.OnCall = (ko, id) => id switch
+[Fact]
+public void Verify_ExactCallCount()
 {
-    1 => new MethodUser { Id = 1, Name = "Admin" },
-    2 => new MethodUser { Id = 2, Name = "Guest" },
-    _ => null
-};
+    var stub = new NotifierMethodsStub();
+    var tracking = stub.Notify.OnCall((message) => { });
+
+    INotifierMethods notifier = stub;
+
+    // Simulate processing a 2-item collection
+    var items = new[] { "item1", "item2" };
+    foreach (var item in items)
+    {
+        notifier.Notify($"Processing {item}");
+    }
+
+    // Verify exactly 2 calls (throws if different)
+    tracking.Verify(Times.Exactly(2));
+}
 ```
 <!-- endSnippet -->
 
-### Sequential Returns
+### Using Verifiable()
 
-<!-- snippet: methods-sequential-returns-usage -->
+For batch verification of multiple methods, use `.Verifiable()` then call `stub.Verify()`:
+
+<!-- snippet: methods-verify-verifiable -->
 ```cs
-var results = new Queue<int>([1, 2, 3]);
-knockOff.GetNext.OnCall = (ko) => results.Dequeue();
-
-var first = service.GetNext();   // 1
-var second = service.GetNext();  // 2
-var third = service.GetNext();   // 3
-```
-<!-- endSnippet -->
-
-### Throwing Exceptions
-
-<!-- snippet: methods-simulating-failures-usage -->
-```cs
-knockOff.Save.OnCall = (ko, entity) =>
+[Fact]
+public void Verifiable_BatchVerification()
 {
-    throw new InvalidOperationException("Connection failed");
-};
+    var stub = new SaveRepoMethodsStub();
+
+    // Mark expected calls
+    stub.Save.OnCall((entity) => { }).Verifiable(Times.Once);
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+
+    ISaveRepoMethods repository = stub;
+    repository.Save(new User { Id = 1 });
+    repository.GetById(1);
+
+    // Verify all marked methods (throws if any not called correctly)
+    stub.Verify();
+}
 ```
 <!-- endSnippet -->
 
-### Accessing Stub State
+---
 
-<!-- snippet: methods-accessing-handler-state-usage -->
+## Capturing Arguments
+
+### Single Parameter Methods
+
+Access the last call's argument using `LastCallArg`:
+
+<!-- snippet: methods-capture-single -->
 ```cs
-knockOff.Process.OnCall = (ko) =>
+[Fact]
+public void LastArg_CapturesSingleParameter()
 {
-    if (!ko.Initialize.WasCalled)
-        throw new InvalidOperationException("Not initialized");
-};
+    var stub = new UserRepoMethodsStub();
+    var tracking = stub.GetUser.OnCall((userId) => new User { Id = userId });
+
+    IUserRepoMethods repository = stub;
+    repository.GetUser(42);
+
+    // LastArg captures the most recent call's argument (from tracking)
+    int capturedId = tracking.LastArg;
+    Assert.Equal(42, capturedId);
+}
 ```
 <!-- endSnippet -->
 
-## Priority Order
+### Multiple Parameter Methods
 
-1. **Callback** (if set) — takes precedence
-2. **User method** (if defined) — fallback
-3. **Default** — `default(T)` for return methods
+Access arguments using the `LastCallArgs` named tuple:
 
-<!-- snippet: methods-priority-order-usage -->
+<!-- snippet: methods-capture-multiple -->
 ```cs
-// No callback → uses user method
-var result1 = service.Calculate(5);  // 10 (5 * 2)
+[Fact]
+public void LastArgs_CapturesAllParameters()
+{
+    var stub = new AuthSvcMethodsStub();
+    var tracking = stub.ValidateCredentials.OnCall((username, password) => true);
 
-// Callback → overrides user method
-knockOff.Calculate2.OnCall = (ko, x) => x * 100;
-var result2 = service.Calculate(5);  // 500 (callback)
+    IAuthSvcMethods auth = stub;
+    auth.ValidateCredentials("admin", "secret123");
 
-// Reset → back to user method
-knockOff.Calculate2.Reset();
-var result3 = service.Calculate(5);  // 10 (user method again)
+    // LastArgs is a named tuple with all parameters (from tracking)
+    var (username, password) = tracking.LastArgs;
+    Assert.Equal("admin", username);
+    Assert.Equal("secret123", password);
+}
 ```
 <!-- endSnippet -->
+
+---
+
+## Overloaded Methods
+
+When an interface has overloaded methods, KnockOff generates numbered suffixes for each overload:
+
+<!-- snippet: methods-overloads -->
+```cs
+[Fact]
+public void Overloads_DistinguishedByCallbackSignature()
+{
+    var stub = new SearchRepoStub();
+
+    // Overloads are distinguished by the callback parameter types
+    // The fully-typed lambda tells KnockOff which overload to configure
+    var findAllTracking = stub.Find.OnCall(() =>
+        new List<User>()).Verifiable();
+    var findByIdTracking = stub.Find.OnCall((int id) =>
+        new User { Id = id, Name = "ById" }).Verifiable();
+    var findByNameTracking = stub.Find.OnCall((string name) =>
+        new User { Id = 1, Name = name }).Verifiable();
+
+    ISearchRepo repo = stub;
+
+    // Call each overload
+    repo.Find();
+    repo.Find(42);
+    repo.Find("Alice");
+
+    // Verify all overloads were called
+    stub.Verify();
+
+    // Access last arguments via tracking objects
+    Assert.Equal(42, findByIdTracking.LastArg);
+    Assert.Equal("Alice", findByNameTracking.LastArg);
+}
+```
+<!-- endSnippet -->
+
+Overloads are numbered in the order they appear in the interface definition.
+
+---
+
+## Resetting Interceptors
+
+Clear call counts and remove callbacks using `Reset()`:
+
+<!-- snippet: methods-reset -->
+```cs
+[Fact]
+public void Reset_ClearsTrackingState()
+{
+    var stub = new ProcessorMethodsStub();
+    var tracking = stub.ProcessData.OnCall((data) => { });
+
+    IProcessorMethods processor = stub;
+    processor.ProcessData("initial");
+
+    // Verify one call was made
+    tracking.Verify(Times.Once);
+
+    // Reset clears CallCount, WasCalled on the interceptor
+    stub.ProcessData.Reset();
+
+    // After reset, Verify(Times.Never) passes via tracking
+    tracking.Verify(Times.Never);
+}
+```
+<!-- endSnippet -->
+
+This is useful when reusing a stub instance across multiple test phases or assertions.
+
+---
+
+## Complete Example
+
+This example demonstrates a realistic test using method configuration, execution, and verification:
+
+<!-- snippet: methods-complete-example -->
+```cs
+[Fact]
+public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
+{
+    // Arrange
+    var stub = new CompleteUserRepoStub();
+
+    var testUser = new User { Id = 1, Name = "Alice", Email = "old@test.com" };
+    var getTracking = stub.GetUser.OnCall((id) => id == 1 ? testUser : null).Verifiable();
+    var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
+
+    var service = new UserService(stub);
+
+    // Act
+    var result = service.UpdateUserEmail(1, "new@test.com");
+
+    // Assert
+    Assert.True(result);
+
+    // Verify both methods were called
+    stub.Verify();
+
+    // Verify GetUser was called with correct ID
+    Assert.Equal(1, getTracking.LastArg);
+
+    // Verify saved user has new email via the tracking args
+    var savedUser = saveTracking.LastArg;
+    Assert.Equal("new@test.com", savedUser.Email);
+}
+```
+<!-- endSnippet -->
+
+---
+
+## Key Takeaways
+
+- **OnCall signature**: First parameter is always the stub instance
+- **Verification**: Use `tracking.Verify()` or `.Verifiable()` + `stub.Verify()`
+- **Arguments**: `LastCallArg` for single parameters, `LastCallArgs` tuple for multiple
+- **Overloads**: Numbered suffixes (Method1, Method2, ...) in declaration order
+- **Reset**: Clears call tracking and callbacks
+
+Next: [Property Interceptors](properties.md) for get/set tracking and configuration.

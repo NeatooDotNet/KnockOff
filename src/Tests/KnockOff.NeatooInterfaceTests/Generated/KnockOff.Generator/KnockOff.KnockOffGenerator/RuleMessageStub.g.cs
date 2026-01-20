@@ -11,20 +11,79 @@ partial class RuleMessageStub : global::Neatoo.Rules.IRuleMessage, global::Knock
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.Rules.IRuleMessage? _source;
 
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+		private bool _valueSet;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<RuleMessageStub, uint>? OnGet { get; set; }
+		public global::System.Func<uint>? OnGet { get; set; }
 
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public uint Value { get; set; } = default!;
+		private uint _value = default!;
+		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+		public uint Value
+		{
+			get => _value;
+			set { _value = value; _valueSet = true; }
+		}
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
+
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public RuleIndexInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public RuleIndexInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RuleIndex", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RuleIndex (get)", times, GetCount));
+		}
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+		internal bool IsConfigured => _valueSet || OnGet != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("RuleIndex", times, totalCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			var totalCount = GetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("RuleIndex", global::KnockOff.Times.AtLeastOnce, totalCount);
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for PropertyName.</summary>
@@ -33,20 +92,79 @@ partial class RuleMessageStub : global::Neatoo.Rules.IRuleMessage, global::Knock
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.Rules.IRuleMessage? _source;
 
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+		private bool _valueSet;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<RuleMessageStub, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public string Value { get; set; } = "";
+		private string _value = "";
+		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+		public string Value
+		{
+			get => _value;
+			set { _value = value; _valueSet = true; }
+		}
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
+
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public PropertyNameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public PropertyNameInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyName", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyName (get)", times, GetCount));
+		}
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+		internal bool IsConfigured => _valueSet || OnGet != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("PropertyName", times, totalCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			var totalCount = GetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("PropertyName", global::KnockOff.Times.AtLeastOnce, totalCount);
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for Message.</summary>
@@ -55,20 +173,79 @@ partial class RuleMessageStub : global::Neatoo.Rules.IRuleMessage, global::Knock
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.Rules.IRuleMessage? _source;
 
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+		private bool _valueSet;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<RuleMessageStub, string?>? OnGet { get; set; }
+		public global::System.Func<string?>? OnGet { get; set; }
 
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public string? Value { get; set; } = default!;
+		private string? _value = default!;
+		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+		public string? Value
+		{
+			get => _value;
+			set { _value = value; _valueSet = true; }
+		}
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
+
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public MessageInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public MessageInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Message", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Message (get)", times, GetCount));
+		}
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+		internal bool IsConfigured => _valueSet || OnGet != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Message", times, totalCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			var totalCount = GetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Message", global::KnockOff.Times.AtLeastOnce, totalCount);
+		}
 	}
 
 	/// <summary>Interceptor for RuleIndex. Configure via .Value, track via .GetCount.</summary>
@@ -99,17 +276,17 @@ partial class RuleMessageStub : global::Neatoo.Rules.IRuleMessage, global::Knock
 
 	uint global::Neatoo.Rules.IRuleMessage.RuleIndex
 	{
-		get { RuleIndex.RecordGet(); if (RuleIndex.OnGet is { } onGet) return onGet(this); if (RuleIndex._source is { } src) return src.RuleIndex; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex"); return RuleIndex.Value; }
+		get { RuleIndex.RecordGet(); if (RuleIndex.OnGet is { } onGet) return onGet(); if (RuleIndex._source is { } src) return src.RuleIndex; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "RuleIndex"); return RuleIndex.Value; }
 	}
 
 	string global::Neatoo.Rules.IRuleMessage.PropertyName
 	{
-		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(this); if (PropertyName._source is { } src) return src.PropertyName; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName"); return PropertyName.Value; }
+		get { PropertyName.RecordGet(); if (PropertyName.OnGet is { } onGet) return onGet(); if (PropertyName._source is { } src) return src.PropertyName; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "PropertyName"); return PropertyName.Value; }
 	}
 
 	string? global::Neatoo.Rules.IRuleMessage.Message
 	{
-		get { Message.RecordGet(); if (Message.OnGet is { } onGet) return onGet(this); if (Message._source is { } src) return src.Message; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message"); return Message.Value; }
+		get { Message.RecordGet(); if (Message.OnGet is { } onGet) return onGet(); if (Message._source is { } src) return src.Message; if (Strict) throw global::KnockOff.StubException.NotConfigured("IRuleMessage", "Message"); return Message.Value; }
 	}
 
 }

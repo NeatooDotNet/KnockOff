@@ -15,95 +15,125 @@ partial class XmlSerializableStubTests
 			internal global::System.Xml.Serialization.IXmlSerializable? _source;
 
 			/// <summary>Delegate for GetSchema.</summary>
-			public delegate global::System.Xml.Schema.XmlSchema? GetSchemaDelegate(Stubs.IXmlSerializable ko);
+			public delegate global::System.Xml.Schema.XmlSchema? GetSchemaDelegate();
 
-			private readonly global::System.Collections.Generic.List<(GetSchemaDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private GetSchemaDelegate? _onCall;
+			private MethodTrackingImpl? _onCallTracking;
+
+			private global::System.Collections.Generic.List<(GetSchemaDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 
-			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(GetSchemaDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequence = null;
 				_sequenceIndex = 0;
-				return tracking;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = callback;
+				_onCallTracking = new MethodTrackingImpl(this);
+				return _onCallTracking;
 			}
 
-			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-			public global::KnockOff.IMethodSequence<GetSchemaDelegate> OnCall(GetSchemaDelegate callback, global::KnockOff.Times times)
+			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<GetSchemaDelegate> OnCallSequence(GetSchemaDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, times, tracking));
+				_onCall = null;
+				_onCallTracking = null;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_sequence = new global::System.Collections.Generic.List<(GetSchemaDelegate Callback, MethodTrackingImpl Tracking)>();
+				var tracking = new MethodTrackingImpl(this);
+				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
 				return new MethodSequenceImpl(this);
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal global::System.Xml.Schema.XmlSchema? Invoke(Stubs.IXmlSerializable ko)
+			internal global::System.Xml.Schema.XmlSchema? Invoke(bool strict)
 			{
-				if (_sequence.Count == 0)
+				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
-					_unconfiguredCallCount++;
-					#pragma warning disable CS8601, SYSLIB0050
-					if (_source is { } src) return src.GetSchema();
-					#pragma warning restore CS8601, SYSLIB0050
-					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetSchema");
+					var (callback, tracking) = _sequence[_sequenceIndex];
+					tracking.RecordCall();
+					_sequenceIndex++;
+					return callback();
+				}
+
+				if (_onCall != null && _onCallTracking != null)
+				{
+					_onCallTracking.RecordCall();
+					return _onCall();
+				}
+
+				_unconfiguredCallCount++;
+				if (_sequence != null && _sequenceIndex >= _sequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetSchema");
 					return default!;
 				}
 
-				var (callback, times, tracking) = _sequence[_sequenceIndex];
-				tracking.RecordCall();
-
-				if (!times.IsForever && tracking.CallCount >= times.Count)
-				{
-					if (_sequenceIndex < _sequence.Count - 1)
-						_sequenceIndex++;
-					else if (tracking.CallCount > times.Count)
-						throw global::KnockOff.StubException.SequenceExhausted("GetSchema");
-				}
-
-				return callback(ko);
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetSchema();
+				#pragma warning restore CS8601, SYSLIB0050
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetSchema");
+				return default!;
 			}
 
-			/// <summary>Resets all tracking state.</summary>
+			/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
 				_source = null;
-				foreach (var (_, _, tracking) in _sequence)
-					tracking.Reset();
+				_onCallTracking?.Reset();
+				if (_sequence != null)
+				{
+					foreach (var (_, tracking) in _sequence)
+						tracking.Reset();
+				}
 				_sequenceIndex = 0;
 			}
 
-			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-			public bool Verify()
+			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				foreach (var (_, times, tracking) in _sequence)
-				{
-					if (times.IsForever)
-					{
-						if (!tracking.WasCalled)
-							return false;
-					}
-					else if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetSchema", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetSchema", global::KnockOff.Times.AtLeastOnce, CallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
 			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 			{
+				private readonly IXmlSerializable_GetSchemaInterceptor _interceptor;
+
+				public MethodTrackingImpl(IXmlSerializable_GetSchemaInterceptor interceptor) => _interceptor = interceptor;
+
 
 				/// <summary>Number of times this callback was invoked.</summary>
 				public int CallCount { get; private set; }
@@ -116,6 +146,32 @@ partial class XmlSerializableStubTests
 
 				/// <summary>Resets tracking state.</summary>
 				public void Reset() => CallCount = 0;
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = times;
+					return this;
+				}
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -130,34 +186,45 @@ partial class XmlSerializableStubTests
 				{
 					get
 					{
+						if (_interceptor._sequence == null) return 0;
 						var total = 0;
-						foreach (var (_, _, tracking) in _interceptor._sequence)
+						foreach (var (_, tracking) in _interceptor._sequence)
 							total += tracking.CallCount;
 						return total;
 					}
 				}
 
-				/// <summary>Add another callback to the sequence.</summary>
-				public global::KnockOff.IMethodSequence<GetSchemaDelegate> ThenCall(GetSchemaDelegate callback, global::KnockOff.Times times)
+				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IMethodSequence<GetSchemaDelegate> ThenCall(GetSchemaDelegate callback)
 				{
-					var tracking = new MethodTrackingImpl();
-					_interceptor._sequence.Add((callback, times, tracking));
+					var tracking = new MethodTrackingImpl(_interceptor);
+					_interceptor._sequence!.Add((callback, tracking));
 					return this;
 				}
 
-				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-				public bool Verify()
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
 				{
-					foreach (var (_, times, tracking) in _interceptor._sequence)
-					{
-						if (!times.Verify(tracking.CallCount))
-							return false;
-					}
-					return true;
+					if (_interceptor._sequence == null) return;
+					var sequenceLength = _interceptor._sequence.Count;
+					var completedCount = _interceptor._sequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 				}
 
-				/// <summary>Reset all tracking in the sequence.</summary>
+				/// <summary>Resets all tracking in the sequence.</summary>
 				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodSequence<GetSchemaDelegate> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 			}
 
 		}
@@ -168,99 +235,131 @@ partial class XmlSerializableStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Xml.Serialization.IXmlSerializable? _source;
 
-			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private global::System.Action<global::System.Xml.XmlReader>? _onCall;
+			private MethodTrackingImpl? _onCallTracking;
+
+			private global::System.Collections.Generic.List<(global::System.Action<global::System.Xml.XmlReader> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
 			private int _unconfiguredCallCount;
 			private global::System.Xml.XmlReader? _unconfiguredLastArg;
 
 			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.Xml.XmlReader? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.Xml.XmlReader? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-			public global::KnockOff.IMethodTracking<global::System.Xml.XmlReader> OnCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> callback)
+			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
+			public global::KnockOff.IMethodTracking<global::System.Xml.XmlReader> OnCall(global::System.Action<global::System.Xml.XmlReader> callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequence = null;
 				_sequenceIndex = 0;
-				return tracking;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = callback;
+				_onCallTracking = new MethodTrackingImpl(this);
+				return _onCallTracking;
 			}
 
-			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader>> OnCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> callback, global::KnockOff.Times times)
+			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlReader>> OnCallSequence(global::System.Action<global::System.Xml.XmlReader> callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, times, tracking));
+				_onCall = null;
+				_onCallTracking = null;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Xml.XmlReader> Callback, MethodTrackingImpl Tracking)>();
+				var tracking = new MethodTrackingImpl(this);
+				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
 				return new MethodSequenceImpl(this);
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IXmlSerializable ko, global::System.Xml.XmlReader reader)
+			internal void Invoke(bool strict, global::System.Xml.XmlReader reader)
 			{
-				if (_sequence.Count == 0)
+				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
-					_unconfiguredCallCount++;
-					_unconfiguredLastArg = reader;
-					#pragma warning disable CS8601, SYSLIB0050
-					if (_source is { } src) { src.ReadXml(reader); return; }
-					#pragma warning restore CS8601, SYSLIB0050
-					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "ReadXml");
+					var (callback, tracking) = _sequence[_sequenceIndex];
+					tracking.RecordCall(reader);
+					_sequenceIndex++;
+					callback(reader);
 					return;
 				}
 
-				var (callback, times, tracking) = _sequence[_sequenceIndex];
-				tracking.RecordCall(reader);
-
-				if (!times.IsForever && tracking.CallCount >= times.Count)
+				if (_onCall != null && _onCallTracking != null)
 				{
-					if (_sequenceIndex < _sequence.Count - 1)
-						_sequenceIndex++;
-					else if (tracking.CallCount > times.Count)
-						throw global::KnockOff.StubException.SequenceExhausted("ReadXml");
+					_onCallTracking.RecordCall(reader);
+					_onCall(reader);
+					return;
 				}
 
-				callback(ko, reader);
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = reader;
+				if (_sequence != null && _sequenceIndex >= _sequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ReadXml");
+					return;
+				}
+
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.ReadXml(reader); return; }
+				#pragma warning restore CS8601, SYSLIB0050
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ReadXml");
+				return;
 			}
 
-			/// <summary>Resets all tracking state.</summary>
+			/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
 				_source = null;
-				foreach (var (_, _, tracking) in _sequence)
-					tracking.Reset();
+				_onCallTracking?.Reset();
+				if (_sequence != null)
+				{
+					foreach (var (_, tracking) in _sequence)
+						tracking.Reset();
+				}
 				_sequenceIndex = 0;
 			}
 
-			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-			public bool Verify()
+			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				foreach (var (_, times, tracking) in _sequence)
-				{
-					if (times.IsForever)
-					{
-						if (!tracking.WasCalled)
-							return false;
-					}
-					else if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("ReadXml", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("ReadXml", global::KnockOff.Times.AtLeastOnce, CallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
 			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::System.Xml.XmlReader>
 			{
+				private readonly IXmlSerializable_ReadXmlInterceptor _interceptor;
+
+				public MethodTrackingImpl(IXmlSerializable_ReadXmlInterceptor interceptor) => _interceptor = interceptor;
+
 				private global::System.Xml.XmlReader _lastArg = default!;
 
 				/// <summary>Number of times this callback was invoked.</summary>
@@ -277,10 +376,39 @@ partial class XmlSerializableStubTests
 
 				/// <summary>Resets tracking state.</summary>
 				public void Reset() { CallCount = 0; _lastArg = default!; }
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking<global::System.Xml.XmlReader> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking<global::System.Xml.XmlReader> Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = times;
+					return this;
+				}
+
+				global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+				global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlReader>>
 			{
 				private readonly IXmlSerializable_ReadXmlInterceptor _interceptor;
 
@@ -291,34 +419,45 @@ partial class XmlSerializableStubTests
 				{
 					get
 					{
+						if (_interceptor._sequence == null) return 0;
 						var total = 0;
-						foreach (var (_, _, tracking) in _interceptor._sequence)
+						foreach (var (_, tracking) in _interceptor._sequence)
 							total += tracking.CallCount;
 						return total;
 					}
 				}
 
-				/// <summary>Add another callback to the sequence.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader>> ThenCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlReader> callback, global::KnockOff.Times times)
+				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlReader>> ThenCall(global::System.Action<global::System.Xml.XmlReader> callback)
 				{
-					var tracking = new MethodTrackingImpl();
-					_interceptor._sequence.Add((callback, times, tracking));
+					var tracking = new MethodTrackingImpl(_interceptor);
+					_interceptor._sequence!.Add((callback, tracking));
 					return this;
 				}
 
-				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-				public bool Verify()
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
 				{
-					foreach (var (_, times, tracking) in _interceptor._sequence)
-					{
-						if (!times.Verify(tracking.CallCount))
-							return false;
-					}
-					return true;
+					if (_interceptor._sequence == null) return;
+					var sequenceLength = _interceptor._sequence.Count;
+					var completedCount = _interceptor._sequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 				}
 
-				/// <summary>Reset all tracking in the sequence.</summary>
+				/// <summary>Resets all tracking in the sequence.</summary>
 				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlReader>> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 			}
 
 		}
@@ -329,99 +468,131 @@ partial class XmlSerializableStubTests
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::System.Xml.Serialization.IXmlSerializable? _source;
 
-			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private global::System.Action<global::System.Xml.XmlWriter>? _onCall;
+			private MethodTrackingImpl? _onCallTracking;
+
+			private global::System.Collections.Generic.List<(global::System.Action<global::System.Xml.XmlWriter> Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
 			private int _unconfiguredCallCount;
 			private global::System.Xml.XmlWriter? _unconfiguredLastArg;
 
 			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.Xml.XmlWriter? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.Xml.XmlWriter? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-			public global::KnockOff.IMethodTracking<global::System.Xml.XmlWriter> OnCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> callback)
+			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
+			public global::KnockOff.IMethodTracking<global::System.Xml.XmlWriter> OnCall(global::System.Action<global::System.Xml.XmlWriter> callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequence = null;
 				_sequenceIndex = 0;
-				return tracking;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = callback;
+				_onCallTracking = new MethodTrackingImpl(this);
+				return _onCallTracking;
 			}
 
-			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter>> OnCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> callback, global::KnockOff.Times times)
+			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlWriter>> OnCallSequence(global::System.Action<global::System.Xml.XmlWriter> callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, times, tracking));
+				_onCall = null;
+				_onCallTracking = null;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action<global::System.Xml.XmlWriter> Callback, MethodTrackingImpl Tracking)>();
+				var tracking = new MethodTrackingImpl(this);
+				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
 				return new MethodSequenceImpl(this);
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.IXmlSerializable ko, global::System.Xml.XmlWriter writer)
+			internal void Invoke(bool strict, global::System.Xml.XmlWriter writer)
 			{
-				if (_sequence.Count == 0)
+				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
-					_unconfiguredCallCount++;
-					_unconfiguredLastArg = writer;
-					#pragma warning disable CS8601, SYSLIB0050
-					if (_source is { } src) { src.WriteXml(writer); return; }
-					#pragma warning restore CS8601, SYSLIB0050
-					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "WriteXml");
+					var (callback, tracking) = _sequence[_sequenceIndex];
+					tracking.RecordCall(writer);
+					_sequenceIndex++;
+					callback(writer);
 					return;
 				}
 
-				var (callback, times, tracking) = _sequence[_sequenceIndex];
-				tracking.RecordCall(writer);
-
-				if (!times.IsForever && tracking.CallCount >= times.Count)
+				if (_onCall != null && _onCallTracking != null)
 				{
-					if (_sequenceIndex < _sequence.Count - 1)
-						_sequenceIndex++;
-					else if (tracking.CallCount > times.Count)
-						throw global::KnockOff.StubException.SequenceExhausted("WriteXml");
+					_onCallTracking.RecordCall(writer);
+					_onCall(writer);
+					return;
 				}
 
-				callback(ko, writer);
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = writer;
+				if (_sequence != null && _sequenceIndex >= _sequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("WriteXml");
+					return;
+				}
+
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.WriteXml(writer); return; }
+				#pragma warning restore CS8601, SYSLIB0050
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WriteXml");
+				return;
 			}
 
-			/// <summary>Resets all tracking state.</summary>
+			/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
 				_source = null;
-				foreach (var (_, _, tracking) in _sequence)
-					tracking.Reset();
+				_onCallTracking?.Reset();
+				if (_sequence != null)
+				{
+					foreach (var (_, tracking) in _sequence)
+						tracking.Reset();
+				}
 				_sequenceIndex = 0;
 			}
 
-			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-			public bool Verify()
+			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				foreach (var (_, times, tracking) in _sequence)
-				{
-					if (times.IsForever)
-					{
-						if (!tracking.WasCalled)
-							return false;
-					}
-					else if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("WriteXml", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("WriteXml", global::KnockOff.Times.AtLeastOnce, CallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
 			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<global::System.Xml.XmlWriter>
 			{
+				private readonly IXmlSerializable_WriteXmlInterceptor _interceptor;
+
+				public MethodTrackingImpl(IXmlSerializable_WriteXmlInterceptor interceptor) => _interceptor = interceptor;
+
 				private global::System.Xml.XmlWriter _lastArg = default!;
 
 				/// <summary>Number of times this callback was invoked.</summary>
@@ -438,10 +609,39 @@ partial class XmlSerializableStubTests
 
 				/// <summary>Resets tracking state.</summary>
 				public void Reset() { CallCount = 0; _lastArg = default!; }
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking<global::System.Xml.XmlWriter> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking<global::System.Xml.XmlWriter> Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = times;
+					return this;
+				}
+
+				global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+				global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlWriter>>
 			{
 				private readonly IXmlSerializable_WriteXmlInterceptor _interceptor;
 
@@ -452,34 +652,45 @@ partial class XmlSerializableStubTests
 				{
 					get
 					{
+						if (_interceptor._sequence == null) return 0;
 						var total = 0;
-						foreach (var (_, _, tracking) in _interceptor._sequence)
+						foreach (var (_, tracking) in _interceptor._sequence)
 							total += tracking.CallCount;
 						return total;
 					}
 				}
 
-				/// <summary>Add another callback to the sequence.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter>> ThenCall(global::System.Action<Stubs.IXmlSerializable, global::System.Xml.XmlWriter> callback, global::KnockOff.Times times)
+				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlWriter>> ThenCall(global::System.Action<global::System.Xml.XmlWriter> callback)
 				{
-					var tracking = new MethodTrackingImpl();
-					_interceptor._sequence.Add((callback, times, tracking));
+					var tracking = new MethodTrackingImpl(_interceptor);
+					_interceptor._sequence!.Add((callback, tracking));
 					return this;
 				}
 
-				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-				public bool Verify()
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
 				{
-					foreach (var (_, times, tracking) in _interceptor._sequence)
-					{
-						if (!times.Verify(tracking.CallCount))
-							return false;
-					}
-					return true;
+					if (_interceptor._sequence == null) return;
+					var sequenceLength = _interceptor._sequence.Count;
+					var completedCount = _interceptor._sequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 				}
 
-				/// <summary>Reset all tracking in the sequence.</summary>
+				/// <summary>Resets all tracking in the sequence.</summary>
 				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action<global::System.Xml.XmlWriter>> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 			}
 
 		}
@@ -498,17 +709,17 @@ partial class XmlSerializableStubTests
 
 			global::System.Xml.Schema.XmlSchema? global::System.Xml.Serialization.IXmlSerializable.GetSchema()
 			{
-				return GetSchema.Invoke(this);
+				return GetSchema.Invoke(Strict);
 			}
 
 			void global::System.Xml.Serialization.IXmlSerializable.ReadXml(global::System.Xml.XmlReader reader)
 			{
-				ReadXml.Invoke(this, reader);
+				ReadXml.Invoke(Strict, reader);
 			}
 
 			void global::System.Xml.Serialization.IXmlSerializable.WriteXml(global::System.Xml.XmlWriter writer)
 			{
-				WriteXml.Invoke(this, writer);
+				WriteXml.Invoke(Strict, writer);
 			}
 
 			/// <summary>The global::System.Xml.Serialization.IXmlSerializable instance. Use for passing to code expecting the interface.</summary>
@@ -530,6 +741,32 @@ partial class XmlSerializableStubTests
 				GetSchema._source = source;
 				ReadXml._source = source;
 				WriteXml._source = source;
+			}
+
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (GetSchema.CheckVerification() is { } getschemaFailure) failures.Add(getschemaFailure);
+				if (ReadXml.CheckVerification() is { } readxmlFailure) failures.Add(readxmlFailure);
+				if (WriteXml.CheckVerification() is { } writexmlFailure) failures.Add(writexmlFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (GetSchema.CheckVerificationAll() is { } getschemaFailure) failures.Add(getschemaFailure);
+				if (ReadXml.CheckVerificationAll() is { } readxmlFailure) failures.Add(readxmlFailure);
+				if (WriteXml.CheckVerificationAll() is { } writexmlFailure) failures.Add(writexmlFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
 			}
 
 		}

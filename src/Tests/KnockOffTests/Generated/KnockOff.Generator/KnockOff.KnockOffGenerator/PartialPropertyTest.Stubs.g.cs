@@ -11,11 +11,15 @@ partial class PartialPropertyTest
 		/// <summary>Interceptor for ISimpleService.Name.</summary>
 		public sealed class ISimpleService_NameInterceptor
 		{
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+			private bool _valueSet;
+
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.ISimpleService, string>? OnGet { get; set; }
+			public global::System.Func<string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
 			public int SetCount { get; private set; }
@@ -24,10 +28,15 @@ partial class PartialPropertyTest
 			public string? LastSetValue { get; private set; }
 
 			/// <summary>Callback for setter.</summary>
-			public global::System.Action<Stubs.ISimpleService, string>? OnSet { get; set; }
+			public global::System.Action<string>? OnSet { get; set; }
 
-			/// <summary>Value returned by getter when OnGet is not set.</summary>
-			public string Value { get; set; } = default!;
+			private string _value = default!;
+			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+			public string Value
+			{
+				get => _value;
+				set { _value = value; _valueSet = true; }
+			}
 
 			/// <summary>Source object for delegation when OnGet is not set.</summary>
 			internal global::KnockOff.Tests.ISimpleService? _source;
@@ -38,8 +47,68 @@ partial class PartialPropertyTest
 			/// <summary>Records a setter access.</summary>
 			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
+
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public ISimpleService_NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public ISimpleService_NameInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				var totalCount = GetCount + SetCount;
+				if (!times.Validate(totalCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name", times, totalCount));
+			}
+
+			/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+			public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void VerifyGet(global::KnockOff.Times times)
+			{
+				if (!times.Validate(GetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, GetCount));
+			}
+
+			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
+			public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void VerifySet(global::KnockOff.Times times)
+			{
+				if (!times.Validate(SetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (set)", times, SetCount));
+			}
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+			internal bool IsConfigured => _valueSet || OnGet != null || OnSet != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				var totalCount = GetCount + SetCount;
+				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Name", times, totalCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				var totalCount = GetCount + SetCount;
+				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Name", global::KnockOff.Times.AtLeastOnce, totalCount);
+			}
 		}
 
 		/// <summary>Tracks and configures behavior for DoSomething.</summary>
@@ -48,93 +117,125 @@ partial class PartialPropertyTest
 			/// <summary>Source object to delegate to when no OnCall is configured.</summary>
 			internal global::KnockOff.Tests.ISimpleService? _source;
 
-			private readonly global::System.Collections.Generic.List<(global::System.Action<Stubs.ISimpleService> Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private global::System.Action? _onCall;
+			private MethodTrackingImpl? _onCallTracking;
+
+			private global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
 			private int _unconfiguredCallCount;
 
 			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 
-			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.ISimpleService> callback)
+			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequence = null;
 				_sequenceIndex = 0;
-				return tracking;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = callback;
+				_onCallTracking = new MethodTrackingImpl(this);
+				return _onCallTracking;
 			}
 
-			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-			public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISimpleService>> OnCall(global::System.Action<Stubs.ISimpleService> callback, global::KnockOff.Times times)
+			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<global::System.Action> OnCallSequence(global::System.Action callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, times, tracking));
+				_onCall = null;
+				_onCallTracking = null;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_sequence = new global::System.Collections.Generic.List<(global::System.Action Callback, MethodTrackingImpl Tracking)>();
+				var tracking = new MethodTrackingImpl(this);
+				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
 				return new MethodSequenceImpl(this);
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal void Invoke(Stubs.ISimpleService ko)
+			internal void Invoke(bool strict)
 			{
-				if (_sequence.Count == 0)
+				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
-					_unconfiguredCallCount++;
-					#pragma warning disable CS8601, SYSLIB0050
-					if (_source is { } src) { src.DoSomething(); return; }
-					#pragma warning restore CS8601, SYSLIB0050
-					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "DoSomething");
+					var (callback, tracking) = _sequence[_sequenceIndex];
+					tracking.RecordCall();
+					_sequenceIndex++;
+					callback();
 					return;
 				}
 
-				var (callback, times, tracking) = _sequence[_sequenceIndex];
-				tracking.RecordCall();
-
-				if (!times.IsForever && tracking.CallCount >= times.Count)
+				if (_onCall != null && _onCallTracking != null)
 				{
-					if (_sequenceIndex < _sequence.Count - 1)
-						_sequenceIndex++;
-					else if (tracking.CallCount > times.Count)
-						throw global::KnockOff.StubException.SequenceExhausted("DoSomething");
+					_onCallTracking.RecordCall();
+					_onCall();
+					return;
 				}
 
-				callback(ko);
+				_unconfiguredCallCount++;
+				if (_sequence != null && _sequenceIndex >= _sequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("DoSomething");
+					return;
+				}
+
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) { src.DoSomething(); return; }
+				#pragma warning restore CS8601, SYSLIB0050
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "DoSomething");
+				return;
 			}
 
-			/// <summary>Resets all tracking state.</summary>
+			/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
 				_source = null;
-				foreach (var (_, _, tracking) in _sequence)
-					tracking.Reset();
+				_onCallTracking?.Reset();
+				if (_sequence != null)
+				{
+					foreach (var (_, tracking) in _sequence)
+						tracking.Reset();
+				}
 				_sequenceIndex = 0;
 			}
 
-			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-			public bool Verify()
+			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				foreach (var (_, times, tracking) in _sequence)
-				{
-					if (times.IsForever)
-					{
-						if (!tracking.WasCalled)
-							return false;
-					}
-					else if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("DoSomething", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("DoSomething", global::KnockOff.Times.AtLeastOnce, CallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
 			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 			{
+				private readonly ISimpleService_DoSomethingInterceptor _interceptor;
+
+				public MethodTrackingImpl(ISimpleService_DoSomethingInterceptor interceptor) => _interceptor = interceptor;
+
 
 				/// <summary>Number of times this callback was invoked.</summary>
 				public int CallCount { get; private set; }
@@ -147,10 +248,36 @@ partial class PartialPropertyTest
 
 				/// <summary>Resets tracking state.</summary>
 				public void Reset() => CallCount = 0;
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = times;
+					return this;
+				}
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
-			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISimpleService>>
+			private sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<global::System.Action>
 			{
 				private readonly ISimpleService_DoSomethingInterceptor _interceptor;
 
@@ -161,34 +288,45 @@ partial class PartialPropertyTest
 				{
 					get
 					{
+						if (_interceptor._sequence == null) return 0;
 						var total = 0;
-						foreach (var (_, _, tracking) in _interceptor._sequence)
+						foreach (var (_, tracking) in _interceptor._sequence)
 							total += tracking.CallCount;
 						return total;
 					}
 				}
 
-				/// <summary>Add another callback to the sequence.</summary>
-				public global::KnockOff.IMethodSequence<global::System.Action<Stubs.ISimpleService>> ThenCall(global::System.Action<Stubs.ISimpleService> callback, global::KnockOff.Times times)
+				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action> ThenCall(global::System.Action callback)
 				{
-					var tracking = new MethodTrackingImpl();
-					_interceptor._sequence.Add((callback, times, tracking));
+					var tracking = new MethodTrackingImpl(_interceptor);
+					_interceptor._sequence!.Add((callback, tracking));
 					return this;
 				}
 
-				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-				public bool Verify()
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
 				{
-					foreach (var (_, times, tracking) in _interceptor._sequence)
-					{
-						if (!times.Verify(tracking.CallCount))
-							return false;
-					}
-					return true;
+					if (_interceptor._sequence == null) return;
+					var sequenceLength = _interceptor._sequence.Count;
+					var completedCount = _interceptor._sequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 				}
 
-				/// <summary>Reset all tracking in the sequence.</summary>
+				/// <summary>Resets all tracking in the sequence.</summary>
 				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodSequence<global::System.Action> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 			}
 
 		}
@@ -200,101 +338,131 @@ partial class PartialPropertyTest
 			internal global::KnockOff.Tests.ISimpleService? _source;
 
 			/// <summary>Delegate for GetValue.</summary>
-			public delegate int GetValueDelegate(Stubs.ISimpleService ko, int input);
+			public delegate int GetValueDelegate(int input);
 
-			private readonly global::System.Collections.Generic.List<(GetValueDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+			private GetValueDelegate? _onCall;
+			private MethodTrackingImpl? _onCallTracking;
+
+			private global::System.Collections.Generic.List<(GetValueDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
 			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-			/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<int> OnCall(GetValueDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+				_sequence = null;
 				_sequenceIndex = 0;
-				return tracking;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = callback;
+				_onCallTracking = new MethodTrackingImpl(this);
+				return _onCallTracking;
 			}
 
-			/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-			public global::KnockOff.IMethodSequence<GetValueDelegate> OnCall(GetValueDelegate callback, global::KnockOff.Times times)
+			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<GetValueDelegate> OnCallSequence(GetValueDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_sequence.Clear();
-				_sequence.Add((callback, times, tracking));
+				_onCall = null;
+				_onCallTracking = null;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_sequence = new global::System.Collections.Generic.List<(GetValueDelegate Callback, MethodTrackingImpl Tracking)>();
+				var tracking = new MethodTrackingImpl(this);
+				_sequence.Add((callback, tracking));
 				_sequenceIndex = 0;
 				return new MethodSequenceImpl(this);
 			}
 
 			/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-			internal int Invoke(Stubs.ISimpleService ko, int input)
+			internal int Invoke(bool strict, int input)
 			{
-				if (_sequence.Count == 0)
+				if (_sequence != null && _sequenceIndex < _sequence.Count)
 				{
-					_unconfiguredCallCount++;
-					_unconfiguredLastArg = input;
-					#pragma warning disable CS8601, SYSLIB0050
-					if (_source is { } src) return src.GetValue(input);
-					#pragma warning restore CS8601, SYSLIB0050
-					if (ko.Strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
+					var (callback, tracking) = _sequence[_sequenceIndex];
+					tracking.RecordCall(input);
+					_sequenceIndex++;
+					return callback(input);
+				}
+
+				if (_onCall != null && _onCallTracking != null)
+				{
+					_onCallTracking.RecordCall(input);
+					return _onCall(input);
+				}
+
+				_unconfiguredCallCount++;
+				_unconfiguredLastArg = input;
+				if (_sequence != null && _sequenceIndex >= _sequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetValue");
 					return default!;
 				}
 
-				var (callback, times, tracking) = _sequence[_sequenceIndex];
-				tracking.RecordCall(input);
-
-				if (!times.IsForever && tracking.CallCount >= times.Count)
-				{
-					if (_sequenceIndex < _sequence.Count - 1)
-						_sequenceIndex++;
-					else if (tracking.CallCount > times.Count)
-						throw global::KnockOff.StubException.SequenceExhausted("GetValue");
-				}
-
-				return callback(ko, input);
+				#pragma warning disable CS8601, SYSLIB0050
+				if (_source is { } src) return src.GetValue(input);
+				#pragma warning restore CS8601, SYSLIB0050
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetValue");
+				return default!;
 			}
 
-			/// <summary>Resets all tracking state.</summary>
+			/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredCallCount = 0;
 				_unconfiguredLastArg = default;
 				_source = null;
-				foreach (var (_, _, tracking) in _sequence)
-					tracking.Reset();
+				_onCallTracking?.Reset();
+				if (_sequence != null)
+				{
+					foreach (var (_, tracking) in _sequence)
+						tracking.Reset();
+				}
 				_sequenceIndex = 0;
 			}
 
-			/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-			public bool Verify()
+			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				foreach (var (_, times, tracking) in _sequence)
-				{
-					if (times.IsForever)
-					{
-						if (!tracking.WasCalled)
-							return false;
-					}
-					else if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", global::KnockOff.Times.AtLeastOnce, CallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
 			private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<int>
 			{
+				private readonly ISimpleService_GetValueInterceptor _interceptor;
+
+				public MethodTrackingImpl(ISimpleService_GetValueInterceptor interceptor) => _interceptor = interceptor;
+
 				private int _lastArg = default!;
 
 				/// <summary>Number of times this callback was invoked.</summary>
@@ -311,6 +479,35 @@ partial class PartialPropertyTest
 
 				/// <summary>Resets tracking state.</summary>
 				public void Reset() { CallCount = 0; _lastArg = default!; }
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking<int> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking<int> Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = times;
+					return this;
+				}
+
+				global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+				global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 			}
 
 			/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -325,34 +522,45 @@ partial class PartialPropertyTest
 				{
 					get
 					{
+						if (_interceptor._sequence == null) return 0;
 						var total = 0;
-						foreach (var (_, _, tracking) in _interceptor._sequence)
+						foreach (var (_, tracking) in _interceptor._sequence)
 							total += tracking.CallCount;
 						return total;
 					}
 				}
 
-				/// <summary>Add another callback to the sequence.</summary>
-				public global::KnockOff.IMethodSequence<GetValueDelegate> ThenCall(GetValueDelegate callback, global::KnockOff.Times times)
+				/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IMethodSequence<GetValueDelegate> ThenCall(GetValueDelegate callback)
 				{
-					var tracking = new MethodTrackingImpl();
-					_interceptor._sequence.Add((callback, times, tracking));
+					var tracking = new MethodTrackingImpl(_interceptor);
+					_interceptor._sequence!.Add((callback, tracking));
 					return this;
 				}
 
-				/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-				public bool Verify()
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
 				{
-					foreach (var (_, times, tracking) in _interceptor._sequence)
-					{
-						if (!times.Verify(tracking.CallCount))
-							return false;
-					}
-					return true;
+					if (_interceptor._sequence == null) return;
+					var sequenceLength = _interceptor._sequence.Count;
+					var completedCount = _interceptor._sequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 				}
 
-				/// <summary>Reset all tracking in the sequence.</summary>
+				/// <summary>Resets all tracking in the sequence.</summary>
 				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodSequence<GetValueDelegate> Verifiable()
+				{
+					_interceptor._isVerifiable = true;
+					_interceptor._verifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 			}
 
 		}
@@ -374,7 +582,7 @@ partial class PartialPropertyTest
 				get
 				{
 					Name.RecordGet();
-					if (Name.OnGet is { } onGet) return onGet(this);
+					if (Name.OnGet is { } onGet) return onGet();
 					if (Name._source is { } src) return src.Name;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "Name");
 					return Name.Value;
@@ -382,7 +590,7 @@ partial class PartialPropertyTest
 				set
 				{
 					Name.RecordSet(value);
-					if (Name.OnSet is { } onSet) { onSet(this, value); return; }
+					if (Name.OnSet is { } onSet) { onSet(value); return; }
 					if (Name._source is { } src) { src.Name = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("ISimpleService", "Name");
 					Name.Value = value;
@@ -391,12 +599,12 @@ partial class PartialPropertyTest
 
 			void global::KnockOff.Tests.ISimpleService.DoSomething()
 			{
-				DoSomething.Invoke(this);
+				DoSomething.Invoke(Strict);
 			}
 
 			int global::KnockOff.Tests.ISimpleService.GetValue(int input)
 			{
-				return GetValue.Invoke(this, input);
+				return GetValue.Invoke(Strict, input);
 			}
 
 			/// <summary>The global::KnockOff.Tests.ISimpleService instance. Use for passing to code expecting the interface.</summary>
@@ -418,6 +626,32 @@ partial class PartialPropertyTest
 				Name._source = source;
 				DoSomething._source = source;
 				GetValue._source = source;
+			}
+
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Name.CheckVerification() is { } nameFailure) failures.Add(nameFailure);
+				if (DoSomething.CheckVerification() is { } dosomethingFailure) failures.Add(dosomethingFailure);
+				if (GetValue.CheckVerification() is { } getvalueFailure) failures.Add(getvalueFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Name.CheckVerificationAll() is { } nameFailure) failures.Add(nameFailure);
+				if (DoSomething.CheckVerificationAll() is { } dosomethingFailure) failures.Add(dosomethingFailure);
+				if (GetValue.CheckVerificationAll() is { } getvalueFailure) failures.Add(getvalueFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
 			}
 
 		}

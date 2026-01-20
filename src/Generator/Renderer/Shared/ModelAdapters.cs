@@ -107,7 +107,7 @@ internal static class ModelAdapters
 				continue;
 
 			var delegateName = $"{method.MethodName}Delegate_{suffix}";
-			var delegateParamList = BuildDelegateParamList(ownerWithParams, method.Parameters);
+			var delegateParamList = BuildDelegateParamList(method.Parameters);
 			var delegateSignature = method.IsVoid
 				? $"public delegate void {delegateName}({delegateParamList});"
 				: $"public delegate {method.ReturnType} {delegateName}({delegateParamList});";
@@ -195,9 +195,9 @@ internal static class ModelAdapters
 		return $"global::KnockOff.IMethodTrackingArgs<{tupleType}>";
 	}
 
-	private static string BuildDelegateParamList(string ownerClassName, EquatableArray<ParameterModel> parameters)
+	private static string BuildDelegateParamList(EquatableArray<ParameterModel> parameters)
 	{
-		var parts = new List<string> { $"{ownerClassName} ko" };
+		var parts = new List<string>();
 		foreach (var p in parameters)
 		{
 			parts.Add($"{p.RefPrefix}{p.Type} {p.EscapedName}");

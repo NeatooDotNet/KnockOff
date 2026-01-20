@@ -11,14 +11,23 @@ partial class AsyncResultStubTests
 		/// <summary>Interceptor for IAsyncResult.AsyncState.</summary>
 		public sealed class IAsyncResult_AsyncStateInterceptor
 		{
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+			private bool _valueSet;
+
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncResult, object?>? OnGet { get; set; }
+			public global::System.Func<object?>? OnGet { get; set; }
 
-			/// <summary>Value returned by getter when OnGet is not set.</summary>
-			public object? Value { get; set; } = default!;
+			private object? _value = default!;
+			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+			public object? Value
+			{
+				get => _value;
+				set { _value = value; _valueSet = true; }
+			}
 
 			/// <summary>Source object for delegation when OnGet is not set.</summary>
 			internal global::System.IAsyncResult? _source;
@@ -26,21 +35,80 @@ partial class AsyncResultStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
+
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IAsyncResult_AsyncStateInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IAsyncResult_AsyncStateInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				var totalCount = GetCount;
+				if (!times.Validate(totalCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("AsyncState", times, totalCount));
+			}
+
+			/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+			public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void VerifyGet(global::KnockOff.Times times)
+			{
+				if (!times.Validate(GetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("AsyncState (get)", times, GetCount));
+			}
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+			internal bool IsConfigured => _valueSet || OnGet != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				var totalCount = GetCount;
+				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("AsyncState", times, totalCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				var totalCount = GetCount;
+				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("AsyncState", global::KnockOff.Times.AtLeastOnce, totalCount);
+			}
 		}
 
 		/// <summary>Interceptor for IAsyncResult.AsyncWaitHandle.</summary>
 		public sealed class IAsyncResult_AsyncWaitHandleInterceptor
 		{
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+			private bool _valueSet;
+
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncResult, global::System.Threading.WaitHandle>? OnGet { get; set; }
+			public global::System.Func<global::System.Threading.WaitHandle>? OnGet { get; set; }
 
-			/// <summary>Value returned by getter when OnGet is not set.</summary>
-			public global::System.Threading.WaitHandle Value { get; set; } = default!;
+			private global::System.Threading.WaitHandle _value = default!;
+			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+			public global::System.Threading.WaitHandle Value
+			{
+				get => _value;
+				set { _value = value; _valueSet = true; }
+			}
 
 			/// <summary>Source object for delegation when OnGet is not set.</summary>
 			internal global::System.IAsyncResult? _source;
@@ -48,21 +116,80 @@ partial class AsyncResultStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
+
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IAsyncResult_AsyncWaitHandleInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IAsyncResult_AsyncWaitHandleInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				var totalCount = GetCount;
+				if (!times.Validate(totalCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("AsyncWaitHandle", times, totalCount));
+			}
+
+			/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+			public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void VerifyGet(global::KnockOff.Times times)
+			{
+				if (!times.Validate(GetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("AsyncWaitHandle (get)", times, GetCount));
+			}
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+			internal bool IsConfigured => _valueSet || OnGet != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				var totalCount = GetCount;
+				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("AsyncWaitHandle", times, totalCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				var totalCount = GetCount;
+				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("AsyncWaitHandle", global::KnockOff.Times.AtLeastOnce, totalCount);
+			}
 		}
 
 		/// <summary>Interceptor for IAsyncResult.CompletedSynchronously.</summary>
 		public sealed class IAsyncResult_CompletedSynchronouslyInterceptor
 		{
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+			private bool _valueSet;
+
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncResult, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
-			/// <summary>Value returned by getter when OnGet is not set.</summary>
-			public bool Value { get; set; } = default!;
+			private bool _value = default!;
+			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+			public bool Value
+			{
+				get => _value;
+				set { _value = value; _valueSet = true; }
+			}
 
 			/// <summary>Source object for delegation when OnGet is not set.</summary>
 			internal global::System.IAsyncResult? _source;
@@ -70,21 +197,80 @@ partial class AsyncResultStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
+
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IAsyncResult_CompletedSynchronouslyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IAsyncResult_CompletedSynchronouslyInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				var totalCount = GetCount;
+				if (!times.Validate(totalCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CompletedSynchronously", times, totalCount));
+			}
+
+			/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+			public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void VerifyGet(global::KnockOff.Times times)
+			{
+				if (!times.Validate(GetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CompletedSynchronously (get)", times, GetCount));
+			}
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+			internal bool IsConfigured => _valueSet || OnGet != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				var totalCount = GetCount;
+				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("CompletedSynchronously", times, totalCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				var totalCount = GetCount;
+				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("CompletedSynchronously", global::KnockOff.Times.AtLeastOnce, totalCount);
+			}
 		}
 
 		/// <summary>Interceptor for IAsyncResult.IsCompleted.</summary>
 		public sealed class IAsyncResult_IsCompletedInterceptor
 		{
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+			private bool _valueSet;
+
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<Stubs.IAsyncResult, bool>? OnGet { get; set; }
+			public global::System.Func<bool>? OnGet { get; set; }
 
-			/// <summary>Value returned by getter when OnGet is not set.</summary>
-			public bool Value { get; set; } = default!;
+			private bool _value = default!;
+			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+			public bool Value
+			{
+				get => _value;
+				set { _value = value; _valueSet = true; }
+			}
 
 			/// <summary>Source object for delegation when OnGet is not set.</summary>
 			internal global::System.IAsyncResult? _source;
@@ -92,8 +278,58 @@ partial class AsyncResultStubTests
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; _source = null; }
+
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IAsyncResult_IsCompletedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IAsyncResult_IsCompletedInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				var totalCount = GetCount;
+				if (!times.Validate(totalCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsCompleted", times, totalCount));
+			}
+
+			/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+			public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void VerifyGet(global::KnockOff.Times times)
+			{
+				if (!times.Validate(GetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsCompleted (get)", times, GetCount));
+			}
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+			internal bool IsConfigured => _valueSet || OnGet != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				var totalCount = GetCount;
+				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsCompleted", times, totalCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				var totalCount = GetCount;
+				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsCompleted", global::KnockOff.Times.AtLeastOnce, totalCount);
+			}
 		}
 
 		/// <summary>Stub implementation of global::System.IAsyncResult.</summary>
@@ -116,7 +352,7 @@ partial class AsyncResultStubTests
 				get
 				{
 					AsyncState.RecordGet();
-					if (AsyncState.OnGet is { } onGet) return onGet(this);
+					if (AsyncState.OnGet is { } onGet) return onGet();
 					if (AsyncState._source is { } src) return src.AsyncState;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncState");
 					return AsyncState.Value;
@@ -128,7 +364,7 @@ partial class AsyncResultStubTests
 				get
 				{
 					AsyncWaitHandle.RecordGet();
-					if (AsyncWaitHandle.OnGet is { } onGet) return onGet(this);
+					if (AsyncWaitHandle.OnGet is { } onGet) return onGet();
 					if (AsyncWaitHandle._source is { } src) return src.AsyncWaitHandle;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "AsyncWaitHandle");
 					return AsyncWaitHandle.Value;
@@ -140,7 +376,7 @@ partial class AsyncResultStubTests
 				get
 				{
 					CompletedSynchronously.RecordGet();
-					if (CompletedSynchronously.OnGet is { } onGet) return onGet(this);
+					if (CompletedSynchronously.OnGet is { } onGet) return onGet();
 					if (CompletedSynchronously._source is { } src) return src.CompletedSynchronously;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "CompletedSynchronously");
 					return CompletedSynchronously.Value;
@@ -152,7 +388,7 @@ partial class AsyncResultStubTests
 				get
 				{
 					IsCompleted.RecordGet();
-					if (IsCompleted.OnGet is { } onGet) return onGet(this);
+					if (IsCompleted.OnGet is { } onGet) return onGet();
 					if (IsCompleted._source is { } src) return src.IsCompleted;
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IAsyncResult", "IsCompleted");
 					return IsCompleted.Value;
@@ -179,6 +415,34 @@ partial class AsyncResultStubTests
 				AsyncWaitHandle._source = source;
 				CompletedSynchronously._source = source;
 				IsCompleted._source = source;
+			}
+
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (AsyncState.CheckVerification() is { } asyncstateFailure) failures.Add(asyncstateFailure);
+				if (AsyncWaitHandle.CheckVerification() is { } asyncwaithandleFailure) failures.Add(asyncwaithandleFailure);
+				if (CompletedSynchronously.CheckVerification() is { } completedsynchronouslyFailure) failures.Add(completedsynchronouslyFailure);
+				if (IsCompleted.CheckVerification() is { } iscompletedFailure) failures.Add(iscompletedFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (AsyncState.CheckVerificationAll() is { } asyncstateFailure) failures.Add(asyncstateFailure);
+				if (AsyncWaitHandle.CheckVerificationAll() is { } asyncwaithandleFailure) failures.Add(asyncwaithandleFailure);
+				if (CompletedSynchronously.CheckVerificationAll() is { } completedsynchronouslyFailure) failures.Add(completedsynchronouslyFailure);
+				if (IsCompleted.CheckVerificationAll() is { } iscompletedFailure) failures.Add(iscompletedFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
 			}
 
 		}

@@ -1,8 +1,8 @@
 namespace KnockOff;
 
 /// <summary>
-/// Specifies how many times a callback should be used (sequencing)
-/// or how many times it should have been called (verification).
+/// Specifies the expected number of times a method should be called during verification.
+/// Used with Verify() and Verifiable() methods to assert call counts.
 /// </summary>
 public readonly struct Times : IEquatable<Times>
 {
@@ -12,7 +12,6 @@ public readonly struct Times : IEquatable<Times>
     private enum TimesKind
     {
         Exactly,
-        Forever,
         AtLeast,
         AtMost,
         Never
@@ -24,41 +23,36 @@ public readonly struct Times : IEquatable<Times>
         _kind = kind;
     }
 
-    /// <summary>Use once, then advance to next callback.</summary>
+    /// <summary>Exactly one call expected.</summary>
     public static Times Once => new(1, TimesKind.Exactly);
 
-    /// <summary>Use twice, then advance to next callback.</summary>
+    /// <summary>Exactly two calls expected.</summary>
     public static Times Twice => new(2, TimesKind.Exactly);
 
-    /// <summary>Use exactly n times, then advance to next callback.</summary>
+    /// <summary>Exactly n calls expected.</summary>
     public static Times Exactly(int count) => new(count, TimesKind.Exactly);
 
-    /// <summary>Repeat indefinitely (never advance).</summary>
-    public static Times Forever => new(0, TimesKind.Forever);
-
-    /// <summary>Verification: must be called at least n times.</summary>
+    /// <summary>At least n calls expected.</summary>
     public static Times AtLeast(int count) => new(count, TimesKind.AtLeast);
 
-    /// <summary>Verification: must be called at most n times.</summary>
+    /// <summary>At least one call expected.</summary>
+    public static Times AtLeastOnce => new(1, TimesKind.AtLeast);
+
+    /// <summary>At most n calls expected.</summary>
     public static Times AtMost(int count) => new(count, TimesKind.AtMost);
 
-    /// <summary>Verification: must never be called.</summary>
+    /// <summary>No calls expected.</summary>
     public static Times Never => new(0, TimesKind.Never);
 
-    /// <summary>The count for Exactly/Once/Twice.</summary>
+    /// <summary>The count for this constraint.</summary>
     public int Count => _count;
 
-    /// <summary>True if this represents Forever (indefinite repeat).</summary>
-    public bool IsForever => _kind == TimesKind.Forever;
-
-    /// <summary>True if this is for verification (AtLeast/AtMost/Never).</summary>
-    public bool IsVerification => _kind is TimesKind.AtLeast or TimesKind.AtMost or TimesKind.Never;
-
-    /// <summary>Verify if actual call count satisfies this constraint.</summary>
-    public bool Verify(int actualCount) => _kind switch
+    /// <summary>Validates if actual call count satisfies this constraint.</summary>
+    /// <param name="actualCount">The actual number of calls.</param>
+    /// <returns>True if the constraint is satisfied.</returns>
+    public bool Validate(int actualCount) => _kind switch
     {
         TimesKind.Exactly => actualCount == _count,
-        TimesKind.Forever => true,
         TimesKind.AtLeast => actualCount >= _count,
         TimesKind.AtMost => actualCount <= _count,
         TimesKind.Never => actualCount == 0,
@@ -73,6 +67,16 @@ public readonly struct Times : IEquatable<Times>
 
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(_count, _kind);
+
+    /// <inheritdoc />
+    public override string ToString() => _kind switch
+    {
+        TimesKind.Exactly => _count == 1 ? "Once" : _count == 2 ? "Twice" : $"Exactly({_count})",
+        TimesKind.AtLeast => _count == 1 ? "AtLeastOnce" : $"AtLeast({_count})",
+        TimesKind.AtMost => $"AtMost({_count})",
+        TimesKind.Never => "Never",
+        _ => "Unknown"
+    };
 
     /// <summary>Equality operator.</summary>
     public static bool operator ==(Times left, Times right) => left.Equals(right);

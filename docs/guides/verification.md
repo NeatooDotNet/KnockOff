@@ -1,412 +1,483 @@
-# Verification
+# Verification Guide
 
-This guide covers verifying method calls, property access, and argument capture.
+After configuring stub behavior, you need to verify that your code under test interacted with the stub correctly. KnockOff provides a fluent verification API inspired by Moq, plus lower-level properties for custom assertions.
 
-## Method Verification
+---
 
-### Was a Method Called?
+## Quick Start
 
-<!-- snippet: verification-was-called -->
+KnockOff offers three verification approaches:
+
+1. **Direct verification** - Call `.Verify()` on individual interceptors
+2. **Marked verification** - Use `.Verifiable()` to mark expected calls, then `stub.Verify()`
+3. **Verify all** - Call `stub.VerifyAll()` to check everything configured
+
+**Recommended:** Use `.Verifiable()` + `stub.Verify()` for most tests. It's explicit, readable, and catches missing verifications.
+
+---
+
+## What You Can Verify
+
+KnockOff enables verification of:
+
+- **Calls** - Whether a method or property was invoked
+- **Call frequency** - Exactly once, at least N times, never, etc.
+- **Arguments** - What values were passed to methods
+- **State** - Property get/set operations and final values
+- **Order** - The sequence of calls across multiple methods
+
+---
+
+## Direct Verification
+
+Call `.Verify()` directly on interceptors returned by `OnCall`. This approach is concise when you only need to verify one or two calls.
+
+### At Least Once (Default)
+
+The simplest verification checks whether a method was invoked at least once.
+
+<!-- snippet: verify-verifiable -->
 ```cs
-public static void WasMethodCalled()
+[Fact]
+public void Verifiable_MarksForBatchVerification()
 {
-    var stub = new VfEmailServiceStub();
-    IVfEmailService service = stub;
-    service.SendEmail("user@test.com", "Subject", "Body");
+    var stub = new RepoVerifyStub();
 
-    var deleteStub = new VfProcessorStub();
+    // Chain .Verifiable() to mark for batch verification
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 
-    Assert.True(stub.SendEmail.WasCalled);
-    Assert.False(deleteStub.Delete.WasCalled);
+    IRepoVerify repository = stub;
+    repository.GetById(42);
+
+    // Verify() checks all members marked with .Verifiable()
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
 
-### How Many Times?
+### Exactly Once
 
-<!-- snippet: verification-call-count -->
+Verify a method was called exactly once.
+
+<!-- snippet: verify-times-once -->
 ```cs
-public static void HowManyTimes()
+[Fact]
+public void Verify_WithTimesOnce()
 {
-    var stub = new VfProcessorStub();
-    IVfProcessor service = stub;
+    var stub = new RepoVerifyStub();
+    var tracking = stub.Save.OnCall((user) => { });
 
-    service.Process("a");
-    service.Process("b");
-    service.Process("c");
+    IRepoVerify repository = stub;
+    repository.Save(new User { Id = 1 });
 
-    Assert.Equal(3, stub.Process.CallCount);
+    // Verify exactly one call using Times.Once
+    tracking.Verify(Times.Once);
 }
 ```
 <!-- endSnippet -->
 
-### Argument Capture
+### At Least N Calls
 
-**Single parameter** — use `LastCallArg`:
+Verify a method was called a minimum number of times.
 
-<!-- snippet: verification-single-arg -->
+<!-- snippet: verify-times-atleast -->
 ```cs
-public static void SingleParameterCapture()
+[Fact]
+public void Verify_WithTimesAtLeast()
 {
-    var stub = new VfRepositoryStub();
-    IVfRepository service = stub;
+    var stub = new RepoVerifyStub();
+    var tracking = stub.Refresh.OnCall(() => { });
 
-    service.GetById(42);
+    IRepoVerify repository = stub;
 
-    int? lastId = stub.GetById.LastCallArg;  // 42
+    // Simulate multiple refreshes
+    repository.Refresh();
+    repository.Refresh();
+    repository.Refresh();
 
-    _ = lastId;
+    // Verify at least 2 calls
+    tracking.Verify(Times.AtLeast(2));
 }
 ```
 <!-- endSnippet -->
 
-**Multiple parameters** — use `LastCallArgs` (named tuple):
+### Never Called
 
-<!-- snippet: verification-multiple-args -->
+Verify a method was never invoked.
+
+<!-- snippet: verify-times-never -->
 ```cs
-public static void MultipleParameterCapture()
+[Fact]
+public void Verify_WithTimesNever()
 {
-    var stub = new VfEmailServiceStub();
-    IVfEmailService service = stub;
+    var stub = new RepoVerifyStub();
+    var tracking = stub.Refresh.OnCall(() => { });
 
-    service.SendEmail("user@test.com", "Subject", "Body");
+    IRepoVerify repository = stub;
+    // Don't call Refresh
 
-    var args = stub.SendEmail.LastCallArgs;
-    Assert.Equal("user@test.com", args?.to);
-    Assert.Equal("Subject", args?.subject);
-    Assert.Equal("Body", args?.body);
+    // Verify method was never called via tracking
+    tracking.Verify(Times.Never);
 }
 ```
 <!-- endSnippet -->
 
-**Note:** Tuple member names match the original parameter names.
+### All Times Matchers
 
-### No Parameters
+The `Times` struct supports these verification modes:
 
-Methods without parameters have `WasCalled` and `CallCount` only:
+- `Times.AtLeastOnce` - Default, at least one call
+- `Times.Once` - Exactly one call
+- `Times.Exactly(n)` - Exactly N calls
+- `Times.AtLeast(n)` - At least N calls
+- `Times.AtMost(n)` - At most N calls
+- `Times.Between(min, max, Range)` - Between min and max calls (inclusive or exclusive)
+- `Times.Never` - Zero calls
 
-<!-- snippet: verification-no-params -->
+---
+
+## Marked Verification (Recommended)
+
+Use `.Verifiable()` to mark interceptors as requiring verification, then call `stub.Verify()` to check them all at once. This approach prevents "missing verification" bugs where you forget to check a critical call.
+
+### Basic Marked Verification
+
+<!-- snippet: verify-verifiable -->
 ```cs
-public static void NoParametersMethod()
+[Fact]
+public void Verifiable_MarksForBatchVerification()
 {
-    var stub = new VfProcessorStub();
-    IVfProcessor service = stub;
+    var stub = new RepoVerifyStub();
 
-    service.Initialize();
+    // Chain .Verifiable() to mark for batch verification
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 
-    Assert.True(stub.Initialize.WasCalled);
-    Assert.Equal(1, stub.Initialize.CallCount);
+    IRepoVerify repository = stub;
+    repository.GetById(42);
+
+    // Verify() checks all members marked with .Verifiable()
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
 
-## Property Verification
+### Verifiable with Times
 
-### Get/Set Counts
+You can specify `Times` constraints when marking with `.Verifiable()`.
 
-<!-- snippet: verification-property-counts -->
+<!-- snippet: verify-verifiable-times -->
 ```cs
-public static void PropertyGetSetCounts()
+[Fact]
+public void Verifiable_WithTimesConstraint()
 {
-    var stub = new VfConnectionServiceStub();
-    IVfConnectionService service = stub;
+    var stub = new RepoVerifyStub();
 
-    _ = service.Name;
-    _ = service.Name;
-    service.Name = "First";
-    service.Name = "Second";
+    // Mark with Times constraint for batch verification
+    stub.Refresh.OnCall(() => { }).Verifiable(Times.Exactly(2));
 
-    Assert.Equal(2, stub.Name.GetCount);
-    Assert.Equal(2, stub.Name.SetCount);
-    Assert.Equal("Second", stub.Name.LastSetValue);
+    IRepoVerify repository = stub;
+    repository.Refresh();
+    repository.Refresh();
+
+    // Verify() respects the Times constraint
+    stub.Verify();
 }
 ```
 <!-- endSnippet -->
 
-### Get-Only Properties
+### When to Use Marked Verification
 
-Get-only properties track getter access:
+**Prefer `.Verifiable()` + `stub.Verify()` when:**
+- You have multiple method calls to verify
+- You want to ensure you don't forget verification
+- You want verification failures to clearly list what wasn't called
 
-<!-- snippet: verification-get-only-property -->
+**Use direct `.Verify()` when:**
+- You only need to check one or two calls
+- The verification logic is complex (argument inspection, etc.)
+
+---
+
+## Verify All
+
+Call `stub.VerifyAll()` to check every interceptor that has `OnCall` or `Value` configured, regardless of whether it was marked `.Verifiable()`.
+
+<!-- snippet: verify-verifyall -->
 ```cs
-public static void GetOnlyPropertyTracking()
+[Fact]
+public void VerifyAll_ChecksAllConfiguredMembers()
 {
-    var stub = new VfConnectionServiceStub();
-    IVfConnectionService service = stub;
+    var stub = new RepoVerifyStub();
 
-    _ = service.ConnectionString;
-    _ = service.ConnectionString;
+    // Configure multiple members (no need to mark Verifiable)
+    stub.GetById.OnCall((id) => new User { Id = id });
+    stub.Save.OnCall((user) => { });
 
-    Assert.Equal(2, stub.ConnectionString.GetCount);
+    IRepoVerify repository = stub;
+    repository.GetById(1);
+    repository.Save(new User { Id = 1 });
+
+    // VerifyAll() checks all configured members were called at least once
+    stub.VerifyAll();
 }
 ```
 <!-- endSnippet -->
 
-### Set-Only Properties
+**Use `VerifyAll()` when:**
+- You want strict verification that everything configured was used
+- You're testing integration scenarios where all dependencies should be touched
 
-Set-only properties track setter calls:
+**Warning:** `VerifyAll()` can be brittle. If you configure a callback for optional behavior, `VerifyAll()` will fail if it's not called.
 
-<!-- snippet: verification-set-only-property -->
+---
+
+## Argument Verification
+
+For argument inspection, use `LastCallArg` or `LastCallArgs` from the tracking object returned by `OnCall`.
+
+### Single Parameter (LastCallArg)
+
+<!-- snippet: verify-lastcallarg -->
 ```cs
-public static void SetOnlyPropertyTracking()
+[Fact]
+public void LastArg_VerifiesSingleParameter()
 {
-    var stub = new VfConnectionServiceStub();
-    IVfConnectionService service = stub;
+    var stub = new RepoVerifyStub();
+    var tracking = stub.GetById.OnCall((id) => new User { Id = id });
 
-    service.Output = "Line 1";
-    service.Output = "Line 2";
+    IRepoVerify repository = stub;
+    repository.GetById(42);
 
-    Assert.Equal(2, stub.Output.SetCount);
-    Assert.Equal("Line 2", stub.Output.LastSetValue);
+    // Verify the parameter value via tracking
+    Assert.Equal(42, tracking.LastArg);
 }
 ```
 <!-- endSnippet -->
 
-## Indexer Verification
+### Multiple Parameters (LastCallArgs)
 
-### Access Tracking
-
-<!-- snippet: verification-indexer -->
+<!-- snippet: verify-lastcallargs-tuple -->
 ```cs
-public static void IndexerTracking()
+[Fact]
+public void LastArgs_VerifiesMultipleParameters()
 {
-    var stub = new VfKeyValueStoreStub();
-    IVfKeyValueStore store = stub;
+    var stub = new SvcVerifyStub();
+    var tracking = stub.Update.OnCall((id, name) => { });
 
-    _ = store["Key1"];
-    _ = store["Key2"];
-    store["Key3"] = "Value";
+    ISvcVerify service = stub;
+    service.Update(42, "Alice");
 
-    Assert.Equal(2, stub.Indexer.GetCount);
-    Assert.Equal("Key2", stub.Indexer.LastGetKey);
-
-    Assert.Equal(1, stub.Indexer.SetCount);
-    Assert.Equal("Key3", stub.Indexer.LastSetEntry?.Key);
-    Assert.Equal("Value", stub.Indexer.LastSetEntry?.Value);
+    // Destructure the named tuple for verification
+    var (id, name) = tracking.LastArgs;
+    Assert.Equal(42, id);
+    Assert.Equal("Alice", name);
 }
 ```
 <!-- endSnippet -->
 
-## Event Verification
+---
 
-### Subscription Tracking
+## Call History Tracking
 
-<!-- snippet: verification-events -->
+For complex scenarios requiring inspection of all calls (not just the last), use `OnCall` callbacks to capture a complete history.
+
+<!-- snippet: verify-call-history -->
 ```cs
-public static void EventSubscriptionTracking()
+[Fact]
+public void OnCall_CapturesAllCallsToList()
 {
-    var stub = new VfEventSourceStub();
-    IVfEventSource source = stub;
+    var stub = new RepoVerifyStub();
 
-    EventHandler<string>? handler = (s, e) => { };
-    source.DataReceived += handler;
-    source.DataReceived -= handler;
+    // Capture all calls to a list within the callback
+    var calls = new List<int>();
+    var tracking = stub.GetById.OnCall((id) =>
+    {
+        calls.Add(id);
+        return new User { Id = id };
+    });
 
-    Assert.Equal(1, stub.DataReceived.AddCount);
-    Assert.Equal(1, stub.DataReceived.RemoveCount);
-    Assert.False(stub.DataReceived.HasSubscribers);
+    IRepoVerify repository = stub;
+
+    repository.GetById(1);
+    repository.GetById(2);
+    repository.GetById(3);
+
+    // Verify the complete call history
+    Assert.Equal(new[] { 1, 2, 3 }, calls);
 }
 ```
 <!-- endSnippet -->
 
-## Generic Method Verification
+This pattern works for any verification need beyond "last call" inspection.
 
-### Per-Type Tracking
+---
 
-<!-- snippet: verification-generic-per-type -->
+## Call Order Verification
+
+To verify that methods were called in a specific sequence, track call order using shared state.
+
+<!-- snippet: verify-call-order -->
 ```cs
-public static void GenericMethodPerType()
+[Fact]
+public void CallOrder_VerifiedWithCounter()
 {
-    var stub = new VfSerializerStub();
-    IVfSerializer service = stub;
+    var stub = new RepoVerifyStub();
 
-    service.Deserialize<VfUser>("{}");
-    service.Deserialize<VfUser>("{}");
-    service.Deserialize<VfOrder>("{}");
+    var order = 0;
+    var saveOrder = 0;
+    var refreshOrder = 0;
 
-    Assert.Equal(2, stub.Deserialize.Of<VfUser>().CallCount);
-    Assert.Equal(1, stub.Deserialize.Of<VfOrder>().CallCount);
+    var saveTracking = stub.Save.OnCall((user) => saveOrder = ++order);
+    var refreshTracking = stub.Refresh.OnCall(() => refreshOrder = ++order);
+
+    IRepoVerify repository = stub;
+
+    // Execute operations
+    repository.Save(new User { Id = 1 });
+    repository.Refresh();
+
+    // Verify Save was called before Refresh
+    Assert.True(saveOrder < refreshOrder, "Save should be called before Refresh");
 }
 ```
 <!-- endSnippet -->
 
-### Aggregate Tracking
+This approach scales to any number of methods and supports complex ordering assertions.
 
-<!-- snippet: verification-generic-aggregate -->
-```cs
-public static void GenericMethodAggregate()
-{
-    var stub = new VfSerializerStub();
-    IVfSerializer service = stub;
-
-    service.Deserialize<VfUser>("{}");
-    service.Deserialize<VfUser>("{}");
-    service.Deserialize<VfOrder>("{}");
-
-    Assert.Equal(3, stub.Deserialize.TotalCallCount);
-    Assert.True(stub.Deserialize.WasCalled);
-    Assert.Equal(2, stub.Deserialize.CalledTypeArguments.Count);
-}
-```
-<!-- endSnippet -->
-
-## Reset
-
-Clear all tracking data:
-
-<!-- snippet: verification-reset -->
-```cs
-public static void ResetTracking()
-{
-    var processStub = new VfProcessorStub();
-    var nameStub = new VfConnectionServiceStub();
-    var eventStub = new VfEventSourceStub();
-    var serializerStub = new VfSerializerStub();
-
-    // Method
-    processStub.Process.Reset();
-    Assert.Equal(0, processStub.Process.CallCount);
-    Assert.False(processStub.Process.WasCalled);
-
-    // Property
-    nameStub.Name.Reset();
-    Assert.Equal(0, nameStub.Name.GetCount);
-    Assert.Equal(0, nameStub.Name.SetCount);
-
-    // Event
-    eventStub.DataReceived.Reset();
-    Assert.Equal(0, eventStub.DataReceived.AddCount);
-    Assert.False(eventStub.DataReceived.HasSubscribers);
-
-    // Generic method (single type)
-    serializerStub.Deserialize.Of<VfUser>().Reset();
-
-    // Generic method (all types)
-    serializerStub.Deserialize.Reset();
-}
-```
-<!-- endSnippet -->
-
-**Note:** `Reset()` clears tracking AND callbacks/OnGet/OnSet. The backing `Value` is preserved for properties.
+---
 
 ## Cross-Interceptor Verification
 
-Verify behavior depends on other stub state:
+Verify multiple methods were called using `.Verifiable()` and `stub.Verify()`.
 
-<!-- snippet: verification-cross-interceptor -->
+<!-- snippet: verify-cross-interceptor -->
 ```cs
-public static void CrossInterceptorVerification()
+[Fact]
+public void CrossInterceptor_VerifyMultipleMethodsCalled()
 {
-    var stub = new VfProcessorStub();
-    IVfProcessor service = stub;
+    var stub = new RepoVerifyStub();
 
-    stub.Process.OnCall = (ko, value) =>
+    // Mark all methods as verifiable
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+    stub.Save.OnCall((user) => { }).Verifiable();
+    stub.Refresh.OnCall(() => { }).Verifiable();
+
+    IRepoVerify repository = stub;
+
+    // Execute operations
+    repository.GetById(1);
+    repository.Save(new User { Id = 1 });
+    repository.Refresh();
+
+    // Single Verify() checks all marked members
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+This approach is cleaner than individual assertions and catches missing verifications.
+
+---
+
+## Property Verification
+
+Properties expose separate interceptors for get and set operations.
+
+**Get verification:**
+- `GetCount` - Number of times the property was read
+- `WasGot` - Whether the property was read at least once
+
+**Set verification:**
+- `SetCount` - Number of times the property was written
+- `WasSet` - Whether the property was written at least once
+- `LastSetValue` - The most recent value assigned to the property
+
+These follow the same patterns as method verification but distinguish between read and write operations.
+
+---
+
+## Complete Example
+
+Here's a comprehensive verification scenario demonstrating the recommended patterns.
+
+<!-- snippet: verify-complete-example -->
+```cs
+[Fact]
+public void CompleteVerification_AllTechniques()
+{
+    var stub = new RepoVerifyStub();
+
+    // Track call order
+    var order = 0;
+    var getOrder = 0;
+    var saveOrder = 0;
+    var refreshOrder = 0;
+
+    // Track call history
+    var getIdHistory = new List<int>();
+
+    // Mark all methods as verifiable with specific constraints
+    var getTracking = stub.GetById.OnCall((id) =>
     {
-        if (!ko.Initialize.WasCalled)
-            throw new InvalidOperationException("Not initialized");
-    };
+        getIdHistory.Add(id);
+        getOrder = ++order;
+        return new User { Id = id, Name = $"User{id}" };
+    }).Verifiable(Times.Exactly(2));
 
-    // This throws because Initialize wasn't called first
-    Assert.Throws<InvalidOperationException>(() => service.Process("test"));
-
-    // Now initialize and try again
-    service.Initialize();
-    service.Process("test");  // Succeeds
-}
-```
-<!-- endSnippet -->
-
-## Verification Patterns
-
-### Verify Exact Call Count
-
-<!-- snippet: verification-exact-count -->
-```cs
-public static void VerifyExactCallCount()
-{
-    var stub = new VfRepositoryStub();
-    IVfRepository service = stub;
-    service.Save(new VfUser());
-
-    Assert.Equal(1, stub.Save.CallCount);  // Called exactly once
-}
-```
-<!-- endSnippet -->
-
-### Verify Never Called
-
-<!-- snippet: verification-never-called -->
-```cs
-public static void VerifyNeverCalled()
-{
-    var stub = new VfProcessorStub();
-
-    Assert.False(stub.Delete.WasCalled);
-    Assert.Equal(0, stub.Delete.CallCount);
-}
-```
-<!-- endSnippet -->
-
-### Verify Call Order
-
-Track order with callbacks:
-
-<!-- snippet: verification-call-order -->
-```cs
-public static void VerifyCallOrder()
-{
-    var stub = new VfProcessorStub();
-    IVfProcessor service = stub;
-
-    var callOrder = new List<string>();
-
-    stub.Initialize.OnCall = (ko) => callOrder.Add("Initialize");
-    stub.Process.OnCall = (ko, value) => callOrder.Add("Process");
-    stub.Cleanup.OnCall = (ko) => callOrder.Add("Cleanup");
-
-    service.Initialize();
-    service.Process("test");
-    service.Cleanup();
-
-    Assert.Equal(["Initialize", "Process", "Cleanup"], callOrder);
-}
-```
-<!-- endSnippet -->
-
-### Verify All Arguments (History)
-
-For full call history, capture in a callback:
-
-<!-- snippet: verification-history -->
-```cs
-public static void VerifyAllArgumentsHistory()
-{
-    var stub = new VfEmailServiceStub();
-    IVfEmailService service = stub;
-
-    var allCalls = new List<(string to, string subject, string body)>();
-
-    stub.SendEmail.OnCall = (ko, to, subject, body) =>
+    var saveTracking = stub.Save.OnCall((user) =>
     {
-        allCalls.Add((to, subject, body));
-    };
+        saveOrder = ++order;
+    }).Verifiable(Times.Once);
 
-    service.SendEmail("a@test.com", "S1", "B1");
-    service.SendEmail("b@test.com", "S2", "B2");
+    var refreshTracking = stub.Refresh.OnCall(() =>
+    {
+        refreshOrder = ++order;
+    }).Verifiable(Times.Once);
 
-    Assert.Equal(2, allCalls.Count);
-    Assert.Equal("a@test.com", allCalls[0].to);
-    Assert.Equal("b@test.com", allCalls[1].to);
+    IRepoVerify repository = stub;
+
+    // Execute operations
+    repository.GetById(1);
+    repository.GetById(2);
+    repository.Save(new User { Id = 1, Name = "Updated" });
+    repository.Refresh();
+
+    // 1. Batch verification - checks all Times constraints
+    stub.Verify();
+
+    // 2. Argument verification
+    Assert.Equal(2, getTracking.LastArg); // Last call was GetById(2)
+
+    // 3. Call history verification
+    Assert.Equal(new[] { 1, 2 }, getIdHistory);
+
+    // 4. Call order verification
+    Assert.True(getOrder < saveOrder, "Get before Save");
+    Assert.True(saveOrder < refreshOrder, "Save before Refresh");
 }
 ```
 <!-- endSnippet -->
 
-## Quick Reference
+This example shows the modern verification approach: mark what matters with `.Verifiable()`, verify with `stub.Verify()`, and add detailed assertions only when needed.
 
-| Member Type | Tracking Properties |
-|-------------|---------------------|
-| **Method** | `WasCalled`, `CallCount`, `LastCallArg`/`LastCallArgs` |
-| **Property** | `GetCount`, `SetCount`, `LastSetValue` |
-| **Indexer** | `GetCount`, `SetCount`, `LastGetKey`, `LastSetEntry` |
-| **Event** | `AddCount`, `RemoveCount`, `HasSubscribers` |
-| **Generic** | `Of<T>().CallCount`, `TotalCallCount`, `CalledTypeArguments` |
+---
+
+## Best Practices
+
+**Prefer `.Verifiable()` + `stub.Verify()` over manual assertions.** This prevents forgetting to verify critical calls and makes test intent explicit.
+
+**Use `Times` constraints to be precise.** `Times.Once` is better than `Times.AtLeastOnce` when you know the exact expected behavior.
+
+**Verify intent, not implementation details.** Test that the right methods were called with the right data, not the exact number of times internal helpers ran.
+
+**Combine with argument verification when needed.** Use `.Verify()` for call frequency, then inspect `LastCallArg` for argument values.
+
+**Keep assertions focused.** One logical verification per test makes failures easier to diagnose.
+
+---
+
+## See Also
+
+- [Methods Guide](methods.md) - Configure method behavior and callbacks
+- [Properties Guide](properties.md) - Work with property interceptors
+- [Interceptor API Reference](../reference/interceptor-api.md) - Complete API documentation

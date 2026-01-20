@@ -243,7 +243,7 @@ public class IValidateListBaseStandaloneTests
         IValidateListBase list = stub;
 
         var parentStub = new ValidateBaseStubForList();
-        stub.Parent.OnGet = (ko) => parentStub;
+        stub.Parent.OnGet = () => parentStub;
 
         Assert.Same(parentStub, list.Parent);
     }
@@ -312,7 +312,7 @@ public partial class IValidateListBaseOfTTests
         IValidateListBase<IValidateBase> list = stub;
 
         var itemStub = new ValidateBaseStubForListT();
-        stub.Indexer.OnGet = (ko, index) => itemStub;
+        stub.Indexer.OnGet = (index) => itemStub;
 
         _ = list[0];
 
@@ -363,7 +363,7 @@ public partial class IValidateListBaseOfTTests
         IValidateListBase<IValidateBase> list = stub;
 
         var itemStub = new ValidateBaseStubForListT();
-        stub.Contains.OnCall((ko, item) => true);
+        stub.Contains.OnCall((item) => true);
 
         var result = list.Contains(itemStub);
 
@@ -378,7 +378,7 @@ public partial class IValidateListBaseOfTTests
         IValidateListBase<IValidateBase> list = stub;
 
         var itemStub = new ValidateBaseStubForListT();
-        stub.IndexOf.OnCall((ko, item) => 3);
+        stub.IndexOf.OnCall((item) => 3);
 
         var result = list.IndexOf(itemStub);
 

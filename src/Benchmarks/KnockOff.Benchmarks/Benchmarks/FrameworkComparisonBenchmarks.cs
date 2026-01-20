@@ -50,10 +50,10 @@ public class FrameworkComparisonBenchmarks
     {
         // Arrange
         var stub = new OrderServiceStub();
-        var getOrderTracking = stub.GetOrder.OnCall((ko, id) => new Order { Id = id, CustomerId = 1 });
-        var validateOrderTracking = stub.ValidateOrder.OnCall((ko, _) => true);
-        stub.CalculateTotal.OnCall((ko, _) => 100m);
-        var saveOrderTracking = stub.SaveOrder.OnCall((ko, _) => { });
+        var getOrderTracking = stub.GetOrder.OnCall((id) => new Order { Id = id, CustomerId = 1 });
+        var validateOrderTracking = stub.ValidateOrder.OnCall((_) => true);
+        stub.CalculateTotal.OnCall((_) => 100m);
+        var saveOrderTracking = stub.SaveOrder.OnCall((_) => { });
 
         var sut = new OrderProcessor(stub);
 
@@ -128,14 +128,14 @@ public class FrameworkComparisonBenchmarks
         var product = new FcBenchProduct { Id = 1, Name = "Widget", Price = 19.99m };
 
         var repository = new FcBenchProductRepositoryStub();
-        var getByIdTracking = repository.GetByIdAsync.OnCall((ko, id) => Task.FromResult<FcBenchProduct?>(product));
+        var getByIdTracking = repository.GetByIdAsync.OnCall((id) => Task.FromResult<FcBenchProduct?>(product));
 
         var cache = new FcBenchCacheServiceStub();
-        cache.Get.Of<FcBenchProduct>().OnCall((ko, key) => null);
-        cache.Set.Of<FcBenchProduct>().OnCall((ko, key, value, expiration) => { });
+        cache.Get.Of<FcBenchProduct>().OnCall((key) => null);
+        cache.Set.Of<FcBenchProduct>().OnCall((key, value, expiration) => { });
 
         var logger = new FcBenchLoggerStub();
-        var logInfoTracking = logger.LogInfo.OnCall((ko, message) => { });
+        var logInfoTracking = logger.LogInfo.OnCall((message) => { });
 
         var service = new FcBenchCachedProductService(repository, cache, logger);
 

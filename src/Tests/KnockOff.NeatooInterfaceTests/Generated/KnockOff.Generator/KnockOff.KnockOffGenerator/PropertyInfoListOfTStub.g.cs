@@ -12,101 +12,131 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 		internal global::Neatoo.IPropertyInfoList? _source;
 
 		/// <summary>Delegate for GetPropertyInfo.</summary>
-		public delegate global::Neatoo.IPropertyInfo? GetPropertyInfoDelegate(PropertyInfoListOfTStub ko, string name);
+		public delegate global::Neatoo.IPropertyInfo? GetPropertyInfoDelegate(string name);
 
-		private readonly global::System.Collections.Generic.List<(GetPropertyInfoDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private GetPropertyInfoDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(GetPropertyInfoDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private string? _unconfiguredLastArg;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(GetPropertyInfoDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<GetPropertyInfoDelegate> OnCall(GetPropertyInfoDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<GetPropertyInfoDelegate> OnCallSequence(GetPropertyInfoDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(GetPropertyInfoDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::Neatoo.IPropertyInfo? Invoke(PropertyInfoListOfTStub ko, bool strict, string name)
+		internal global::Neatoo.IPropertyInfo? Invoke(bool strict, string name)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArg = name;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.GetPropertyInfo(name);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetPropertyInfo");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(name);
+				_sequenceIndex++;
+				return callback(name);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall(name);
+				return _onCall(name);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArg = name;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("GetPropertyInfo");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall(name);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("GetPropertyInfo");
-			}
-
-			return callback(ko, name);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.GetPropertyInfo(name);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "GetPropertyInfo");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetPropertyInfo", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetPropertyInfo", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string>
 		{
+			private readonly GetPropertyInfoInterceptor _interceptor;
+
+			public MethodTrackingImpl(GetPropertyInfoInterceptor interceptor) => _interceptor = interceptor;
+
 			private string _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -123,6 +153,35 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -137,34 +196,45 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<GetPropertyInfoDelegate> ThenCall(GetPropertyInfoDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<GetPropertyInfoDelegate> ThenCall(GetPropertyInfoDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<GetPropertyInfoDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -176,95 +246,125 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 		internal global::Neatoo.IPropertyInfoList? _source;
 
 		/// <summary>Delegate for Properties.</summary>
-		public delegate global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> PropertiesDelegate(PropertyInfoListOfTStub ko);
+		public delegate global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> PropertiesDelegate();
 
-		private readonly global::System.Collections.Generic.List<(PropertiesDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private PropertiesDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(PropertiesDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(PropertiesDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<PropertiesDelegate> OnCall(PropertiesDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<PropertiesDelegate> OnCallSequence(PropertiesDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(PropertiesDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> Invoke(PropertyInfoListOfTStub ko, bool strict)
+		internal global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> Invoke(bool strict)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.Properties();
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Properties");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall();
+				_sequenceIndex++;
+				return callback();
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall();
+				return _onCall();
+			}
+
+			_unconfiguredCallCount++;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Properties");
 				return new global::System.Collections.Generic.List<global::Neatoo.IPropertyInfo>();
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall();
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("Properties");
-			}
-
-			return callback(ko);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.Properties();
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Properties");
+			return new global::System.Collections.Generic.List<global::Neatoo.IPropertyInfo>();
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Properties", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Properties", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking
 		{
+			private readonly PropertiesInterceptor _interceptor;
+
+			public MethodTrackingImpl(PropertiesInterceptor interceptor) => _interceptor = interceptor;
+
 
 			/// <summary>Number of times this callback was invoked.</summary>
 			public int CallCount { get; private set; }
@@ -277,6 +377,32 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() => CallCount = 0;
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -291,34 +417,45 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<PropertiesDelegate> ThenCall(PropertiesDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<PropertiesDelegate> ThenCall(PropertiesDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<PropertiesDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -330,101 +467,131 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 		internal global::Neatoo.IPropertyInfoList? _source;
 
 		/// <summary>Delegate for HasProperty.</summary>
-		public delegate bool HasPropertyDelegate(PropertyInfoListOfTStub ko, string propertyName);
+		public delegate bool HasPropertyDelegate(string propertyName);
 
-		private readonly global::System.Collections.Generic.List<(HasPropertyDelegate Callback, global::KnockOff.Times Times, MethodTrackingImpl Tracking)> _sequence = new();
+		private HasPropertyDelegate? _onCall;
+		private MethodTrackingImpl? _onCallTracking;
+
+		private global::System.Collections.Generic.List<(HasPropertyDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
 		private int _unconfiguredCallCount;
 		private string? _unconfiguredLastArg;
 
 		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { int sum = _unconfiguredCallCount; foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
-		/// <summary>Configures callback that repeats forever. Returns tracking interface.</summary>
+		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(HasPropertyDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, global::KnockOff.Times.Forever, tracking));
+			_sequence = null;
 			_sequenceIndex = 0;
-			return tracking;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = callback;
+			_onCallTracking = new MethodTrackingImpl(this);
+			return _onCallTracking;
 		}
 
-		/// <summary>Configures callback with Times constraint. Returns sequence for ThenCall chaining.</summary>
-		public global::KnockOff.IMethodSequence<HasPropertyDelegate> OnCall(HasPropertyDelegate callback, global::KnockOff.Times times)
+		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IMethodSequence<HasPropertyDelegate> OnCallSequence(HasPropertyDelegate callback)
 		{
-			var tracking = new MethodTrackingImpl();
-			_sequence.Clear();
-			_sequence.Add((callback, times, tracking));
+			_onCall = null;
+			_onCallTracking = null;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_sequence = new global::System.Collections.Generic.List<(HasPropertyDelegate Callback, MethodTrackingImpl Tracking)>();
+			var tracking = new MethodTrackingImpl(this);
+			_sequence.Add((callback, tracking));
 			_sequenceIndex = 0;
 			return new MethodSequenceImpl(this);
 		}
 
 		/// <summary>Invokes the configured callback. Called by explicit interface implementation.</summary>
-		internal bool Invoke(PropertyInfoListOfTStub ko, bool strict, string propertyName)
+		internal bool Invoke(bool strict, string propertyName)
 		{
-			if (_sequence.Count == 0)
+			if (_sequence != null && _sequenceIndex < _sequence.Count)
 			{
-				_unconfiguredCallCount++;
-				_unconfiguredLastArg = propertyName;
-				#pragma warning disable CS8601, SYSLIB0050
-				if (_source is { } src) return src.HasProperty(propertyName);
-				#pragma warning restore CS8601, SYSLIB0050
-				if (strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
+				var (callback, tracking) = _sequence[_sequenceIndex];
+				tracking.RecordCall(propertyName);
+				_sequenceIndex++;
+				return callback(propertyName);
+			}
+
+			if (_onCall != null && _onCallTracking != null)
+			{
+				_onCallTracking.RecordCall(propertyName);
+				return _onCall(propertyName);
+			}
+
+			_unconfiguredCallCount++;
+			_unconfiguredLastArg = propertyName;
+			if (_sequence != null && _sequenceIndex >= _sequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("HasProperty");
 				return default!;
 			}
 
-			var (callback, times, tracking) = _sequence[_sequenceIndex];
-			tracking.RecordCall(propertyName);
-
-			if (!times.IsForever && tracking.CallCount >= times.Count)
-			{
-				if (_sequenceIndex < _sequence.Count - 1)
-					_sequenceIndex++;
-				else if (tracking.CallCount > times.Count)
-					throw global::KnockOff.StubException.SequenceExhausted("HasProperty");
-			}
-
-			return callback(ko, propertyName);
+			#pragma warning disable CS8601, SYSLIB0050
+			if (_source is { } src) return src.HasProperty(propertyName);
+			#pragma warning restore CS8601, SYSLIB0050
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "HasProperty");
+			return default!;
 		}
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredCallCount = 0;
 			_unconfiguredLastArg = default;
 			_source = null;
-			foreach (var (_, _, tracking) in _sequence)
-				tracking.Reset();
+			_onCallTracking?.Reset();
+			if (_sequence != null)
+			{
+				foreach (var (_, tracking) in _sequence)
+					tracking.Reset();
+			}
 			_sequenceIndex = 0;
 		}
 
-		/// <summary>Verifies all Times constraints were satisfied. For Forever, verifies called at least once.</summary>
-		public bool Verify()
+		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			foreach (var (_, times, tracking) in _sequence)
-			{
-				if (times.IsForever)
-				{
-					if (!tracking.WasCalled)
-						return false;
-				}
-				else if (!times.Verify(tracking.CallCount))
-					return false;
-			}
-			return true;
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("HasProperty", times, CallCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("HasProperty", global::KnockOff.Times.AtLeastOnce, CallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
 		private sealed class MethodTrackingImpl : global::KnockOff.IMethodTracking<string>
 		{
+			private readonly HasPropertyInterceptor _interceptor;
+
+			public MethodTrackingImpl(HasPropertyInterceptor interceptor) => _interceptor = interceptor;
+
 			private string _lastArg = default!;
 
 			/// <summary>Number of times this callback was invoked.</summary>
@@ -441,6 +608,35 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 
 			/// <summary>Resets tracking state.</summary>
 			public void Reset() { CallCount = 0; _lastArg = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking<string> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = times;
+				return this;
+			}
+
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+			global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 		}
 
 		/// <summary>Sequence implementation for ThenCall chaining.</summary>
@@ -455,34 +651,45 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 			{
 				get
 				{
+					if (_interceptor._sequence == null) return 0;
 					var total = 0;
-					foreach (var (_, _, tracking) in _interceptor._sequence)
+					foreach (var (_, tracking) in _interceptor._sequence)
 						total += tracking.CallCount;
 					return total;
 				}
 			}
 
-			/// <summary>Add another callback to the sequence.</summary>
-			public global::KnockOff.IMethodSequence<HasPropertyDelegate> ThenCall(HasPropertyDelegate callback, global::KnockOff.Times times)
+			/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IMethodSequence<HasPropertyDelegate> ThenCall(HasPropertyDelegate callback)
 			{
-				var tracking = new MethodTrackingImpl();
-				_interceptor._sequence.Add((callback, times, tracking));
+				var tracking = new MethodTrackingImpl(_interceptor);
+				_interceptor._sequence!.Add((callback, tracking));
 				return this;
 			}
 
-			/// <summary>Verify all Times constraints in the sequence were satisfied.</summary>
-			public bool Verify()
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
 			{
-				foreach (var (_, times, tracking) in _interceptor._sequence)
-				{
-					if (!times.Verify(tracking.CallCount))
-						return false;
-				}
-				return true;
+				if (_interceptor._sequence == null) return;
+				var sequenceLength = _interceptor._sequence.Count;
+				var completedCount = _interceptor._sequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("method", sequenceLength, completedCount));
 			}
 
-			/// <summary>Reset all tracking in the sequence.</summary>
+			/// <summary>Resets all tracking in the sequence.</summary>
 			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodSequence<HasPropertyDelegate> Verifiable()
+			{
+				_interceptor._isVerifiable = true;
+				_interceptor._verifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();
 		}
 
 	}
@@ -502,21 +709,30 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 	/// <summary>The global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> instance. Use for passing to code expecting the interface.</summary>
 	public global::Neatoo.IPropertyInfoList<global::Neatoo.IValidateBase> Object => this;
 
-	/// <summary>Verifies all method interceptors' Times constraints were satisfied.</summary>
-	public bool Verify()
+	/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+	public void Verify()
 	{
-		var result = true;
-		result &= GetPropertyInfo.Verify();
-		result &= Properties.Verify();
-		result &= HasProperty.Verify();
-		return result;
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (GetPropertyInfo.CheckVerification() is { } getpropertyinfoFailure) failures.Add(getpropertyinfoFailure);
+		if (Properties.CheckVerification() is { } propertiesFailure) failures.Add(propertiesFailure);
+		if (HasProperty.CheckVerification() is { } haspropertyFailure) failures.Add(haspropertyFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
-	/// <summary>Verifies all method interceptors' Times constraints and throws if any fail.</summary>
+	/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
 	public void VerifyAll()
 	{
-		if (!Verify())
-			throw new global::KnockOff.VerificationException("One or more method verifications failed.");
+		var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+		if (GetPropertyInfo.CheckVerificationAll() is { } getpropertyinfoFailure) failures.Add(getpropertyinfoFailure);
+		if (Properties.CheckVerificationAll() is { } propertiesFailure) failures.Add(propertiesFailure);
+		if (HasProperty.CheckVerificationAll() is { } haspropertyFailure) failures.Add(haspropertyFailure);
+
+		if (failures.Count > 0)
+			throw new global::KnockOff.VerificationException(failures);
 	}
 
 	// Source(T) methods for interface delegation
@@ -541,17 +757,17 @@ partial class PropertyInfoListOfTStub : global::Neatoo.IPropertyInfoList<global:
 
 	global::Neatoo.IPropertyInfo? global::Neatoo.IPropertyInfoList.GetPropertyInfo(string name)
 	{
-		return GetPropertyInfo.Invoke(this, Strict, name);
+		return GetPropertyInfo.Invoke(Strict, name);
 	}
 
 	global::System.Collections.Generic.IEnumerable<global::Neatoo.IPropertyInfo> global::Neatoo.IPropertyInfoList.Properties()
 	{
-		return Properties.Invoke(this, Strict);
+		return Properties.Invoke(Strict);
 	}
 
 	bool global::Neatoo.IPropertyInfoList.HasProperty(string propertyName)
 	{
-		return HasProperty.Invoke(this, Strict, propertyName);
+		return HasProperty.Invoke(Strict, propertyName);
 	}
 
 }

@@ -37,4 +37,6 @@ internal sealed record InlineIndexerModel(
     /// <summary>Constraint clauses for type parameters.</summary>
     string ConstraintClauses,
     /// <summary>The declaring interface type for Source(T) feature.</summary>
-    string DeclaringInterface);
+    string DeclaringInterface,
+    /// <summary>Friendly name for the key type (e.g., "Int32", "String") for OfXxx pattern.</summary>
+    string KeyTypeFriendlyName);

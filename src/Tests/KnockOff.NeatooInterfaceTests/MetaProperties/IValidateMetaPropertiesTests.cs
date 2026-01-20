@@ -46,7 +46,7 @@ public partial class IValidateMetaPropertiesTests
         var stub = new Stubs.IValidateMetaProperties();
         IValidateMetaProperties meta = stub;
 
-        stub.IsBusy.OnGet = (ko) => true;
+        stub.IsBusy.OnGet = () => true;
 
         Assert.True(meta.IsBusy);
     }
@@ -146,7 +146,7 @@ public partial class IValidateMetaPropertiesTests
         IValidateMetaProperties meta = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.OnCall((Stubs.IValidateMetaProperties_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((ko, propOrFlag, token) =>
+        stub.RunRules.OnCall((Stubs.IValidateMetaProperties_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((propOrFlag, token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;
@@ -259,7 +259,7 @@ public class IValidateMetaPropertiesStandaloneTests
         IValidateMetaProperties meta = stub;
 
         // Configure callback to enable tracking
-        var tracking = stub.WaitForTasks.OnCall((ko) => Task.CompletedTask);
+        var tracking = stub.WaitForTasks.OnCall(() => Task.CompletedTask);
 
         await meta.WaitForTasks();
 
@@ -276,7 +276,7 @@ public class IValidateMetaPropertiesStandaloneTests
         var propertyMessageStub = new IValidateMetaPropertiesTests.Stubs.IPropertyMessage();
         propertyMessageStub.Message.Value = "Required";
         var messages = new List<IPropertyMessage> { propertyMessageStub };
-        stub.PropertyMessages.OnGet = (ko) => messages;
+        stub.PropertyMessages.OnGet = () => messages;
 
         Assert.Same(messages, meta.PropertyMessages);
     }

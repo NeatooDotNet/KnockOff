@@ -46,7 +46,7 @@ public class IndexerTests
 		IPropertyStore store = knockOff;
 
 		var mockProperty = new PropertyInfo { Name = "FromCallback", Value = "Mocked" };
-		knockOff.Indexer.OnGet = (ko, key) =>
+		knockOff.Indexer.OnGet = (key) =>
 		{
 			if (key == "Special") return mockProperty;
 			return null;
@@ -64,10 +64,10 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.Indexer.OnGet = (ko, key) =>
+		knockOff.Indexer.OnGet = (key) =>
 		{
-			Assert.Same(knockOff, ko);
-			return new PropertyInfo { Name = key, Value = $"Accessed {ko.Indexer.GetCount} times" };
+			// Can access the knockOff instance via closure
+			return new PropertyInfo { Name = key, Value = $"Accessed {knockOff.Indexer.GetCount} times" };
 		};
 
 		_ = store["First"];
@@ -115,7 +115,7 @@ public class IndexerTests
 		IReadWriteStore store = knockOff;
 
 		(string key, PropertyInfo? value)? capturedEntry = null;
-		knockOff.Indexer.OnSet = (ko, key, value) =>
+		knockOff.Indexer.OnSet = (key, value) =>
 		{
 			capturedEntry = (key, value);
 		};
@@ -132,14 +132,14 @@ public class IndexerTests
 	}
 
 	[Fact]
-	public void Indexer_Reset_ClearsAllState()
+	public void Indexer_Reset_ClearsTrackingButPreservesConfiguration()
 	{
 		var knockOff = new ReadWriteStoreKnockOff();
 		IReadWriteStore store = knockOff;
 
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
 		knockOff.Indexer.Backing["Existing"] = prop;
-		knockOff.Indexer.OnGet = (ko, key) => prop;
+		knockOff.Indexer.OnGet = (key) => prop;
 
 		_ = store["Key1"];
 		_ = store["Key2"];
@@ -151,14 +151,14 @@ public class IndexerTests
 
 		knockOff.Indexer.Reset();
 
+		// Tracking state is cleared
 		Assert.Equal(0, knockOff.Indexer.GetCount);
 		Assert.Null(knockOff.Indexer.LastGetKey);
 		Assert.Equal(0, knockOff.Indexer.SetCount);
 		Assert.Null(knockOff.Indexer.LastSetEntry);
-		Assert.Null(knockOff.Indexer.OnGet);
-		Assert.Null(knockOff.Indexer.OnSet);
 
-		// Backing dictionary is NOT cleared by Reset
+		// Configuration is preserved (OnGet, OnSet, Backing dictionary)
+		Assert.NotNull(knockOff.Indexer.OnGet);
 		Assert.True(knockOff.Indexer.Backing.ContainsKey("Existing"));
 	}
 

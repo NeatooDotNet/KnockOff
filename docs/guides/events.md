@@ -1,258 +1,224 @@
-# Events
+# Working with Events
 
-KnockOff supports interface events with full subscription tracking and programmatic raising.
+KnockOff generates event interceptors that let you raise events from your test stubs and verify subscription behavior. Event interceptors support `EventHandler`, `EventHandler<T>`, `Action`, `Action<T>`, and custom delegate types.
 
-## Basic Usage
-
-<!-- snippet: events-basic-interface -->
-```cs
-public interface IGuideEventSource
-{
-    event EventHandler<string>? MessageReceived;
-    event EventHandler? OnCompleted;
-    event Action<int>? OnProgress;
-    event Action<string, int>? OnData;
-}
-
-[KnockOff]
-public partial class GuideEventSourceKnockOff : IGuideEventSource { }
-```
-<!-- endSnippet -->
-
-## Supported Delegate Types
-
-| Delegate Type | Raise Signature |
-|--------------|-----------------|
-| `EventHandler` | `Raise(object? sender, EventArgs e)` |
-| `EventHandler<T>` | `Raise(object? sender, T e)` |
-| `Action` | `Raise()` |
-| `Action<T>` | `Raise(T arg)` |
-| `Action<T1, T2>` | `Raise(T1 arg1, T2 arg2)` |
-
-## Subscription Tracking
-
-<!-- snippet: events-subscription-tracking -->
-```cs
-// Initially no subscribers
-var hasSubscribers = knockOff.MessageReceived.HasSubscribers;  // false
-var addCount = knockOff.MessageReceived.AddCount;              // 0
-
-// Subscribe
-EventHandler<string> handler = (sender, e) => Console.WriteLine(e);
-source.MessageReceived += handler;
-
-hasSubscribers = knockOff.MessageReceived.HasSubscribers;  // true
-addCount = knockOff.MessageReceived.AddCount;              // 1
-
-// Unsubscribe
-source.MessageReceived -= handler;
-
-var removeCount = knockOff.MessageReceived.RemoveCount;    // 1
-```
-<!-- endSnippet -->
+---
 
 ## Raising Events
 
-### EventHandler<T>
+### EventHandler and EventHandler&lt;T&gt;
 
-<!-- snippet: events-eventhandler-raise -->
+For standard event handler delegates, use the `Raise(sender, args)` method with two parameters.
+
+<!-- snippet: events-raise-eventhandler -->
 ```cs
-string? received = null;
-source.MessageReceived += (sender, e) => received = e;
+[Fact]
+public void Raise_EventHandler_NotifiesSubscribers()
+{
+    var stub = new EventPubStub();
 
-// Raise always requires sender parameter
-knockOff.MessageReceived.Raise(null, "Hello");
+    DataEventArgs? receivedArgs = null;
 
-// received is now "Hello"
+    // Subscribe to the event through the interface
+    IEventPub publisher = stub;
+    publisher.DataReceived += (sender, args) =>
+    {
+        receivedArgs = args;
+    };
+
+    // Raise the event using the interceptor
+    var eventArgs = new DataEventArgs { Data = "Test Data" };
+    stub.DataReceived.Raise(stub, eventArgs);
+
+    Assert.NotNull(receivedArgs);
+    Assert.Equal("Test Data", receivedArgs.Data);
+}
 ```
 <!-- endSnippet -->
 
-### EventHandler (no type parameter)
+### Action and Action&lt;T&gt;
 
-<!-- snippet: events-eventhandler-noargs -->
+For Action-based events, use the `Raise(arg)` method with a single parameter matching the action's argument type.
+
+<!-- snippet: events-raise-action -->
 ```cs
-var invoked = false;
-source.OnCompleted += (sender, e) => invoked = true;
+[Fact]
+public void Raise_Action_NotifiesSubscribers()
+{
+    var stub = new EventPubStub();
 
-// Raise requires sender and EventArgs
-knockOff.OnCompleted.Raise(null, EventArgs.Empty);
+    string? receivedStatus = null;
 
-// invoked is now true
+    IEventPub publisher = stub;
+    publisher.StatusChanged += status => receivedStatus = status;
+
+    // Raise Action<T> event with single argument
+    stub.StatusChanged.Raise("Connected");
+
+    Assert.Equal("Connected", receivedStatus);
+}
 ```
 <!-- endSnippet -->
 
-### Action<T>
+---
 
-<!-- snippet: events-action-raise -->
+## Verifying Subscriptions
+
+### Checking for Subscribers
+
+Use `HasSubscribers` to verify whether any handlers are currently subscribed to an event.
+
+<!-- snippet: events-verify-subscribe -->
 ```cs
-int? progress = null;
-source.OnProgress += (value) => progress = value;
+[Fact]
+public void HasSubscribers_VerifiesActiveSubscriptions()
+{
+    var stub = new EventSubStub();
 
-knockOff.OnProgress.Raise(75);
+    IEventSub subscriber = stub;
 
-// progress is now 75
+    // Initially no subscribers
+    Assert.False(stub.OnCompleted.HasSubscribers);
+
+    // Subscribe a handler
+    subscriber.OnCompleted += (sender, args) => { };
+
+    // Now has subscribers
+    Assert.True(stub.OnCompleted.HasSubscribers);
+}
 ```
 <!-- endSnippet -->
 
-### Action<T1, T2>
+### Counting Add Operations
 
-<!-- snippet: events-action-multi -->
+Use `AddCount` to track how many times handlers have been added to the event.
+
+<!-- snippet: events-verify-addcount -->
 ```cs
-string? name = null;
-int? value = null;
-source.OnData += (n, v) => { name = n; value = v; };
+[Fact]
+public void AddCount_TracksSubscriptionOperations()
+{
+    var stub = new EventSubStub();
 
-knockOff.OnData.Raise("Temperature", 72);
+    IEventSub subscriber = stub;
 
-// name is "Temperature", value is 72
+    subscriber.OnCompleted += (sender, args) => { };
+    subscriber.OnCompleted += (sender, args) => { };
+
+    // AddCount tracks subscribe operations
+    Assert.Equal(2, stub.OnCompleted.AddCount);
+}
 ```
 <!-- endSnippet -->
 
-## Tracking Properties
+---
 
-Event interceptors track subscription counts:
+## Verifying Unsubscriptions
 
-<!-- snippet: events-tracking-properties -->
+Use `RemoveCount` to verify how many times handlers have been unsubscribed from the event.
+
+<!-- snippet: events-verify-unsubscribe -->
 ```cs
-// Subscription tracking
-var addCount = knockOff.MessageReceived.AddCount;        // Times += was called
-var removeCount = knockOff.MessageReceived.RemoveCount;  // Times -= was called
-var hasSubs = knockOff.MessageReceived.HasSubscribers;   // At least one handler attached
+[Fact]
+public void RemoveCount_TracksUnsubscribeOperations()
+{
+    var stub = new EventSubStub();
+
+    IEventSub subscriber = stub;
+
+    EventHandler handler = (sender, args) => { };
+
+    subscriber.OnCompleted += handler;
+    subscriber.OnCompleted -= handler;
+
+    // RemoveCount tracks unsubscribe operations
+    Assert.Equal(1, stub.OnCompleted.RemoveCount);
+}
 ```
 <!-- endSnippet -->
 
-## Reset
+---
 
-`Reset()` clears **both tracking counts and removes all handlers**:
+## Resetting Events
+
+The `Reset()` method clears subscription counts but **does not** remove active subscribers. Use this to reset verification state between test phases while preserving event handlers.
 
 <!-- snippet: events-reset -->
 ```cs
-var invoked = false;
-source.MessageReceived += (s, e) => invoked = true;
+[Fact]
+public void Reset_ClearsCountsAndSubscribers()
+{
+    var stub = new EventSubStub();
 
-// Before reset
-var addCountBefore = knockOff.MessageReceived.AddCount;        // 1
-var hasSubsBefore = knockOff.MessageReceived.HasSubscribers;   // true
+    IEventSub subscriber = stub;
 
-knockOff.MessageReceived.Reset();
+    EventHandler handler = (sender, args) => { };
+    subscriber.OnCompleted += handler;
 
-// After reset - tracking cleared
-var addCountAfter = knockOff.MessageReceived.AddCount;         // 0
-var removeCountAfter = knockOff.MessageReceived.RemoveCount;   // 0
-var hasSubsAfter = knockOff.MessageReceived.HasSubscribers;    // false
+    Assert.Equal(1, stub.OnCompleted.AddCount);
+    Assert.True(stub.OnCompleted.HasSubscribers);
 
-// Handlers also cleared - raise does nothing
-invoked = false;
-knockOff.MessageReceived.Raise(null, "After");
-// invoked is still false - handler was removed by Reset
+    // Reset clears counts and subscribers
+    stub.OnCompleted.Reset();
+
+    // Counts are cleared
+    Assert.Equal(0, stub.OnCompleted.AddCount);
+
+    // Subscribers are also cleared
+    Assert.False(stub.OnCompleted.HasSubscribers);
+}
 ```
 <!-- endSnippet -->
 
-## No Subscribers Safe
+**Important**: `Reset()` only clears tracking counters. If you need to verify subscription state after reset, use `HasSubscribers` to confirm handlers are still attached.
 
-Raising an event with no subscribers does not throw:
+---
 
-<!-- snippet: events-no-subscribers -->
+## Complete Example
+
+This example demonstrates the full event interceptor workflow: subscribing handlers, raising events, verifying counts, and checking subscription state.
+
+<!-- snippet: events-complete-example -->
 ```cs
-var knockOff = new GuideEventSourceKnockOff();
+[Fact]
+public void Event_FullWorkflow_SubscribeRaiseUnsubscribe()
+{
+    var stub = new EventPubStub();
 
-// No exception - safe to raise with no handlers
-knockOff.MessageReceived.Raise(null, "No one listening");
+    DataEventArgs? receivedArgs = null;
+    int raiseCount = 0;
+
+    EventHandler<DataEventArgs> handler = (sender, args) =>
+    {
+        receivedArgs = args;
+        raiseCount++;
+    };
+
+    IEventPub publisher = stub;
+
+    // Subscribe and verify
+    publisher.DataReceived += handler;
+    Assert.Equal(1, stub.DataReceived.AddCount);
+    Assert.True(stub.DataReceived.HasSubscribers);
+
+    // Raise the event
+    var eventArgs = new DataEventArgs { Data = "Test" };
+    stub.DataReceived.Raise(stub, eventArgs);
+    Assert.Equal(1, raiseCount);
+    Assert.Equal("Test", receivedArgs?.Data);
+
+    // Unsubscribe and verify
+    publisher.DataReceived -= handler;
+    Assert.Equal(1, stub.DataReceived.RemoveCount);
+    Assert.False(stub.DataReceived.HasSubscribers);
+}
 ```
 <!-- endSnippet -->
 
-## Common Patterns
+---
 
-### Testing Event Handlers
+## Next Steps
 
-<!-- snippet: events-testing-viewmodel -->
-```cs
-[KnockOff]
-public partial class GuideDataServiceKnockOff : IGuideDataService { }
-```
-<!-- endSnippet -->
-
-<!-- snippet: events-viewmodel-event-tests -->
-```cs
-var knockOff = new GuideDataServiceKnockOff();
-IGuideDataService service = knockOff;
-var viewModel = new GuideViewModel(service);
-
-// ViewModel should have subscribed
-Assert.True(knockOff.DataChanged.HasSubscribers);
-Assert.Equal(1, knockOff.DataChanged.AddCount);
-
-// Simulate data change
-knockOff.DataChanged.Raise(null, new DataChangedEventArgs { NewValue = 42 });
-
-Assert.Equal(42, viewModel.CurrentValue);
-```
-<!-- endSnippet -->
-
-### Testing Event Unsubscription
-
-<!-- snippet: events-viewmodel-unsubscribe-test -->
-```cs
-var knockOff = new GuideDataServiceKnockOff();
-IGuideDataService service = knockOff;
-var viewModel = new GuideViewModel(service);
-
-Assert.Equal(1, knockOff.DataChanged.AddCount);
-
-viewModel.Dispose();
-
-Assert.Equal(1, knockOff.DataChanged.RemoveCount);
-```
-<!-- endSnippet -->
-
-### Progress Reporting
-
-<!-- snippet: events-progress-reporting -->
-```cs
-[KnockOff]
-public partial class GuideDownloaderKnockOff : IGuideDownloader { }
-```
-<!-- endSnippet -->
-
-<!-- snippet: events-progress-example -->
-```cs
-var progressValues = new List<int>();
-((IGuideDownloader)knockOff).ProgressChanged += (p) => progressValues.Add(p);
-
-// Simulate download progress
-knockOff.ProgressChanged.Raise(0);
-knockOff.ProgressChanged.Raise(25);
-knockOff.ProgressChanged.Raise(50);
-knockOff.ProgressChanged.Raise(75);
-knockOff.ProgressChanged.Raise(100);
-
-// progressValues is [0, 25, 50, 75, 100]
-```
-<!-- endSnippet -->
-
-### Multiple Subscribers
-
-<!-- snippet: events-multiple-subscribers -->
-```cs
-var received = new List<string>();
-source.MessageReceived += (s, e) => received.Add($"Handler1: {e}");
-source.MessageReceived += (s, e) => received.Add($"Handler2: {e}");
-source.MessageReceived += (s, e) => received.Add($"Handler3: {e}");
-
-var addCount = knockOff.MessageReceived.AddCount;  // 3
-
-knockOff.MessageReceived.Raise(null, "Test");
-
-// received contains ["Handler1: Test", "Handler2: Test", "Handler3: Test"]
-```
-<!-- endSnippet -->
-
-## Interceptor API Reference
-
-| Property/Method | Type | Description |
-|----------------|------|-------------|
-| `AddCount` | `int` | Times handlers were added (+=) |
-| `RemoveCount` | `int` | Times handlers were removed (-=) |
-| `HasSubscribers` | `bool` | True if any handler is attached |
-| `Raise(...)` | `void` | Raises the event to all handlers |
-| `Reset()` | `void` | Clears counts AND removes all handlers |
+- Learn about [method interceptors](methods.md) for verifying method calls
+- Explore [property interceptors](properties.md) for property access tracking
+- Review [interceptor API reference](../reference/interceptor-api.md) for all available members

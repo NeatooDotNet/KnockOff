@@ -18,11 +18,12 @@ partial class GenericDelegateInlineTest
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.Factory, string>? OnCall { get; set; }
+			public global::System.Func<string>? OnCall { get; set; }
 
 			public void RecordCall() { CallCount++; }
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.Factory<string> delegate.</summary>
@@ -37,7 +38,7 @@ partial class GenericDelegateInlineTest
 			private string Invoke()
 			{
 				Interceptor.RecordCall();
-				if (Interceptor.OnCall is { } onCall) return onCall(this);
+				if (Interceptor.OnCall is { } onCall) return onCall();
 				return default!;
 			}
 
@@ -58,11 +59,12 @@ partial class GenericDelegateInlineTest
 			public int? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.Converter, int, string>? OnCall { get; set; }
+			public global::System.Func<int, string>? OnCall { get; set; }
 
 			public void RecordCall(int input) { CallCount++; LastCallArg = input; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.Converter<int, string> delegate.</summary>
@@ -77,7 +79,7 @@ partial class GenericDelegateInlineTest
 			private string Invoke(int input)
 			{
 				Interceptor.RecordCall(input);
-				if (Interceptor.OnCall is { } onCall) return onCall(this, input);
+				if (Interceptor.OnCall is { } onCall) return onCall(input);
 				return default!;
 			}
 

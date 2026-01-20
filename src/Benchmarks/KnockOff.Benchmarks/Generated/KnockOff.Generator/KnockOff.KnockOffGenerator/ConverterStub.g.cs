@@ -58,7 +58,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 		public sealed class ConvertTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Convert.</summary>
-			public delegate T ConvertDelegate(ConverterStub ko, object @value);
+			public delegate T ConvertDelegate(object @value);
 
 			private ConvertDelegate? _onCall;
 
@@ -82,6 +82,22 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -123,7 +139,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 		public sealed class TransformTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Transform.</summary>
-			public delegate TOut TransformDelegate(ConverterStub ko, TIn input);
+			public delegate TOut TransformDelegate(TIn input);
 
 			private TransformDelegate? _onCall;
 
@@ -144,6 +160,22 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -193,7 +225,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 	{
 		Convert.Of<T>().RecordCall(@value);
 		if (Convert.Of<T>().Callback is { } callback)
-			return callback(this, @value);
+			return callback(@value);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Convert");
 		return SmartDefault<T>("Convert");
 	}
@@ -202,7 +234,7 @@ partial class ConverterStub : global::KnockOff.Benchmarks.Interfaces.IConverter,
 	{
 		Transform.Of<TIn, TOut>().RecordCall();
 		if (Transform.Of<TIn, TOut>().Callback is { } callback)
-			return callback(this, input);
+			return callback(input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IConverter", "Transform");
 		return SmartDefault<TOut>("Transform");
 	}

@@ -11,11 +11,15 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Tests.IKeyLookup? _source;
 
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+		private bool _valueSet;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<KeyLookupKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -24,10 +28,15 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 		public int? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<KeyLookupKnockOff, int>? OnSet { get; set; }
+		public global::System.Action<int>? OnSet { get; set; }
 
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public int Value { get; set; } = default!;
+		private int _value = default!;
+		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+		public int Value
+		{
+			get => _value;
+			set { _value = value; _valueSet = true; }
+		}
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
@@ -35,8 +44,68 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
+
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public CountInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount + SetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, GetCount));
+		}
+
+		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifySet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(SetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (set)", times, SetCount));
+		}
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+		internal bool IsConfigured => _valueSet || OnGet != null || OnSet != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount + SetCount;
+			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Count", times, totalCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			var totalCount = GetCount + SetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Count", global::KnockOff.Times.AtLeastOnce, totalCount);
+		}
 	}
 
 	/// <summary>Tracks calls to GetData (user-defined implementation).</summary>
@@ -58,6 +127,25 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 
 		/// <summary>Resets tracking state.</summary>
 		public void Reset() { CallCount = 0; _lastArg = default!; }
+
+		/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+		}
+
+		/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public global::KnockOff.IMethodTracking<string> Verifiable() => this;
+
+		/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public global::KnockOff.IMethodTracking<string> Verifiable(global::KnockOff.Times times) => this;
+
+		global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();
+		global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);
 	}
 
 	/// <summary>Interceptor for Count. Configure via .Value, track via .GetCount.</summary>
@@ -83,8 +171,8 @@ partial class KeyLookupKnockOff : global::KnockOff.Tests.IKeyLookup, global::Kno
 
 	int global::KnockOff.Tests.IKeyLookup.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(this); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
-		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(this, value); return; } if (Count._source is { } src) { src.Count = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
+		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); return Count.Value; }
+		set { Count.RecordSet(value); if (Count.OnSet is { } onSet) { onSet(value); return; } if (Count._source is { } src) { src.Count = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IKeyLookup", "Count"); Count.Value = value; }
 	}
 
 	int global::KnockOff.Tests.IKeyLookup.GetData(string key)

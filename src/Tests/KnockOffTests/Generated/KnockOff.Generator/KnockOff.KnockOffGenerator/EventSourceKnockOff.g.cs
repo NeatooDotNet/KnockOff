@@ -28,8 +28,83 @@ partial class EventSourceKnockOff : global::KnockOff.Tests.IEventSource, global:
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(object? sender, string e) => _handler?.Invoke(sender, e);
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the event was subscribed to at least once.</summary>
+		public void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
+		public void VerifyAdd(global::KnockOff.Times times)
+		{
+			if (!times.Validate(AddCount))
+				throw new global::KnockOff.VerificationException($"Event 'MessageReceived' add verification failed: expected {times}, but was called {AddCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was unsubscribed at least once.</summary>
+		public void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
+		public void VerifyRemove(global::KnockOff.Times times)
+		{
+			if (!times.Validate(RemoveCount))
+				throw new global::KnockOff.VerificationException($"Event 'MessageReceived' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Event 'MessageReceived' verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public MessageReceivedInterceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public MessageReceivedInterceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => _handler != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("MessageReceived", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("MessageReceived", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Interceptor for OnCompleted event.</summary>
@@ -55,8 +130,83 @@ partial class EventSourceKnockOff : global::KnockOff.Tests.IEventSource, global:
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(object? sender, global::System.EventArgs e) => _handler?.Invoke(sender, e);
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the event was subscribed to at least once.</summary>
+		public void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
+		public void VerifyAdd(global::KnockOff.Times times)
+		{
+			if (!times.Validate(AddCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnCompleted' add verification failed: expected {times}, but was called {AddCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was unsubscribed at least once.</summary>
+		public void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
+		public void VerifyRemove(global::KnockOff.Times times)
+		{
+			if (!times.Validate(RemoveCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnCompleted' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnCompleted' verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public OnCompletedInterceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public OnCompletedInterceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => _handler != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("OnCompleted", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("OnCompleted", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Interceptor for OnProgress event.</summary>
@@ -82,8 +232,83 @@ partial class EventSourceKnockOff : global::KnockOff.Tests.IEventSource, global:
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(int obj) => _handler?.Invoke(obj);
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the event was subscribed to at least once.</summary>
+		public void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
+		public void VerifyAdd(global::KnockOff.Times times)
+		{
+			if (!times.Validate(AddCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnProgress' add verification failed: expected {times}, but was called {AddCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was unsubscribed at least once.</summary>
+		public void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
+		public void VerifyRemove(global::KnockOff.Times times)
+		{
+			if (!times.Validate(RemoveCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnProgress' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnProgress' verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public OnProgressInterceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public OnProgressInterceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => _handler != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("OnProgress", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("OnProgress", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Interceptor for OnData event.</summary>
@@ -109,8 +334,83 @@ partial class EventSourceKnockOff : global::KnockOff.Tests.IEventSource, global:
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(string arg1, int arg2) => _handler?.Invoke(arg1, arg2);
 
-		/// <summary>Resets all tracking state.</summary>
+		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
 		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+
+		/// <summary>Verifies the event was subscribed to at least once.</summary>
+		public void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
+		public void VerifyAdd(global::KnockOff.Times times)
+		{
+			if (!times.Validate(AddCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnData' add verification failed: expected {times}, but was called {AddCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was unsubscribed at least once.</summary>
+		public void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
+		public void VerifyRemove(global::KnockOff.Times times)
+		{
+			if (!times.Validate(RemoveCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnData' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+		}
+
+		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnData' verification failed: expected {times}, but was called {totalCount} time(s).");
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public OnDataInterceptor Verifiable()
+		{
+			_isVerifiable = true;
+			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
+			return this;
+		}
+
+		/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public OnDataInterceptor Verifiable(global::KnockOff.Times times)
+		{
+			_isVerifiable = true;
+			_verifiableTimes = times;
+			return this;
+		}
+
+		internal bool IsVerifiable => _isVerifiable;
+		internal bool IsConfigured => _handler != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("OnData", times, totalCount);
+			return null;
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured && !_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = AddCount + RemoveCount;
+			if (!times.Validate(totalCount))
+				return new global::KnockOff.VerificationFailure("OnData", times, totalCount);
+			return null;
+		}
 	}
 
 	/// <summary>Interceptor for MessageReceived event.</summary>

@@ -21,11 +21,12 @@ partial class InlineDelegateTests
 			public global::Neatoo.NeatooPropertyChangedEventArgs? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.NeatooPropertyChanged, global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task>? OnCall { get; set; }
+			public global::System.Func<global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task>? OnCall { get; set; }
 
 			public void RecordCall(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) { CallCount++; LastCallArg = propertyNameBreadCrumbs; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 		}
 
 		/// <summary>Stub for global::Neatoo.NeatooPropertyChanged delegate.</summary>
@@ -40,7 +41,7 @@ partial class InlineDelegateTests
 			private global::System.Threading.Tasks.Task Invoke(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs)
 			{
 				Interceptor.RecordCall(propertyNameBreadCrumbs);
-				if (Interceptor.OnCall is { } onCall) return onCall(this, propertyNameBreadCrumbs);
+				if (Interceptor.OnCall is { } onCall) return onCall(propertyNameBreadCrumbs);
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 

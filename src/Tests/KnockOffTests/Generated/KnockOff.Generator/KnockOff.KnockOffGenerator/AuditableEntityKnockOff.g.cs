@@ -11,11 +11,15 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Tests.IAuditableEntity? _source;
 
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+		private bool _valueSet;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AuditableEntityKnockOff, global::System.DateTime?>? OnGet { get; set; }
+		public global::System.Func<global::System.DateTime?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -24,10 +28,15 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		public global::System.DateTime? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<AuditableEntityKnockOff, global::System.DateTime?>? OnSet { get; set; }
+		public global::System.Action<global::System.DateTime?>? OnSet { get; set; }
 
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public global::System.DateTime? Value { get; set; } = default!;
+		private global::System.DateTime? _value = default!;
+		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+		public global::System.DateTime? Value
+		{
+			get => _value;
+			set { _value = value; _valueSet = true; }
+		}
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
@@ -35,8 +44,68 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(global::System.DateTime? value) { SetCount++; LastSetValue = value; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
+
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public ModifiedAtInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public ModifiedAtInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount + SetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ModifiedAt", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ModifiedAt (get)", times, GetCount));
+		}
+
+		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifySet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(SetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ModifiedAt (set)", times, SetCount));
+		}
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+		internal bool IsConfigured => _valueSet || OnGet != null || OnSet != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount + SetCount;
+			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("ModifiedAt", times, totalCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			var totalCount = GetCount + SetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("ModifiedAt", global::KnockOff.Times.AtLeastOnce, totalCount);
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for ModifiedBy.</summary>
@@ -45,11 +114,15 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Tests.IAuditableEntity? _source;
 
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+		private bool _valueSet;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AuditableEntityKnockOff, string>? OnGet { get; set; }
+		public global::System.Func<string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
 		public int SetCount { get; private set; }
@@ -58,10 +131,15 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Callback invoked when the setter is accessed.</summary>
-		public global::System.Action<AuditableEntityKnockOff, string>? OnSet { get; set; }
+		public global::System.Action<string>? OnSet { get; set; }
 
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public string Value { get; set; } = "";
+		private string _value = "";
+		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+		public string Value
+		{
+			get => _value;
+			set { _value = value; _valueSet = true; }
+		}
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
@@ -69,8 +147,68 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		/// <summary>Records a setter access.</summary>
 		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; SetCount = 0; LastSetValue = default; OnSet = null; Value = default!; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
+
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public ModifiedByInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public ModifiedByInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount + SetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ModifiedBy", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ModifiedBy (get)", times, GetCount));
+		}
+
+		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifySet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(SetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ModifiedBy (set)", times, SetCount));
+		}
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+		internal bool IsConfigured => _valueSet || OnGet != null || OnSet != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount + SetCount;
+			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("ModifiedBy", times, totalCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			var totalCount = GetCount + SetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("ModifiedBy", global::KnockOff.Times.AtLeastOnce, totalCount);
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for Id.</summary>
@@ -79,20 +217,79 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Tests.IBaseEntity? _source;
 
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+		private bool _valueSet;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AuditableEntityKnockOff, int>? OnGet { get; set; }
+		public global::System.Func<int>? OnGet { get; set; }
 
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public int Value { get; set; } = default!;
+		private int _value = default!;
+		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+		public int Value
+		{
+			get => _value;
+			set { _value = value; _valueSet = true; }
+		}
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
+
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public IdInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Id", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Id (get)", times, GetCount));
+		}
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+		internal bool IsConfigured => _valueSet || OnGet != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Id", times, totalCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			var totalCount = GetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Id", global::KnockOff.Times.AtLeastOnce, totalCount);
+		}
 	}
 
 	/// <summary>Tracks and configures behavior for CreatedAt.</summary>
@@ -101,20 +298,79 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Tests.IBaseEntity? _source;
 
+		private bool _isVerifiable;
+		private global::KnockOff.Times? _verifiableTimes;
+		private bool _valueSet;
+
 		/// <summary>Number of times the getter was accessed.</summary>
 		public int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<AuditableEntityKnockOff, global::System.DateTime>? OnGet { get; set; }
+		public global::System.Func<global::System.DateTime>? OnGet { get; set; }
 
-		/// <summary>Value returned by getter when OnGet is not set.</summary>
-		public global::System.DateTime Value { get; set; } = default!;
+		private global::System.DateTime _value = default!;
+		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+		public global::System.DateTime Value
+		{
+			get => _value;
+			set { _value = value; _valueSet = true; }
+		}
 
 		/// <summary>Records a getter access.</summary>
 		public void RecordGet() => GetCount++;
 
-		/// <summary>Resets all tracking state.</summary>
-		public void Reset() { GetCount = 0; OnGet = null; Value = default!; _source = null; }
+		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
+		public void Reset() { GetCount = 0; _source = null; }
+
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public CreatedAtInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public CreatedAtInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			var totalCount = GetCount;
+			if (!times.Validate(totalCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CreatedAt", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(GetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CreatedAt (get)", times, GetCount));
+		}
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isVerifiable;
+
+		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
+		internal bool IsConfigured => _valueSet || OnGet != null;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerification()
+		{
+			if (!_isVerifiable) return null;
+			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+			var totalCount = GetCount;
+			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("CreatedAt", times, totalCount);
+		}
+
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+		{
+			if (!IsConfigured) return null;
+			var totalCount = GetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("CreatedAt", global::KnockOff.Times.AtLeastOnce, totalCount);
+		}
 	}
 
 	/// <summary>Interceptor for ModifiedAt. Configure via .Value, track via .GetCount.</summary>
@@ -159,24 +415,24 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 
 	global::System.DateTime? global::KnockOff.Tests.IAuditableEntity.ModifiedAt
 	{
-		get { ModifiedAt.RecordGet(); if (ModifiedAt.OnGet is { } onGet) return onGet(this); if (ModifiedAt._source is { } src) return src.ModifiedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedAt"); return ModifiedAt.Value; }
-		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet is { } onSet) { onSet(this, value); return; } if (ModifiedAt._source is { } src) { src.ModifiedAt = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedAt"); ModifiedAt.Value = value; }
+		get { ModifiedAt.RecordGet(); if (ModifiedAt.OnGet is { } onGet) return onGet(); if (ModifiedAt._source is { } src) return src.ModifiedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedAt"); return ModifiedAt.Value; }
+		set { ModifiedAt.RecordSet(value); if (ModifiedAt.OnSet is { } onSet) { onSet(value); return; } if (ModifiedAt._source is { } src) { src.ModifiedAt = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedAt"); ModifiedAt.Value = value; }
 	}
 
 	string global::KnockOff.Tests.IAuditableEntity.ModifiedBy
 	{
-		get { ModifiedBy.RecordGet(); if (ModifiedBy.OnGet is { } onGet) return onGet(this); if (ModifiedBy._source is { } src) return src.ModifiedBy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedBy"); return ModifiedBy.Value; }
-		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet is { } onSet) { onSet(this, value); return; } if (ModifiedBy._source is { } src) { src.ModifiedBy = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedBy"); ModifiedBy.Value = value; }
+		get { ModifiedBy.RecordGet(); if (ModifiedBy.OnGet is { } onGet) return onGet(); if (ModifiedBy._source is { } src) return src.ModifiedBy; if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedBy"); return ModifiedBy.Value; }
+		set { ModifiedBy.RecordSet(value); if (ModifiedBy.OnSet is { } onSet) { onSet(value); return; } if (ModifiedBy._source is { } src) { src.ModifiedBy = value; return; } if (Strict) throw global::KnockOff.StubException.NotConfigured("IAuditableEntity", "ModifiedBy"); ModifiedBy.Value = value; }
 	}
 
 	int global::KnockOff.Tests.IBaseEntity.Id
 	{
-		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(this); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
+		get { Id.RecordGet(); if (Id.OnGet is { } onGet) return onGet(); if (Id._source is { } src) return src.Id; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "Id"); return Id.Value; }
 	}
 
 	global::System.DateTime global::KnockOff.Tests.IBaseEntity.CreatedAt
 	{
-		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(this); if (CreatedAt._source is { } src) return src.CreatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "CreatedAt"); return CreatedAt.Value; }
+		get { CreatedAt.RecordGet(); if (CreatedAt.OnGet is { } onGet) return onGet(); if (CreatedAt._source is { } src) return src.CreatedAt; if (Strict) throw global::KnockOff.StubException.NotConfigured("IBaseEntity", "CreatedAt"); return CreatedAt.Value; }
 	}
 
 }

@@ -49,7 +49,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsNew.OnGet = (ko) => true;
+        stub.IsNew.OnGet = () => true;
 
         Assert.True(entity.IsNew);
         Assert.Equal(1, stub.IsNew.GetCount);
@@ -120,7 +120,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Indexer.OfString.OnGet = (ko, propertyName) => null!;
+        stub.Indexer.OfString.OnGet = (propertyName) => null!;
 
         _ = entity["FirstName"];
         _ = entity["LastName"];
@@ -133,7 +133,7 @@ public class EntityBaseStandaloneTests
     public void Delete_TracksCall()
     {
         var stub = new EntityBaseStub();
-        var tracking = stub.Delete.OnCall(ko => { });
+        var tracking = stub.Delete.OnCall(() => { });
         IEntityBase entity = stub;
 
         entity.Delete();
@@ -146,7 +146,7 @@ public class EntityBaseStandaloneTests
     public void UnDelete_TracksCall()
     {
         var stub = new EntityBaseStub();
-        var tracking = stub.UnDelete.OnCall(ko => { });
+        var tracking = stub.UnDelete.OnCall(() => { });
         IEntityBase entity = stub;
 
         entity.UnDelete();
@@ -161,7 +161,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        var tracking = stub.Save.OnCall((ko) => Task.FromResult<IEntityBase>(ko));
+        var tracking = stub.Save.OnCall(() => Task.FromResult<IEntityBase>(stub));
 
         var result = await entity.Save();
 
@@ -177,7 +177,7 @@ public class EntityBaseStandaloneTests
         var savedStub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Save.OnCall((ko) => Task.FromResult<IEntityBase>(savedStub));
+        stub.Save.OnCall(() => Task.FromResult<IEntityBase>(savedStub));
 
         var result = await entity.Save();
 
@@ -192,7 +192,7 @@ public class EntityBaseStandaloneTests
 
         var modified = new[] { "FirstName", "LastName" };
         // ModifiedProperties is on IEntityBase interceptor, not IEntityMetaProperties
-        stub.ModifiedProperties.OnGet = (ko) => modified;
+        stub.ModifiedProperties.OnGet = () => modified;
 
         Assert.Equal(modified, entity.ModifiedProperties);
     }
@@ -205,7 +205,7 @@ public class EntityBaseStandaloneTests
         IEntityBase entity = stub;
 
         // Parent is now on IValidateBase (IBase was removed in Neatoo 10.6)
-        stub.Parent.OnGet = (ko) => parentStub;
+        stub.Parent.OnGet = () => parentStub;
 
         Assert.Same(parentStub, entity.Parent);
     }
@@ -215,7 +215,7 @@ public class EntityBaseStandaloneTests
     {
         var stub = new EntityBaseStub();
         // WaitForTasks is overloaded - use OnCall with no-arg lambda for the parameterless overload
-        var tracking = stub.WaitForTasks.OnCall((ko) => Task.CompletedTask);
+        var tracking = stub.WaitForTasks.OnCall(() => Task.CompletedTask);
         IEntityBase entity = stub;
 
         await entity.WaitForTasks();
@@ -239,7 +239,7 @@ public class EntityBaseStandaloneTests
     public void Reset_ClearsAllTracking()
     {
         var stub = new EntityBaseStub();
-        var deleteTracking = stub.Delete.OnCall(ko => { });
+        var deleteTracking = stub.Delete.OnCall(() => { });
         IEntityBase entity = stub;
 
         stub.IsNew.Value = true;
@@ -313,7 +313,7 @@ public class ValidateBaseStandaloneTests
         IValidateBase validate = stub;
 
         var messages = new List<IPropertyMessage>();
-        stub.PropertyMessages.OnGet = (ko) => messages;
+        stub.PropertyMessages.OnGet = () => messages;
 
         Assert.Same(messages, validate.PropertyMessages);
     }
@@ -323,7 +323,7 @@ public class ValidateBaseStandaloneTests
     {
         var stub = new ValidateBaseStub();
         // RunRules is overloaded - use explicit delegate type to disambiguate
-        var tracking = stub.RunRules.OnCall((ValidateBaseStub.RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((ko, propertyName, token) => Task.CompletedTask));
+        var tracking = stub.RunRules.OnCall((ValidateBaseStub.RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((propertyName, token) => Task.CompletedTask));
         IValidateBase validate = stub;
 
         await validate.RunRules("FirstName", null);
@@ -337,7 +337,7 @@ public class ValidateBaseStandaloneTests
     {
         var stub = new ValidateBaseStub();
         // RunRules is overloaded - use explicit delegate type to disambiguate
-        var tracking = stub.RunRules.OnCall((ValidateBaseStub.RunRulesInterceptor.RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)((ko, flag, token) => Task.CompletedTask));
+        var tracking = stub.RunRules.OnCall((ValidateBaseStub.RunRulesInterceptor.RunRulesDelegate_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task)((flag, token) => Task.CompletedTask));
         IValidateBase validate = stub;
 
         await validate.RunRules(RunRulesFlag.All, null);
@@ -349,7 +349,7 @@ public class ValidateBaseStandaloneTests
     public void ClearAllMessages_TracksCall()
     {
         var stub = new ValidateBaseStub();
-        var tracking = stub.ClearAllMessages.OnCall(ko => { });
+        var tracking = stub.ClearAllMessages.OnCall(() => { });
         IValidateBase validate = stub;
 
         validate.ClearAllMessages();
@@ -361,7 +361,7 @@ public class ValidateBaseStandaloneTests
     public void ClearSelfMessages_TracksCall()
     {
         var stub = new ValidateBaseStub();
-        var tracking = stub.ClearSelfMessages.OnCall(ko => { });
+        var tracking = stub.ClearSelfMessages.OnCall(() => { });
         IValidateBase validate = stub;
 
         validate.ClearSelfMessages();
@@ -375,7 +375,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        var tracking = stub.GetProperty.OnCall((ko, name) => null!);
+        var tracking = stub.GetProperty.OnCall((name) => null!);
 
         _ = validate.GetProperty("Age");
 
@@ -389,7 +389,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.Indexer.OnGet = (ko, name) => null!;
+        stub.Indexer.OnGet = (name) => null!;
 
         _ = validate["Email"];
 
@@ -435,7 +435,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.IsValid.OnGet = (s) => true;
+        stub.IsValid.OnGet = () => true;
 
         Assert.True(validate.IsValid);
     }
@@ -469,7 +469,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.Indexer.OnGet = (s, name) => null!;
+        stub.Indexer.OnGet = (name) => null!;
 
         _ = validate["PropertyName"];
 
@@ -483,7 +483,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.GetProperty.OnCall((s, name) => null!);
+        stub.GetProperty.OnCall((name) => null!);
 
         _ = validate.GetProperty("TestProp");
 
@@ -497,7 +497,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.TryGetProperty.OnCall((InlineValidateBaseTests.Stubs.IValidateBase_TryGetPropertyInterceptor.TryGetPropertyDelegate)((Stubs.IValidateBase ko, string name, out IValidateProperty prop) => { prop = default!; return true; }));
+        stub.TryGetProperty.OnCall((InlineValidateBaseTests.Stubs.IValidateBase_TryGetPropertyInterceptor.TryGetPropertyDelegate)((string name, out IValidateProperty prop) => { prop = default!; return true; }));
 
         var result = validate.TryGetProperty("TestProp", out _);
 
@@ -535,7 +535,7 @@ public partial class InlineValidateBaseTests
         IValidateBase validate = stub;
         var callbackExecuted = false;
 
-        stub.RunRules.OnCall((InlineValidateBaseTests.Stubs.IValidateBase_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((ko, prop, token) =>
+        stub.RunRules.OnCall((InlineValidateBaseTests.Stubs.IValidateBase_RunRulesInterceptor.RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task)((prop, token) =>
         {
             callbackExecuted = true;
             return Task.CompletedTask;
@@ -756,7 +756,7 @@ public partial class InlineDelegateTests
 
         // Must set OnCall to return Task.CompletedTask, otherwise await on null
         // TODO: Generator should return Task.CompletedTask for async delegates by default
-        stub.Interceptor.OnCall = (s, args) => Task.CompletedTask;
+        stub.Interceptor.OnCall = (args) => Task.CompletedTask;
 
         // NeatooPropertyChanged takes only 1 arg: NeatooPropertyChangedEventArgs
         // EventArgs constructor: (propertyName, source)
@@ -773,7 +773,7 @@ public partial class InlineDelegateTests
         NeatooPropertyChanged del = stub;
 
         // Must set OnCall to return Task.CompletedTask
-        stub.Interceptor.OnCall = (s, args) => Task.CompletedTask;
+        stub.Interceptor.OnCall = (args) => Task.CompletedTask;
 
         await del(new NeatooPropertyChangedEventArgs("Prop1", this));
         await del(new NeatooPropertyChangedEventArgs("Prop2", this));
@@ -791,7 +791,7 @@ public partial class InlineDelegateTests
         string? capturedPropertyName = null;
 
         // OnCall takes (stub, args) - only 2 parameters
-        stub.Interceptor.OnCall = (s, args) =>
+        stub.Interceptor.OnCall = (args) =>
         {
             callbackExecuted = true;
             capturedPropertyName = args.PropertyName;
@@ -811,7 +811,7 @@ public partial class InlineDelegateTests
         NeatooPropertyChanged del = stub;
 
         // Must set OnCall to return Task.CompletedTask
-        stub.Interceptor.OnCall = (s, args) => Task.CompletedTask;
+        stub.Interceptor.OnCall = (args) => Task.CompletedTask;
 
         await del(new NeatooPropertyChangedEventArgs("Prop", this));
 

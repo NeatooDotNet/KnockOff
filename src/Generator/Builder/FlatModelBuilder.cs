@@ -747,7 +747,7 @@ internal static class FlatModelBuilder
 		if (needsCustomDelegate)
 		{
 			customDelegateName = $"{member.Name}Delegate";
-			var delegateParams = new List<string> { $"{className} ko" };
+			var delegateParams = new List<string>();
 			foreach (var p in paramArray)
 			{
 				delegateParams.Add(FormatParameterWithRefKind(p));
@@ -760,12 +760,12 @@ internal static class FlatModelBuilder
 		}
 		else if (paramArray.Length == 0)
 		{
-			onCallDelegateType = $"global::System.Action<{className}>?";
+			onCallDelegateType = "global::System.Action?";
 		}
 		else
 		{
 			var paramTypes = string.Join(", ", paramArray.Select(p => p.Type));
-			onCallDelegateType = $"global::System.Action<{className}, {paramTypes}>?";
+			onCallDelegateType = $"global::System.Action<{paramTypes}>?";
 		}
 
 		// Default expression
@@ -884,7 +884,7 @@ internal static class FlatModelBuilder
 
 		// For generic methods, we use a delegate (not Action/Func) because of type parameters
 		var delegateName = $"{member.Name}Delegate";
-		var delegateParams = new List<string> { $"{className} ko" };
+		var delegateParams = new List<string>();
 		foreach (var p in paramArray)
 		{
 			delegateParams.Add(FormatParameterWithRefKind(p));
@@ -1036,10 +1036,10 @@ internal static class FlatModelBuilder
 			lastCallType = $"({string.Join(", ", nonGenericParams.Select(p => $"{p.NullableType} {p.EscapedName}"))})";
 		}
 
-		// Delegate signature
+		// Delegate signature (no stub parameter)
 		var isVoid = group.IsVoid;
 		var delegateReturnType = isVoid ? "void" : group.ReturnType;
-		var delegateParams = new List<string> { $"{className} ko" };
+		var delegateParams = new List<string>();
 		foreach (var p in paramArray)
 		{
 			delegateParams.Add(FormatParameterWithRefKind(p));

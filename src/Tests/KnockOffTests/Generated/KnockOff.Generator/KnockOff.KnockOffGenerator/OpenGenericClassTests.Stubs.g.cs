@@ -11,23 +11,82 @@ partial class OpenGenericClassTests
 		/// <summary>Interceptor for OGRepository.Name.</summary>
 		public sealed class OGRepository_NameInterceptor<T> where T : class
 		{
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+			private bool _configured;
+
 			/// <summary>Number of times the getter was accessed.</summary>
 			public int GetCount { get; private set; }
 
-			/// <summary>Callback for getter. If set, returns its value instead of base.</summary>
-			public global::System.Func<Stubs.OGRepository<T>, string>? OnGet { get; set; }
+			private global::System.Func<string>? _onGet;
+			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
+			public global::System.Func<string>? OnGet
+			{
+				get => _onGet;
+				set { _onGet = value; if (value != null) _configured = true; }
+			}
 
 			/// <summary>Records a getter access.</summary>
 			public void RecordGet() => GetCount++;
 
-			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { GetCount = 0; OnGet = null; }
+			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset() { GetCount = 0; }
+
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public OGRepository_NameInterceptor<T> Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public OGRepository_NameInterceptor<T> Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				var totalCount = GetCount;
+				if (!times.Validate(totalCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name", times, totalCount));
+			}
+
+			/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+			public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void VerifyGet(global::KnockOff.Times times)
+			{
+				if (!times.Validate(GetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, GetCount));
+			}
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isVerifiable;
+
+			/// <summary>Whether this property has been configured (callbacks registered).</summary>
+			internal bool IsConfigured => _configured;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				var totalCount = GetCount;
+				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Name", times, totalCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				var totalCount = GetCount;
+				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Name", global::KnockOff.Times.AtLeastOnce, totalCount);
+			}
 		}
 
 		/// <summary>Interceptor for OGRepository.GetById.</summary>
 		public sealed class OGRepository_GetByIdInterceptor<T> : global::KnockOff.IMethodTracking where T : class
 		{
-			private global::System.Func<Stubs.OGRepository<T>, int, T?>? _onCall;
+			private global::System.Func<int, T?>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -39,20 +98,58 @@ partial class OpenGenericClassTests
 			public int? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.OGRepository<T>, int, T?> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<int, T?> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<Stubs.OGRepository<T>, int, T?>? Callback => _onCall;
+			internal global::System.Func<int, T?>? Callback => _onCall;
 
 			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			internal bool IsVerifiable => _isVerifiable;
+			internal bool IsConfigured => _onCall != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetById", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("GetById", global::KnockOff.Times.AtLeastOnce, CallCount);
+			}
 		}
 
 		/// <summary>Interceptor for OGRepository.Save.</summary>
 		public sealed class OGRepository_SaveInterceptor<T> : global::KnockOff.IMethodTracking where T : class
 		{
-			private global::System.Action<Stubs.OGRepository<T>, T>? _onCall;
+			private global::System.Action<T>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -64,14 +161,52 @@ partial class OpenGenericClassTests
 			public T? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.OGRepository<T>, T> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<T> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.OGRepository<T>, T>? Callback => _onCall;
+			internal global::System.Action<T>? Callback => _onCall;
 
 			public void RecordCall(T entity) { CallCount++; LastCallArg = entity; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			internal bool IsVerifiable => _isVerifiable;
+			internal bool IsConfigured => _onCall != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Save", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Save", global::KnockOff.Times.AtLeastOnce, CallCount);
+			}
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.OGRepository<T> via composition.</summary>
@@ -103,6 +238,32 @@ partial class OpenGenericClassTests
 				Save.Reset();
 			}
 
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Name.CheckVerification() is { } nameFailure) failures.Add(nameFailure);
+				if (GetById.CheckVerification() is { } getbyidFailure) failures.Add(getbyidFailure);
+				if (Save.CheckVerification() is { } saveFailure) failures.Add(saveFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Name.CheckVerificationAll() is { } nameFailure) failures.Add(nameFailure);
+				if (GetById.CheckVerificationAll() is { } getbyidFailure) failures.Add(getbyidFailure);
+				if (Save.CheckVerificationAll() is { } saveFailure) failures.Add(saveFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
 			/// <summary>Internal implementation that inherits from global::KnockOff.Tests.OGRepository<T>.</summary>
 			private sealed class Impl : global::KnockOff.Tests.OGRepository<T>
 			{
@@ -119,7 +280,7 @@ partial class OpenGenericClassTests
 					get
 					{
 						_stub?.Name.RecordGet();
-						if (_stub?.Name.OnGet is { } onGet) return onGet(_stub);
+						if (_stub?.Name.OnGet is { } onGet) return onGet();
 						return base.Name;
 					}
 				}
@@ -128,7 +289,7 @@ partial class OpenGenericClassTests
 				public override T? GetById(int id)
 				{
 					_stub?.GetById.RecordCall(id);
-					if (_stub?.GetById.Callback is { } onCall) return onCall(_stub, id);
+					if (_stub?.GetById.Callback is { } onCall) return onCall(id);
 					return default!;
 				}
 
@@ -136,7 +297,7 @@ partial class OpenGenericClassTests
 				public override void Save(T entity)
 				{
 					_stub?.Save.RecordCall(entity);
-					if (_stub?.Save.Callback is { } onCall) { onCall(_stub, entity); return; }
+					if (_stub?.Save.Callback is { } onCall) { onCall(entity); return; }
 				}
 
 			}
@@ -145,7 +306,7 @@ partial class OpenGenericClassTests
 		/// <summary>Interceptor for OGCache.Get.</summary>
 		public sealed class OGCache_GetInterceptor<TKey, TValue> : global::KnockOff.IMethodTracking where TKey : notnull where TValue : new()
 		{
-			private global::System.Func<Stubs.OGCache<TKey, TValue>, TKey, TValue>? _onCall;
+			private global::System.Func<TKey, TValue>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -157,20 +318,58 @@ partial class OpenGenericClassTests
 			public TKey? LastCallArg { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<Stubs.OGCache<TKey, TValue>, TKey, TValue> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Func<TKey, TValue> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<Stubs.OGCache<TKey, TValue>, TKey, TValue>? Callback => _onCall;
+			internal global::System.Func<TKey, TValue>? Callback => _onCall;
 
 			public void RecordCall(TKey key) { CallCount++; LastCallArg = key; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			internal bool IsVerifiable => _isVerifiable;
+			internal bool IsConfigured => _onCall != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Get", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Get", global::KnockOff.Times.AtLeastOnce, CallCount);
+			}
 		}
 
 		/// <summary>Interceptor for OGCache.Set.</summary>
 		public sealed class OGCache_SetInterceptor<TKey, TValue> : global::KnockOff.IMethodTracking where TKey : notnull where TValue : new()
 		{
-			private global::System.Action<Stubs.OGCache<TKey, TValue>, TKey, TValue>? _onCall;
+			private global::System.Action<TKey, TValue>? _onCall;
 
 			/// <summary>Number of times this method was called.</summary>
 			public int CallCount { get; private set; }
@@ -182,14 +381,52 @@ partial class OpenGenericClassTests
 			public (TKey? key, TValue? value)? LastCallArgs { get; private set; }
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action<Stubs.OGCache<TKey, TValue>, TKey, TValue> callback) { _onCall = callback; return this; }
+			public global::KnockOff.IMethodTracking OnCall(global::System.Action<TKey, TValue> callback) { _onCall = callback; return this; }
 
 			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action<Stubs.OGCache<TKey, TValue>, TKey, TValue>? Callback => _onCall;
+			internal global::System.Action<TKey, TValue>? Callback => _onCall;
 
 			public void RecordCall(TKey key, TValue value) { CallCount++; LastCallArgs = (key, value); }
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArgs = default; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			private bool _isVerifiable;
+			private global::KnockOff.Times? _verifiableTimes;
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+			internal bool IsVerifiable => _isVerifiable;
+			internal bool IsConfigured => _onCall != null;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (!_isVerifiable) return null;
+				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Set", times, CallCount);
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Set", global::KnockOff.Times.AtLeastOnce, CallCount);
+			}
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.OGCache<TKey, TValue> via composition.</summary>
@@ -218,6 +455,30 @@ partial class OpenGenericClassTests
 				Set.Reset();
 			}
 
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Get.CheckVerification() is { } getFailure) failures.Add(getFailure);
+				if (Set.CheckVerification() is { } setFailure) failures.Add(setFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Get.CheckVerificationAll() is { } getFailure) failures.Add(getFailure);
+				if (Set.CheckVerificationAll() is { } setFailure) failures.Add(setFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
 			/// <summary>Internal implementation that inherits from global::KnockOff.Tests.OGCache<TKey, TValue>.</summary>
 			private sealed class Impl : global::KnockOff.Tests.OGCache<TKey, TValue>
 			{
@@ -232,7 +493,7 @@ partial class OpenGenericClassTests
 				public override TValue Get(TKey key)
 				{
 					_stub?.Get.RecordCall(key);
-					if (_stub?.Get.Callback is { } onCall) return onCall(_stub, key);
+					if (_stub?.Get.Callback is { } onCall) return onCall(key);
 					return default!;
 				}
 
@@ -240,7 +501,7 @@ partial class OpenGenericClassTests
 				public override void Set(TKey key, TValue value)
 				{
 					_stub?.Set.RecordCall(key, value);
-					if (_stub?.Set.Callback is { } onCall) { onCall(_stub, key, value); return; }
+					if (_stub?.Set.Callback is { } onCall) { onCall(key, value); return; }
 				}
 
 			}

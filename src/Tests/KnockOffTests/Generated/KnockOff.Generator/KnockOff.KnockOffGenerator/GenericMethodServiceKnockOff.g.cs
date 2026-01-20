@@ -58,7 +58,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : new()
 		{
 			/// <summary>Delegate for Create.</summary>
-			public delegate T CreateDelegate(GenericMethodServiceKnockOff ko);
+			public delegate T CreateDelegate();
 
 			private CreateDelegate? _onCall;
 
@@ -79,6 +79,22 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -120,7 +136,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Process.</summary>
-			public delegate void ProcessDelegate(GenericMethodServiceKnockOff ko, T @value);
+			public delegate void ProcessDelegate(T @value);
 
 			private ProcessDelegate? _onCall;
 
@@ -141,6 +157,22 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -182,7 +214,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Deserialize.</summary>
-			public delegate T DeserializeDelegate(GenericMethodServiceKnockOff ko, string json);
+			public delegate T DeserializeDelegate(string json);
 
 			private DeserializeDelegate? _onCall;
 
@@ -206,6 +238,22 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -247,7 +295,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Convert.</summary>
-			public delegate TOut ConvertDelegate(GenericMethodServiceKnockOff ko, TIn input);
+			public delegate TOut ConvertDelegate(TIn input);
 
 			private ConvertDelegate? _onCall;
 
@@ -268,6 +316,22 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -309,7 +373,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		public sealed class FindTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 		{
 			/// <summary>Delegate for Find.</summary>
-			public delegate T? FindDelegate(GenericMethodServiceKnockOff ko, int id);
+			public delegate T? FindDelegate(int id);
 
 			private FindDelegate? _onCall;
 
@@ -333,6 +397,22 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -374,7 +454,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 		public sealed class TransferTypedHandler<TSource, TDest> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 		{
 			/// <summary>Delegate for Transfer.</summary>
-			public delegate void TransferDelegate(GenericMethodServiceKnockOff ko, TSource source, TDest destination);
+			public delegate void TransferDelegate(TSource source, TDest destination);
 
 			private TransferDelegate? _onCall;
 
@@ -395,6 +475,22 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 
 			/// <summary>Resets all tracking state.</summary>
 			public void Reset() { CallCount = 0; _onCall = null; }
+
+			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable() => this;
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 		}
 	}
 
@@ -456,7 +552,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	{
 		Create.Of<T>().RecordCall();
 		if (Create.Of<T>().Callback is { } callback)
-			return callback(this);
+			return callback();
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Create");
 		return SmartDefault<T>("Create");
 	}
@@ -465,7 +561,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	{
 		Process.Of<T>().RecordCall();
 		if (Process.Of<T>().Callback is { } onCallCallback)
-		{ onCallCallback(this, @value); return; }
+		{ onCallCallback(@value); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Process");
 	}
 
@@ -473,7 +569,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	{
 		Deserialize.Of<T>().RecordCall(json);
 		if (Deserialize.Of<T>().Callback is { } callback)
-			return callback(this, json);
+			return callback(json);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Deserialize");
 		return SmartDefault<T>("Deserialize");
 	}
@@ -482,7 +578,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	{
 		Convert.Of<TIn, TOut>().RecordCall();
 		if (Convert.Of<TIn, TOut>().Callback is { } callback)
-			return callback(this, input);
+			return callback(input);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Convert");
 		return SmartDefault<TOut>("Convert");
 	}
@@ -491,7 +587,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	{
 		Find.Of<T>().RecordCall(id);
 		if (Find.Of<T>().Callback is { } callback)
-			return callback(this, id);
+			return callback(id);
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Find");
 		return default!;
 	}
@@ -500,7 +596,7 @@ partial class GenericMethodServiceKnockOff : global::KnockOff.Tests.IGenericMeth
 	{
 		Transfer.Of<TSource, TDest>().RecordCall();
 		if (Transfer.Of<TSource, TDest>().Callback is { } onCallCallback)
-		{ onCallCallback(this, source, destination); return; }
+		{ onCallCallback(source, destination); return; }
 		if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Transfer");
 	}
 

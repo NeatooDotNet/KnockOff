@@ -18,11 +18,12 @@ partial class DelegateInlineTest
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Action<Stubs.VoidNoParamDelegate>? OnCall { get; set; }
+			public global::System.Action? OnCall { get; set; }
 
 			public void RecordCall() { CallCount++; }
 
-			public void Reset() { CallCount = 0; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.VoidNoParamDelegate delegate.</summary>
@@ -37,7 +38,7 @@ partial class DelegateInlineTest
 			private void Invoke()
 			{
 				Interceptor.RecordCall();
-				if (Interceptor.OnCall is { } onCall) onCall(this);
+				if (Interceptor.OnCall is { } onCall) onCall();
 			}
 
 			/// <summary>Implicit conversion to global::KnockOff.Tests.VoidNoParamDelegate.</summary>
@@ -57,11 +58,12 @@ partial class DelegateInlineTest
 			public string? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Action<Stubs.VoidOneParamDelegate, string>? OnCall { get; set; }
+			public global::System.Action<string>? OnCall { get; set; }
 
 			public void RecordCall(string message) { CallCount++; LastCallArg = message; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.VoidOneParamDelegate delegate.</summary>
@@ -76,7 +78,7 @@ partial class DelegateInlineTest
 			private void Invoke(string message)
 			{
 				Interceptor.RecordCall(message);
-				if (Interceptor.OnCall is { } onCall) onCall(this, message);
+				if (Interceptor.OnCall is { } onCall) onCall(message);
 			}
 
 			/// <summary>Implicit conversion to global::KnockOff.Tests.VoidOneParamDelegate.</summary>
@@ -96,11 +98,12 @@ partial class DelegateInlineTest
 			public int? LastCallArg { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.ReturnOneParamDelegate, int, int>? OnCall { get; set; }
+			public global::System.Func<int, int>? OnCall { get; set; }
 
 			public void RecordCall(int input) { CallCount++; LastCallArg = input; }
 
-			public void Reset() { CallCount = 0; LastCallArg = default; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArg = default; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.ReturnOneParamDelegate delegate.</summary>
@@ -115,7 +118,7 @@ partial class DelegateInlineTest
 			private int Invoke(int input)
 			{
 				Interceptor.RecordCall(input);
-				if (Interceptor.OnCall is { } onCall) return onCall(this, input);
+				if (Interceptor.OnCall is { } onCall) return onCall(input);
 				return default!;
 			}
 
@@ -136,11 +139,12 @@ partial class DelegateInlineTest
 			public (string? name, int? age)? LastCallArgs { get; private set; }
 
 			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<Stubs.MultiParamDelegate, string, int, string>? OnCall { get; set; }
+			public global::System.Func<string, int, string>? OnCall { get; set; }
 
 			public void RecordCall(string name, int age) { CallCount++; LastCallArgs = (name, age); }
 
-			public void Reset() { CallCount = 0; LastCallArgs = default; OnCall = null; }
+			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { CallCount = 0; LastCallArgs = default; }
 		}
 
 		/// <summary>Stub for global::KnockOff.Tests.MultiParamDelegate delegate.</summary>
@@ -155,7 +159,7 @@ partial class DelegateInlineTest
 			private string Invoke(string name, int age)
 			{
 				Interceptor.RecordCall(name, age);
-				if (Interceptor.OnCall is { } onCall) return onCall(this, name, age);
+				if (Interceptor.OnCall is { } onCall) return onCall(name, age);
 				return default!;
 			}
 

@@ -1,239 +1,417 @@
-# Properties and Indexers
+# Property Configuration Guide
 
-This guide covers stubbing properties (get/set, get-only, set-only, init, required) and indexers.
+Properties in KnockOff can be configured two ways: **static values** for test data or **dynamic callbacks** for computed/stateful behavior. Choose the approach that matches your test scenario.
 
-## Properties
+---
 
-### Basic Configuration
+## Configuration Approaches
 
-Use `Value` for simple property values:
+**Static Value (Recommended for Test Data)**
+- Set `Property.Value` before running test
+- Use when the property should return a fixed value
+- Simple, readable, and covers most test scenarios
 
-<!-- snippet: properties-value-preset -->
+**Dynamic Callbacks (For Complex Scenarios)**
+- Set `Property.OnGet` to compute values at runtime
+- Set `Property.OnSet` to intercept and validate writes
+- Use when values depend on state, time, or other factors
+
+---
+
+## Static Values (Recommended for Test Data)
+
+The simplest way to configure a property is to assign a value before your test runs. This is ideal for pre-populating dependencies with test data.
+
+<!-- snippet: properties-value-basic -->
 ```cs
-// Pre-set a property value before test execution
-knockOff.Name.Value = "John Doe";
-
-// Now accessing the property returns the pre-set value
-var name = service.Name;  // "John Doe"
-```
-<!-- endSnippet -->
-
-Use `OnGet` for dynamic values:
-
-<!-- snippet: properties-onget-callback -->
-```cs
-knockOff.Name.OnGet = (ko) => "Always This Value";
-
-var value = service.Name;  // "Always This Value"
-```
-<!-- endSnippet -->
-
-### Property Types
-
-**Get/Set properties** have full tracking:
-
-```csharp
-stub.Name.Value = "Test";       // Set return value
-stub.Name.OnGet = (ko) => val;  // Dynamic getter
-stub.Name.OnSet = (ko, v) => {};// Setter callback
-stub.Name.GetCount              // Getter call count
-stub.Name.SetCount              // Setter call count
-stub.Name.LastSetValue          // Last value set
-```
-
-**Get-only properties** can use `Value` or `OnGet`:
-
-<!-- snippet: properties-get-only-usage -->
-```cs
-// Set value directly (recommended for static values)
-knockOff.ConnectionString.Value = "Server=test";
-```
-<!-- endSnippet -->
-
-**Set-only properties** track setter calls:
-
-```csharp
-stub.Output.SetCount      // Number of sets
-stub.Output.LastSetValue  // Last value set
-stub.Output.OnSet = (ko, value) => { };
-```
-
-### Tracking
-
-<!-- snippet: properties-get-tracking -->
-```cs
-_ = service.Name;
-_ = service.Name;
-_ = service.Name;
-
-var getCount = knockOff.Name.GetCount;  // 3
-```
-<!-- endSnippet -->
-
-<!-- snippet: properties-set-tracking -->
-```cs
-service.Name = "First";
-service.Name = "Second";
-service.Name = "Third";
-
-var setCount = knockOff.Name.SetCount;          // 3
-var lastValue = knockOff.Name.LastSetValue;     // "Third"
-```
-<!-- endSnippet -->
-
-### Init Properties (C# 9+)
-
-Init-only properties are configured via `Value`:
-
-```csharp
-public interface IEntity
+[Fact]
+public void Value_SetsPropertyReturnValue()
 {
-    string Id { get; init; }
+    var stub = new UserConfigPropsStub();
+
+    // Set a static value for the property via the interceptor
+    stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
+
+    IUserConfigProps config = stub;
+    var user = config.CurrentUser;
+
+    Assert.NotNull(user);
+    Assert.Equal("Alice", user.Name);
 }
-
-stub.Id.Value = "entity-123";
-var id = entity.Id;  // "entity-123"
-```
-
-### Required Properties (C# 11+)
-
-Required properties work like regular properties. The `[SetsRequiredMembers]` attribute is auto-generated:
-
-```csharp
-public class AuditableEntity
-{
-    public required string Id { get; set; }
-    public required string CreatedBy { get; set; }
-}
-
-// [KnockOff<AuditableEntity>]
-stub.Id.OnGet = (ko) => "audit-001";
-stub.CreatedBy.OnGet = (ko) => "admin";
-```
-
-### Conditional Logic
-
-<!-- snippet: properties-conditional-usage -->
-```cs
-knockOff.IsConnected.OnGet = (ko) =>
-{
-    // Check other interceptor state
-    return ko.Connect.WasCalled;
-};
 ```
 <!-- endSnippet -->
 
-### Reset
+When setting up test fixtures, you can configure multiple properties at once:
+
+<!-- snippet: properties-value-multiple -->
+```cs
+[Fact]
+public void Value_ConfigureMultipleProperties()
+{
+    var stub = new UserConfigPropsStub();
+
+    // Configure several properties before test execution
+    stub.UserId.Value = 42;
+    stub.Email.Value = "test@example.com";
+    stub.CurrentUser.Value = new User { Id = 42, Name = "Test User" };
+
+    IUserConfigProps config = stub;
+
+    Assert.Equal(42, config.UserId);
+    Assert.Equal("test@example.com", config.Email);
+    Assert.NotNull(config.CurrentUser);
+}
+```
+<!-- endSnippet -->
+
+**When to use Value:**
+- Pre-populating repository stub data
+- Configuring service dependencies with fixed values
+- Setting up DTOs or configuration objects
+- Any scenario where the value doesn't change during the test
+
+---
+
+## Dynamic Getters
+
+Use `OnGet` when a property's value should be computed at access time. The callback receives the stub instance as a parameter.
+
+<!-- snippet: properties-onget-dynamic -->
+```cs
+[Fact]
+public void OnGet_ReturnsComputedValue()
+{
+    var stub = new TimeProviderPropsStub();
+
+    // OnGet callback returns dynamic value on each access
+    stub.Timestamp.OnGet = () => DateTime.UtcNow;
+
+    ITimeProviderProps timeProvider = stub;
+
+    var time1 = timeProvider.Timestamp;
+    Thread.Sleep(10);
+    var time2 = timeProvider.Timestamp;
+
+    // Each access returns current time
+    Assert.True(time2 >= time1);
+}
+```
+<!-- endSnippet -->
+
+OnGet callbacks can access other interceptors on the stub to create state-dependent behavior:
+
+<!-- snippet: properties-onget-stateful -->
+```cs
+[Fact]
+public void OnGet_DependsOnOtherInterceptorState()
+{
+    var stub = new ServiceWithInitPropsStub();
+
+    // OnGet checks if Initialize() was called via interceptor CallCount
+    stub.IsReady.OnGet = () => stub.Initialize.CallCount > 0;
+    var initTracking = stub.Initialize.OnCall(() => { });
+
+    IServiceWithInitProps service = stub;
+
+    // Initially false (Initialize not called)
+    Assert.False(service.IsReady);
+
+    // After Initialize, becomes true
+    service.Initialize();
+    Assert.True(service.IsReady);
+}
+```
+<!-- endSnippet -->
+
+**When to use OnGet:**
+- Values that change over time (timestamps, random values)
+- Computed values based on other stub state
+- Simulating stateful behavior in dependencies
+- Testing race conditions or timing-dependent logic
+
+---
+
+## Setter Interception
+
+Use `OnSet` to intercept property writes. This allows tracking values or validating input during tests.
+
+<!-- snippet: properties-onset-tracking -->
+```cs
+[Fact]
+public void OnSet_TracksAllWrittenValues()
+{
+    var stub = new ConfigPropsStub();
+
+    var setValues = new List<string>();
+    stub.Name.OnSet = ((value) => setValues.Add(value);
+
+    IConfigProps config = stub;
+
+    config.Name = "First";
+    config.Name = "Second";
+    config.Name = "Third";
+
+    Assert.Equal(3, setValues.Count);
+    Assert.Equal(new[] { "First", "Second", "Third" }, setValues);
+}
+```
+<!-- endSnippet -->
+
+You can also use `OnSet` to simulate validation logic in dependencies:
+
+<!-- snippet: properties-onset-validation -->
+```cs
+[Fact]
+public void OnSet_SimulatesValidation()
+{
+    var stub = new ConfigPropsStub();
+
+    // OnSet throws for invalid values
+    stub.Age.OnSet = ((value) =>
+    {
+        if (value < 0)
+            throw new ArgumentException("Age cannot be negative");
+    };
+
+    IConfigProps config = stub;
+
+    // Valid value works
+    config.Age = 25;
+
+    // Invalid value throws
+    Assert.Throws<ArgumentException>(() => config.Age = -1);
+}
+```
+<!-- endSnippet -->
+
+**When to use OnSet:**
+- Tracking all values written to a property
+- Simulating validation failures in dependencies
+- Testing how your code handles property setter exceptions
+- Verifying the sequence of property writes
+
+---
+
+## Verifying Property Access
+
+Property interceptors support verification similar to methods.
+
+### Using Verify() on Properties
+
+<!-- snippet: properties-verify-getcount -->
+```cs
+[Fact]
+public void GetCount_TracksPropertyReads()
+{
+    var stub = new ConfigPropsStub();
+    stub.Age.Value = 42;
+
+    IConfigProps service = stub;
+
+    _ = service.Age;
+    _ = service.Age;
+
+    // GetCount tracks how many times property was read
+    Assert.Equal(2, stub.Age.GetCount);
+}
+```
+<!-- endSnippet -->
+
+<!-- snippet: properties-verify-lastsetvalue -->
+```cs
+[Fact]
+public void LastSetValue_CapturesLastWrittenValue()
+{
+    var stub = new ConfigPropsStub();
+
+    IConfigProps service = stub;
+
+    service.Name = "First";
+    service.Name = "Second";
+    service.Name = "Expected";
+
+    // LastSetValue contains the most recent value
+    Assert.Equal("Expected", stub.Name.LastSetValue);
+}
+```
+<!-- endSnippet -->
+
+### Using Verifiable() on Properties
+
+<!-- snippet: properties-verifiable -->
+```cs
+[Fact]
+public void Verifiable_MarksPropertyForVerification()
+{
+    var stub = new ConfigPropsStub();
+
+    // Mark property get/set as verifiable
+    stub.Name.Value = "test";
+    stub.Name.MarkVerifiableGet();
+    stub.Age.MarkVerifiableSet();
+
+    IConfigProps service = stub;
+    _ = service.Name;
+    service.Age = 42;
+
+    // Verify all marked properties
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+**Available verification methods:**
+- `VerifyGet(Times)` - Verify property getter was called
+- `VerifySet(Times)` - Verify property setter was called
+- `MarkVerifiableGet(Times)` - Mark getter for batch verification
+- `MarkVerifiableSet(Times)` - Mark setter for batch verification
+
+**Available inspection properties:**
+- `GetCount` - Number of times property was read
+- `SetCount` - Number of times property was written
+- `LastSetValue` - The most recent value written (null if never set)
+
+---
+
+## Value vs OnGet Priority
+
+When both `Value` and `OnGet` are configured, `OnGet` takes precedence. Setting `OnGet` replaces any previously set `Value`.
+
+<!-- snippet: properties-priority -->
+```cs
+[Fact]
+public void OnGet_TakesPrecedenceOverValue()
+{
+    var stub = new ConfigPropsStub();
+
+    // Set a static value
+    stub.Name.Value = "initial";
+
+    // Then set OnGet - it takes precedence
+    stub.Name.OnGet = () => "dynamic";
+
+    IConfigProps config = stub;
+
+    // OnGet wins over Value
+    Assert.Equal("dynamic", config.Name);
+}
+```
+<!-- endSnippet -->
+
+**Design principle:** This allows upgrading from simple Value configuration to dynamic OnGet behavior without removing the Value assignment first.
+
+---
+
+## Resetting Properties
+
+Calling `Reset()` on a property interceptor clears all counters and callbacks but **preserves the Value**.
 
 <!-- snippet: properties-reset -->
 ```cs
-knockOff.Name.Reset();
-
-var getCount = knockOff.Name.GetCount;    // 0
-var setCount = knockOff.Name.SetCount;    // 0
-var onGet = knockOff.Name.OnGet;          // null
-var onSet = knockOff.Name.OnSet;          // null
-// Note: Backing field is NOT cleared by Reset
-```
-<!-- endSnippet -->
-
-## Indexers
-
-Indexers use a backing dictionary for storage.
-
-### Basic Usage
-
-<!-- snippet: indexers-backing-dictionary -->
-```cs
-// Pre-populate backing dictionary
-knockOff.Indexer.Backing["Config"] = new IdxPropertyInfo { Value = "Value1" };
-knockOff.Indexer.Backing["Setting"] = new IdxPropertyInfo { Value = "Value2" };
-
-// Access returns backing values
-var config = store["Config"];   // Returns the pre-populated value
-var setting = store["Setting"]; // Returns the pre-populated value
-```
-<!-- endSnippet -->
-
-### Naming
-
-- Single indexer: `stub.Indexer`
-- Multiple indexers: `stub.IndexerString`, `stub.IndexerInt32` (key type suffix)
-
-### Tracking
-
-<!-- snippet: indexers-get-tracking -->
-```cs
-_ = store["Name"];
-_ = store["Age"];
-
-var getCount = knockOff.Indexer.GetCount;       // 2
-var lastKey = knockOff.Indexer.LastGetKey;      // "Age"
-```
-<!-- endSnippet -->
-
-<!-- snippet: indexers-set-tracking -->
-```cs
-store["Key"] = value1;
-
-var setCount = knockOff.Indexer.SetCount;         // 1
-var lastEntry = knockOff.Indexer.LastSetEntry;
-var lastSetKey = lastEntry?.Key;                        // "Key"
-var lastSetValue = lastEntry?.Value;                    // value1
-```
-<!-- endSnippet -->
-
-### Callbacks
-
-<!-- snippet: indexers-onget-callback -->
-```cs
-knockOff.Indexer.OnGet = (ko, key) =>
+[Fact]
+public void Reset_ClearsCountsButPreservesValue()
 {
-    // Compute or fetch value dynamically
-    return new IdxPropertyInfo { Name = key, Value = key.Length };
-};
+    var stub = new ConfigPropsStub();
 
-var result = store["Hello"];  // Returns IdxPropertyInfo with Value = 5
+    stub.Name.Value = "test";
+
+    IConfigProps config = stub;
+
+    // Access property to increment counts
+    _ = config.Name;
+    config.Name = "updated";
+
+    Assert.True(stub.Name.GetCount > 0);
+    Assert.True(stub.Name.SetCount > 0);
+
+    // Reset clears counts and callbacks
+    stub.Name.Reset();
+
+    Assert.Equal(0, stub.Name.GetCount);
+    Assert.Equal(0, stub.Name.SetCount);
+    // Note: Reset also clears Value, OnGet, OnSet
+}
 ```
 <!-- endSnippet -->
 
-<!-- snippet: indexers-onset-callback -->
+**Why Value is preserved:** Value represents test data configuration, not test execution state. Resetting execution state (counts, callbacks) shouldn't require reconfiguring test data.
+
+---
+
+## Decision Guide
+
+Choose your configuration approach based on the test scenario:
+
+| Scenario | Use This | Example |
+|----------|----------|---------|
+| Property should return fixed test data | `Value` | `stub.UserId.Value = 42;` |
+| Property should return current time/random value | `OnGet` | `stub.Now.OnGet = () => DateTime.UtcNow;` |
+| Property depends on other stub state | `OnGet` | `stub.IsReady.OnGet = () => stub.Init.WasCalled;` |
+| Track all values written to property | `OnSet` | `stub.Name.OnSet = (v) => list.Add(v);` |
+| Simulate validation in dependency | `OnSet` | `stub.Age.OnSet = (v) => Validate(v);` |
+| Verify property was accessed N times | Verification | `Assert.Equal(2, stub.UserId.GetCount);` |
+| Verify last value written | Verification | `Assert.Equal("x", stub.Name.LastSetValue);` |
+
+---
+
+## Complete Example
+
+This example demonstrates all property configuration approaches in a realistic test scenario.
+
+<!-- snippet: properties-complete-example -->
 ```cs
-knockOff.Indexer.OnSet = (ko, key, value) =>
+[Fact]
+public void CompletePropertyExample_AllConfigurationApproaches()
 {
-    changes.Add((key, value));
-};
+    var stub = new UserConfigCompleteStub();
 
-store["Key1"] = new IdxPropertyInfo { Value = "A" };
-store["Key2"] = new IdxPropertyInfo { Value = "B" };
+    // Value: Static test data
+    stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
-// changes contains [("Key1", ...), ("Key2", ...)]
+    // OnGet: State-dependent behavior
+    stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
+
+    // OnSet: Track all values written
+    var connectionStrings = new List<string>();
+    stub.ConnectionString.OnSet = ((value) => connectionStrings.Add(value);
+
+    // Configure the Connect method
+    var connectTracking = stub.Connect.OnCall(() => { });
+
+    IUserConfigComplete service = stub;
+
+    // Test execution
+    var user = service.CurrentUser;            // Read CurrentUser
+    Assert.False(service.IsConnected);         // Not connected yet
+
+    service.Connect();                          // Call Connect
+    Assert.True(service.IsConnected);          // Now connected
+
+    service.ConnectionString = "Server=test";  // Write ConnectionString
+
+    // Verification
+    Assert.Equal(1, stub.CurrentUser.GetCount);
+    Assert.True(service.IsConnected);
+    Assert.Single(connectionStrings);
+    Assert.Equal("Server=test", stub.ConnectionString.LastSetValue);
+}
 ```
 <!-- endSnippet -->
 
-**Note:** When `OnSet` is set, values do NOT go to the backing dictionary.
+---
 
-### Integer Indexers
+## Key Takeaways
 
-<!-- snippet: indexers-integer-indexer-usage -->
-```cs
-knockOff.Indexer.Backing[0] = "First";
-knockOff.Indexer.Backing[1] = "Second";
+1. **Start with Value** - It covers most scenarios and keeps tests simple
+2. **Use OnGet for computed values** - Time-dependent or state-dependent returns
+3. **Use OnSet for tracking** - When you need to verify writes or simulate validation
+4. **OnGet replaces Value** - You can upgrade from static to dynamic without conflicts
+5. **Reset() preserves Value** - Clears execution state but not test data configuration
+6. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like method verification
 
-var first = list[0];   // "First"
-var second = list[1];  // "Second"
+---
 
-var lastGetIndex = knockOff.Indexer.LastGetKey;  // 1
-```
-<!-- endSnippet -->
-
-## Value vs OnGet
-
-| Scenario | Use |
-|----------|-----|
-| Static test data | `Value` |
-| Different value each call | `OnGet` |
-| Depends on stub state | `OnGet` |
-| Throw on access | `OnGet` |
-
-**Rule of thumb:** Start with `Value`. Only use `OnGet` when you need dynamic behavior.
+**Next Steps:**
+- [Method Configuration Guide](methods.md) - Configure method behavior and callbacks
+- [Verification Patterns](verification.md) - Assert on stub interactions
+- [Interceptor API Reference](../reference/interceptor-api.md) - Complete interceptor API documentation

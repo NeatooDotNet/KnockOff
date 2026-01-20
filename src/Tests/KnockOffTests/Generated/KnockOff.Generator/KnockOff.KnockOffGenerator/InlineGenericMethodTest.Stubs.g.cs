@@ -39,19 +39,31 @@ partial class InlineGenericMethodTest
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
+			}
+
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Create", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Typed handler for Create with specific type arguments.</summary>
 			public sealed class CreateTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : new()
 			{
 				/// <summary>Delegate for Create.</summary>
-				public delegate T CreateDelegate(Stubs.IGenericMethodService ko);
+				public delegate T CreateDelegate();
 
 				private CreateDelegate? _onCall;
 
@@ -70,8 +82,24 @@ partial class InlineGenericMethodTest
 				/// <summary>Records a method call.</summary>
 				public void RecordCall() => CallCount++;
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -101,19 +129,31 @@ partial class InlineGenericMethodTest
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
+			}
+
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Process", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Typed handler for Process with specific type arguments.</summary>
 			public sealed class ProcessTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for Process.</summary>
-				public delegate void ProcessDelegate(Stubs.IGenericMethodService ko, T value);
+				public delegate void ProcessDelegate(T value);
 
 				private ProcessDelegate? _onCall;
 
@@ -132,8 +172,24 @@ partial class InlineGenericMethodTest
 				/// <summary>Records a method call.</summary>
 				public void RecordCall() => CallCount++;
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -163,19 +219,31 @@ partial class InlineGenericMethodTest
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
+			}
+
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Deserialize", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Typed handler for Deserialize with specific type arguments.</summary>
 			public sealed class DeserializeTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for Deserialize.</summary>
-				public delegate T DeserializeDelegate(Stubs.IGenericMethodService ko, string json);
+				public delegate T DeserializeDelegate(string json);
 
 				private DeserializeDelegate? _onCall;
 
@@ -197,8 +265,24 @@ partial class InlineGenericMethodTest
 				/// <summary>Records a method call.</summary>
 				public void RecordCall(string json) { CallCount++; LastCallArg = json; }
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; LastCallArg = default; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -228,19 +312,31 @@ partial class InlineGenericMethodTest
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<(global::System.Type, global::System.Type)> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
+			}
+
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Convert", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Typed handler for Convert with specific type arguments.</summary>
 			public sealed class ConvertTypedHandler<TIn, TOut> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for Convert.</summary>
-				public delegate TOut ConvertDelegate(Stubs.IGenericMethodService ko, TIn input);
+				public delegate TOut ConvertDelegate(TIn input);
 
 				private ConvertDelegate? _onCall;
 
@@ -259,8 +355,24 @@ partial class InlineGenericMethodTest
 				/// <summary>Records a method call.</summary>
 				public void RecordCall() => CallCount++;
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -290,19 +402,31 @@ partial class InlineGenericMethodTest
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
+			}
+
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Find", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Typed handler for Find with specific type arguments.</summary>
 			public sealed class FindTypedHandler<T> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking where T : class
 			{
 				/// <summary>Delegate for Find.</summary>
-				public delegate T? FindDelegate(Stubs.IGenericMethodService ko, int id);
+				public delegate T? FindDelegate(int id);
 
 				private FindDelegate? _onCall;
 
@@ -324,8 +448,24 @@ partial class InlineGenericMethodTest
 				/// <summary>Records a method call.</summary>
 				public void RecordCall(int id) { CallCount++; LastCallArg = id; }
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; LastCallArg = default; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -355,19 +495,31 @@ partial class InlineGenericMethodTest
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<(global::System.Type, global::System.Type)> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
-			/// <summary>Resets all typed handlers.</summary>
+			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
-				_typedHandlers.Clear();
+			}
+
+			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
+			internal bool IsConfigured => _typedHandlers.Count > 0;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification() => null; // Generic methods not individually verifiable
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (!IsConfigured) return null;
+				return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Transfer", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Typed handler for Transfer with specific type arguments.</summary>
 			public sealed class TransferTypedHandler<TSource, TDest> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking
 			{
 				/// <summary>Delegate for Transfer.</summary>
-				public delegate void TransferDelegate(Stubs.IGenericMethodService ko, TSource source, TDest destination);
+				public delegate void TransferDelegate(TSource source, TDest destination);
 
 				private TransferDelegate? _onCall;
 
@@ -386,8 +538,24 @@ partial class InlineGenericMethodTest
 				/// <summary>Records a method call.</summary>
 				public void RecordCall() => CallCount++;
 
-				/// <summary>Resets all tracking state.</summary>
-				public void Reset() { CallCount = 0; _onCall = null; }
+				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { CallCount = 0; }
+
+				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable() => this;
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;
 			}
 		}
 
@@ -417,7 +585,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Create.Of<T>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this);
+					return onCallCallback();
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Create");
 				return SmartDefault<T>("Create");
 			}
@@ -427,7 +595,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Process.Of<T>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-				{ onCallCallback(this, value); return; }
+				{ onCallCallback(value); return; }
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Process");
 			}
 
@@ -436,7 +604,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Deserialize.Of<T>();
 				typedHandler.RecordCall(json);
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, json);
+					return onCallCallback(json);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Deserialize");
 				return SmartDefault<T>("Deserialize");
 			}
@@ -446,7 +614,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Convert.Of<TIn, TOut>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, input);
+					return onCallCallback(input);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Convert");
 				return SmartDefault<TOut>("Convert");
 			}
@@ -456,7 +624,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Find.Of<T>();
 				typedHandler.RecordCall(id);
 				if (typedHandler.Callback is { } onCallCallback)
-					return onCallCallback(this, id);
+					return onCallCallback(id);
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Find");
 				return default!;
 			}
@@ -466,7 +634,7 @@ partial class InlineGenericMethodTest
 				var typedHandler = Transfer.Of<TSource, TDest>();
 				typedHandler.RecordCall();
 				if (typedHandler.Callback is { } onCallCallback)
-				{ onCallCallback(this, source, destination); return; }
+				{ onCallCallback(source, destination); return; }
 				if (Strict) throw global::KnockOff.StubException.NotConfigured("IGenericMethodService", "Transfer");
 			}
 
@@ -508,6 +676,38 @@ partial class InlineGenericMethodTest
 				throw new global::System.InvalidOperationException(
 					$"No implementation provided for {methodName}<{type.Name}>. " +
 					$"Set the handler's OnCall.");
+			}
+
+			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+			public void Verify()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Create.CheckVerification() is { } createFailure) failures.Add(createFailure);
+				if (Process.CheckVerification() is { } processFailure) failures.Add(processFailure);
+				if (Deserialize.CheckVerification() is { } deserializeFailure) failures.Add(deserializeFailure);
+				if (Convert.CheckVerification() is { } convertFailure) failures.Add(convertFailure);
+				if (Find.CheckVerification() is { } findFailure) failures.Add(findFailure);
+				if (Transfer.CheckVerification() is { } transferFailure) failures.Add(transferFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
+			}
+
+			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+			public void VerifyAll()
+			{
+				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+				if (Create.CheckVerificationAll() is { } createFailure) failures.Add(createFailure);
+				if (Process.CheckVerificationAll() is { } processFailure) failures.Add(processFailure);
+				if (Deserialize.CheckVerificationAll() is { } deserializeFailure) failures.Add(deserializeFailure);
+				if (Convert.CheckVerificationAll() is { } convertFailure) failures.Add(convertFailure);
+				if (Find.CheckVerificationAll() is { } findFailure) failures.Add(findFailure);
+				if (Transfer.CheckVerificationAll() is { } transferFailure) failures.Add(transferFailure);
+
+				if (failures.Count > 0)
+					throw new global::KnockOff.VerificationException(failures);
 			}
 
 		}

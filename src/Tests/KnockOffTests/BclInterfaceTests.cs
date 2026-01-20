@@ -48,7 +48,7 @@ public class BclInterfaceTests
     {
         var stub = new DisposableStubTests.Stubs.IDisposable();
         var disposed = false;
-        stub.Dispose.OnCall(ko => disposed = true);
+        stub.Dispose.OnCall(() => disposed = true);
         IDisposable disposable = stub;
 
         disposable.Dispose();
@@ -98,7 +98,7 @@ public class BclInterfaceTests
     {
         var stub = new EnumerableStringStubTests.Stubs.IEnumerable();
         var items = new List<string> { "a", "b", "c" };
-        stub.GetEnumerator.OnCall(ko => items.GetEnumerator());
+        stub.GetEnumerator.OnCall(() => items.GetEnumerator());
         IEnumerable<string> enumerable = stub;
 
         using var enumerator = enumerable.GetEnumerator();
@@ -134,7 +134,7 @@ public class BclInterfaceTests
         // Bug: Prior to fix, non-generic GetEnumerator had its own interceptor instead of delegating
         var stub = new EnumerableStringStubTests.Stubs.IEnumerable();
         var items = new List<string> { "a", "b", "c" };
-        stub.GetEnumerator.OnCall(ko => items.GetEnumerator());
+        stub.GetEnumerator.OnCall(() => items.GetEnumerator());
 
         // Cast to non-generic IEnumerable and call GetEnumerator - should delegate to generic version
         IEnumerable nonGenericEnumerable = stub;
@@ -530,7 +530,7 @@ public class BclInterfaceTests
     public void IComparableInt_CompareTo_OnCall_CustomBehavior()
     {
         var stub = new ComparableIntStubTests.Stubs.IComparable();
-        stub.CompareTo.OnCall((ko, other) => other > 50 ? 1 : -1);
+        stub.CompareTo.OnCall((other) => other > 50 ? 1 : -1);
         IComparable<int> comparable = stub;
 
         var result1 = comparable.CompareTo(60);
@@ -570,7 +570,7 @@ public class BclInterfaceTests
     public void IComparerInt_Compare_OnCall_CustomBehavior()
     {
         var stub = new ComparerIntStubTests.Stubs.IComparer();
-        stub.Compare.OnCall((ko, x, y) => x - y);
+        stub.Compare.OnCall((x, y) => x - y);
         IComparer<int> comparer = stub;
 
         var result = comparer.Compare(10, 5);
@@ -598,7 +598,7 @@ public class BclInterfaceTests
     {
         var stub = new CloneableStubTests.Stubs.ICloneable();
         var clonedObject = new object();
-        stub.Clone.OnCall(ko => clonedObject);
+        stub.Clone.OnCall(() => clonedObject);
         ICloneable cloneable = stub;
 
         var result = cloneable.Clone();
@@ -627,7 +627,7 @@ public class BclInterfaceTests
     {
         var stub = new ServiceProviderStubTests.Stubs.IServiceProvider();
         var service = new List<string>();
-        stub.GetService.OnCall((ko, type) => type == typeof(IList<string>) ? service : null);
+        stub.GetService.OnCall((type) => type == typeof(IList<string>) ? service : null);
         IServiceProvider provider = stub;
 
         var result = provider.GetService(typeof(IList<string>));
@@ -1041,7 +1041,7 @@ public class BclInterfaceTests
     {
         var stub = new ProgressIntStubTests.Stubs.IProgress();
         var reportedValues = new List<int>();
-        stub.Report.OnCall((ko, value) => reportedValues.Add(value));
+        stub.Report.OnCall((value) => reportedValues.Add(value));
         IProgress<int> progress = stub;
 
         progress.Report(25);
@@ -1072,7 +1072,7 @@ public class BclInterfaceTests
     public void ICustomFormatter_Format_OnCall_ReturnsCustomFormat()
     {
         var stub = new CustomFormatterStubTests.Stubs.ICustomFormatter();
-        stub.Format.OnCall((ko, format, arg, formatProvider) => $"[{format}:{arg}]");
+        stub.Format.OnCall((format, arg, formatProvider) => $"[{format}:{arg}]");
         ICustomFormatter formatter = stub;
 
         var result = formatter.Format("X", 255, null);
