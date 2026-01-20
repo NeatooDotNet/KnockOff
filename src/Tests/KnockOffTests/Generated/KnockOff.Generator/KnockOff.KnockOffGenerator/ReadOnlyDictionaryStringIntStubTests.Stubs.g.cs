@@ -1028,9 +1028,6 @@ partial class ReadOnlyDictionaryStringIntStubTests
 		/// <summary>Stub implementation of global::System.Collections.Generic.IReadOnlyDictionary<string, int>.</summary>
 		public class IReadOnlyDictionary : global::System.Collections.Generic.IReadOnlyDictionary<string, int>, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IReadOnlyDictionary_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Keys.</summary>
 			public IReadOnlyDictionary_KeysInterceptor Keys { get; } = new();
 
@@ -1039,6 +1036,9 @@ partial class ReadOnlyDictionaryStringIntStubTests
 
 			/// <summary>Interceptor for Count.</summary>
 			public IReadOnlyDictionary_CountInterceptor Count { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IReadOnlyDictionary_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for ContainsKey.</summary>
 			public IReadOnlyDictionary_ContainsKeyInterceptor ContainsKey { get; } = new();
@@ -1183,10 +1183,10 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerification() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerification() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (ContainsKey.CheckVerification() is { } containskeyFailure) failures.Add(containskeyFailure);
 				if (TryGetValue.CheckVerification() is { } trygetvalueFailure) failures.Add(trygetvalueFailure);
 				if (GetEnumerator.CheckVerification() is { } getenumeratorFailure) failures.Add(getenumeratorFailure);
@@ -1200,10 +1200,10 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerificationAll() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerificationAll() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (ContainsKey.CheckVerificationAll() is { } containskeyFailure) failures.Add(containskeyFailure);
 				if (TryGetValue.CheckVerificationAll() is { } trygetvalueFailure) failures.Add(trygetvalueFailure);
 				if (GetEnumerator.CheckVerificationAll() is { } getenumeratorFailure) failures.Add(getenumeratorFailure);

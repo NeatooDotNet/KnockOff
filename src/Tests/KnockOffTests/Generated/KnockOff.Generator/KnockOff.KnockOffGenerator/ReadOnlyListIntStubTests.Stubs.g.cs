@@ -397,11 +397,11 @@ partial class ReadOnlyListIntStubTests
 		/// <summary>Stub implementation of global::System.Collections.Generic.IReadOnlyList<int>.</summary>
 		public class IReadOnlyList : global::System.Collections.Generic.IReadOnlyList<int>, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IReadOnlyList_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IReadOnlyList_CountInterceptor Count { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IReadOnlyList_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for GetEnumerator.</summary>
 			public IReadOnlyList_GetEnumeratorInterceptor GetEnumerator { get; } = new();
@@ -490,8 +490,8 @@ partial class ReadOnlyListIntStubTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (GetEnumerator.CheckVerification() is { } getenumeratorFailure) failures.Add(getenumeratorFailure);
 
 				if (failures.Count > 0)
@@ -503,8 +503,8 @@ partial class ReadOnlyListIntStubTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (GetEnumerator.CheckVerificationAll() is { } getenumeratorFailure) failures.Add(getenumeratorFailure);
 
 				if (failures.Count > 0)

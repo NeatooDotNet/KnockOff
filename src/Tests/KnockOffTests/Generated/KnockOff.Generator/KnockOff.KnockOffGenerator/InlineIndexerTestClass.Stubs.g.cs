@@ -55,8 +55,8 @@ partial class InlineIndexerTestClass
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::KnockOff.Tests.IMultiIndexerService? _source;
 
-			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = default; _source = null; }
+			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; SetCount = 0; LastSetEntry = default; _onSet = null; _configured = false; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IMultiIndexerService_IndexerStringInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -149,8 +149,8 @@ partial class InlineIndexerTestClass
 			/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>
 			internal global::KnockOff.Tests.IMultiIndexerService? _source;
 
-			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+			/// <summary>Resets tracking state but preserves verifiable marking.</summary>
+			public void Reset() { GetCount = 0; LastGetKey = default; _onGet = null; _configured = false; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IMultiIndexerService_IndexerInt32Interceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -203,32 +203,65 @@ partial class InlineIndexerTestClass
 			}
 		}
 
+		/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>
+		public sealed class IndexerContainer
+		{
+			/// <summary>Gets the interceptor for indexer with String key type.</summary>
+			public IMultiIndexerService_IndexerStringInterceptor OfString { get; } = new();
+
+			/// <summary>Gets the interceptor for indexer with Int32 key type.</summary>
+			public IMultiIndexerService_IndexerInt32Interceptor OfInt32 { get; } = new();
+
+			/// <summary>Resets all indexer interceptors.</summary>
+			public void Reset()
+			{
+				OfString.Reset();
+				OfInt32.Reset();
+			}
+
+			internal bool IsVerifiable => false; // Container is not individually verifiable
+			internal bool IsConfigured => OfString.IsConfigured || OfInt32.IsConfigured;
+
+			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerification()
+			{
+				if (OfString.CheckVerification() is { } failureString) return failureString;
+				if (OfInt32.CheckVerification() is { } failureInt32) return failureInt32;
+				return null;
+			}
+
+			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+			{
+				if (OfString.CheckVerificationAll() is { } failureString) return failureString;
+				if (OfInt32.CheckVerificationAll() is { } failureInt32) return failureInt32;
+				return null;
+			}
+		}
+
 		/// <summary>Stub implementation of global::KnockOff.Tests.IMultiIndexerService.</summary>
 		public class IMultiIndexerService : global::KnockOff.Tests.IMultiIndexerService, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for IndexerString.</summary>
-			public IMultiIndexerService_IndexerStringInterceptor IndexerString { get; } = new();
-
-			/// <summary>Interceptor for IndexerInt32.</summary>
-			public IMultiIndexerService_IndexerInt32Interceptor IndexerInt32 { get; } = new();
+			/// <summary>Container for indexer interceptors. Access via .OfXxx.</summary>
+			public IndexerContainer Indexer { get; } = new();
 
 			string global::KnockOff.Tests.IMultiIndexerService.this[string key]
 			{
 				get
 				{
-					IndexerString.RecordGet(key);
-					if (IndexerString.OnGet is { } onGet) return onGet(key);
-					if (IndexerString._source is { } src) return src[key];
+					Indexer.OfString.RecordGet(key);
+					if (Indexer.OfString.OnGet is { } onGet) return onGet(key);
+					if (Indexer.OfString._source is { } src) return src[key];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiIndexerService", "this[]");
-					return IndexerString.Backing.TryGetValue(key, out var v) ? v : default!;
+					return Indexer.OfString.Backing.TryGetValue(key, out var v) ? v : default!;
 				}
 				set
 				{
-					IndexerString.RecordSet(key, value);
-					if (IndexerString.OnSet is { } onSet) { onSet(key, value); return; }
-					if (IndexerString._source is { } src) { src[key] = value; return; }
+					Indexer.OfString.RecordSet(key, value);
+					if (Indexer.OfString.OnSet is { } onSet) { onSet(key, value); return; }
+					if (Indexer.OfString._source is { } src) { src[key] = value; return; }
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiIndexerService", "this[]");
-					IndexerString.Backing[key] = value;
+					Indexer.OfString.Backing[key] = value;
 				}
 			}
 
@@ -236,11 +269,11 @@ partial class InlineIndexerTestClass
 			{
 				get
 				{
-					IndexerInt32.RecordGet(index);
-					if (IndexerInt32.OnGet is { } onGet) return onGet(index);
-					if (IndexerInt32._source is { } src) return src[index];
+					Indexer.OfInt32.RecordGet(index);
+					if (Indexer.OfInt32.OnGet is { } onGet) return onGet(index);
+					if (Indexer.OfInt32._source is { } src) return src[index];
 					if (Strict) throw global::KnockOff.StubException.NotConfigured("IMultiIndexerService", "this[]");
-					return IndexerInt32.Backing.TryGetValue(index, out var v) ? v : default!;
+					return Indexer.OfInt32.Backing.TryGetValue(index, out var v) ? v : default!;
 				}
 			}
 
@@ -260,8 +293,8 @@ partial class InlineIndexerTestClass
 			/// <summary>Sets the source object for global::KnockOff.Tests.IMultiIndexerService delegation.</summary>
 			public void Source(global::KnockOff.Tests.IMultiIndexerService? source)
 			{
-				IndexerString._source = source;
-				IndexerInt32._source = source;
+				Indexer.OfString._source = source;
+				Indexer.OfInt32._source = source;
 			}
 
 			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
@@ -269,8 +302,7 @@ partial class InlineIndexerTestClass
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (IndexerString.CheckVerification() is { } indexerstringFailure) failures.Add(indexerstringFailure);
-				if (IndexerInt32.CheckVerification() is { } indexerint32Failure) failures.Add(indexerint32Failure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 
 				if (failures.Count > 0)
 					throw new global::KnockOff.VerificationException(failures);
@@ -281,8 +313,7 @@ partial class InlineIndexerTestClass
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (IndexerString.CheckVerificationAll() is { } indexerstringFailure) failures.Add(indexerstringFailure);
-				if (IndexerInt32.CheckVerificationAll() is { } indexerint32Failure) failures.Add(indexerint32Failure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 
 				if (failures.Count > 0)
 					throw new global::KnockOff.VerificationException(failures);

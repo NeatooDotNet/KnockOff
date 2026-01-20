@@ -27,6 +27,8 @@ internal sealed record InlineInterfaceStubModel(
     EquatableArray<InlinePropertyModel> Properties,
     /// <summary>Indexer interceptors.</summary>
     EquatableArray<InlineIndexerModel> Indexers,
+    /// <summary>Indexer groups for container generation.</summary>
+    EquatableArray<InlineIndexerGroup> IndexerGroups,
     /// <summary>Method interceptors (non-generic). Uses unified model for shared rendering.</summary>
     EquatableArray<UnifiedMethodInterceptorModel> Methods,
     /// <summary>Generic method handlers.</summary>

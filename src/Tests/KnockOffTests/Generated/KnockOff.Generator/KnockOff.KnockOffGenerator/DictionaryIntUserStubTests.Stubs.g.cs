@@ -2685,9 +2685,6 @@ partial class DictionaryIntUserStubTests
 		/// <summary>Stub implementation of global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>.</summary>
 		public class IDictionary : global::System.Collections.Generic.IDictionary<int, global::KnockOff.Tests.User>, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IDictionary_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Keys.</summary>
 			public IDictionary_KeysInterceptor Keys { get; } = new();
 
@@ -2699,6 +2696,9 @@ partial class DictionaryIntUserStubTests
 
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IDictionary_IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IDictionary_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Add.</summary>
 			public IDictionary_AddInterceptor Add { get; } = new();
@@ -2937,11 +2937,11 @@ partial class DictionaryIntUserStubTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerification() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerification() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
 				if (ContainsKey.CheckVerification() is { } containskeyFailure) failures.Add(containskeyFailure);
 				if (Remove.CheckVerification() is { } removeFailure) failures.Add(removeFailure);
@@ -2960,11 +2960,11 @@ partial class DictionaryIntUserStubTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerificationAll() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerificationAll() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
 				if (ContainsKey.CheckVerificationAll() is { } containskeyFailure) failures.Add(containskeyFailure);
 				if (Remove.CheckVerificationAll() is { } removeFailure) failures.Add(removeFailure);

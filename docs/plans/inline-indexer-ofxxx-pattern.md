@@ -64,24 +64,22 @@ internal sealed record InlineIndexerGroup(
     /// <summary>Whether this group needs the 'new' keyword.</summary>
     bool NeedsNewKeyword,
     /// <summary>All indexers in this group.</summary>
-    EquatableArray<InlineIndexerModel> Indexers,
-    /// <summary>Type parameter list for open generic interfaces.</summary>
-    string TypeParameterList,
-    /// <summary>Constraint clauses for type parameters.</summary>
-    string ConstraintClauses);
+    EquatableArray<InlineIndexerModel> Indexers);
 ```
+
+**Note:** No `TypeParameterList` or `ConstraintClauses` on the group - these are on the individual `InlineIndexerModel` records. The container class is not generic; the contained interceptors carry any generics.
 
 #### Modify: `InlineIndexerModel`
 
-Add `KeyTypeFriendlyName` field (matching `FlatIndexerModel`):
+Add `KeyTypeFriendlyName` field:
 
 ```csharp
 // Add to InlineIndexerModel record
 /// <summary>Friendly name for the key type (e.g., "Int32", "String") for OfXxx pattern.</summary>
-string KeyTypeFriendlyName,
-/// <summary>Base name for indexer grouping (e.g., "Indexer").</summary>
-string BaseName
+string KeyTypeFriendlyName
 ```
+
+**Note:** `BaseName` is NOT needed on `InlineIndexerModel` - for inline stubs it is always "Indexer". The `BaseName` is stored in `InlineIndexerGroup` instead.
 
 #### Modify: `InlineInterfaceStubModel`
 
@@ -97,24 +95,107 @@ EquatableArray<InlineIndexerGroup> IndexerGroups,
 
 #### `InlineModelBuilder.cs`
 
-1. Update `BuildIndexerModel` to compute `KeyTypeFriendlyName` and `BaseName`
-2. Add `GroupIndexers` method (similar to `FlatModelBuilder`)
-3. Update `BuildInterfaceStub` to create indexer groups
-4. Update `BuildInterceptorProperties` to emit container property instead of individual indexer properties
-5. Update `BuildImplementations` to route through container
+1. Add `GetKeyTypeFriendlyName` helper method (reuse `GetTypeSuffix` pattern from `FlatModelBuilder.cs` lines 1203-1221)
+2. Update `BuildIndexerModel` to compute `KeyTypeFriendlyName`
+3. Add `GroupIndexers` method to create `InlineIndexerGroup` records
+4. Update `BuildInterfaceStub` to build indexer groups
+5. Update `BuildInterceptorProperties` to:
+   - For single-indexer groups: emit direct `Indexer` property (type = interceptor class)
+   - For multi-indexer groups: emit `Indexer` property (type = container class)
+6. Build indexer access map for implementations (see Access Map Usage below)
 
-**Key computation for `KeyTypeFriendlyName`:**
+**KeyTypeFriendlyName computation** - reuse the existing `GetTypeSuffix` method pattern from `FlatModelBuilder.cs`:
+
 ```csharp
-private static string GetKeyTypeFriendlyName(string keyType)
+private static string GetTypeSuffix(string type)
 {
-    // Handle simple types
-    if (keyType == "int" || keyType == "global::System.Int32") return "Int32";
-    if (keyType == "string" || keyType == "global::System.String") return "String";
-    // ... etc for other common types
+    var simple = type.Replace("global::", "").Replace("System.", "");
+    simple = simple switch
+    {
+        "int" => "Int32",
+        "string" => "String",
+        "bool" => "Boolean",
+        "long" => "Int64",
+        "double" => "Double",
+        "float" => "Single",
+        "decimal" => "Decimal",
+        "char" => "Char",
+        "byte" => "Byte",
+        "void" => "Void",
+        _ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "").Replace(",", "_").Replace(" ", "")
+    };
+    return simple.TrimEnd('?');
+}
+```
 
-    // Extract simple name from global:: qualified type
-    var lastDot = keyType.LastIndexOf('.');
-    return lastDot >= 0 ? keyType.Substring(lastDot + 1) : keyType;
+#### Access Map Usage
+
+The access map determines the correct interceptor access path for implementations:
+
+| Scenario | InterceptorName | Access Path |
+|----------|-----------------|-------------|
+| Single indexer | `IndexerString` | `Indexer` |
+| Multi indexer (string) | `IndexerString` | `Indexer.OfString` |
+| Multi indexer (int) | `IndexerInt32` | `Indexer.OfInt32` |
+
+Build the map in `InlineModelBuilder` (same pattern as `FlatModelBuilder.cs` lines 1711-1730):
+
+```csharp
+private static Dictionary<string, string> BuildIndexerAccessMap(IEnumerable<InlineIndexerGroup> groups)
+{
+    var map = new Dictionary<string, string>();
+
+    foreach (var group in groups)
+    {
+        if (group.Indexers.Count == 1)
+        {
+            // Single indexer - direct access
+            var indexer = group.Indexers.GetArray()![0];
+            map[indexer.IndexerName] = group.BaseName;
+        }
+        else
+        {
+            // Multiple indexers - container with OfXxx pattern
+            foreach (var indexer in group.Indexers)
+            {
+                map[indexer.IndexerName] = $"{group.BaseName}.Of{indexer.KeyTypeFriendlyName}";
+            }
+        }
+    }
+
+    return map;
+}
+```
+
+Pass the access map to implementations via `InlineInterfaceImplementation.InterceptorName` field.
+
+#### InterceptorProperties Generation Changes
+
+Update `BuildInterceptorProperties` to handle containers:
+
+```csharp
+// For indexers, use groups instead of individual members
+foreach (var group in indexerGroups)
+{
+    if (group.Indexers.Count == 1)
+    {
+        // Single indexer - direct property
+        var indexer = group.Indexers.GetArray()![0];
+        properties.Add(new InlineInterceptorPropertyModel(
+            PropertyName: group.BaseName,
+            InterceptorTypeName: indexer.InterceptorClassName,
+            NeedsNewKeyword: group.NeedsNewKeyword,
+            Description: $"Interceptor for indexer."));
+    }
+    else
+    {
+        // Multiple indexers - container property
+        properties.Add(new InlineInterceptorPropertyModel(
+            PropertyName: group.BaseName,
+            InterceptorTypeName: group.ContainerClassName,
+            NeedsNewKeyword: group.NeedsNewKeyword,
+            Description: $"Container for indexer interceptors. Access via .OfXxx."));
+    }
 }
 ```
 
@@ -122,16 +203,46 @@ private static string GetKeyTypeFriendlyName(string keyType)
 
 #### `InlineRenderer.cs`
 
-1. **Add** `RenderIndexerContainerClass` method (copy pattern from `FlatRenderer.RenderIndexerContainerClass`)
-2. **Modify** `RenderInterfaceStub` to:
-   - Render container classes for multi-indexer groups
-   - Emit single `Indexer` property of container type (for multi-indexer groups)
-   - Keep individual properties for single-indexer groups
-3. **Modify** `RenderIndexerImplementation` to:
-   - Route through `Indexer.OfXxx` for multi-indexer groups
-   - Use `indexerAccessMap` pattern from `FlatRenderer`
-4. **Modify** `RenderInlineVerifyMethods` to aggregate verification from container
-5. **Modify** `RenderSourceMethods` to route through container
+1. **Add** `RenderIndexerContainerClass` method (adapt from `FlatRenderer.cs` lines 571-636)
+2. **Add** `BuildIndexerAccessMap` helper method
+3. **Modify** `RenderInterfaceStub` to:
+   - Render container classes for multi-indexer groups (after individual interceptors)
+   - Interceptor properties already handled by model (via `InlineInterceptorPropertyModel`)
+4. **Modify** `RenderIndexerImplementation` to:
+   - Accept access map as parameter
+   - Use access map to get correct path (e.g., `Indexer.OfString` vs `Indexer`)
+5. **Modify** `RenderInlineVerifyMethods` for containers (aggregate from contained interceptors)
+6. **Modify** `RenderSourceMethods` to route through container (see Source(T) Delegation below)
+
+**Note:** The FlatRenderer implementation loop for indexers is at lines 145-146, not 1200-1250. Line 2376 is where `RenderIndexerImplementation` is defined.
+
+#### Verify Methods Updates
+
+Update `RenderInlineVerifyMethods` to aggregate verification from containers:
+
+```csharp
+// For multi-indexer groups, aggregate from container
+w.Line($"if ({group.BaseName}.CheckVerification() is {{ }} {group.BaseName}Failure) failures.Add({group.BaseName}Failure);");
+```
+
+For `VerifyAll`:
+```csharp
+w.Line($"if ({group.BaseName}.CheckVerificationAll() is {{ }} {group.BaseName}Failure) failures.Add({group.BaseName}Failure);");
+```
+
+#### Source(T) Delegation
+
+For multi-indexer groups, `Source(T)` must set `_source` on each contained interceptor:
+
+```csharp
+// In Source(T) method generation
+// For single indexer: Indexer._source = source;
+// For multi indexer:
+Indexer.OfString._source = source;
+Indexer.OfInt32._source = source;
+```
+
+The access map built in the builder should be used to generate the correct paths.
 
 ### Generated Code Pattern
 
@@ -154,8 +265,8 @@ public sealed class IndexerContainer
 
     internal VerificationFailure? CheckVerification()
     {
-        if (OfString.CheckVerification() is { } f1) return f1;
-        if (OfInt32.CheckVerification() is { } f2) return f2;
+        if (OfString.CheckVerification() is { } failureString) return failureString;
+        if (OfInt32.CheckVerification() is { } failureInt32) return failureInt32;
         return null;
     }
 
@@ -175,6 +286,7 @@ public class IMultiIndexerService : global::KnockOff.Tests.IMultiIndexerService
         {
             Indexer.OfString.RecordGet(key);
             if (Indexer.OfString.OnGet is { } onGet) return onGet(key);
+            if (Indexer.OfString._source is { } src) return src[key];
             // ...
         }
     }
@@ -188,54 +300,83 @@ Keep current behavior - direct `Indexer` property without container.
 
 ## Implementation Steps
 
-### Phase 1: Model Changes
+### Phase 1: Model Changes (Checkpoint: Build succeeds)
 
 1. **Create** `src/Generator/Model/Inline/InlineIndexerGroup.cs`
-   - Copy pattern from `FlatIndexerGroup.cs`
-   - Add `TypeParameterList` and `ConstraintClauses` for open generics
+   - Simple record with: `BaseName`, `ContainerClassName`, `NeedsNewKeyword`, `Indexers`
+   - No type parameters on the group
 
 2. **Modify** `src/Generator/Model/Inline/InlineIndexerModel.cs`
    - Add `KeyTypeFriendlyName` parameter
-   - Add `BaseName` parameter
 
 3. **Modify** `src/Generator/Model/Inline/InlineInterfaceStubModel.cs`
    - Add `IndexerGroups` parameter
 
-### Phase 2: Builder Changes
+**Verification:** `dotnet build src/Generator`
+
+### Phase 2A: Builder - Indexer Grouping (Checkpoint: Build succeeds)
 
 4. **Modify** `src/Generator/Builder/InlineModelBuilder.cs`
-   - Add `GetKeyTypeFriendlyName` helper method
-   - Update `BuildIndexerModel` to compute `KeyTypeFriendlyName` and `BaseName`
-   - Add `GroupIndexers` method
-   - Update `BuildInterfaceStub` to build indexer groups
-   - Update `BuildInterceptorProperties` for container pattern
-   - Build indexer access map for implementations
+   - Add `GetTypeSuffix` helper method (copy from FlatModelBuilder)
+   - Update `BuildIndexerModel` to compute `KeyTypeFriendlyName`
+   - Add `GroupIndexers` method to create `InlineIndexerGroup` records
+   - Update `BuildInterfaceStub` to call `GroupIndexers` and pass to model
 
-### Phase 3: Renderer Changes
+**Verification:** `dotnet build src/Generator`
 
-5. **Modify** `src/Generator/Renderer/InlineRenderer.cs`
-   - Add `RenderIndexerContainerClass` method
+### Phase 2B: Builder - Access Map and Properties (Checkpoint: Build succeeds)
+
+5. **Modify** `src/Generator/Builder/InlineModelBuilder.cs`
    - Add `BuildIndexerAccessMap` helper method
-   - Update `RenderInterfaceStub` to render containers
-   - Update interceptor property generation
-   - Update `RenderIndexerImplementation` to use access map
-   - Update `RenderInlineVerifyMethods` for containers
-   - Update `RenderSourceMethods` for containers
+   - Update `BuildInterceptorProperties` to emit container property for multi-indexer groups
+   - Update implementation building to use access map for `InterceptorName`
+
+**Verification:** `dotnet build src/Generator`
+
+### Phase 3A: Renderer - Container Class (Checkpoint: Build succeeds)
+
+6. **Modify** `src/Generator/Renderer/InlineRenderer.cs`
+   - Add `RenderIndexerContainerClass` method (adapt from FlatRenderer lines 571-636)
+   - Call from `RenderInterfaceStub` for groups with multiple indexers
+
+**Verification:** `dotnet build src/Generator`
+
+### Phase 3B: Renderer - Implementation Updates (Checkpoint: Build and basic tests pass)
+
+7. **Modify** `src/Generator/Renderer/InlineRenderer.cs`
+   - Update `RenderIndexerImplementation` to use access map for interceptor path
+   - Pass access map through rendering pipeline
+
+**Verification:** `dotnet build && dotnet test src/Tests/KnockOffTests --filter "FullyQualifiedName~Indexer"`
+
+### Phase 3C: Renderer - Verification and Source (Checkpoint: All tests pass)
+
+8. **Modify** `src/Generator/Renderer/InlineRenderer.cs`
+   - Update `RenderInlineVerifyMethods` to aggregate from containers
+   - Update `RenderSourceMethods` to route through container paths
+
+**Verification:** `dotnet test src/Tests/KnockOffTests`
 
 ### Phase 4: Testing
 
-6. **Modify** `src/Tests/KnockOffTests/InlineMultiIndexerTests.cs`
-   - Update test API calls from `stub.IndexerString` to `stub.Indexer.OfString`
-   - Update test API calls from `stub.IndexerInt32` to `stub.Indexer.OfInt32`
-   - Add test for container Reset() method
-   - Add test for container verification aggregation
+9. **Create** `src/Tests/KnockOffTests/InlineMultiIndexerTests.cs` (if not exists)
+   - Test multi-indexer `stub.Indexer.OfString` API
+   - Test multi-indexer `stub.Indexer.OfInt32` API
+   - Test container Reset() method
+   - Test container verification aggregation
+   - Test Source(T) through container
 
-7. **Run** full test suite to verify no regressions
+10. **Verify** single indexer behavior unchanged
+    - Test direct `stub.Indexer.OnGet` access (no OfXxx)
+
+11. **Run** full test suite to verify no regressions
+
+**Verification:** `dotnet test`
 
 ### Phase 5: Documentation
 
-8. **Update** inline stub documentation (if exists)
-9. **Update** todo status to complete Phase 3
+12. **Update** todo status to complete Phase 3
+13. **Update** inline stub documentation (if exists)
 
 ---
 
@@ -244,11 +385,72 @@ Keep current behavior - direct `Indexer` property without container.
 | File | Change Type | Description |
 |------|-------------|-------------|
 | `src/Generator/Model/Inline/InlineIndexerGroup.cs` | Create | New model record |
-| `src/Generator/Model/Inline/InlineIndexerModel.cs` | Modify | Add `KeyTypeFriendlyName`, `BaseName` |
+| `src/Generator/Model/Inline/InlineIndexerModel.cs` | Modify | Add `KeyTypeFriendlyName` |
 | `src/Generator/Model/Inline/InlineInterfaceStubModel.cs` | Modify | Add `IndexerGroups` |
-| `src/Generator/Builder/InlineModelBuilder.cs` | Modify | Add grouping logic |
+| `src/Generator/Builder/InlineModelBuilder.cs` | Modify | Add grouping logic, access map |
 | `src/Generator/Renderer/InlineRenderer.cs` | Modify | Add container rendering |
-| `src/Tests/KnockOffTests/InlineMultiIndexerTests.cs` | Modify | Update test API |
+| `src/Tests/KnockOffTests/InlineMultiIndexerTests.cs` | Create/Modify | Test OfXxx API |
+
+---
+
+## Test Cases
+
+### Must-Have Tests
+
+1. **Single indexer keeps direct access**
+   ```csharp
+   // Interface with one indexer
+   stub.Indexer.OnGet = (key) => "value";  // NOT stub.Indexer.OfString
+   ```
+
+2. **Multi-indexer uses OfXxx pattern**
+   ```csharp
+   stub.Indexer.OfString.OnGet = (key) => "value";
+   stub.Indexer.OfInt32.OnGet = (index) => 42;
+   ```
+
+3. **Source(T) through container**
+   ```csharp
+   stub.Source(realImplementation);
+   // Verify Indexer.OfString._source and Indexer.OfInt32._source are set
+   ```
+
+4. **Container Reset() aggregates**
+   ```csharp
+   stub.Indexer.Reset();  // Should reset all contained interceptors
+   ```
+
+5. **Container verification aggregates**
+   ```csharp
+   stub.Indexer.OfString.Verifiable();
+   stub.Verify();  // Should check OfString
+   ```
+
+6. **Inherited interface indexers**
+   ```csharp
+   // IChild : IParent where both have indexers
+   // All indexers should be grouped correctly
+   ```
+
+7. **Open generic interface with indexers**
+   ```csharp
+   [KnockOff<IGenericRepo<>>]
+   // Container should work with generic interceptors
+   ```
+
+### Edge Case Tests
+
+8. **Tuple key types** (multi-parameter indexers)
+   ```csharp
+   // this[string key, int index] -> KeyTypeFriendlyName = "String_Int32"
+   stub.Indexer.OfString_Int32.OnGet = (key, index) => "value";
+   ```
+
+9. **Same key type from different interfaces**
+   ```csharp
+   // IFoo : IBar where both have this[string]
+   // Should deduplicate by KeyTypeFriendlyName
+   ```
 
 ---
 
@@ -257,7 +459,7 @@ Keep current behavior - direct `Indexer` property without container.
 - [ ] Inline stubs with multiple indexers expose `Indexer.OfXxx` pattern
 - [ ] Inline stubs with single indexer keep direct `Indexer` property
 - [ ] All existing indexer tests pass
-- [ ] `InlineMultiIndexerTests.cs` passes with OfXxx API
+- [ ] New `InlineMultiIndexerTests.cs` tests pass with OfXxx API
 - [ ] Container Reset() aggregates to all child interceptors
 - [ ] Container verification aggregates correctly
 - [ ] Source(T) delegation works through container
@@ -286,30 +488,40 @@ This is a **breaking API change** for any inline stubs with multiple indexers. U
 
 ### Single vs Multi Indexer Behavior
 
-Decision: Should single-indexer interfaces also use the container pattern for consistency?
+**Decision**: Keep single-indexer as direct property (`stub.Indexer.OnGet`) matching standalone behavior. The container pattern only activates when there are multiple indexer key types.
 
-**Recommendation**: No. Keep single-indexer as direct property (`stub.Indexer.OnGet`) matching standalone behavior. The container pattern only activates when there are multiple indexer key types.
+### Tuple Key Types
 
-### Generic Interface Indexers
+Multi-parameter indexers like `this[string key, int index]` will have `KeyTypeFriendlyName` computed by `GetTypeSuffix`. The tuple type `(string, int)` will be converted to something like `ValueTuple_String_Int32`. Verify this produces valid C# identifiers.
 
-Open generic interfaces with indexers need container classes that carry type parameters:
+**Risk Mitigation**: The existing `GetTypeSuffix` method handles angle brackets and commas by replacing with underscores, which should work for tuples.
+
+### Interface Inheritance
+
+When `IChild : IParent` both have indexers with the same key type, they should share the same container slot (deduplicated by `KeyTypeFriendlyName`). This matches the standalone behavior.
+
+**Risk Mitigation**: Group by `BaseName` first, then deduplicate within the group by `KeyTypeFriendlyName`.
+
+### Open Generic Interface Indexers
+
+For `[KnockOff<IRepo<>>]` with indexers, the individual interceptor classes carry the type parameters:
 
 ```csharp
-public class IndexerContainer<T>
+public class IndexerContainer
 {
-    public IGenericInterface_IndexerTInterceptor<T> OfT { get; } = new();
+    public IRepo_IndexerInterceptor<T> OfT { get; } = new();
 }
 ```
 
-This is already handled by passing `TypeParameterList` and `ConstraintClauses` to the model.
+The container itself is NOT generic. This matches the standalone pattern.
 
 ### Verification Message Consistency
 
 Ensure verification failure messages match between standalone and inline:
 - Standalone: `"Indexer"` (generic name)
-- Inline: `"IndexerString"` (specific name) vs. `"Indexer"` through container
+- Inline: Should use specific names (`IndexerString`, `IndexerInt32`) for clarity in multi-indexer scenarios.
 
-**Decision**: Keep specific names (`IndexerString`, `IndexerInt32`) for clarity in multi-indexer scenarios.
+**Decision**: Keep specific names in failure messages for better debugging.
 
 ---
 
@@ -319,5 +531,10 @@ The standalone pattern implementation in `FlatRenderer.cs` serves as the authori
 
 - `RenderIndexerContainerClass` (lines 571-636)
 - `BuildIndexerAccessMap` (lines 171-194)
-- `RenderIndexerImplementation` (lines 1200-1250)
-- `RenderInterceptorProperties` handling for containers
+- `RenderIndexerImplementation` (lines 2376-2398) - note: called in loop at lines 145-146
+- `RenderInterceptorProperties` handling for containers (lines 122-126)
+
+The builder implementation in `FlatModelBuilder.cs`:
+- Indexer grouping (lines 52-58)
+- Access map for Source(T) (lines 1710-1755)
+- `GetTypeSuffix` (lines 1203-1221)

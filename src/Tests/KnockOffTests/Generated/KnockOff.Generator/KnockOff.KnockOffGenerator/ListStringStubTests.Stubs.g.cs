@@ -2359,14 +2359,14 @@ partial class ListStringStubTests
 		/// <summary>Stub implementation of global::System.Collections.Generic.IList<string>.</summary>
 		public class IList : global::System.Collections.Generic.IList<string>, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IList_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IList_CountInterceptor Count { get; } = new();
 
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IList_IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IList_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for IndexOf.</summary>
 			public IList_IndexOfInterceptor IndexOf { get; } = new();
@@ -2575,9 +2575,9 @@ partial class ListStringStubTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IndexOf.CheckVerification() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerification() is { } insertFailure) failures.Add(insertFailure);
 				if (RemoveAt.CheckVerification() is { } removeatFailure) failures.Add(removeatFailure);
@@ -2597,9 +2597,9 @@ partial class ListStringStubTests
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IndexOf.CheckVerificationAll() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerificationAll() is { } insertFailure) failures.Add(insertFailure);
 				if (RemoveAt.CheckVerificationAll() is { } removeatFailure) failures.Add(removeatFailure);

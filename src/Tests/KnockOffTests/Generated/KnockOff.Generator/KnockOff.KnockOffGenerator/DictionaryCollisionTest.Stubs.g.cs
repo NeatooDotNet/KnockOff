@@ -2685,9 +2685,6 @@ partial class DictionaryCollisionTest
 		/// <summary>Stub implementation of global::System.Collections.Generic.IDictionary<string, int>.</summary>
 		public class IDictionaryStringInt32 : global::System.Collections.Generic.IDictionary<string, int>, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IDictionaryStringInt32_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Keys.</summary>
 			public IDictionaryStringInt32_KeysInterceptor Keys { get; } = new();
 
@@ -2699,6 +2696,9 @@ partial class DictionaryCollisionTest
 
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IDictionaryStringInt32_IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IDictionaryStringInt32_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Add.</summary>
 			public IDictionaryStringInt32_AddInterceptor Add { get; } = new();
@@ -2937,11 +2937,11 @@ partial class DictionaryCollisionTest
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerification() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerification() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
 				if (ContainsKey.CheckVerification() is { } containskeyFailure) failures.Add(containskeyFailure);
 				if (Remove.CheckVerification() is { } removeFailure) failures.Add(removeFailure);
@@ -2960,11 +2960,11 @@ partial class DictionaryCollisionTest
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerificationAll() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerificationAll() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
 				if (ContainsKey.CheckVerificationAll() is { } containskeyFailure) failures.Add(containskeyFailure);
 				if (Remove.CheckVerificationAll() is { } removeFailure) failures.Add(removeFailure);
@@ -5657,9 +5657,6 @@ partial class DictionaryCollisionTest
 		/// <summary>Stub implementation of global::System.Collections.Generic.IDictionary<int, string>.</summary>
 		public class IDictionaryInt32String : global::System.Collections.Generic.IDictionary<int, string>, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IDictionaryInt32String_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Keys.</summary>
 			public IDictionaryInt32String_KeysInterceptor Keys { get; } = new();
 
@@ -5671,6 +5668,9 @@ partial class DictionaryCollisionTest
 
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IDictionaryInt32String_IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IDictionaryInt32String_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Add.</summary>
 			public IDictionaryInt32String_AddInterceptor Add { get; } = new();
@@ -5909,11 +5909,11 @@ partial class DictionaryCollisionTest
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerification() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerification() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
 				if (ContainsKey.CheckVerification() is { } containskeyFailure) failures.Add(containskeyFailure);
 				if (Remove.CheckVerification() is { } removeFailure) failures.Add(removeFailure);
@@ -5932,11 +5932,11 @@ partial class DictionaryCollisionTest
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerificationAll() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerificationAll() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
 				if (ContainsKey.CheckVerificationAll() is { } containskeyFailure) failures.Add(containskeyFailure);
 				if (Remove.CheckVerificationAll() is { } removeFailure) failures.Add(removeFailure);

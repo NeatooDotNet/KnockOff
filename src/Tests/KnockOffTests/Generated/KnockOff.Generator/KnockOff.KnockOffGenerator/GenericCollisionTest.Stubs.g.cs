@@ -2359,14 +2359,14 @@ partial class GenericCollisionTest
 		/// <summary>Stub implementation of global::System.Collections.Generic.IList<string>.</summary>
 		public class IListString : global::System.Collections.Generic.IList<string>, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IListString_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IListString_CountInterceptor Count { get; } = new();
 
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IListString_IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IListString_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for IndexOf.</summary>
 			public IListString_IndexOfInterceptor IndexOf { get; } = new();
@@ -2575,9 +2575,9 @@ partial class GenericCollisionTest
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IndexOf.CheckVerification() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerification() is { } insertFailure) failures.Add(insertFailure);
 				if (RemoveAt.CheckVerification() is { } removeatFailure) failures.Add(removeatFailure);
@@ -2597,9 +2597,9 @@ partial class GenericCollisionTest
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IndexOf.CheckVerificationAll() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerificationAll() is { } insertFailure) failures.Add(insertFailure);
 				if (RemoveAt.CheckVerificationAll() is { } removeatFailure) failures.Add(removeatFailure);
@@ -4967,14 +4967,14 @@ partial class GenericCollisionTest
 		/// <summary>Stub implementation of global::System.Collections.Generic.IList<int>.</summary>
 		public class IListInt32 : global::System.Collections.Generic.IList<int>, global::KnockOff.IKnockOffStub
 		{
-			/// <summary>Interceptor for Indexer.</summary>
-			public IListInt32_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Count.</summary>
 			public IListInt32_CountInterceptor Count { get; } = new();
 
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IListInt32_IsReadOnlyInterceptor IsReadOnly { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IListInt32_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for IndexOf.</summary>
 			public IListInt32_IndexOfInterceptor IndexOf { get; } = new();
@@ -5183,9 +5183,9 @@ partial class GenericCollisionTest
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IndexOf.CheckVerification() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerification() is { } insertFailure) failures.Add(insertFailure);
 				if (RemoveAt.CheckVerification() is { } removeatFailure) failures.Add(removeatFailure);
@@ -5205,9 +5205,9 @@ partial class GenericCollisionTest
 			{
 				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
 
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (IndexOf.CheckVerificationAll() is { } indexofFailure) failures.Add(indexofFailure);
 				if (Insert.CheckVerificationAll() is { } insertFailure) failures.Add(insertFailure);
 				if (RemoveAt.CheckVerificationAll() is { } removeatFailure) failures.Add(removeatFailure);

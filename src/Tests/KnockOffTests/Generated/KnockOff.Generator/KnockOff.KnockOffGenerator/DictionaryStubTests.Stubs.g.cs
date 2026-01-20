@@ -2069,9 +2069,6 @@ partial class DictionaryStubTests
 			/// <summary>Interceptor for IsReadOnly.</summary>
 			public IDictionary_IsReadOnlyInterceptor IsReadOnly { get; } = new();
 
-			/// <summary>Interceptor for Indexer.</summary>
-			public IDictionary_IndexerInterceptor Indexer { get; } = new();
-
 			/// <summary>Interceptor for Keys.</summary>
 			public IDictionary_KeysInterceptor Keys { get; } = new();
 
@@ -2086,6 +2083,9 @@ partial class DictionaryStubTests
 
 			/// <summary>Interceptor for SyncRoot.</summary>
 			public IDictionary_SyncRootInterceptor SyncRoot { get; } = new();
+
+			/// <summary>Interceptor for indexer.</summary>
+			public IDictionary_IndexerInterceptor Indexer { get; } = new();
 
 			/// <summary>Interceptor for Add.</summary>
 			public IDictionary_AddInterceptor Add { get; } = new();
@@ -2321,12 +2321,12 @@ partial class DictionaryStubTests
 
 				if (IsFixedSize.CheckVerification() is { } isfixedsizeFailure) failures.Add(isfixedsizeFailure);
 				if (IsReadOnly.CheckVerification() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
-				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerification() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerification() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerification() is { } countFailure) failures.Add(countFailure);
 				if (IsSynchronized.CheckVerification() is { } issynchronizedFailure) failures.Add(issynchronizedFailure);
 				if (SyncRoot.CheckVerification() is { } syncrootFailure) failures.Add(syncrootFailure);
+				if (Indexer.CheckVerification() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerification() is { } addFailure) failures.Add(addFailure);
 				if (Clear.CheckVerification() is { } clearFailure) failures.Add(clearFailure);
 				if (Contains.CheckVerification() is { } containsFailure) failures.Add(containsFailure);
@@ -2345,12 +2345,12 @@ partial class DictionaryStubTests
 
 				if (IsFixedSize.CheckVerificationAll() is { } isfixedsizeFailure) failures.Add(isfixedsizeFailure);
 				if (IsReadOnly.CheckVerificationAll() is { } isreadonlyFailure) failures.Add(isreadonlyFailure);
-				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Keys.CheckVerificationAll() is { } keysFailure) failures.Add(keysFailure);
 				if (Values.CheckVerificationAll() is { } valuesFailure) failures.Add(valuesFailure);
 				if (Count.CheckVerificationAll() is { } countFailure) failures.Add(countFailure);
 				if (IsSynchronized.CheckVerificationAll() is { } issynchronizedFailure) failures.Add(issynchronizedFailure);
 				if (SyncRoot.CheckVerificationAll() is { } syncrootFailure) failures.Add(syncrootFailure);
+				if (Indexer.CheckVerificationAll() is { } indexerFailure) failures.Add(indexerFailure);
 				if (Add.CheckVerificationAll() is { } addFailure) failures.Add(addFailure);
 				if (Clear.CheckVerificationAll() is { } clearFailure) failures.Add(clearFailure);
 				if (Contains.CheckVerificationAll() is { } containsFailure) failures.Add(containsFailure);
