@@ -308,9 +308,9 @@ This change follows established KnockOff patterns:
 **In Scope:**
 
 ### Phase 1: Public Interfaces
-- [ ] `src/KnockOff/IMethodSequence.cs` - Remove `TotalCallCount` property (line 11)
-- [ ] `src/KnockOff/IMethodTracking.cs` - Remove `CallCount` property (line 9)
-- [ ] **Checkpoint**: Build to verify interface changes compile
+- [x] `src/KnockOff/IMethodSequence.cs` - Remove `TotalCallCount` property (line 11)
+- [x] `src/KnockOff/IMethodTracking.cs` - Remove `CallCount` property (line 9)
+- [x] **Checkpoint**: Build to verify interface changes compile
 
 ### Phase 2: Generator Renderers
 - [ ] `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs`:
@@ -365,7 +365,11 @@ Key test files (source files with CallCount assertions):
 ## Implementation Progress
 
 ### Phase 1: Public Interfaces
-**Status:** Not Started
+**Status:** Complete
+
+- [x] `IMethodTracking.cs` - Removed `CallCount` property
+- [x] `IMethodSequence.cs` - Removed `TotalCallCount` property
+- [x] Verified build compiles successfully
 
 ### Phase 2: Generator Renderers
 **Status:** Not Started

@@ -641,8 +641,7 @@ partial class UserServiceKnockOff : global::KnockOff.Sandbox.IUserService, globa
 	{
 		private string _lastArg = default!;
 
-		/// <summary>Number of times this method was called.</summary>
-		public int CallCount { get; private set; }
+		internal int CallCount { get; private set; }
 
 		/// <summary>True if CallCount > 0.</summary>
 		public bool WasCalled => CallCount > 0;

@@ -1048,9 +1048,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// CallCount property
-			w.Line("/// <summary>Number of times this callback was invoked.</summary>");
-			w.Line("public int CallCount { get; private set; }");
+			// CallCount property (internal - use WasCalled or Verify(Times) for public API)
+			w.Line("internal int CallCount { get; private set; }");
 			w.Line();
 
 			// WasCalled property
@@ -1127,9 +1126,8 @@ internal static class FlatRenderer
 			w.Line($"public MethodSequenceImpl({method.InterceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
-			// TotalCallCount
-			w.Line("/// <summary>Total calls across all callbacks in sequence.</summary>");
-			w.Line("public int TotalCallCount");
+			// TotalCallCount (internal - use Verify() to check sequence completion)
+			w.Line("internal int TotalCallCount");
 			using (w.Braces())
 			{
 				w.Line("get");
@@ -1436,7 +1434,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			w.Line("public int CallCount { get; private set; }");
+			// CallCount (internal - use WasCalled or Verify(Times) for public API)
+			w.Line("internal int CallCount { get; private set; }");
 			w.Line();
 			w.Line("public bool WasCalled => CallCount > 0;");
 			w.Line();
@@ -1496,7 +1495,8 @@ internal static class FlatRenderer
 			w.Line($"public MethodSequenceImpl_{suffix}({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
-			w.Line("public int TotalCallCount");
+			// TotalCallCount (internal - use Verify() to check sequence completion)
+			w.Line("internal int TotalCallCount");
 			using (w.Braces())
 			{
 				w.Line("get");
@@ -1567,9 +1567,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// CallCount property
-			w.Line("/// <summary>Number of times this method was called.</summary>");
-			w.Line("public int CallCount { get; private set; }");
+			// CallCount property (internal - use WasCalled or Verify(Times) for public API)
+			w.Line("internal int CallCount { get; private set; }");
 			w.Line();
 
 			// WasCalled property
