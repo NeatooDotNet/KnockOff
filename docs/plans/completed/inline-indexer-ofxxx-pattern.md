@@ -1,9 +1,9 @@
 # Inline Indexer OfXxx Pattern Implementation
 
 **Date:** 2026-01-19
-**Related Todo:** [Inline Interceptor API Unification](../todos/inline-interceptor-api-unification.md)
-**Status:** Draft
-**Last Updated:** 2026-01-19
+**Related Todo:** [Inline Interceptor API Unification](../todos/completed/inline-interceptor-api-unification.md)
+**Status:** Completed
+**Completed:** 2026-01-19
 
 ---
 

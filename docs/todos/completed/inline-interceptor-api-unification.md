@@ -1,10 +1,9 @@
 # Inline Interceptor API Unification
 
-**Status:** In Progress (Methods Complete, Inline Indexers Pending)
+**Status:** Completed
 **Priority:** High
 **Created:** 2026-01-16
-**Updated:** 2026-01-19
-**Worktree:** `feature/inlineindexersof`
+**Completed:** 2026-01-19
 
 ---
 
@@ -112,22 +111,22 @@ stub.Indexer.OfString.GetCount
 - [x] Ensure `.Of<T>()` returns handler with OnCall() method
 - [x] Support Times and ThenCall() for generic methods
 
-### Phase 3: Inline Indexers (OfXxx Pattern)
+### Phase 3: Inline Indexers (OfXxx Pattern) ✅
 
-- [ ] Generate `IndexerContainer` class with OfXxx properties
-- [ ] Generate `OfInt32`, `OfString`, etc. based on key types
-- [ ] Each OfXxx is property-like: `Backing`, `OnGet`, `OnSet`, tracking
-- [ ] Update explicit interface implementation to route to correct OfXxx
+- [x] Generate `IndexerContainer` class with OfXxx properties
+- [x] Generate `OfInt32`, `OfString`, etc. based on key types
+- [x] Each OfXxx is property-like: `Backing`, `OnGet`, `OnSet`, tracking
+- [x] Update explicit interface implementation to route to correct OfXxx
 
 ### Phase 4: Standalone Generic Methods ✅
 
 - [x] Update `FlatRenderer` to generate OnCall() method for generic typed handlers
 - [x] Ensure consistency with regular method pattern
 
-### Phase 5: Standalone Indexers (OfXxx Pattern)
+### Phase 5: Standalone Indexers (OfXxx Pattern) ✅
 
-- [ ] Update `FlatRenderer` to generate IndexerContainer with OfXxx
-- [ ] Match inline indexer implementation
+- [x] Update `FlatRenderer` to generate IndexerContainer with OfXxx
+- [x] Match inline indexer implementation
 
 ### Phase 6: Inline Class Stubs ✅
 
@@ -146,9 +145,9 @@ stub.Indexer.OfString.GetCount
 - [x] Add tests for ThenCall() chaining (inline)
 - [x] Add tests for Verify() (inline)
 - [x] Add tests for method overload resolution (inline)
-- [ ] Add tests for indexer OfXxx pattern (inline & standalone) - *deferred*
+- [x] Add tests for indexer OfXxx pattern (inline)
 - [x] Add tests for generic method OnCall() pattern (inline & standalone)
-- [x] Verify existing tests still pass (550+ tests across all projects)
+- [x] Verify existing tests still pass (608 tests in KnockOffTests, 1,345+ total)
 
 ### Phase 9: Documentation
 
@@ -292,12 +291,27 @@ docs/
 - Updated Neatoo interface tests (IEnumerable methods require callbacks)
 - All 1,345+ tests passing across all projects
 
-### 2026-01-19
+### 2026-01-19 (Session 1)
 - **Verified inline indexers missing OfXxx pattern** - Created `InlineMultiIndexerTests.cs` test file
 - Test confirmed inline stubs generate `IndexerString`/`IndexerInt32` (direct properties) instead of `Indexer.OfString`/`Indexer.OfInt32` (container pattern)
 - **Standalone indexers confirmed working** - `IndexerTestKnockOff.g.cs` correctly generates `IndexerContainer` with `OfXxx` properties
 - Created implementation plan: `docs/plans/inline-indexer-ofxxx-pattern.md`
 - Created git worktree: `feature/inlineindexersof`
+
+### 2026-01-19 (Session 2)
+- **Implemented inline indexer OfXxx pattern**
+  - Created `InlineIndexerGroup` record for grouping indexers by key type
+  - Added `KeyTypeFriendlyName` to `InlineIndexerModel`
+  - Added indexer grouping logic to `InlineModelBuilder`
+  - Generated `IndexerContainer` class with `OfString`, `OfInt32`, etc. properties
+  - Updated `Source(T)` method to set `_source` on all indexer interceptors
+  - Added verification methods to container
+- **Merged to MakeNewDocs**
+  - Resolved merge conflict with Reset semantics changes from commit d9e7136
+  - All 608 tests passing
+  - Both Reset semantics and OfXxx pattern confirmed present
+- Created `InlineMultiIndexerTests.cs` with comprehensive tests for OfXxx pattern
+- Completed implementation plan: `docs/plans/completed/inline-indexer-ofxxx-pattern.md`
 
 ---
 
@@ -306,11 +320,12 @@ docs/
 ### Completed
 - **Method API unification is complete** - Both standalone and inline stubs now use `OnCall()` method pattern
 - **Generic method API unification is complete** - `.Of<T>().OnCall()` pattern works for both stub types
+- **Indexer API unification is complete** - Both standalone and inline stubs use `IndexerContainer` with OfXxx pattern
 - **Shared infrastructure** - `UnifiedInterceptorBuilder` and `MethodInterceptorRenderer` reduce code duplication
+- **All core functionality implemented** - Methods, generic methods, and indexers unified
 
 ### Remaining Work
-- **Indexers (OfXxx pattern)** - Phases 3 & 5 deferred to separate PR
-- **Documentation** - Phase 9 pending
+- **Documentation** - Phase 9 pending (update guides and samples)
 
 ### Breaking Changes Applied
 | Old API | New API |
