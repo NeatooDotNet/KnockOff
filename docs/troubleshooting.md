@@ -72,7 +72,7 @@ public void PassingStubObjectToMethod()
     // Pass stub.Object to method expecting EmailService
     UseEmailService(stub.Object);
 
-    Assert.True(stub.Send.WasCalled);
+    stub.Send.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -90,23 +90,23 @@ OnCall callbacks receive only the method's parameters - they do not receive the 
 <!-- snippet: troubleshoot-oncall-signature -->
 ```cs
 [Fact]
-public void OnCallSignature_MatchesMethodParams()
+public void OnCallSignature_KoParameterFirst()
 {
     var stub = new TroubleshootRepoStub();
 
-    // CORRECT: Callback receives only the method parameter (id)
+    // ERROR (won't compile): Missing ko parameter
+    // stub.GetByIdAsync.OnCall((id) => Task.FromResult<User?>(null));
+
+    // CORRECT: Include ko as first parameter
     stub.GetByIdAsync.OnCall((id) =>
         Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 
-    // For methods with multiple parameters, include all of them
-    stub.FindAsync.OnCall((name, active) =>
-        Task.FromResult(new List<User>()));
-
-    // To access the stub inside a callback, use closure
+    // The ko parameter gives access to the stub instance
+    // Useful for accessing other interceptors or state
     stub.GetByIdAsync.OnCall((id) =>
     {
-        // Access stub via closure (not a callback parameter)
-        var wasCached = stub.GetFromCache.WasCalled;
+        // Can access other interceptors via ko
+        // ko is the stub instance itself
         return Task.FromResult<User?>(new User { Id = id });
     });
 }
@@ -253,16 +253,16 @@ public void Reset_ClearsTracking_NotValue()
     // Configure Value
     stub.Host.Value = "configured-host";
 
-    // Access property to increment GetCount
+    // Access property to verify reads
     _ = config.Host;
     _ = config.Host;
-    Assert.Equal(2, stub.Host.GetCount);
+    stub.Host.VerifyGet(Times.Exactly(2));
 
     // Reset clears tracking
     stub.Host.Reset();
 
-    // GetCount is now 0
-    Assert.Equal(0, stub.Host.GetCount);
+    // Verify tracking was cleared
+    stub.Host.VerifyGet(Times.Never);
 
     // BUT Value is preserved after Reset
     // Note: Actually Reset() clears Value too in current implementation

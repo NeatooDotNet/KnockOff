@@ -107,8 +107,8 @@ public void OnGet_DependsOnOtherInterceptorState()
 {
     var stub = new ServiceWithInitPropsStub();
 
-    // OnGet checks if Initialize() was called via interceptor WasCalled
-    stub.IsReady.OnGet = () => stub.Initialize.WasCalled;
+    // OnGet checks if Initialize() was called via interceptor CallCount
+    stub.IsReady.OnGet = () => stub.Initialize.CallCount > 0;
     var initTracking = stub.Initialize.OnCall(() => { });
 
     IServiceWithInitProps service = stub;
@@ -143,7 +143,7 @@ public void OnSet_TracksAllWrittenValues()
     var stub = new ConfigPropsStub();
 
     var setValues = new List<string>();
-    stub.Name.OnSet = ((value) => setValues.Add(value);
+    stub.Name.OnSet = (value) => setValues.Add(value);
 
     IConfigProps config = stub;
 
@@ -167,7 +167,7 @@ public void OnSet_SimulatesValidation()
     var stub = new ConfigPropsStub();
 
     // OnSet throws for invalid values
-    stub.Age.OnSet = ((value) =>
+    stub.Age.OnSet = (value) =>
     {
         if (value < 0)
             throw new ArgumentException("Age cannot be negative");
@@ -201,7 +201,7 @@ Property interceptors support verification similar to methods.
 <!-- snippet: properties-verify-getcount -->
 ```cs
 [Fact]
-public void GetCount_TracksPropertyReads()
+public void VerifyGet_TracksPropertyReads()
 {
     var stub = new ConfigPropsStub();
     stub.Age.Value = 42;
@@ -211,8 +211,8 @@ public void GetCount_TracksPropertyReads()
     _ = service.Age;
     _ = service.Age;
 
-    // GetCount tracks how many times property was read
-    Assert.Equal(2, stub.Age.GetCount);
+    // VerifyGet checks how many times property was read
+    stub.Age.VerifyGet(Times.Exactly(2));
 }
 ```
 <!-- endSnippet -->
@@ -245,17 +245,18 @@ public void Verifiable_MarksPropertyForVerification()
 {
     var stub = new ConfigPropsStub();
 
-    // Mark property get/set as verifiable
+    // Mark property as verifiable
     stub.Name.Value = "test";
-    stub.Name.MarkVerifiableGet();
-    stub.Age.MarkVerifiableSet();
+    stub.Name.Verifiable();
+    stub.Age.Verifiable();
 
     IConfigProps service = stub;
     _ = service.Name;
     service.Age = 42;
 
-    // Verify all marked properties
-    stub.Verify();
+    // Verify individually (standalone stubs verify at interceptor level)
+    stub.Name.Verify();
+    stub.Age.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -321,14 +322,14 @@ public void Reset_ClearsCountsButPreservesValue()
     _ = config.Name;
     config.Name = "updated";
 
-    Assert.True(stub.Name.GetCount > 0);
-    Assert.True(stub.Name.SetCount > 0);
+    stub.Name.VerifyGet(Times.AtLeastOnce);
+    stub.Name.VerifySet(Times.AtLeastOnce);
 
     // Reset clears counts and callbacks
     stub.Name.Reset();
 
-    Assert.Equal(0, stub.Name.GetCount);
-    Assert.Equal(0, stub.Name.SetCount);
+    stub.Name.VerifyGet(Times.Never);
+    stub.Name.VerifySet(Times.Never);
     // Note: Reset also clears Value, OnGet, OnSet
 }
 ```
@@ -369,11 +370,11 @@ public void CompletePropertyExample_AllConfigurationApproaches()
     stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
     // OnGet: State-dependent behavior
-    stub.IsConnected.OnGet = () => stub.Connect.WasCalled;
+    stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
 
     // OnSet: Track all values written
     var connectionStrings = new List<string>();
-    stub.ConnectionString.OnSet = ((value) => connectionStrings.Add(value);
+    stub.ConnectionString.OnSet = (value) => connectionStrings.Add(value);
 
     // Configure the Connect method
     var connectTracking = stub.Connect.OnCall(() => { });
@@ -390,7 +391,7 @@ public void CompletePropertyExample_AllConfigurationApproaches()
     service.ConnectionString = "Server=test";  // Write ConnectionString
 
     // Verification
-    Assert.Equal(1, stub.CurrentUser.GetCount);
+    stub.CurrentUser.VerifyGet(Times.Once);
     Assert.True(service.IsConnected);
     Assert.Single(connectionStrings);
     Assert.Equal("Server=test", stub.ConnectionString.LastSetValue);

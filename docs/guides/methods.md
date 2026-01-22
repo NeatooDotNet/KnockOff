@@ -31,7 +31,7 @@ public void VoidMethod_ConfiguredWithOnCall()
 
     Assert.Single(logged);
     Assert.Equal("Hello, World!", logged[0]);
-    Assert.True(tracking.WasCalled);
+    tracking.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -47,14 +47,14 @@ public void MethodWithReturn_ConfiguredWithOnCall()
 {
     var stub = new LogSvcMethodsStub();
 
-    // OnCall callback receives the method parameters
+    // OnCall with return value: first param is stub (ko), then method params
     var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
 
     ILogSvcMethods logger = stub;
     var name = logger.GetUserName(42);
 
     Assert.Equal("TestUser", name);
-    Assert.True(tracking.WasCalled);
+    tracking.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -72,7 +72,7 @@ public void MethodWithMultipleParams_AllAvailableInOnCall()
 {
     var stub = new AuthSvcMethodsStub();
 
-    // All method parameters are passed to the callback
+    // All method parameters follow the stub instance (ko)
     var tracking = stub.ValidateCredentials.OnCall((username, password) =>
         username == "admin" && password == "secret");
 
@@ -274,7 +274,7 @@ public void Reset_ClearsTrackingState()
     // Verify one call was made
     tracking.Verify(Times.Once);
 
-    // Reset clears WasCalled, LastCallArg, and callbacks on the interceptor
+    // Reset clears CallCount on the interceptor
     stub.ProcessData.Reset();
 
     // After reset, Verify(Times.Never) passes via tracking

@@ -265,16 +265,16 @@ public class ResetBehaviorTests
         // Configure Value
         stub.Host.Value = "configured-host";
 
-        // Access property to increment GetCount
+        // Access property to verify reads
         _ = config.Host;
         _ = config.Host;
-        Assert.Equal(2, stub.Host.GetCount);
+        stub.Host.VerifyGet(Times.Exactly(2));
 
         // Reset clears tracking
         stub.Host.Reset();
 
-        // GetCount is now 0
-        Assert.Equal(0, stub.Host.GetCount);
+        // Verify tracking was cleared
+        stub.Host.VerifyGet(Times.Never);
 
         // BUT Value is preserved after Reset
         // Note: Actually Reset() clears Value too in current implementation

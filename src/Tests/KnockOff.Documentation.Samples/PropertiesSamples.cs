@@ -193,7 +193,7 @@ public class PropertyVerificationTests
 {
     #region properties-verify-getcount
     [Fact]
-    public void GetCount_TracksPropertyReads()
+    public void VerifyGet_TracksPropertyReads()
     {
         var stub = new ConfigPropsStub();
         stub.Age.Value = 42;
@@ -203,8 +203,8 @@ public class PropertyVerificationTests
         _ = service.Age;
         _ = service.Age;
 
-        // GetCount tracks how many times property was read
-        Assert.Equal(2, stub.Age.GetCount);
+        // VerifyGet checks how many times property was read
+        stub.Age.VerifyGet(Times.Exactly(2));
     }
     #endregion
 
@@ -267,14 +267,14 @@ public class PropertyResetTests
         _ = config.Name;
         config.Name = "updated";
 
-        Assert.True(stub.Name.GetCount > 0);
-        Assert.True(stub.Name.SetCount > 0);
+        stub.Name.VerifyGet(Times.AtLeastOnce);
+        stub.Name.VerifySet(Times.AtLeastOnce);
 
         // Reset clears counts and callbacks
         stub.Name.Reset();
 
-        Assert.Equal(0, stub.Name.GetCount);
-        Assert.Equal(0, stub.Name.SetCount);
+        stub.Name.VerifyGet(Times.Never);
+        stub.Name.VerifySet(Times.Never);
         // Note: Reset also clears Value, OnGet, OnSet
     }
     #endregion
@@ -354,7 +354,7 @@ public class CompletePropertyExampleTests
         service.ConnectionString = "Server=test";  // Write ConnectionString
 
         // Verification
-        Assert.Equal(1, stub.CurrentUser.GetCount);
+        stub.CurrentUser.VerifyGet(Times.Once);
         Assert.True(service.IsConnected);
         Assert.Single(connectionStrings);
         Assert.Equal("Server=test", stub.ConnectionString.LastSetValue);

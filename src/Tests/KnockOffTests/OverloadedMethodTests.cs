@@ -108,32 +108,18 @@ public class OverloadedMethodTests
 		var knockOff = new OverloadedServiceKnockOff();
 		IOverloadedService service = knockOff;
 
-		var overload1Called = false;
-		var overload2Called = false;
-		var overload3Called = false;
-
 		// Compiler resolves correct delegate type based on lambda signature
-		knockOff.Process.OnCall((data) =>
-		{
-			overload1Called = true;
-		});
-
-		knockOff.Process.OnCall((data, priority) =>
-		{
-			overload2Called = true;
-		});
-
-		knockOff.Process.OnCall((data, priority, async) =>
-		{
-			overload3Called = true;
-		});
+		var tracking1 = knockOff.Process.OnCall((data) => { });
+		var tracking2 = knockOff.Process.OnCall((data, priority) => { });
+		var tracking3 = knockOff.Process.OnCall((data, priority, async) => { });
 
 		// Call only the first overload
 		service.Process("test");
 
-		Assert.True(overload1Called);
-		Assert.False(overload2Called);
-		Assert.False(overload3Called);
+		// Verify only the first overload was called
+		tracking1.Verify(Times.Once);
+		tracking2.Verify(Times.Never);
+		tracking3.Verify(Times.Never);
 	}
 
 	[Fact]

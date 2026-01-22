@@ -124,14 +124,14 @@ public class PropertyInterceptorApiTests
         var conn = repository.ConnectionString;
         Assert.Equal("Server=localhost", conn);
 
-        // GetCount tracks reads
-        Assert.Equal(1, stub.ConnectionString.GetCount);
+        // Verify property was read
+        stub.ConnectionString.VerifyGet(Times.Once);
 
         // Write property
         repository.ConnectionString = "Server=production";
 
-        // SetCount tracks writes
-        Assert.Equal(1, stub.ConnectionString.SetCount);
+        // Verify property was written
+        stub.ConnectionString.VerifySet(Times.Once);
 
         // LastSetValue captures what was written
         Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
@@ -182,8 +182,8 @@ public class IndexerInterceptorApiTests
         Assert.NotNull(user1);
         Assert.Equal("Alice", user1.Name);
 
-        // GetCount tracks reads
-        Assert.Equal(1, stub.Indexer.GetCount);
+        // Verify indexer was read
+        stub.Indexer.VerifyGet(Times.Once);
 
         // LastGetKey captures the key used
         Assert.Equal(1, stub.Indexer.LastGetKey);
@@ -191,8 +191,8 @@ public class IndexerInterceptorApiTests
         // Write to indexer - updates Backing by default
         repository[3] = new User { Id = 3, Name = "Charlie" };
 
-        // SetCount tracks writes
-        Assert.Equal(1, stub.Indexer.SetCount);
+        // Verify indexer was written
+        stub.Indexer.VerifySet(Times.Once);
 
         // LastSetEntry captures key and value (nullable tuple)
         var lastEntry = stub.Indexer.LastSetEntry;
@@ -240,8 +240,8 @@ public class EventInterceptorApiTests
         var changedInvoked = false;
         repository.Changed += (sender, e) => changedInvoked = true;
 
-        // AddCount tracks subscriptions
-        Assert.Equal(1, stub.Changed.AddCount);
+        // Verify subscription occurred
+        stub.Changed.VerifyAdd(Times.Once);
 
         // HasSubscribers indicates active subscriptions
         Assert.True(stub.Changed.HasSubscribers);
@@ -253,10 +253,10 @@ public class EventInterceptorApiTests
         // Unsubscribe
         EventHandler handler = (sender, e) => { };
         repository.Changed += handler;
-        Assert.Equal(2, stub.Changed.AddCount);
+        stub.Changed.VerifyAdd(Times.Exactly(2));
 
         repository.Changed -= handler;
-        Assert.Equal(1, stub.Changed.RemoveCount);
+        stub.Changed.VerifyRemove(Times.Once);
 
         // Action<T> events work similarly
         User? addedUser = null;

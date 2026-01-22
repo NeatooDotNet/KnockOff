@@ -116,8 +116,6 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 | Property | Type | Description |
 |----------|------|-------------|
 | `Value` | `T` | Backing value returned by property getter |
-| `GetCount` | `int` | Number of times the property getter was called |
-| `SetCount` | `int` | Number of times the property setter was called |
 | `LastSetValue` | `T` | The value from the most recent setter call |
 | `OnGet` | `Func<T>` | Callback invoked when the property is read |
 | `OnSet` | `Action<T>` | Callback invoked when the property is written |
@@ -143,7 +141,7 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 
 ### Methods
 
-- `void Reset()` - Clears `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, and `OnSet`. Does NOT reset `Value`
+- `void Reset()` - Clears tracking state, `LastSetValue`, `OnGet`, and `OnSet`. Does NOT reset `Value`
 
 ### Example
 
@@ -163,27 +161,28 @@ public void PropertyInterceptor_CompleteApiDemonstration()
     var conn = repository.ConnectionString;
     Assert.Equal("Server=localhost", conn);
 
-    // GetCount tracks reads
-    Assert.Equal(1, stub.ConnectionString.GetCount);
+    // Verify property was read
+    stub.ConnectionString.VerifyGet(Times.Once);
 
     // Write property
     repository.ConnectionString = "Server=production";
 
-    // SetCount tracks writes
-    Assert.Equal(1, stub.ConnectionString.SetCount);
+    // Verify property was written
+    stub.ConnectionString.VerifySet(Times.Once);
 
     // LastSetValue captures what was written
     Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
 
     // OnGet replaces Value with callback return
+    // Note: OnGet takes the stub as first parameter (ko)
     stub.Timeout.OnGet = () => 30;
     var timeout = repository.Timeout;
     Assert.Equal(30, timeout);
 
     // OnSet provides custom setter behavior
-    // Note: OnSet takes ((value) - does NOT automatically update Value
+    // Note: OnSet takes (value) - does NOT automatically update Value
     var setWasCalled = false;
-    stub.Timeout.OnSet = ((val) =>
+    stub.Timeout.OnSet = (val) =>
     {
         setWasCalled = true;
         // Manually update Value if needed:
@@ -208,12 +207,19 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 | Property | Type | Description |
 |----------|------|-------------|
 | `Backing` | `Dictionary<TKey, TValue>` | Backing dictionary used by default get/set operations |
-| `GetCount` | `int` | Number of times the indexer getter was called |
-| `SetCount` | `int` | Number of times the indexer setter was called |
 | `LastGetKey` | `TKey` | The key from the most recent getter call |
 | `LastSetEntry` | `(TKey, TValue)` | Tuple of key and value from the most recent setter call |
 | `OnGet` | `Func<TKey, TValue>` | Callback invoked when the indexer is read |
 | `OnSet` | `Action<TKey, TValue>` | Callback invoked when the indexer is written |
+
+### Verification Methods
+
+| Method | Description |
+|--------|-------------|
+| `VerifyGet()` | Verify indexer getter was called at least once (throws if not) |
+| `VerifyGet(Times)` | Verify indexer getter was called according to Times constraint |
+| `VerifySet()` | Verify indexer setter was called at least once (throws if not) |
+| `VerifySet(Times)` | Verify indexer setter was called according to Times constraint |
 
 ### Behavior Notes
 
@@ -223,7 +229,7 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 ### Methods
 
-- `void Reset()` - Clears `GetCount`, `SetCount`, `LastGetKey`, `LastSetEntry`, `OnGet`, and `OnSet`. Does NOT clear `Backing`
+- `void Reset()` - Clears tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, and `OnSet`. Does NOT clear `Backing`
 
 ### Example
 
@@ -245,8 +251,8 @@ public void IndexerInterceptor_CompleteApiDemonstration()
     Assert.NotNull(user1);
     Assert.Equal("Alice", user1.Name);
 
-    // GetCount tracks reads
-    Assert.Equal(1, stub.Indexer.GetCount);
+    // Verify indexer was read
+    stub.Indexer.VerifyGet(Times.Once);
 
     // LastGetKey captures the key used
     Assert.Equal(1, stub.Indexer.LastGetKey);
@@ -254,8 +260,8 @@ public void IndexerInterceptor_CompleteApiDemonstration()
     // Write to indexer - updates Backing by default
     repository[3] = new User { Id = 3, Name = "Charlie" };
 
-    // SetCount tracks writes
-    Assert.Equal(1, stub.Indexer.SetCount);
+    // Verify indexer was written
+    stub.Indexer.VerifySet(Times.Once);
 
     // LastSetEntry captures key and value (nullable tuple)
     var lastEntry = stub.Indexer.LastSetEntry;
@@ -264,15 +270,15 @@ public void IndexerInterceptor_CompleteApiDemonstration()
     Assert.Equal("Charlie", lastEntry.Value.Value?.Name);
 
     // OnGet overrides Backing lookup
-    // Note: OnGet takes ((key)
-    stub.Indexer.OnGet = ((k) => new User { Id = k, Name = "FromCallback" };
+    // Note: OnGet takes (key)
+    stub.Indexer.OnGet = (k) => new User { Id = k, Name = "FromCallback" };
     var fromCallback = repository[999];
     Assert.Equal("FromCallback", fromCallback?.Name);
 
     // OnSet overrides Backing storage
-    // Note: OnSet takes ((key, value) - does NOT automatically update Backing
+    // Note: OnSet takes (key, value) - does NOT automatically update Backing
     var onSetCalled = false;
-    stub.Indexer.OnSet = ((k, v) =>
+    stub.Indexer.OnSet = (k, v) =>
     {
         onSetCalled = true;
         // Manually update Backing if needed:
@@ -296,9 +302,16 @@ Generated for interface events. Tracks add/remove operations, checks for subscri
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `AddCount` | `int` | Number of times the event was subscribed (`+=`) |
-| `RemoveCount` | `int` | Number of times the event was unsubscribed (`-=`) |
 | `HasSubscribers` | `bool` | True if there are currently active subscribers |
+
+### Verification Methods
+
+| Method | Description |
+|--------|-------------|
+| `VerifyAdd()` | Verify event was subscribed at least once (throws if not) |
+| `VerifyAdd(Times)` | Verify event was subscribed according to Times constraint |
+| `VerifyRemove()` | Verify event was unsubscribed at least once (throws if not) |
+| `VerifyRemove(Times)` | Verify event was unsubscribed according to Times constraint |
 
 ### Methods
 
@@ -318,7 +331,7 @@ Calling `Raise` invokes all subscribed handlers with the provided arguments.
 
 #### Reset
 
-- `void Reset()` - Clears `AddCount` and `RemoveCount`. Does NOT remove subscribers
+- `void Reset()` - Clears tracking state. Does NOT remove subscribers
 
 ### Example
 
@@ -334,8 +347,8 @@ public void EventInterceptor_CompleteApiDemonstration()
     var changedInvoked = false;
     repository.Changed += (sender, e) => changedInvoked = true;
 
-    // AddCount tracks subscriptions
-    Assert.Equal(1, stub.Changed.AddCount);
+    // Verify subscription occurred
+    stub.Changed.VerifyAdd(Times.Once);
 
     // HasSubscribers indicates active subscriptions
     Assert.True(stub.Changed.HasSubscribers);
@@ -347,10 +360,10 @@ public void EventInterceptor_CompleteApiDemonstration()
     // Unsubscribe
     EventHandler handler = (sender, e) => { };
     repository.Changed += handler;
-    Assert.Equal(2, stub.Changed.AddCount);
+    stub.Changed.VerifyAdd(Times.Exactly(2));
 
     repository.Changed -= handler;
-    Assert.Equal(1, stub.Changed.RemoveCount);
+    stub.Changed.VerifyRemove(Times.Once);
 
     // Action<T> events work similarly
     User? addedUser = null;
@@ -455,10 +468,10 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | `WasCalled`, `LastCallArg`, `LastCallArgs`, `OnCall` | N/A |
-| **Property** | `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, `OnSet` | `Value` |
-| **Indexer** | `GetCount`, `SetCount`, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet` | `Backing` dictionary |
-| **Event** | `AddCount`, `RemoveCount` | Active subscribers |
+| **Method** | Tracking state, `LastCallArg`, `LastCallArgs`, `OnCall` | N/A |
+| **Property** | Tracking state, `LastSetValue`, `OnGet`, `OnSet` | `Value` |
+| **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet` | `Backing` dictionary |
+| **Event** | Tracking state | Active subscribers |
 | **Generic Method (Base)** | All tracking and callbacks across all type arguments | N/A |
 | **Generic Method (Typed)** | Tracking and callback for specific type argument(s) only | Tracking for other type arguments |
 

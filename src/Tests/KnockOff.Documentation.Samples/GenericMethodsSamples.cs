@@ -220,8 +220,8 @@ public class ResetTypedTests
         // Reset only User-specific state
         stub.GetById.Of<User>().Reset();
 
-        Assert.Equal(0, stub.GetById.Of<User>().CallCount);
-        Assert.Equal(1, stub.GetById.Of<Order>().CallCount);
+        stub.GetById.Of<User>().Verify(Times.Never);
+        stub.GetById.Of<Order>().Verify(Times.Once);
     }
     #endregion
 }
