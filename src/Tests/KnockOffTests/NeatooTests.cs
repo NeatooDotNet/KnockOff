@@ -139,7 +139,7 @@ public class EntityBaseStandaloneTests
         entity.Delete();
 
         Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        tracking.Verify(Times.Once);
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class EntityBaseStandaloneTests
         entity.UnDelete();
 
         Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        tracking.Verify(Times.Once);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class EntityBaseStandaloneTests
 
         Assert.Same(entity, result);
         Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        tracking.Verify(Times.Once);
     }
 
     [Fact]
@@ -255,7 +255,7 @@ public class EntityBaseStandaloneTests
         // Verify reset
         Assert.Equal(0, stub.IsNew.GetCount);
         Assert.False(deleteTracking.WasCalled);
-        Assert.Equal(0, deleteTracking.CallCount);
+        deleteTracking.Verify(Times.Never);
     }
 }
 
@@ -329,7 +329,7 @@ public class ValidateBaseStandaloneTests
         await validate.RunRules("FirstName", null);
 
         Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        tracking.Verify(Times.Once);
     }
 
     [Fact]

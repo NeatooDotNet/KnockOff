@@ -39,7 +39,7 @@ public class OutParameterTests
 		service.TryGetValue("myKey", out var result);
 
 		// Tracking should only show the input parameter 'key', not the out param 'value'
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 		Assert.Equal("myKey", tracking.LastArg);
 	}
 
@@ -96,7 +96,7 @@ public class OutParameterTests
 		Assert.Equal(0, defaultVal);
 
 		// Verify tracking
-		Assert.Equal(2, tracking.CallCount);
+		tracking.Verify(Times.Exactly(2));
 	}
 
 	[Fact]
@@ -116,7 +116,7 @@ public class OutParameterTests
 
 		Assert.Equal("TestName", name);
 		Assert.Equal(100, count);
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 		Assert.True(tracking.WasCalled);
 	}
 
@@ -163,11 +163,11 @@ public class OutParameterTests
 		service.TryGetValue("key1", out _);
 		service.TryGetValue("key2", out _);
 
-		Assert.Equal(2, tracking.CallCount);
+		tracking.Verify(Times.Exactly(2));
 
 		knockOff.TryGetValue.Reset();
 
-		Assert.Equal(0, tracking.CallCount);
+		tracking.Verify(Times.Never);
 		Assert.False(tracking.WasCalled);
 	}
 
@@ -183,7 +183,7 @@ public class OutParameterTests
 		service.TryParse("second", out _);
 		service.TryParse("third", out _);
 
-		Assert.Equal(3, tracking.CallCount);
+		tracking.Verify(Times.Exactly(3));
 		Assert.Equal("third", tracking.LastArg); // Last call
 	}
 }

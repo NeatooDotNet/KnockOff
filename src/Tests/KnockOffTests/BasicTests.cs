@@ -55,7 +55,7 @@ public class BasicTests
 		service.DoSomething();
 
 		Assert.True(tracking.WasCalled);
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 	}
 
 	[Fact]
@@ -67,7 +67,7 @@ public class BasicTests
 		var result = service.GetValue(42);
 
 		Assert.Equal(84, result);
-		Assert.Equal(1, knockOff.GetValue2.CallCount);
+		knockOff.GetValue2.Verify(Times.Once);
 
 		int lastArg = knockOff.GetValue2.LastArg;
 		Assert.Equal(42, lastArg);
@@ -98,7 +98,7 @@ public class BasicTests
 		service.GetValue(2);
 		service.GetValue(3);
 
-		Assert.Equal(3, knockOff.GetValue2.CallCount);
+		knockOff.GetValue2.Verify(Times.Exactly(3));
 		Assert.Equal(3, knockOff.GetValue2.LastArg); // Last call was GetValue(3)
 	}
 
@@ -142,7 +142,7 @@ public class BasicTests
 		knockOff.DoSomething.Reset();
 
 		Assert.Equal(0, knockOff.Name.SetCount);
-		Assert.Equal(0, knockOff.GetValue2.CallCount);
+		knockOff.GetValue2.Verify(Times.Never);
 		// After reset, the tracking object is also reset
 		Assert.False(doSomethingTracking.WasCalled);
 	}

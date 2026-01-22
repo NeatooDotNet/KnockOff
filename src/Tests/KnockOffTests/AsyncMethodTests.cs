@@ -15,7 +15,7 @@ public class AsyncMethodTests
 		await service.DoWorkAsync();
 
 		Assert.True(tracking.WasCalled);
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 	}
 
 	[Fact]

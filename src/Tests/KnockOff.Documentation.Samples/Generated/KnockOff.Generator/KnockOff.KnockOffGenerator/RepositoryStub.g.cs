@@ -61,7 +61,9 @@ partial class RepositoryStub : global::KnockOff.Documentation.Samples.GenericMet
 
 			private GetByIdDelegate? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>The 'id' argument from the most recent call.</summary>
 			public int? LastCallArg { get; private set; }
@@ -76,10 +78,10 @@ partial class RepositoryStub : global::KnockOff.Documentation.Samples.GenericMet
 			internal GetByIdDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(int? id) { CallCount++; LastCallArg = id; }
+			public void RecordCall(int? id) { _callCount++; LastCallArg = id; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			public void Reset() { _callCount = 0; LastCallArg = default; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

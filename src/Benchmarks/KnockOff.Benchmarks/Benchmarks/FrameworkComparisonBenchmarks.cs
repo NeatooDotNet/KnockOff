@@ -61,9 +61,9 @@ public class FrameworkComparisonBenchmarks
         sut.Process(1);
 
         // Assert
-        _ = getOrderTracking.CallCount == 1;
-        _ = validateOrderTracking.CallCount == 1;
-        _ = saveOrderTracking.CallCount == 1;
+        getOrderTracking.Verify(Times.Once);
+        validateOrderTracking.Verify(Times.Once);
+        saveOrderTracking.Verify(Times.Once);
     }
 
     [Benchmark]
@@ -143,8 +143,8 @@ public class FrameworkComparisonBenchmarks
         var result = await service.GetProductAsync(1);
 
         // Assert
-        _ = getByIdTracking.CallCount == 1;
-        _ = cache.Set.Of<FcBenchProduct>().CallCount == 1;
+        getByIdTracking.Verify(Times.Once);
+        cache.Set.Of<FcBenchProduct>().Verify(Times.Once);
         _ = logInfoTracking.LastArg?.Contains("Cache miss");
 
         return result;

@@ -66,7 +66,9 @@ partial class IAttributeToRuleTests
 
 				private GetRuleDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>The arguments from the most recent call.</summary>
 				public (global::Neatoo.IPropertyInfo r, object? attribute)? LastCallArgs { get; private set; }
@@ -81,10 +83,10 @@ partial class IAttributeToRuleTests
 				internal GetRuleDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall(global::Neatoo.IPropertyInfo r, object? attribute) { CallCount++; LastCallArgs = (r, attribute); }
+				public void RecordCall(global::Neatoo.IPropertyInfo r, object? attribute) { _callCount++; LastCallArgs = (r, attribute); }
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; LastCallArgs = default; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; LastCallArgs = default; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

@@ -284,7 +284,9 @@ partial class OrderedEnumerableStringStubTests
 
 				private CreateOrderedEnumerableDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>The 'descending' argument from the most recent call.</summary>
 				public bool? LastCallArg { get; private set; }
@@ -299,10 +301,10 @@ partial class OrderedEnumerableStringStubTests
 				internal CreateOrderedEnumerableDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall(bool descending) { CallCount++; LastCallArg = descending; }
+				public void RecordCall(bool descending) { _callCount++; LastCallArg = descending; }
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; LastCallArg = default; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; LastCallArg = default; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

@@ -258,7 +258,7 @@ Overloads are numbered in the order they appear in the interface definition.
 
 ## Resetting Interceptors
 
-Clear call counts and remove callbacks using `Reset()`:
+Clear tracking state and remove callbacks using `Reset()`:
 
 <!-- snippet: methods-reset -->
 ```cs
@@ -274,7 +274,7 @@ public void Reset_ClearsTrackingState()
     // Verify one call was made
     tracking.Verify(Times.Once);
 
-    // Reset clears CallCount, WasCalled on the interceptor
+    // Reset clears WasCalled, LastCallArg, and callbacks on the interceptor
     stub.ProcessData.Reset();
 
     // After reset, Verify(Times.Never) passes via tracking
@@ -328,10 +328,10 @@ public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
 
 ## Key Takeaways
 
-- **OnCall signature**: First parameter is always the stub instance
-- **Verification**: Use `tracking.Verify()` or `.Verifiable()` + `stub.Verify()`
+- **OnCall signature**: Callback receives only the method parameters (no stub instance parameter)
+- **Verification**: Use `tracking.Verify(Times)` or `.Verifiable()` + `stub.Verify()`
 - **Arguments**: `LastCallArg` for single parameters, `LastCallArgs` tuple for multiple
 - **Overloads**: Numbered suffixes (Method1, Method2, ...) in declaration order
-- **Reset**: Clears call tracking and callbacks
+- **Reset**: Clears `WasCalled`, arguments, and callbacks
 
 Next: [Property Interceptors](properties.md) for get/set tracking and configuration.

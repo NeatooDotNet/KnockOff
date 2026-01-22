@@ -22,7 +22,7 @@ public class BclStandaloneTests
         disposable.Dispose();
 
         Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        tracking.Verify(Times.Once);
     }
 
     [Fact]
@@ -48,11 +48,11 @@ public class BclStandaloneTests
         disposable.Dispose();
         disposable.Dispose();
 
-        Assert.Equal(2, tracking.CallCount);
+        tracking.Verify(Times.Exactly(2));
 
         knockOff.Dispose.Reset();
 
-        Assert.Equal(0, tracking.CallCount);
+        tracking.Verify(Times.Never);
         Assert.False(tracking.WasCalled);
     }
 
@@ -70,7 +70,7 @@ public class BclStandaloneTests
         await disposable.DisposeAsync();
 
         Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        tracking.Verify(Times.Once);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class BclStandaloneTests
         comparable.CompareTo("bb");
         comparable.CompareTo("ccc");
 
-        Assert.Equal(3, tracking.CallCount);
+        tracking.Verify(Times.Exactly(3));
         Assert.Equal("ccc", tracking.LastArg);
     }
 
@@ -398,7 +398,7 @@ public class BclStandaloneTests
         observer.OnNext("c");
         observer.OnCompleted();
 
-        Assert.Equal(3, onNextTracking.CallCount);
+        onNextTracking.Verify(Times.Exactly(3));
         Assert.Equal(new[] { "a", "b", "c" }, receivedValues);
         Assert.True(onCompletedTracking.WasCalled);
     }
@@ -456,7 +456,7 @@ public class BclStandaloneTests
 
         Assert.Equal(100, lastProgress);
         Assert.Equal(10, progressUpdates);
-        Assert.Equal(10, tracking.CallCount);
+        tracking.Verify(Times.Exactly(10));
     }
 
     #endregion
@@ -473,7 +473,7 @@ public class BclStandaloneTests
         Assert.Throws<InvalidOperationException>(() => enumerable.GetEnumerator());
 
         Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        tracking.Verify(Times.Once);
     }
 
     [Fact]
@@ -488,7 +488,7 @@ public class BclStandaloneTests
 
         // Both generic and non-generic should use the same handler
         Assert.True(tracking.WasCalled);
-        Assert.Equal(1, tracking.CallCount);
+        tracking.Verify(Times.Once);
     }
 
     [Fact]

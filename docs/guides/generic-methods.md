@@ -97,7 +97,7 @@ public void VerifyTypedCalls_WithTimesConstraint()
 ```
 <!-- endSnippet -->
 
-For aggregate tracking across all types, use the base properties:
+You can verify calls for multiple types independently:
 
 <!-- snippet: generic-verify-aggregate -->
 ```cs
@@ -204,8 +204,11 @@ public void ResetTyped_ClearsOnlySpecificType()
     // Reset only User-specific state
     stub.GetById.Of<User>().Reset();
 
-    Assert.Equal(0, stub.GetById.Of<User>().CallCount);
-    Assert.Equal(1, stub.GetById.Of<Order>().CallCount);
+    // User tracking is cleared (Verify Never passes)
+    stub.GetById.Of<User>().Verify(Times.Never);
+
+    // Order tracking is preserved
+    stub.GetById.Of<Order>().Verify(Times.Once);
 }
 ```
 <!-- endSnippet -->
@@ -230,7 +233,8 @@ public void ResetAll_ClearsAllTypeSpecificState()
     // Reset all type-specific state
     stub.GetById.Reset();
 
-    Assert.Equal(0, stub.GetById.TotalCallCount);
+    // All tracking cleared
+    Assert.False(stub.GetById.WasCalled);
     Assert.Empty(stub.GetById.CalledTypeArguments);
 }
 ```
@@ -286,9 +290,10 @@ public void Serializer_FullGenericWorkflow()
 
 ## Key Takeaways
 
-- **`.Of<T>()`** provides type-specific access to `OnCall`, `CallCount`, `LastCallArg`, and `Reset()`
-- **Base properties** (`TotalCallCount`, `WasCalled`, `CalledTypeArguments`) aggregate across all types
+- **`.Of<T>()`** provides type-specific access to `OnCall`, `WasCalled`, `LastCallArg`, and `Reset()`
+- **Base properties** (`WasCalled`, `CalledTypeArguments`) track calls across all types
 - **Multiple type parameters** use `.Of<T1, T2, ...>()` matching the method signature
+- **Verification** uses `tracking.Verify(Times)` for type-specific call count assertions
 - **Reset behavior** differs: `.Of<T>().Reset()` is type-specific, `.Reset()` clears everything
 - **Type discovery** via `CalledTypeArguments` shows which types were actually used
 

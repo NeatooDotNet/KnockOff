@@ -43,7 +43,7 @@ public class RealisticBenchmarks
         ((ISimpleService)stub).DoWork();
 
         // Assert
-        _ = tracking.CallCount == 1;
+        tracking.Verify(Times.Once);
     }
 
     [Benchmark]
@@ -101,9 +101,9 @@ public class RealisticBenchmarks
         sut.Process(1);
 
         // Assert
-        _ = getOrderTracking.CallCount == 1;
-        _ = validateOrderTracking.CallCount == 1;
-        _ = saveOrderTracking.CallCount == 1;
+        getOrderTracking.Verify(Times.Once);
+        validateOrderTracking.Verify(Times.Once);
+        saveOrderTracking.Verify(Times.Once);
     }
 
     [Benchmark]
@@ -177,8 +177,8 @@ public class TestSuiteBenchmarks
             _ = ((IOrderService)stub).GetOrder(i);
             _ = ((IOrderService)stub).ValidateOrder(new Order());
 
-            _ = getOrderTracking.CallCount == 1;
-            _ = validateOrderTracking.CallCount == 1;
+            getOrderTracking.Verify(Times.Once);
+            validateOrderTracking.Verify(Times.Once);
         }
     }
 

@@ -291,7 +291,9 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 
 			private GetDelegate? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>The 'key' argument from the most recent call.</summary>
 			public string? LastCallArg { get; private set; }
@@ -306,10 +308,10 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 			internal GetDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
+			public void RecordCall(string? key) { _callCount++; LastCallArg = key; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			public void Reset() { _callCount = 0; LastCallArg = default; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -370,7 +372,9 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 
 			private SetDelegate? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>The 'key' argument from the most recent call.</summary>
 			public string? LastCallArg { get; private set; }
@@ -385,10 +389,10 @@ partial class FcBenchCacheServiceStub : global::KnockOff.Benchmarks.Benchmarks.I
 			internal SetDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(string? key) { CallCount++; LastCallArg = key; }
+			public void RecordCall(string? key) { _callCount++; LastCallArg = key; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			public void Reset() { _callCount = 0; LastCallArg = default; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

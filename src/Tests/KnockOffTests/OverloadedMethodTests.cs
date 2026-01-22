@@ -23,9 +23,9 @@ public class OverloadedMethodTests
 		service.Process("data3", 10, true);  // Process(string, int, bool)
 
 		// Each overload has its own separate tracking
-		Assert.Equal(1, tracking1.CallCount);
-		Assert.Equal(1, tracking2.CallCount);
-		Assert.Equal(1, tracking3.CallCount);
+		tracking1.Verify(Times.Once);
+		tracking2.Verify(Times.Once);
+		tracking3.Verify(Times.Once);
 	}
 
 	[Fact]
@@ -41,7 +41,7 @@ public class OverloadedMethodTests
 
 		// Single param uses LastArg
 		Assert.Equal("second", tracking.LastArg);
-		Assert.Equal(2, tracking.CallCount);
+		tracking.Verify(Times.Exactly(2));
 	}
 
 	[Fact]
@@ -92,13 +92,13 @@ public class OverloadedMethodTests
 		service.Process("d", 2, false);
 
 		// Each tracking object tracks its own overload
-		Assert.Equal(2, tracking1.CallCount);
+		tracking1.Verify(Times.Exactly(2));
 		Assert.Equal("b", tracking1.LastArg); // Last call to this overload
 
-		Assert.Equal(1, tracking2.CallCount);
+		tracking2.Verify(Times.Once);
 		Assert.Equal(("c", 1), tracking2.LastArgs);
 
-		Assert.Equal(1, tracking3.CallCount);
+		tracking3.Verify(Times.Once);
 		Assert.Equal(("d", 2, false), tracking3.LastArgs);
 	}
 
@@ -180,8 +180,8 @@ public class OverloadedMethodTests
 		Assert.Equal("FromCt", result2?.Name);
 
 		// Verify tracking - each overload tracked separately
-		Assert.Equal(1, tracking1.CallCount);
-		Assert.Equal(1, tracking2.CallCount);
+		tracking1.Verify(Times.Once);
+		tracking2.Verify(Times.Once);
 
 		// LastArg for single param overload
 		Assert.Equal(1, tracking1.LastArg);
@@ -204,16 +204,16 @@ public class OverloadedMethodTests
 		service.Process("test");
 		service.Process("test2", 1);
 
-		Assert.Equal(1, tracking1.CallCount);
-		Assert.Equal(1, tracking2.CallCount);
+		tracking1.Verify(Times.Once);
+		tracking2.Verify(Times.Once);
 
 		// Reset clears all overloads
 		knockOff.Process.Reset();
 
-		Assert.Equal(0, tracking1.CallCount);
+		tracking1.Verify(Times.Never);
 		Assert.False(tracking1.WasCalled);
 
-		Assert.Equal(0, tracking2.CallCount);
+		tracking2.Verify(Times.Never);
 		Assert.False(tracking2.WasCalled);
 	}
 
@@ -231,11 +231,11 @@ public class OverloadedMethodTests
 		service.Calculate(3, 7);
 
 		// Single param overload
-		Assert.Equal(1, tracking1.CallCount);
+		tracking1.Verify(Times.Once);
 		Assert.Equal(5, tracking1.LastArg);
 
 		// Two param overload
-		Assert.Equal(1, tracking2.CallCount);
+		tracking2.Verify(Times.Once);
 		Assert.Equal((3, 7), tracking2.LastArgs);
 	}
 

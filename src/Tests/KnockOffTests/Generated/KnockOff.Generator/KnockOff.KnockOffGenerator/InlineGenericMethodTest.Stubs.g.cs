@@ -66,7 +66,9 @@ partial class InlineGenericMethodTest
 
 				private CreateDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -78,10 +80,10 @@ partial class InlineGenericMethodTest
 				internal CreateDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall() => CallCount++;
+				public void RecordCall() => _callCount++;
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -154,7 +156,9 @@ partial class InlineGenericMethodTest
 
 				private ProcessDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -166,10 +170,10 @@ partial class InlineGenericMethodTest
 				internal ProcessDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall() => CallCount++;
+				public void RecordCall() => _callCount++;
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -242,7 +246,9 @@ partial class InlineGenericMethodTest
 
 				private DeserializeDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>The 'json' argument from the most recent call.</summary>
 				public string? LastCallArg { get; private set; }
@@ -257,10 +263,10 @@ partial class InlineGenericMethodTest
 				internal DeserializeDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall(string json) { CallCount++; LastCallArg = json; }
+				public void RecordCall(string json) { _callCount++; LastCallArg = json; }
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; LastCallArg = default; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; LastCallArg = default; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -333,7 +339,9 @@ partial class InlineGenericMethodTest
 
 				private ConvertDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -345,10 +353,10 @@ partial class InlineGenericMethodTest
 				internal ConvertDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall() => CallCount++;
+				public void RecordCall() => _callCount++;
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -421,7 +429,9 @@ partial class InlineGenericMethodTest
 
 				private FindDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>The 'id' argument from the most recent call.</summary>
 				public int? LastCallArg { get; private set; }
@@ -436,10 +446,10 @@ partial class InlineGenericMethodTest
 				internal FindDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+				public void RecordCall(int id) { _callCount++; LastCallArg = id; }
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; LastCallArg = default; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; LastCallArg = default; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -512,7 +522,9 @@ partial class InlineGenericMethodTest
 
 				private TransferDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -524,10 +536,10 @@ partial class InlineGenericMethodTest
 				internal TransferDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall() => CallCount++;
+				public void RecordCall() => _callCount++;
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

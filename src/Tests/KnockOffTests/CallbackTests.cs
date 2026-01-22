@@ -36,7 +36,7 @@ public class CallbackTests
 		// User method returns input * 2
 		Assert.Equal(10, result);
 		Assert.Equal(5, knockOff.GetValue2.LastArg);
-		Assert.Equal(1, knockOff.GetValue2.CallCount);
+		knockOff.GetValue2.Verify(Times.Once);
 	}
 
 	[Fact]
@@ -127,18 +127,18 @@ public class CallbackTests
 
 		var resultBefore = service.GetOptional();
 		Assert.Equal("callback value", resultBefore);
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 		Assert.True(tracking.WasCalled);
 
 		knockOff.GetOptional.Reset();
 
 		// After reset, tracking state is cleared but callback still works
-		Assert.Equal(0, tracking.CallCount);
+		tracking.Verify(Times.Never);
 		Assert.False(tracking.WasCalled);
 
 		var resultAfter = service.GetOptional();
 		Assert.Equal("callback value", resultAfter);
-		Assert.Equal(1, tracking.CallCount); // Called once more after reset
+		tracking.Verify(Times.Once); // Called once more after reset
 	}
 
 	[Fact]

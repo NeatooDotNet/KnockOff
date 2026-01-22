@@ -802,7 +802,9 @@ partial class InlineRuleManagerTests
 
 				private AddRuleDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -814,10 +816,10 @@ partial class InlineRuleManagerTests
 				internal AddRuleDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall() => CallCount++;
+				public void RecordCall() => _callCount++;
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -890,7 +892,9 @@ partial class InlineRuleManagerTests
 
 				private AddRulesDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -902,10 +906,10 @@ partial class InlineRuleManagerTests
 				internal AddRulesDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall() => CallCount++;
+				public void RecordCall() => _callCount++;
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -978,7 +982,9 @@ partial class InlineRuleManagerTests
 
 				private RunRuleGenericDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>The 'token' argument from the most recent call.</summary>
 				public global::System.Threading.CancellationToken? LastCallArg { get; private set; }
@@ -993,10 +999,10 @@ partial class InlineRuleManagerTests
 				internal RunRuleGenericDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall(global::System.Threading.CancellationToken? token) { CallCount++; LastCallArg = token; }
+				public void RecordCall(global::System.Threading.CancellationToken? token) { _callCount++; LastCallArg = token; }
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; LastCallArg = default; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; LastCallArg = default; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

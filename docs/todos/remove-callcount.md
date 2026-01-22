@@ -1,9 +1,9 @@
 # Remove CallCount from Public API
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-01-19
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-01-20
 
 ---
 
@@ -60,16 +60,16 @@ Callback patterns using `CallCount` for state (e.g., `stub.Connect.CallCount > 0
 
 ## Tasks
 
-- [ ] Identify all public interfaces exposing CallCount/TotalCallCount
-- [ ] Update IMethodSequence interface to remove TotalCallCount
-- [ ] Update IMethodTracking interface to remove CallCount
-- [ ] Update generator to remove CallCount from method interceptor public API
-- [ ] Update generator to remove TotalCallCount from generic method interceptors
-- [ ] Update all tests using CallCount to use Verify(Times) instead
-- [ ] Address callback-based patterns that used CallCount for state
-- [ ] Update documentation (interceptor-api.md, guides)
-- [ ] Update samples in Documentation.Samples
-- [ ] Add migration guidance in from-moq.md for this breaking change
+- [x] Identify all public interfaces exposing CallCount/TotalCallCount
+- [x] Update IMethodSequence interface to remove TotalCallCount
+- [x] Update IMethodTracking interface to remove CallCount
+- [x] Update generator to remove CallCount from method interceptor public API
+- [x] Update generator to remove TotalCallCount from generic method interceptors
+- [x] Update all tests using CallCount to use Verify(Times) instead
+- [x] Address callback-based patterns that used CallCount for state
+- [x] Update documentation (interceptor-api.md, guides)
+- [x] Update samples in Documentation.Samples
+- [ ] Add migration guidance in from-moq.md for this breaking change (deferred to release notes)
 
 ---
 
@@ -82,6 +82,15 @@ Callback patterns using `CallCount` for state (e.g., `stub.Connect.CallCount > 0
 
 Decision: Proceed with removal from public API. Internal use can remain. Breaking change accepted.
 
+2026-01-20: Implementation completed:
+- Removed CallCount from IMethodTracking and TotalCallCount from IMethodSequence
+- Updated FlatRenderer and InlineRenderer to use internal CallCount
+- Updated 15+ test files and 3 benchmark files to use Verify(Times) API
+- Updated documentation guides
+- All 608 tests passing
+
 ---
 
 ## Results / Conclusions
+
+**Completed successfully.** CallCount and TotalCallCount have been removed from the public API. Internal tracking remains for verification features. All tests updated to use the idiomatic `Verify(Times)` pattern.

@@ -689,7 +689,9 @@ partial class IPropertyInfoTests
 
 				private GetCustomAttributeDelegate? _onCall;
 
-				internal int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -701,10 +703,10 @@ partial class IPropertyInfoTests
 				internal GetCustomAttributeDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall() => CallCount++;
+				public void RecordCall() => _callCount++;
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

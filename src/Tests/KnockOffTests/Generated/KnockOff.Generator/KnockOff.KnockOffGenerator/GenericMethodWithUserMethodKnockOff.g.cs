@@ -61,7 +61,9 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 
 			private CreateDelegate? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -73,10 +75,10 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			internal CreateDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -137,7 +139,9 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 
 			private TransformDelegate? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -149,10 +153,10 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			internal TransformDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -213,7 +217,9 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 
 			private ConvertDelegate? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -225,10 +231,10 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			internal ConvertDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

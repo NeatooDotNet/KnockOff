@@ -1737,8 +1737,10 @@ internal static class FlatRenderer
 			w.Line($"private {handler.MethodName}Delegate? _onCall;");
 			w.Line();
 
-			// CallCount (internal - use WasCalled or Verify for public API)
-			w.Line("internal int CallCount { get; private set; }");
+			// CallCount - private field with explicit interface implementation
+			w.Line("private int _callCount;");
+			w.Line("int IGenericMethodCallTracker.CallCount => _callCount;");
+			w.Line("internal int CallCount => _callCount;");
 			w.Line();
 
 			// LastCallArg/LastCallArgs
@@ -1775,18 +1777,18 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Records a method call.</summary>");
 			if (handler.NonGenericParams.Count == 0)
 			{
-				w.Line("public void RecordCall() => CallCount++;");
+				w.Line("public void RecordCall() => _callCount++;");
 			}
 			else if (handler.NonGenericParams.Count == 1)
 			{
 				var param = handler.NonGenericParams.GetArray()![0];
-				w.Line($"public void RecordCall({param.NullableType} {param.EscapedName}) {{ CallCount++; LastCallArg = {param.EscapedName}; }}");
+				w.Line($"public void RecordCall({param.NullableType} {param.EscapedName}) {{ _callCount++; LastCallArg = {param.EscapedName}; }}");
 			}
 			else
 			{
 				var paramList = string.Join(", ", handler.NonGenericParams.Select(p => $"{p.NullableType} {p.EscapedName}"));
 				var tupleConstruction = string.Join(", ", handler.NonGenericParams.Select(p => p.EscapedName));
-				w.Line($"public void RecordCall({paramList}) {{ CallCount++; LastCallArgs = ({tupleConstruction}); }}");
+				w.Line($"public void RecordCall({paramList}) {{ _callCount++; LastCallArgs = ({tupleConstruction}); }}");
 			}
 			w.Line();
 
@@ -1794,15 +1796,15 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Resets all tracking state.</summary>");
 			if (handler.NonGenericParams.Count == 0)
 			{
-				w.Line("public void Reset() { CallCount = 0; _onCall = null; }");
+				w.Line("public void Reset() { _callCount = 0; _onCall = null; }");
 			}
 			else if (handler.NonGenericParams.Count == 1)
 			{
-				w.Line("public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }");
+				w.Line("public void Reset() { _callCount = 0; LastCallArg = default; _onCall = null; }");
 			}
 			else
 			{
-				w.Line("public void Reset() { CallCount = 0; LastCallArgs = default; _onCall = null; }");
+				w.Line("public void Reset() { _callCount = 0; LastCallArgs = default; _onCall = null; }");
 			}
 			w.Line();
 

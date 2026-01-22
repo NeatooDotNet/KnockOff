@@ -28,7 +28,6 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `CallCount` | `int` | Number of times the method was called |
 | `WasCalled` | `bool` | True if the method was called at least once |
 | `LastCallArg` | `T` | The argument from the most recent call (single-parameter methods only) |
 | `LastCallArgs` | `(T1, T2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
@@ -60,7 +59,7 @@ When `OnCall` is set, the callback is invoked instead of user-defined methods. F
 
 ### Methods
 
-- `void Reset()` - Clears `CallCount`, `LastCallArg`, `LastCallArgs`, and `OnCall`
+- `void Reset()` - Clears `WasCalled`, `LastCallArg`, `LastCallArgs`, and `OnCall`
 
 ### Example
 
@@ -377,7 +376,6 @@ Available directly on the interceptor instance:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `TotalCallCount` | `int` | Total calls across all type arguments |
 | `WasCalled` | `bool` | True if the method was called with any type arguments |
 | `CalledTypeArguments` | `IReadOnlyList<Type>` | List of all type arguments used in calls (in order of first use) |
 
@@ -389,7 +387,6 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `CallCount` | `int` | Number of times the method was called with these type arguments |
 | `WasCalled` | `bool` | True if the method was called with these type arguments |
 | `LastCallArg` | `TArg` | The argument from the most recent call with these type arguments (single-parameter methods) |
 | `LastCallArgs` | `(TArg1, TArg2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
@@ -458,7 +455,7 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | `CallCount`, `LastCallArg`, `LastCallArgs`, `OnCall` | N/A |
+| **Method** | `WasCalled`, `LastCallArg`, `LastCallArgs`, `OnCall` | N/A |
 | **Property** | `GetCount`, `SetCount`, `LastSetValue`, `OnGet`, `OnSet` | `Value` |
 | **Indexer** | `GetCount`, `SetCount`, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet` | `Backing` dictionary |
 | **Event** | `AddCount`, `RemoveCount` | Active subscribers |
