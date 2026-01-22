@@ -30,7 +30,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Reflection.PropertyInfo>? OnGet { get; set; }
@@ -111,7 +111,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<string>? OnGet { get; set; }
@@ -192,7 +192,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Type>? OnGet { get; set; }
@@ -273,7 +273,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<string>? OnGet { get; set; }
@@ -354,7 +354,7 @@ partial class PropertyInfoStub : global::Neatoo.IPropertyInfo, global::KnockOff.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }

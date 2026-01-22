@@ -11,10 +11,10 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		private global::System.EventHandler? _handler;
 
 		/// <summary>Number of times event was subscribed to.</summary>
-		public int AddCount { get; private set; }
+		internal int AddCount { get; private set; }
 
 		/// <summary>Number of times event subscription was removed.</summary>
-		public int RemoveCount { get; private set; }
+		internal int RemoveCount { get; private set; }
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
@@ -113,10 +113,10 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		private global::System.Action<global::KnockOff.Documentation.Samples.User>? _handler;
 
 		/// <summary>Number of times event was subscribed to.</summary>
-		public int AddCount { get; private set; }
+		internal int AddCount { get; private set; }
 
 		/// <summary>Number of times event subscription was removed.</summary>
-		public int RemoveCount { get; private set; }
+		internal int RemoveCount { get; private set; }
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;

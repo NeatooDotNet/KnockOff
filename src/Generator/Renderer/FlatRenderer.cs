@@ -279,11 +279,11 @@ internal static class FlatRenderer
 		w.Line();
 
 		w.Line("/// <summary>Number of times the getter was accessed.</summary>");
-		w.Line("public int GetCount { get; private set; }");
+		w.Line("internal int GetCount { get; private set; }");
 		w.Line();
 
 		w.Line("/// <summary>Number of times the setter was accessed.</summary>");
-		w.Line("public int SetCount { get; private set; }");
+		w.Line("internal int SetCount { get; private set; }");
 		w.Line();
 
 		w.Line("/// <summary>The value from the most recent setter call.</summary>");
@@ -399,7 +399,7 @@ internal static class FlatRenderer
 		if (prop.HasGetter)
 		{
 			w.Line("/// <summary>Number of times the getter was accessed.</summary>");
-			w.Line("public int GetCount { get; private set; }");
+			w.Line("internal int GetCount { get; private set; }");
 			w.Line();
 
 			w.Line("/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>");
@@ -410,7 +410,7 @@ internal static class FlatRenderer
 		if (prop.HasSetter)
 		{
 			w.Line("/// <summary>Number of times the setter was accessed.</summary>");
-			w.Line("public int SetCount { get; private set; }");
+			w.Line("internal int SetCount { get; private set; }");
 			w.Line();
 
 			w.Line("/// <summary>The value from the most recent setter call.</summary>");
@@ -651,7 +651,7 @@ internal static class FlatRenderer
 			if (indexer.HasGetter)
 			{
 				w.Line("/// <summary>Number of times the getter was accessed.</summary>");
-				w.Line("public int GetCount { get; private set; }");
+				w.Line("internal int GetCount { get; private set; }");
 				w.Line();
 
 				w.Line("/// <summary>The key from the most recent getter access.</summary>");
@@ -666,7 +666,7 @@ internal static class FlatRenderer
 			if (indexer.HasSetter)
 			{
 				w.Line("/// <summary>Number of times the setter was accessed.</summary>");
-				w.Line("public int SetCount { get; private set; }");
+				w.Line("internal int SetCount { get; private set; }");
 				w.Line();
 
 				w.Line("/// <summary>The key and value from the most recent setter call.</summary>");
@@ -1840,11 +1840,11 @@ internal static class FlatRenderer
 
 			// Add/Remove tracking
 			w.Line("/// <summary>Number of times event was subscribed to.</summary>");
-			w.Line("public int AddCount { get; private set; }");
+			w.Line("internal int AddCount { get; private set; }");
 			w.Line();
 
 			w.Line("/// <summary>Number of times event subscription was removed.</summary>");
-			w.Line("public int RemoveCount { get; private set; }");
+			w.Line("internal int RemoveCount { get; private set; }");
 			w.Line();
 
 			w.Line("/// <summary>Whether any handlers are subscribed.</summary>");

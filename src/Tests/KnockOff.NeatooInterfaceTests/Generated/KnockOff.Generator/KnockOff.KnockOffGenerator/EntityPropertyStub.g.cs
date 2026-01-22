@@ -16,13 +16,13 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public bool? LastSetValue { get; private set; }
@@ -119,7 +119,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -200,7 +200,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -281,7 +281,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<string>? OnGet { get; set; }
@@ -362,7 +362,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<string>? OnGet { get; set; }
@@ -443,13 +443,13 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<object?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public object? LastSetValue { get; private set; }
@@ -546,7 +546,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Threading.Tasks.Task>? OnGet { get; set; }
@@ -627,7 +627,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -708,7 +708,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -789,7 +789,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Type>? OnGet { get; set; }
@@ -870,7 +870,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<string?>? OnGet { get; set; }
@@ -951,7 +951,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -1032,7 +1032,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -1113,7 +1113,7 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
@@ -3269,10 +3269,10 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private global::System.ComponentModel.PropertyChangedEventHandler? _handler;
 
 		/// <summary>Number of times event was subscribed to.</summary>
-		public int AddCount { get; private set; }
+		internal int AddCount { get; private set; }
 
 		/// <summary>Number of times event subscription was removed.</summary>
-		public int RemoveCount { get; private set; }
+		internal int RemoveCount { get; private set; }
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
@@ -3371,10 +3371,10 @@ partial class EntityPropertyStub : global::Neatoo.IEntityProperty, global::Neato
 		private global::Neatoo.NeatooPropertyChanged? _handler;
 
 		/// <summary>Number of times event was subscribed to.</summary>
-		public int AddCount { get; private set; }
+		internal int AddCount { get; private set; }
 
 		/// <summary>Number of times event subscription was removed.</summary>
-		public int RemoveCount { get; private set; }
+		internal int RemoveCount { get; private set; }
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;

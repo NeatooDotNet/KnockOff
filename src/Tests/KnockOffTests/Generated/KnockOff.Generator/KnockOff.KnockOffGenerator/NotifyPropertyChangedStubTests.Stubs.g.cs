@@ -12,10 +12,10 @@ partial class NotifyPropertyChangedStubTests
 		public sealed class INotifyPropertyChanged_PropertyChangedInterceptor
 		{
 			/// <summary>Number of times the event was subscribed to.</summary>
-			public int AddCount { get; private set; }
+			internal int AddCount { get; private set; }
 
 			/// <summary>Number of times the event was unsubscribed from.</summary>
-			public int RemoveCount { get; private set; }
+			internal int RemoveCount { get; private set; }
 
 			/// <summary>The backing delegate for raising the event.</summary>
 			public global::System.ComponentModel.PropertyChangedEventHandler? Handler { get; private set; }

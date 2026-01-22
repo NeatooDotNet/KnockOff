@@ -16,7 +16,7 @@ partial class DictionaryIntUserStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.Generic.ICollection<int>>? OnGet { get; set; }
@@ -97,7 +97,7 @@ partial class DictionaryIntUserStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.Generic.ICollection<global::KnockOff.Tests.User>>? OnGet { get; set; }
@@ -178,7 +178,7 @@ partial class DictionaryIntUserStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<int>? OnGet { get; set; }
@@ -259,7 +259,7 @@ partial class DictionaryIntUserStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -340,7 +340,7 @@ partial class DictionaryIntUserStubTests
 			private bool _configured;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }
@@ -354,7 +354,7 @@ partial class DictionaryIntUserStubTests
 			}
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (int Key, global::KnockOff.Tests.User Value)? LastSetEntry { get; private set; }

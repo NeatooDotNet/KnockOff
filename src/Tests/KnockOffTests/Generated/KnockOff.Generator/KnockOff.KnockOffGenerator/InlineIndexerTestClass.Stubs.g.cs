@@ -16,7 +16,7 @@ partial class InlineIndexerTestClass
 			private bool _configured;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
@@ -30,7 +30,7 @@ partial class InlineIndexerTestClass
 			}
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (string Key, string Value)? LastSetEntry { get; private set; }
@@ -127,7 +127,7 @@ partial class InlineIndexerTestClass
 			private bool _configured;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }

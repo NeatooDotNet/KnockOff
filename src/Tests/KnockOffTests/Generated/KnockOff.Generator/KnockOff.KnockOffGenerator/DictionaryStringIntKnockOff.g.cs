@@ -16,7 +16,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.ICollection<string>>? OnGet { get; set; }
@@ -97,7 +97,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.ICollection<int>>? OnGet { get; set; }
@@ -178,7 +178,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<int>? OnGet { get; set; }
@@ -259,7 +259,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -336,7 +336,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		internal global::System.Collections.Generic.IDictionary<string, int>? _source;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
@@ -345,7 +345,7 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 		public global::System.Func<string, int>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The key and value from the most recent setter call.</summary>
 		public (string? Key, int? Value)? LastSetEntry { get; private set; }

@@ -86,3 +86,7 @@ Use "create objects then test them" pattern:
 1. Define a test interface and `[KnockOff]` stub class
 2. Source generator produces explicit interface implementations
 3. Instantiate the stub and verify behavior through the interface
+
+## Versioning
+
+KnockOff is pre-1.0. All changes, including breaking changes, bump the minor version only.

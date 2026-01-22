@@ -44,7 +44,7 @@ public partial class IEntityMetaPropertiesTests
         stub.IsChild.Value = true;
 
         Assert.True(meta.IsChild);
-        Assert.Equal(1, stub.IsChild.GetCount);
+        stub.IsChild.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -203,7 +203,7 @@ public partial class IEntityMetaPropertiesTests
 
         stub.IsChild.Reset();
 
-        Assert.Equal(0, stub.IsChild.GetCount);
+        stub.IsChild.VerifyGet(Times.Never);
     }
 
     #endregion

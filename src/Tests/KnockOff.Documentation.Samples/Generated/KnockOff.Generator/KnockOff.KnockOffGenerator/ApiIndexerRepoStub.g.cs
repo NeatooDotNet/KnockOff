@@ -12,7 +12,7 @@ partial class ApiIndexerRepoStub : global::KnockOff.Documentation.Samples.Interc
 		internal global::KnockOff.Documentation.Samples.InterceptorApi.IApiIndexerRepo? _source;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public int? LastGetKey { get; private set; }
@@ -21,7 +21,7 @@ partial class ApiIndexerRepoStub : global::KnockOff.Documentation.Samples.Interc
 		public global::System.Func<int, global::KnockOff.Documentation.Samples.User?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The key and value from the most recent setter call.</summary>
 		public (int? Key, global::KnockOff.Documentation.Samples.User? Value)? LastSetEntry { get; private set; }

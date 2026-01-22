@@ -112,8 +112,8 @@ public class SubscriptionVerificationTests
         subscriber.OnCompleted += (sender, args) => { };
         subscriber.OnCompleted += (sender, args) => { };
 
-        // AddCount tracks subscribe operations
-        Assert.Equal(2, stub.OnCompleted.AddCount);
+        // VerifyAdd tracks subscribe operations
+        stub.OnCompleted.VerifyAdd(Times.Exactly(2));
     }
     #endregion
 
@@ -130,8 +130,8 @@ public class SubscriptionVerificationTests
         subscriber.OnCompleted += handler;
         subscriber.OnCompleted -= handler;
 
-        // RemoveCount tracks unsubscribe operations
-        Assert.Equal(1, stub.OnCompleted.RemoveCount);
+        // VerifyRemove tracks unsubscribe operations
+        stub.OnCompleted.VerifyRemove(Times.Once);
     }
     #endregion
 }
@@ -153,14 +153,14 @@ public class EventResetTests
         EventHandler handler = (sender, args) => { };
         subscriber.OnCompleted += handler;
 
-        Assert.Equal(1, stub.OnCompleted.AddCount);
+        stub.OnCompleted.VerifyAdd(Times.Once);
         Assert.True(stub.OnCompleted.HasSubscribers);
 
         // Reset clears counts and subscribers
         stub.OnCompleted.Reset();
 
-        // Counts are cleared
-        Assert.Equal(0, stub.OnCompleted.AddCount);
+        // Counts are cleared - verify add was never called after reset
+        stub.OnCompleted.VerifyAdd(Times.Never);
 
         // Subscribers are also cleared
         Assert.False(stub.OnCompleted.HasSubscribers);
@@ -193,7 +193,7 @@ public class CompleteEventExampleTests
 
         // Subscribe and verify
         publisher.DataReceived += handler;
-        Assert.Equal(1, stub.DataReceived.AddCount);
+        stub.DataReceived.VerifyAdd(Times.Once);
         Assert.True(stub.DataReceived.HasSubscribers);
 
         // Raise the event
@@ -204,7 +204,7 @@ public class CompleteEventExampleTests
 
         // Unsubscribe and verify
         publisher.DataReceived -= handler;
-        Assert.Equal(1, stub.DataReceived.RemoveCount);
+        stub.DataReceived.VerifyRemove(Times.Once);
         Assert.False(stub.DataReceived.HasSubscribers);
     }
     #endregion
