@@ -16,7 +16,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
@@ -97,7 +97,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.Generic.IEnumerable<int>>? OnGet { get; set; }
@@ -178,7 +178,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<int>? OnGet { get; set; }
@@ -259,7 +259,7 @@ partial class ReadOnlyDictionaryStringIntStubTests
 			private bool _configured;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }

@@ -16,7 +16,7 @@ partial class InlineClassTests
 			private bool _configured;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			private global::System.Func<bool>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
@@ -27,7 +27,7 @@ partial class InlineClassTests
 			}
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last value passed to the setter.</summary>
 			public bool? LastSetValue { get; private set; }

@@ -11,10 +11,10 @@ partial class EventSourceStub : global::KnockOff.Benchmarks.Interfaces.IEventSou
 		private global::System.EventHandler<string>? _handler;
 
 		/// <summary>Number of times event was subscribed to.</summary>
-		public int AddCount { get; private set; }
+		internal int AddCount { get; private set; }
 
 		/// <summary>Number of times event subscription was removed.</summary>
-		public int RemoveCount { get; private set; }
+		internal int RemoveCount { get; private set; }
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
@@ -113,10 +113,10 @@ partial class EventSourceStub : global::KnockOff.Benchmarks.Interfaces.IEventSou
 		private global::System.Action<int>? _handler;
 
 		/// <summary>Number of times event was subscribed to.</summary>
-		public int AddCount { get; private set; }
+		internal int AddCount { get; private set; }
 
 		/// <summary>Number of times event subscription was removed.</summary>
-		public int RemoveCount { get; private set; }
+		internal int RemoveCount { get; private set; }
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;

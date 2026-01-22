@@ -16,7 +16,7 @@ partial class GenericCollisionTest
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<int>? OnGet { get; set; }
@@ -97,7 +97,7 @@ partial class GenericCollisionTest
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -178,7 +178,7 @@ partial class GenericCollisionTest
 			private bool _configured;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }
@@ -192,7 +192,7 @@ partial class GenericCollisionTest
 			}
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (int Key, string Value)? LastSetEntry { get; private set; }
@@ -2642,7 +2642,7 @@ partial class GenericCollisionTest
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<int>? OnGet { get; set; }
@@ -2723,7 +2723,7 @@ partial class GenericCollisionTest
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -2804,7 +2804,7 @@ partial class GenericCollisionTest
 			private bool _configured;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }
@@ -2818,7 +2818,7 @@ partial class GenericCollisionTest
 			}
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (int Key, int Value)? LastSetEntry { get; private set; }

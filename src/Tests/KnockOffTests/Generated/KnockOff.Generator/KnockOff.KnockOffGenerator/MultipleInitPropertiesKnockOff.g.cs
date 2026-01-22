@@ -21,10 +21,10 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 		}
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public string? LastSetValue { get; private set; }
@@ -115,10 +115,10 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 		}
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public string? LastSetValue { get; private set; }
@@ -209,10 +209,10 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 		}
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public int? LastSetValue { get; private set; }

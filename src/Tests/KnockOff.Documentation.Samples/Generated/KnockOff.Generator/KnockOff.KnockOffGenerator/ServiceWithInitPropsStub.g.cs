@@ -16,7 +16,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }

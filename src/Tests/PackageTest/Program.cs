@@ -11,8 +11,10 @@ ICalculator calc = knockOff;
 // Test property
 calc.LastResult = 42;
 Console.WriteLine($"LastResult set to: {calc.LastResult}");
-Console.WriteLine($"  SetCount: {knockOff.LastResult.SetCount}");
-Console.WriteLine($"  GetCount: {knockOff.LastResult.GetCount}");
+knockOff.LastResult.VerifySet(Times.Once);
+Console.WriteLine($"  VerifySet(Times.Once) passed!");
+knockOff.LastResult.VerifyGet(Times.Once);
+Console.WriteLine($"  VerifyGet(Times.Once) passed!");
 Console.WriteLine($"  LastSetValue: {knockOff.LastResult.LastSetValue}");
 
 // Test method with user implementation

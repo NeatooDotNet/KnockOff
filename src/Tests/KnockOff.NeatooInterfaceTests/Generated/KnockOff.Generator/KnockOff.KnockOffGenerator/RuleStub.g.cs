@@ -16,7 +16,7 @@ partial class RuleStub : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -97,7 +97,7 @@ partial class RuleStub : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<int>? OnGet { get; set; }
@@ -178,7 +178,7 @@ partial class RuleStub : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<uint>? OnGet { get; set; }
@@ -259,7 +259,7 @@ partial class RuleStub : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage>>? OnGet { get; set; }
@@ -340,7 +340,7 @@ partial class RuleStub : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty>>? OnGet { get; set; }

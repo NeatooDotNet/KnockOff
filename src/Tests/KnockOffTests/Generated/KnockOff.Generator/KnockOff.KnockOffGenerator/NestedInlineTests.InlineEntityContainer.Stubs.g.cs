@@ -18,7 +18,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
@@ -99,7 +99,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.Generic.IEnumerable<string>>? OnGet { get; set; }
@@ -180,7 +180,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
@@ -261,7 +261,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -342,7 +342,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -423,7 +423,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -504,7 +504,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -585,7 +585,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
@@ -666,7 +666,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -747,7 +747,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -828,7 +828,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -909,7 +909,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -990,7 +990,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -1071,7 +1071,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -1152,7 +1152,7 @@ partial class InlineEntityContainer
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -1233,7 +1233,7 @@ partial class InlineEntityContainer
 			private bool _configured;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
@@ -3744,10 +3744,10 @@ partial class InlineEntityContainer
 		public sealed class IEntityBase_PropertyChangedInterceptor
 		{
 			/// <summary>Number of times the event was subscribed to.</summary>
-			public int AddCount { get; private set; }
+			internal int AddCount { get; private set; }
 
 			/// <summary>Number of times the event was unsubscribed from.</summary>
-			public int RemoveCount { get; private set; }
+			internal int RemoveCount { get; private set; }
 
 			/// <summary>The backing delegate for raising the event.</summary>
 			public global::System.ComponentModel.PropertyChangedEventHandler? Handler { get; private set; }
@@ -3841,10 +3841,10 @@ partial class InlineEntityContainer
 		public sealed class IEntityBase_NeatooPropertyChangedInterceptor
 		{
 			/// <summary>Number of times the event was subscribed to.</summary>
-			public int AddCount { get; private set; }
+			internal int AddCount { get; private set; }
 
 			/// <summary>Number of times the event was unsubscribed from.</summary>
-			public int RemoveCount { get; private set; }
+			internal int RemoveCount { get; private set; }
 
 			/// <summary>The backing delegate for raising the event.</summary>
 			public global::Neatoo.NeatooPropertyChanged? Handler { get; private set; }

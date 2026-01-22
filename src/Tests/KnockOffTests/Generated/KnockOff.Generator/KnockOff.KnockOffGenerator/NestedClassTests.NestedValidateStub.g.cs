@@ -18,7 +18,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
@@ -99,7 +99,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -180,7 +180,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -261,7 +261,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -342,7 +342,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -423,7 +423,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		private bool _valueSet;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
@@ -500,7 +500,7 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		internal global::Neatoo.IValidateBase? _source;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
@@ -2353,10 +2353,10 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		private global::System.ComponentModel.PropertyChangedEventHandler? _handler;
 
 		/// <summary>Number of times event was subscribed to.</summary>
-		public int AddCount { get; private set; }
+		internal int AddCount { get; private set; }
 
 		/// <summary>Number of times event subscription was removed.</summary>
-		public int RemoveCount { get; private set; }
+		internal int RemoveCount { get; private set; }
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
@@ -2455,10 +2455,10 @@ partial class NestedValidateStub : global::Neatoo.IValidateBase, global::System.
 		private global::Neatoo.NeatooPropertyChanged? _handler;
 
 		/// <summary>Number of times event was subscribed to.</summary>
-		public int AddCount { get; private set; }
+		internal int AddCount { get; private set; }
 
 		/// <summary>Number of times event subscription was removed.</summary>
-		public int RemoveCount { get; private set; }
+		internal int RemoveCount { get; private set; }
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;

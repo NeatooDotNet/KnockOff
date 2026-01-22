@@ -274,7 +274,7 @@ internal static class InlineRenderer
         if (prop.HasGetter)
         {
             w.Line("\t\t\t/// <summary>Number of times the getter was accessed.</summary>");
-            w.Line("\t\t\tpublic int GetCount { get; private set; }");
+            w.Line("\t\t\tinternal int GetCount { get; private set; }");
             w.Line();
             w.Line($"\t\t\t/// <summary>Callback for getter. If set, returns its value.</summary>");
             w.Line($"\t\t\tpublic global::System.Func<{prop.ReturnType}>? OnGet {{ get; set; }}");
@@ -284,7 +284,7 @@ internal static class InlineRenderer
         if (prop.HasSetter)
         {
             w.Line("\t\t\t/// <summary>Number of times the setter was accessed.</summary>");
-            w.Line("\t\t\tpublic int SetCount { get; private set; }");
+            w.Line("\t\t\tinternal int SetCount { get; private set; }");
             w.Line();
             w.Line($"\t\t\t/// <summary>The last value passed to the setter.</summary>");
             w.Line($"\t\t\tpublic {prop.NullableReturnType} LastSetValue {{ get; private set; }}");
@@ -447,7 +447,7 @@ internal static class InlineRenderer
         if (indexer.HasGetter)
         {
             w.Line("\t\t\t/// <summary>Number of times the getter was accessed.</summary>");
-            w.Line("\t\t\tpublic int GetCount { get; private set; }");
+            w.Line("\t\t\tinternal int GetCount { get; private set; }");
             w.Line();
             w.Line($"\t\t\t/// <summary>The last key used to access the getter.</summary>");
             w.Line($"\t\t\tpublic {indexer.NullableKeyType} LastGetKey {{ get; private set; }}");
@@ -465,7 +465,7 @@ internal static class InlineRenderer
         if (indexer.HasSetter)
         {
             w.Line("\t\t\t/// <summary>Number of times the setter was accessed.</summary>");
-            w.Line("\t\t\tpublic int SetCount { get; private set; }");
+            w.Line("\t\t\tinternal int SetCount { get; private set; }");
             w.Line();
             w.Line($"\t\t\t/// <summary>The last key-value pair passed to the setter.</summary>");
             w.Line($"\t\t\tpublic ({indexer.KeyType} Key, {indexer.ReturnType} Value)? LastSetEntry {{ get; private set; }}");
@@ -872,10 +872,10 @@ internal static class InlineRenderer
         w.Line("\t\t{");
 
         w.Line("\t\t\t/// <summary>Number of times the event was subscribed to.</summary>");
-        w.Line("\t\t\tpublic int AddCount { get; private set; }");
+        w.Line("\t\t\tinternal int AddCount { get; private set; }");
         w.Line();
         w.Line("\t\t\t/// <summary>Number of times the event was unsubscribed from.</summary>");
-        w.Line("\t\t\tpublic int RemoveCount { get; private set; }");
+        w.Line("\t\t\tinternal int RemoveCount { get; private set; }");
         w.Line();
         w.Line($"\t\t\t/// <summary>The backing delegate for raising the event.</summary>");
         w.Line($"\t\t\tpublic {evt.DelegateType}? Handler {{ get; private set; }}");

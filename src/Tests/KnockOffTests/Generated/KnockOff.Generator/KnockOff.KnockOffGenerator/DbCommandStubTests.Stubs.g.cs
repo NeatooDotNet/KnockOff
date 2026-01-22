@@ -16,13 +16,13 @@ partial class DbCommandStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<string>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
@@ -119,13 +119,13 @@ partial class DbCommandStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<int>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last value passed to the setter.</summary>
 			public int? LastSetValue { get; private set; }
@@ -222,13 +222,13 @@ partial class DbCommandStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Data.CommandType>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last value passed to the setter.</summary>
 			public global::System.Data.CommandType? LastSetValue { get; private set; }
@@ -325,13 +325,13 @@ partial class DbCommandStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Data.IDbConnection?>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last value passed to the setter.</summary>
 			public global::System.Data.IDbConnection? LastSetValue { get; private set; }
@@ -428,7 +428,7 @@ partial class DbCommandStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Data.IDataParameterCollection>? OnGet { get; set; }
@@ -509,13 +509,13 @@ partial class DbCommandStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Data.IDbTransaction?>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last value passed to the setter.</summary>
 			public global::System.Data.IDbTransaction? LastSetValue { get; private set; }
@@ -612,13 +612,13 @@ partial class DbCommandStubTests
 			private bool _valueSet;
 
 			/// <summary>Number of times the getter was accessed.</summary>
-			public int GetCount { get; private set; }
+			internal int GetCount { get; private set; }
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Data.UpdateRowSource>? OnGet { get; set; }
 
 			/// <summary>Number of times the setter was accessed.</summary>
-			public int SetCount { get; private set; }
+			internal int SetCount { get; private set; }
 
 			/// <summary>The last value passed to the setter.</summary>
 			public global::System.Data.UpdateRowSource? LastSetValue { get; private set; }

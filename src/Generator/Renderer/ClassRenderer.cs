@@ -116,7 +116,7 @@ internal static class ClassRenderer
         if (prop.HasGetter)
         {
             w.Line($"{indent1}/// <summary>Number of times the getter was accessed.</summary>");
-            w.Line($"{indent1}public int GetCount {{ get; private set; }}");
+            w.Line($"{indent1}internal int GetCount {{ get; private set; }}");
             w.Line();
             w.Line($"{indent1}private global::System.Func<{prop.ReturnType}>? _onGet;");
             w.Line($"{indent1}/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>");
@@ -131,7 +131,7 @@ internal static class ClassRenderer
         if (prop.HasSetter)
         {
             w.Line($"{indent1}/// <summary>Number of times the setter was accessed.</summary>");
-            w.Line($"{indent1}public int SetCount {{ get; private set; }}");
+            w.Line($"{indent1}internal int SetCount {{ get; private set; }}");
             w.Line();
             w.Line($"{indent1}/// <summary>The last value passed to the setter.</summary>");
             w.Line($"{indent1}public {prop.NullableReturnType} LastSetValue {{ get; private set; }}");
@@ -271,7 +271,7 @@ internal static class ClassRenderer
         if (indexer.HasGetter)
         {
             w.Line($"{indent1}/// <summary>Number of times the getter was accessed.</summary>");
-            w.Line($"{indent1}public int GetCount {{ get; private set; }}");
+            w.Line($"{indent1}internal int GetCount {{ get; private set; }}");
             w.Line();
 
             var nullableKeyType = MakeNullable(indexer.KeyType);
@@ -289,7 +289,7 @@ internal static class ClassRenderer
         if (indexer.HasSetter)
         {
             w.Line($"{indent1}/// <summary>Number of times the setter was accessed.</summary>");
-            w.Line($"{indent1}public int SetCount {{ get; private set; }}");
+            w.Line($"{indent1}internal int SetCount {{ get; private set; }}");
             w.Line();
 
             var entryType = $"({indexer.KeyType} Key, {indexer.ReturnType} Value)";
@@ -471,10 +471,10 @@ internal static class ClassRenderer
         w.Line($"{indent}{{");
 
         w.Line($"{indent1}/// <summary>Number of times the event was subscribed to.</summary>");
-        w.Line($"{indent1}public int AddCount {{ get; private set; }}");
+        w.Line($"{indent1}internal int AddCount {{ get; private set; }}");
         w.Line();
         w.Line($"{indent1}/// <summary>Number of times the event was unsubscribed from.</summary>");
-        w.Line($"{indent1}public int RemoveCount {{ get; private set; }}");
+        w.Line($"{indent1}internal int RemoveCount {{ get; private set; }}");
         w.Line();
         w.Line($"{indent1}/// <summary>The backing delegate for raising the event.</summary>");
         w.Line($"{indent1}public {evt.DelegateType}? Handler {{ get; private set; }}");

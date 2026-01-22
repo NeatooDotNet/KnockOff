@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v10.26.0](v10.26.0.md) | 2026-01-22 | **Breaking:** Removed count properties from public API |
 | [v10.25.0](v10.25.0.md) | 2026-01-22 | **Breaking:** Removed WasCalled, added Verify() to method interceptors |
 | [v10.24.0](v10.24.0.md) | 2026-01-20 | **Breaking:** Removed CallCount from public API |
 | [v10.21.0](v10.21.0.md) | 2026-01-16 | **Breaking:** Interceptor API redesign, method overloading support |
@@ -30,6 +31,7 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.26.0](v10.26.0.md) - 2026-01-22 - **Breaking:** Removed count properties from public API
 - [v10.25.0](v10.25.0.md) - 2026-01-22 - **Breaking:** Removed WasCalled, added Verify() to method interceptors
 - [v10.24.0](v10.24.0.md) - 2026-01-20 - **Breaking:** Removed CallCount from public API
 - [v10.23.0](v10.23.0.md) - 2026-01-18 - Fix init-only property set tracking in standalone stubs

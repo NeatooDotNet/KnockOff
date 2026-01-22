@@ -12,7 +12,7 @@ partial class ReadWriteStoreKnockOff : global::KnockOff.Tests.IReadWriteStore, g
 		internal global::KnockOff.Tests.IReadWriteStore? _source;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
@@ -21,7 +21,7 @@ partial class ReadWriteStoreKnockOff : global::KnockOff.Tests.IReadWriteStore, g
 		public global::System.Func<string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The key and value from the most recent setter call.</summary>
 		public (string? Key, global::KnockOff.Tests.PropertyInfo? Value)? LastSetEntry { get; private set; }

@@ -12,7 +12,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		internal global::KnockOff.Tests.IIndexerTestService? _source;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
@@ -21,7 +21,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		public global::System.Func<string, string>? OnGet { get; set; }
 
 		/// <summary>Number of times the setter was accessed.</summary>
-		public int SetCount { get; private set; }
+		internal int SetCount { get; private set; }
 
 		/// <summary>The key and value from the most recent setter call.</summary>
 		public (string? Key, string? Value)? LastSetEntry { get; private set; }
@@ -124,7 +124,7 @@ partial class IndexerTestKnockOff : global::KnockOff.Tests.IIndexerTestService, 
 		internal global::KnockOff.Tests.IIndexerTestService? _source;
 
 		/// <summary>Number of times the getter was accessed.</summary>
-		public int GetCount { get; private set; }
+		internal int GetCount { get; private set; }
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public int? LastGetKey { get; private set; }
