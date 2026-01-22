@@ -1,8 +1,9 @@
 # Verifiable() API Design
 
 **Date:** 2026-01-18
-**Related Todo:** [Verifiable API Enhancement](../todos/verifiable-api.md)
-**Status:** Draft
+**Related Todo:** [Verifiable API Enhancement](../todos/completed/verifiable-api.md)
+**Status:** Complete
+**Completed:** 2026-01-22
 **Last Updated:** 2026-01-18 (Developer review fixes: DD8 correction, IsConfigured fix, Reset() clarification, VerifyAll() constraints, GetTypedHandlers() fix, VerificationFailure fix, _isVerifiable clarification, stub-level example code consistency)
 
 ---

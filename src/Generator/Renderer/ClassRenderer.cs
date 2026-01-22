@@ -268,6 +268,12 @@ internal static class ClassRenderer
         w.Line($"{indent}public sealed class {indexer.InterceptorClassName}{indexer.TypeParameterList}{indexer.ConstraintClauses}");
         w.Line($"{indent}{{");
 
+        // Verifiable state
+        w.Line($"{indent1}private bool _isVerifiable;");
+        w.Line($"{indent1}private global::KnockOff.Times? _verifiableTimes;");
+        w.Line($"{indent1}private bool _configured;");
+        w.Line();
+
         if (indexer.HasGetter)
         {
             w.Line($"{indent1}/// <summary>Number of times the getter was accessed.</summary>");
@@ -281,8 +287,13 @@ internal static class ClassRenderer
 
             var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => p.Trim().Split(' ')[0]).ToArray();
             var paramList = string.Join(", ", paramTypes);
-            w.Line($"{indent1}/// <summary>Callback for getter.</summary>");
-            w.Line($"{indent1}public global::System.Func<{paramList}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
+            w.Line($"{indent1}private global::System.Func<{paramList}, {indexer.ReturnType}>? _onGet;");
+            w.Line($"{indent1}/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>");
+            w.Line($"{indent1}public global::System.Func<{paramList}, {indexer.ReturnType}>? OnGet");
+            w.Line($"{indent1}{{");
+            w.Line($"{indent1}\tget => _onGet;");
+            w.Line($"{indent1}\tset {{ _onGet = value; if (value != null) _configured = true; }}");
+            w.Line($"{indent1}}}");
             w.Line();
         }
 
@@ -299,8 +310,13 @@ internal static class ClassRenderer
 
             var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => p.Trim().Split(' ')[0]).ToArray();
             var paramList = string.Join(", ", paramTypes);
-            w.Line($"{indent1}/// <summary>Callback for setter.</summary>");
-            w.Line($"{indent1}public global::System.Action<{paramList}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
+            w.Line($"{indent1}private global::System.Action<{paramList}, {indexer.ReturnType}>? _onSet;");
+            w.Line($"{indent1}/// <summary>Callback for setter. Setting this marks the indexer as configured.</summary>");
+            w.Line($"{indent1}public global::System.Action<{paramList}, {indexer.ReturnType}>? OnSet");
+            w.Line($"{indent1}{{");
+            w.Line($"{indent1}\tget => _onSet;");
+            w.Line($"{indent1}\tset {{ _onSet = value; if (value != null) _configured = true; }}");
+            w.Line($"{indent1}}}");
             w.Line();
         }
 
@@ -329,13 +345,100 @@ internal static class ClassRenderer
         w.Line($"{indent1}public global::System.Collections.Generic.Dictionary<{singleKeyType}, {indexer.ReturnType}> Backing {{ get; }} = new();");
         w.Line();
 
-        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing)
-        w.Line($"{indent1}/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing).</summary>");
+        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing) and verifiable marking
+        w.Line($"{indent1}/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>");
         var resetParts = new List<string>();
         if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default;");
         if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default;");
         // Note: Backing dictionary is intentionally NOT cleared
         w.Line($"{indent1}public void Reset() {{ {string.Join(" ", resetParts)} }}");
+        w.Line();
+
+        // Build total count expression based on available accessors
+        var totalCountExpr = indexer.HasGetter && indexer.HasSetter
+            ? "GetCount + SetCount"
+            : (indexer.HasGetter ? "GetCount" : "SetCount");
+
+        // Verifiable methods (fluent)
+        w.Line($"{indent1}/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public {indexer.InterceptorClassName}{indexer.TypeParameterList} Verifiable() {{ _isVerifiable = true; _verifiableTimes = null; return this; }}");
+        w.Line();
+        w.Line($"{indent1}/// <summary>Marks this indexer for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public {indexer.InterceptorClassName}{indexer.TypeParameterList} Verifiable(global::KnockOff.Times times) {{ _isVerifiable = true; _verifiableTimes = times; return this; }}");
+        w.Line();
+
+        // Verify methods - throw on failure
+        w.Line($"{indent1}/// <summary>Verifies the indexer was accessed at least once. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify(global::KnockOff.Times times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tvar totalCount = {totalCountExpr};");
+        w.Line($"{indent1}\tif (!times.Validate(totalCount))");
+        w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", times, totalCount));");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // VerifyGet methods
+        if (indexer.HasGetter)
+        {
+            w.Line($"{indent1}/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>");
+            w.Line($"{indent1}public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);");
+            w.Line();
+
+            w.Line($"{indent1}/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+            w.Line($"{indent1}public void VerifyGet(global::KnockOff.Times times)");
+            w.Line($"{indent1}{{");
+            w.Line($"{indent1}\tif (!times.Validate(GetCount))");
+            w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (get)\", times, GetCount));");
+            w.Line($"{indent1}}}");
+            w.Line();
+        }
+
+        // VerifySet methods
+        if (indexer.HasSetter)
+        {
+            w.Line($"{indent1}/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>");
+            w.Line($"{indent1}public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);");
+            w.Line();
+
+            w.Line($"{indent1}/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+            w.Line($"{indent1}public void VerifySet(global::KnockOff.Times times)");
+            w.Line($"{indent1}{{");
+            w.Line($"{indent1}\tif (!times.Validate(SetCount))");
+            w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (set)\", times, SetCount));");
+            w.Line($"{indent1}}}");
+            w.Line();
+        }
+
+        // Internal verification support for stub-level Verify/VerifyAll
+        w.Line($"{indent1}/// <summary>Whether this indexer was marked with Verifiable().</summary>");
+        w.Line($"{indent1}internal bool IsVerifiable => _isVerifiable;");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Whether this indexer has been configured (callbacks registered).</summary>");
+        w.Line($"{indent1}internal bool IsConfigured => _configured;");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerification()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!_isVerifiable) return null;");
+        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\tvar totalCount = {totalCountExpr};");
+        w.Line($"{indent1}\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", times, totalCount);");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent1}\tif (!IsConfigured) return null;");
+        w.Line($"{indent1}\tvar totalCount = {totalCountExpr};");
+        w.Line($"{indent1}\treturn totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", global::KnockOff.Times.AtLeastOnce, totalCount);");
+        w.Line($"{indent1}}}");
 
         w.Line($"{indent}}}");
         w.Line();
