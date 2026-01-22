@@ -141,10 +141,13 @@ public class OverloadedMethodVerificationBenchmarks
     }
 
     [Benchmark]
-    public bool KnockOff_VerifyOverloadedCalls()
+    public void KnockOff_VerifyOverloadedCalls()
     {
-        return _processIntTracking.WasCalled && _processIntTracking.LastArg == 42
-            && _processStringTracking.WasCalled && _processStringTracking.LastArg == "test"
-            && _processTwoArgsTracking.WasCalled && _processTwoArgsTracking.LastArgs == (1, 2);
+        _processIntTracking.Verify();
+        _ = _processIntTracking.LastArg == 42;
+        _processStringTracking.Verify();
+        _ = _processStringTracking.LastArg == "test";
+        _processTwoArgsTracking.Verify();
+        _ = _processTwoArgsTracking.LastArgs == (1, 2);
     }
 }

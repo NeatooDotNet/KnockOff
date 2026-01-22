@@ -48,7 +48,7 @@ public partial class IRuleOfTTests
 
         await rule.RunRule(validateStub, null);
 
-        Assert.True(stub.RunRule.WasCalled);
+        stub.RunRule.Verify();
         Assert.Equal(1, stub.RunRule.CallCount);
     }
 
@@ -204,7 +204,7 @@ public class IRuleOfTStandaloneTests
 
         await rule.RunRule(validateStub, null);
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 }
 
@@ -253,7 +253,7 @@ public partial class IRuleOfCustomTypeTests
 
         await rule.RunRule(customStub, null);
 
-        Assert.True(stub.RunRule1.WasCalled);
+        stub.RunRule1.Verify();
     }
 
     /// <summary>
@@ -278,6 +278,6 @@ public partial class IRuleOfCustomTypeTests
         await baseRule.RunRule(customStub, null);
 
         // The call should be tracked (delegated to the typed implementation)
-        Assert.True(stub.RunRule1.WasCalled);
+        stub.RunRule1.Verify();
     }
 }

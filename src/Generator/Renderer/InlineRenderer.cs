@@ -58,7 +58,7 @@ internal static class InlineRenderer
         // Check if any interface has generic methods - if so, generate helper interfaces
         if (unit.HasGenericMethods)
         {
-            w.Line("\t\tprivate interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }");
+            w.Line("\t\tprivate interface IGenericMethodCallTracker { int CallCount { get; } }");
             w.Line("\t\tprivate interface IResettable { void Reset(); }");
             w.Line();
         }
@@ -703,11 +703,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t}");
         w.Line();
 
-        // Aggregate tracking (internal - use WasCalled or Verify for public API)
+        // Aggregate tracking (internal - use Verify for public API)
         w.Line("\t\t\tinternal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
-        w.Line();
-        w.Line("\t\t\t/// <summary>True if this method was called with any type argument.</summary>");
-        w.Line("\t\t\tpublic bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);");
         w.Line();
         w.Line($"\t\t\t/// <summary>All type argument(s) that were used in calls.</summary>");
         w.Line($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Keys.ToList();");
@@ -719,6 +716,19 @@ internal static class InlineRenderer
         w.Line("\t\t\t{");
         w.Line("\t\t\t\tforeach (var handler in _typedHandlers.Values.Cast<IResettable>())");
         w.Line("\t\t\t\t\thandler.Reset();");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // Verify methods
+        w.Line("\t\t\t/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\tpublic void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\tpublic void Verify(global::KnockOff.Times times)");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!times.Validate(TotalCallCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{handler.MethodName}\", times, TotalCallCount));");
         w.Line("\t\t\t}");
         w.Line();
 
@@ -782,10 +792,6 @@ internal static class InlineRenderer
             w.Line($"\t\t\t\tpublic {handler.LastCallArgsType} LastCallArgs {{ get; private set; }}");
             w.Line();
         }
-
-        w.Line("\t\t\t\t/// <summary>True if this method was called at least once with these type arguments.</summary>");
-        w.Line("\t\t\t\tpublic bool WasCalled => CallCount > 0;");
-        w.Line();
 
         // OnCall method (returns IMethodTracking for consistency with regular method interceptors)
         w.Line("\t\t\t\t/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
@@ -1256,11 +1262,8 @@ internal static class InlineRenderer
         w.Line($"\t\tpublic sealed class {del.InterceptorClassName}{del.TypeParameterList}{del.ConstraintClauses}");
         w.Line("\t\t{");
 
-        // CallCount and WasCalled
+        // CallCount (internal - use Verify(Times) for public API)
         w.Line("\t\t\tinternal int CallCount { get; private set; }");
-        w.Line();
-        w.Line("\t\t\t/// <summary>Whether this delegate was invoked at least once.</summary>");
-        w.Line("\t\t\tpublic bool WasCalled => CallCount > 0;");
         w.Line();
 
         // LastCallArg/LastCallArgs
@@ -1308,6 +1311,19 @@ internal static class InlineRenderer
         else if (del.LastCallArgsType != null)
             w.Append("LastCallArgs = default; ");
         w.Line("}");
+        w.Line();
+
+        // Verify methods
+        w.Line("\t\t\t/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\tpublic void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line();
+
+        w.Line("\t\t\t/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+        w.Line("\t\t\tpublic void Verify(global::KnockOff.Times times)");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\tif (!times.Validate(CallCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"delegate\", times, CallCount));");
+        w.Line("\t\t\t}");
 
         w.Line("\t\t}");
         w.Line();

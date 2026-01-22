@@ -108,7 +108,7 @@ public partial class EmailServiceTests
         // Pass stub.Object to method expecting EmailService
         UseEmailService(stub.Object);
 
-        Assert.True(stub.Send.WasCalled);
+        stub.Send.Verify();
     }
     #endregion
 }

@@ -475,8 +475,15 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Int32_void?.CallCount ?? 0) + (_sequence_String_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_string_int_void?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_string_int_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-		/// <summary>Whether this method was called at least once (any overload).</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Add", times, CallCount));
+		}
 
 		/// <summary>Configures callback for Add(string, int). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(string? key, int? @value)> OnCall(AddDelegate_String_Int32_void callback)
@@ -668,8 +675,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? key, int? @value) LastArgs => _lastArgs;
@@ -721,8 +726,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public global::System.Collections.Generic.KeyValuePair<string, int> LastArg => _lastArg;
@@ -892,12 +895,19 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ContainsKey", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(ContainsKeyDelegate callback)
@@ -1004,8 +1014,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
@@ -1134,8 +1142,15 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Boolean?.CallCount ?? 0) + (_sequence_String_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_string_int_Boolean?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_string_int_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-		/// <summary>Whether this method was called at least once (any overload).</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Remove", times, CallCount));
+		}
 
 		/// <summary>Configures callback for Remove(string). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(RemoveDelegate_String_Boolean callback)
@@ -1323,8 +1338,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
@@ -1376,8 +1389,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public global::System.Collections.Generic.KeyValuePair<string, int> LastArg => _lastArg;
@@ -1547,12 +1558,19 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("TryGetValue", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(TryGetValueDelegate callback)
@@ -1660,8 +1678,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
@@ -1775,9 +1791,16 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Clear", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
@@ -1883,8 +1906,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1996,12 +2017,19 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public global::System.Collections.Generic.KeyValuePair<string, int>? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public global::System.Collections.Generic.KeyValuePair<string, int>? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Contains", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<global::System.Collections.Generic.KeyValuePair<string, int>> OnCall(ContainsDelegate callback)
@@ -2108,8 +2136,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public global::System.Collections.Generic.KeyValuePair<string, int> LastArg => _lastArg;
@@ -2224,12 +2250,19 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (global::System.Collections.Generic.KeyValuePair<string, int>[]? array, int? arrayIndex)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (global::System.Collections.Generic.KeyValuePair<string, int>[]? array, int? arrayIndex)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CopyTo", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(global::System.Collections.Generic.KeyValuePair<string, int>[]? array, int? arrayIndex)> OnCall(global::System.Action<global::System.Collections.Generic.KeyValuePair<string, int>[], int> callback)
@@ -2338,8 +2371,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::System.Collections.Generic.KeyValuePair<string, int>[]? array, int? arrayIndex) LastArgs => _lastArgs;
@@ -2468,8 +2499,15 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-		/// <summary>Whether this method was called at least once (any overload).</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount));
+		}
 
 		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_Collections_Generic_KeyValuePair_string_int callback)
@@ -2656,8 +2694,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2702,8 +2738,6 @@ partial class DictionaryStringIntKnockOff : global::System.Collections.Generic.I
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;

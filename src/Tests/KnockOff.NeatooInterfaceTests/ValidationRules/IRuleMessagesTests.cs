@@ -60,7 +60,7 @@ public partial class IRuleMessagesTests
         messages.Add("PropertyName", "Error message");
 
         // The Add(string, string) method is specific to IRuleMessages
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public partial class IRuleMessagesTests
         list.Add(messageStub);
 
         // The IList.Add method should also be tracked
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public partial class IRuleMessagesTests
 
         list.Clear();
 
-        Assert.True(stub.Clear.WasCalled);
+        stub.Clear.Verify();
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public partial class IRuleMessagesTests
 
         var result = list.Contains(messageStub);
 
-        Assert.True(stub.Contains.WasCalled);
+        stub.Contains.Verify();
         Assert.True(result);
     }
 
@@ -162,7 +162,7 @@ public partial class IRuleMessagesTests
 
         var result = list.IndexOf(messageStub);
 
-        Assert.True(stub.IndexOf.WasCalled);
+        stub.IndexOf.Verify();
         Assert.Equal(3, result);
     }
 
@@ -175,7 +175,7 @@ public partial class IRuleMessagesTests
         var messageStub = new RuleMessageStubForList();
         list.Insert(0, messageStub);
 
-        Assert.True(stub.Insert.WasCalled);
+        stub.Insert.Verify();
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public partial class IRuleMessagesTests
         var messageStub = new RuleMessageStubForList();
         list.Remove(messageStub);
 
-        Assert.True(stub.Remove.WasCalled);
+        stub.Remove.Verify();
     }
 
     [Fact]
@@ -198,7 +198,7 @@ public partial class IRuleMessagesTests
 
         list.RemoveAt(0);
 
-        Assert.True(stub.RemoveAt.WasCalled);
+        stub.RemoveAt.Verify();
     }
 
     #endregion
@@ -225,7 +225,7 @@ public partial class IRuleMessagesTests
         var array = new IRuleMessage[5];
         collection.CopyTo(array, 0);
 
-        Assert.True(stub.CopyTo.WasCalled);
+        stub.CopyTo.Verify();
     }
 
     #endregion
@@ -243,7 +243,7 @@ public partial class IRuleMessagesTests
 
         var enumerator = enumerable.GetEnumerator();
 
-        Assert.True(stub.GetEnumerator.WasCalled);
+        stub.GetEnumerator.Verify();
     }
 
     #endregion
@@ -261,7 +261,7 @@ public partial class IRuleMessagesTests
 
         stub.Add.Reset();
 
-        Assert.False(stub.Add.WasCalled);
+        stub.Add.Verify(Times.Never);
         Assert.Equal(0, stub.Add.CallCount);
     }
 
@@ -321,7 +321,7 @@ public class IRuleMessagesStandaloneTests
         messages.Add("Property", "Message");
 
         // Tracking is available via the returned tracking object
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]

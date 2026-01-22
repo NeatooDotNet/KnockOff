@@ -98,7 +98,7 @@ public partial class IValidateMetaPropertiesTests
         await meta.WaitForTasks();
 
         // Method overloads should be distinguishable
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
         Assert.Equal(1, stub.WaitForTasks.CallCount);
     }
 
@@ -113,7 +113,7 @@ public partial class IValidateMetaPropertiesTests
 
         // The overload with CancellationToken should be tracked
         // Generator should distinguish overloads
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public partial class IValidateMetaPropertiesTests
         await meta.RunRules("TestProperty", null);
 
         // RunRules has overloads - string and RunRulesFlag versions
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public partial class IValidateMetaPropertiesTests
 
         await meta.RunRules(RunRulesFlag.All, null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public partial class IValidateMetaPropertiesTests
 
         meta.ClearAllMessages();
 
-        Assert.True(stub.ClearAllMessages.WasCalled);
+        stub.ClearAllMessages.Verify();
         Assert.Equal(1, stub.ClearAllMessages.CallCount);
     }
 
@@ -177,7 +177,7 @@ public partial class IValidateMetaPropertiesTests
 
         meta.ClearSelfMessages();
 
-        Assert.True(stub.ClearSelfMessages.WasCalled);
+        stub.ClearSelfMessages.Verify();
     }
 
     #endregion
@@ -209,7 +209,7 @@ public partial class IValidateMetaPropertiesTests
 
         stub.WaitForTasks.Reset();
 
-        Assert.False(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify(Times.Never);
         Assert.Equal(0, stub.WaitForTasks.CallCount);
     }
 
@@ -264,7 +264,7 @@ public class IValidateMetaPropertiesStandaloneTests
         await meta.WaitForTasks();
 
         // Tracking is available via the returned tracking object
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]

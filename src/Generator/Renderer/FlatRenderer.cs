@@ -228,7 +228,6 @@ internal static class FlatRenderer
 		using (w.Block("private interface IGenericMethodCallTracker"))
 		{
 			w.Line("int CallCount { get; }");
-			w.Line("bool WasCalled { get; }");
 		}
 		w.Line();
 
@@ -905,7 +904,7 @@ internal static class FlatRenderer
 					w.Line("if (times.IsForever)");
 					using (w.Braces())
 					{
-						w.Line("if (!tracking.WasCalled)");
+						w.Line("if (tracking.CallCount == 0)");
 						w.Line("\treturn false;");
 					}
 					w.Line("else if (!times.Verify(tracking.CallCount))");
@@ -1048,13 +1047,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// CallCount property (internal - use WasCalled or Verify(Times) for public API)
+			// CallCount property (internal - use Verify(Times) for public API)
 			w.Line("internal int CallCount { get; private set; }");
-			w.Line();
-
-			// WasCalled property
-			w.Line("/// <summary>True if CallCount > 0.</summary>");
-			w.Line("public bool WasCalled => CallCount > 0;");
 			w.Line();
 
 			// LastArg/LastArgs property (non-nullable to match interface)
@@ -1294,7 +1288,7 @@ internal static class FlatRenderer
 						w.Line("if (times.IsForever)");
 						using (w.Braces())
 						{
-							w.Line("if (!tracking.WasCalled)");
+							w.Line("if (tracking.CallCount == 0)");
 							w.Line("\treturn false;");
 						}
 						w.Line("else if (!times.Verify(tracking.CallCount))");
@@ -1434,10 +1428,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// CallCount (internal - use WasCalled or Verify(Times) for public API)
+			// CallCount (internal - use Verify(Times) for public API)
 			w.Line("internal int CallCount { get; private set; }");
-			w.Line();
-			w.Line("public bool WasCalled => CallCount > 0;");
 			w.Line();
 
 			if (method.TrackableParameters.Count == 1)
@@ -1528,7 +1520,7 @@ internal static class FlatRenderer
 					w.Line("if (times.IsForever)");
 					using (w.Braces())
 					{
-						w.Line("if (!tracking.WasCalled)");
+						w.Line("if (tracking.CallCount == 0)");
 						w.Line("\treturn false;");
 					}
 					w.Line("else if (!times.Verify(tracking.CallCount))");
@@ -1567,13 +1559,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// CallCount property (internal - use WasCalled or Verify(Times) for public API)
+			// CallCount property (internal - use Verify(Times) for public API)
 			w.Line("internal int CallCount { get; private set; }");
-			w.Line();
-
-			// WasCalled property
-			w.Line("/// <summary>True if CallCount > 0.</summary>");
-			w.Line("public bool WasCalled => CallCount > 0;");
 			w.Line();
 
 			// LastArg/LastArgs property (non-nullable to match interface)
@@ -1696,11 +1683,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// Aggregate tracking (internal - use WasCalled or Verify for public API)
+			// Aggregate tracking (internal - use Verify for public API)
 			w.Line("internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);");
-			w.Line();
-			w.Line("/// <summary>True if this method was called with any type argument.</summary>");
-			w.Line("public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);");
 			w.Line();
 			w.Line($"/// <summary>All type argument(s) that were used in calls.</summary>");
 			w.Line($"public global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Keys.ToList();");
@@ -1713,6 +1697,20 @@ internal static class FlatRenderer
 				w.Line("foreach (var handler in _typedHandlers.Values)");
 				w.Line("\t((IResettable)handler).Reset();");
 				w.Line("_typedHandlers.Clear();");
+			}
+			w.Line();
+
+			// Verify methods
+			w.Line("/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+			w.Line();
+
+			w.Line("/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify(global::KnockOff.Times times)");
+			using (w.Braces())
+			{
+				w.Line("if (!times.Validate(TotalCallCount))");
+				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{handler.MethodName}\", times, TotalCallCount));");
 			}
 			w.Line();
 
@@ -1757,11 +1755,6 @@ internal static class FlatRenderer
 				w.Line($"public {handler.LastCallType}? LastCallArgs {{ get; private set; }}");
 				w.Line();
 			}
-
-			// WasCalled
-			w.Line("/// <summary>True if this method was called at least once with these type arguments.</summary>");
-			w.Line("public bool WasCalled => CallCount > 0;");
-			w.Line();
 
 			// OnCall method (returns IMethodTracking for consistency with regular method interceptors)
 			w.Line("/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");

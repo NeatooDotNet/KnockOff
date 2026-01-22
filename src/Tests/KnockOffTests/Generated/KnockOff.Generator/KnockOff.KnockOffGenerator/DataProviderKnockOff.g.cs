@@ -93,9 +93,6 @@ partial class DataProviderKnockOff : global::KnockOff.Tests.IDataProvider, globa
 
 		internal int CallCount { get; private set; }
 
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>Last argument passed to this method. Default if never called.</summary>
 		public int LastArg => _lastArg;
 

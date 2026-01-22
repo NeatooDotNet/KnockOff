@@ -366,8 +366,15 @@ partial class IValidateMetaPropertiesTests
 
 			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_NoParams_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-			/// <summary>Whether this method was called at least once (any overload).</summary>
-			public bool WasCalled => CallCount > 0;
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("WaitForTasks", times, CallCount));
+			}
 
 			/// <summary>Configures callback for WaitForTasks(). Returns tracking interface.</summary>
 			public global::KnockOff.IMethodTracking OnCall(WaitForTasksDelegate_NoParams_Threading_Tasks_Task callback)
@@ -554,8 +561,6 @@ partial class IValidateMetaPropertiesTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -601,8 +606,6 @@ partial class IValidateMetaPropertiesTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.Threading.CancellationToken LastArg => _lastArg;
@@ -783,8 +786,15 @@ partial class IValidateMetaPropertiesTests
 
 			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-			/// <summary>Whether this method was called at least once (any overload).</summary>
-			public bool WasCalled => CallCount > 0;
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRules", times, CallCount));
+			}
 
 			/// <summary>Configures callback for RunRules(string, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
 			public global::KnockOff.IMethodTrackingArgs<(string propertyName, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task callback)
@@ -972,8 +982,6 @@ partial class IValidateMetaPropertiesTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (string propertyName, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -1025,8 +1033,6 @@ partial class IValidateMetaPropertiesTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -1192,9 +1198,16 @@ partial class IValidateMetaPropertiesTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ClearAllMessages", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
@@ -1300,8 +1313,6 @@ partial class IValidateMetaPropertiesTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -1409,9 +1420,16 @@ partial class IValidateMetaPropertiesTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ClearSelfMessages", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
@@ -1517,8 +1535,6 @@ partial class IValidateMetaPropertiesTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;

@@ -385,12 +385,15 @@ Properties expose separate interceptors for get and set operations.
 
 **Get verification:**
 - `GetCount` - Number of times the property was read
-- `WasGot` - Whether the property was read at least once
+- `VerifyGet()` / `VerifyGet(Times)` - Verify get access count
 
 **Set verification:**
 - `SetCount` - Number of times the property was written
-- `WasSet` - Whether the property was written at least once
 - `LastSetValue` - The most recent value assigned to the property
+- `VerifySet()` / `VerifySet(Times)` - Verify set access count
+
+**Combined verification:**
+- `Verify()` / `Verify(Times)` - Verify total access count (get + set)
 
 These follow the same patterns as method verification but distinguish between read and write operations.
 

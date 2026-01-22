@@ -117,7 +117,6 @@ public class OutParameterTests
 		Assert.Equal("TestName", name);
 		Assert.Equal(100, count);
 		tracking.Verify(Times.Once);
-		Assert.True(tracking.WasCalled);
 	}
 
 	[Fact]
@@ -168,7 +167,6 @@ public class OutParameterTests
 		knockOff.TryGetValue.Reset();
 
 		tracking.Verify(Times.Never);
-		Assert.False(tracking.WasCalled);
 	}
 
 	[Fact]

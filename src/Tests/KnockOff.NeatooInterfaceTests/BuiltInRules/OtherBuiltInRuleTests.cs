@@ -378,7 +378,7 @@ public partial class IAttributeToRuleTests
         var propertyInfoStub = new PropertyInfoStubForAttr();
         converter.GetRule<ValidateBaseStubForAttr>(propertyInfoStub, null);
 
-        Assert.True(stub.GetRule.WasCalled);
+        stub.GetRule.Verify();
     }
 
     [Fact]
@@ -390,7 +390,7 @@ public partial class IAttributeToRuleTests
         var propertyInfoStub = new PropertyInfoStubForAttr();
         converter.GetRule<ValidateBaseStubForAttr>(propertyInfoStub, null);
 
-        Assert.True(stub.GetRule.Of<ValidateBaseStubForAttr>().WasCalled);
+        stub.GetRule.Of<ValidateBaseStubForAttr>().Verify();
     }
 
     [Fact]
@@ -493,6 +493,6 @@ public class IAttributeToRuleStandaloneTests
         converter.GetRule<ValidateBaseStubForAttr>(propertyInfoStub, null);
 
         // Standalone stub may have different interceptor naming
-        Assert.True(stub.GetRule.WasCalled);
+        stub.GetRule.Verify();
     }
 }

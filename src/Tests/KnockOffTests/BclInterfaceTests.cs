@@ -26,8 +26,7 @@ public class BclInterfaceTests
 
         disposable.Dispose();
 
-        Assert.True(stub.Dispose.WasCalled);
-        Assert.Equal(1, stub.Dispose.CallCount);
+        stub.Dispose.Verify(Times.Once);
     }
 
     [Fact]
@@ -64,8 +63,7 @@ public class BclInterfaceTests
 
         await disposable.DisposeAsync();
 
-        Assert.True(stub.DisposeAsync.WasCalled);
-        Assert.Equal(1, stub.DisposeAsync.CallCount);
+        stub.DisposeAsync.Verify(Times.Once);
     }
 
     #endregion
@@ -80,7 +78,7 @@ public class BclInterfaceTests
 
         // GetEnumerator will throw because no OnCall is set, but we can verify tracking
         Assert.Throws<InvalidOperationException>(() => enumerable.GetEnumerator());
-        Assert.True(stub.GetEnumerator.WasCalled);
+        stub.GetEnumerator.Verify();
     }
 
     [Fact]
@@ -90,7 +88,7 @@ public class BclInterfaceTests
         IEnumerable<string> enumerable = stub;
 
         Assert.Throws<InvalidOperationException>(() => enumerable.GetEnumerator());
-        Assert.True(stub.GetEnumerator.WasCalled);
+        stub.GetEnumerator.Verify();
     }
 
     [Fact]
@@ -114,7 +112,7 @@ public class BclInterfaceTests
         IEnumerable<int> enumerable = stub;
 
         Assert.Throws<InvalidOperationException>(() => enumerable.GetEnumerator());
-        Assert.True(stub.GetEnumerator.WasCalled);
+        stub.GetEnumerator.Verify();
     }
 
     [Fact]
@@ -124,7 +122,7 @@ public class BclInterfaceTests
         IEnumerable<User> enumerable = stub;
 
         Assert.Throws<InvalidOperationException>(() => enumerable.GetEnumerator());
-        Assert.True(stub.GetEnumerator.WasCalled);
+        stub.GetEnumerator.Verify();
     }
 
     [Fact]
@@ -157,7 +155,7 @@ public class BclInterfaceTests
 
         list.Add("test");
 
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
         Assert.Equal("test", stub.Add.LastCallArg);
     }
 
@@ -182,7 +180,7 @@ public class BclInterfaceTests
 
         var result = list.Contains("test");
 
-        Assert.True(stub.Contains.WasCalled);
+        stub.Contains.Verify();
         Assert.Equal("test", stub.Contains.LastCallArg);
     }
 
@@ -234,7 +232,7 @@ public class BclInterfaceTests
 
         list.Add(user);
 
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
         Assert.Same(user, stub.Add.LastCallArg);
     }
 
@@ -262,7 +260,7 @@ public class BclInterfaceTests
 
         collection.CopyTo(array, 0);
 
-        Assert.True(stub.CopyTo.WasCalled);
+        stub.CopyTo.Verify();
     }
 
     [Fact]
@@ -273,7 +271,7 @@ public class BclInterfaceTests
 
         collection.Add("item");
 
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
         Assert.Equal("item", stub.Add.LastCallArg);
     }
 
@@ -285,7 +283,7 @@ public class BclInterfaceTests
 
         collection.Clear();
 
-        Assert.True(stub.Clear.WasCalled);
+        stub.Clear.Verify();
     }
 
     [Fact]
@@ -296,7 +294,7 @@ public class BclInterfaceTests
 
         collection.Contains(42);
 
-        Assert.True(stub.Contains.WasCalled);
+        stub.Contains.Verify();
         Assert.Equal(42, stub.Contains.LastCallArg);
     }
 
@@ -312,7 +310,7 @@ public class BclInterfaceTests
 
         dict.Add("key", "value");
 
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
     }
 
     [Fact]
@@ -336,7 +334,7 @@ public class BclInterfaceTests
 
         dict.Add("key", 42);
 
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
     }
 
     [Fact]
@@ -347,7 +345,7 @@ public class BclInterfaceTests
 
         dict.TryGetValue("key", out _);
 
-        Assert.True(stub.TryGetValue.WasCalled);
+        stub.TryGetValue.Verify();
     }
 
     [Fact]
@@ -372,7 +370,7 @@ public class BclInterfaceTests
 
         dict.ContainsKey("test");
 
-        Assert.True(stub.ContainsKey.WasCalled);
+        stub.ContainsKey.Verify();
         Assert.Equal("test", stub.ContainsKey.LastCallArg);
     }
 
@@ -432,7 +430,7 @@ public class BclInterfaceTests
 
         dict.ContainsKey("test");
 
-        Assert.True(stub.ContainsKey.WasCalled);
+        stub.ContainsKey.Verify();
     }
 
     #endregion
@@ -447,7 +445,7 @@ public class BclInterfaceTests
 
         set.Add("item");
 
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
         Assert.Equal("item", stub.Add.LastCallArg);
     }
 
@@ -459,7 +457,7 @@ public class BclInterfaceTests
 
         set.Contains("item");
 
-        Assert.True(stub.Contains.WasCalled);
+        stub.Contains.Verify();
     }
 
     [Fact]
@@ -471,7 +469,7 @@ public class BclInterfaceTests
 
         set.UnionWith(other);
 
-        Assert.True(stub.UnionWith.WasCalled);
+        stub.UnionWith.Verify();
     }
 
     [Fact]
@@ -483,7 +481,7 @@ public class BclInterfaceTests
 
         set.IntersectWith(other);
 
-        Assert.True(stub.IntersectWith.WasCalled);
+        stub.IntersectWith.Verify();
     }
 
     #endregion
@@ -498,7 +496,7 @@ public class BclInterfaceTests
 
         comparable.CompareTo("other");
 
-        Assert.True(stub.CompareTo.WasCalled);
+        stub.CompareTo.Verify();
         Assert.Equal("other", stub.CompareTo.LastCallArg);
     }
 
@@ -510,7 +508,7 @@ public class BclInterfaceTests
 
         comparable.CompareTo("other");
 
-        Assert.True(stub.CompareTo.WasCalled);
+        stub.CompareTo.Verify();
         Assert.Equal("other", stub.CompareTo.LastCallArg);
     }
 
@@ -522,7 +520,7 @@ public class BclInterfaceTests
 
         comparable.CompareTo(42);
 
-        Assert.True(stub.CompareTo.WasCalled);
+        stub.CompareTo.Verify();
         Assert.Equal(42, stub.CompareTo.LastCallArg);
     }
 
@@ -552,7 +550,7 @@ public class BclInterfaceTests
 
         comparer.Compare("a", "b");
 
-        Assert.True(stub.Compare.WasCalled);
+        stub.Compare.Verify();
     }
 
     [Fact]
@@ -563,7 +561,7 @@ public class BclInterfaceTests
 
         comparer.Compare("a", "b");
 
-        Assert.True(stub.Compare.WasCalled);
+        stub.Compare.Verify();
     }
 
     [Fact]
@@ -590,7 +588,7 @@ public class BclInterfaceTests
 
         cloneable.Clone();
 
-        Assert.True(stub.Clone.WasCalled);
+        stub.Clone.Verify();
     }
 
     [Fact]
@@ -618,7 +616,7 @@ public class BclInterfaceTests
 
         provider.GetService(typeof(string));
 
-        Assert.True(stub.GetService.WasCalled);
+        stub.GetService.Verify();
         Assert.Equal(typeof(string), stub.GetService.LastCallArg);
     }
 
@@ -648,7 +646,7 @@ public class BclInterfaceTests
 
         // Subscribe throws because no OnCall is set (IDisposable has no smart default)
         Assert.Throws<InvalidOperationException>(() => observable.Subscribe(observer));
-        Assert.True(stub.Subscribe.WasCalled);
+        stub.Subscribe.Verify();
     }
 
     [Fact]
@@ -659,7 +657,7 @@ public class BclInterfaceTests
 
         observer.OnNext("value");
 
-        Assert.True(stub.OnNext.WasCalled);
+        stub.OnNext.Verify();
         Assert.Equal("value", stub.OnNext.LastCallArg);
     }
 
@@ -672,7 +670,7 @@ public class BclInterfaceTests
 
         observer.OnError(error);
 
-        Assert.True(stub.OnError.WasCalled);
+        stub.OnError.Verify();
         Assert.Same(error, stub.OnError.LastCallArg);
     }
 
@@ -684,7 +682,7 @@ public class BclInterfaceTests
 
         observer.OnCompleted();
 
-        Assert.True(stub.OnCompleted.WasCalled);
+        stub.OnCompleted.Verify();
     }
 
     [Fact]
@@ -695,7 +693,7 @@ public class BclInterfaceTests
 
         observer.OnNext(42);
 
-        Assert.True(stub.OnNext.WasCalled);
+        stub.OnNext.Verify();
         Assert.Equal(42, stub.OnNext.LastCallArg);
     }
 
@@ -804,7 +802,7 @@ public class BclInterfaceTests
 
         reader.Read();
 
-        Assert.True(stub.Read.WasCalled);
+        stub.Read.Verify();
     }
 
     [Fact]
@@ -815,7 +813,7 @@ public class BclInterfaceTests
 
         reader.Close();
 
-        Assert.True(stub.Close.WasCalled);
+        stub.Close.Verify();
     }
 
     [Fact]
@@ -826,7 +824,7 @@ public class BclInterfaceTests
 
         reader.GetValue(0);
 
-        Assert.True(stub.GetValue.WasCalled);
+        stub.GetValue.Verify();
         Assert.Equal(0, stub.GetValue.LastCallArg);
     }
 
@@ -838,7 +836,7 @@ public class BclInterfaceTests
 
         transaction.Commit();
 
-        Assert.True(stub.Commit.WasCalled);
+        stub.Commit.Verify();
     }
 
     [Fact]
@@ -849,7 +847,7 @@ public class BclInterfaceTests
 
         transaction.Rollback();
 
-        Assert.True(stub.Rollback.WasCalled);
+        stub.Rollback.Verify();
     }
 
     [Fact]
@@ -862,7 +860,7 @@ public class BclInterfaceTests
         var result = record.GetString(0);
 
         Assert.Null(result);
-        Assert.True(stub.GetString.WasCalled);
+        stub.GetString.Verify();
         Assert.Equal(0, stub.GetString.LastCallArg);
     }
 
@@ -874,7 +872,7 @@ public class BclInterfaceTests
 
         record.GetInt32(0);
 
-        Assert.True(stub.GetInt32.WasCalled);
+        stub.GetInt32.Verify();
     }
 
     #endregion
@@ -937,7 +935,7 @@ public class BclInterfaceTests
 
         serializable.GetSchema();
 
-        Assert.True(stub.GetSchema.WasCalled);
+        stub.GetSchema.Verify();
     }
 
     #endregion
@@ -953,7 +951,7 @@ public class BclInterfaceTests
 
         comparable.CompareTo(new object(), comparer);
 
-        Assert.True(stub.CompareTo.WasCalled);
+        stub.CompareTo.Verify();
     }
 
     #endregion
@@ -968,7 +966,7 @@ public class BclInterfaceTests
 
         provider.GetFormat(typeof(string));
 
-        Assert.True(stub.GetFormat.WasCalled);
+        stub.GetFormat.Verify();
         Assert.Equal(typeof(string), stub.GetFormat.LastCallArg);
     }
 
@@ -983,7 +981,7 @@ public class BclInterfaceTests
         IAsyncEnumerable<string> enumerable = stub;
 
         Assert.Throws<InvalidOperationException>(() => enumerable.GetAsyncEnumerator());
-        Assert.True(stub.GetAsyncEnumerator.WasCalled);
+        stub.GetAsyncEnumerator.Verify();
     }
 
     [Fact]
@@ -994,7 +992,7 @@ public class BclInterfaceTests
 
         await enumerator.MoveNextAsync();
 
-        Assert.True(stub.MoveNextAsync.WasCalled);
+        stub.MoveNextAsync.Verify();
     }
 
     [Fact]
@@ -1020,7 +1018,7 @@ public class BclInterfaceTests
 
         progress.Report(50);
 
-        Assert.True(stub.Report.WasCalled);
+        stub.Report.Verify();
         Assert.Equal(50, stub.Report.LastCallArg);
     }
 
@@ -1032,7 +1030,7 @@ public class BclInterfaceTests
 
         progress.Report("50% complete");
 
-        Assert.True(stub.Report.WasCalled);
+        stub.Report.Verify();
         Assert.Equal("50% complete", stub.Report.LastCallArg);
     }
 
@@ -1065,7 +1063,7 @@ public class BclInterfaceTests
         var result = formatter.Format("G", 42, null);
 
         Assert.Null(result);
-        Assert.True(stub.Format.WasCalled);
+        stub.Format.Verify();
     }
 
     [Fact]
@@ -1092,7 +1090,7 @@ public class BclInterfaceTests
 
         enumerator.MoveNext();
 
-        Assert.True(stub.MoveNext.WasCalled);
+        stub.MoveNext.Verify();
     }
 
     [Fact]
@@ -1155,7 +1153,7 @@ public class BclInterfaceTests
 
         // CreateOrderedEnumerable throws because IOrderedEnumerable<T> has no smart default
         Assert.Throws<InvalidOperationException>(() => ordered.CreateOrderedEnumerable<int>(x => x.Length, null, false));
-        Assert.True(stub.CreateOrderedEnumerable.WasCalled);
+        stub.CreateOrderedEnumerable.Verify();
     }
 
     [Fact]

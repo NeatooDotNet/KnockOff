@@ -60,7 +60,6 @@ public class SequencingTests
         Assert.Equal(11, svc.Add(5, 6));
 
         tracking.Verify(Times.Exactly(3));
-        Assert.True(tracking.WasCalled);
     }
 
     [Fact]

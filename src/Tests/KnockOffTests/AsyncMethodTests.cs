@@ -14,7 +14,6 @@ public class AsyncMethodTests
 
 		await service.DoWorkAsync();
 
-		Assert.True(tracking.WasCalled);
 		tracking.Verify(Times.Once);
 	}
 
@@ -40,7 +39,7 @@ public class AsyncMethodTests
 		var result = await service.GetOptionalAsync();
 
 		Assert.Null(result);
-		Assert.True(tracking.WasCalled);
+		tracking.Verify();
 	}
 
 	[Fact]
@@ -52,7 +51,7 @@ public class AsyncMethodTests
 
 		await service.DoWorkValueTaskAsync();
 
-		Assert.True(tracking.WasCalled);
+		tracking.Verify();
 	}
 
 	[Fact]

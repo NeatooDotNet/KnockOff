@@ -114,7 +114,7 @@ public partial class IValidatePropertyManagerTests
 
         await manager.WaitForTasks();
 
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
         Assert.Equal(1, stub.WaitForTasks.CallCount);
     }
 
@@ -126,7 +126,7 @@ public partial class IValidatePropertyManagerTests
 
         manager.HasProperty("TestProperty");
 
-        Assert.True(stub.HasProperty.WasCalled);
+        stub.HasProperty.Verify();
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public partial class IValidatePropertyManagerTests
 
         manager.GetProperty("Name");
 
-        Assert.True(stub.GetProperty.WasCalled);
+        stub.GetProperty.Verify();
         Assert.Equal("Name", stub.GetProperty.LastCallArg);
     }
 
@@ -194,7 +194,7 @@ public partial class IValidatePropertyManagerTests
         var properties = new List<IValidateProperty>();
         manager.SetProperties(properties);
 
-        Assert.True(stub.SetProperties.WasCalled);
+        stub.SetProperties.Verify();
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public partial class IValidatePropertyManagerTests
 
         await manager.RunRules(RunRulesFlag.All, null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -216,7 +216,7 @@ public partial class IValidatePropertyManagerTests
 
         manager.PauseAllActions();
 
-        Assert.True(stub.PauseAllActions.WasCalled);
+        stub.PauseAllActions.Verify();
     }
 
     [Fact]
@@ -227,7 +227,7 @@ public partial class IValidatePropertyManagerTests
 
         manager.ResumeAllActions();
 
-        Assert.True(stub.ResumeAllActions.WasCalled);
+        stub.ResumeAllActions.Verify();
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public partial class IValidatePropertyManagerTests
 
         manager.ClearAllMessages();
 
-        Assert.True(stub.ClearAllMessages.WasCalled);
+        stub.ClearAllMessages.Verify();
     }
 
     [Fact]
@@ -249,7 +249,7 @@ public partial class IValidatePropertyManagerTests
 
         manager.ClearSelfMessages();
 
-        Assert.True(stub.ClearSelfMessages.WasCalled);
+        stub.ClearSelfMessages.Verify();
     }
 
     #endregion
@@ -308,7 +308,7 @@ public partial class IValidatePropertyManagerTests
 
         stub.PauseAllActions.Reset();
 
-        Assert.False(stub.PauseAllActions.WasCalled);
+        stub.PauseAllActions.Verify(Times.Never);
     }
 
     #endregion
@@ -370,6 +370,6 @@ public class IValidatePropertyManagerStandaloneTests
         manager.HasProperty("Test");
 
         // Tracking is available via the returned tracking object
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 }

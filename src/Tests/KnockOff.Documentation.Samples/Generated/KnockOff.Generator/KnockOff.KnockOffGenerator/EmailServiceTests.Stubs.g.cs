@@ -15,9 +15,6 @@ partial class EmailServiceTests
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The arguments from the last call.</summary>
 			public (string? to, string? subject)? LastCallArgs { get; private set; }
 

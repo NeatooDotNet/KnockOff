@@ -117,7 +117,7 @@ public partial class IValidateListBaseTests
 
         await list.WaitForTasks();
 
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
         Assert.Equal(1, stub.WaitForTasks.CallCount);
     }
 
@@ -129,7 +129,7 @@ public partial class IValidateListBaseTests
 
         await list.RunRules(RunRulesFlag.All, null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public partial class IValidateListBaseTests
 
         list.ClearAllMessages();
 
-        Assert.True(stub.ClearAllMessages.WasCalled);
+        stub.ClearAllMessages.Verify();
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public partial class IValidateListBaseTests
 
         list.ClearSelfMessages();
 
-        Assert.True(stub.ClearSelfMessages.WasCalled);
+        stub.ClearSelfMessages.Verify();
     }
 
     #endregion
@@ -329,7 +329,7 @@ public partial class IValidateListBaseOfTTests
         var itemStub = new ValidateBaseStubForListT();
         list.Add(itemStub);
 
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
         Assert.Equal(1, stub.Add.CallCount);
     }
 
@@ -342,7 +342,7 @@ public partial class IValidateListBaseOfTTests
         var itemStub = new ValidateBaseStubForListT();
         list.Remove(itemStub);
 
-        Assert.True(stub.Remove.WasCalled);
+        stub.Remove.Verify();
     }
 
     [Fact]
@@ -353,7 +353,7 @@ public partial class IValidateListBaseOfTTests
 
         list.Clear();
 
-        Assert.True(stub.Clear.WasCalled);
+        stub.Clear.Verify();
     }
 
     [Fact]
@@ -367,7 +367,7 @@ public partial class IValidateListBaseOfTTests
 
         var result = list.Contains(itemStub);
 
-        Assert.True(stub.Contains.WasCalled);
+        stub.Contains.Verify();
         Assert.True(result);
     }
 
@@ -382,7 +382,7 @@ public partial class IValidateListBaseOfTTests
 
         var result = list.IndexOf(itemStub);
 
-        Assert.True(stub.IndexOf.WasCalled);
+        stub.IndexOf.Verify();
         Assert.Equal(3, result);
     }
 
@@ -395,7 +395,7 @@ public partial class IValidateListBaseOfTTests
         var itemStub = new ValidateBaseStubForListT();
         list.Insert(0, itemStub);
 
-        Assert.True(stub.Insert.WasCalled);
+        stub.Insert.Verify();
     }
 
     [Fact]
@@ -406,7 +406,7 @@ public partial class IValidateListBaseOfTTests
 
         list.RemoveAt(0);
 
-        Assert.True(stub.RemoveAt.WasCalled);
+        stub.RemoveAt.Verify();
     }
 }
 

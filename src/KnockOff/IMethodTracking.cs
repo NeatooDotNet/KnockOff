@@ -5,10 +5,7 @@ namespace KnockOff;
 /// </summary>
 public interface IMethodTracking
 {
-    /// <summary>True if callback was invoked at least once.</summary>
-    bool WasCalled { get; }
-
-    /// <summary>Clears tracking state for this registration (WasCalled = false, LastArg/LastArgs = default).</summary>
+    /// <summary>Clears tracking state for this registration (LastArg/LastArgs = default, call count = 0).</summary>
     void Reset();
 
     /// <summary>
@@ -44,7 +41,7 @@ public interface IMethodTracking
 /// </summary>
 public interface IMethodTracking<TArg> : IMethodTracking
 {
-    /// <summary>Last argument passed to this callback. Default if never called (check WasCalled).</summary>
+    /// <summary>Last argument passed to this callback. Default if never called.</summary>
     TArg LastArg { get; }
 
     /// <summary>
@@ -67,7 +64,7 @@ public interface IMethodTracking<TArg> : IMethodTracking
 /// </summary>
 public interface IMethodTrackingArgs<TArgs> : IMethodTracking
 {
-    /// <summary>Last arguments passed to this callback as named tuple. Default if never called (check WasCalled).</summary>
+    /// <summary>Last arguments passed to this callback as named tuple. Default if never called.</summary>
     TArgs LastArgs { get; }
 
     /// <summary>

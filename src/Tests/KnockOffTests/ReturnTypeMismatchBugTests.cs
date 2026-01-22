@@ -26,7 +26,7 @@ public class ReturnTypeMismatchBugTests
 		var result = factory.Fetch(entity);
 
 		// Verify tracking
-		Assert.True(trackingSync.WasCalled);
+		trackingSync.Verify();
 		Assert.Equal(1, result.Id);
 	}
 

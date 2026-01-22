@@ -24,7 +24,8 @@ Console.WriteLine($"  LastCallArgs: {knockOff.Add2.LastCallArgs}");
 // Test void method
 calc.Clear();
 Console.WriteLine($"Clear() called");
-Console.WriteLine($"  WasCalled: {knockOff.Clear.WasCalled}");
+knockOff.Clear.Verify();
+Console.WriteLine($"  Clear verified!");
 
 Console.WriteLine();
 Console.WriteLine("Package test successful!");

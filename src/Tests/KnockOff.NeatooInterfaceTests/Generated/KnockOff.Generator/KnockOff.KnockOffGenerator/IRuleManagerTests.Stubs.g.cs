@@ -10,7 +10,7 @@ partial class IRuleManagerTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }
+		private interface IGenericMethodCallTracker { int CallCount { get; } }
 		private interface IResettable { void Reset(); }
 
 		/// <summary>Interceptor for IRuleManager.Rules.</summary>
@@ -128,8 +128,15 @@ partial class IRuleManagerTests
 
 			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-			/// <summary>Whether this method was called at least once (any overload).</summary>
-			public bool WasCalled => CallCount > 0;
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRules", times, CallCount));
+			}
 
 			/// <summary>Configures callback for RunRules(string, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
 			public global::KnockOff.IMethodTrackingArgs<(string propertyName, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task callback)
@@ -317,8 +324,6 @@ partial class IRuleManagerTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (string propertyName, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -370,8 +375,6 @@ partial class IRuleManagerTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -541,12 +544,19 @@ partial class IRuleManagerTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
-			public (global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+			public (global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRule", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token)> OnCall(RunRuleDelegate callback)
@@ -653,8 +663,6 @@ partial class IRuleManagerTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (global::Neatoo.Rules.IRule r, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -768,9 +776,6 @@ partial class IRuleManagerTests
 
 			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
-			/// <summary>True if this method was called with any type argument.</summary>
-			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
-
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
@@ -779,6 +784,16 @@ partial class IRuleManagerTests
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
+			}
+
+			/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("AddRule", times, TotalCallCount));
 			}
 
 			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
@@ -805,9 +820,6 @@ partial class IRuleManagerTests
 				private int _callCount;
 				int IGenericMethodCallTracker.CallCount => _callCount;
 				internal int CallCount => _callCount;
-
-				/// <summary>True if this method was called at least once with these type arguments.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 				public global::KnockOff.IMethodTracking OnCall(AddRuleDelegate callback) { _onCall = callback; return this; }
@@ -858,9 +870,6 @@ partial class IRuleManagerTests
 
 			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
-			/// <summary>True if this method was called with any type argument.</summary>
-			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
-
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
@@ -869,6 +878,16 @@ partial class IRuleManagerTests
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
+			}
+
+			/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("AddRules", times, TotalCallCount));
 			}
 
 			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
@@ -895,9 +914,6 @@ partial class IRuleManagerTests
 				private int _callCount;
 				int IGenericMethodCallTracker.CallCount => _callCount;
 				internal int CallCount => _callCount;
-
-				/// <summary>True if this method was called at least once with these type arguments.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 				public global::KnockOff.IMethodTracking OnCall(AddRulesDelegate callback) { _onCall = callback; return this; }
@@ -948,9 +964,6 @@ partial class IRuleManagerTests
 
 			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
-			/// <summary>True if this method was called with any type argument.</summary>
-			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
-
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
@@ -959,6 +972,16 @@ partial class IRuleManagerTests
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
+			}
+
+			/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRuleGeneric", times, TotalCallCount));
 			}
 
 			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
@@ -988,9 +1011,6 @@ partial class IRuleManagerTests
 
 				/// <summary>The 'token' argument from the most recent call.</summary>
 				public global::System.Threading.CancellationToken? LastCallArg { get; private set; }
-
-				/// <summary>True if this method was called at least once with these type arguments.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 				public global::KnockOff.IMethodTracking OnCall(RunRuleGenericDelegate callback) { _onCall = callback; return this; }
