@@ -1,9 +1,9 @@
 # Verifiable() API Enhancement
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** High
 **Created:** 2026-01-18
-**Last Updated:** 2026-01-18
+**Completed:** 2026-01-22
 
 ---
 
@@ -32,7 +32,7 @@ This aligns KnockOff more closely with Moq's verification patterns while maintai
 
 ## Plans
 
-- [Verifiable API Design](../plans/verifiable-api-design.md)
+- [Verifiable API Design](../plans/completed/verifiable-api-design.md)
 
 ---
 
@@ -49,12 +49,15 @@ This aligns KnockOff more closely with Moq's verification patterns while maintai
 - [x] Update stub-level Verify/VerifyAll generation
 - [x] Update FlatRenderer for all three patterns
 - [x] Update InlineRenderer for all three patterns
-- [x] Update ClassRenderer for all three patterns
+- [x] Update ClassRenderer for methods, properties, events
+- [x] **Update ClassRenderer indexer interceptors (add Verifiable, VerifyGet, VerifySet, CheckVerification)**
 - [x] Update existing tests for new API
 - [x] Add new tests for Verifiable() behavior
-- [ ] Update documentation and migration guide (will be done as part of a documentation rewrite)
+- [x] ~~Update documentation and migration guide~~ (deferred - will be done outside this todo)
 - [x] Update event interceptor generation (add Verifiable)
-- [x] Update indexer interceptor generation (add Verifiable)
+- [x] Update FlatRenderer indexer interceptors (add Verifiable)
+- [x] Update InlineRenderer indexer interceptors (add Verifiable)
+- [x] Add tests for ClassRenderer indexer verification API
 
 ---
 
@@ -113,7 +116,91 @@ Remaining work:
 - Container classes (IndexerContainer, GenericMethodHandler) aggregate verification
 - All 601 tests passing
 
+**2026-01-22:** Code review discovered incomplete implementation:
+- ClassRenderer.RenderIndexerInterceptorClass (lines 263-342) is **missing the verification API**
+- FlatRenderer and InlineRenderer have full indexer verification API, ClassRenderer does not
+- Previous progress log entry incorrectly claimed indexer interceptors were complete
+- Architect reviewed DD14 in verifiable-api-design.md - design is still valid
+- Tasks updated to reflect actual state; remaining work identified
+
+**Missing from ClassRenderer indexer interceptors (per DD14):**
+1. `_isVerifiable`, `_verifiableTimes`, `_configured` fields
+2. `Verifiable()`, `Verifiable(Times)` fluent methods
+3. `Verify()`, `Verify(Times)` throwing methods
+4. `VerifyGet()`, `VerifyGet(Times)` (conditional on HasGetter)
+5. `VerifySet()`, `VerifySet(Times)` (conditional on HasSetter)
+6. `IsVerifiable`, `IsConfigured` internal properties
+7. `CheckVerification()`, `CheckVerificationAll()` internal methods
+8. OnGet/OnSet need backing fields with configuration tracking
+
+**Reference implementations:** FlatRenderer lines 709-820, InlineRenderer lines 441-606
+
+**2026-01-22:** ClassRenderer indexer verification API implemented:
+- Updated `RenderIndexerInterceptorClass` (lines 263-420) with full verification API
+- Added `_isVerifiable`, `_verifiableTimes`, `_configured` fields
+- Converted `OnGet`/`OnSet` to backing fields (`_onGet`/`_onSet`) with configuration tracking in setters
+- Added `Verifiable()` and `Verifiable(Times)` fluent methods returning the interceptor type
+- Added `Verify()` and `Verify(Times)` methods that throw VerificationException
+- Added `VerifyGet()`/`VerifyGet(Times)` (conditional on HasGetter)
+- Added `VerifySet()`/`VerifySet(Times)` (conditional on HasSetter)
+- Added `IsVerifiable` and `IsConfigured` internal properties
+- Added `CheckVerification()` and `CheckVerificationAll()` internal methods
+- Updated Reset() comment to indicate verifiable marking is preserved
+- Build succeeded with 0 errors, 0 warnings
+- All tests pass (607 net8.0, 608 net9.0/net10.0, plus 134 Documentation.Samples and 473 NeatooInterfaceTests per target)
+
+**2026-01-22:** Added tests for ClassRenderer indexer verification API:
+- Created `ClassIndexerVerificationTests.cs` with 35 comprehensive tests
+- Created test classes `IndexedCacheService` (get/set indexer) and `ReadOnlyIndexedService` (get-only indexer)
+- Tests cover all verification API methods:
+  - `Verifiable()` and `Verifiable(Times)` - marking for stub-level verification
+  - `VerifyGet()` and `VerifyGet(Times)` - getter access verification
+  - `VerifySet()` and `VerifySet(Times)` - setter access verification
+  - `Verify()` and `Verify(Times)` - total access verification
+  - `stub.Verify()` - stub-level verifiable indexer integration
+  - `stub.VerifyAll()` - stub-level configured indexer integration
+  - `Reset()` - preserves verifiable marking
+- All 35 tests pass on net8.0, net9.0, net10.0
+- Full test suite passes: 642 tests (net8.0), 643 tests (net9.0/net10.0)
+
 ---
 
 ## Results / Conclusions
 
+### What Was Implemented
+
+The Verifiable() API redesign is complete across all three stub patterns (Stand-Alone, Inline Interface, Inline Class):
+
+**Core API Changes:**
+- `Times.Forever` removed; `Times` now verification-only
+- `IMethodTracking.Verify()` throws `VerificationException` instead of returning bool
+- `IMethodTracking.Verifiable()` and `Verifiable(Times)` for marking
+- `IMethodSequence` updated with pure sequencing (no Times in ThenCall)
+- `VerificationException` aggregates all failures
+
+**Interceptor Verification API (all member types):**
+- Methods: `Verify()`, `Verify(Times)`, `Verifiable()`, `Verifiable(Times)`
+- Properties: Above plus `VerifyGet()`, `VerifySet()` with Times overloads
+- Indexers: Same as properties
+- Events: `VerifyAdd()`, `VerifyRemove()` with Times overloads
+
+**Stub-Level Verification:**
+- `stub.Verify()` - checks only `.Verifiable()` marked items
+- `stub.VerifyAll()` - checks all configured items
+
+### Breaking Changes
+
+- `Times.Forever` removed
+- `Verify()` methods throw instead of returning bool
+- `VerificationException` uses `Failures` collection (removed `Member`, `Expected`, `Actual` properties)
+
+### Test Coverage
+
+- 642+ tests across all frameworks
+- 35 dedicated tests for ClassRenderer indexer verification
+- All three stub patterns fully tested
+
+### Notes
+
+- Documentation update deferred to separate documentation rewrite effort
+- ClassRenderer indexer verification gap discovered 2026-01-22 and fixed same day
