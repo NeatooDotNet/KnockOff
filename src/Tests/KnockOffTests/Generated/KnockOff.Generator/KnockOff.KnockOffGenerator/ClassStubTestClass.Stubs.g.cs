@@ -219,9 +219,6 @@ partial class ClassStubTestClass
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
 
@@ -277,9 +274,6 @@ partial class ClassStubTestClass
 			private global::System.Func<int, int>? _onCall;
 
 			internal int CallCount { get; private set; }
-
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call.</summary>
 			public int? LastCallArg { get; private set; }
@@ -339,9 +333,6 @@ partial class ClassStubTestClass
 			private global::System.Func<string, int, string>? _onCall;
 
 			internal int CallCount { get; private set; }
-
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The arguments from the last call.</summary>
 			public (string? input, int? count)? LastCallArgs { get; private set; }

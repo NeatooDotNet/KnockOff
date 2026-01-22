@@ -152,7 +152,7 @@ public partial class IEntityListBaseTests
 
         await list.WaitForTasks();
 
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
     }
 
     [Fact]
@@ -163,7 +163,7 @@ public partial class IEntityListBaseTests
 
         await list.RunRules(RunRulesFlag.All, null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -174,7 +174,7 @@ public partial class IEntityListBaseTests
 
         list.ClearAllMessages();
 
-        Assert.True(stub.ClearAllMessages.WasCalled);
+        stub.ClearAllMessages.Verify();
     }
 
     #endregion
@@ -370,7 +370,7 @@ public partial class IEntityListBaseOfTTests
         var itemStub = new EntityBaseStubForListT();
         list.Add(itemStub);
 
-        Assert.True(stub.Add.WasCalled);
+        stub.Add.Verify();
     }
 
     [Fact]
@@ -382,7 +382,7 @@ public partial class IEntityListBaseOfTTests
         var itemStub = new EntityBaseStubForListT();
         list.Remove(itemStub);
 
-        Assert.True(stub.Remove.WasCalled);
+        stub.Remove.Verify();
     }
 
     [Fact]
@@ -393,7 +393,7 @@ public partial class IEntityListBaseOfTTests
 
         list.Clear();
 
-        Assert.True(stub.Clear.WasCalled);
+        stub.Clear.Verify();
     }
 
     [Fact]
@@ -407,7 +407,7 @@ public partial class IEntityListBaseOfTTests
 
         var result = list.Contains(itemStub);
 
-        Assert.True(stub.Contains.WasCalled);
+        stub.Contains.Verify();
         Assert.True(result);
     }
 
@@ -422,7 +422,7 @@ public partial class IEntityListBaseOfTTests
 
         list.RemoveAt(0);
 
-        Assert.True(stub.RemoveAt.WasCalled);
+        stub.RemoveAt.Verify();
     }
 }
 

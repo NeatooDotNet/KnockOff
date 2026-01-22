@@ -20,7 +20,7 @@ public class NamespaceCollisionTests
 		service.SavePerson(new DomainModel.Person { Name = "Test" });
 
 		// Assert
-		Assert.True(tracking.WasCalled);
+		tracking.Verify();
 	}
 
 	[Fact]
@@ -35,7 +35,7 @@ public class NamespaceCollisionTests
 		// Act
 		service.SavePerson(new DomainModel.Person { Name = "Test" });
 
-		// Assert - inline stubs have WasCalled on the interceptor directly
-		Assert.True(stub.SavePerson.WasCalled);
+		// Assert - inline stubs have Verify() on the interceptor directly
+		stub.SavePerson.Verify();
 	}
 }

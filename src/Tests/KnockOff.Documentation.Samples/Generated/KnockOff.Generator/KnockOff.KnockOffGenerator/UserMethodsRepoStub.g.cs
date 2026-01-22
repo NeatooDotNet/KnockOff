@@ -12,9 +12,6 @@ partial class UserMethodsRepoStub : global::KnockOff.Documentation.Samples.UserM
 
 		internal int CallCount { get; private set; }
 
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>Last argument passed to this method. Default if never called.</summary>
 		public int LastArg => _lastArg;
 
@@ -51,9 +48,6 @@ partial class UserMethodsRepoStub : global::KnockOff.Documentation.Samples.UserM
 
 		internal int CallCount { get; private set; }
 
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>Last argument passed to this method. Default if never called.</summary>
 		public int LastArg => _lastArg;
 
@@ -89,9 +83,6 @@ partial class UserMethodsRepoStub : global::KnockOff.Documentation.Samples.UserM
 		private int _lastArg = default!;
 
 		internal int CallCount { get; private set; }
-
-		/// <summary>True if CallCount > 0.</summary>
-		public bool WasCalled => CallCount > 0;
 
 		/// <summary>Last argument passed to this method. Default if never called.</summary>
 		public int LastArg => _lastArg;

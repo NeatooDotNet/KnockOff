@@ -189,9 +189,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetIntDelegate callback)
@@ -295,8 +302,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -407,9 +412,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetBool", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetBoolDelegate callback)
@@ -513,8 +525,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -625,9 +635,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDateTime", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetDateTimeDelegate callback)
@@ -731,8 +748,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -843,9 +858,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetNullableString", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetNullableStringDelegate callback)
@@ -949,8 +971,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1061,9 +1081,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetNullableEntity", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetNullableEntityDelegate callback)
@@ -1167,8 +1194,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1279,9 +1304,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetList", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetListDelegate callback)
@@ -1385,8 +1417,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1497,9 +1527,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDictionary", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetDictionaryDelegate callback)
@@ -1603,8 +1640,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1715,9 +1750,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEntity", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetEntityDelegate callback)
@@ -1821,8 +1863,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1933,9 +1973,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetIList", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetIListDelegate callback)
@@ -2039,8 +2086,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2151,9 +2196,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetString", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetStringDelegate callback)
@@ -2257,8 +2309,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2369,9 +2419,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDisposable", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetDisposableDelegate callback)
@@ -2475,8 +2532,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2587,9 +2642,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetIntAsync", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetIntAsyncDelegate callback)
@@ -2693,8 +2755,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2805,9 +2865,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetListAsync", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetListAsyncDelegate callback)
@@ -2911,8 +2978,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -3023,9 +3088,16 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetStringAsync", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetStringAsyncDelegate callback)
@@ -3129,8 +3201,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;

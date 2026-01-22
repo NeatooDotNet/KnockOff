@@ -61,7 +61,7 @@ public partial class ITriggerPropertyTests
 
         trigger.IsMatch("SomeProperty");
 
-        Assert.True(stub.IsMatch.WasCalled);
+        stub.IsMatch.Verify();
         Assert.Equal(1, stub.IsMatch.CallCount);
     }
 
@@ -132,7 +132,7 @@ public partial class ITriggerPropertyTests
 
         stub.IsMatch.Reset();
 
-        Assert.False(stub.IsMatch.WasCalled);
+        stub.IsMatch.Verify(Times.Never);
         Assert.Equal(0, stub.IsMatch.CallCount);
         Assert.Null(stub.IsMatch.LastCallArg);
     }
@@ -185,7 +185,7 @@ public class ITriggerPropertyStandaloneTests
 
         trigger.IsMatch("Test");
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 }
 
@@ -229,7 +229,7 @@ public partial class ITriggerPropertyOfTTests
         var targetStub = new ValidateBaseStubForTrigger();
         trigger.GetValue(targetStub);
 
-        Assert.True(stub.GetValue.WasCalled);
+        stub.GetValue.Verify();
         Assert.Equal(1, stub.GetValue.CallCount);
     }
 
@@ -289,7 +289,7 @@ public partial class ITriggerPropertyOfTTests
 
         trigger.IsMatch("Test");
 
-        Assert.True(stub.IsMatch.WasCalled);
+        stub.IsMatch.Verify();
     }
 
     #endregion
@@ -338,6 +338,6 @@ public class ITriggerPropertyOfTStandaloneTests
         var targetStub = new ValidateBaseStubForTrigger();
         trigger.GetValue(targetStub);
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 }

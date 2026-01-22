@@ -24,9 +24,16 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method1", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
@@ -132,8 +139,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -242,12 +247,19 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public int? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method2", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
@@ -356,8 +368,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
@@ -472,12 +482,19 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method3", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(global::System.Action<string> callback)
@@ -586,8 +603,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
@@ -702,12 +717,19 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (int? a, string? b)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (int? a, string? b)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method4", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, string? b)> OnCall(global::System.Action<int, string> callback)
@@ -816,8 +838,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (int? a, string? b) LastArgs => _lastArgs;
@@ -932,12 +952,19 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (int? a, int? b, int? c)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (int? a, int? b, int? c)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method5", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, int? b, int? c)> OnCall(global::System.Action<int, int, int> callback)
@@ -1046,8 +1073,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (int? a, int? b, int? c) LastArgs => _lastArgs;
@@ -1164,9 +1189,16 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method6", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(Method6Delegate callback)
@@ -1270,8 +1302,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1382,9 +1412,16 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
 
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method7", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking OnCall(Method7Delegate callback)
@@ -1488,8 +1525,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1601,12 +1636,19 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public int? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method8", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<int> OnCall(Method8Delegate callback)
@@ -1713,8 +1755,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
@@ -1832,12 +1872,19 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method9", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(Method9Delegate callback)
@@ -1944,8 +1991,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
@@ -2063,12 +2108,19 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Whether this method was called at least once.</summary>
-		public bool WasCalled => CallCount > 0;
-
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (int? a, string? b)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (int? a, string? b)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
+
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Method10", times, CallCount));
+		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 		public global::KnockOff.IMethodTrackingArgs<(int? a, string? b)> OnCall(Method10Delegate callback)
@@ -2175,8 +2227,6 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (int? a, string? b) LastArgs => _lastArgs;

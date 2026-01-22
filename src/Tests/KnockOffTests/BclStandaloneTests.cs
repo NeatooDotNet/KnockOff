@@ -21,7 +21,7 @@ public class BclStandaloneTests
 
         disposable.Dispose();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         tracking.Verify(Times.Once);
     }
 
@@ -53,7 +53,7 @@ public class BclStandaloneTests
         knockOff.Dispose.Reset();
 
         tracking.Verify(Times.Never);
-        Assert.False(tracking.WasCalled);
+        tracking.Verify(Times.Never);
     }
 
     #endregion
@@ -69,7 +69,7 @@ public class BclStandaloneTests
 
         await disposable.DisposeAsync();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         tracking.Verify(Times.Once);
     }
 
@@ -103,7 +103,7 @@ public class BclStandaloneTests
 
         comparable.CompareTo("other");
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         Assert.Equal("other", tracking.LastArg);
     }
 
@@ -147,7 +147,7 @@ public class BclStandaloneTests
 
         comparer.Compare("a", "b");
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -189,7 +189,7 @@ public class BclStandaloneTests
 
         cloneable.Clone();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -230,7 +230,7 @@ public class BclStandaloneTests
 
         provider.GetService(typeof(string));
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         Assert.Equal(typeof(string), tracking.LastArg);
     }
 
@@ -354,7 +354,7 @@ public class BclStandaloneTests
 
         observer.OnNext("value");
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         Assert.Equal("value", tracking.LastArg);
     }
 
@@ -368,7 +368,7 @@ public class BclStandaloneTests
 
         observer.OnError(error);
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         Assert.Same(error, tracking.LastArg);
     }
 
@@ -381,7 +381,7 @@ public class BclStandaloneTests
 
         observer.OnCompleted();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -400,7 +400,7 @@ public class BclStandaloneTests
 
         onNextTracking.Verify(Times.Exactly(3));
         Assert.Equal(new[] { "a", "b", "c" }, receivedValues);
-        Assert.True(onCompletedTracking.WasCalled);
+        onCompletedTracking.Verify();
     }
 
     #endregion
@@ -416,7 +416,7 @@ public class BclStandaloneTests
 
         progress.Report(50);
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         Assert.Equal(50, tracking.LastArg);
     }
 
@@ -472,7 +472,7 @@ public class BclStandaloneTests
         // Call the generic GetEnumerator (will throw since callback throws)
         Assert.Throws<InvalidOperationException>(() => enumerable.GetEnumerator());
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         tracking.Verify(Times.Once);
     }
 
@@ -487,7 +487,7 @@ public class BclStandaloneTests
         Assert.Throws<InvalidOperationException>(() => enumerable.GetEnumerator());
 
         // Both generic and non-generic should use the same handler
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         tracking.Verify(Times.Once);
     }
 
@@ -517,7 +517,7 @@ public class BclStandaloneTests
 
         collection.Add("test");
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         Assert.Equal("test", tracking.LastArg);
     }
 
@@ -549,7 +549,7 @@ public class BclStandaloneTests
             result.Add(item);
 
         Assert.Equal(new[] { "x", "y" }, result);
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     #endregion
@@ -578,7 +578,7 @@ public class BclStandaloneTests
         var index = list.IndexOf("found");
 
         Assert.Equal(3, index);
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -657,7 +657,7 @@ public class BclStandaloneTests
 
         Assert.Equal(2, result.Count);
         Assert.Equal("a", result[0].Key);
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     #endregion
@@ -673,7 +673,7 @@ public class BclStandaloneTests
         var result = set.Add("test");
 
         Assert.True(result);
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -687,7 +687,7 @@ public class BclStandaloneTests
 
         collection.Add("test");
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         Assert.Equal("test", tracking.LastArg);
     }
 
@@ -701,7 +701,7 @@ public class BclStandaloneTests
 
         set.UnionWith(other);
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     #endregion

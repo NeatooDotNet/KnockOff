@@ -27,7 +27,8 @@ Console.WriteLine();
 Console.WriteLine("Void Method (no params):");
 var doWorkTracking = knockOff.DoWork.OnCall(() => { });
 service.DoWork();
-Console.WriteLine($"  DoWork.WasCalled: {doWorkTracking.WasCalled}");
+doWorkTracking.Verify(); // Verify method was called
+Console.WriteLine($"  DoWork verified!");
 // Verify method was called (throws if not)
 doWorkTracking.Verify(Times.Once);
 Console.WriteLine();

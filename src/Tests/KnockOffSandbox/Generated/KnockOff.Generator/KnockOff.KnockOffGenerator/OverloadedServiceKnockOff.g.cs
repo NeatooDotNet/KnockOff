@@ -51,8 +51,15 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 
 		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_String?.CallCount ?? 0) + (_sequence_String_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Boolean_String?.CallCount ?? 0) + (_sequence_String_Boolean_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_String?.CallCount ?? 0) + (_sequence_String_Int32_String?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-		/// <summary>Whether this method was called at least once (any overload).</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Format", times, CallCount));
+		}
 
 		/// <summary>Configures callback for Format(string). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking<string> OnCall(FormatDelegate_String_String callback)
@@ -315,8 +322,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
@@ -368,8 +373,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? input, bool? uppercase) LastArgs => _lastArgs;
@@ -421,8 +424,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Sandbox.IOverloadedSe
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? input, int? maxLength) LastArgs => _lastArgs;

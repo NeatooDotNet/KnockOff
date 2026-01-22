@@ -13,9 +13,6 @@ partial class InlineDelegateTests
 		{
 			internal int CallCount { get; private set; }
 
-			/// <summary>Whether this delegate was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last invocation.</summary>
 			public global::Neatoo.NeatooPropertyChangedEventArgs? LastCallArg { get; private set; }
 
@@ -26,6 +23,16 @@ partial class InlineDelegateTests
 
 			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
 			public void Reset() { CallCount = 0; LastCallArg = default; }
+
+			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+			}
 		}
 
 		/// <summary>Stub for global::Neatoo.NeatooPropertyChanged delegate.</summary>

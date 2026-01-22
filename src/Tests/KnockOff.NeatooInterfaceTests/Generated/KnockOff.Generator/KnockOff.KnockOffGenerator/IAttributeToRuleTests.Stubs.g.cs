@@ -10,7 +10,7 @@ partial class IAttributeToRuleTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }
+		private interface IGenericMethodCallTracker { int CallCount { get; } }
 		private interface IResettable { void Reset(); }
 
 		/// <summary>Interceptor for GetRule.</summary>
@@ -32,9 +32,6 @@ partial class IAttributeToRuleTests
 
 			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
-			/// <summary>True if this method was called with any type argument.</summary>
-			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
-
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
@@ -43,6 +40,16 @@ partial class IAttributeToRuleTests
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
+			}
+
+			/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetRule", times, TotalCallCount));
 			}
 
 			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
@@ -72,9 +79,6 @@ partial class IAttributeToRuleTests
 
 				/// <summary>The arguments from the most recent call.</summary>
 				public (global::Neatoo.IPropertyInfo r, object? attribute)? LastCallArgs { get; private set; }
-
-				/// <summary>True if this method was called at least once with these type arguments.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 				public global::KnockOff.IMethodTracking OnCall(GetRuleDelegate callback) { _onCall = callback; return this; }

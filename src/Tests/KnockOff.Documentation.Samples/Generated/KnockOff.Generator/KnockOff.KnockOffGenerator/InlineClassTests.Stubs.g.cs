@@ -117,9 +117,6 @@ partial class InlineClassTests
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call.</summary>
 			public int? LastCallArg { get; private set; }
 
@@ -178,9 +175,6 @@ partial class InlineClassTests
 			private global::System.Action<global::KnockOff.Documentation.Samples.User>? _onCall;
 
 			internal int CallCount { get; private set; }
-
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call.</summary>
 			public global::KnockOff.Documentation.Samples.User? LastCallArg { get; private set; }

@@ -103,6 +103,9 @@ internal static class MethodInterceptorRenderer
 		RenderBackwardCompatibleTrackingProperties(w, model.TrackableParameters, model.LastArgType, model.LastArgsType);
 		w.Line();
 
+		// Verify() methods for direct interceptor verification
+		RenderInterceptorVerifyMethods(w, model.MethodName);
+
 		// OnCall() - repeating callback, returns IMethodTracking
 		w.Line($"/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>");
 		w.Line($"public {model.TrackingInterface} OnCall({delegateType} callback)");
@@ -202,6 +205,9 @@ internal static class MethodInterceptorRenderer
 		// Backward compatibility: aggregate tracking properties across all overloads
 		RenderOverloadBackwardCompatibleProperties(w, model.Overloads);
 		w.Line();
+
+		// Verify() methods for direct interceptor verification
+		RenderInterceptorVerifyMethods(w, model.MethodName);
 
 		// OnCall overloads for each unique signature
 		foreach (var overload in model.Overloads)
@@ -659,9 +665,6 @@ internal static class MethodInterceptorRenderer
 			w.Line("internal int CallCount { get; private set; }");
 			w.Line();
 
-			// WasCalled property
-			w.Line("/// <summary>True if callback was invoked at least once.</summary>");
-			w.Line("public bool WasCalled => CallCount > 0;");
 			w.Line();
 
 			// LastArg/LastArgs property
@@ -920,13 +923,8 @@ internal static class MethodInterceptorRenderer
 		string? lastArgType,
 		string? lastArgsType)
 	{
-		// CallCount - total across OnCall + sequence + unconfigured (internal - use WasCalled or Verify(Times) for public API)
+		// CallCount - total across OnCall + sequence + unconfigured (internal - use Verify(Times) for public API)
 		w.Line("internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }");
-		w.Line();
-
-		// WasCalled
-		w.Line("/// <summary>Whether this method was called at least once.</summary>");
-		w.Line("public bool WasCalled => CallCount > 0;");
 		w.Line();
 
 		// LastCallArg - for single param methods
@@ -934,7 +932,7 @@ internal static class MethodInterceptorRenderer
 		{
 			var nullableType = lastArgType.EndsWith("?") ? lastArgType : $"{lastArgType}?";
 			w.Line($"/// <summary>The argument from the last call (from most recently called registration).</summary>");
-			w.Line($"public {nullableType} LastCallArg {{ get {{ if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; }} }}");
+			w.Line($"public {nullableType} LastCallArg {{ get {{ if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; }} }}");
 			w.Line();
 		}
 
@@ -943,7 +941,7 @@ internal static class MethodInterceptorRenderer
 		{
 			var nullableType = lastArgsType.EndsWith("?") ? lastArgsType : $"{lastArgsType}?";
 			w.Line($"/// <summary>The arguments from the last call (from most recently called registration).</summary>");
-			w.Line($"public {nullableType} LastCallArgs {{ get {{ if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; }} }}");
+			w.Line($"public {nullableType} LastCallArgs {{ get {{ if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; }} }}");
 			w.Line();
 		}
 	}
@@ -961,12 +959,27 @@ internal static class MethodInterceptorRenderer
 			$"(_onCallTracking_{o.SignatureSuffix}?.CallCount ?? 0) + (_sequence_{o.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)");
 		var sumExpr = "_unconfiguredCallCount + " + string.Join(" + ", sumParts);
 
-		// Internal - use WasCalled or Verify(Times) for public API
+		// Internal - use Verify(Times) for public API
 		w.Line($"internal int CallCount => {sumExpr};");
+	}
+
+	/// <summary>
+	/// Renders Verify() and Verify(Times) methods on an interceptor class.
+	/// </summary>
+	private static void RenderInterceptorVerifyMethods(CodeWriter w, string methodName)
+	{
+		w.Line("/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>");
+		w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
 		w.Line();
 
-		w.Line("/// <summary>Whether this method was called at least once (any overload).</summary>");
-		w.Line("public bool WasCalled => CallCount > 0;");
+		w.Line("/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+		w.Line("public void Verify(global::KnockOff.Times times)");
+		using (w.Braces())
+		{
+			w.Line("if (!times.Validate(CallCount))");
+			w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{methodName}\", times, CallCount));");
+		}
+		w.Line();
 	}
 
 	#endregion

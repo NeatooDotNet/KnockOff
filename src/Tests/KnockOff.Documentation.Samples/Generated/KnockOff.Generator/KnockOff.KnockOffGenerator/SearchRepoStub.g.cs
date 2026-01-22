@@ -51,8 +51,15 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_Int32_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_String_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-		/// <summary>Whether this method was called at least once (any overload).</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Find", times, CallCount));
+		}
 
 		/// <summary>Configures callback for Find(). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(FindDelegate_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User callback)
@@ -314,8 +321,6 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -361,8 +366,6 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
@@ -414,8 +417,6 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;

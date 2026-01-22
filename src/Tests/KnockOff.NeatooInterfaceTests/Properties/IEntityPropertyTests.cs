@@ -103,7 +103,7 @@ public partial class IEntityPropertyTests
 
         property.MarkSelfUnmodified();
 
-        Assert.True(stub.MarkSelfUnmodified.WasCalled);
+        stub.MarkSelfUnmodified.Verify();
         Assert.Equal(1, stub.MarkSelfUnmodified.CallCount);
     }
 
@@ -116,7 +116,7 @@ public partial class IEntityPropertyTests
         var propertyInfoStub = new PropertyInfoStub();
         property.ApplyPropertyInfo(propertyInfoStub);
 
-        Assert.True(stub.ApplyPropertyInfo.WasCalled);
+        stub.ApplyPropertyInfo.Verify();
     }
 
     [Fact]
@@ -197,7 +197,7 @@ public partial class IEntityPropertyTests
 
         await property.SetValue("NewEntityValue");
 
-        Assert.True(stub.SetValue.WasCalled);
+        stub.SetValue.Verify();
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public partial class IEntityPropertyTests
 
         property.LoadValue("LoadedValue");
 
-        Assert.True(stub.LoadValue.WasCalled);
+        stub.LoadValue.Verify();
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public partial class IEntityPropertyTests
 
         await property.WaitForTasks();
 
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
     }
 
     #endregion
@@ -252,7 +252,7 @@ public partial class IEntityPropertyTests
 
         stub.MarkSelfUnmodified.Reset();
 
-        Assert.False(stub.MarkSelfUnmodified.WasCalled);
+        stub.MarkSelfUnmodified.Verify(Times.Never);
     }
 
     #endregion

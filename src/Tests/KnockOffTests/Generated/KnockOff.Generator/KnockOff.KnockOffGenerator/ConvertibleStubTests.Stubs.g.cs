@@ -30,9 +30,16 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetTypeCode", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(GetTypeCodeDelegate callback)
@@ -136,8 +143,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -249,12 +254,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToBoolean", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToBooleanDelegate callback)
@@ -361,8 +373,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -480,12 +490,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToByte", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToByteDelegate callback)
@@ -592,8 +609,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -711,12 +726,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToChar", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToCharDelegate callback)
@@ -823,8 +845,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -942,12 +962,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToDateTime", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToDateTimeDelegate callback)
@@ -1054,8 +1081,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -1173,12 +1198,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToDecimal", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToDecimalDelegate callback)
@@ -1285,8 +1317,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -1404,12 +1434,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToDouble", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToDoubleDelegate callback)
@@ -1516,8 +1553,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -1635,12 +1670,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToInt16", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToInt16Delegate callback)
@@ -1747,8 +1789,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -1866,12 +1906,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToInt32", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToInt32Delegate callback)
@@ -1978,8 +2025,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -2097,12 +2142,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToInt64", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToInt64Delegate callback)
@@ -2209,8 +2261,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -2328,12 +2378,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToSByte", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToSByteDelegate callback)
@@ -2440,8 +2497,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -2559,12 +2614,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToSingle", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToSingleDelegate callback)
@@ -2671,8 +2733,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -2790,12 +2850,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToString", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToStringDelegate callback)
@@ -2902,8 +2969,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -3021,12 +3086,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
-			public (global::System.Type conversionType, global::System.IFormatProvider? provider)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+			public (global::System.Type conversionType, global::System.IFormatProvider? provider)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToType", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTrackingArgs<(global::System.Type conversionType, global::System.IFormatProvider? provider)> OnCall(ToTypeDelegate callback)
@@ -3133,8 +3205,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (global::System.Type conversionType, global::System.IFormatProvider? provider) LastArgs => _lastArgs;
@@ -3252,12 +3322,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToUInt16", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToUInt16Delegate callback)
@@ -3364,8 +3441,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -3483,12 +3558,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToUInt32", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToUInt32Delegate callback)
@@ -3595,8 +3677,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;
@@ -3714,12 +3794,19 @@ partial class ConvertibleStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::System.IFormatProvider? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::System.IFormatProvider? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ToUInt64", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<global::System.IFormatProvider?> OnCall(ToUInt64Delegate callback)
@@ -3826,8 +3913,6 @@ partial class ConvertibleStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.IFormatProvider? LastArg => _lastArg;

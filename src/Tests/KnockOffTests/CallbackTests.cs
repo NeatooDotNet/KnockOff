@@ -20,7 +20,7 @@ public class CallbackTests
 		service.DoSomething();
 
 		Assert.True(callbackInvoked);
-		Assert.True(tracking.WasCalled);
+		tracking.Verify();
 	}
 
 	[Fact]
@@ -74,7 +74,7 @@ public class CallbackTests
 		// GetValue has user implementation - we just verify tracking works
 		var result = service.GetValue(3);
 
-		Assert.True(doSomethingTracking.WasCalled);
+		doSomethingTracking.Verify();
 		Assert.Equal(6, result); // User method returns input * 2
 	}
 
@@ -128,13 +128,11 @@ public class CallbackTests
 		var resultBefore = service.GetOptional();
 		Assert.Equal("callback value", resultBefore);
 		tracking.Verify(Times.Once);
-		Assert.True(tracking.WasCalled);
 
 		knockOff.GetOptional.Reset();
 
 		// After reset, tracking state is cleared but callback still works
 		tracking.Verify(Times.Never);
-		Assert.False(tracking.WasCalled);
 
 		var resultAfter = service.GetOptional();
 		Assert.Equal("callback value", resultAfter);

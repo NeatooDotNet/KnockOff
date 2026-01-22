@@ -24,7 +24,7 @@ public class InlineStubBugTests
 		// Call the sync overload
 		var result = factory.Fetch(entity);
 
-		Assert.True(stub.Fetch2.WasCalled);
+		stub.Fetch2.Verify();
 		Assert.Equal(1, result.Id);
 	}
 
@@ -43,7 +43,7 @@ public class InlineStubBugTests
 
 		Assert.NotNull(result);
 		Assert.Equal(42, result!.Id);
-		Assert.True(stub.Fetch1.WasCalled);
+		stub.Fetch1.Verify();
 	}
 
 	#endregion
@@ -66,7 +66,7 @@ public class InlineStubBugTests
 		// Call via typed interface
 		var result = rule.Execute(target, CancellationToken.None);
 
-		Assert.True(stub.Execute1.WasCalled);
+		stub.Execute1.Verify();
 	}
 
 	[Fact]
@@ -86,7 +86,7 @@ public class InlineStubBugTests
 		var result = rule.Execute(target, CancellationToken.None);
 
 		Assert.NotNull(result);
-		Assert.True(stub.Execute2.WasCalled);
+		stub.Execute2.Verify();
 	}
 
 	#endregion

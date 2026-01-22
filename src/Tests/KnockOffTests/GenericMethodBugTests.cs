@@ -22,7 +22,7 @@ public class GenericMethodBugTests
 
 		// User method sets Id = 999
 		Assert.Equal(999, result.Id);
-		Assert.True(knockOff.Create2.Of<TestEntity>().WasCalled);
+		knockOff.Create2.Of<TestEntity>().Verify();
 	}
 
 	[Fact]
@@ -155,7 +155,7 @@ public class GenericMethodBugTests
 		var result = service.GetAttribute<TestAttribute>();
 
 		Assert.Same(testAttr, result);
-		Assert.True(knockOff.GetAttribute.Of<TestAttribute>().WasCalled);
+		knockOff.GetAttribute.Of<TestAttribute>().Verify();
 	}
 
 	[Fact]

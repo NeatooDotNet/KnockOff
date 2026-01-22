@@ -94,7 +94,7 @@ public class MethodConfigurationTests
 
         Assert.Single(logged);
         Assert.Equal("Hello, World!", logged[0]);
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
     #endregion
 
@@ -111,7 +111,7 @@ public class MethodConfigurationTests
         var name = logger.GetUserName(42);
 
         Assert.Equal("TestUser", name);
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
     #endregion
 
@@ -278,7 +278,7 @@ public class MethodResetTests
         // Verify one call was made
         tracking.Verify(Times.Once);
 
-        // Reset clears CallCount, WasCalled on the interceptor
+        // Reset clears CallCount on the interceptor
         stub.ProcessData.Reset();
 
         // After reset, Verify(Times.Never) passes via tracking

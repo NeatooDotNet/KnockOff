@@ -52,7 +52,7 @@ public partial class IRuleManagerTests
 
         await ruleManager.RunRules("TestProperty", null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public partial class IRuleManagerTests
 
         await ruleManager.RunRules(RunRulesFlag.All, null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public partial class IRuleManagerTests
         var ruleStub = new RuleStubForManager();
         await ruleManager.RunRule(ruleStub, null);
 
-        Assert.True(stub.RunRule.WasCalled);
+        stub.RunRule.Verify();
         Assert.Equal(1, stub.RunRule.CallCount);
     }
 
@@ -148,7 +148,7 @@ public partial class IRuleManagerTests
         await ruleManager.RunRule<TestRuleForManager>(null);
 
         // Generic methods should use a separate interceptor
-        Assert.True(stub.RunRuleGeneric.WasCalled);
+        stub.RunRuleGeneric.Verify();
     }
 
     [Fact]
@@ -160,7 +160,7 @@ public partial class IRuleManagerTests
         await ruleManager.RunRule<TestRuleForManager>(null);
 
         // Generic method tracking should track the type argument
-        Assert.True(stub.RunRuleGeneric.Of<TestRuleForManager>().WasCalled);
+        stub.RunRuleGeneric.Of<TestRuleForManager>().Verify();
         Assert.Equal(1, stub.RunRuleGeneric.Of<TestRuleForManager>().CallCount);
     }
 
@@ -192,7 +192,7 @@ public partial class IRuleManagerTests
         var ruleStub = new RuleOfTStubForManager();
         ruleManager.AddRule<IValidateBase>(ruleStub);
 
-        Assert.True(stub.AddRule.WasCalled);
+        stub.AddRule.Verify();
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public partial class IRuleManagerTests
         var ruleStub = new RuleOfTStubForManager();
         ruleManager.AddRule<IValidateBase>(ruleStub);
 
-        Assert.True(stub.AddRule.Of<IValidateBase>().WasCalled);
+        stub.AddRule.Of<IValidateBase>().Verify();
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public partial class IRuleManagerTests
 
         ruleManager.AddRules<IValidateBase>(rule1, rule2);
 
-        Assert.True(stub.AddRules.WasCalled);
+        stub.AddRules.Verify();
     }
 
     [Fact]
@@ -232,7 +232,7 @@ public partial class IRuleManagerTests
 
         ruleManager.AddRules<IValidateBase>(rule1, rule2);
 
-        Assert.True(stub.AddRules.Of<IValidateBase>().WasCalled);
+        stub.AddRules.Of<IValidateBase>().Verify();
     }
 
     #endregion
@@ -250,7 +250,7 @@ public partial class IRuleManagerTests
 
         stub.RunRules.Reset();
 
-        Assert.False(stub.RunRules.WasCalled);
+        stub.RunRules.Verify(Times.Never);
         Assert.Equal(0, stub.RunRules.CallCount);
     }
 
@@ -265,7 +265,7 @@ public partial class IRuleManagerTests
 
         stub.RunRuleGeneric.Reset();
 
-        Assert.False(stub.RunRuleGeneric.WasCalled);
+        stub.RunRuleGeneric.Verify(Times.Never);
         Assert.Equal(0, stub.RunRuleGeneric.TotalCallCount);
     }
 
@@ -353,6 +353,6 @@ public class IRuleManagerStandaloneTests
         await ruleManager.RunRules("Property", null);
 
         // Tracking is available via the returned tracking object
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 }

@@ -11,7 +11,6 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 	private interface IGenericMethodCallTracker
 	{
 		int CallCount { get; }
-		bool WasCalled { get; }
 	}
 
 	/// <summary>Interface for resetting state.</summary>
@@ -39,9 +38,6 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 
 		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
-		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
-
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
@@ -51,6 +47,16 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			foreach (var handler in _typedHandlers.Values)
 				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
+		}
+
+		/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Create", times, TotalCallCount));
 		}
 
 		/// <summary>Typed handler for Create with specific type arguments.</summary>
@@ -64,9 +70,6 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
 			internal int CallCount => _callCount;
-
-			/// <summary>True if this method was called at least once with these type arguments.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(CreateDelegate callback) { _onCall = callback; return this; }
@@ -117,9 +120,6 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 
 		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
-		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
-
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
@@ -129,6 +129,16 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			foreach (var handler in _typedHandlers.Values)
 				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
+		}
+
+		/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Transform", times, TotalCallCount));
 		}
 
 		/// <summary>Typed handler for Transform with specific type arguments.</summary>
@@ -142,9 +152,6 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
 			internal int CallCount => _callCount;
-
-			/// <summary>True if this method was called at least once with these type arguments.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(TransformDelegate callback) { _onCall = callback; return this; }
@@ -195,9 +202,6 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 
 		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
-		/// <summary>True if this method was called with any type argument.</summary>
-		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
-
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<(global::System.Type, global::System.Type)> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
@@ -207,6 +211,16 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			foreach (var handler in _typedHandlers.Values)
 				((IResettable)handler).Reset();
 			_typedHandlers.Clear();
+		}
+
+		/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Convert", times, TotalCallCount));
 		}
 
 		/// <summary>Typed handler for Convert with specific type arguments.</summary>
@@ -220,9 +234,6 @@ partial class GenericMethodWithUserMethodKnockOff : global::KnockOff.Tests.IGene
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
 			internal int CallCount => _callCount;
-
-			/// <summary>True if this method was called at least once with these type arguments.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(ConvertDelegate callback) { _onCall = callback; return this; }

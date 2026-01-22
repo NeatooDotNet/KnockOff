@@ -171,7 +171,7 @@ public partial class IValidatePropertyTests
 
         await property.SetValue("NewValue");
 
-        Assert.True(stub.SetValue.WasCalled);
+        stub.SetValue.Verify();
         Assert.Equal(1, stub.SetValue.CallCount);
     }
 
@@ -194,7 +194,7 @@ public partial class IValidatePropertyTests
 
         property.AddMarkedBusy(12345);
 
-        Assert.True(stub.AddMarkedBusy.WasCalled);
+        stub.AddMarkedBusy.Verify();
         Assert.Equal(12345L, stub.AddMarkedBusy.LastCallArg);
     }
 
@@ -206,7 +206,7 @@ public partial class IValidatePropertyTests
 
         property.RemoveMarkedBusy(12345);
 
-        Assert.True(stub.RemoveMarkedBusy.WasCalled);
+        stub.RemoveMarkedBusy.Verify();
         Assert.Equal(12345L, stub.RemoveMarkedBusy.LastCallArg);
     }
 
@@ -218,7 +218,7 @@ public partial class IValidatePropertyTests
 
         property.LoadValue("LoadedValue");
 
-        Assert.True(stub.LoadValue.WasCalled);
+        stub.LoadValue.Verify();
         Assert.Equal("LoadedValue", stub.LoadValue.LastCallArg);
     }
 
@@ -230,7 +230,7 @@ public partial class IValidatePropertyTests
 
         await property.WaitForTasks();
 
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
     }
 
     [Fact]
@@ -241,7 +241,7 @@ public partial class IValidatePropertyTests
 
         await property.RunRules(RunRulesFlag.All, null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -377,7 +377,7 @@ public partial class IValidatePropertyTests
 
         stub.SetValue.Reset();
 
-        Assert.False(stub.SetValue.WasCalled);
+        stub.SetValue.Verify(Times.Never);
         Assert.Equal(0, stub.SetValue.CallCount);
     }
 

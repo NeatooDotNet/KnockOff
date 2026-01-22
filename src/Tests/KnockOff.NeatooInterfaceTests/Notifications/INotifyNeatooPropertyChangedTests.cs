@@ -133,7 +133,7 @@ public partial class NeatooPropertyChangedDelegateTests
 
         await del(new NeatooPropertyChangedEventArgs("TestProperty", this));
 
-        Assert.True(stub.Interceptor.WasCalled);
+        stub.Interceptor.Verify();
         Assert.Equal(1, stub.Interceptor.CallCount);
     }
 
@@ -185,7 +185,7 @@ public partial class NeatooPropertyChangedDelegateTests
 
         stub.Interceptor.Reset();
 
-        Assert.False(stub.Interceptor.WasCalled);
+        stub.Interceptor.Verify(Times.Never);
         Assert.Equal(0, stub.Interceptor.CallCount);
     }
 }

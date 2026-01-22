@@ -50,7 +50,7 @@ public class KOPropertyCollisionTests
 
 		collision.DoWork();
 
-		Assert.True(tracking.WasCalled);
+		tracking.Verify();
 	}
 
 	[Fact]

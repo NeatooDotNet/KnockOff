@@ -353,11 +353,8 @@ internal static class ClassRenderer
         w.Line($"{indent1}private {method.DelegateType}? _onCall;");
         w.Line();
 
-        // CallCount and WasCalled
+        // CallCount (internal - use Verify(Times) for public API)
         w.Line($"{indent1}internal int CallCount {{ get; private set; }}");
-        w.Line();
-        w.Line($"{indent1}/// <summary>Whether this method was called at least once.</summary>");
-        w.Line($"{indent1}public bool WasCalled => CallCount > 0;");
         w.Line();
 
         // LastCallArg/LastCallArgs

@@ -140,7 +140,7 @@ public partial class IRequiredRuleTests
 
         await rule.RunRule(validateStub, null);
 
-        Assert.True(stub.RunRule.WasCalled);
+        stub.RunRule.Verify();
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public partial class IRequiredRuleTests
         var ruleManagerStub = new RuleManagerStubForRequiredRule();
         rule.OnRuleAdded(ruleManagerStub, 5);
 
-        Assert.True(stub.OnRuleAdded.WasCalled);
+        stub.OnRuleAdded.Verify();
     }
 
     #endregion

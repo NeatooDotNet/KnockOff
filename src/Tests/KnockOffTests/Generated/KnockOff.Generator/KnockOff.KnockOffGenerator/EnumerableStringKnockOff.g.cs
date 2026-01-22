@@ -39,8 +39,15 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 
 		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-		/// <summary>Whether this method was called at least once (any overload).</summary>
-		public bool WasCalled => CallCount > 0;
+		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void Verify(global::KnockOff.Times times)
+		{
+			if (!times.Validate(CallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount));
+		}
 
 		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
 		public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate_NoParams_Collections_Generic_IEnumerator_string callback)
@@ -227,8 +234,6 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -273,8 +278,6 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>True if callback was invoked at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;

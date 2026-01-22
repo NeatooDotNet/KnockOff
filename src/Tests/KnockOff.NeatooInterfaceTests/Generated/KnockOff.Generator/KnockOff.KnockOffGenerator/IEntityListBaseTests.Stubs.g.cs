@@ -1600,12 +1600,19 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public object? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public object? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Add", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<object?> OnCall(AddDelegate callback)
@@ -1712,8 +1719,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public object? LastArg => _lastArg;
@@ -1827,9 +1832,16 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Clear", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
@@ -1935,8 +1947,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -2048,12 +2058,19 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public object? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public object? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Contains", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<object?> OnCall(ContainsDelegate callback)
@@ -2160,8 +2177,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public object? LastArg => _lastArg;
@@ -2279,12 +2294,19 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public object? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public object? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexOf", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<object?> OnCall(IndexOfDelegate callback)
@@ -2391,8 +2413,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public object? LastArg => _lastArg;
@@ -2507,12 +2527,19 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
-			public (int index, object? @value)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+			public (int index, object? @value)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Insert", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTrackingArgs<(int index, object? @value)> OnCall(global::System.Action<int, object?> callback)
@@ -2621,8 +2648,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (int index, object? @value) LastArgs => _lastArgs;
@@ -2737,12 +2762,19 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public object? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public object? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Remove", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<object?> OnCall(global::System.Action<object?> callback)
@@ -2851,8 +2883,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public object? LastArg => _lastArg;
@@ -2967,12 +2997,19 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RemoveAt", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Action<int> callback)
@@ -3081,8 +3118,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -3197,12 +3232,19 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
-			public (global::System.Array array, int index)? LastCallArgs { get { if (_onCallTracking?.WasCalled == true) return _onCallTracking.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+			public (global::System.Array array, int index)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
+
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CopyTo", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTrackingArgs<(global::System.Array array, int index)> OnCall(global::System.Action<global::System.Array, int> callback)
@@ -3311,8 +3353,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (global::System.Array array, int index) LastArgs => _lastArgs;
@@ -3429,9 +3469,16 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate callback)
@@ -3535,8 +3582,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -3659,8 +3704,15 @@ partial class IEntityListBaseTests
 
 			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_NoParams_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-			/// <summary>Whether this method was called at least once (any overload).</summary>
-			public bool WasCalled => CallCount > 0;
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("WaitForTasks", times, CallCount));
+			}
 
 			/// <summary>Configures callback for WaitForTasks(). Returns tracking interface.</summary>
 			public global::KnockOff.IMethodTracking OnCall(WaitForTasksDelegate_NoParams_Threading_Tasks_Task callback)
@@ -3847,8 +3899,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -3894,8 +3944,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.Threading.CancellationToken LastArg => _lastArg;
@@ -4076,8 +4124,15 @@ partial class IEntityListBaseTests
 
 			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
-			/// <summary>Whether this method was called at least once (any overload).</summary>
-			public bool WasCalled => CallCount > 0;
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRules", times, CallCount));
+			}
 
 			/// <summary>Configures callback for RunRules(string, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
 			public global::KnockOff.IMethodTrackingArgs<(string propertyName, global::System.Threading.CancellationToken? token)> OnCall(RunRulesDelegate_String_Threading_CancellationToken_Threading_Tasks_Task callback)
@@ -4265,8 +4320,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (string propertyName, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -4318,8 +4371,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -4485,9 +4536,16 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ClearAllMessages", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
@@ -4593,8 +4651,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -4702,9 +4758,16 @@ partial class IEntityListBaseTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ClearSelfMessages", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback)
@@ -4810,8 +4873,6 @@ partial class IEntityListBaseTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;

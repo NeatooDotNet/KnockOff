@@ -211,10 +211,8 @@ public class OverloadedMethodTests
 		knockOff.Process.Reset();
 
 		tracking1.Verify(Times.Never);
-		Assert.False(tracking1.WasCalled);
 
 		tracking2.Verify(Times.Never);
-		Assert.False(tracking2.WasCalled);
 	}
 
 	[Fact]
@@ -253,8 +251,8 @@ public class OverloadedMethodTests
 		service.Process("data", 42);  // This is the two-param overload
 
 		// Clear identification of which overload was called
-		Assert.False(tracking1.WasCalled);  // Process(string) - NOT called
-		Assert.True(tracking2.WasCalled);   // Process(string, int) - CALLED!
-		Assert.False(tracking3.WasCalled);  // Process(string, int, bool) - NOT called
+		tracking1.Verify(Times.Never);  // Process(string) - NOT called
+		tracking2.Verify(Times.Once);   // Process(string, int) - CALLED!
+		tracking3.Verify(Times.Never);  // Process(string, int, bool) - NOT called
 	}
 }

@@ -17,7 +17,7 @@ public class GenericMethodTests
 		service.Create<TestEntity>();
 
 		Assert.Equal(2, knockOff.Create.Of<TestEntity>().CallCount);
-		Assert.True(knockOff.Create.Of<TestEntity>().WasCalled);
+		knockOff.Create.Of<TestEntity>().Verify();
 	}
 
 	[Fact]
@@ -66,16 +66,16 @@ public class GenericMethodTests
 	}
 
 	[Fact]
-	public void GenericMethod_WasCalled_TrueIfAnyTypeArgCalled()
+	public void GenericMethod_Verify_ConfirmsAnyTypeArgCalled()
 	{
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		Assert.False(knockOff.Create.WasCalled);
+		knockOff.Create.Verify(Times.Never);
 
 		service.Create<TestEntity>();
 
-		Assert.True(knockOff.Create.WasCalled);
+		knockOff.Create.Verify();
 	}
 
 	[Fact]
@@ -410,7 +410,7 @@ public class GenericMethodTests
 		knockOff.Create.Of<TestEntity>().Reset();
 
 		Assert.Equal(0, knockOff.Create.Of<TestEntity>().CallCount);
-		Assert.False(knockOff.Create.Of<TestEntity>().WasCalled);
+		knockOff.Create.Of<TestEntity>().Verify(Times.Never);
 		// OnCall is now a method, callback state is internal
 	}
 
@@ -426,7 +426,7 @@ public class GenericMethodTests
 		knockOff.Create.Reset();
 
 		Assert.Equal(0, knockOff.Create.TotalCallCount);
-		Assert.False(knockOff.Create.WasCalled);
+		knockOff.Create.Verify(Times.Never);
 		Assert.Empty(knockOff.Create.CalledTypeArguments);
 	}
 
@@ -456,7 +456,7 @@ public class GenericMethodTests
 
 		// Accessing Of<T>() without calling should have zero count
 		Assert.Equal(0, knockOff.Create.Of<TestEntity>().CallCount);
-		Assert.False(knockOff.Create.Of<TestEntity>().WasCalled);
+		knockOff.Create.Of<TestEntity>().Verify(Times.Never);
 	}
 
 	[Fact]
@@ -473,7 +473,7 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 
 		Assert.Equal(0, knockOff.Create.TotalCallCount);
-		Assert.False(knockOff.Create.WasCalled);
+		knockOff.Create.Verify(Times.Never);
 	}
 
 	#endregion

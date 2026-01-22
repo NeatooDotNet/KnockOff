@@ -50,7 +50,6 @@ public class GenericStandaloneStubTests
 
 		// Assert
 		tracking.Verify(Times.Exactly(2));
-		Assert.True(tracking.WasCalled);
 	}
 
 	[Fact]
@@ -238,7 +237,6 @@ public class GenericStandaloneStubTests
 
 		// Assert - tracking object is also reset
 		tracking.Verify(Times.Never);
-		Assert.False(tracking.WasCalled);
 	}
 
 	#endregion

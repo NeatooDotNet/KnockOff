@@ -143,7 +143,6 @@ public class RefParameterTests
 		knockOff.Increment.Reset();
 
 		tracking.Verify(Times.Never);
-		Assert.False(tracking.WasCalled);
 	}
 
 	[Fact]
@@ -170,18 +169,18 @@ public class RefParameterTests
 	}
 
 	[Fact]
-	public void RefParameter_WasCalled_ReportsCorrectly()
+	public void RefParameter_Verify_ReportsCorrectly()
 	{
 		var knockOff = new RefParameterServiceKnockOff();
 		IRefParameterService service = knockOff;
 
 		var tracking = knockOff.Increment.OnCall((ref int v) => { });
 
-		Assert.False(tracking.WasCalled);
+		tracking.Verify(Times.Never);
 
 		int dummy = 0;
 		service.Increment(ref dummy);
 
-		Assert.True(tracking.WasCalled);
+		tracking.Verify(Times.Once);
 	}
 }

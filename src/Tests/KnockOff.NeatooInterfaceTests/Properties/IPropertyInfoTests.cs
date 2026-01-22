@@ -96,7 +96,7 @@ public partial class IPropertyInfoTests
 
         propertyInfo.GetCustomAttribute<ObsoleteAttribute>();
 
-        Assert.True(stub.GetCustomAttribute.WasCalled);
+        stub.GetCustomAttribute.Verify();
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public partial class IPropertyInfoTests
 
         propertyInfo.GetCustomAttribute<ObsoleteAttribute>();
 
-        Assert.True(stub.GetCustomAttribute.Of<ObsoleteAttribute>().WasCalled);
+        stub.GetCustomAttribute.Of<ObsoleteAttribute>().Verify();
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public partial class IPropertyInfoTests
 
         propertyInfo.GetCustomAttributes();
 
-        Assert.True(stub.GetCustomAttributes.WasCalled);
+        stub.GetCustomAttributes.Verify();
         Assert.Equal(1, stub.GetCustomAttributes.CallCount);
     }
 
@@ -195,7 +195,7 @@ public partial class IPropertyInfoTests
 
         stub.GetCustomAttributes.Reset();
 
-        Assert.False(stub.GetCustomAttributes.WasCalled);
+        stub.GetCustomAttributes.Verify(Times.Never);
         Assert.Equal(0, stub.GetCustomAttributes.CallCount);
     }
 
@@ -252,7 +252,7 @@ public class IPropertyInfoStandaloneTests
 
         propertyInfo.GetCustomAttribute<ObsoleteAttribute>();
 
-        Assert.True(stub.GetCustomAttribute.WasCalled);
+        stub.GetCustomAttribute.Verify();
     }
 }
 
@@ -287,7 +287,7 @@ public partial class IPropertyInfoListTests
 
         list.GetPropertyInfo("Name");
 
-        Assert.True(stub.GetPropertyInfo.WasCalled);
+        stub.GetPropertyInfo.Verify();
         Assert.Equal(1, stub.GetPropertyInfo.CallCount);
     }
 
@@ -338,7 +338,7 @@ public partial class IPropertyInfoListTests
 
         list.Properties();
 
-        Assert.True(stub.Properties.WasCalled);
+        stub.Properties.Verify();
     }
 
     [Fact]
@@ -363,7 +363,7 @@ public partial class IPropertyInfoListTests
 
         list.HasProperty("Name");
 
-        Assert.True(stub.HasProperty.WasCalled);
+        stub.HasProperty.Verify();
     }
 
     [Fact]
@@ -427,7 +427,7 @@ public partial class IPropertyInfoListOfTTests
 
         list.GetPropertyInfo("Property");
 
-        Assert.True(stub.GetPropertyInfo.WasCalled);
+        stub.GetPropertyInfo.Verify();
     }
 
     [Fact]
@@ -438,7 +438,7 @@ public partial class IPropertyInfoListOfTTests
 
         list.HasProperty("Property");
 
-        Assert.True(stub.HasProperty.WasCalled);
+        stub.HasProperty.Verify();
     }
 }
 

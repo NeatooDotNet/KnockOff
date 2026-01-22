@@ -31,7 +31,7 @@ public class GenericInheritanceTypeMismatchBugTests
 		var result = rule.Execute(target, CancellationToken.None);
 
 		// Should be tracked on the typed tracking
-		Assert.True(typedTracking.WasCalled);
+		typedTracking.Verify();
 	}
 
 	[Fact]
@@ -50,7 +50,7 @@ public class GenericInheritanceTypeMismatchBugTests
 		var result = rule.Execute(target, CancellationToken.None);
 
 		Assert.NotNull(result);
-		Assert.True(baseTracking.WasCalled);
+		baseTracking.Verify();
 	}
 
 	[Fact]

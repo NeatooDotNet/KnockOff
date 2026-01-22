@@ -48,7 +48,7 @@ public class InlineStubTests
 		service.DoSomething();
 
 		Assert.Equal(2, stub.DoSomething.CallCount);
-		Assert.True(stub.DoSomething.WasCalled);
+		stub.DoSomething.Verify();
 	}
 
 	[Fact]
@@ -100,7 +100,7 @@ public class InlineStubTests
 		stub.GetValue.Reset();
 
 		Assert.Equal(0, stub.GetValue.CallCount);
-		Assert.False(stub.GetValue.WasCalled);
+		stub.GetValue.Verify(Times.Never);
 		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.GetValue.LastCallArg);
 	}
@@ -120,8 +120,8 @@ public class InlineStubTests
 		service.DoSomething();
 		logger.Log("test");
 
-		Assert.True(serviceStub.DoSomething.WasCalled);
-		Assert.True(loggerStub.Log.WasCalled);
+		serviceStub.DoSomething.Verify();
+		loggerStub.Log.Verify();
 		Assert.Equal("test", loggerStub.Log.LastCallArg);
 	}
 
@@ -138,7 +138,7 @@ public class InlineStubTests
 		// Verify it's a working stub
 		ISimpleService service = stub;
 		service.DoSomething();
-		Assert.True(stub.DoSomething.WasCalled);
+		stub.DoSomething.Verify();
 	}
 #endif
 
@@ -154,7 +154,7 @@ public class InlineStubTests
 		service.Create<TestEntity>();
 
 		Assert.Equal(2, stub.Create.Of<TestEntity>().CallCount);
-		Assert.True(stub.Create.Of<TestEntity>().WasCalled);
+		stub.Create.Of<TestEntity>().Verify();
 	}
 
 	[Fact]
@@ -240,7 +240,7 @@ public class InlineStubTests
 		stub.Create.Reset();
 
 		Assert.Equal(0, stub.Create.TotalCallCount);
-		Assert.False(stub.Create.WasCalled);
+		stub.Create.Verify(Times.Never);
 	}
 
 	#endregion
@@ -322,7 +322,7 @@ public class DelegateStubTests
 		del();
 
 		Assert.Equal(2, stub.Interceptor.CallCount);
-		Assert.True(stub.Interceptor.WasCalled);
+		stub.Interceptor.Verify();
 	}
 
 	[Fact]
@@ -383,7 +383,7 @@ public class DelegateStubTests
 
 		del("Alice", 30);
 
-		Assert.True(stub.Interceptor.WasCalled);
+		stub.Interceptor.Verify();
 		Assert.NotNull(stub.Interceptor.LastCallArgs);
 		Assert.Equal("Alice", stub.Interceptor.LastCallArgs.Value.name);
 		Assert.Equal(30, stub.Interceptor.LastCallArgs.Value.age);
@@ -414,7 +414,7 @@ public class DelegateStubTests
 
 		// Tracking state is cleared
 		Assert.Equal(0, stub.Interceptor.CallCount);
-		Assert.False(stub.Interceptor.WasCalled);
+		stub.Interceptor.Verify(Times.Never);
 		Assert.Null(stub.Interceptor.LastCallArg);
 
 		// Configuration is preserved (OnCall)
@@ -444,7 +444,7 @@ public class DelegateStubTests
 		var result = del();
 
 		Assert.Equal("generated value", result);
-		Assert.True(stub.Interceptor.WasCalled);
+		stub.Interceptor.Verify();
 		Assert.Equal(1, stub.Interceptor.CallCount);
 	}
 
@@ -475,7 +475,7 @@ public class DelegateStubTests
 
 		// Tracking state is cleared
 		Assert.Equal(0, stub.Interceptor.CallCount);
-		Assert.False(stub.Interceptor.WasCalled);
+		stub.Interceptor.Verify(Times.Never);
 		Assert.Null(stub.Interceptor.LastCallArg);
 
 		// Configuration is preserved (OnCall)
@@ -674,9 +674,9 @@ public class GenericCollisionTests
 		stringList.Add("hello");
 		intList.Add(42);
 
-		Assert.True(stringStub.Add.WasCalled);
+		stringStub.Add.Verify();
 		Assert.Equal("hello", stringStub.Add.LastCallArg);
-		Assert.True(intStub.Add.WasCalled);
+		intStub.Add.Verify();
 		Assert.Equal(42, intStub.Add.LastCallArg);
 	}
 
@@ -691,7 +691,7 @@ public class GenericCollisionTests
 		IList<string> list = stub;
 		list.Add("test");
 
-		Assert.True(stub.Add.WasCalled);
+		stub.Add.Verify();
 	}
 
 	[Fact]
@@ -711,8 +711,8 @@ public class GenericCollisionTests
 		dict1.Add("key", 123);
 		dict2.Add(456, "value");
 
-		Assert.True(stringIntStub.Add.WasCalled);
-		Assert.True(intStringStub.Add.WasCalled);
+		stringIntStub.Add.Verify();
+		intStringStub.Add.Verify();
 	}
 }
 
@@ -790,7 +790,7 @@ public class ClassStubTests
 		stub.Object.DoWork();
 
 		Assert.Equal(2, stub.DoWork.CallCount);
-		Assert.True(stub.DoWork.WasCalled);
+		stub.DoWork.Verify();
 	}
 
 	[Fact]
@@ -849,7 +849,7 @@ public class ClassStubTests
 		stub.Calculate.Reset();
 
 		Assert.Equal(0, stub.Calculate.CallCount);
-		Assert.False(stub.Calculate.WasCalled);
+		stub.Calculate.Verify(Times.Never);
 		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.Calculate.LastCallArg);
 	}
@@ -932,7 +932,7 @@ public class AbstractClassStubTests
 		// Should not throw - abstract void methods just record the call
 		stub.Object.Connect();
 
-		Assert.True(stub.Connect.WasCalled);
+		stub.Connect.Verify();
 	}
 
 	[Fact]
@@ -991,7 +991,7 @@ public class MixedClassStubTests
 
 		stub.Object.VirtualMethod();
 
-		Assert.True(stub.VirtualMethod.WasCalled);
+		stub.VirtualMethod.Verify();
 	}
 
 	[Fact]

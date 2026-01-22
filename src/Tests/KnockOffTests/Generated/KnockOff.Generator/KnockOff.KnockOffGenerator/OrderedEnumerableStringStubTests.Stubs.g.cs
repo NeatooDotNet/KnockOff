@@ -10,7 +10,7 @@ partial class OrderedEnumerableStringStubTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		private interface IGenericMethodCallTracker { int CallCount { get; } bool WasCalled { get; } }
+		private interface IGenericMethodCallTracker { int CallCount { get; } }
 		private interface IResettable { void Reset(); }
 
 		/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
@@ -35,9 +35,16 @@ partial class OrderedEnumerableStringStubTests
 
 			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
+			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount));
+			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
 			public global::KnockOff.IMethodTracking OnCall(GetEnumeratorDelegate callback)
@@ -141,8 +148,6 @@ partial class OrderedEnumerableStringStubTests
 
 				internal int CallCount { get; private set; }
 
-				/// <summary>True if callback was invoked at least once.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -250,9 +255,6 @@ partial class OrderedEnumerableStringStubTests
 
 			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
-			/// <summary>True if this method was called with any type argument.</summary>
-			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
-
 			/// <summary>All type argument(s) that were used in calls.</summary>
 			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
 
@@ -261,6 +263,16 @@ partial class OrderedEnumerableStringStubTests
 			{
 				foreach (var handler in _typedHandlers.Values.Cast<IResettable>())
 					handler.Reset();
+			}
+
+			/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CreateOrderedEnumerable", times, TotalCallCount));
 			}
 
 			internal bool IsVerifiable => false; // Generic handlers are not individually verifiable
@@ -290,9 +302,6 @@ partial class OrderedEnumerableStringStubTests
 
 				/// <summary>The 'descending' argument from the most recent call.</summary>
 				public bool? LastCallArg { get; private set; }
-
-				/// <summary>True if this method was called at least once with these type arguments.</summary>
-				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 				public global::KnockOff.IMethodTracking OnCall(CreateOrderedEnumerableDelegate callback) { _onCall = callback; return this; }

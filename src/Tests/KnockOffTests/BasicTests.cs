@@ -54,7 +54,6 @@ public class BasicTests
 
 		service.DoSomething();
 
-		Assert.True(tracking.WasCalled);
 		tracking.Verify(Times.Once);
 	}
 
@@ -112,7 +111,7 @@ public class BasicTests
 		var result = service.GetOptional();
 
 		Assert.Null(result);
-		Assert.True(tracking.WasCalled);
+		tracking.Verify();
 	}
 
 	[Fact]
@@ -144,7 +143,7 @@ public class BasicTests
 		Assert.Equal(0, knockOff.Name.SetCount);
 		knockOff.GetValue2.Verify(Times.Never);
 		// After reset, the tracking object is also reset
-		Assert.False(doSomethingTracking.WasCalled);
+		doSomethingTracking.Verify(Times.Never);
 	}
 
 	[Fact]

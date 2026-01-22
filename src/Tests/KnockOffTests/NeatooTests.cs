@@ -138,7 +138,7 @@ public class EntityBaseStandaloneTests
 
         entity.Delete();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         tracking.Verify(Times.Once);
     }
 
@@ -151,7 +151,7 @@ public class EntityBaseStandaloneTests
 
         entity.UnDelete();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         tracking.Verify(Times.Once);
     }
 
@@ -166,7 +166,7 @@ public class EntityBaseStandaloneTests
         var result = await entity.Save();
 
         Assert.Same(entity, result);
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         tracking.Verify(Times.Once);
     }
 
@@ -220,7 +220,7 @@ public class EntityBaseStandaloneTests
 
         await entity.WaitForTasks();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public class EntityBaseStandaloneTests
 
         // Verify reset
         Assert.Equal(0, stub.IsNew.GetCount);
-        Assert.False(deleteTracking.WasCalled);
+        deleteTracking.Verify(Times.Never);
         deleteTracking.Verify(Times.Never);
     }
 }
@@ -328,7 +328,7 @@ public class ValidateBaseStandaloneTests
 
         await validate.RunRules("FirstName", null);
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         tracking.Verify(Times.Once);
     }
 
@@ -342,7 +342,7 @@ public class ValidateBaseStandaloneTests
 
         await validate.RunRules(RunRulesFlag.All, null);
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -354,7 +354,7 @@ public class ValidateBaseStandaloneTests
 
         validate.ClearAllMessages();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -366,7 +366,7 @@ public class ValidateBaseStandaloneTests
 
         validate.ClearSelfMessages();
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 
     [Fact]
@@ -379,7 +379,7 @@ public class ValidateBaseStandaloneTests
 
         _ = validate.GetProperty("Age");
 
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
         Assert.Equal("Age", tracking.LastArg);
     }
 
@@ -487,7 +487,7 @@ public partial class InlineValidateBaseTests
 
         _ = validate.GetProperty("TestProp");
 
-        Assert.True(stub.GetProperty.WasCalled);
+        stub.GetProperty.Verify();
         Assert.Equal("TestProp", stub.GetProperty.LastCallArg);
     }
 
@@ -501,7 +501,7 @@ public partial class InlineValidateBaseTests
 
         var result = validate.TryGetProperty("TestProp", out _);
 
-        Assert.True(stub.TryGetProperty.WasCalled);
+        stub.TryGetProperty.Verify();
         Assert.Equal("TestProp", stub.TryGetProperty.LastCallArg);
     }
 
@@ -513,7 +513,7 @@ public partial class InlineValidateBaseTests
 
         await validate.RunRules("PropertyName", null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
         Assert.Equal(1, stub.RunRules.CallCount);
     }
 
@@ -525,7 +525,7 @@ public partial class InlineValidateBaseTests
 
         await validate.RunRules(RunRulesFlag.All, null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
     }
 
     [Fact]
@@ -554,7 +554,7 @@ public partial class InlineValidateBaseTests
 
         validate.ClearAllMessages();
 
-        Assert.True(stub.ClearAllMessages.WasCalled);
+        stub.ClearAllMessages.Verify();
     }
 
     [Fact]
@@ -565,7 +565,7 @@ public partial class InlineValidateBaseTests
 
         validate.ClearSelfMessages();
 
-        Assert.True(stub.ClearSelfMessages.WasCalled);
+        stub.ClearSelfMessages.Verify();
     }
 
     [Fact]
@@ -576,7 +576,7 @@ public partial class InlineValidateBaseTests
 
         await validate.WaitForTasks();
 
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
     }
 
     [Fact]
@@ -659,7 +659,7 @@ public partial class InlineRuleManagerTests
         // Non-generic RunRule should use the RunRule interceptor (not RunRuleGeneric)
         await ruleManager.RunRule(null!, null);
 
-        Assert.True(stub.RunRule.WasCalled);
+        stub.RunRule.Verify();
         Assert.Equal(1, stub.RunRule.CallCount);
     }
 
@@ -672,8 +672,8 @@ public partial class InlineRuleManagerTests
         // Generic RunRule<T> should use the RunRuleGeneric interceptor with Of<T>()
         await ruleManager.RunRule<TestRule>(null);
 
-        Assert.True(stub.RunRuleGeneric.WasCalled);
-        Assert.True(stub.RunRuleGeneric.Of<TestRule>().WasCalled);
+        stub.RunRuleGeneric.Verify();
+        stub.RunRuleGeneric.Of<TestRule>().Verify();
         Assert.Equal(1, stub.RunRuleGeneric.Of<TestRule>().CallCount);
     }
 
@@ -685,7 +685,7 @@ public partial class InlineRuleManagerTests
 
         await ruleManager.RunRules("PropertyName", null);
 
-        Assert.True(stub.RunRules.WasCalled);
+        stub.RunRules.Verify();
         Assert.Equal(1, stub.RunRules.CallCount);
     }
 
@@ -697,8 +697,8 @@ public partial class InlineRuleManagerTests
 
         ruleManager.AddRule<IValidateBase>(null!);
 
-        Assert.True(stub.AddRule.WasCalled);
-        Assert.True(stub.AddRule.Of<IValidateBase>().WasCalled);
+        stub.AddRule.Verify();
+        stub.AddRule.Of<IValidateBase>().Verify();
     }
 
     [Fact]
@@ -762,7 +762,7 @@ public partial class InlineDelegateTests
         // EventArgs constructor: (propertyName, source)
         await del(new NeatooPropertyChangedEventArgs("TestProperty", this));
 
-        Assert.True(stub.Interceptor.WasCalled);
+        stub.Interceptor.Verify();
         Assert.Equal(1, stub.Interceptor.CallCount);
     }
 
@@ -817,7 +817,7 @@ public partial class InlineDelegateTests
 
         stub.Interceptor.Reset();
 
-        Assert.False(stub.Interceptor.WasCalled);
+        stub.Interceptor.Verify(Times.Never);
         Assert.Equal(0, stub.Interceptor.CallCount);
     }
 }

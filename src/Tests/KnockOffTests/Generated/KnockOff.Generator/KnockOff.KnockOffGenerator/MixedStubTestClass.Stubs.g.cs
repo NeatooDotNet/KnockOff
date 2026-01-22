@@ -117,9 +117,6 @@ partial class MixedStubTestClass
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
 

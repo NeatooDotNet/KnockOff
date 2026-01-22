@@ -39,7 +39,7 @@ public class OpenGenericInlineStubTests
 		repo.Add("another");
 
 		Assert.Equal(2, stub.Add.CallCount);
-		Assert.True(stub.Add.WasCalled);
+		stub.Add.Verify();
 		Assert.Equal("another", stub.Add.LastCallArg);
 	}
 
@@ -112,7 +112,7 @@ public class OpenGenericInlineStubTests
 		IKeyValueStore<string, int> store = stub;
 		store.Set("key", 42);
 
-		Assert.True(stub.Set.WasCalled);
+		stub.Set.Verify();
 		Assert.Equal(("key", 42), stub.Set.LastCallArgs);
 	}
 

@@ -74,7 +74,7 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyCalled()
     {
-        _ = _knockOffSimpleTracking.WasCalled;
+        _knockOffSimpleTracking.Verify();
     }
 
     [Benchmark]

@@ -90,9 +90,6 @@ partial class OpenGenericClassTests
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call.</summary>
 			public int? LastCallArg { get; private set; }
 
@@ -151,9 +148,6 @@ partial class OpenGenericClassTests
 			private global::System.Action<T>? _onCall;
 
 			internal int CallCount { get; private set; }
-
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The argument from the last call.</summary>
 			public T? LastCallArg { get; private set; }
@@ -308,9 +302,6 @@ partial class OpenGenericClassTests
 
 			internal int CallCount { get; private set; }
 
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
-
 			/// <summary>The argument from the last call.</summary>
 			public TKey? LastCallArg { get; private set; }
 
@@ -369,9 +360,6 @@ partial class OpenGenericClassTests
 			private global::System.Action<TKey, TValue>? _onCall;
 
 			internal int CallCount { get; private set; }
-
-			/// <summary>Whether this method was called at least once.</summary>
-			public bool WasCalled => CallCount > 0;
 
 			/// <summary>The arguments from the last call.</summary>
 			public (TKey? key, TValue? value)? LastCallArgs { get; private set; }

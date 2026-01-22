@@ -15,7 +15,7 @@ public class GenericInterfaceTests
 		var user = new User { Id = 1, Name = "Test" };
 		repo.Save(user);
 
-		Assert.True(tracking.WasCalled);
+		tracking.Verify();
 		Assert.Same(user, tracking.LastArg);
 	}
 
@@ -54,6 +54,6 @@ public class GenericInterfaceTests
 		IRepository<User> repo = knockOff;
 
 		repo.Save(new User { Id = 1, Name = "Via cast" });
-		Assert.True(tracking.WasCalled);
+		tracking.Verify();
 	}
 }

@@ -123,7 +123,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.MarkSelfUnmodified();
 
-        Assert.True(stub.MarkSelfUnmodified.WasCalled);
+        stub.MarkSelfUnmodified.Verify();
         Assert.Equal(1, stub.MarkSelfUnmodified.CallCount);
     }
 
@@ -148,7 +148,7 @@ public partial class IEntityPropertyManagerTests
 
         await manager.WaitForTasks();
 
-        Assert.True(stub.WaitForTasks.WasCalled);
+        stub.WaitForTasks.Verify();
         Assert.Equal(1, stub.WaitForTasks.CallCount);
     }
 
@@ -160,7 +160,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.HasProperty("TestProperty");
 
-        Assert.True(stub.HasProperty.WasCalled);
+        stub.HasProperty.Verify();
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.GetProperty("Name");
 
-        Assert.True(stub.GetProperty.WasCalled);
+        stub.GetProperty.Verify();
         Assert.Equal("Name", stub.GetProperty.LastCallArg);
     }
 
@@ -214,7 +214,7 @@ public partial class IEntityPropertyManagerTests
         var properties = new List<IEntityProperty>();
         manager.SetProperties(properties);
 
-        Assert.True(stub.SetProperties.WasCalled);
+        stub.SetProperties.Verify();
     }
 
     [Fact]
@@ -225,7 +225,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.PauseAllActions();
 
-        Assert.True(stub.PauseAllActions.WasCalled);
+        stub.PauseAllActions.Verify();
     }
 
     [Fact]
@@ -236,7 +236,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.ResumeAllActions();
 
-        Assert.True(stub.ResumeAllActions.WasCalled);
+        stub.ResumeAllActions.Verify();
     }
 
     [Fact]
@@ -247,7 +247,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.ClearAllMessages();
 
-        Assert.True(stub.ClearAllMessages.WasCalled);
+        stub.ClearAllMessages.Verify();
     }
 
     #endregion
@@ -306,7 +306,7 @@ public partial class IEntityPropertyManagerTests
 
         stub.MarkSelfUnmodified.Reset();
 
-        Assert.False(stub.MarkSelfUnmodified.WasCalled);
+        stub.MarkSelfUnmodified.Verify(Times.Never);
     }
 
     #endregion
@@ -368,6 +368,6 @@ public class IEntityPropertyManagerStandaloneTests
         manager.MarkSelfUnmodified();
 
         // Tracking is available via the returned tracking object
-        Assert.True(tracking.WasCalled);
+        tracking.Verify();
     }
 }
