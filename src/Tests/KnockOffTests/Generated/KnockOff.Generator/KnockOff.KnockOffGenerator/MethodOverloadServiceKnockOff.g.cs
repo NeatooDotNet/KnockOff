@@ -49,8 +49,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		private bool _isVerifiable_String_Int32_String;
 		private global::KnockOff.Times? _verifiableTimes_String_Int32_String;
 
-		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_String?.CallCount ?? 0) + (_sequence_String_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Boolean_String?.CallCount ?? 0) + (_sequence_String_Boolean_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_String?.CallCount ?? 0) + (_sequence_String_Int32_String?.Sum(s => s.Tracking.CallCount) ?? 0);
+		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_String?.CallCount ?? 0) + (_sequence_String_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Boolean_String?.CallCount ?? 0) + (_sequence_String_Boolean_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_String?.CallCount ?? 0) + (_sequence_String_Int32_String?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -314,10 +313,9 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -368,10 +366,9 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			private (string? input, bool? uppercase) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -422,10 +419,9 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			private (string? input, int? maxLength) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -474,8 +470,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			public MethodSequenceImpl_String_String(FormatInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -527,8 +522,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			public MethodSequenceImpl_String_Boolean_String(FormatInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -580,8 +574,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			public MethodSequenceImpl_String_Int32_String(FormatInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{

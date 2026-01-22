@@ -5,13 +5,10 @@ namespace KnockOff;
 /// </summary>
 public interface IMethodTracking
 {
-    /// <summary>Number of times this callback was invoked.</summary>
-    int CallCount { get; }
-
-    /// <summary>True if CallCount > 0.</summary>
+    /// <summary>True if callback was invoked at least once.</summary>
     bool WasCalled { get; }
 
-    /// <summary>Clears tracking state for this registration (CallCount = 0, LastArg/LastArgs = default).</summary>
+    /// <summary>Clears tracking state for this registration (WasCalled = false, LastArg/LastArgs = default).</summary>
     void Reset();
 
     /// <summary>

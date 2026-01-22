@@ -1,3 +1,4 @@
+using KnockOff;
 using KnockOff.Sandbox;
 
 // Sandbox for manually testing the KnockOff source generator.
@@ -27,7 +28,8 @@ Console.WriteLine("Void Method (no params):");
 var doWorkTracking = knockOff.DoWork.OnCall(() => { });
 service.DoWork();
 Console.WriteLine($"  DoWork.WasCalled: {doWorkTracking.WasCalled}");
-Console.WriteLine($"  DoWork.CallCount: {doWorkTracking.CallCount}");
+// Verify method was called (throws if not)
+doWorkTracking.Verify(Times.Once);
 Console.WriteLine();
 
 // Test method with single param - user-defined method with tracking interceptor
@@ -48,7 +50,8 @@ service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 
 var processArgs = processTracking.LastArgs;
-Console.WriteLine($"  Call count: {processTracking.CallCount}");
+// Verify method was called twice (throws if not)
+processTracking.Verify(Times.Exactly(2));
 Console.WriteLine($"  Last call: ({processArgs.id}, {processArgs.count}, {processArgs.urgent})");
 Console.WriteLine();
 

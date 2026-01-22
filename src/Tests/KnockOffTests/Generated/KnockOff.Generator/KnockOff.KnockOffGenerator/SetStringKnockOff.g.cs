@@ -199,8 +199,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private bool _isVerifiable_String_void;
 		private global::KnockOff.Times? _verifiableTimes_String_void;
 
-		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Boolean?.CallCount ?? 0) + (_sequence_String_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Boolean?.CallCount ?? 0) + (_sequence_String_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -391,10 +390,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -445,10 +443,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -497,8 +494,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl_String_Boolean(AddInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -550,8 +546,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl_String_void(AddInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -616,8 +611,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -731,10 +725,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -783,8 +776,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(ExceptWithInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -849,8 +841,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -964,10 +955,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1016,8 +1006,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(IntersectWithInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1085,8 +1074,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -1198,10 +1186,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1250,8 +1237,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(IsProperSubsetOfInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1319,8 +1305,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -1432,10 +1417,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1484,8 +1468,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(IsProperSupersetOfInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1553,8 +1536,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -1666,10 +1648,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1718,8 +1699,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(IsSubsetOfInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1787,8 +1767,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -1900,10 +1879,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1952,8 +1930,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(IsSupersetOfInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2021,8 +1998,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2134,10 +2110,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -2186,8 +2161,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(OverlapsInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2255,8 +2229,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2368,10 +2341,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -2420,8 +2392,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(SetEqualsInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2486,8 +2457,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2601,10 +2571,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -2653,8 +2622,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(SymmetricExceptWithInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2719,8 +2687,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<string>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2834,10 +2801,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private global::System.Collections.Generic.IEnumerable<string> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -2886,8 +2852,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(UnionWithInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2951,8 +2916,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -3060,10 +3024,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public MethodTrackingImpl(ClearInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -3106,8 +3069,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(ClearInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -3175,8 +3137,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private string? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -3288,10 +3249,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -3340,8 +3300,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(ContainsInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -3406,8 +3365,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private (string[]? array, int? arrayIndex)? _unconfiguredLastArgs;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -3521,10 +3479,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private (string[]? array, int? arrayIndex) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -3573,8 +3530,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(CopyToInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -3642,8 +3598,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private int _unconfiguredCallCount;
 		private string? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -3755,10 +3710,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -3807,8 +3761,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl(RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -3887,8 +3840,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 		private bool _isVerifiable_NoParams_Collections_IEnumerator;
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_IEnumerator;
 
-		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
+		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -4076,10 +4028,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -4123,10 +4074,9 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 			public MethodTrackingImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -4169,8 +4119,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -4222,8 +4171,7 @@ partial class SetStringKnockOff : global::System.Collections.Generic.ISet<string
 
 			public MethodSequenceImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{

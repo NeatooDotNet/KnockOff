@@ -313,8 +313,7 @@ partial class IRuleMessagesTests
 			private bool _isVerifiable_Neatoo_Rules_IRuleMessage_void;
 			private global::KnockOff.Times? _verifiableTimes_Neatoo_Rules_IRuleMessage_void;
 
-			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-			public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_String_void?.CallCount ?? 0) + (_sequence_String_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_Rules_IRuleMessage_void?.CallCount ?? 0) + (_sequence_Neatoo_Rules_IRuleMessage_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_String_void?.CallCount ?? 0) + (_sequence_String_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_Rules_IRuleMessage_void?.CallCount ?? 0) + (_sequence_Neatoo_Rules_IRuleMessage_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
@@ -507,10 +506,9 @@ partial class IRuleMessagesTests
 
 				private (string propertyName, string message) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -561,10 +559,9 @@ partial class IRuleMessagesTests
 
 				private global::Neatoo.Rules.IRuleMessage _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -613,8 +610,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl_String_String_void(IRuleMessages_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -666,8 +662,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl_Neatoo_Rules_IRuleMessage_void(IRuleMessages_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -735,8 +730,7 @@ partial class IRuleMessagesTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.Rules.IRuleMessage? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -848,10 +842,9 @@ partial class IRuleMessagesTests
 
 				private global::Neatoo.Rules.IRuleMessage _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -900,8 +893,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl(IRuleMessages_IndexOfInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -966,8 +958,7 @@ partial class IRuleMessagesTests
 			private int _unconfiguredCallCount;
 			private (int index, global::Neatoo.Rules.IRuleMessage item)? _unconfiguredLastArgs;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1081,10 +1072,9 @@ partial class IRuleMessagesTests
 
 				private (int index, global::Neatoo.Rules.IRuleMessage item) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -1133,8 +1123,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl(IRuleMessages_InsertInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1199,8 +1188,7 @@ partial class IRuleMessagesTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1314,10 +1302,9 @@ partial class IRuleMessagesTests
 
 				private int _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1366,8 +1353,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl(IRuleMessages_RemoveAtInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1431,8 +1417,7 @@ partial class IRuleMessagesTests
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1540,10 +1525,9 @@ partial class IRuleMessagesTests
 				public MethodTrackingImpl(IRuleMessages_ClearInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -1586,8 +1570,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl(IRuleMessages_ClearInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1655,8 +1638,7 @@ partial class IRuleMessagesTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.Rules.IRuleMessage? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1768,10 +1750,9 @@ partial class IRuleMessagesTests
 
 				private global::Neatoo.Rules.IRuleMessage _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1820,8 +1801,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl(IRuleMessages_ContainsInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1886,8 +1866,7 @@ partial class IRuleMessagesTests
 			private int _unconfiguredCallCount;
 			private (global::Neatoo.Rules.IRuleMessage[] array, int arrayIndex)? _unconfiguredLastArgs;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2001,10 +1980,9 @@ partial class IRuleMessagesTests
 
 				private (global::Neatoo.Rules.IRuleMessage[] array, int arrayIndex) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -2053,8 +2031,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl(IRuleMessages_CopyToInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2122,8 +2099,7 @@ partial class IRuleMessagesTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.Rules.IRuleMessage? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2235,10 +2211,9 @@ partial class IRuleMessagesTests
 
 				private global::Neatoo.Rules.IRuleMessage _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -2287,8 +2262,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl(IRuleMessages_RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2355,8 +2329,7 @@ partial class IRuleMessagesTests
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2462,10 +2435,9 @@ partial class IRuleMessagesTests
 				public MethodTrackingImpl(IRuleMessages_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -2508,8 +2480,7 @@ partial class IRuleMessagesTests
 
 				public MethodSequenceImpl(IRuleMessages_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{

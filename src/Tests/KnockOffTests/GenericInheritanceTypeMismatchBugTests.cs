@@ -75,8 +75,8 @@ public class GenericInheritanceTypeMismatchBugTests
 		baseRule.Execute(target2, CancellationToken.None);
 
 		// Each overload tracked separately
-		Assert.Equal(1, typedTracking.CallCount);
-		Assert.Equal(1, baseTracking.CallCount);
+		typedTracking.Verify(Times.Once);
+		baseTracking.Verify(Times.Once);
 	}
 
 	[Fact]

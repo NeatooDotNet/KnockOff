@@ -208,8 +208,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		private bool _isVerifiable_NoParams_Collections_IEnumerator;
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_IEnumerator;
 
-		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
+		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -397,10 +396,9 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 			public MethodTrackingImpl_NoParams_Collections_Generic_IEnumerator_string(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -444,10 +442,9 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 			public MethodTrackingImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -490,8 +487,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 
 			public MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -543,8 +539,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 
 			public MethodSequenceImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{

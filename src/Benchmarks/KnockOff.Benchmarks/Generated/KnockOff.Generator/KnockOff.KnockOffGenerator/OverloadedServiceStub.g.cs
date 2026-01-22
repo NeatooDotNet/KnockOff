@@ -49,8 +49,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private bool _isVerifiable_Int32_Int32_void;
 		private global::KnockOff.Times? _verifiableTimes_Int32_Int32_void;
 
-		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_void?.CallCount ?? 0) + (_sequence_Int32_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_void?.CallCount ?? 0) + (_sequence_Int32_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -320,10 +319,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			private int _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -374,10 +372,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -428,10 +425,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			private (int? a, int? b) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -480,8 +476,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -533,8 +528,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_String_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -586,8 +580,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_Int32_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -666,8 +659,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private bool _isVerifiable_Int32_Int32_Int32;
 		private global::KnockOff.Times? _verifiableTimes_Int32_Int32_Int32;
 
-		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
+		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -856,10 +848,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			private int _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -910,10 +901,9 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			private (int? a, int? b) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -962,8 +952,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_Int32_Int32(CalculateInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1015,8 +1004,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_Int32_Int32_Int32(CalculateInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{

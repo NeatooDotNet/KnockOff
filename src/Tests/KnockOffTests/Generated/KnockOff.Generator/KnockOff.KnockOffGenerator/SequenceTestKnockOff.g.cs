@@ -26,8 +26,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 		private int _unconfiguredCallCount;
 		private (int? a, int? b)? _unconfiguredLastArgs;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -139,10 +138,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 
 			private (int? a, int? b) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -191,8 +189,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 
 			public MethodSequenceImpl(AddInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -256,8 +253,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -365,10 +361,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 			public MethodTrackingImpl(DoWorkInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -411,8 +406,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 
 			public MethodSequenceImpl(DoWorkInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -480,8 +474,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 		private int _unconfiguredCallCount;
 		private string? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -593,10 +586,9 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -645,8 +637,7 @@ partial class SequenceTestKnockOff : global::KnockOff.Tests.ISequenceTestService
 
 			public MethodSequenceImpl(GetMessageInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{

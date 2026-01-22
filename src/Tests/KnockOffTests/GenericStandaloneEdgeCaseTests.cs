@@ -139,7 +139,7 @@ public class GenericStandaloneEdgeCaseTests
 		service.Save(entity);
 
 		// Assert
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 		Assert.Same(entity, tracking.LastArg);
 	}
 

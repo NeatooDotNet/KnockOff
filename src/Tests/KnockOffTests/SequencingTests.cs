@@ -59,7 +59,7 @@ public class SequencingTests
         Assert.Equal(7, svc.Add(3, 4));
         Assert.Equal(11, svc.Add(5, 6));
 
-        Assert.Equal(3, tracking.CallCount);
+        tracking.Verify(Times.Exactly(3));
         Assert.True(tracking.WasCalled);
     }
 
@@ -135,7 +135,7 @@ public class SequencingTests
         svc.DoWork();
 
         Assert.Equal(2, callCount);
-        Assert.Equal(2, tracking.CallCount);
+        tracking.Verify(Times.Exactly(2));
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class SequencingTests
     }
 
     [Fact]
-    public void Sequence_TotalCallCount_TracksAllCalls()
+    public void Sequence_AllCallbacks_ExecuteInOrder()
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
@@ -192,11 +192,12 @@ public class SequencingTests
             .ThenCall((a, b) => 3);
 
         ISequenceTestService svc = stub;
-        svc.Add(0, 0);
-        svc.Add(0, 0);
-        svc.Add(0, 0);
+        Assert.Equal(1, svc.Add(0, 0)); // First callback
+        Assert.Equal(2, svc.Add(0, 0)); // Second callback
+        Assert.Equal(3, svc.Add(0, 0)); // Third callback
 
-        Assert.Equal(3, sequence.TotalCallCount);
+        // Verify sequence completed (all 3 callbacks were invoked)
+        sequence.Verify();
     }
 
     [Fact]
@@ -210,10 +211,12 @@ public class SequencingTests
         ISequenceTestService svc = stub;
         svc.Add(0, 0);
         svc.Add(0, 0);
-        Assert.Equal(2, sequence.TotalCallCount);
+        // Verify sequence completed
+        sequence.Verify();
 
         sequence.Reset();
-        Assert.Equal(0, sequence.TotalCallCount);
+        // After reset, sequence is incomplete again - Verify should throw
+        Assert.Throws<VerificationException>(() => sequence.Verify());
 
         // After reset, should start from beginning
         Assert.Equal(1, svc.Add(0, 0));  // First callback again
@@ -384,9 +387,9 @@ public class MethodOverloadTests
         Assert.Equal("world", svc.Format("world", false));
         Assert.Equal("hel", svc.Format("hello", 3));
 
-        Assert.Equal(1, tracking1.CallCount);
-        Assert.Equal(1, tracking2.CallCount);
-        Assert.Equal(1, tracking3.CallCount);
+        tracking1.Verify(Times.Once);
+        tracking2.Verify(Times.Once);
+        tracking3.Verify(Times.Once);
     }
 
     [Fact]
@@ -403,10 +406,10 @@ public class MethodOverloadTests
         svc.Format("b");
         svc.Format("c", true);
 
-        Assert.Equal(2, tracking1.CallCount);
+        tracking1.Verify(Times.Exactly(2));
         Assert.Equal("b", tracking1.LastArg);
 
-        Assert.Equal(1, tracking2.CallCount);
+        tracking2.Verify(Times.Once);
         Assert.Equal(("c", true), tracking2.LastArgs);
     }
 }

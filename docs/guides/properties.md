@@ -107,8 +107,8 @@ public void OnGet_DependsOnOtherInterceptorState()
 {
     var stub = new ServiceWithInitPropsStub();
 
-    // OnGet checks if Initialize() was called via interceptor CallCount
-    stub.IsReady.OnGet = () => stub.Initialize.CallCount > 0;
+    // OnGet checks if Initialize() was called via interceptor WasCalled
+    stub.IsReady.OnGet = () => stub.Initialize.WasCalled;
     var initTracking = stub.Initialize.OnCall(() => { });
 
     IServiceWithInitProps service = stub;
@@ -369,7 +369,7 @@ public void CompletePropertyExample_AllConfigurationApproaches()
     stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
     // OnGet: State-dependent behavior
-    stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
+    stub.IsConnected.OnGet = () => stub.Connect.WasCalled;
 
     // OnSet: Track all values written
     var connectionStrings = new List<string>();

@@ -37,8 +37,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (GetAttributeTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -62,8 +61,9 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private GetAttributeDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -75,10 +75,10 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			internal GetAttributeDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -115,8 +115,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (GetOrDefaultTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -140,8 +139,9 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private GetOrDefaultDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -153,10 +153,10 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			internal GetOrDefaultDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -193,8 +193,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (TransformTypedHandler<TInput, TResult>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -218,8 +217,9 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private TransformDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -231,10 +231,10 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			internal TransformDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -271,8 +271,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (GetValueTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -296,8 +295,9 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private GetValueDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>The 'index' argument from the most recent call.</summary>
 			public int? LastCallArg { get; private set; }
@@ -312,10 +312,10 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			internal GetValueDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(int? index) { CallCount++; LastCallArg = index; }
+			public void RecordCall(int? index) { _callCount++; LastCallArg = index; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			public void Reset() { _callCount = 0; LastCallArg = default; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -352,8 +352,7 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			return (FindServiceTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -377,8 +376,9 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 
 			private FindServiceDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -390,10 +390,10 @@ partial class ConstrainedGenericMethodKnockOff : global::KnockOff.Tests.IConstra
 			internal FindServiceDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

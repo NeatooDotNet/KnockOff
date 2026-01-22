@@ -11,8 +11,7 @@ partial class DelegateInlineTest
 		/// <summary>Interceptor for VoidNoParamDelegate delegate.</summary>
 		public sealed class VoidNoParamDelegateInterceptor
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -48,8 +47,7 @@ partial class DelegateInlineTest
 		/// <summary>Interceptor for VoidOneParamDelegate delegate.</summary>
 		public sealed class VoidOneParamDelegateInterceptor
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -88,8 +86,7 @@ partial class DelegateInlineTest
 		/// <summary>Interceptor for ReturnOneParamDelegate delegate.</summary>
 		public sealed class ReturnOneParamDelegateInterceptor
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -129,8 +126,7 @@ partial class DelegateInlineTest
 		/// <summary>Interceptor for MultiParamDelegate delegate.</summary>
 		public sealed class MultiParamDelegateInterceptor
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;

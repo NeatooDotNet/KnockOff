@@ -1271,8 +1271,7 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1386,10 +1385,9 @@ partial class IEntityListBaseOfTTests
 
 				private int _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1438,8 +1436,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_RemoveAtInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1507,8 +1504,7 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.IEntityBase? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1620,10 +1616,9 @@ partial class IEntityListBaseOfTTests
 
 				private global::Neatoo.IEntityBase _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1672,8 +1667,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_IndexOfInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1738,8 +1732,7 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private (int index, global::Neatoo.IEntityBase item)? _unconfiguredLastArgs;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1853,10 +1846,9 @@ partial class IEntityListBaseOfTTests
 
 				private (int index, global::Neatoo.IEntityBase item) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -1905,8 +1897,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_InsertInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1971,8 +1962,7 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.IEntityBase? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2086,10 +2076,9 @@ partial class IEntityListBaseOfTTests
 
 				private global::Neatoo.IEntityBase _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -2138,8 +2127,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2203,8 +2191,7 @@ partial class IEntityListBaseOfTTests
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2312,10 +2299,9 @@ partial class IEntityListBaseOfTTests
 				public MethodTrackingImpl(IEntityListBase_ClearInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -2358,8 +2344,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_ClearInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2427,8 +2412,7 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.IEntityBase? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2540,10 +2524,9 @@ partial class IEntityListBaseOfTTests
 
 				private global::Neatoo.IEntityBase _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -2592,8 +2575,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_ContainsInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2658,8 +2640,7 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private (global::Neatoo.IEntityBase[] array, int arrayIndex)? _unconfiguredLastArgs;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2773,10 +2754,9 @@ partial class IEntityListBaseOfTTests
 
 				private (global::Neatoo.IEntityBase[] array, int arrayIndex) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -2825,8 +2805,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_CopyToInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2894,8 +2873,7 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.IEntityBase? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -3007,10 +2985,9 @@ partial class IEntityListBaseOfTTests
 
 				private global::Neatoo.IEntityBase _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -3059,8 +3036,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -3127,8 +3103,7 @@ partial class IEntityListBaseOfTTests
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -3234,10 +3209,9 @@ partial class IEntityListBaseOfTTests
 				public MethodTrackingImpl(IEntityListBase_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -3280,8 +3254,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -3360,8 +3333,7 @@ partial class IEntityListBaseOfTTests
 			private bool _isVerifiable_Threading_CancellationToken_Threading_Tasks_Task;
 			private global::KnockOff.Times? _verifiableTimes_Threading_CancellationToken_Threading_Tasks_Task;
 
-			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-			public int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_NoParams_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
+			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_NoParams_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
@@ -3549,10 +3521,9 @@ partial class IEntityListBaseOfTTests
 				public MethodTrackingImpl_NoParams_Threading_Tasks_Task(IEntityListBase_WaitForTasksInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -3597,10 +3568,9 @@ partial class IEntityListBaseOfTTests
 
 				private global::System.Threading.CancellationToken _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -3649,8 +3619,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl_NoParams_Threading_Tasks_Task(IEntityListBase_WaitForTasksInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -3702,8 +3671,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl_Threading_CancellationToken_Threading_Tasks_Task(IEntityListBase_WaitForTasksInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -3782,8 +3750,7 @@ partial class IEntityListBaseOfTTests
 			private bool _isVerifiable_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 			private global::KnockOff.Times? _verifiableTimes_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 
-			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-			public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
+			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
@@ -3972,10 +3939,9 @@ partial class IEntityListBaseOfTTests
 
 				private (string propertyName, global::System.Threading.CancellationToken? token) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -4026,10 +3992,9 @@ partial class IEntityListBaseOfTTests
 
 				private (global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -4078,8 +4043,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task(IEntityListBase_RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -4131,8 +4095,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(IEntityListBase_RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -4196,8 +4159,7 @@ partial class IEntityListBaseOfTTests
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -4305,10 +4267,9 @@ partial class IEntityListBaseOfTTests
 				public MethodTrackingImpl(IEntityListBase_ClearAllMessagesInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -4351,8 +4312,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_ClearAllMessagesInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -4416,8 +4376,7 @@ partial class IEntityListBaseOfTTests
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -4525,10 +4484,9 @@ partial class IEntityListBaseOfTTests
 				public MethodTrackingImpl(IEntityListBase_ClearSelfMessagesInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -4571,8 +4529,7 @@ partial class IEntityListBaseOfTTests
 
 				public MethodSequenceImpl(IEntityListBase_ClearSelfMessagesInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{

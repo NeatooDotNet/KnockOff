@@ -33,8 +33,7 @@ partial class OrderedEnumerableStringStubTests
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -140,10 +139,9 @@ partial class OrderedEnumerableStringStubTests
 				public MethodTrackingImpl(IOrderedEnumerable_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -186,8 +184,7 @@ partial class OrderedEnumerableStringStubTests
 
 				public MethodSequenceImpl(IOrderedEnumerable_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -251,8 +248,7 @@ partial class OrderedEnumerableStringStubTests
 				return (CreateOrderedEnumerableTypedHandler<TKey>)handler;
 			}
 
-			/// <summary>Total number of calls across all type arguments.</summary>
-			public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>True if this method was called with any type argument.</summary>
 			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
@@ -288,8 +284,9 @@ partial class OrderedEnumerableStringStubTests
 
 				private CreateOrderedEnumerableDelegate? _onCall;
 
-				/// <summary>Number of times this method was called with these type arguments.</summary>
-				public int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>The 'descending' argument from the most recent call.</summary>
 				public bool? LastCallArg { get; private set; }
@@ -304,10 +301,10 @@ partial class OrderedEnumerableStringStubTests
 				internal CreateOrderedEnumerableDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall(bool descending) { CallCount++; LastCallArg = descending; }
+				public void RecordCall(bool descending) { _callCount++; LastCallArg = descending; }
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; LastCallArg = default; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; LastCallArg = default; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

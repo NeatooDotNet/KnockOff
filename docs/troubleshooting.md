@@ -236,7 +236,7 @@ public void Understanding_Property_Priority()
 
 ### Reset() doesn't clear Value
 
-**Cause:** By design, Reset() preserves the Value property. It only clears call tracking (CallCount, Args, etc.).
+**Cause:** By design, Reset() preserves the Value property. It only clears call tracking (WasCalled, Args, etc.).
 
 Reset() is intended to clear test verification state between test iterations, not to reset stub behavior configuration.
 

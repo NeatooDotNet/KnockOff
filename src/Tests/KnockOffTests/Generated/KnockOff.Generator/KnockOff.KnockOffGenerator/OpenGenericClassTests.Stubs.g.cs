@@ -88,8 +88,7 @@ partial class OpenGenericClassTests
 		{
 			private global::System.Func<int, T?>? _onCall;
 
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -151,8 +150,7 @@ partial class OpenGenericClassTests
 		{
 			private global::System.Action<T>? _onCall;
 
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -308,8 +306,7 @@ partial class OpenGenericClassTests
 		{
 			private global::System.Func<TKey, TValue>? _onCall;
 
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -371,8 +368,7 @@ partial class OpenGenericClassTests
 		{
 			private global::System.Action<TKey, TValue>? _onCall;
 
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;

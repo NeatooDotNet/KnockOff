@@ -36,7 +36,7 @@ public class RefParameterTests
 		service.Increment(ref myValue);
 
 		// The ref param should be tracked with its input value (5), not the modified value
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 		Assert.Equal(5, tracking.LastArg);
 	}
 
@@ -80,7 +80,7 @@ public class RefParameterTests
 		Assert.Equal("HELLO", text);
 
 		// Check tracking - should have both key and the original value
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 		var args = tracking.LastArgs;
 		Assert.Equal("valid", args.key);
 		Assert.Equal("hello", args.value); // Original value, before modification
@@ -99,7 +99,7 @@ public class RefParameterTests
 		service.Increment(ref v2);
 		service.Increment(ref v3);
 
-		Assert.Equal(3, tracking.CallCount);
+		tracking.Verify(Times.Exactly(3));
 		Assert.Equal(3, tracking.LastArg); // Last original value passed
 
 		// And the values were modified
@@ -123,7 +123,7 @@ public class RefParameterTests
 		Assert.Equal(100, val);
 
 		// Call was tracked
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 	}
 
 	[Fact]
@@ -138,11 +138,11 @@ public class RefParameterTests
 		service.Increment(ref x);
 		service.Increment(ref x);
 
-		Assert.Equal(2, tracking.CallCount);
+		tracking.Verify(Times.Exactly(2));
 
 		knockOff.Increment.Reset();
 
-		Assert.Equal(0, tracking.CallCount);
+		tracking.Verify(Times.Never);
 		Assert.False(tracking.WasCalled);
 	}
 

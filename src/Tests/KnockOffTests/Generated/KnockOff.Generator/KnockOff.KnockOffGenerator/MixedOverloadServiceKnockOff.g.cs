@@ -52,8 +52,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		private bool _isVerifiable_Int32_void;
 		private global::KnockOff.Times? _verifiableTimes_Int32_void;
 
-		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -246,10 +245,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 			private string _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -300,10 +298,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 			private int _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -352,8 +349,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 			public MethodSequenceImpl_String_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -405,8 +401,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 			public MethodSequenceImpl_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -474,8 +469,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 		private int _unconfiguredCallCount;
 		private int? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -587,10 +581,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 			private int _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -639,8 +632,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 			public MethodSequenceImpl(FormatInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -704,8 +696,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			return (ProcessTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -729,8 +720,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 			private ProcessDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -742,10 +734,10 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			internal ProcessDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -782,8 +774,7 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			return (FormatTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -807,8 +798,9 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 
 			private FormatDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -820,10 +812,10 @@ partial class MixedOverloadServiceKnockOff : global::KnockOff.Tests.IMixedOverlo
 			internal FormatDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

@@ -49,7 +49,7 @@ public class GenericStandaloneStubTests
 		repo.Save(new User { Id = 2 });
 
 		// Assert
-		Assert.Equal(2, tracking.CallCount);
+		tracking.Verify(Times.Exactly(2));
 		Assert.True(tracking.WasCalled);
 	}
 
@@ -168,7 +168,7 @@ public class GenericStandaloneStubTests
 
 		// Assert
 		Assert.Equal(42, result);
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 		Assert.Equal("answer", tracking.LastArg);
 	}
 
@@ -201,7 +201,7 @@ public class GenericStandaloneStubTests
 		repo.Save(user);
 
 		// Assert
-		Assert.Equal(1, tracking.CallCount);
+		tracking.Verify(Times.Once);
 		Assert.Same(user, tracking.LastArg);
 	}
 
@@ -237,7 +237,7 @@ public class GenericStandaloneStubTests
 		stub.GetById.Reset();
 
 		// Assert - tracking object is also reset
-		Assert.Equal(0, tracking.CallCount);
+		tracking.Verify(Times.Never);
 		Assert.False(tracking.WasCalled);
 	}
 

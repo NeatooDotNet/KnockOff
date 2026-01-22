@@ -187,8 +187,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -294,10 +293,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetIntInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -340,8 +338,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetIntInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -408,8 +405,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -515,10 +511,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetBoolInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -561,8 +556,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetBoolInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -629,8 +623,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -736,10 +729,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetDateTimeInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -782,8 +774,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetDateTimeInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -850,8 +841,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -957,10 +947,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetNullableStringInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -1003,8 +992,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetNullableStringInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1071,8 +1059,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -1178,10 +1165,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetNullableEntityInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -1224,8 +1210,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetNullableEntityInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1292,8 +1277,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -1399,10 +1383,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetListInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -1445,8 +1428,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetListInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1513,8 +1495,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -1620,10 +1601,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetDictionaryInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -1666,8 +1646,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetDictionaryInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1734,8 +1713,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -1841,10 +1819,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetEntityInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -1887,8 +1864,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetEntityInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -1955,8 +1931,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2062,10 +2037,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetIListInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -2108,8 +2082,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetIListInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2176,8 +2149,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2283,10 +2255,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetStringInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -2329,8 +2300,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetStringInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2397,8 +2367,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2504,10 +2473,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetDisposableInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -2550,8 +2518,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetDisposableInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2618,8 +2585,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2725,10 +2691,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetIntAsyncInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -2771,8 +2736,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetIntAsyncInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -2839,8 +2803,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -2946,10 +2909,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetListAsyncInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -2992,8 +2954,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetListAsyncInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -3060,8 +3021,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -3167,10 +3127,9 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 			public MethodTrackingImpl(GetStringAsyncInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -3213,8 +3172,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetStringAsyncInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{

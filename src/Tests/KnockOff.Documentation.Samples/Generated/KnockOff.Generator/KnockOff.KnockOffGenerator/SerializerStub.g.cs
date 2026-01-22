@@ -37,8 +37,7 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 			return (SerializeTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -62,8 +61,9 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 
 			private SerializeDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -75,10 +75,10 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 			internal SerializeDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -115,8 +115,7 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 			return (DeserializeTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -140,8 +139,9 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 
 			private DeserializeDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>The 'data' argument from the most recent call.</summary>
 			public string? LastCallArg { get; private set; }
@@ -156,10 +156,10 @@ partial class SerializerStub : global::KnockOff.Documentation.Samples.GenericMet
 			internal DeserializeDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall(string? data) { CallCount++; LastCallArg = data; }
+			public void RecordCall(string? data) { _callCount++; LastCallArg = data; }
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; _onCall = null; }
+			public void Reset() { _callCount = 0; LastCallArg = default; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

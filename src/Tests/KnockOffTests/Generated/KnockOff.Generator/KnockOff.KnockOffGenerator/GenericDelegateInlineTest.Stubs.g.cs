@@ -11,8 +11,7 @@ partial class GenericDelegateInlineTest
 		/// <summary>Interceptor for Factory delegate.</summary>
 		public sealed class FactoryInterceptor
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -49,8 +48,7 @@ partial class GenericDelegateInlineTest
 		/// <summary>Interceptor for Converter delegate.</summary>
 		public sealed class ConverterInterceptor
 		{
-			/// <summary>Number of times this delegate was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this delegate was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;

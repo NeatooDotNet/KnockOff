@@ -475,8 +475,7 @@ partial class DictionaryCollisionTest
 			private bool _isVerifiable_Collections_Generic_KeyValuePair_string_int_void;
 			private global::KnockOff.Times? _verifiableTimes_Collections_Generic_KeyValuePair_string_int_void;
 
-			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-			public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Int32_void?.CallCount ?? 0) + (_sequence_String_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_string_int_void?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_string_int_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Int32_void?.CallCount ?? 0) + (_sequence_String_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_string_int_void?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_string_int_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
@@ -669,10 +668,9 @@ partial class DictionaryCollisionTest
 
 				private (string key, int @value) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -723,10 +721,9 @@ partial class DictionaryCollisionTest
 
 				private global::System.Collections.Generic.KeyValuePair<string, int> _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -775,8 +772,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl_String_Int32_void(IDictionaryStringInt32_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -828,8 +824,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl_Collections_Generic_KeyValuePair_string_int_void(IDictionaryStringInt32_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -897,8 +892,7 @@ partial class DictionaryCollisionTest
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1010,10 +1004,9 @@ partial class DictionaryCollisionTest
 
 				private string _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1062,8 +1055,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryStringInt32_ContainsKeyInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1142,8 +1134,7 @@ partial class DictionaryCollisionTest
 			private bool _isVerifiable_Collections_Generic_KeyValuePair_string_int_Boolean;
 			private global::KnockOff.Times? _verifiableTimes_Collections_Generic_KeyValuePair_string_int_Boolean;
 
-			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-			public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Boolean?.CallCount ?? 0) + (_sequence_String_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_string_int_Boolean?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_string_int_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0);
+			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Boolean?.CallCount ?? 0) + (_sequence_String_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_string_int_Boolean?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_string_int_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1332,10 +1323,9 @@ partial class DictionaryCollisionTest
 
 				private string _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1386,10 +1376,9 @@ partial class DictionaryCollisionTest
 
 				private global::System.Collections.Generic.KeyValuePair<string, int> _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1438,8 +1427,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl_String_Boolean(IDictionaryStringInt32_RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1491,8 +1479,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl_Collections_Generic_KeyValuePair_string_int_Boolean(IDictionaryStringInt32_RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1560,8 +1547,7 @@ partial class DictionaryCollisionTest
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1674,10 +1660,9 @@ partial class DictionaryCollisionTest
 
 				private string _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -1726,8 +1711,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryStringInt32_TryGetValueInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -1791,8 +1775,7 @@ partial class DictionaryCollisionTest
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -1900,10 +1883,9 @@ partial class DictionaryCollisionTest
 				public MethodTrackingImpl(IDictionaryStringInt32_ClearInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -1946,8 +1928,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryStringInt32_ClearInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2015,8 +1996,7 @@ partial class DictionaryCollisionTest
 			private int _unconfiguredCallCount;
 			private global::System.Collections.Generic.KeyValuePair<string, int>? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2128,10 +2108,9 @@ partial class DictionaryCollisionTest
 
 				private global::System.Collections.Generic.KeyValuePair<string, int> _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -2180,8 +2159,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryStringInt32_ContainsInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2246,8 +2224,7 @@ partial class DictionaryCollisionTest
 			private int _unconfiguredCallCount;
 			private (global::System.Collections.Generic.KeyValuePair<string, int>[] array, int arrayIndex)? _unconfiguredLastArgs;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2361,10 +2338,9 @@ partial class DictionaryCollisionTest
 
 				private (global::System.Collections.Generic.KeyValuePair<string, int>[] array, int arrayIndex) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -2413,8 +2389,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryStringInt32_CopyToInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -2481,8 +2456,7 @@ partial class DictionaryCollisionTest
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -2588,10 +2562,9 @@ partial class DictionaryCollisionTest
 				public MethodTrackingImpl(IDictionaryStringInt32_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -2634,8 +2607,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryStringInt32_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -3447,8 +3419,7 @@ partial class DictionaryCollisionTest
 			private bool _isVerifiable_Collections_Generic_KeyValuePair_int_string_void;
 			private global::KnockOff.Times? _verifiableTimes_Collections_Generic_KeyValuePair_int_string_void;
 
-			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-			public int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_String_void?.CallCount ?? 0) + (_sequence_Int32_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_int_string_void?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_int_string_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_String_void?.CallCount ?? 0) + (_sequence_Int32_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_int_string_void?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_int_string_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
@@ -3641,10 +3612,9 @@ partial class DictionaryCollisionTest
 
 				private (int key, string @value) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -3695,10 +3665,9 @@ partial class DictionaryCollisionTest
 
 				private global::System.Collections.Generic.KeyValuePair<int, string> _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -3747,8 +3716,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl_Int32_String_void(IDictionaryInt32String_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -3800,8 +3768,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl_Collections_Generic_KeyValuePair_int_string_void(IDictionaryInt32String_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -3869,8 +3836,7 @@ partial class DictionaryCollisionTest
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -3982,10 +3948,9 @@ partial class DictionaryCollisionTest
 
 				private int _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -4034,8 +3999,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryInt32String_ContainsKeyInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -4114,8 +4078,7 @@ partial class DictionaryCollisionTest
 			private bool _isVerifiable_Collections_Generic_KeyValuePair_int_string_Boolean;
 			private global::KnockOff.Times? _verifiableTimes_Collections_Generic_KeyValuePair_int_string_Boolean;
 
-			/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-			public int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Boolean?.CallCount ?? 0) + (_sequence_Int32_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_int_string_Boolean?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_int_string_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0);
+			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Boolean?.CallCount ?? 0) + (_sequence_Int32_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Collections_Generic_KeyValuePair_int_string_Boolean?.CallCount ?? 0) + (_sequence_Collections_Generic_KeyValuePair_int_string_Boolean?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Whether this method was called at least once (any overload).</summary>
 			public bool WasCalled => CallCount > 0;
@@ -4304,10 +4267,9 @@ partial class DictionaryCollisionTest
 
 				private int _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -4358,10 +4320,9 @@ partial class DictionaryCollisionTest
 
 				private global::System.Collections.Generic.KeyValuePair<int, string> _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -4410,8 +4371,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl_Int32_Boolean(IDictionaryInt32String_RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -4463,8 +4423,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl_Collections_Generic_KeyValuePair_int_string_Boolean(IDictionaryInt32String_RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -4532,8 +4491,7 @@ partial class DictionaryCollisionTest
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -4646,10 +4604,9 @@ partial class DictionaryCollisionTest
 
 				private int _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -4698,8 +4655,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryInt32String_TryGetValueInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -4763,8 +4719,7 @@ partial class DictionaryCollisionTest
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -4872,10 +4827,9 @@ partial class DictionaryCollisionTest
 				public MethodTrackingImpl(IDictionaryInt32String_ClearInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -4918,8 +4872,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryInt32String_ClearInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -4987,8 +4940,7 @@ partial class DictionaryCollisionTest
 			private int _unconfiguredCallCount;
 			private global::System.Collections.Generic.KeyValuePair<int, string>? _unconfiguredLastArg;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -5100,10 +5052,9 @@ partial class DictionaryCollisionTest
 
 				private global::System.Collections.Generic.KeyValuePair<int, string> _lastArg = default!;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -5152,8 +5103,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryInt32String_ContainsInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -5218,8 +5168,7 @@ partial class DictionaryCollisionTest
 			private int _unconfiguredCallCount;
 			private (global::System.Collections.Generic.KeyValuePair<int, string>[] array, int arrayIndex)? _unconfiguredLastArgs;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -5333,10 +5282,9 @@ partial class DictionaryCollisionTest
 
 				private (global::System.Collections.Generic.KeyValuePair<int, string>[] array, int arrayIndex) _lastArgs;
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -5385,8 +5333,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryInt32String_CopyToInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -5453,8 +5400,7 @@ partial class DictionaryCollisionTest
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -5560,10 +5506,9 @@ partial class DictionaryCollisionTest
 				public MethodTrackingImpl(IDictionaryInt32String_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -5606,8 +5551,7 @@ partial class DictionaryCollisionTest
 
 				public MethodSequenceImpl(IDictionaryInt32String_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{

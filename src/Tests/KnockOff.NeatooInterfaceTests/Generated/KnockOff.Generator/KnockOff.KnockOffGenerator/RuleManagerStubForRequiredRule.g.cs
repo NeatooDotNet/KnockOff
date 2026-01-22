@@ -133,8 +133,7 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 		private bool _isVerifiable_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 		private global::KnockOff.Times? _verifiableTimes_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 
-		/// <summary>Total number of times this method was called (across all overloads and registrations).</summary>
-		public int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
+		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Whether this method was called at least once (any overload).</summary>
 		public bool WasCalled => CallCount > 0;
@@ -323,10 +322,9 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			private (string? propertyName, global::System.Threading.CancellationToken? token) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -377,10 +375,9 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			private (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -429,8 +426,7 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			public MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task(RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -482,8 +478,7 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			public MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -551,8 +546,7 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 		private int _unconfiguredCallCount;
 		private (global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -664,10 +658,9 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			private (global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token) _lastArgs;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
@@ -716,8 +709,7 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			public MethodSequenceImpl(RunRuleInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -781,8 +773,7 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 			return (AddRuleTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -806,8 +797,9 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			private AddRuleDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -819,10 +811,10 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 			internal AddRuleDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -859,8 +851,7 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 			return (AddRulesTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -884,8 +875,9 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			private AddRulesDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -897,10 +889,10 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 			internal AddRulesDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -937,8 +929,7 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 			return (RunRuleTypedHandler<T>)handler;
 		}
 
-		/// <summary>Total number of calls across all type arguments.</summary>
-		public int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>True if this method was called with any type argument.</summary>
 		public bool WasCalled => _typedHandlers.Values.Any(h => ((IGenericMethodCallTracker)h).WasCalled);
@@ -962,8 +953,9 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 
 			private RunRuleDelegate? _onCall;
 
-			/// <summary>Number of times this method was called with these type arguments.</summary>
-			public int CallCount { get; private set; }
+			private int _callCount;
+			int IGenericMethodCallTracker.CallCount => _callCount;
+			internal int CallCount => _callCount;
 
 			/// <summary>True if this method was called at least once with these type arguments.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -975,10 +967,10 @@ partial class RuleManagerStubForRequiredRule : global::Neatoo.Rules.IRuleManager
 			internal RunRuleDelegate? Callback => _onCall;
 
 			/// <summary>Records a method call.</summary>
-			public void RecordCall() => CallCount++;
+			public void RecordCall() => _callCount++;
 
 			/// <summary>Resets all tracking state.</summary>
-			public void Reset() { CallCount = 0; _onCall = null; }
+			public void Reset() { _callCount = 0; _onCall = null; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

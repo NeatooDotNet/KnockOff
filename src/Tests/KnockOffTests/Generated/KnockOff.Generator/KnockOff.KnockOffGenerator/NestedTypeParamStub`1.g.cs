@@ -25,8 +25,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 
 		private int _unconfiguredCallCount;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -132,10 +131,9 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 			public MethodTrackingImpl(GetItemsInterceptor interceptor) => _interceptor = interceptor;
 
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Records a call to this callback.</summary>
@@ -178,8 +176,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 
 			public MethodSequenceImpl(GetItemsInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{
@@ -244,8 +241,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 		private int _unconfiguredCallCount;
 		private global::System.Collections.Generic.IEnumerable<T>? _unconfiguredLastArg;
 
-		/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-		public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>Whether this method was called at least once.</summary>
 		public bool WasCalled => CallCount > 0;
@@ -359,10 +355,9 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 
 			private global::System.Collections.Generic.IEnumerable<T> _lastArg = default!;
 
-			/// <summary>Number of times this callback was invoked.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
-			/// <summary>True if CallCount > 0.</summary>
+			/// <summary>True if callback was invoked at least once.</summary>
 			public bool WasCalled => CallCount > 0;
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
@@ -411,8 +406,7 @@ partial class NestedTypeParamStub<T> : global::KnockOff.Tests.INestedTypeParamSe
 
 			public MethodSequenceImpl(AddItemsInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Total calls across all callbacks in sequence.</summary>
-			public int TotalCallCount
+			internal int TotalCallCount
 			{
 				get
 				{

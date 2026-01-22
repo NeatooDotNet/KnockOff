@@ -115,8 +115,7 @@ partial class InlineClassTests
 		{
 			private global::System.Func<int, global::KnockOff.Documentation.Samples.User?>? _onCall;
 
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -178,8 +177,7 @@ partial class InlineClassTests
 		{
 			private global::System.Action<global::KnockOff.Documentation.Samples.User>? _onCall;
 
-			/// <summary>Number of times this method was called.</summary>
-			public int CallCount { get; private set; }
+			internal int CallCount { get; private set; }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;

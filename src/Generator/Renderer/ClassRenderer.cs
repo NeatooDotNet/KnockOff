@@ -354,8 +354,7 @@ internal static class ClassRenderer
         w.Line();
 
         // CallCount and WasCalled
-        w.Line($"{indent1}/// <summary>Number of times this method was called.</summary>");
-        w.Line($"{indent1}public int CallCount {{ get; private set; }}");
+        w.Line($"{indent1}internal int CallCount {{ get; private set; }}");
         w.Line();
         w.Line($"{indent1}/// <summary>Whether this method was called at least once.</summary>");
         w.Line($"{indent1}public bool WasCalled => CallCount > 0;");

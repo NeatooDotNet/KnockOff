@@ -703,9 +703,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t}");
         w.Line();
 
-        // Aggregate tracking
-        w.Line("\t\t\t/// <summary>Total number of calls across all type arguments.</summary>");
-        w.Line("\t\t\tpublic int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
+        // Aggregate tracking (internal - use WasCalled or Verify for public API)
+        w.Line("\t\t\tinternal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
         w.Line();
         w.Line("\t\t\t/// <summary>True if this method was called with any type argument.</summary>");
         w.Line("\t\t\tpublic bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);");
@@ -763,9 +762,10 @@ internal static class InlineRenderer
         w.Line($"\t\t\t\tprivate {handler.MethodName}Delegate? _onCall;");
         w.Line();
 
-        // CallCount
-        w.Line("\t\t\t\t/// <summary>Number of times this method was called with these type arguments.</summary>");
-        w.Line("\t\t\t\tpublic int CallCount { get; private set; }");
+        // CallCount - private field with explicit interface implementation
+        w.Line("\t\t\t\tprivate int _callCount;");
+        w.Line("\t\t\t\tint IGenericMethodCallTracker.CallCount => _callCount;");
+        w.Line("\t\t\t\tinternal int CallCount => _callCount;");
         w.Line();
 
         // LastCallArg/LastCallArgs
@@ -801,34 +801,34 @@ internal static class InlineRenderer
         w.Line("\t\t\t\t/// <summary>Records a method call.</summary>");
         if (handler.NonGenericParameters.Count == 0)
         {
-            w.Line("\t\t\t\tpublic void RecordCall() => CallCount++;");
+            w.Line("\t\t\t\tpublic void RecordCall() => _callCount++;");
         }
         else if (handler.NonGenericParameters.Count == 1)
         {
             var param = handler.NonGenericParameters.GetArray()![0];
-            w.Line($"\t\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ CallCount++; LastCallArg = {param.Name}; }}");
+            w.Line($"\t\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ _callCount++; LastCallArg = {param.Name}; }}");
         }
         else
         {
             var paramList = string.Join(", ", handler.NonGenericParameters.Select(p => $"{p.Type} {p.Name}"));
             var tupleConstruction = string.Join(", ", handler.NonGenericParameters.Select(p => p.Name));
-            w.Line($"\t\t\t\tpublic void RecordCall({paramList}) {{ CallCount++; LastCallArgs = ({tupleConstruction}); }}");
+            w.Line($"\t\t\t\tpublic void RecordCall({paramList}) {{ _callCount++; LastCallArgs = ({tupleConstruction}); }}");
         }
         w.Line();
 
         // Reset - clears tracking state but preserves configuration (OnCall callback)
-        w.Line("\t\t\t\t/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
+        w.Line("\t\t\t\t/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
         if (handler.NonGenericParameters.Count == 0)
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; }");
+            w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; }");
         }
         else if (handler.NonGenericParameters.Count == 1)
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArg = default; }");
+            w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; LastCallArg = default; }");
         }
         else
         {
-            w.Line("\t\t\t\tpublic void Reset() { CallCount = 0; LastCallArgs = default; }");
+            w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; LastCallArgs = default; }");
         }
         w.Line();
 
@@ -1257,8 +1257,7 @@ internal static class InlineRenderer
         w.Line("\t\t{");
 
         // CallCount and WasCalled
-        w.Line("\t\t\t/// <summary>Number of times this delegate was invoked.</summary>");
-        w.Line("\t\t\tpublic int CallCount { get; private set; }");
+        w.Line("\t\t\tinternal int CallCount { get; private set; }");
         w.Line();
         w.Line("\t\t\t/// <summary>Whether this delegate was invoked at least once.</summary>");
         w.Line("\t\t\tpublic bool WasCalled => CallCount > 0;");

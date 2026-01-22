@@ -33,9 +33,9 @@ public class MethodOverloadTests
         Assert.Equal("world", svc.Format("world", false));
         Assert.Equal("hel", svc.Format("hello", 3));
 
-        Assert.Equal(1, tracking1.CallCount);
-        Assert.Equal(1, tracking2.CallCount);
-        Assert.Equal(1, tracking3.CallCount);
+        tracking1.Verify(Times.Once);
+        tracking2.Verify(Times.Once);
+        tracking3.Verify(Times.Once);
     }
 
     [Fact]
@@ -52,10 +52,10 @@ public class MethodOverloadTests
         svc.Format("b");
         svc.Format("c", true);
 
-        Assert.Equal(2, tracking1.CallCount);
+        tracking1.Verify(Times.Exactly(2));
         Assert.Equal("b", tracking1.LastArg);
 
-        Assert.Equal(1, tracking2.CallCount);
+        tracking2.Verify(Times.Once);
         Assert.Equal(("c", true), tracking2.LastArgs);
     }
 }

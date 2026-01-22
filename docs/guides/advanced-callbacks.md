@@ -152,7 +152,7 @@ public void Property_ReflectsMethodCallState()
     var stub = new ConnectionStub();
 
     // IsConnected returns true only after Connect() has been called
-    stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
+    stub.IsConnected.OnGet = () => stub.Connect.WasCalled;
 
     var connectTracking = stub.Connect.OnCall(() => { });
 
@@ -183,7 +183,7 @@ public void Method_ThrowsIfNotInitialized()
 
     var queryTracking = stub.Query.OnCall((sql) =>
     {
-        if (stub.Initialize.CallCount == 0)
+        if (!stub.Initialize.WasCalled)
             throw new InvalidOperationException("Must call Initialize() first");
         return "result";
     });

@@ -438,8 +438,7 @@ partial class IPropertyInfoTests
 
 			private int _unconfiguredCallCount;
 
-			/// <summary>Total number of times this method was called (across all OnCall registrations).</summary>
-			public int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>Whether this method was called at least once.</summary>
 			public bool WasCalled => CallCount > 0;
@@ -545,10 +544,9 @@ partial class IPropertyInfoTests
 				public MethodTrackingImpl(IPropertyInfo_GetCustomAttributesInterceptor interceptor) => _interceptor = interceptor;
 
 
-				/// <summary>Number of times this callback was invoked.</summary>
-				public int CallCount { get; private set; }
+				internal int CallCount { get; private set; }
 
-				/// <summary>True if CallCount > 0.</summary>
+				/// <summary>True if callback was invoked at least once.</summary>
 				public bool WasCalled => CallCount > 0;
 
 				/// <summary>Records a call to this callback.</summary>
@@ -591,8 +589,7 @@ partial class IPropertyInfoTests
 
 				public MethodSequenceImpl(IPropertyInfo_GetCustomAttributesInterceptor interceptor) => _interceptor = interceptor;
 
-				/// <summary>Total calls across all callbacks in sequence.</summary>
-				public int TotalCallCount
+				internal int TotalCallCount
 				{
 					get
 					{
@@ -656,8 +653,7 @@ partial class IPropertyInfoTests
 				return (GetCustomAttributeTypedHandler<T>)handler;
 			}
 
-			/// <summary>Total number of calls across all type arguments.</summary>
-			public int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>True if this method was called with any type argument.</summary>
 			public bool WasCalled => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Any(h => h.WasCalled);
@@ -693,8 +689,9 @@ partial class IPropertyInfoTests
 
 				private GetCustomAttributeDelegate? _onCall;
 
-				/// <summary>Number of times this method was called with these type arguments.</summary>
-				public int CallCount { get; private set; }
+				private int _callCount;
+				int IGenericMethodCallTracker.CallCount => _callCount;
+				internal int CallCount => _callCount;
 
 				/// <summary>True if this method was called at least once with these type arguments.</summary>
 				public bool WasCalled => CallCount > 0;
@@ -706,10 +703,10 @@ partial class IPropertyInfoTests
 				internal GetCustomAttributeDelegate? Callback => _onCall;
 
 				/// <summary>Records a method call.</summary>
-				public void RecordCall() => CallCount++;
+				public void RecordCall() => _callCount++;
 
-				/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-				public void Reset() { CallCount = 0; }
+				/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+				public void Reset() { _callCount = 0; }
 
 				/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);

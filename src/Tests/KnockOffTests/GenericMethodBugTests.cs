@@ -75,8 +75,8 @@ public class GenericMethodBugTests
 		service.Process(42);
 
 		// Non-generic overloads should be tracked
-		Assert.Equal(1, stringTracking.CallCount); // Process(string)
-		Assert.Equal(1, intTracking.CallCount); // Process(int)
+		stringTracking.Verify(Times.Once); // Process(string)
+		intTracking.Verify(Times.Once); // Process(int)
 	}
 
 	[Fact]
@@ -109,8 +109,8 @@ public class GenericMethodBugTests
 		service.Process<int>(200);          // Generic with T=int
 
 		// All should be tracked independently
-		Assert.Equal(1, stringTracking.CallCount);  // Process(string)
-		Assert.Equal(1, intTracking.CallCount);  // Process(int)
+		stringTracking.Verify(Times.Once);  // Process(string)
+		intTracking.Verify(Times.Once);  // Process(int)
 		Assert.Equal(1, knockOff.ProcessGeneric.Of<string>().CallCount);
 		Assert.Equal(1, knockOff.ProcessGeneric.Of<int>().CallCount);
 
