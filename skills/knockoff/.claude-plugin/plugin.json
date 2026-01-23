@@ -1,0 +1,9 @@
+{
+  "name": "knockoff",
+  "version": "1.0.0",
+  "description": "Comprehensive KnockOff stub library assistance - create stubs, migrate from Moq, troubleshoot issues",
+  "author": {
+    "name": "NeatooDotNet"
+  },
+  "keywords": ["testing", "stubs", "mocking", "unit-tests", "csharp", "dotnet"]
+}
