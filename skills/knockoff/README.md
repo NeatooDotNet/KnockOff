@@ -53,9 +53,10 @@ Describe your issue or point to the problematic code.
 
 ## Documentation
 
-For comprehensive KnockOff documentation, see:
-- [Getting Started](../../docs/getting-started.md)
-- [Stub Patterns](../../docs/guides/stub-patterns.md)
-- [Methods Guide](../../docs/guides/methods.md)
-- [Properties Guide](../../docs/guides/properties.md)
-- [Migration from Moq](../../docs/migration/from-moq.md)
+The plugin includes comprehensive reference documentation:
+
+- [Stub Patterns](skills/knockoff-usage/references/patterns.md) - All three patterns with complete examples
+- [Methods Guide](skills/knockoff-usage/references/methods.md) - Method interceptor configuration and verification
+- [Properties Guide](skills/knockoff-usage/references/properties.md) - Property interceptors (Value, OnGet, OnSet)
+- [API Reference](skills/knockoff-usage/references/api-reference.md) - Complete interceptor API
+- [Moq Migration](skills/knockoff-usage/references/moq-migration.md) - Step-by-step migration guide

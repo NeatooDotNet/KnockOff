@@ -226,18 +226,15 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
 | `.Verifiable()` + `mock.Verify()` | `.Verifiable()` + `stub.Verify()` |
 | `It.IsAny<T>()` | Callback receives all args |
 
-## Documentation References
+## Reference Documentation
 
-For comprehensive documentation, consult:
+For detailed documentation, consult the reference files in `references/`:
 
-- **Getting Started**: `docs/getting-started.md`
-- **Stub Patterns**: `docs/guides/stub-patterns.md`
-- **Methods Guide**: `docs/guides/methods.md`
-- **Properties Guide**: `docs/guides/properties.md`
-- **Async Patterns**: `docs/guides/async-patterns.md`
-- **Verification**: `docs/guides/verification.md`
-- **Migration from Moq**: `docs/migration/from-moq.md`
-- **Interceptor API Reference**: `docs/reference/interceptor-api.md`
+- **`references/patterns.md`** - Complete guide to all three stub patterns with examples
+- **`references/methods.md`** - Method interceptor configuration, verification, and argument capture
+- **`references/properties.md`** - Property interceptors with Value, OnGet, OnSet
+- **`references/api-reference.md`** - Complete interceptor API (methods, properties, indexers, events, generics)
+- **`references/moq-migration.md`** - Step-by-step Moq to KnockOff migration guide
 
 ## Troubleshooting
 
