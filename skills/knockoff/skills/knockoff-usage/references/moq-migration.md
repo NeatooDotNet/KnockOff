@@ -37,7 +37,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `.Setup(x => x.Property).Returns(value)` | `stub.Property.Value = value` |
 | `.ReturnsAsync(value)` | `stub.Method.OnCall(() => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
-| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` or `stub.Verify()` |
+| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` or `stub.Method.Verify(Times.Once)` |
 | `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
 | `mock.Verify()` | `stub.Verify()` |
 | `It.IsAny<T>()` | Callback receives all arguments for inspection |
@@ -230,15 +230,21 @@ public void VerifyCalls_KnockOffApproach()
     // Verify() checks all members marked with .Verifiable()
     stub.Verify();
 
-    // Or verify with Times constraint directly on tracking
+    // Or verify with Times constraint directly on interceptor
     // stub.SaveUser.Verify(Times.Once);
+
+    // Or verify via tracking object
+    // var tracking = stub.SaveUser.OnCall((user) => { });
+    // tracking.Verify(Times.Once);
 }
 ```
 
 **Key differences:**
 - Moq uses `mock.Verify(expression, times)` with expression trees
-- KnockOff uses `tracking.Verify(times)` on the object returned by `OnCall`
-- KnockOff also supports `.Verifiable()` + `stub.Verify()` for batch verification
+- KnockOff has three verification approaches:
+  - `tracking.Verify(times)` on the object returned by `OnCall`
+  - `stub.Method.Verify(times)` directly on the interceptor property
+  - `.Verifiable()` + `stub.Verify()` for batch verification
 - Both support the same `Times` matchers (Once, AtLeastOnce, Exactly, etc.)
 
 ---
@@ -632,5 +638,5 @@ Use this checklist when migrating a test file from Moq to KnockOff:
 - [ ] Convert `.ReturnsAsync()` to `Task.FromResult()`
 - [ ] Move `.Callback()` logic into `OnCall` delegates
 - [ ] Replace `It.IsAny<T>()` with callback parameter inspection
-- [ ] Convert `.Verify()` calls to `tracking.Verify()` or `stub.Verify()`
+- [ ] Convert `.Verify()` calls to `tracking.Verify()`, `stub.Method.Verify()`, or batch `stub.Verify()`
 - [ ] Update `using` statements (remove Moq, add KnockOff namespace if needed)

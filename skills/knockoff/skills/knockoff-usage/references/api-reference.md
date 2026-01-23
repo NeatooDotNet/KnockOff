@@ -28,7 +28,6 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `WasCalled` | `bool` | True if the method was called at least once |
 | `LastCallArg` | `T` | The argument from the most recent call (single-parameter methods only) |
 | `LastCallArgs` | `(T1, T2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
 | `OnCall` | Delegate | Callback invoked when the method is called |
@@ -59,7 +58,7 @@ When `OnCall` is set, the callback is invoked instead of user-defined methods. F
 
 ### Methods
 
-- `void Reset()` - Clears `WasCalled`, `LastCallArg`, `LastCallArgs`, and `OnCall`
+- `void Reset()` - Clears tracking state, `LastCallArg`, `LastCallArgs`, and `OnCall`
 
 ### Example
 
@@ -381,7 +380,6 @@ Available directly on the interceptor instance:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `WasCalled` | `bool` | True if the method was called with any type arguments |
 | `CalledTypeArguments` | `IReadOnlyList<Type>` | List of all type arguments used in calls (in order of first use) |
 
 ### Typed Access
@@ -392,7 +390,6 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `WasCalled` | `bool` | True if the method was called with these type arguments |
 | `LastCallArg` | `TArg` | The argument from the most recent call with these type arguments (single-parameter methods) |
 | `LastCallArgs` | `(TArg1, TArg2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
 | `OnCall` | Delegate | Callback invoked when the method is called with these type arguments |
