@@ -773,7 +773,7 @@ partial class IRuleManagerTests
 			private int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>All type argument(s) that were used in calls.</summary>
-			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
@@ -866,7 +866,7 @@ partial class IRuleManagerTests
 			private int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>All type argument(s) that were used in calls.</summary>
-			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
@@ -959,7 +959,7 @@ partial class IRuleManagerTests
 			private int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>All type argument(s) that were used in calls.</summary>
-			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()

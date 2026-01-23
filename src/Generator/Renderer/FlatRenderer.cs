@@ -1679,7 +1679,7 @@ internal static class FlatRenderer
 			w.Line("private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);");
 			w.Line();
 			w.Line($"/// <summary>All type argument(s) that were used in calls.</summary>");
-			w.Line($"public global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Keys.ToList();");
+			w.Line($"public global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();");
 			w.Line();
 
 			// Reset method

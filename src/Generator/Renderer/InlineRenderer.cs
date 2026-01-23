@@ -703,7 +703,7 @@ internal static class InlineRenderer
         w.Line("\t\t\tprivate int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
         w.Line();
         w.Line($"\t\t\t/// <summary>All type argument(s) that were used in calls.</summary>");
-        w.Line($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Keys.ToList();");
+        w.Line($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();");
         w.Line();
 
         // Reset method - clears tracking state but preserves configuration (typed handlers with OnCall)

@@ -779,7 +779,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
@@ -860,7 +860,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
@@ -941,7 +941,7 @@ partial class RuleManagerStubForRule : global::Neatoo.Rules.IRuleManager, global
 		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
