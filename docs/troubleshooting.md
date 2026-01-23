@@ -171,11 +171,11 @@ public void FixOptions_ForRequiredReturnValues()
 
 ### OnGet not being called
 
-**Cause:** Value was set after OnGet was configured. Value takes precedence over OnGet.
+**Cause:** OnGet was cleared or set to null after configuration.
 
-When both Value and OnGet are configured, Value is used. This is by design—explicit values override callbacks.
+When `OnGet` is set, it takes precedence over `Value`. If OnGet is not returning the expected value, verify it hasn't been cleared.
 
-**Solution:** Check your configuration order. If you want OnGet to be used, don't set Value, or set Value to default after configuring OnGet.
+**Solution:** Ensure OnGet remains configured when you need dynamic property behavior.
 
 <!-- snippet: troubleshoot-onget-priority -->
 ```cs
@@ -236,11 +236,11 @@ public void Understanding_Property_Priority()
 
 ### Reset() doesn't clear Value
 
-**Cause:** By design, Reset() preserves the Value property. It only clears call tracking (WasCalled, Args, etc.).
+**Cause:** By design, Reset() preserves the Value property while clearing tracking counters, `LastSetValue`, `OnGet`, and `OnSet`.
 
-Reset() is intended to clear test verification state between test iterations, not to reset stub behavior configuration.
+Reset() is intended to clear test verification state between test phases, not to reset test data configuration.
 
-**Solution:** Manually set Value back to its default if you need to clear configured values.
+**Solution:** If you need to clear configured values, manually set Value back to its default.
 
 <!-- snippet: troubleshoot-reset-value -->
 ```cs
