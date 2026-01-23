@@ -37,7 +37,7 @@ public partial class IRuleManagerTests
         stub.Rules.Value = rules;
 
         Assert.Same(rules, ruleManager.Rules);
-        Assert.Equal(1, stub.Rules.GetCount);
+        stub.Rules.VerifyGet(Times.Once);
     }
 
     #endregion
@@ -116,8 +116,7 @@ public partial class IRuleManagerTests
         var ruleStub = new RuleStubForManager();
         await ruleManager.RunRule(ruleStub, null);
 
-        stub.RunRule.Verify();
-        Assert.Equal(1, stub.RunRule.CallCount);
+        stub.RunRule.Verify(Times.Once);
     }
 
     [Fact]
@@ -160,8 +159,7 @@ public partial class IRuleManagerTests
         await ruleManager.RunRule<TestRuleForManager>(null);
 
         // Generic method tracking should track the type argument
-        stub.RunRuleGeneric.Of<TestRuleForManager>().Verify();
-        Assert.Equal(1, stub.RunRuleGeneric.Of<TestRuleForManager>().CallCount);
+        stub.RunRuleGeneric.Of<TestRuleForManager>().Verify(Times.Once);
     }
 
     [Fact]
@@ -174,9 +172,8 @@ public partial class IRuleManagerTests
         await ruleManager.RunRule<AnotherTestRule>(null);
         await ruleManager.RunRule<TestRuleForManager>(null);
 
-        Assert.Equal(2, stub.RunRuleGeneric.Of<TestRuleForManager>().CallCount);
-        Assert.Equal(1, stub.RunRuleGeneric.Of<AnotherTestRule>().CallCount);
-        Assert.Equal(3, stub.RunRuleGeneric.TotalCallCount);
+        stub.RunRuleGeneric.Of<TestRuleForManager>().Verify(Times.Exactly(2));
+        stub.RunRuleGeneric.Of<AnotherTestRule>().Verify(Times.Once);
     }
 
     #endregion
@@ -251,7 +248,6 @@ public partial class IRuleManagerTests
         stub.RunRules.Reset();
 
         stub.RunRules.Verify(Times.Never);
-        Assert.Equal(0, stub.RunRules.CallCount);
     }
 
     [Fact]
@@ -266,7 +262,6 @@ public partial class IRuleManagerTests
         stub.RunRuleGeneric.Reset();
 
         stub.RunRuleGeneric.Verify(Times.Never);
-        Assert.Equal(0, stub.RunRuleGeneric.TotalCallCount);
     }
 
     #endregion

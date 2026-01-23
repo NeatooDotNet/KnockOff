@@ -106,8 +106,8 @@ public class GenericStandaloneStubTests
 
 		// Assert
 		Assert.Equal(5, value);
-		Assert.Equal(1, stub.Count.GetCount);
-		Assert.Equal(1, stub.Count.SetCount);
+		stub.Count.VerifyGet(Times.Once);
+		stub.Count.VerifySet(Times.Once);
 		Assert.Equal(10, stub.Count.LastSetValue);
 	}
 

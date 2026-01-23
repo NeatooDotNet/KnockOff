@@ -15,8 +15,7 @@ partial class InlineClassPatternTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			private global::System.Func<bool>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
@@ -27,10 +26,10 @@ partial class InlineClassPatternTests
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; }
+			public void Reset() { _getCount = 0; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public EmailServiceBase_IsConfiguredInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -44,7 +43,7 @@ partial class InlineClassPatternTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsConfigured", times, totalCount));
 			}
@@ -55,8 +54,8 @@ partial class InlineClassPatternTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsConfigured (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsConfigured (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -70,7 +69,7 @@ partial class InlineClassPatternTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsConfigured", times, totalCount);
 			}
 
@@ -78,7 +77,7 @@ partial class InlineClassPatternTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsConfigured", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -88,7 +87,7 @@ partial class InlineClassPatternTests
 		{
 			private global::System.Action<string, string, string>? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The arguments from the last call.</summary>
 			public (string? to, string? subject, string? body)? LastCallArgs { get; private set; }
@@ -99,10 +98,10 @@ partial class InlineClassPatternTests
 			/// <summary>Gets the configured callback (internal use).</summary>
 			internal global::System.Action<string, string, string>? Callback => _onCall;
 
-			public void RecordCall(string to, string subject, string body) { CallCount++; LastCallArgs = (to, subject, body); }
+			public void RecordCall(string to, string subject, string body) { _callCount++; LastCallArgs = (to, subject, body); }
 
 			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArgs = default; }
+			public void Reset() { _callCount = 0; LastCallArgs = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -110,8 +109,8 @@ partial class InlineClassPatternTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			private bool _isVerifiable;
@@ -131,14 +130,14 @@ partial class InlineClassPatternTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Send", times, CallCount);
+				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Send", times, _callCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Send", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Send", global::KnockOff.Times.AtLeastOnce, _callCount);
 			}
 		}
 

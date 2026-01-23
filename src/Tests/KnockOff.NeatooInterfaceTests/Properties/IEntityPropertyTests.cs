@@ -43,7 +43,7 @@ public partial class IEntityPropertyTests
         stub.IsPaused.Value = true;
 
         Assert.True(property.IsPaused);
-        Assert.Equal(1, stub.IsPaused.GetCount);
+        stub.IsPaused.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public partial class IEntityPropertyTests
 
         property.IsPaused = true;
 
-        Assert.Equal(1, stub.IsPaused.SetCount);
+        stub.IsPaused.VerifySet(Times.Once);
         Assert.Equal(true, stub.IsPaused.LastSetValue);
     }
 
@@ -103,8 +103,7 @@ public partial class IEntityPropertyTests
 
         property.MarkSelfUnmodified();
 
-        stub.MarkSelfUnmodified.Verify();
-        Assert.Equal(1, stub.MarkSelfUnmodified.CallCount);
+        stub.MarkSelfUnmodified.Verify(Times.Once);
     }
 
     [Fact]
@@ -238,7 +237,7 @@ public partial class IEntityPropertyTests
 
         stub.IsModified.Reset();
 
-        Assert.Equal(0, stub.IsModified.GetCount);
+        stub.IsModified.VerifyGet(Times.Never);
     }
 
     [Fact]
@@ -372,7 +371,7 @@ public partial class IEntityPropertyOfTTests
 
         property.Value = "NewTypedEntityValue";
 
-        Assert.Equal(1, stub.Value.SetCount);
+        stub.Value.VerifySet(Times.Once);
         Assert.Equal("NewTypedEntityValue", stub.Value.LastSetValue);
     }
 

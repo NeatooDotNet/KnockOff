@@ -39,7 +39,7 @@ public class BclInterfaceTests
         disposable.Dispose();
         disposable.Dispose();
 
-        Assert.Equal(3, stub.Dispose.CallCount);
+        stub.Dispose.Verify(Times.Exactly(3));
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class BclInterfaceTests
 
         Assert.True(enumerator.MoveNext());
         Assert.Equal("a", enumerator.Current);
-        Assert.Equal(1, stub.GetEnumerator.CallCount); // Should only track once via delegation
+        stub.GetEnumerator.Verify(Times.Once); // Should only track once via delegation
     }
 
     #endregion
@@ -168,8 +168,8 @@ public class BclInterfaceTests
         list[0] = "value";
         var _ = list[1];
 
-        Assert.Equal(1, stub.Indexer.SetCount);
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class BclInterfaceTests
         list.Add("item1");
         list.Add("item2");
 
-        Assert.Equal(2, stub.Add.CallCount);
+        stub.Add.Verify(Times.Exactly(2));
         Assert.Equal("item2", stub.Add.LastCallArg);
     }
 
@@ -206,8 +206,8 @@ public class BclInterfaceTests
         list[0] = "value";
         var _ = list[1];
 
-        Assert.Equal(1, stub.Indexer.SetCount);
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public class BclInterfaceTests
         list.Add(42);
         list.Add(100);
 
-        Assert.Equal(2, stub.Add.CallCount);
+        stub.Add.Verify(Times.Exactly(2));
         Assert.Equal(100, stub.Add.LastCallArg);
     }
 
@@ -248,7 +248,7 @@ public class BclInterfaceTests
 
         var _ = collection.Count;
 
-        Assert.Equal(1, stub.Count.GetCount);
+        stub.Count.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -322,8 +322,8 @@ public class BclInterfaceTests
         dict["key"] = "value";
         var _ = dict["otherKey"];
 
-        Assert.Equal(1, stub.Indexer.SetCount);
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -358,8 +358,8 @@ public class BclInterfaceTests
         dict[1] = user;
         var _ = dict[2];
 
-        Assert.Equal(1, stub.Indexer.SetCount);
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -386,7 +386,7 @@ public class BclInterfaceTests
 
         var _ = list[0];
 
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -397,7 +397,7 @@ public class BclInterfaceTests
 
         var _ = list.Count;
 
-        Assert.Equal(1, stub.Count.GetCount);
+        stub.Count.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -408,7 +408,7 @@ public class BclInterfaceTests
 
         var _ = collection.Count;
 
-        Assert.Equal(1, stub.Count.GetCount);
+        stub.Count.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -419,7 +419,7 @@ public class BclInterfaceTests
 
         var _ = dict["key"];
 
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -725,7 +725,7 @@ public class BclInterfaceTests
         notifier.PropertyChanged += (s, e) => { };
         notifier.PropertyChanged += (s, e) => { };
 
-        Assert.Equal(2, stub.PropertyChangedInterceptor.AddCount);
+        stub.PropertyChangedInterceptor.VerifyAdd(Times.Exactly(2));
     }
 
     [Fact]
@@ -754,7 +754,7 @@ public class BclInterfaceTests
 
         var _ = queryable.Expression;
 
-        Assert.Equal(1, stub.Expression.GetCount);
+        stub.Expression.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -765,7 +765,7 @@ public class BclInterfaceTests
 
         var _ = queryable.ElementType;
 
-        Assert.Equal(1, stub.ElementType.GetCount);
+        stub.ElementType.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -776,7 +776,7 @@ public class BclInterfaceTests
 
         var _ = queryable.Provider;
 
-        Assert.Equal(1, stub.Provider.GetCount);
+        stub.Provider.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -787,7 +787,7 @@ public class BclInterfaceTests
 
         var _ = queryable.Expression;
 
-        Assert.Equal(1, stub.Expression.GetCount);
+        stub.Expression.VerifyGet(Times.Once);
     }
 
     #endregion
@@ -887,7 +887,7 @@ public class BclInterfaceTests
 
         var _ = asyncResult.IsCompleted;
 
-        Assert.Equal(1, stub.IsCompleted.GetCount);
+        stub.IsCompleted.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -898,7 +898,7 @@ public class BclInterfaceTests
 
         var _ = asyncResult.AsyncWaitHandle;
 
-        Assert.Equal(1, stub.AsyncWaitHandle.GetCount);
+        stub.AsyncWaitHandle.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -909,7 +909,7 @@ public class BclInterfaceTests
 
         var _ = asyncResult.CompletedSynchronously;
 
-        Assert.Equal(1, stub.CompletedSynchronously.GetCount);
+        stub.CompletedSynchronously.VerifyGet(Times.Once);
     }
 
     #endregion
@@ -1003,7 +1003,7 @@ public class BclInterfaceTests
 
         var _ = enumerator.Current;
 
-        Assert.Equal(1, stub.Current.GetCount);
+        stub.Current.VerifyGet(Times.Once);
     }
 
     #endregion
@@ -1101,7 +1101,7 @@ public class BclInterfaceTests
 
         var _ = enumerator.Key;
 
-        Assert.Equal(1, stub.Key.GetCount);
+        stub.Key.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -1112,7 +1112,7 @@ public class BclInterfaceTests
 
         var _ = enumerator.Value;
 
-        Assert.Equal(1, stub.Value.GetCount);
+        stub.Value.VerifyGet(Times.Once);
     }
 
     #endregion
@@ -1127,7 +1127,7 @@ public class BclInterfaceTests
 
         var _ = grouping.Key;
 
-        Assert.Equal(1, stub.Key.GetCount);
+        stub.Key.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -1138,7 +1138,7 @@ public class BclInterfaceTests
 
         var _ = grouping.Key;
 
-        Assert.Equal(1, stub.Key.GetCount);
+        stub.Key.VerifyGet(Times.Once);
     }
 
     #endregion
@@ -1164,7 +1164,7 @@ public class BclInterfaceTests
 
         var _ = ordered.Expression;
 
-        Assert.Equal(1, stub.Expression.GetCount);
+        stub.Expression.VerifyGet(Times.Once);
     }
 
     #endregion

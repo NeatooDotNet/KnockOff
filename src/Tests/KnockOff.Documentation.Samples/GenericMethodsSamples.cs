@@ -245,7 +245,9 @@ public class ResetAllTests
         // Reset all type-specific state
         stub.GetById.Reset();
 
-        Assert.Equal(0, stub.GetById.TotalCallCount);
+        // Verify no calls after reset using Times.Never
+        stub.GetById.Of<User>().Verify(Times.Never);
+        stub.GetById.Of<Order>().Verify(Times.Never);
         Assert.Empty(stub.GetById.CalledTypeArguments);
     }
     #endregion

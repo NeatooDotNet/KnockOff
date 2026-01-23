@@ -15,8 +15,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -30,10 +29,10 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsReadyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -47,7 +46,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReady", times, totalCount));
 		}
@@ -58,8 +57,8 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReady (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReady (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -73,7 +72,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsReady", times, totalCount);
 		}
 
@@ -81,7 +80,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsReady", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -103,7 +102,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -112,8 +111,8 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Initialize", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Initialize", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -200,14 +199,14 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Initialize", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Initialize", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Initialize", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Initialize", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -219,7 +218,6 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -261,7 +259,7 @@ partial class ServiceWithInitPropsStub : global::KnockOff.Documentation.Samples.
 
 			public MethodSequenceImpl(InitializeInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

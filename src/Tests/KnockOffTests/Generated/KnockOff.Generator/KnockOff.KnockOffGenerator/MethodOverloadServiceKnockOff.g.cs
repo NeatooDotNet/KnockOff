@@ -49,7 +49,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		private bool _isVerifiable_String_Int32_String;
 		private global::KnockOff.Times? _verifiableTimes_String_Int32_String;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_String?.CallCount ?? 0) + (_sequence_String_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Boolean_String?.CallCount ?? 0) + (_sequence_String_Boolean_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_String?.CallCount ?? 0) + (_sequence_String_Int32_String?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_String_String?.CallCount ?? 0) + (_sequence_String_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Boolean_String?.CallCount ?? 0) + (_sequence_String_Boolean_String?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_String?.CallCount ?? 0) + (_sequence_String_Int32_String?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -57,8 +57,8 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Format", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Format", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for Format(string). Returns tracking interface.</summary>
@@ -322,7 +322,6 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
 
@@ -372,7 +371,6 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 			private (string? input, bool? uppercase) _lastArgs;
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? input, bool? uppercase) LastArgs => _lastArgs;
@@ -424,7 +422,6 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? input, int? maxLength) LastArgs => _lastArgs;
 
@@ -471,7 +468,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			public MethodSequenceImpl_String_String(FormatInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -523,7 +520,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			public MethodSequenceImpl_String_Boolean_String(FormatInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -575,7 +572,7 @@ partial class MethodOverloadServiceKnockOff : global::KnockOffTests.IMethodOverl
 
 			public MethodSequenceImpl_String_Int32_String(FormatInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

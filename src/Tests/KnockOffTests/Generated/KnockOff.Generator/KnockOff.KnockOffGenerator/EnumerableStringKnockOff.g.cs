@@ -37,7 +37,7 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 		private bool _isVerifiable_NoParams_Collections_IEnumerator;
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_IEnumerator;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -45,8 +45,8 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
@@ -234,7 +234,6 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
@@ -278,7 +277,6 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
@@ -319,7 +317,7 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 
 			public MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -371,7 +369,7 @@ partial class EnumerableStringKnockOff : global::System.Collections.Generic.IEnu
 
 			public MethodSequenceImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

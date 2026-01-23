@@ -11,23 +11,20 @@ partial class INotifyNeatooPropertyChangedTests
 		/// <summary>Interceptor for INotifyNeatooPropertyChanged.NeatooPropertyChanged event.</summary>
 		public sealed class INotifyNeatooPropertyChanged_NeatooPropertyChangedInterceptor
 		{
-			/// <summary>Number of times the event was subscribed to.</summary>
-			internal int AddCount { get; private set; }
-
-			/// <summary>Number of times the event was unsubscribed from.</summary>
-			internal int RemoveCount { get; private set; }
+			private int _addCount;
+			private int _removeCount;
 
 			/// <summary>The backing delegate for raising the event.</summary>
 			public global::Neatoo.NeatooPropertyChanged? Handler { get; private set; }
 
 			/// <summary>Records an event subscription.</summary>
-			public void RecordAdd(global::Neatoo.NeatooPropertyChanged? handler) { AddCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Combine(Handler, handler); }
+			public void RecordAdd(global::Neatoo.NeatooPropertyChanged? handler) { _addCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Combine(Handler, handler); }
 
 			/// <summary>Records an event unsubscription.</summary>
-			public void RecordRemove(global::Neatoo.NeatooPropertyChanged? handler) { RemoveCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(Handler, handler); }
+			public void RecordRemove(global::Neatoo.NeatooPropertyChanged? handler) { _removeCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(Handler, handler); }
 
 			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
+			public void Reset() { _addCount = 0; _removeCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;
@@ -38,8 +35,8 @@ partial class INotifyNeatooPropertyChangedTests
 			/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
 			public void VerifyAdd(global::KnockOff.Times times)
 			{
-				if (!times.Validate(AddCount))
-					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' add verification failed: expected {times}, but was called {AddCount} time(s).");
+				if (!times.Validate(_addCount))
+					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' add verification failed: expected {times}, but was called {_addCount} time(s).");
 			}
 
 			/// <summary>Verifies the event was unsubscribed at least once.</summary>
@@ -48,8 +45,8 @@ partial class INotifyNeatooPropertyChangedTests
 			/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
 			public void VerifyRemove(global::KnockOff.Times times)
 			{
-				if (!times.Validate(RemoveCount))
-					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+				if (!times.Validate(_removeCount))
+					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' remove verification failed: expected {times}, but was called {_removeCount} time(s).");
 			}
 
 			/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
@@ -58,7 +55,7 @@ partial class INotifyNeatooPropertyChangedTests
 			/// <summary>Verifies the total event access count matches the Times constraint.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' verification failed: expected {times}, but was called {totalCount} time(s).");
 			}
@@ -87,7 +84,7 @@ partial class INotifyNeatooPropertyChangedTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					return new global::KnockOff.VerificationFailure("NeatooPropertyChanged", times, totalCount);
 				return null;
@@ -98,7 +95,7 @@ partial class INotifyNeatooPropertyChangedTests
 			{
 				if (!IsConfigured && !_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					return new global::KnockOff.VerificationFailure("NeatooPropertyChanged", times, totalCount);
 				return null;

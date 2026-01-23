@@ -273,8 +273,7 @@ internal static class InlineRenderer
 
         if (prop.HasGetter)
         {
-            w.Line("\t\t\t/// <summary>Number of times the getter was accessed.</summary>");
-            w.Line("\t\t\tinternal int GetCount { get; private set; }");
+            w.Line("\t\t\tprivate int _getCount;");
             w.Line();
             w.Line($"\t\t\t/// <summary>Callback for getter. If set, returns its value.</summary>");
             w.Line($"\t\t\tpublic global::System.Func<{prop.ReturnType}>? OnGet {{ get; set; }}");
@@ -283,8 +282,7 @@ internal static class InlineRenderer
 
         if (prop.HasSetter)
         {
-            w.Line("\t\t\t/// <summary>Number of times the setter was accessed.</summary>");
-            w.Line("\t\t\tinternal int SetCount { get; private set; }");
+            w.Line("\t\t\tprivate int _setCount;");
             w.Line();
             w.Line($"\t\t\t/// <summary>The last value passed to the setter.</summary>");
             w.Line($"\t\t\tpublic {prop.NullableReturnType} LastSetValue {{ get; private set; }}");
@@ -316,21 +314,21 @@ internal static class InlineRenderer
         if (prop.HasGetter)
         {
             w.Line("\t\t\t/// <summary>Records a getter access.</summary>");
-            w.Line("\t\t\tpublic void RecordGet() => GetCount++;");
+            w.Line("\t\t\tpublic void RecordGet() => _getCount++;");
             w.Line();
         }
         if (prop.HasSetter)
         {
             w.Line("\t\t\t/// <summary>Records a setter access.</summary>");
-            w.Line($"\t\t\tpublic void RecordSet({prop.NullableReturnType} value) {{ SetCount++; LastSetValue = value; }}");
+            w.Line($"\t\t\tpublic void RecordSet({prop.NullableReturnType} value) {{ _setCount++; LastSetValue = value; }}");
             w.Line();
         }
 
         // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Value) and verifiable marking
         w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>");
         var resetParts = new List<string>();
-        if (prop.HasGetter) resetParts.Add("GetCount = 0;");
-        if (prop.HasSetter) resetParts.Add("SetCount = 0; LastSetValue = default;");
+        if (prop.HasGetter) resetParts.Add("_getCount = 0;");
+        if (prop.HasSetter) resetParts.Add("_setCount = 0; LastSetValue = default;");
         if (!string.IsNullOrEmpty(prop.DeclaringInterface) && !prop.IsInitOnly) resetParts.Add("_source = null;");
         w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
         w.Line();
@@ -346,8 +344,8 @@ internal static class InlineRenderer
         // Verify methods - throw on failure
         // Build total count expression based on available accessors
         var totalCountExpr = prop.HasGetter && prop.HasSetter
-            ? "GetCount + SetCount"
-            : (prop.HasGetter ? "GetCount" : "SetCount");
+            ? "_getCount + _setCount"
+            : (prop.HasGetter ? "_getCount" : "_setCount");
 
         w.Line("\t\t\t/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>");
         w.Line("\t\t\tpublic void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
@@ -372,8 +370,8 @@ internal static class InlineRenderer
             w.Line("\t\t\t/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
             w.Line("\t\t\tpublic void VerifyGet(global::KnockOff.Times times)");
             w.Line("\t\t\t{");
-            w.Line("\t\t\t\tif (!times.Validate(GetCount))");
-            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName} (get)\", times, GetCount));");
+            w.Line("\t\t\t\tif (!times.Validate(_getCount))");
+            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName} (get)\", times, _getCount));");
             w.Line("\t\t\t}");
             w.Line();
         }
@@ -388,8 +386,8 @@ internal static class InlineRenderer
             w.Line("\t\t\t/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
             w.Line("\t\t\tpublic void VerifySet(global::KnockOff.Times times)");
             w.Line("\t\t\t{");
-            w.Line("\t\t\t\tif (!times.Validate(SetCount))");
-            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName} (set)\", times, SetCount));");
+            w.Line("\t\t\t\tif (!times.Validate(_setCount))");
+            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{prop.PropertyName} (set)\", times, _setCount));");
             w.Line("\t\t\t}");
             w.Line();
         }
@@ -446,8 +444,7 @@ internal static class InlineRenderer
 
         if (indexer.HasGetter)
         {
-            w.Line("\t\t\t/// <summary>Number of times the getter was accessed.</summary>");
-            w.Line("\t\t\tinternal int GetCount { get; private set; }");
+            w.Line("\t\t\tprivate int _getCount;");
             w.Line();
             w.Line($"\t\t\t/// <summary>The last key used to access the getter.</summary>");
             w.Line($"\t\t\tpublic {indexer.NullableKeyType} LastGetKey {{ get; private set; }}");
@@ -464,8 +461,7 @@ internal static class InlineRenderer
 
         if (indexer.HasSetter)
         {
-            w.Line("\t\t\t/// <summary>Number of times the setter was accessed.</summary>");
-            w.Line("\t\t\tinternal int SetCount { get; private set; }");
+            w.Line("\t\t\tprivate int _setCount;");
             w.Line();
             w.Line($"\t\t\t/// <summary>The last key-value pair passed to the setter.</summary>");
             w.Line($"\t\t\tpublic ({indexer.KeyType} Key, {indexer.ReturnType} Value)? LastSetEntry {{ get; private set; }}");
@@ -484,13 +480,13 @@ internal static class InlineRenderer
         if (indexer.HasGetter)
         {
             w.Line($"\t\t\t/// <summary>Records a getter access.</summary>");
-            w.Line($"\t\t\tpublic void RecordGet({indexer.ParameterSignature}) {{ GetCount++; LastGetKey = {indexer.KeyExpression}; }}");
+            w.Line($"\t\t\tpublic void RecordGet({indexer.ParameterSignature}) {{ _getCount++; LastGetKey = {indexer.KeyExpression}; }}");
             w.Line();
         }
         if (indexer.HasSetter)
         {
             w.Line($"\t\t\t/// <summary>Records a setter access.</summary>");
-            w.Line($"\t\t\tpublic void RecordSet({indexer.ParameterSignature}, {indexer.ReturnType} value) {{ SetCount++; LastSetEntry = ({indexer.KeyExpression}, value); }}");
+            w.Line($"\t\t\tpublic void RecordSet({indexer.ParameterSignature}, {indexer.ReturnType} value) {{ _setCount++; LastSetEntry = ({indexer.KeyExpression}, value); }}");
             w.Line();
         }
 
@@ -510,16 +506,16 @@ internal static class InlineRenderer
         // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing) and verifiable marking
         w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>");
         var resetParts = new List<string>();
-        if (indexer.HasGetter) resetParts.Add("GetCount = 0; LastGetKey = default;");
-        if (indexer.HasSetter) resetParts.Add("SetCount = 0; LastSetEntry = default;");
+        if (indexer.HasGetter) resetParts.Add("_getCount = 0; LastGetKey = default;");
+        if (indexer.HasSetter) resetParts.Add("_setCount = 0; LastSetEntry = default;");
         if (!string.IsNullOrEmpty(indexer.DeclaringInterface)) resetParts.Add("_source = null;");
         w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
         w.Line();
 
         // Build total count expression based on available accessors
         var totalCountExpr = indexer.HasGetter && indexer.HasSetter
-            ? "GetCount + SetCount"
-            : (indexer.HasGetter ? "GetCount" : "SetCount");
+            ? "_getCount + _setCount"
+            : (indexer.HasGetter ? "_getCount" : "_setCount");
 
         // Verifiable methods (fluent)
         w.Line($"\t\t\t/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
@@ -553,8 +549,8 @@ internal static class InlineRenderer
             w.Line("\t\t\t/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
             w.Line("\t\t\tpublic void VerifyGet(global::KnockOff.Times times)");
             w.Line("\t\t\t{");
-            w.Line("\t\t\t\tif (!times.Validate(GetCount))");
-            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (get)\", times, GetCount));");
+            w.Line("\t\t\t\tif (!times.Validate(_getCount))");
+            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (get)\", times, _getCount));");
             w.Line("\t\t\t}");
             w.Line();
         }
@@ -569,8 +565,8 @@ internal static class InlineRenderer
             w.Line("\t\t\t/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
             w.Line("\t\t\tpublic void VerifySet(global::KnockOff.Times times)");
             w.Line("\t\t\t{");
-            w.Line("\t\t\t\tif (!times.Validate(SetCount))");
-            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (set)\", times, SetCount));");
+            w.Line("\t\t\t\tif (!times.Validate(_setCount))");
+            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (set)\", times, _setCount));");
             w.Line("\t\t\t}");
             w.Line();
         }
@@ -703,8 +699,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t}");
         w.Line();
 
-        // Aggregate tracking (internal - use Verify for public API)
-        w.Line("\t\t\tinternal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
+        // Aggregate tracking (private - use Verify for public API)
+        w.Line("\t\t\tprivate int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
         w.Line();
         w.Line($"\t\t\t/// <summary>All type argument(s) that were used in calls.</summary>");
         w.Line($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Keys.ToList();");
@@ -772,10 +768,9 @@ internal static class InlineRenderer
         w.Line($"\t\t\t\tprivate {handler.MethodName}Delegate? _onCall;");
         w.Line();
 
-        // CallCount - private field with explicit interface implementation
+        // CallCount - private field with explicit interface implementation for aggregation
         w.Line("\t\t\t\tprivate int _callCount;");
         w.Line("\t\t\t\tint IGenericMethodCallTracker.CallCount => _callCount;");
-        w.Line("\t\t\t\tinternal int CallCount => _callCount;");
         w.Line();
 
         // LastCallArg/LastCallArgs
@@ -846,8 +841,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t\t/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
         w.Line("\t\t\t\tpublic void Verify(global::KnockOff.Times times)");
         w.Line("\t\t\t\t{");
-        w.Line("\t\t\t\t\tif (!times.Validate(CallCount))");
-        w.Line("\t\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, CallCount));");
+        w.Line("\t\t\t\t\tif (!times.Validate(_callCount))");
+        w.Line("\t\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, _callCount));");
         w.Line("\t\t\t\t}");
         w.Line();
 
@@ -871,23 +866,20 @@ internal static class InlineRenderer
         w.Line($"\t\tpublic sealed class {evt.InterceptorClassName}{typeParamList}{constraintClause}");
         w.Line("\t\t{");
 
-        w.Line("\t\t\t/// <summary>Number of times the event was subscribed to.</summary>");
-        w.Line("\t\t\tinternal int AddCount { get; private set; }");
-        w.Line();
-        w.Line("\t\t\t/// <summary>Number of times the event was unsubscribed from.</summary>");
-        w.Line("\t\t\tinternal int RemoveCount { get; private set; }");
+        w.Line("\t\t\tprivate int _addCount;");
+        w.Line("\t\t\tprivate int _removeCount;");
         w.Line();
         w.Line($"\t\t\t/// <summary>The backing delegate for raising the event.</summary>");
         w.Line($"\t\t\tpublic {evt.DelegateType}? Handler {{ get; private set; }}");
         w.Line();
         w.Line("\t\t\t/// <summary>Records an event subscription.</summary>");
-        w.Line($"\t\t\tpublic void RecordAdd({evt.DelegateType}? handler) {{ AddCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Combine(Handler, handler); }}");
+        w.Line($"\t\t\tpublic void RecordAdd({evt.DelegateType}? handler) {{ _addCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Combine(Handler, handler); }}");
         w.Line();
         w.Line("\t\t\t/// <summary>Records an event unsubscription.</summary>");
-        w.Line($"\t\t\tpublic void RecordRemove({evt.DelegateType}? handler) {{ RemoveCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Remove(Handler, handler); }}");
+        w.Line($"\t\t\tpublic void RecordRemove({evt.DelegateType}? handler) {{ _removeCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Remove(Handler, handler); }}");
         w.Line();
         w.Line("\t\t\t/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>");
-        w.Line("\t\t\tpublic void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }");
+        w.Line("\t\t\tpublic void Reset() { _addCount = 0; _removeCount = 0; Handler = null; }");
         w.Line();
 
         // Verification API for events
@@ -902,8 +894,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t/// <summary>Verifies the event subscription count matches the Times constraint.</summary>");
         w.Line("\t\t\tpublic void VerifyAdd(global::KnockOff.Times times)");
         w.Line("\t\t\t{");
-        w.Line("\t\t\t\tif (!times.Validate(AddCount))");
-        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' add verification failed: expected {{times}}, but was called {{AddCount}} time(s).\");");
+        w.Line("\t\t\t\tif (!times.Validate(_addCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' add verification failed: expected {{times}}, but was called {{_addCount}} time(s).\");");
         w.Line("\t\t\t}");
         w.Line();
 
@@ -914,8 +906,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>");
         w.Line("\t\t\tpublic void VerifyRemove(global::KnockOff.Times times)");
         w.Line("\t\t\t{");
-        w.Line("\t\t\t\tif (!times.Validate(RemoveCount))");
-        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' remove verification failed: expected {{times}}, but was called {{RemoveCount}} time(s).\");");
+        w.Line("\t\t\t\tif (!times.Validate(_removeCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' remove verification failed: expected {{times}}, but was called {{_removeCount}} time(s).\");");
         w.Line("\t\t\t}");
         w.Line();
 
@@ -926,7 +918,7 @@ internal static class InlineRenderer
         w.Line("\t\t\t/// <summary>Verifies the total event access count matches the Times constraint.</summary>");
         w.Line("\t\t\tpublic void Verify(global::KnockOff.Times times)");
         w.Line("\t\t\t{");
-        w.Line("\t\t\t\tvar totalCount = AddCount + RemoveCount;");
+        w.Line("\t\t\t\tvar totalCount = _addCount + _removeCount;");
         w.Line("\t\t\t\tif (!times.Validate(totalCount))");
         w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' verification failed: expected {{times}}, but was called {{totalCount}} time(s).\");");
         w.Line("\t\t\t}");
@@ -960,7 +952,7 @@ internal static class InlineRenderer
         w.Line("\t\t\t{");
         w.Line("\t\t\t\tif (!_isVerifiable) return null;");
         w.Line("\t\t\t\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
-        w.Line("\t\t\t\tvar totalCount = AddCount + RemoveCount;");
+        w.Line("\t\t\t\tvar totalCount = _addCount + _removeCount;");
         w.Line("\t\t\t\tif (!times.Validate(totalCount))");
         w.Line($"\t\t\t\t\treturn new global::KnockOff.VerificationFailure(\"{evt.EventName}\", times, totalCount);");
         w.Line("\t\t\t\treturn null;");
@@ -972,7 +964,7 @@ internal static class InlineRenderer
         w.Line("\t\t\t{");
         w.Line("\t\t\t\tif (!IsConfigured && !_isVerifiable) return null;");
         w.Line("\t\t\t\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
-        w.Line("\t\t\t\tvar totalCount = AddCount + RemoveCount;");
+        w.Line("\t\t\t\tvar totalCount = _addCount + _removeCount;");
         w.Line("\t\t\t\tif (!times.Validate(totalCount))");
         w.Line($"\t\t\t\t\treturn new global::KnockOff.VerificationFailure(\"{evt.EventName}\", times, totalCount);");
         w.Line("\t\t\t\treturn null;");
@@ -1262,8 +1254,8 @@ internal static class InlineRenderer
         w.Line($"\t\tpublic sealed class {del.InterceptorClassName}{del.TypeParameterList}{del.ConstraintClauses}");
         w.Line("\t\t{");
 
-        // CallCount (internal - use Verify(Times) for public API)
-        w.Line("\t\t\tinternal int CallCount { get; private set; }");
+        // CallCount (private - use Verify() API to check call counts)
+        w.Line("\t\t\tprivate int _callCount;");
         w.Line();
 
         // LastCallArg/LastCallArgs
@@ -1288,24 +1280,24 @@ internal static class InlineRenderer
         // RecordCall method
         if (del.Parameters.Count == 0)
         {
-            w.Line("\t\t\tpublic void RecordCall() { CallCount++; }");
+            w.Line("\t\t\tpublic void RecordCall() { _callCount++; }");
         }
         else if (del.Parameters.Count == 1)
         {
             var param = del.Parameters.GetArray()![0];
-            w.Line($"\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ CallCount++; LastCallArg = {param.Name}; }}");
+            w.Line($"\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ _callCount++; LastCallArg = {param.Name}; }}");
         }
         else
         {
             var paramList = string.Join(", ", del.Parameters.Select(p => $"{p.Type} {p.Name}"));
             var argList = string.Join(", ", del.Parameters.Select(p => p.Name));
-            w.Line($"\t\t\tpublic void RecordCall({paramList}) {{ CallCount++; LastCallArgs = ({argList}); }}");
+            w.Line($"\t\t\tpublic void RecordCall({paramList}) {{ _callCount++; LastCallArgs = ({argList}); }}");
         }
         w.Line();
 
         // Reset method - clears tracking state but preserves configuration (OnCall)
-        w.Line("\t\t\t/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
-        w.Append("\t\t\tpublic void Reset() { CallCount = 0; ");
+        w.Line("\t\t\t/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
+        w.Append("\t\t\tpublic void Reset() { _callCount = 0; ");
         if (del.LastCallArgType != null)
             w.Append("LastCallArg = default; ");
         else if (del.LastCallArgsType != null)
@@ -1321,8 +1313,8 @@ internal static class InlineRenderer
         w.Line("\t\t\t/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
         w.Line("\t\t\tpublic void Verify(global::KnockOff.Times times)");
         w.Line("\t\t\t{");
-        w.Line("\t\t\t\tif (!times.Validate(CallCount))");
-        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"delegate\", times, CallCount));");
+        w.Line("\t\t\t\tif (!times.Validate(_callCount))");
+        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"delegate\", times, _callCount));");
         w.Line("\t\t\t}");
 
         w.Line("\t\t}");

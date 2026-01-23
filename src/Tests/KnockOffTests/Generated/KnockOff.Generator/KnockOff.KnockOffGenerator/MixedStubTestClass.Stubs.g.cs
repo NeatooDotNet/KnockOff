@@ -15,8 +15,7 @@ partial class MixedStubTestClass
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
@@ -26,8 +25,7 @@ partial class MixedStubTestClass
 				set { _onGet = value; if (value != null) _configured = true; }
 			}
 
-			/// <summary>Number of times the setter was accessed.</summary>
-			internal int SetCount { get; private set; }
+			private int _setCount;
 
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
@@ -41,13 +39,13 @@ partial class MixedStubTestClass
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Records a setter access.</summary>
-			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
+			public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
+			public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public MixedService_VirtualPropertyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -61,7 +59,7 @@ partial class MixedStubTestClass
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty", times, totalCount));
 			}
@@ -72,8 +70,8 @@ partial class MixedStubTestClass
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty (get)", times, _getCount));
 			}
 
 			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -82,8 +80,8 @@ partial class MixedStubTestClass
 			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifySet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(SetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty (set)", times, SetCount));
+				if (!times.Validate(_setCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty (set)", times, _setCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -97,7 +95,7 @@ partial class MixedStubTestClass
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("VirtualProperty", times, totalCount);
 			}
 
@@ -105,7 +103,7 @@ partial class MixedStubTestClass
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("VirtualProperty", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -115,7 +113,7 @@ partial class MixedStubTestClass
 		{
 			private global::System.Action? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
@@ -123,10 +121,10 @@ partial class MixedStubTestClass
 			/// <summary>Gets the configured callback (internal use).</summary>
 			internal global::System.Action? Callback => _onCall;
 
-			public void RecordCall() { CallCount++; }
+			public void RecordCall() { _callCount++; }
 
 			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; }
+			public void Reset() { _callCount = 0; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -134,8 +132,8 @@ partial class MixedStubTestClass
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			private bool _isVerifiable;
@@ -155,14 +153,14 @@ partial class MixedStubTestClass
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("VirtualMethod", times, CallCount);
+				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("VirtualMethod", times, _callCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("VirtualMethod", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("VirtualMethod", global::KnockOff.Times.AtLeastOnce, _callCount);
 			}
 		}
 

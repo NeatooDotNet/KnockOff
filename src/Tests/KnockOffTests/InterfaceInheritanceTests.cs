@@ -14,8 +14,8 @@ public class InterfaceInheritanceTests
 		entity.ModifiedAt = DateTime.Now;
 		entity.ModifiedBy = "TestUser";
 
-		Assert.Equal(1, knockOff.ModifiedAt.SetCount);
-		Assert.Equal(1, knockOff.ModifiedBy.SetCount);
+		knockOff.ModifiedAt.VerifySet(Times.Once);
+		knockOff.ModifiedBy.VerifySet(Times.Once);
 		Assert.Equal("TestUser", knockOff.ModifiedBy.LastSetValue);
 	}
 
@@ -28,8 +28,8 @@ public class InterfaceInheritanceTests
 		var id = entity.Id;
 		var createdAt = entity.CreatedAt;
 
-		Assert.Equal(1, knockOff.Id.GetCount);
-		Assert.Equal(1, knockOff.CreatedAt.GetCount);
+		knockOff.Id.VerifyGet(Times.Once);
+		knockOff.CreatedAt.VerifyGet(Times.Once);
 	}
 
 	[Fact]
@@ -43,8 +43,8 @@ public class InterfaceInheritanceTests
 		auditable.ModifiedBy = "Via cast";
 		var id = baseEntity.Id;
 
-		Assert.Equal(1, knockOff.ModifiedBy.SetCount);
-		Assert.Equal(1, knockOff.Id.GetCount);
+		knockOff.ModifiedBy.VerifySet(Times.Once);
+		knockOff.Id.VerifyGet(Times.Once);
 	}
 
 	[Fact]
@@ -56,7 +56,7 @@ public class InterfaceInheritanceTests
 		var id = entity.Id;
 		var createdAt = entity.CreatedAt;
 
-		Assert.Equal(1, knockOff.Id.GetCount);
-		Assert.Equal(1, knockOff.CreatedAt.GetCount);
+		knockOff.Id.VerifyGet(Times.Once);
+		knockOff.CreatedAt.VerifyGet(Times.Once);
 	}
 }

@@ -11,15 +11,15 @@ partial class OpenGenericDelegateTests
 		/// <summary>Interceptor for OGFactory delegate.</summary>
 		public sealed class OGFactoryInterceptor<T>
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Func<T>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			public void RecordCall() { _callCount++; }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -27,8 +27,8 @@ partial class OpenGenericDelegateTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 
@@ -55,7 +55,7 @@ partial class OpenGenericDelegateTests
 		/// <summary>Interceptor for OGConverter delegate.</summary>
 		public sealed class OGConverterInterceptor<TIn, TOut, TResult> where TResult : class
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The argument from the last invocation.</summary>
 			public TIn? LastCallArg { get; private set; }
@@ -63,10 +63,10 @@ partial class OpenGenericDelegateTests
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Func<TIn, TResult>? OnCall { get; set; }
 
-			public void RecordCall(TIn input) { CallCount++; LastCallArg = input; }
+			public void RecordCall(TIn input) { _callCount++; LastCallArg = input; }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -74,8 +74,8 @@ partial class OpenGenericDelegateTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 

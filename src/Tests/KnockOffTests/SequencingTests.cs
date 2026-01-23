@@ -276,7 +276,7 @@ public class IndexerOfXxxTests
         var result = svc["key1"];
 
         Assert.Equal("value1", result);
-        Assert.Equal(1, stub.Indexer.OfString.GetCount);
+        stub.Indexer.OfString.VerifyGet(Times.Once);
         Assert.Equal("key1", stub.Indexer.OfString.LastGetKey);
     }
 
@@ -293,7 +293,7 @@ public class IndexerOfXxxTests
         Assert.Equal(100, svc[0]);
         Assert.Equal(200, svc[1]);
 
-        Assert.Equal(2, stub.Indexer.OfInt32.GetCount);
+        stub.Indexer.OfInt32.VerifyGet(Times.Exactly(2));
         Assert.Equal(1, stub.Indexer.OfInt32.LastGetKey);
     }
 
@@ -318,7 +318,7 @@ public class IndexerOfXxxTests
         svc["key1"] = "value1";
         svc["key2"] = "value2";
 
-        Assert.Equal(2, stub.Indexer.OfString.SetCount);
+        stub.Indexer.OfString.VerifySet(Times.Exactly(2));
         Assert.Equal(("key2", "value2"), stub.Indexer.OfString.LastSetEntry);
     }
 
@@ -358,8 +358,8 @@ public class IndexerOfXxxTests
         Assert.Equal(42, svc[42]);
 
         // Verify tracking is independent
-        Assert.Equal(1, stub.Indexer.OfString.GetCount);
-        Assert.Equal(1, stub.Indexer.OfInt32.GetCount);
+        stub.Indexer.OfString.VerifyGet(Times.Once);
+        stub.Indexer.OfInt32.VerifyGet(Times.Once);
     }
 }
 

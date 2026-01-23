@@ -556,7 +556,7 @@ internal static class MethodInterceptorRenderer
 			{
 				w.Line("if (!_isVerifiable) return null;");
 				w.Line("var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
-				w.Line($"return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure(\"{methodName}\", times, CallCount);");
+				w.Line($"return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure(\"{methodName}\", times, TotalCallCount);");
 			}
 			w.Line();
 
@@ -565,7 +565,7 @@ internal static class MethodInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line("if (!IsConfigured) return null;");
-				w.Line($"return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, CallCount);");
+				w.Line($"return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, TotalCallCount);");
 			}
 			w.Line();
 		}
@@ -661,10 +661,8 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// CallCount property (internal - use WasCalled or Verify(Times) for public API)
+			// CallCount property (internal to nested class - parent accesses for aggregate; users can't access private nested class)
 			w.Line("internal int CallCount { get; private set; }");
-			w.Line();
-
 			w.Line();
 
 			// LastArg/LastArgs property
@@ -808,8 +806,8 @@ internal static class MethodInterceptorRenderer
 			w.Line($"public {className}({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
-			// TotalCallCount (internal - use Verify() to check sequence completion)
-			w.Line("internal int TotalCallCount");
+			// TotalCallCount (private - use Verify() to check sequence completion)
+			w.Line("private int TotalCallCount");
 			using (w.Braces())
 			{
 				w.Line("get");
@@ -923,8 +921,8 @@ internal static class MethodInterceptorRenderer
 		string? lastArgType,
 		string? lastArgsType)
 	{
-		// CallCount - total across OnCall + sequence + unconfigured (internal - use Verify(Times) for public API)
-		w.Line("internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }");
+		// CallCount - total across OnCall + sequence + unconfigured (private - use Verify() API to check call counts)
+		w.Line("private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }");
 		w.Line();
 
 		// LastCallArg - for single param methods
@@ -959,8 +957,8 @@ internal static class MethodInterceptorRenderer
 			$"(_onCallTracking_{o.SignatureSuffix}?.CallCount ?? 0) + (_sequence_{o.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)");
 		var sumExpr = "_unconfiguredCallCount + " + string.Join(" + ", sumParts);
 
-		// Internal - use Verify(Times) for public API
-		w.Line($"internal int CallCount => {sumExpr};");
+		// Private - use Verify() API to check call counts
+		w.Line($"private int TotalCallCount => {sumExpr};");
 	}
 
 	/// <summary>
@@ -976,8 +974,8 @@ internal static class MethodInterceptorRenderer
 		w.Line("public void Verify(global::KnockOff.Times times)");
 		using (w.Braces())
 		{
-			w.Line("if (!times.Validate(CallCount))");
-			w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{methodName}\", times, CallCount));");
+			w.Line("if (!times.Validate(TotalCallCount))");
+			w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{methodName}\", times, TotalCallCount));");
 		}
 		w.Line();
 	}

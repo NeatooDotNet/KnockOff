@@ -37,7 +37,7 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 		private bool _isVerifiable_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
 		private global::KnockOff.Times? _verifiableTimes_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult?.CallCount ?? 0) + (_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult?.CallCount ?? 0) + (_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult?.CallCount ?? 0) + (_sequence_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult?.CallCount ?? 0) + (_sequence_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -45,8 +45,8 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Execute", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Execute", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for Execute(global::KnockOff.Tests.ISampleTarget, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
@@ -235,7 +235,6 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::KnockOff.Tests.ISampleTarget? target, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
@@ -286,7 +285,6 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::KnockOff.Tests.ISampleRuleTarget? target, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
@@ -333,7 +331,7 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 
 			public MethodSequenceImpl_KnockOff_Tests_ISampleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(ExecuteInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -385,7 +383,7 @@ partial class SampleValidationRuleKnockOff : global::KnockOff.Tests.ISampleValid
 
 			public MethodSequenceImpl_KnockOff_Tests_ISampleRuleTarget_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_ISampleResult(ExecuteInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

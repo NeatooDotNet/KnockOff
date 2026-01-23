@@ -9,7 +9,7 @@
 
 ## Problem
 
-`CallCount`, `GetCount`, and `SetCount` properties are still accessible in test projects despite being marked `internal`. This is because:
+`CallCount`, `GetCount`, `SetCount`, `AddCount`, and `RemoveCount` properties are still accessible in test projects despite being marked `internal`. This is because:
 
 1. Interceptor classes are generated **inside the user's assembly** (not the KnockOff library)
 2. `internal` only restricts access from other assemblies
@@ -20,7 +20,7 @@ The intent was to make these properties truly internal to the stub's implementat
 
 ## Solution
 
-Remove `CallCount`, `GetCount`, and `SetCount` properties entirely from the generated interceptor classes. Users should use the `Verify()` API instead:
+Remove `CallCount`, `GetCount`, `SetCount`, `AddCount`, and `RemoveCount` properties entirely from the generated interceptor classes. Users should use the `Verify()` API instead:
 
 **Before (current):**
 ```csharp
@@ -40,12 +40,17 @@ The count tracking will still exist internally (private fields) to support `Veri
 
 ## Plans
 
+- [Remove Count Properties from Public API](../plans/remove-count-properties-from-api.md)
+
 ---
 
 ## Tasks
 
-- [ ] Identify all locations in renderers that emit count properties
-- [ ] Change count properties from `internal` to `private` fields
+- [x] Identify all locations in renderers that emit count properties (see plan)
+- [ ] Change count properties from `internal` to `private` fields in MethodInterceptorRenderer.cs
+- [ ] Change count properties from `internal` to `private` fields in FlatRenderer.cs
+- [ ] Change count properties from `internal` to `private` fields in InlineRenderer.cs
+- [ ] Change count properties from `internal` to `private` fields in ClassRenderer.cs
 - [ ] Ensure `Verify()` methods still work with private count tracking
 - [ ] Update KnockOffTests to use Verify API instead of count properties
 - [ ] Update KnockOff.NeatooInterfaceTests to use Verify API
@@ -58,6 +63,14 @@ The count tracking will still exist internally (private fields) to support `Veri
 ---
 
 ## Progress Log
+
+**2026-01-22**: Completed architectural analysis. Identified all renderer locations emitting count properties:
+- `MethodInterceptorRenderer.cs`: Method interceptor CallCount (aggregate and per-tracking)
+- `FlatRenderer.cs`: Property, indexer, event count properties
+- `InlineRenderer.cs`: Property, indexer, event, delegate, generic method count properties
+- `ClassRenderer.cs`: Property, indexer, method, event count properties
+
+Identified ~65 test usages across 5 test projects that need migration. Created comprehensive plan with implementation steps and migration patterns.
 
 ---
 

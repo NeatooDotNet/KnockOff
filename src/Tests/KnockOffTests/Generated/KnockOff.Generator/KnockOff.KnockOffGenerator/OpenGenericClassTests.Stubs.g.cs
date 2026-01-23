@@ -15,8 +15,7 @@ partial class OpenGenericClassTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			private global::System.Func<string>? _onGet;
 			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
@@ -27,10 +26,10 @@ partial class OpenGenericClassTests
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; }
+			public void Reset() { _getCount = 0; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public OGRepository_NameInterceptor<T> Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -44,7 +43,7 @@ partial class OpenGenericClassTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name", times, totalCount));
 			}
@@ -55,8 +54,8 @@ partial class OpenGenericClassTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -70,7 +69,7 @@ partial class OpenGenericClassTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Name", times, totalCount);
 			}
 
@@ -78,7 +77,7 @@ partial class OpenGenericClassTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Name", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -88,7 +87,7 @@ partial class OpenGenericClassTests
 		{
 			private global::System.Func<int, T?>? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The argument from the last call.</summary>
 			public int? LastCallArg { get; private set; }
@@ -99,10 +98,10 @@ partial class OpenGenericClassTests
 			/// <summary>Gets the configured callback (internal use).</summary>
 			internal global::System.Func<int, T?>? Callback => _onCall;
 
-			public void RecordCall(int id) { CallCount++; LastCallArg = id; }
+			public void RecordCall(int id) { _callCount++; LastCallArg = id; }
 
 			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; }
+			public void Reset() { _callCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -110,8 +109,8 @@ partial class OpenGenericClassTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			private bool _isVerifiable;
@@ -131,14 +130,14 @@ partial class OpenGenericClassTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetById", times, CallCount);
+				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("GetById", times, _callCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("GetById", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("GetById", global::KnockOff.Times.AtLeastOnce, _callCount);
 			}
 		}
 
@@ -147,7 +146,7 @@ partial class OpenGenericClassTests
 		{
 			private global::System.Action<T>? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The argument from the last call.</summary>
 			public T? LastCallArg { get; private set; }
@@ -158,10 +157,10 @@ partial class OpenGenericClassTests
 			/// <summary>Gets the configured callback (internal use).</summary>
 			internal global::System.Action<T>? Callback => _onCall;
 
-			public void RecordCall(T entity) { CallCount++; LastCallArg = entity; }
+			public void RecordCall(T entity) { _callCount++; LastCallArg = entity; }
 
 			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; }
+			public void Reset() { _callCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -169,8 +168,8 @@ partial class OpenGenericClassTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			private bool _isVerifiable;
@@ -190,14 +189,14 @@ partial class OpenGenericClassTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Save", times, CallCount);
+				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Save", times, _callCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Save", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Save", global::KnockOff.Times.AtLeastOnce, _callCount);
 			}
 		}
 
@@ -300,7 +299,7 @@ partial class OpenGenericClassTests
 		{
 			private global::System.Func<TKey, TValue>? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The argument from the last call.</summary>
 			public TKey? LastCallArg { get; private set; }
@@ -311,10 +310,10 @@ partial class OpenGenericClassTests
 			/// <summary>Gets the configured callback (internal use).</summary>
 			internal global::System.Func<TKey, TValue>? Callback => _onCall;
 
-			public void RecordCall(TKey key) { CallCount++; LastCallArg = key; }
+			public void RecordCall(TKey key) { _callCount++; LastCallArg = key; }
 
 			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; }
+			public void Reset() { _callCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -322,8 +321,8 @@ partial class OpenGenericClassTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			private bool _isVerifiable;
@@ -343,14 +342,14 @@ partial class OpenGenericClassTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Get", times, CallCount);
+				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Get", times, _callCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Get", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Get", global::KnockOff.Times.AtLeastOnce, _callCount);
 			}
 		}
 
@@ -359,7 +358,7 @@ partial class OpenGenericClassTests
 		{
 			private global::System.Action<TKey, TValue>? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The arguments from the last call.</summary>
 			public (TKey? key, TValue? value)? LastCallArgs { get; private set; }
@@ -370,10 +369,10 @@ partial class OpenGenericClassTests
 			/// <summary>Gets the configured callback (internal use).</summary>
 			internal global::System.Action<TKey, TValue>? Callback => _onCall;
 
-			public void RecordCall(TKey key, TValue value) { CallCount++; LastCallArgs = (key, value); }
+			public void RecordCall(TKey key, TValue value) { _callCount++; LastCallArgs = (key, value); }
 
 			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArgs = default; }
+			public void Reset() { _callCount = 0; LastCallArgs = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -381,8 +380,8 @@ partial class OpenGenericClassTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			private bool _isVerifiable;
@@ -402,14 +401,14 @@ partial class OpenGenericClassTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Set", times, CallCount);
+				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Set", times, _callCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Set", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Set", global::KnockOff.Times.AtLeastOnce, _callCount);
 			}
 		}
 

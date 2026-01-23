@@ -10,26 +10,23 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 	{
 		private global::System.EventHandler? _handler;
 
-		/// <summary>Number of times event was subscribed to.</summary>
-		internal int AddCount { get; private set; }
-
-		/// <summary>Number of times event subscription was removed.</summary>
-		internal int RemoveCount { get; private set; }
+		private int _addCount;
+		private int _removeCount;
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
 		/// <summary>Records an event subscription.</summary>
-		public void RecordAdd(global::System.EventHandler? value) { AddCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Combine(_handler, value); }
+		public void RecordAdd(global::System.EventHandler? value) { _addCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Combine(_handler, value); }
 
 		/// <summary>Records an event unsubscription.</summary>
-		public void RecordRemove(global::System.EventHandler? value) { RemoveCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Remove(_handler, value); }
+		public void RecordRemove(global::System.EventHandler? value) { _removeCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Remove(_handler, value); }
 
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(object? sender, global::System.EventArgs e) => _handler?.Invoke(sender, e);
 
 		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+		public void Reset() { _addCount = 0; _removeCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -40,8 +37,8 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
 		public void VerifyAdd(global::KnockOff.Times times)
 		{
-			if (!times.Validate(AddCount))
-				throw new global::KnockOff.VerificationException($"Event 'Changed' add verification failed: expected {times}, but was called {AddCount} time(s).");
+			if (!times.Validate(_addCount))
+				throw new global::KnockOff.VerificationException($"Event 'Changed' add verification failed: expected {times}, but was called {_addCount} time(s).");
 		}
 
 		/// <summary>Verifies the event was unsubscribed at least once.</summary>
@@ -50,8 +47,8 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
 		public void VerifyRemove(global::KnockOff.Times times)
 		{
-			if (!times.Validate(RemoveCount))
-				throw new global::KnockOff.VerificationException($"Event 'Changed' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+			if (!times.Validate(_removeCount))
+				throw new global::KnockOff.VerificationException($"Event 'Changed' remove verification failed: expected {times}, but was called {_removeCount} time(s).");
 		}
 
 		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
@@ -60,7 +57,7 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException($"Event 'Changed' verification failed: expected {times}, but was called {totalCount} time(s).");
 		}
@@ -89,7 +86,7 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Changed", times, totalCount);
 			return null;
@@ -100,7 +97,7 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		{
 			if (!IsConfigured && !_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Changed", times, totalCount);
 			return null;
@@ -112,26 +109,23 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 	{
 		private global::System.Action<global::KnockOff.Documentation.Samples.User>? _handler;
 
-		/// <summary>Number of times event was subscribed to.</summary>
-		internal int AddCount { get; private set; }
-
-		/// <summary>Number of times event subscription was removed.</summary>
-		internal int RemoveCount { get; private set; }
+		private int _addCount;
+		private int _removeCount;
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
 		/// <summary>Records an event subscription.</summary>
-		public void RecordAdd(global::System.Action<global::KnockOff.Documentation.Samples.User>? value) { AddCount++; _handler = (global::System.Action<global::KnockOff.Documentation.Samples.User>?)global::System.Delegate.Combine(_handler, value); }
+		public void RecordAdd(global::System.Action<global::KnockOff.Documentation.Samples.User>? value) { _addCount++; _handler = (global::System.Action<global::KnockOff.Documentation.Samples.User>?)global::System.Delegate.Combine(_handler, value); }
 
 		/// <summary>Records an event unsubscription.</summary>
-		public void RecordRemove(global::System.Action<global::KnockOff.Documentation.Samples.User>? value) { RemoveCount++; _handler = (global::System.Action<global::KnockOff.Documentation.Samples.User>?)global::System.Delegate.Remove(_handler, value); }
+		public void RecordRemove(global::System.Action<global::KnockOff.Documentation.Samples.User>? value) { _removeCount++; _handler = (global::System.Action<global::KnockOff.Documentation.Samples.User>?)global::System.Delegate.Remove(_handler, value); }
 
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(global::KnockOff.Documentation.Samples.User obj) => _handler?.Invoke(obj);
 
 		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+		public void Reset() { _addCount = 0; _removeCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -142,8 +136,8 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
 		public void VerifyAdd(global::KnockOff.Times times)
 		{
-			if (!times.Validate(AddCount))
-				throw new global::KnockOff.VerificationException($"Event 'UserAdded' add verification failed: expected {times}, but was called {AddCount} time(s).");
+			if (!times.Validate(_addCount))
+				throw new global::KnockOff.VerificationException($"Event 'UserAdded' add verification failed: expected {times}, but was called {_addCount} time(s).");
 		}
 
 		/// <summary>Verifies the event was unsubscribed at least once.</summary>
@@ -152,8 +146,8 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
 		public void VerifyRemove(global::KnockOff.Times times)
 		{
-			if (!times.Validate(RemoveCount))
-				throw new global::KnockOff.VerificationException($"Event 'UserAdded' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+			if (!times.Validate(_removeCount))
+				throw new global::KnockOff.VerificationException($"Event 'UserAdded' remove verification failed: expected {times}, but was called {_removeCount} time(s).");
 		}
 
 		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
@@ -162,7 +156,7 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException($"Event 'UserAdded' verification failed: expected {times}, but was called {totalCount} time(s).");
 		}
@@ -191,7 +185,7 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("UserAdded", times, totalCount);
 			return null;
@@ -202,7 +196,7 @@ partial class ApiEventRepoStub : global::KnockOff.Documentation.Samples.Intercep
 		{
 			if (!IsConfigured && !_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("UserAdded", times, totalCount);
 			return null;

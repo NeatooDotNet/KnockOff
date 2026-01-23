@@ -52,7 +52,7 @@ public partial class IEntityPropertyManagerTests
         stub.IsModified.Value = true;
 
         Assert.True(manager.IsModified);
-        Assert.Equal(1, stub.IsModified.GetCount);
+        stub.IsModified.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -123,8 +123,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.MarkSelfUnmodified();
 
-        stub.MarkSelfUnmodified.Verify();
-        Assert.Equal(1, stub.MarkSelfUnmodified.CallCount);
+        stub.MarkSelfUnmodified.Verify(Times.Once);
     }
 
     [Fact]
@@ -137,7 +136,7 @@ public partial class IEntityPropertyManagerTests
         manager.MarkSelfUnmodified();
         manager.MarkSelfUnmodified();
 
-        Assert.Equal(3, stub.MarkSelfUnmodified.CallCount);
+        stub.MarkSelfUnmodified.Verify(Times.Exactly(3));
     }
 
     [Fact]
@@ -148,8 +147,7 @@ public partial class IEntityPropertyManagerTests
 
         await manager.WaitForTasks();
 
-        stub.WaitForTasks.Verify();
-        Assert.Equal(1, stub.WaitForTasks.CallCount);
+        stub.WaitForTasks.Verify(Times.Once);
     }
 
     [Fact]
@@ -201,7 +199,7 @@ public partial class IEntityPropertyManagerTests
 
         _ = manager["PropertyName"];
 
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifyGet(Times.Once);
         Assert.Equal("PropertyName", stub.Indexer.LastGetKey);
     }
 
@@ -262,7 +260,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.PropertyChanged += (s, e) => { };
 
-        Assert.Equal(1, stub.PropertyChangedInterceptor.AddCount);
+        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 
     [Fact]
@@ -273,7 +271,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        Assert.Equal(1, stub.NeatooPropertyChangedInterceptor.AddCount);
+        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 
     #endregion
@@ -292,7 +290,7 @@ public partial class IEntityPropertyManagerTests
 
         stub.IsModified.Reset();
 
-        Assert.Equal(0, stub.IsModified.GetCount);
+        stub.IsModified.VerifyGet(Times.Never);
     }
 
     [Fact]

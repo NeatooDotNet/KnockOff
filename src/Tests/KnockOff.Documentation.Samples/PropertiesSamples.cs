@@ -119,9 +119,12 @@ public class DynamicGetterTests
     {
         var stub = new ServiceWithInitPropsStub();
 
-        // OnGet checks if Initialize() was called via interceptor CallCount
-        stub.IsReady.OnGet = () => stub.Initialize.CallCount > 0;
-        var initTracking = stub.Initialize.OnCall(() => { });
+        // Track initialization state with local variable
+        var isInitialized = false;
+
+        // OnGet checks the tracked state
+        stub.IsReady.OnGet = () => isInitialized;
+        var initTracking = stub.Initialize.OnCall(() => { isInitialized = true; });
 
         IServiceWithInitProps service = stub;
 
@@ -329,18 +332,21 @@ public class CompletePropertyExampleTests
     {
         var stub = new UserConfigCompleteStub();
 
+        // Track connection state with local variable
+        var isConnected = false;
+
         // Value: Static test data
         stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
-        // OnGet: State-dependent behavior
-        stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
+        // OnGet: State-dependent behavior using tracked state
+        stub.IsConnected.OnGet = () => isConnected;
 
         // OnSet: Track all values written
         var connectionStrings = new List<string>();
         stub.ConnectionString.OnSet = (value) => connectionStrings.Add(value);
 
-        // Configure the Connect method
-        var connectTracking = stub.Connect.OnCall(() => { });
+        // Configure the Connect method to update state
+        var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });
 
         IUserConfigComplete service = stub;
 

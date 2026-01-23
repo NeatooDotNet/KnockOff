@@ -54,7 +54,7 @@ public partial class IValidatePropertyManagerTests
         stub.IsBusy.Value = true;
 
         Assert.True(manager.IsBusy);
-        Assert.Equal(1, stub.IsBusy.GetCount);
+        stub.IsBusy.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -114,8 +114,7 @@ public partial class IValidatePropertyManagerTests
 
         await manager.WaitForTasks();
 
-        stub.WaitForTasks.Verify();
-        Assert.Equal(1, stub.WaitForTasks.CallCount);
+        stub.WaitForTasks.Verify(Times.Once);
     }
 
     [Fact]
@@ -181,7 +180,7 @@ public partial class IValidatePropertyManagerTests
 
         _ = manager["PropertyName"];
 
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifyGet(Times.Once);
         Assert.Equal("PropertyName", stub.Indexer.LastGetKey);
     }
 
@@ -264,7 +263,7 @@ public partial class IValidatePropertyManagerTests
 
         manager.PropertyChanged += (s, e) => { };
 
-        Assert.Equal(1, stub.PropertyChangedInterceptor.AddCount);
+        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 
     [Fact]
@@ -275,7 +274,7 @@ public partial class IValidatePropertyManagerTests
 
         manager.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        Assert.Equal(1, stub.NeatooPropertyChangedInterceptor.AddCount);
+        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 
     #endregion
@@ -294,7 +293,7 @@ public partial class IValidatePropertyManagerTests
 
         stub.IsBusy.Reset();
 
-        Assert.Equal(0, stub.IsBusy.GetCount);
+        stub.IsBusy.VerifyGet(Times.Never);
     }
 
     [Fact]

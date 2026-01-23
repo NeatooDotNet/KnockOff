@@ -37,7 +37,7 @@ public partial class IValidateMetaPropertiesTests
         stub.IsBusy.Value = true;
 
         Assert.True(meta.IsBusy);
-        Assert.Equal(1, stub.IsBusy.GetCount);
+        stub.IsBusy.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -98,8 +98,7 @@ public partial class IValidateMetaPropertiesTests
         await meta.WaitForTasks();
 
         // Method overloads should be distinguishable
-        stub.WaitForTasks.Verify();
-        Assert.Equal(1, stub.WaitForTasks.CallCount);
+        stub.WaitForTasks.Verify(Times.Once);
     }
 
     [Fact]
@@ -165,8 +164,7 @@ public partial class IValidateMetaPropertiesTests
 
         meta.ClearAllMessages();
 
-        stub.ClearAllMessages.Verify();
-        Assert.Equal(1, stub.ClearAllMessages.CallCount);
+        stub.ClearAllMessages.Verify(Times.Once);
     }
 
     [Fact]
@@ -196,7 +194,7 @@ public partial class IValidateMetaPropertiesTests
 
         stub.IsBusy.Reset();
 
-        Assert.Equal(0, stub.IsBusy.GetCount);
+        stub.IsBusy.VerifyGet(Times.Never);
     }
 
     [Fact]
@@ -210,7 +208,6 @@ public partial class IValidateMetaPropertiesTests
         stub.WaitForTasks.Reset();
 
         stub.WaitForTasks.Verify(Times.Never);
-        Assert.Equal(0, stub.WaitForTasks.CallCount);
     }
 
     #endregion

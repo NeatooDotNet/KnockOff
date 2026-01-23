@@ -37,7 +37,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private bool _isVerifiable_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User;
 		private global::KnockOff.Times? _verifiableTimes_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Threading_Tasks_Task_KnockOff_Tests_User?.CallCount ?? 0) + (_sequence_Int32_Threading_Tasks_Task_KnockOff_Tests_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User?.CallCount ?? 0) + (_sequence_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Threading_Tasks_Task_KnockOff_Tests_User?.CallCount ?? 0) + (_sequence_Int32_Threading_Tasks_Task_KnockOff_Tests_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User?.CallCount ?? 0) + (_sequence_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -45,8 +45,8 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetByIdAsync", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetByIdAsync", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for GetByIdAsync(int). Returns tracking interface.</summary>
@@ -235,7 +235,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
 
@@ -286,7 +285,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (int? id, global::System.Threading.CancellationToken? cancellationToken) LastArgs => _lastArgs;
 
@@ -333,7 +331,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			public MethodSequenceImpl_Int32_Threading_Tasks_Task_KnockOff_Tests_User(GetByIdAsyncInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -385,7 +383,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			public MethodSequenceImpl_Int32_Threading_CancellationToken_Threading_Tasks_Task_KnockOff_Tests_User(GetByIdAsyncInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -476,7 +474,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private bool _isVerifiable_String_Int32_Boolean_void;
 		private global::KnockOff.Times? _verifiableTimes_String_Int32_Boolean_void;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_void?.CallCount ?? 0) + (_sequence_String_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_Boolean_void?.CallCount ?? 0) + (_sequence_String_Int32_Boolean_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_void?.CallCount ?? 0) + (_sequence_String_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_Int32_Boolean_void?.CallCount ?? 0) + (_sequence_String_Int32_Boolean_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -484,8 +482,8 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Process", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Process", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for Process(string). Returns tracking interface.</summary>
@@ -755,7 +753,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
 
@@ -805,7 +802,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 			private (string? data, int? priority) _lastArgs;
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? data, int? priority) LastArgs => _lastArgs;
@@ -857,7 +853,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? data, int? priority, bool? async) LastArgs => _lastArgs;
 
@@ -904,7 +899,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			public MethodSequenceImpl_String_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -956,7 +951,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			public MethodSequenceImpl_String_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1008,7 +1003,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			public MethodSequenceImpl_String_Int32_Boolean_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1087,7 +1082,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		private bool _isVerifiable_Int32_Int32_Int32;
 		private global::KnockOff.Times? _verifiableTimes_Int32_Int32_Int32;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -1095,8 +1090,8 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Calculate", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Calculate", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for Calculate(int). Returns tracking interface.</summary>
@@ -1285,7 +1280,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
 
@@ -1336,7 +1330,6 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (int? a, int? b) LastArgs => _lastArgs;
 
@@ -1383,7 +1376,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			public MethodSequenceImpl_Int32_Int32(CalculateInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1435,7 +1428,7 @@ partial class OverloadedServiceKnockOff : global::KnockOff.Tests.IOverloadedServ
 
 			public MethodSequenceImpl_Int32_Int32_Int32(CalculateInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

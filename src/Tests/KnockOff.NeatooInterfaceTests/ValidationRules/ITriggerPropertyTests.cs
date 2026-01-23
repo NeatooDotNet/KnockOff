@@ -35,7 +35,7 @@ public partial class ITriggerPropertyTests
         stub.PropertyName.Value = "TestProperty";
 
         Assert.Equal("TestProperty", trigger.PropertyName);
-        Assert.Equal(1, stub.PropertyName.GetCount);
+        stub.PropertyName.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -61,8 +61,7 @@ public partial class ITriggerPropertyTests
 
         trigger.IsMatch("SomeProperty");
 
-        stub.IsMatch.Verify();
-        Assert.Equal(1, stub.IsMatch.CallCount);
+        stub.IsMatch.Verify(Times.Once);
     }
 
     [Fact]
@@ -98,7 +97,7 @@ public partial class ITriggerPropertyTests
         trigger.IsMatch("Second");
         trigger.IsMatch("Third");
 
-        Assert.Equal(3, stub.IsMatch.CallCount);
+        stub.IsMatch.Verify(Times.Exactly(3));
         Assert.Equal("Third", stub.IsMatch.LastCallArg);
     }
 
@@ -118,7 +117,7 @@ public partial class ITriggerPropertyTests
 
         stub.PropertyName.Reset();
 
-        Assert.Equal(0, stub.PropertyName.GetCount);
+        stub.PropertyName.VerifyGet(Times.Never);
     }
 
     [Fact]
@@ -133,7 +132,6 @@ public partial class ITriggerPropertyTests
         stub.IsMatch.Reset();
 
         stub.IsMatch.Verify(Times.Never);
-        Assert.Equal(0, stub.IsMatch.CallCount);
         Assert.Null(stub.IsMatch.LastCallArg);
     }
 
@@ -229,8 +227,7 @@ public partial class ITriggerPropertyOfTTests
         var targetStub = new ValidateBaseStubForTrigger();
         trigger.GetValue(targetStub);
 
-        stub.GetValue.Verify();
-        Assert.Equal(1, stub.GetValue.CallCount);
+        stub.GetValue.Verify(Times.Once);
     }
 
     [Fact]

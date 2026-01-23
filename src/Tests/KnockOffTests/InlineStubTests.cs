@@ -22,7 +22,7 @@ public class InlineStubTests
 		ISimpleService service = stub;
 		var name = service.Name;
 
-		Assert.Equal(1, stub.Name.GetCount);
+		stub.Name.VerifyGet(Times.Once);
 		Assert.Equal("Test", name);
 	}
 
@@ -34,7 +34,7 @@ public class InlineStubTests
 		ISimpleService service = stub;
 		service.Name = "NewValue";
 
-		Assert.Equal(1, stub.Name.SetCount);
+		stub.Name.VerifySet(Times.Once);
 		Assert.Equal("NewValue", stub.Name.LastSetValue);
 	}
 
@@ -47,7 +47,7 @@ public class InlineStubTests
 		service.DoSomething();
 		service.DoSomething();
 
-		Assert.Equal(2, stub.DoSomething.CallCount);
+		stub.DoSomething.Verify(Times.Exactly(2));
 		stub.DoSomething.Verify();
 	}
 
@@ -99,7 +99,7 @@ public class InlineStubTests
 
 		stub.GetValue.Reset();
 
-		Assert.Equal(0, stub.GetValue.CallCount);
+		stub.GetValue.Verify(Times.Never);
 		stub.GetValue.Verify(Times.Never);
 		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.GetValue.LastCallArg);
@@ -153,7 +153,7 @@ public class InlineStubTests
 		service.Create<TestEntity>();
 		service.Create<TestEntity>();
 
-		Assert.Equal(2, stub.Create.Of<TestEntity>().CallCount);
+		stub.Create.Of<TestEntity>().Verify(Times.Exactly(2));
 		stub.Create.Of<TestEntity>().Verify();
 	}
 
@@ -167,8 +167,8 @@ public class InlineStubTests
 		service.Create<List<int>>();
 		service.Create<List<int>>();
 
-		Assert.Equal(1, stub.Create.Of<TestEntity>().CallCount);
-		Assert.Equal(2, stub.Create.Of<List<int>>().CallCount);
+		stub.Create.Of<TestEntity>().Verify(Times.Once);
+		stub.Create.Of<List<int>>().Verify(Times.Exactly(2));
 	}
 
 	[Fact]
@@ -181,7 +181,7 @@ public class InlineStubTests
 		service.Create<List<int>>();
 		service.Create<List<string>>();
 
-		Assert.Equal(3, stub.Create.TotalCallCount);
+		stub.Create.Verify(Times.Exactly(3));
 	}
 
 	[Fact]
@@ -208,8 +208,8 @@ public class InlineStubTests
 		service.Process(42);
 		service.Process(42);
 
-		Assert.Equal(1, stub.Process.Of<string>().CallCount);
-		Assert.Equal(2, stub.Process.Of<int>().CallCount);
+		stub.Process.Of<string>().Verify(Times.Once);
+		stub.Process.Of<int>().Verify(Times.Exactly(2));
 	}
 
 	[Fact]
@@ -224,8 +224,8 @@ public class InlineStubTests
 		service.Convert<string, int>("hello");
 		service.Convert<int, string>(42);
 
-		Assert.Equal(1, stub.Convert.Of<string, int>().CallCount);
-		Assert.Equal(1, stub.Convert.Of<int, string>().CallCount);
+		stub.Convert.Of<string, int>().Verify(Times.Once);
+		stub.Convert.Of<int, string>().Verify(Times.Once);
 	}
 
 	[Fact]
@@ -239,7 +239,7 @@ public class InlineStubTests
 
 		stub.Create.Reset();
 
-		Assert.Equal(0, stub.Create.TotalCallCount);
+		stub.Create.Verify(Times.Never);
 		stub.Create.Verify(Times.Never);
 	}
 
@@ -321,7 +321,7 @@ public class DelegateStubTests
 		del();
 		del();
 
-		Assert.Equal(2, stub.Interceptor.CallCount);
+		stub.Interceptor.Verify(Times.Exactly(2));
 		stub.Interceptor.Verify();
 	}
 
@@ -334,7 +334,7 @@ public class DelegateStubTests
 		del("hello");
 		del("world");
 
-		Assert.Equal(2, stub.Interceptor.CallCount);
+		stub.Interceptor.Verify(Times.Exactly(2));
 		Assert.Equal("world", stub.Interceptor.LastCallArg);
 	}
 
@@ -413,7 +413,7 @@ public class DelegateStubTests
 		stub.Interceptor.Reset();
 
 		// Tracking state is cleared
-		Assert.Equal(0, stub.Interceptor.CallCount);
+		stub.Interceptor.Verify(Times.Never);
 		stub.Interceptor.Verify(Times.Never);
 		Assert.Null(stub.Interceptor.LastCallArg);
 
@@ -445,7 +445,7 @@ public class DelegateStubTests
 
 		Assert.Equal("generated value", result);
 		stub.Interceptor.Verify();
-		Assert.Equal(1, stub.Interceptor.CallCount);
+		stub.Interceptor.Verify(Times.Once);
 	}
 
 	[Fact]
@@ -474,7 +474,7 @@ public class DelegateStubTests
 		stub.Interceptor.Reset();
 
 		// Tracking state is cleared
-		Assert.Equal(0, stub.Interceptor.CallCount);
+		stub.Interceptor.Verify(Times.Never);
 		stub.Interceptor.Verify(Times.Never);
 		Assert.Null(stub.Interceptor.LastCallArg);
 
@@ -752,7 +752,7 @@ public class ClassStubTests
 
 		var name = stub.Object.Name;
 
-		Assert.Equal(1, stub.Name.GetCount);
+		stub.Name.VerifyGet(Times.Once);
 		Assert.Equal("Intercepted", name);
 	}
 
@@ -763,7 +763,7 @@ public class ClassStubTests
 
 		stub.Object.Name = "NewValue";
 
-		Assert.Equal(1, stub.Name.SetCount);
+		stub.Name.VerifySet(Times.Once);
 		Assert.Equal("NewValue", stub.Name.LastSetValue);
 	}
 
@@ -789,7 +789,7 @@ public class ClassStubTests
 		stub.Object.DoWork();
 		stub.Object.DoWork();
 
-		Assert.Equal(2, stub.DoWork.CallCount);
+		stub.DoWork.Verify(Times.Exactly(2));
 		stub.DoWork.Verify();
 	}
 
@@ -848,7 +848,7 @@ public class ClassStubTests
 
 		stub.Calculate.Reset();
 
-		Assert.Equal(0, stub.Calculate.CallCount);
+		stub.Calculate.Verify(Times.Never);
 		stub.Calculate.Verify(Times.Never);
 		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.Calculate.LastCallArg);
@@ -865,9 +865,9 @@ public class ClassStubTests
 
 		stub.ResetInterceptors();
 
-		Assert.Equal(0, stub.Calculate.CallCount);
-		Assert.Equal(0, stub.DoWork.CallCount);
-		Assert.Equal(0, stub.Name.SetCount);
+		stub.Calculate.Verify(Times.Never);
+		stub.DoWork.Verify(Times.Never);
+		stub.Name.VerifySet(Times.Never);
 	}
 
 	[Fact]
@@ -981,7 +981,7 @@ public class MixedClassStubTests
 
 		stub.Object.VirtualProperty = "Test";
 
-		Assert.Equal(1, stub.VirtualProperty.SetCount);
+		stub.VirtualProperty.VerifySet(Times.Once);
 	}
 
 	[Fact]

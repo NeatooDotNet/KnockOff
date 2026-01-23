@@ -262,7 +262,6 @@ public partial class IRuleMessagesTests
         stub.Add.Reset();
 
         stub.Add.Verify(Times.Never);
-        Assert.Equal(0, stub.Add.CallCount);
     }
 
     #endregion

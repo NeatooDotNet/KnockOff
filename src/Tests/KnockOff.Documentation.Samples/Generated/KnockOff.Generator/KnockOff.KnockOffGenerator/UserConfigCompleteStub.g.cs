@@ -15,8 +15,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::KnockOff.Documentation.Samples.User?>? OnGet { get; set; }
@@ -30,10 +29,10 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public CurrentUserInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -47,7 +46,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CurrentUser", times, totalCount));
 		}
@@ -58,8 +57,8 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CurrentUser (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CurrentUser (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -73,7 +72,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("CurrentUser", times, totalCount);
 		}
 
@@ -81,7 +80,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("CurrentUser", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -96,8 +95,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -111,10 +109,10 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IsConnectedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -128,7 +126,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsConnected", times, totalCount));
 		}
@@ -139,8 +137,8 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsConnected (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsConnected (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -154,7 +152,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsConnected", times, totalCount);
 		}
 
@@ -162,7 +160,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsConnected", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -177,14 +175,12 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<string>? OnGet { get; set; }
 
-		/// <summary>Number of times the setter was accessed.</summary>
-		internal int SetCount { get; private set; }
+		private int _setCount;
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public string? LastSetValue { get; private set; }
@@ -201,13 +197,13 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
+		public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
+		public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public ConnectionStringInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -221,7 +217,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ConnectionString", times, totalCount));
 		}
@@ -232,8 +228,8 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ConnectionString (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ConnectionString (get)", times, _getCount));
 		}
 
 		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -242,8 +238,8 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifySet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(SetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ConnectionString (set)", times, SetCount));
+			if (!times.Validate(_setCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ConnectionString (set)", times, _setCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -257,7 +253,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("ConnectionString", times, totalCount);
 		}
 
@@ -265,7 +261,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("ConnectionString", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -287,7 +283,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -296,8 +292,8 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Connect", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Connect", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -384,14 +380,14 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Connect", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Connect", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Connect", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Connect", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -403,7 +399,6 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -445,7 +440,7 @@ partial class UserConfigCompleteStub : global::KnockOff.Documentation.Samples.Pr
 
 			public MethodSequenceImpl(ConnectInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

@@ -11,15 +11,15 @@ partial class DelegateInlineTest
 		/// <summary>Interceptor for VoidNoParamDelegate delegate.</summary>
 		public sealed class VoidNoParamDelegateInterceptor
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Action? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			public void RecordCall() { _callCount++; }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -27,8 +27,8 @@ partial class DelegateInlineTest
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 
@@ -54,7 +54,7 @@ partial class DelegateInlineTest
 		/// <summary>Interceptor for VoidOneParamDelegate delegate.</summary>
 		public sealed class VoidOneParamDelegateInterceptor
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The argument from the last invocation.</summary>
 			public string? LastCallArg { get; private set; }
@@ -62,10 +62,10 @@ partial class DelegateInlineTest
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Action<string>? OnCall { get; set; }
 
-			public void RecordCall(string message) { CallCount++; LastCallArg = message; }
+			public void RecordCall(string message) { _callCount++; LastCallArg = message; }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -73,8 +73,8 @@ partial class DelegateInlineTest
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 
@@ -100,7 +100,7 @@ partial class DelegateInlineTest
 		/// <summary>Interceptor for ReturnOneParamDelegate delegate.</summary>
 		public sealed class ReturnOneParamDelegateInterceptor
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The argument from the last invocation.</summary>
 			public int? LastCallArg { get; private set; }
@@ -108,10 +108,10 @@ partial class DelegateInlineTest
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Func<int, int>? OnCall { get; set; }
 
-			public void RecordCall(int input) { CallCount++; LastCallArg = input; }
+			public void RecordCall(int input) { _callCount++; LastCallArg = input; }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -119,8 +119,8 @@ partial class DelegateInlineTest
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 
@@ -147,7 +147,7 @@ partial class DelegateInlineTest
 		/// <summary>Interceptor for MultiParamDelegate delegate.</summary>
 		public sealed class MultiParamDelegateInterceptor
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The arguments from the last invocation.</summary>
 			public (string? name, int? age)? LastCallArgs { get; private set; }
@@ -155,10 +155,10 @@ partial class DelegateInlineTest
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Func<string, int, string>? OnCall { get; set; }
 
-			public void RecordCall(string name, int age) { CallCount++; LastCallArgs = (name, age); }
+			public void RecordCall(string name, int age) { _callCount++; LastCallArgs = (name, age); }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArgs = default; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; LastCallArgs = default; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -166,8 +166,8 @@ partial class DelegateInlineTest
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 

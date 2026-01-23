@@ -12,12 +12,12 @@ public class EventTests
 		IEventSource source = knockOff;
 
 		Assert.False(knockOff.MessageReceived.HasSubscribers);
-		Assert.Equal(0, knockOff.MessageReceived.AddCount);
+		knockOff.MessageReceived.VerifyAdd(Times.Never);
 
 		source.MessageReceived += (sender, e) => { };
 
 		Assert.True(knockOff.MessageReceived.HasSubscribers);
-		Assert.Equal(1, knockOff.MessageReceived.AddCount);
+		knockOff.MessageReceived.VerifyAdd(Times.Once);
 	}
 
 	[Fact]
@@ -30,8 +30,8 @@ public class EventTests
 		source.MessageReceived += handler;
 		source.MessageReceived -= handler;
 
-		Assert.Equal(1, knockOff.MessageReceived.AddCount);
-		Assert.Equal(1, knockOff.MessageReceived.RemoveCount);
+		knockOff.MessageReceived.VerifyAdd(Times.Once);
+		knockOff.MessageReceived.VerifyRemove(Times.Once);
 	}
 
 	[Fact]
@@ -126,12 +126,12 @@ public class EventTests
 		source.MessageReceived += (sender, e) => { };
 
 		Assert.True(knockOff.MessageReceived.HasSubscribers);
-		Assert.Equal(1, knockOff.MessageReceived.AddCount);
+		knockOff.MessageReceived.VerifyAdd(Times.Once);
 
 		knockOff.MessageReceived.Reset();
 
-		Assert.Equal(0, knockOff.MessageReceived.AddCount);
-		Assert.Equal(0, knockOff.MessageReceived.RemoveCount);
+		knockOff.MessageReceived.VerifyAdd(Times.Never);
+		knockOff.MessageReceived.VerifyRemove(Times.Never);
 		Assert.False(knockOff.MessageReceived.HasSubscribers);
 	}
 
@@ -159,7 +159,7 @@ public class EventTests
 		source.MessageReceived += (sender, e) => invocations.Add(2);
 		source.MessageReceived += (sender, e) => invocations.Add(3);
 
-		Assert.Equal(3, knockOff.MessageReceived.AddCount);
+		knockOff.MessageReceived.VerifyAdd(Times.Exactly(3));
 
 		knockOff.MessageReceived.Raise(null, "Test");
 

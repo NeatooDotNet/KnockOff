@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using KnockOff;
 using KnockOff.Benchmarks.Interfaces;
 using KnockOff.Benchmarks.Stubs;
 using Moq;
@@ -110,7 +111,14 @@ public class IndexerVerificationBenchmarks
     [Benchmark]
     public bool KnockOff_VerifyIndexerAccess()
     {
-        return _knockOffStub.Indexer.OfString.GetCount > 0
-            && _knockOffStub.Indexer.OfString.LastGetKey == "key";
+        try
+        {
+            _knockOffStub.Indexer.OfString.VerifyGet(Times.AtLeastOnce);
+            return _knockOffStub.Indexer.OfString.LastGetKey == "key";
+        }
+        catch (VerificationException)
+        {
+            return false;
+        }
     }
 }

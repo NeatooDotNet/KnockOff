@@ -11,8 +11,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ICache? _source;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
@@ -20,8 +19,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		/// <summary>Callback invoked when the getter is accessed.</summary>
 		public global::System.Func<string, object>? OnGet { get; set; }
 
-		/// <summary>Number of times the setter was accessed.</summary>
-		internal int SetCount { get; private set; }
+		private int _setCount;
 
 		/// <summary>The key and value from the most recent setter call.</summary>
 		public (string? Key, object? Value)? LastSetEntry { get; private set; }
@@ -30,16 +28,16 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		public global::System.Action<string, object>? OnSet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
+		public void RecordGet(string? key) { _getCount++; LastGetKey = key; }
 
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string? key, object? value) { SetCount++; LastSetEntry = (key, value); }
+		public void RecordSet(string? key, object? value) { _setCount++; LastSetEntry = (key, value); }
 
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<string, object> Backing { get; } = new();
 
 		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = null; _source = null; }
+		public void Reset() { _getCount = 0; LastGetKey = default; _setCount = 0; LastSetEntry = null; _source = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -50,8 +48,8 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		/// <summary>Verifies the indexer getter access count matches the Times constraint.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {GetCount} time(s).");
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {_getCount} time(s).");
 		}
 
 		/// <summary>Verifies the indexer setter was accessed at least once.</summary>
@@ -60,8 +58,8 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		/// <summary>Verifies the indexer setter access count matches the Times constraint.</summary>
 		public void VerifySet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(SetCount))
-				throw new global::KnockOff.VerificationException($"Indexer setter verification failed: expected {times}, but was called {SetCount} time(s).");
+			if (!times.Validate(_setCount))
+				throw new global::KnockOff.VerificationException($"Indexer setter verification failed: expected {times}, but was called {_setCount} time(s).");
 		}
 
 		/// <summary>Verifies the indexer was accessed at least once.</summary>
@@ -70,7 +68,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		/// <summary>Verifies the total indexer access count matches the Times constraint.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException($"Indexer verification failed: expected {times}, but was called {totalCount} time(s).");
 		}
@@ -99,7 +97,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			return null;
@@ -110,7 +108,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		{
 			if (!IsConfigured && !_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			return null;
@@ -123,8 +121,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ICache? _source;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public int? LastGetKey { get; private set; }
@@ -133,13 +130,13 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		public global::System.Func<int, int>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
+		public void RecordGet(int? index) { _getCount++; LastGetKey = index; }
 
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
 
 		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+		public void Reset() { _getCount = 0; LastGetKey = default; _source = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -150,8 +147,8 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		/// <summary>Verifies the indexer getter access count matches the Times constraint.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {GetCount} time(s).");
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {_getCount} time(s).");
 		}
 
 		/// <summary>Verifies the indexer was accessed at least once.</summary>
@@ -160,7 +157,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		/// <summary>Verifies the total indexer access count matches the Times constraint.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException($"Indexer verification failed: expected {times}, but was called {totalCount} time(s).");
 		}
@@ -189,7 +186,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			return null;
@@ -200,7 +197,7 @@ partial class CacheStub : global::KnockOff.Benchmarks.Interfaces.ICache, global:
 		{
 			if (!IsConfigured && !_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			return null;

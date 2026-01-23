@@ -294,8 +294,8 @@ public class BclStandaloneTests
         notifier.PropertyChanged += (s, e) => { };
         notifier.PropertyChanged += (s, e) => { };
 
-        // Standalone stubs use PropertyChanged.AddCount
-        Assert.Equal(2, knockOff.PropertyChanged.AddCount);
+        // Standalone stubs use PropertyChanged.VerifyAdd
+        knockOff.PropertyChanged.VerifyAdd(Times.Exactly(2));
     }
 
     [Fact]
@@ -308,8 +308,8 @@ public class BclStandaloneTests
         notifier.PropertyChanged += handler;
         notifier.PropertyChanged -= handler;
 
-        Assert.Equal(1, knockOff.PropertyChanged.AddCount);
-        Assert.Equal(1, knockOff.PropertyChanged.RemoveCount);
+        knockOff.PropertyChanged.VerifyAdd(Times.Once);
+        knockOff.PropertyChanged.VerifyRemove(Times.Once);
     }
 
     [Fact]
@@ -531,7 +531,7 @@ public class BclStandaloneTests
         var count = collection.Count;
 
         Assert.Equal(42, count);
-        Assert.Equal(1, knockOff.Count.GetCount);
+        knockOff.Count.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -565,7 +565,7 @@ public class BclStandaloneTests
         var result = list[5];
 
         Assert.Equal("item_5", result);
-        Assert.Equal(1, knockOff.Indexer.GetCount);
+        knockOff.Indexer.VerifyGet(Times.Once);
     }
 
     [Fact]

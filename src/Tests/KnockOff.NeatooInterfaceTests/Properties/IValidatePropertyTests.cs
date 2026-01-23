@@ -55,7 +55,7 @@ public partial class IValidatePropertyTests
         stub.Name.Value = "TestProperty";
 
         Assert.Equal("TestProperty", property.Name);
-        Assert.Equal(1, stub.Name.GetCount);
+        stub.Name.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public partial class IValidatePropertyTests
 
         property.Value = "NewValue";
 
-        Assert.Equal(1, stub.Value.SetCount);
+        stub.Value.VerifySet(Times.Once);
         Assert.Equal("NewValue", stub.Value.LastSetValue);
     }
 
@@ -171,8 +171,7 @@ public partial class IValidatePropertyTests
 
         await property.SetValue("NewValue");
 
-        stub.SetValue.Verify();
-        Assert.Equal(1, stub.SetValue.CallCount);
+        stub.SetValue.Verify(Times.Once);
     }
 
     [Fact]
@@ -274,7 +273,7 @@ public partial class IValidatePropertyTests
 
         property.PropertyChanged += (s, e) => { };
 
-        Assert.Equal(1, stub.PropertyChangedInterceptor.AddCount);
+        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 
     [Fact]
@@ -287,8 +286,8 @@ public partial class IValidatePropertyTests
         property.PropertyChanged += handler;
         property.PropertyChanged -= handler;
 
-        Assert.Equal(1, stub.PropertyChangedInterceptor.AddCount);
-        Assert.Equal(1, stub.PropertyChangedInterceptor.RemoveCount);
+        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
+        stub.PropertyChangedInterceptor.VerifyRemove(Times.Once);
     }
 
     [Fact]
@@ -299,7 +298,7 @@ public partial class IValidatePropertyTests
 
         property.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        Assert.Equal(1, stub.NeatooPropertyChangedInterceptor.AddCount);
+        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 
     #endregion
@@ -363,7 +362,7 @@ public partial class IValidatePropertyTests
 
         stub.Name.Reset();
 
-        Assert.Equal(0, stub.Name.GetCount);
+        stub.Name.VerifyGet(Times.Never);
     }
 
     [Fact]
@@ -378,7 +377,6 @@ public partial class IValidatePropertyTests
         stub.SetValue.Reset();
 
         stub.SetValue.Verify(Times.Never);
-        Assert.Equal(0, stub.SetValue.CallCount);
     }
 
     #endregion
@@ -481,7 +479,7 @@ public partial class IValidatePropertyOfTTests
 
         property.Value = "NewTypedValue";
 
-        Assert.Equal(1, stub.Value.SetCount);
+        stub.Value.VerifySet(Times.Once);
         Assert.Equal("NewTypedValue", stub.Value.LastSetValue);
     }
 

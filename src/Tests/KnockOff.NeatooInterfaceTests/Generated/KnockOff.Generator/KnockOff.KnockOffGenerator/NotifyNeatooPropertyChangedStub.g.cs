@@ -10,26 +10,23 @@ partial class NotifyNeatooPropertyChangedStub : global::Neatoo.INotifyNeatooProp
 	{
 		private global::Neatoo.NeatooPropertyChanged? _handler;
 
-		/// <summary>Number of times event was subscribed to.</summary>
-		internal int AddCount { get; private set; }
-
-		/// <summary>Number of times event subscription was removed.</summary>
-		internal int RemoveCount { get; private set; }
+		private int _addCount;
+		private int _removeCount;
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
 		/// <summary>Records an event subscription.</summary>
-		public void RecordAdd(global::Neatoo.NeatooPropertyChanged? value) { AddCount++; _handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Combine(_handler, value); }
+		public void RecordAdd(global::Neatoo.NeatooPropertyChanged? value) { _addCount++; _handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Combine(_handler, value); }
 
 		/// <summary>Records an event unsubscription.</summary>
-		public void RecordRemove(global::Neatoo.NeatooPropertyChanged? value) { RemoveCount++; _handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(_handler, value); }
+		public void RecordRemove(global::Neatoo.NeatooPropertyChanged? value) { _removeCount++; _handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(_handler, value); }
 
 		/// <summary>Invokes the handler if subscribed.</summary>
 		public void Raise(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) => _handler?.DynamicInvoke(propertyNameBreadCrumbs);
 
 		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+		public void Reset() { _addCount = 0; _removeCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -40,8 +37,8 @@ partial class NotifyNeatooPropertyChangedStub : global::Neatoo.INotifyNeatooProp
 		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
 		public void VerifyAdd(global::KnockOff.Times times)
 		{
-			if (!times.Validate(AddCount))
-				throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' add verification failed: expected {times}, but was called {AddCount} time(s).");
+			if (!times.Validate(_addCount))
+				throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' add verification failed: expected {times}, but was called {_addCount} time(s).");
 		}
 
 		/// <summary>Verifies the event was unsubscribed at least once.</summary>
@@ -50,8 +47,8 @@ partial class NotifyNeatooPropertyChangedStub : global::Neatoo.INotifyNeatooProp
 		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
 		public void VerifyRemove(global::KnockOff.Times times)
 		{
-			if (!times.Validate(RemoveCount))
-				throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+			if (!times.Validate(_removeCount))
+				throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' remove verification failed: expected {times}, but was called {_removeCount} time(s).");
 		}
 
 		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
@@ -60,7 +57,7 @@ partial class NotifyNeatooPropertyChangedStub : global::Neatoo.INotifyNeatooProp
 		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' verification failed: expected {times}, but was called {totalCount} time(s).");
 		}
@@ -89,7 +86,7 @@ partial class NotifyNeatooPropertyChangedStub : global::Neatoo.INotifyNeatooProp
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("NeatooPropertyChanged", times, totalCount);
 			return null;
@@ -100,7 +97,7 @@ partial class NotifyNeatooPropertyChangedStub : global::Neatoo.INotifyNeatooProp
 		{
 			if (!IsConfigured && !_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("NeatooPropertyChanged", times, totalCount);
 			return null;

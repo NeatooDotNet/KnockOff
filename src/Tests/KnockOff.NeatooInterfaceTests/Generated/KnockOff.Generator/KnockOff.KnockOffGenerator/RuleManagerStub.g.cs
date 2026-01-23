@@ -29,8 +29,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.IEnumerable<global::Neatoo.Rules.IRule>>? OnGet { get; set; }
@@ -44,10 +43,10 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public RulesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -61,7 +60,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Rules", times, totalCount));
 		}
@@ -72,8 +71,8 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Rules (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Rules (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -87,7 +86,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Rules", times, totalCount);
 		}
 
@@ -95,7 +94,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Rules", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -132,7 +131,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		private bool _isVerifiable_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 		private global::KnockOff.Times? _verifiableTimes_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -140,8 +139,8 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRules", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRules", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for RunRules(string, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
@@ -330,7 +329,6 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (string? propertyName, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
@@ -381,7 +379,6 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
@@ -428,7 +425,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 
 			public MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task(RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -480,7 +477,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 
 			public MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -548,7 +545,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		private int _unconfiguredCallCount;
 		private (global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
 		public (global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -560,8 +557,8 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRule", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRule", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -648,14 +645,14 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("RunRule", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("RunRule", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("RunRule", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("RunRule", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -668,7 +665,6 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 			private (global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token) _lastArgs;
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::Neatoo.Rules.IRule? r, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -716,7 +712,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 
 			public MethodSequenceImpl(RunRuleInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -780,7 +776,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 			return (AddRuleTypedHandler<T>)handler;
 		}
 
-		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -813,7 +809,6 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
-			internal int CallCount => _callCount;
 
 			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(AddRuleDelegate callback) { _onCall = callback; return this; }
@@ -833,8 +828,8 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
@@ -862,7 +857,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 			return (AddRulesTypedHandler<T>)handler;
 		}
 
-		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -895,7 +890,6 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
-			internal int CallCount => _callCount;
 
 			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(AddRulesDelegate callback) { _onCall = callback; return this; }
@@ -915,8 +909,8 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
@@ -944,7 +938,7 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 			return (RunRuleTypedHandler<T>)handler;
 		}
 
-		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
 		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
@@ -977,7 +971,6 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
-			internal int CallCount => _callCount;
 
 			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(RunRuleDelegate callback) { _onCall = callback; return this; }
@@ -997,8 +990,8 @@ partial class RuleManagerStub : global::Neatoo.Rules.IRuleManager, global::Knock
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>

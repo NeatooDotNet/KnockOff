@@ -11,8 +11,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Tests.IPropertyStore? _source;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public string? LastGetKey { get; private set; }
@@ -21,13 +20,13 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		public global::System.Func<string, global::KnockOff.Tests.PropertyInfo?>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(string? key) { GetCount++; LastGetKey = key; }
+		public void RecordGet(string? key) { _getCount++; LastGetKey = key; }
 
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<string, global::KnockOff.Tests.PropertyInfo?> Backing { get; } = new();
 
 		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+		public void Reset() { _getCount = 0; LastGetKey = default; _source = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -38,8 +37,8 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		/// <summary>Verifies the indexer getter access count matches the Times constraint.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {GetCount} time(s).");
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {_getCount} time(s).");
 		}
 
 		/// <summary>Verifies the indexer was accessed at least once.</summary>
@@ -48,7 +47,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		/// <summary>Verifies the total indexer access count matches the Times constraint.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException($"Indexer verification failed: expected {times}, but was called {totalCount} time(s).");
 		}
@@ -77,7 +76,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			return null;
@@ -88,7 +87,7 @@ partial class PropertyStoreKnockOff : global::KnockOff.Tests.IPropertyStore, glo
 		{
 			if (!IsConfigured && !_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			return null;

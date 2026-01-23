@@ -20,23 +20,20 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWith
 			set { _value = value; _valueSet = true; }
 		}
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
-
-		/// <summary>Number of times the setter was accessed.</summary>
-		internal int SetCount { get; private set; }
+		private int _getCount;
+		private int _setCount;
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public string? LastSetValue { get; private set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
+		public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; }
+		public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public IdInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -44,13 +41,13 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWith
 		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
 		public IdInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
 
-		/// <summary>Verifies the property was accessed at least once (GetCount + SetCount >= 1). Throws VerificationException if not.</summary>
+		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
 
-		/// <summary>Verifies total access count (GetCount + SetCount) satisfies the Times constraint. Throws VerificationException if not.</summary>
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Id", times, totalCount));
 		}
@@ -61,8 +58,8 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWith
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Id (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Id (get)", times, _getCount));
 		}
 
 		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -71,8 +68,8 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWith
 		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifySet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(SetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Id (set)", times, SetCount));
+			if (!times.Validate(_setCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Id (set)", times, _setCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -86,7 +83,7 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWith
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Id", times, totalCount);
 		}
 
@@ -94,7 +91,7 @@ partial class EntityWithInitPropertyKnockOff : global::KnockOffTests.IEntityWith
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Id", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}

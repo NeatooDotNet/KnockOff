@@ -36,7 +36,7 @@ public partial class IRuleTests
         stub.Executed.Value = true;
 
         Assert.True(rule.Executed);
-        Assert.Equal(1, stub.Executed.GetCount);
+        stub.Executed.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -103,8 +103,7 @@ public partial class IRuleTests
 
         await rule.RunRule(validateStub, null);
 
-        stub.RunRule.Verify();
-        Assert.Equal(1, stub.RunRule.CallCount);
+        stub.RunRule.Verify(Times.Once);
     }
 
     [Fact]
@@ -172,8 +171,7 @@ public partial class IRuleTests
 
         rule.OnRuleAdded(ruleManagerStub, 10);
 
-        stub.OnRuleAdded.Verify();
-        Assert.Equal(1, stub.OnRuleAdded.CallCount);
+        stub.OnRuleAdded.Verify(Times.Once);
     }
 
     [Fact]
@@ -205,7 +203,7 @@ public partial class IRuleTests
 
         stub.Executed.Reset();
 
-        Assert.Equal(0, stub.Executed.GetCount);
+        stub.Executed.VerifyGet(Times.Never);
     }
 
     [Fact]
@@ -225,7 +223,6 @@ public partial class IRuleTests
         stub.RunRule.Reset();
 
         stub.RunRule.Verify(Times.Never);
-        Assert.Equal(0, stub.RunRule.CallCount);
     }
 
     #endregion
