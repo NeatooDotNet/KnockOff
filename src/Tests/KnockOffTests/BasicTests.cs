@@ -28,7 +28,7 @@ public class BasicTests
 
 		service.Name = "Test";
 
-		Assert.Equal(1, knockOff.Name.SetCount);
+		knockOff.Name.VerifySet(Times.Once);
 		string? lastValue = knockOff.Name.LastSetValue;
 		Assert.Equal("Test", lastValue);
 	}
@@ -42,7 +42,7 @@ public class BasicTests
 		service.Name = "Test";
 		var _ = service.Name;
 
-		Assert.Equal(1, knockOff.Name.GetCount);
+		knockOff.Name.VerifyGet(Times.Once);
 	}
 
 	[Fact]
@@ -122,7 +122,7 @@ public class BasicTests
 		ISampleService service = knockOff;
 
 		service.Name = "Test";
-		Assert.Equal(1, knockOff.Name.SetCount);
+		knockOff.Name.VerifySet(Times.Once);
 	}
 
 	[Fact]
@@ -140,7 +140,7 @@ public class BasicTests
 		knockOff.GetValue2.Reset();
 		knockOff.DoSomething.Reset();
 
-		Assert.Equal(0, knockOff.Name.SetCount);
+		knockOff.Name.VerifySet(Times.Never);
 		knockOff.GetValue2.Verify(Times.Never);
 		// After reset, the tracking object is also reset
 		doSomethingTracking.Verify(Times.Never);

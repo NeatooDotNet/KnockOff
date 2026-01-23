@@ -15,7 +15,7 @@ public class IndexerTests
 
 		var result = store["Name"];
 
-		Assert.Equal(1, knockOff.Indexer.GetCount);
+		knockOff.Indexer.VerifyGet(Times.Once);
 		Assert.Equal("Name", knockOff.Indexer.LastGetKey);
 		Assert.NotNull(result);
 		Assert.Equal("Name", result.Name);
@@ -35,7 +35,7 @@ public class IndexerTests
 		_ = store["Second"];
 		_ = store["Third"];
 
-		Assert.Equal(3, knockOff.Indexer.GetCount);
+		knockOff.Indexer.VerifyGet(Times.Exactly(3));
 		Assert.Equal("Third", knockOff.Indexer.LastGetKey); // Last key accessed
 	}
 
@@ -64,10 +64,12 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
+		var accessCount = 0;
 		knockOff.Indexer.OnGet = (key) =>
 		{
-			// Can access the knockOff instance via closure
-			return new PropertyInfo { Name = key, Value = $"Accessed {knockOff.Indexer.GetCount} times" };
+			// Track access count via closure
+			accessCount++;
+			return new PropertyInfo { Name = key, Value = $"Accessed {accessCount} times" };
 		};
 
 		_ = store["First"];
@@ -86,7 +88,7 @@ public class IndexerTests
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
 		store["Test"] = prop;
 
-		Assert.Equal(1, knockOff.Indexer.SetCount);
+		knockOff.Indexer.VerifySet(Times.Once);
 		Assert.NotNull(knockOff.Indexer.LastSetEntry);
 		Assert.Equal("Test", knockOff.Indexer.LastSetEntry.Value.Key);
 		Assert.Same(prop, knockOff.Indexer.LastSetEntry.Value.Value);
@@ -145,16 +147,16 @@ public class IndexerTests
 		_ = store["Key2"];
 		store["Key3"] = prop;
 
-		Assert.Equal(2, knockOff.Indexer.GetCount);
-		Assert.Equal(1, knockOff.Indexer.SetCount);
+		knockOff.Indexer.VerifyGet(Times.Exactly(2));
+		knockOff.Indexer.VerifySet(Times.Once);
 		Assert.NotNull(knockOff.Indexer.OnGet);
 
 		knockOff.Indexer.Reset();
 
 		// Tracking state is cleared
-		Assert.Equal(0, knockOff.Indexer.GetCount);
+		knockOff.Indexer.VerifyGet(Times.Never);
 		Assert.Null(knockOff.Indexer.LastGetKey);
-		Assert.Equal(0, knockOff.Indexer.SetCount);
+		knockOff.Indexer.VerifySet(Times.Never);
 		Assert.Null(knockOff.Indexer.LastSetEntry);
 
 		// Configuration is preserved (OnGet, OnSet, Backing dictionary)
@@ -171,6 +173,6 @@ public class IndexerTests
 		var result = store["NonExistent"];
 
 		Assert.Null(result);
-		Assert.Equal(1, knockOff.Indexer.GetCount);
+		knockOff.Indexer.VerifyGet(Times.Once);
 	}
 }

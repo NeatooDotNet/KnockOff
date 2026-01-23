@@ -20,8 +20,7 @@ partial class IPropertyInfoTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Reflection.PropertyInfo>? OnGet { get; set; }
@@ -38,10 +37,10 @@ partial class IPropertyInfoTests
 			internal global::Neatoo.IPropertyInfo? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_PropertyInfoInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -55,7 +54,7 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyInfo", times, totalCount));
 			}
@@ -66,8 +65,8 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyInfo (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyInfo (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -81,7 +80,7 @@ partial class IPropertyInfoTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("PropertyInfo", times, totalCount);
 			}
 
@@ -89,7 +88,7 @@ partial class IPropertyInfoTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("PropertyInfo", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -101,8 +100,7 @@ partial class IPropertyInfoTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<string>? OnGet { get; set; }
@@ -119,10 +117,10 @@ partial class IPropertyInfoTests
 			internal global::Neatoo.IPropertyInfo? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -136,7 +134,7 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name", times, totalCount));
 			}
@@ -147,8 +145,8 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -162,7 +160,7 @@ partial class IPropertyInfoTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Name", times, totalCount);
 			}
 
@@ -170,7 +168,7 @@ partial class IPropertyInfoTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Name", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -182,8 +180,7 @@ partial class IPropertyInfoTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Type>? OnGet { get; set; }
@@ -200,10 +197,10 @@ partial class IPropertyInfoTests
 			internal global::Neatoo.IPropertyInfo? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_TypeInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -217,7 +214,7 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Type", times, totalCount));
 			}
@@ -228,8 +225,8 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Type (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Type (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -243,7 +240,7 @@ partial class IPropertyInfoTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Type", times, totalCount);
 			}
 
@@ -251,7 +248,7 @@ partial class IPropertyInfoTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Type", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -263,8 +260,7 @@ partial class IPropertyInfoTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<string>? OnGet { get; set; }
@@ -281,10 +277,10 @@ partial class IPropertyInfoTests
 			internal global::Neatoo.IPropertyInfo? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_KeyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -298,7 +294,7 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Key", times, totalCount));
 			}
@@ -309,8 +305,8 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Key (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Key (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -324,7 +320,7 @@ partial class IPropertyInfoTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Key", times, totalCount);
 			}
 
@@ -332,7 +328,7 @@ partial class IPropertyInfoTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Key", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -344,8 +340,7 @@ partial class IPropertyInfoTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -362,10 +357,10 @@ partial class IPropertyInfoTests
 			internal global::Neatoo.IPropertyInfo? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IPropertyInfo_IsPrivateSetterInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -379,7 +374,7 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsPrivateSetter", times, totalCount));
 			}
@@ -390,8 +385,8 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsPrivateSetter (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsPrivateSetter (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -405,7 +400,7 @@ partial class IPropertyInfoTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsPrivateSetter", times, totalCount);
 			}
 
@@ -413,7 +408,7 @@ partial class IPropertyInfoTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsPrivateSetter", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -438,7 +433,7 @@ partial class IPropertyInfoTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -447,8 +442,8 @@ partial class IPropertyInfoTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetCustomAttributes", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetCustomAttributes", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -533,14 +528,14 @@ partial class IPropertyInfoTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetCustomAttributes", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetCustomAttributes", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetCustomAttributes", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetCustomAttributes", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -552,7 +547,6 @@ partial class IPropertyInfoTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -594,7 +588,7 @@ partial class IPropertyInfoTests
 
 				public MethodSequenceImpl(IPropertyInfo_GetCustomAttributesInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -658,10 +652,10 @@ partial class IPropertyInfoTests
 				return (GetCustomAttributeTypedHandler<T>)handler;
 			}
 
-			internal int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
+			private int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);
 
 			/// <summary>All type argument(s) that were used in calls.</summary>
-			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+			public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 			/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>
 			public void Reset()
@@ -703,7 +697,6 @@ partial class IPropertyInfoTests
 
 				private int _callCount;
 				int IGenericMethodCallTracker.CallCount => _callCount;
-				internal int CallCount => _callCount;
 
 				/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 				public global::KnockOff.IMethodTracking OnCall(GetCustomAttributeDelegate callback) { _onCall = callback; return this; }
@@ -723,8 +716,8 @@ partial class IPropertyInfoTests
 				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 				public void Verify(global::KnockOff.Times times)
 				{
-					if (!times.Validate(CallCount))
-						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+					if (!times.Validate(_callCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 				}
 
 				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>

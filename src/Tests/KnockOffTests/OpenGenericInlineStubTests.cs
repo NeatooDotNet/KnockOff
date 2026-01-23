@@ -38,7 +38,7 @@ public class OpenGenericInlineStubTests
 		repo.Add("test");
 		repo.Add("another");
 
-		Assert.Equal(2, stub.Add.CallCount);
+		stub.Add.Verify(Times.Exactly(2));
 		stub.Add.Verify();
 		Assert.Equal("another", stub.Add.LastCallArg);
 	}
@@ -52,7 +52,7 @@ public class OpenGenericInlineStubTests
 		stub.Count.Value = 42;
 		var count = repo.Count;
 
-		Assert.Equal(1, stub.Count.GetCount);
+		stub.Count.VerifyGet(Times.Once);
 		Assert.Equal(42, count);
 	}
 
@@ -80,8 +80,8 @@ public class OpenGenericInlineStubTests
 		stringRepo.Add("test");
 		intRepo.Add(42);
 
-		Assert.Equal(1, stringStub.Add.CallCount);
-		Assert.Equal(1, intStub.Add.CallCount);
+		stringStub.Add.Verify(Times.Once);
+		intStub.Add.Verify(Times.Once);
 		Assert.Equal("test", stringStub.Add.LastCallArg);
 		Assert.Equal(42, intStub.Add.LastCallArg);
 	}
@@ -173,7 +173,7 @@ public partial class OpenGenericDelegateTests
 		var result = factory();
 
 		Assert.Equal("test-value", result);
-		Assert.Equal(1, stub.Interceptor.CallCount);
+		stub.Interceptor.Verify(Times.Once);
 	}
 
 	[Fact]
@@ -234,7 +234,7 @@ public partial class OpenGenericClassTests
 
 		Assert.NotNull(user);
 		Assert.Equal(42, user.Id);
-		Assert.Equal(1, stub.GetById.CallCount);
+		stub.GetById.Verify(Times.Once);
 	}
 
 	[Fact]

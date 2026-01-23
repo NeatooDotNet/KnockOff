@@ -33,9 +33,9 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 |-------------|---------------------|
 | `new Mock<IFoo>()` | `new FooStub()` with `[KnockOff<IFoo>] partial class FooStub` |
 | `mock.Object` | `stub` (direct instance) |
-| `.Setup(x => x.Method()).Returns(value)` | `stub.IFoo_Method.OnCall = () => value` |
-| `.Setup(x => x.Property).Returns(value)` | `stub.IFoo_Property.Value = value` |
-| `.ReturnsAsync(value)` | `stub.IFoo_Method.OnCall = () => Task.FromResult(value)` |
+| `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall(() => value)` |
+| `.Setup(x => x.Property).Returns(value)` | `stub.Property.Value = value` |
+| `.ReturnsAsync(value)` | `stub.Method.OnCall(() => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` or `stub.Verify()` |
 | `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
@@ -552,10 +552,10 @@ partial class UserRepositoryStub { }
 
 ```csharp
 // Wrong: GetUser(int id) expects (int) callback
-stub.IUserRepository_GetUser.OnCall = () => user;
+stub.GetUser.OnCall(() => user);
 
 // Correct
-stub.IUserRepository_GetUser.OnCall = (id) => user;
+stub.GetUser.OnCall((id) => user);
 ```
 
 ### Forgetting `.Object` Equivalence for Class Stubs

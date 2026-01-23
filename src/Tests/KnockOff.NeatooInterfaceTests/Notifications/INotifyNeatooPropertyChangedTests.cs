@@ -32,7 +32,7 @@ public partial class INotifyNeatooPropertyChangedTests
 
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        Assert.Equal(1, stub.NeatooPropertyChangedInterceptor.AddCount);
+        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public partial class INotifyNeatooPropertyChangedTests
         notify.NeatooPropertyChanged += handler;
         notify.NeatooPropertyChanged -= handler;
 
-        Assert.Equal(1, stub.NeatooPropertyChangedInterceptor.AddCount);
-        Assert.Equal(1, stub.NeatooPropertyChangedInterceptor.RemoveCount);
+        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChangedInterceptor.VerifyRemove(Times.Once);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public partial class INotifyNeatooPropertyChangedTests
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        Assert.Equal(3, stub.NeatooPropertyChangedInterceptor.AddCount);
+        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Exactly(3));
     }
 }
 
@@ -96,7 +96,7 @@ public class INotifyNeatooPropertyChangedStandaloneTests
 
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        Assert.Equal(1, stub.NeatooPropertyChanged.AddCount);
+        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
     }
 }
 
@@ -133,8 +133,7 @@ public partial class NeatooPropertyChangedDelegateTests
 
         await del(new NeatooPropertyChangedEventArgs("TestProperty", this));
 
-        stub.Interceptor.Verify();
-        Assert.Equal(1, stub.Interceptor.CallCount);
+        stub.Interceptor.Verify(Times.Once);
     }
 
     [Fact]
@@ -149,7 +148,7 @@ public partial class NeatooPropertyChangedDelegateTests
         await del(new NeatooPropertyChangedEventArgs("Prop2", this));
         await del(new NeatooPropertyChangedEventArgs("Prop3", this));
 
-        Assert.Equal(3, stub.Interceptor.CallCount);
+        stub.Interceptor.Verify(Times.Exactly(3));
     }
 
     [Fact]
@@ -186,6 +185,5 @@ public partial class NeatooPropertyChangedDelegateTests
         stub.Interceptor.Reset();
 
         stub.Interceptor.Verify(Times.Never);
-        Assert.Equal(0, stub.Interceptor.CallCount);
     }
 }

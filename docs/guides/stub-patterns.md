@@ -64,7 +64,8 @@ public void StandaloneStub_CanBeConfiguredAndVerified()
     // Assert - verify via Verify()
     Assert.NotNull(user);
     stub.Verify();
-    // User method tracks via special interceptor
+    // User methods get a numbered interceptor (GetById2) for tracking
+    // This allows verification without blocking the user method implementation
     stub.GetById2.Verify(Times.Once);
 }
 ```

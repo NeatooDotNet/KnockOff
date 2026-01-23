@@ -36,10 +36,10 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 			return (GetByIdTypedHandler<T>)handler;
 		}
 
-		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
@@ -69,7 +69,6 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
-			internal int CallCount => _callCount;
 
 			/// <summary>The 'id' argument from the most recent call.</summary>
 			public int? LastCallArg { get; private set; }
@@ -92,8 +91,8 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
@@ -121,10 +120,10 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 			return (SaveTypedHandler<T>)handler;
 		}
 
-		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Keys.ToList();
+		public global::System.Collections.Generic.IReadOnlyList<global::System.Type> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
@@ -154,7 +153,6 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
-			internal int CallCount => _callCount;
 
 			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(SaveDelegate callback) { _onCall = callback; return this; }
@@ -174,8 +172,8 @@ partial class ApiGenericRepoStub : global::KnockOff.Documentation.Samples.Interc
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>

@@ -15,14 +15,12 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<string>? OnGet { get; set; }
 
-		/// <summary>Number of times the setter was accessed.</summary>
-		internal int SetCount { get; private set; }
+		private int _setCount;
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public string? LastSetValue { get; private set; }
@@ -39,13 +37,13 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
+		public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
+		public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -59,7 +57,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name", times, totalCount));
 		}
@@ -70,8 +68,8 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, _getCount));
 		}
 
 		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -80,8 +78,8 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifySet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(SetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (set)", times, SetCount));
+			if (!times.Validate(_setCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (set)", times, _setCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -95,7 +93,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Name", times, totalCount);
 		}
 
@@ -103,7 +101,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Name", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -118,14 +116,12 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<int>? OnGet { get; set; }
 
-		/// <summary>Number of times the setter was accessed.</summary>
-		internal int SetCount { get; private set; }
+		private int _setCount;
 
 		/// <summary>The value from the most recent setter call.</summary>
 		public int? LastSetValue { get; private set; }
@@ -142,13 +138,13 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Records a setter access.</summary>
-		public void RecordSet(int? value) { SetCount++; LastSetValue = value; }
+		public void RecordSet(int? value) { _setCount++; LastSetValue = value; }
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
+		public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public AgeInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -162,7 +158,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Age", times, totalCount));
 		}
@@ -173,8 +169,8 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Age (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Age (get)", times, _getCount));
 		}
 
 		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -183,8 +179,8 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifySet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(SetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Age (set)", times, SetCount));
+			if (!times.Validate(_setCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Age (set)", times, _setCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -198,7 +194,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Age", times, totalCount);
 		}
 
@@ -206,7 +202,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount + SetCount;
+			var totalCount = _getCount + _setCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Age", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}

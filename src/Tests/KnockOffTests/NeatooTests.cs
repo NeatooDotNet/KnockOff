@@ -52,7 +52,7 @@ public class EntityBaseStandaloneTests
         stub.IsNew.OnGet = () => true;
 
         Assert.True(entity.IsNew);
-        Assert.Equal(1, stub.IsNew.GetCount);
+        stub.IsNew.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class EntityBaseStandaloneTests
         _ = entity.IsDeleted;
         _ = entity.IsDeleted;
 
-        Assert.Equal(3, stub.IsDeleted.GetCount);
+        stub.IsDeleted.VerifyGet(Times.Exactly(3));
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class EntityBaseStandaloneTests
         _ = entity["FirstName"];
         _ = entity["LastName"];
 
-        Assert.Equal(2, stub.Indexer.OfString.GetCount);
+        stub.Indexer.OfString.VerifyGet(Times.Exactly(2));
         Assert.Equal("LastName", stub.Indexer.OfString.LastGetKey);
     }
 
@@ -253,7 +253,7 @@ public class EntityBaseStandaloneTests
         stub.Delete.Reset();
 
         // Verify reset
-        Assert.Equal(0, stub.IsNew.GetCount);
+        stub.IsNew.VerifyGet(Times.Never);
         deleteTracking.Verify(Times.Never);
         deleteTracking.Verify(Times.Never);
     }
@@ -393,7 +393,7 @@ public class ValidateBaseStandaloneTests
 
         _ = validate["Email"];
 
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifyGet(Times.Once);
         Assert.Equal("Email", stub.Indexer.LastGetKey);
     }
 }
@@ -426,7 +426,7 @@ public partial class InlineValidateBaseTests
         stub.IsValid.Value = true;
 
         Assert.True(validate.IsValid);
-        Assert.Equal(1, stub.IsValid.GetCount);
+        stub.IsValid.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -473,7 +473,7 @@ public partial class InlineValidateBaseTests
 
         _ = validate["PropertyName"];
 
-        Assert.Equal(1, stub.Indexer.GetCount);
+        stub.Indexer.VerifyGet(Times.Once);
         Assert.Equal("PropertyName", stub.Indexer.LastGetKey);
     }
 
@@ -514,7 +514,7 @@ public partial class InlineValidateBaseTests
         await validate.RunRules("PropertyName", null);
 
         stub.RunRules.Verify();
-        Assert.Equal(1, stub.RunRules.CallCount);
+        stub.RunRules.Verify(Times.Once);
     }
 
     [Fact]
@@ -598,7 +598,7 @@ public partial class InlineValidateBaseTests
 
         validate.PropertyChanged += (s, e) => { };
 
-        Assert.Equal(1, stub.PropertyChangedInterceptor.AddCount);
+        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 
     [Fact]
@@ -611,8 +611,8 @@ public partial class InlineValidateBaseTests
         validate.PropertyChanged += handler;
         validate.PropertyChanged -= handler;
 
-        Assert.Equal(1, stub.PropertyChangedInterceptor.AddCount);
-        Assert.Equal(1, stub.PropertyChangedInterceptor.RemoveCount);
+        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
+        stub.PropertyChangedInterceptor.VerifyRemove(Times.Once);
     }
 
     [Fact]
@@ -624,7 +624,7 @@ public partial class InlineValidateBaseTests
         // NeatooPropertyChanged delegate takes only 1 arg (NeatooPropertyChangedEventArgs)
         validate.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        Assert.Equal(1, stub.NeatooPropertyChangedInterceptor.AddCount);
+        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
     }
 }
 
@@ -660,7 +660,7 @@ public partial class InlineRuleManagerTests
         await ruleManager.RunRule(null!, null);
 
         stub.RunRule.Verify();
-        Assert.Equal(1, stub.RunRule.CallCount);
+        stub.RunRule.Verify(Times.Once);
     }
 
     [Fact]
@@ -674,7 +674,7 @@ public partial class InlineRuleManagerTests
 
         stub.RunRuleGeneric.Verify();
         stub.RunRuleGeneric.Of<TestRule>().Verify();
-        Assert.Equal(1, stub.RunRuleGeneric.Of<TestRule>().CallCount);
+        stub.RunRuleGeneric.Of<TestRule>().Verify(Times.Once);
     }
 
     [Fact]
@@ -686,7 +686,7 @@ public partial class InlineRuleManagerTests
         await ruleManager.RunRules("PropertyName", null);
 
         stub.RunRules.Verify();
-        Assert.Equal(1, stub.RunRules.CallCount);
+        stub.RunRules.Verify(Times.Once);
     }
 
     [Fact]
@@ -711,7 +711,7 @@ public partial class InlineRuleManagerTests
         stub.Rules.Value = rules;
 
         Assert.Same(rules, ruleManager.Rules);
-        Assert.Equal(1, stub.Rules.GetCount);
+        stub.Rules.VerifyGet(Times.Once);
     }
 
     // Use KnockOff to stub IRule for the generic method test
@@ -763,7 +763,7 @@ public partial class InlineDelegateTests
         await del(new NeatooPropertyChangedEventArgs("TestProperty", this));
 
         stub.Interceptor.Verify();
-        Assert.Equal(1, stub.Interceptor.CallCount);
+        stub.Interceptor.Verify(Times.Once);
     }
 
     [Fact]
@@ -779,7 +779,7 @@ public partial class InlineDelegateTests
         await del(new NeatooPropertyChangedEventArgs("Prop2", this));
         await del(new NeatooPropertyChangedEventArgs("Prop3", this));
 
-        Assert.Equal(3, stub.Interceptor.CallCount);
+        stub.Interceptor.Verify(Times.Exactly(3));
     }
 
     [Fact]
@@ -818,7 +818,6 @@ public partial class InlineDelegateTests
         stub.Interceptor.Reset();
 
         stub.Interceptor.Verify(Times.Never);
-        Assert.Equal(0, stub.Interceptor.CallCount);
     }
 }
 

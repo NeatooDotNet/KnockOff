@@ -1,5 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using KnockOff;
 using KnockOff.Benchmarks.Interfaces;
 using KnockOff.Benchmarks.Stubs;
 using Moq;
@@ -120,7 +121,14 @@ public class EventVerificationBenchmarks
     [Benchmark]
     public bool KnockOff_VerifyEventSubscribed()
     {
-        return _knockOffStub.MessageReceived.HasSubscribers
-            && _knockOffStub.MessageReceived.AddCount == 2;
+        try
+        {
+            _knockOffStub.MessageReceived.VerifyAdd(Times.Exactly(2));
+            return _knockOffStub.MessageReceived.HasSubscribers;
+        }
+        catch (VerificationException)
+        {
+            return false;
+        }
     }
 }

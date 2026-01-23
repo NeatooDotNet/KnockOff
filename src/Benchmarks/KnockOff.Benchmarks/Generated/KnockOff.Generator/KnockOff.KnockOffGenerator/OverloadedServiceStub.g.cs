@@ -49,7 +49,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private bool _isVerifiable_Int32_Int32_void;
 		private global::KnockOff.Times? _verifiableTimes_Int32_Int32_void;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_void?.CallCount ?? 0) + (_sequence_Int32_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_Int32_void?.CallCount ?? 0) + (_sequence_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_void?.CallCount ?? 0) + (_sequence_String_void?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_void?.CallCount ?? 0) + (_sequence_Int32_Int32_void?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -57,8 +57,8 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Process", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Process", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for Process(int). Returns tracking interface.</summary>
@@ -328,7 +328,6 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
 
@@ -378,7 +377,6 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 			private string _lastArg = default!;
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
@@ -430,7 +428,6 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (int? a, int? b) LastArgs => _lastArgs;
 
@@ -477,7 +474,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -529,7 +526,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_String_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -581,7 +578,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_Int32_Int32_void(ProcessInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -660,7 +657,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		private bool _isVerifiable_Int32_Int32_Int32;
 		private global::KnockOff.Times? _verifiableTimes_Int32_Int32_Int32;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_Int32_Int32?.CallCount ?? 0) + (_sequence_Int32_Int32_Int32?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -668,8 +665,8 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Calculate", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Calculate", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for Calculate(int). Returns tracking interface.</summary>
@@ -858,7 +855,6 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
 
@@ -909,7 +905,6 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (int? a, int? b) LastArgs => _lastArgs;
 
@@ -956,7 +951,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_Int32_Int32(CalculateInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1008,7 +1003,7 @@ partial class OverloadedServiceStub : global::KnockOff.Benchmarks.Interfaces.IOv
 
 			public MethodSequenceImpl_Int32_Int32_Int32(CalculateInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

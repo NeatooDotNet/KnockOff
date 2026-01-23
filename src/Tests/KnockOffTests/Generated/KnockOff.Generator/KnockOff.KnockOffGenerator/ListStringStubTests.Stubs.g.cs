@@ -15,8 +15,7 @@ partial class ListStringStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<int>? OnGet { get; set; }
@@ -33,10 +32,10 @@ partial class ListStringStubTests
 			internal global::System.Collections.Generic.ICollection<string>? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IList_CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -50,7 +49,7 @@ partial class ListStringStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count", times, totalCount));
 			}
@@ -61,8 +60,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -76,7 +75,7 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Count", times, totalCount);
 			}
 
@@ -84,7 +83,7 @@ partial class ListStringStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Count", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -96,8 +95,7 @@ partial class ListStringStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -114,10 +112,10 @@ partial class ListStringStubTests
 			internal global::System.Collections.Generic.ICollection<string>? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IList_IsReadOnlyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -131,7 +129,7 @@ partial class ListStringStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReadOnly", times, totalCount));
 			}
@@ -142,8 +140,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReadOnly (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReadOnly (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -157,7 +155,7 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsReadOnly", times, totalCount);
 			}
 
@@ -165,7 +163,7 @@ partial class ListStringStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsReadOnly", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -177,8 +175,7 @@ partial class ListStringStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }
@@ -191,8 +188,7 @@ partial class ListStringStubTests
 				set { _onGet = value; if (value != null) _configured = true; }
 			}
 
-			/// <summary>Number of times the setter was accessed.</summary>
-			internal int SetCount { get; private set; }
+			private int _setCount;
 
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (int Key, string Value)? LastSetEntry { get; private set; }
@@ -206,10 +202,10 @@ partial class ListStringStubTests
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
+			public void RecordGet(int index) { _getCount++; LastGetKey = index; }
 
 			/// <summary>Records a setter access.</summary>
-			public void RecordSet(int index, string value) { SetCount++; LastSetEntry = (index, value); }
+			public void RecordSet(int index, string value) { _setCount++; LastSetEntry = (index, value); }
 
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
@@ -218,7 +214,7 @@ partial class ListStringStubTests
 			internal global::System.Collections.Generic.IList<string>? _source;
 
 			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = default; _source = null; }
+			public void Reset() { _getCount = 0; LastGetKey = default; _setCount = 0; LastSetEntry = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IList_IndexerInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -232,7 +228,7 @@ partial class ListStringStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer", times, totalCount));
 			}
@@ -243,8 +239,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (get)", times, _getCount));
 			}
 
 			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -253,8 +249,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifySet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(SetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (set)", times, SetCount));
+				if (!times.Validate(_setCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (set)", times, _setCount));
 			}
 
 			/// <summary>Whether this indexer was marked with Verifiable().</summary>
@@ -268,7 +264,7 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			}
 
@@ -276,7 +272,7 @@ partial class ListStringStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Indexer", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -302,7 +298,7 @@ partial class ListStringStubTests
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -314,8 +310,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexOf", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexOf", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -402,14 +398,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("IndexOf", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("IndexOf", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("IndexOf", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("IndexOf", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -422,7 +418,6 @@ partial class ListStringStubTests
 				private string _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public string LastArg => _lastArg;
@@ -470,7 +465,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_IndexOfInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -535,7 +530,7 @@ partial class ListStringStubTests
 			private int _unconfiguredCallCount;
 			private (int index, string item)? _unconfiguredLastArgs;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
 			public (int index, string item)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -547,8 +542,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Insert", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Insert", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -637,14 +632,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Insert", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Insert", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Insert", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Insert", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -657,7 +652,6 @@ partial class ListStringStubTests
 				private (int index, string item) _lastArgs;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (int index, string item) LastArgs => _lastArgs;
@@ -705,7 +699,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_InsertInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -770,7 +764,7 @@ partial class ListStringStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -782,8 +776,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RemoveAt", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RemoveAt", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -872,14 +866,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("RemoveAt", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("RemoveAt", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("RemoveAt", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("RemoveAt", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -892,7 +886,6 @@ partial class ListStringStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -940,7 +933,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_RemoveAtInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1005,7 +998,7 @@ partial class ListStringStubTests
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1017,8 +1010,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Add", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Add", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1107,14 +1100,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Add", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Add", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Add", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Add", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1127,7 +1120,6 @@ partial class ListStringStubTests
 				private string _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public string LastArg => _lastArg;
@@ -1175,7 +1167,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1239,7 +1231,7 @@ partial class ListStringStubTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1248,8 +1240,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Clear", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Clear", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1336,14 +1328,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Clear", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Clear", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Clear", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Clear", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1355,7 +1347,6 @@ partial class ListStringStubTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -1397,7 +1388,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_ClearInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1465,7 +1456,7 @@ partial class ListStringStubTests
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1477,8 +1468,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Contains", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Contains", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1565,14 +1556,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Contains", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Contains", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Contains", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Contains", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1585,7 +1576,6 @@ partial class ListStringStubTests
 				private string _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public string LastArg => _lastArg;
@@ -1633,7 +1623,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_ContainsInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1698,7 +1688,7 @@ partial class ListStringStubTests
 			private int _unconfiguredCallCount;
 			private (string[] array, int arrayIndex)? _unconfiguredLastArgs;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
 			public (string[] array, int arrayIndex)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -1710,8 +1700,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CopyTo", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CopyTo", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1800,14 +1790,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("CopyTo", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("CopyTo", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("CopyTo", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("CopyTo", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1820,7 +1810,6 @@ partial class ListStringStubTests
 				private (string[] array, int arrayIndex) _lastArgs;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (string[] array, int arrayIndex) LastArgs => _lastArgs;
@@ -1868,7 +1857,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_CopyToInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1936,7 +1925,7 @@ partial class ListStringStubTests
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1948,8 +1937,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Remove", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Remove", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2036,14 +2025,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Remove", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Remove", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Remove", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Remove", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2056,7 +2045,6 @@ partial class ListStringStubTests
 				private string _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public string LastArg => _lastArg;
@@ -2104,7 +2092,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -2171,7 +2159,7 @@ partial class ListStringStubTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2180,8 +2168,8 @@ partial class ListStringStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2266,14 +2254,14 @@ partial class ListStringStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetEnumerator", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetEnumerator", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetEnumerator", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2285,7 +2273,6 @@ partial class ListStringStubTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -2327,7 +2314,7 @@ partial class ListStringStubTests
 
 				public MethodSequenceImpl(IList_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{

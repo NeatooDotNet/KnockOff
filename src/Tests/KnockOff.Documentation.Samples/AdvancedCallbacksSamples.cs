@@ -223,10 +223,14 @@ public class StateDependentPropertyTests
     {
         var stub = new ConnectionStub();
 
-        // IsConnected returns true only after Connect() has been called
-        stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
+        // Track connection state with local variable
+        var isConnected = false;
 
-        var connectTracking = stub.Connect.OnCall(() => { });
+        // IsConnected returns the tracked state
+        stub.IsConnected.OnGet = () => isConnected;
+
+        // Connect() updates the tracked state
+        var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });
 
         IConnection connection = stub;
 
@@ -252,11 +256,14 @@ public class StateDependentMethodTests
     {
         var stub = new DatabaseStub();
 
-        var initTracking = stub.Initialize.OnCall(() => { });
+        // Track initialization state with local variable
+        var isInitialized = false;
+
+        var initTracking = stub.Initialize.OnCall(() => { isInitialized = true; });
 
         var queryTracking = stub.Query.OnCall((sql) =>
         {
-            if (stub.Initialize.CallCount == 0)
+            if (!isInitialized)
                 throw new InvalidOperationException("Must call Initialize() first");
             return "result";
         });

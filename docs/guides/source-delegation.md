@@ -161,7 +161,7 @@ This is useful when you need source delegation for test setup but want to verify
 
 KnockOff's interceptors evaluate member calls in this priority order:
 
-1. **OnCall callback** - Highest priority, set via `stub.Interceptors.Method.OnCall(...)`
+1. **OnCall callback** - Highest priority, set via `stub.Method.OnCall(...)`
 2. **User method** - Detected methods you define in the stub class
 3. **Source delegation** - Set via `stub.Source(realImplementation)`
 4. **Smart default** - Lowest priority, KnockOff's built-in return value generation

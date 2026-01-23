@@ -15,14 +15,12 @@ partial class StrictModeInlineTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<string>? OnGet { get; set; }
 
-			/// <summary>Number of times the setter was accessed.</summary>
-			internal int SetCount { get; private set; }
+			private int _setCount;
 
 			/// <summary>The last value passed to the setter.</summary>
 			public string? LastSetValue { get; private set; }
@@ -42,13 +40,13 @@ partial class StrictModeInlineTests
 			internal global::KnockOff.Tests.IStrictModeTest? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Records a setter access.</summary>
-			public void RecordSet(string? value) { SetCount++; LastSetValue = value; }
+			public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; SetCount = 0; LastSetValue = default; _source = null; }
+			public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IStrictModeTest_NameInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -62,7 +60,7 @@ partial class StrictModeInlineTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name", times, totalCount));
 			}
@@ -73,8 +71,8 @@ partial class StrictModeInlineTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (get)", times, _getCount));
 			}
 
 			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -83,8 +81,8 @@ partial class StrictModeInlineTests
 			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifySet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(SetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (set)", times, SetCount));
+				if (!times.Validate(_setCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Name (set)", times, _setCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -98,7 +96,7 @@ partial class StrictModeInlineTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Name", times, totalCount);
 			}
 
@@ -106,7 +104,7 @@ partial class StrictModeInlineTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Name", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -132,7 +130,7 @@ partial class StrictModeInlineTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -144,8 +142,8 @@ partial class StrictModeInlineTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetValue", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetValue", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -232,14 +230,14 @@ partial class StrictModeInlineTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -252,7 +250,6 @@ partial class StrictModeInlineTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -300,7 +297,7 @@ partial class StrictModeInlineTests
 
 				public MethodSequenceImpl(IStrictModeTest_GetValueInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -364,7 +361,7 @@ partial class StrictModeInlineTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -373,8 +370,8 @@ partial class StrictModeInlineTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("DoSomething", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("DoSomething", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -461,14 +458,14 @@ partial class StrictModeInlineTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("DoSomething", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("DoSomething", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("DoSomething", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("DoSomething", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -480,7 +477,6 @@ partial class StrictModeInlineTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -522,7 +518,7 @@ partial class StrictModeInlineTests
 
 				public MethodSequenceImpl(IStrictModeTest_DoSomethingInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -680,7 +676,7 @@ partial class StrictModeInlineTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -689,8 +685,8 @@ partial class StrictModeInlineTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetData", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetData", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -775,14 +771,14 @@ partial class StrictModeInlineTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetData", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetData", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetData", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetData", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -794,7 +790,6 @@ partial class StrictModeInlineTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -836,7 +831,7 @@ partial class StrictModeInlineTests
 
 				public MethodSequenceImpl(IStrictByDefault_GetDataInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{

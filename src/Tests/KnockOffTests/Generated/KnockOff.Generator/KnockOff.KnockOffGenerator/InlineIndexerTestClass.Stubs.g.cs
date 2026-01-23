@@ -15,8 +15,7 @@ partial class InlineIndexerTestClass
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
@@ -29,8 +28,7 @@ partial class InlineIndexerTestClass
 				set { _onGet = value; if (value != null) _configured = true; }
 			}
 
-			/// <summary>Number of times the setter was accessed.</summary>
-			internal int SetCount { get; private set; }
+			private int _setCount;
 
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (string Key, string Value)? LastSetEntry { get; private set; }
@@ -44,10 +42,10 @@ partial class InlineIndexerTestClass
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string key) { GetCount++; LastGetKey = key; }
+			public void RecordGet(string key) { _getCount++; LastGetKey = key; }
 
 			/// <summary>Records a setter access.</summary>
-			public void RecordSet(string key, string value) { SetCount++; LastSetEntry = (key, value); }
+			public void RecordSet(string key, string value) { _setCount++; LastSetEntry = (key, value); }
 
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, string> Backing { get; } = new();
@@ -56,7 +54,7 @@ partial class InlineIndexerTestClass
 			internal global::KnockOff.Tests.IMultiIndexerService? _source;
 
 			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = default; _source = null; }
+			public void Reset() { _getCount = 0; LastGetKey = default; _setCount = 0; LastSetEntry = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IMultiIndexerService_IndexerStringInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -70,7 +68,7 @@ partial class InlineIndexerTestClass
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerString", times, totalCount));
 			}
@@ -81,8 +79,8 @@ partial class InlineIndexerTestClass
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerString (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerString (get)", times, _getCount));
 			}
 
 			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -91,8 +89,8 @@ partial class InlineIndexerTestClass
 			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifySet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(SetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerString (set)", times, SetCount));
+				if (!times.Validate(_setCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerString (set)", times, _setCount));
 			}
 
 			/// <summary>Whether this indexer was marked with Verifiable().</summary>
@@ -106,7 +104,7 @@ partial class InlineIndexerTestClass
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IndexerString", times, totalCount);
 			}
 
@@ -114,7 +112,7 @@ partial class InlineIndexerTestClass
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IndexerString", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -126,8 +124,7 @@ partial class InlineIndexerTestClass
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }
@@ -141,7 +138,7 @@ partial class InlineIndexerTestClass
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet(int index) { GetCount++; LastGetKey = index; }
+			public void RecordGet(int index) { _getCount++; LastGetKey = index; }
 
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, int> Backing { get; } = new();
@@ -150,7 +147,7 @@ partial class InlineIndexerTestClass
 			internal global::KnockOff.Tests.IMultiIndexerService? _source;
 
 			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+			public void Reset() { _getCount = 0; LastGetKey = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IMultiIndexerService_IndexerInt32Interceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -164,7 +161,7 @@ partial class InlineIndexerTestClass
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerInt32", times, totalCount));
 			}
@@ -175,8 +172,8 @@ partial class InlineIndexerTestClass
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerInt32 (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerInt32 (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this indexer was marked with Verifiable().</summary>
@@ -190,7 +187,7 @@ partial class InlineIndexerTestClass
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IndexerInt32", times, totalCount);
 			}
 
@@ -198,7 +195,7 @@ partial class InlineIndexerTestClass
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IndexerInt32", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}

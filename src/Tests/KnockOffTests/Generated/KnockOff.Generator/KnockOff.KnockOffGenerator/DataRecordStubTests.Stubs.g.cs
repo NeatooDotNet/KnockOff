@@ -15,8 +15,7 @@ partial class DataRecordStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<int>? OnGet { get; set; }
@@ -33,10 +32,10 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataRecord_FieldCountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -50,7 +49,7 @@ partial class DataRecordStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("FieldCount", times, totalCount));
 			}
@@ -61,8 +60,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("FieldCount (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("FieldCount (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -76,7 +75,7 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("FieldCount", times, totalCount);
 			}
 
@@ -84,7 +83,7 @@ partial class DataRecordStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("FieldCount", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -96,8 +95,7 @@ partial class DataRecordStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>The last key used to access the getter.</summary>
 			public int? LastGetKey { get; private set; }
@@ -111,7 +109,7 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet(int i) { GetCount++; LastGetKey = i; }
+			public void RecordGet(int i) { _getCount++; LastGetKey = i; }
 
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<int, object> Backing { get; } = new();
@@ -120,7 +118,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+			public void Reset() { _getCount = 0; LastGetKey = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataRecord_IndexerInt32Interceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -134,7 +132,7 @@ partial class DataRecordStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerInt32", times, totalCount));
 			}
@@ -145,8 +143,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerInt32 (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerInt32 (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this indexer was marked with Verifiable().</summary>
@@ -160,7 +158,7 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IndexerInt32", times, totalCount);
 			}
 
@@ -168,7 +166,7 @@ partial class DataRecordStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IndexerInt32", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -180,8 +178,7 @@ partial class DataRecordStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
@@ -195,7 +192,7 @@ partial class DataRecordStubTests
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string name) { GetCount++; LastGetKey = name; }
+			public void RecordGet(string name) { _getCount++; LastGetKey = name; }
 
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, object> Backing { get; } = new();
@@ -204,7 +201,7 @@ partial class DataRecordStubTests
 			internal global::System.Data.IDataRecord? _source;
 
 			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+			public void Reset() { _getCount = 0; LastGetKey = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDataRecord_IndexerStringInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -218,7 +215,7 @@ partial class DataRecordStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerString", times, totalCount));
 			}
@@ -229,8 +226,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerString (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IndexerString (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this indexer was marked with Verifiable().</summary>
@@ -244,7 +241,7 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IndexerString", times, totalCount);
 			}
 
@@ -252,7 +249,7 @@ partial class DataRecordStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IndexerString", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -314,7 +311,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -326,8 +323,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetBoolean", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetBoolean", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -414,14 +411,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetBoolean", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetBoolean", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetBoolean", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetBoolean", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -434,7 +431,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -482,7 +478,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetBooleanInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -550,7 +546,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -562,8 +558,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetByte", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetByte", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -650,14 +646,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetByte", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetByte", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetByte", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetByte", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -670,7 +666,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -718,7 +713,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetByteInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -786,7 +781,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private (int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)? _unconfiguredLastArgs;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
 			public (int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -798,8 +793,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetBytes", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetBytes", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -886,14 +881,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetBytes", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetBytes", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetBytes", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetBytes", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -906,7 +901,6 @@ partial class DataRecordStubTests
 				private (int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length) _lastArgs;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length) LastArgs => _lastArgs;
@@ -954,7 +948,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetBytesInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1022,7 +1016,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1034,8 +1028,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetChar", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetChar", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1122,14 +1116,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetChar", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetChar", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetChar", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetChar", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1142,7 +1136,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -1190,7 +1183,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetCharInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1258,7 +1251,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private (int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)? _unconfiguredLastArgs;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
 			public (int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -1270,8 +1263,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetChars", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetChars", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1358,14 +1351,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetChars", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetChars", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetChars", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetChars", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1378,7 +1371,6 @@ partial class DataRecordStubTests
 				private (int i, long fieldoffset, char[]? buffer, int bufferoffset, int length) _lastArgs;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (int i, long fieldoffset, char[]? buffer, int bufferoffset, int length) LastArgs => _lastArgs;
@@ -1426,7 +1418,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetCharsInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1494,7 +1486,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1506,8 +1498,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetData", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetData", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1594,14 +1586,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetData", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetData", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetData", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetData", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1614,7 +1606,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -1662,7 +1653,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetDataInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1730,7 +1721,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1742,8 +1733,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDataTypeName", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDataTypeName", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1830,14 +1821,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDataTypeName", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDataTypeName", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDataTypeName", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDataTypeName", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1850,7 +1841,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -1898,7 +1888,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetDataTypeNameInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1966,7 +1956,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1978,8 +1968,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDateTime", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDateTime", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2066,14 +2056,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDateTime", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDateTime", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDateTime", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDateTime", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2086,7 +2076,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -2134,7 +2123,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetDateTimeInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -2202,7 +2191,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -2214,8 +2203,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDecimal", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDecimal", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2302,14 +2291,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDecimal", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDecimal", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDecimal", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDecimal", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2322,7 +2311,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -2370,7 +2358,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetDecimalInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -2438,7 +2426,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -2450,8 +2438,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDouble", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDouble", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2538,14 +2526,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDouble", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDouble", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDouble", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDouble", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2558,7 +2546,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -2606,7 +2593,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetDoubleInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -2674,7 +2661,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -2686,8 +2673,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetFieldType", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetFieldType", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2774,14 +2761,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetFieldType", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetFieldType", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetFieldType", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetFieldType", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2794,7 +2781,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -2842,7 +2828,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetFieldTypeInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -2910,7 +2896,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -2922,8 +2908,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetFloat", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetFloat", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -3010,14 +2996,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetFloat", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetFloat", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetFloat", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetFloat", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -3030,7 +3016,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -3078,7 +3063,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetFloatInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -3146,7 +3131,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -3158,8 +3143,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetGuid", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetGuid", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -3246,14 +3231,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetGuid", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetGuid", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetGuid", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetGuid", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -3266,7 +3251,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -3314,7 +3298,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetGuidInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -3382,7 +3366,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -3394,8 +3378,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt16", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt16", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -3482,14 +3466,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetInt16", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetInt16", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetInt16", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetInt16", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -3502,7 +3486,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -3550,7 +3533,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetInt16Interceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -3618,7 +3601,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -3630,8 +3613,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt32", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt32", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -3718,14 +3701,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetInt32", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetInt32", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetInt32", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetInt32", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -3738,7 +3721,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -3786,7 +3768,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetInt32Interceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -3854,7 +3836,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -3866,8 +3848,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt64", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt64", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -3954,14 +3936,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetInt64", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetInt64", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetInt64", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetInt64", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -3974,7 +3956,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -4022,7 +4003,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetInt64Interceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -4090,7 +4071,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -4102,8 +4083,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetName", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetName", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -4190,14 +4171,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetName", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetName", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetName", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetName", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -4210,7 +4191,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -4258,7 +4238,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetNameInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -4326,7 +4306,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -4338,8 +4318,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetOrdinal", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetOrdinal", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -4426,14 +4406,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetOrdinal", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetOrdinal", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetOrdinal", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetOrdinal", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -4446,7 +4426,6 @@ partial class DataRecordStubTests
 				private string _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public string LastArg => _lastArg;
@@ -4494,7 +4473,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetOrdinalInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -4562,7 +4541,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -4574,8 +4553,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetString", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetString", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -4662,14 +4641,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetString", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetString", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetString", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetString", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -4682,7 +4661,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -4730,7 +4708,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetStringInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -4798,7 +4776,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -4810,8 +4788,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetValue", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetValue", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -4898,14 +4876,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetValue", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -4918,7 +4896,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -4966,7 +4943,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetValueInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -5034,7 +5011,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private object[]? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public object[]? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -5046,8 +5023,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetValues", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetValues", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -5134,14 +5111,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetValues", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetValues", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetValues", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetValues", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -5154,7 +5131,6 @@ partial class DataRecordStubTests
 				private object[] _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public object[] LastArg => _lastArg;
@@ -5202,7 +5178,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_GetValuesInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -5270,7 +5246,7 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -5282,8 +5258,8 @@ partial class DataRecordStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsDBNull", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsDBNull", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -5370,14 +5346,14 @@ partial class DataRecordStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("IsDBNull", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("IsDBNull", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("IsDBNull", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("IsDBNull", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -5390,7 +5366,6 @@ partial class DataRecordStubTests
 				private int _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public int LastArg => _lastArg;
@@ -5438,7 +5413,7 @@ partial class DataRecordStubTests
 
 				public MethodSequenceImpl(IDataRecord_IsDBNullInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{

@@ -15,8 +15,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<int>? OnGet { get; set; }
@@ -30,10 +29,10 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -47,7 +46,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count", times, totalCount));
 		}
@@ -58,8 +57,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -73,7 +72,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Count", times, totalCount);
 		}
 
@@ -81,7 +80,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Count", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -96,8 +95,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.List<string>>? OnGet { get; set; }
@@ -111,10 +109,10 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public ItemsInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -128,7 +126,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Items", times, totalCount));
 		}
@@ -139,8 +137,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Items (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Items (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -154,7 +152,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Items", times, totalCount);
 		}
 
@@ -162,7 +160,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Items", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -187,7 +185,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -196,8 +194,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetInt", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -282,14 +280,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetInt", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetInt", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetInt", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetInt", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -301,7 +299,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -343,7 +340,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetIntInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -410,7 +407,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -419,8 +416,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetBool", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetBool", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -505,14 +502,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetBool", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetBool", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetBool", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetBool", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -524,7 +521,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -566,7 +562,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetBoolInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -633,7 +629,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -642,8 +638,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDateTime", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDateTime", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -728,14 +724,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDateTime", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDateTime", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDateTime", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDateTime", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -747,7 +743,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -789,7 +784,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetDateTimeInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -856,7 +851,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -865,8 +860,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetNullableString", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetNullableString", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -951,14 +946,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetNullableString", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetNullableString", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetNullableString", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetNullableString", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -970,7 +965,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1012,7 +1006,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetNullableStringInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1079,7 +1073,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1088,8 +1082,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetNullableEntity", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetNullableEntity", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1174,14 +1168,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetNullableEntity", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetNullableEntity", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetNullableEntity", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetNullableEntity", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1193,7 +1187,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1235,7 +1228,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetNullableEntityInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1302,7 +1295,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1311,8 +1304,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetList", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetList", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1397,14 +1390,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetList", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetList", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetList", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetList", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1416,7 +1409,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1458,7 +1450,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetListInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1525,7 +1517,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1534,8 +1526,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDictionary", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDictionary", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1620,14 +1612,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDictionary", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDictionary", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDictionary", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDictionary", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1639,7 +1631,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1681,7 +1672,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetDictionaryInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1748,7 +1739,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1757,8 +1748,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEntity", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEntity", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1843,14 +1834,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetEntity", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetEntity", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetEntity", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetEntity", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1862,7 +1853,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -1904,7 +1894,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetEntityInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -1971,7 +1961,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1980,8 +1970,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetIList", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetIList", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2066,14 +2056,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetIList", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetIList", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetIList", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetIList", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2085,7 +2075,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2127,7 +2116,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetIListInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -2194,7 +2183,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2203,8 +2192,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetString", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetString", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2289,14 +2278,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetString", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetString", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetString", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetString", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2308,7 +2297,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2350,7 +2338,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetStringInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -2417,7 +2405,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2426,8 +2414,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDisposable", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetDisposable", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2512,14 +2500,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDisposable", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDisposable", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetDisposable", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetDisposable", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2531,7 +2519,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2573,7 +2560,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetDisposableInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -2640,7 +2627,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2649,8 +2636,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetIntAsync", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetIntAsync", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2735,14 +2722,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetIntAsync", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetIntAsync", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetIntAsync", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetIntAsync", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2754,7 +2741,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -2796,7 +2782,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetIntAsyncInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -2863,7 +2849,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2872,8 +2858,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetListAsync", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetListAsync", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2958,14 +2944,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetListAsync", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetListAsync", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetListAsync", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetListAsync", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2977,7 +2963,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -3019,7 +3004,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetListAsyncInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -3086,7 +3071,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3095,8 +3080,8 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetStringAsync", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetStringAsync", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -3181,14 +3166,14 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetStringAsync", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetStringAsync", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetStringAsync", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetStringAsync", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -3200,7 +3185,6 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -3242,7 +3226,7 @@ partial class SmartDefaultsKnockOff : global::KnockOff.Tests.ISmartDefaultsServi
 
 			public MethodSequenceImpl(GetStringAsyncInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

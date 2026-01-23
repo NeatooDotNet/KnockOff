@@ -107,9 +107,12 @@ public void OnGet_DependsOnOtherInterceptorState()
 {
     var stub = new ServiceWithInitPropsStub();
 
-    // OnGet checks if Initialize() was called via interceptor WasCalled
-    stub.IsReady.OnGet = () => stub.Initialize.WasCalled;
-    var initTracking = stub.Initialize.OnCall(() => { });
+    // Track initialization state with local variable
+    var isInitialized = false;
+
+    // OnGet checks the tracked state
+    stub.IsReady.OnGet = () => isInitialized;
+    var initTracking = stub.Initialize.OnCall(() => { isInitialized = true; });
 
     IServiceWithInitProps service = stub;
 
@@ -143,7 +146,7 @@ public void OnSet_TracksAllWrittenValues()
     var stub = new ConfigPropsStub();
 
     var setValues = new List<string>();
-    stub.Name.OnSet = ((value) => setValues.Add(value);
+    stub.Name.OnSet = (value) => setValues.Add(value);
 
     IConfigProps config = stub;
 
@@ -167,7 +170,7 @@ public void OnSet_SimulatesValidation()
     var stub = new ConfigPropsStub();
 
     // OnSet throws for invalid values
-    stub.Age.OnSet = ((value) =>
+    stub.Age.OnSet = (value) =>
     {
         if (value < 0)
             throw new ArgumentException("Age cannot be negative");
@@ -201,7 +204,7 @@ Property interceptors support verification similar to methods.
 <!-- snippet: properties-verify-getcount -->
 ```cs
 [Fact]
-public void GetCount_TracksPropertyReads()
+public void VerifyGet_TracksPropertyReads()
 {
     var stub = new ConfigPropsStub();
     stub.Age.Value = 42;
@@ -211,8 +214,8 @@ public void GetCount_TracksPropertyReads()
     _ = service.Age;
     _ = service.Age;
 
-    // GetCount tracks how many times property was read
-    Assert.Equal(2, stub.Age.GetCount);
+    // VerifyGet checks how many times property was read
+    stub.Age.VerifyGet(Times.Exactly(2));
 }
 ```
 <!-- endSnippet -->
@@ -245,17 +248,18 @@ public void Verifiable_MarksPropertyForVerification()
 {
     var stub = new ConfigPropsStub();
 
-    // Mark property get/set as verifiable
+    // Mark property as verifiable
     stub.Name.Value = "test";
-    stub.Name.MarkVerifiableGet();
-    stub.Age.MarkVerifiableSet();
+    stub.Name.Verifiable();
+    stub.Age.Verifiable();
 
     IConfigProps service = stub;
     _ = service.Name;
     service.Age = 42;
 
-    // Verify all marked properties
-    stub.Verify();
+    // Verify individually (standalone stubs verify at interceptor level)
+    stub.Name.Verify();
+    stub.Age.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -321,20 +325,20 @@ public void Reset_ClearsCountsButPreservesValue()
     _ = config.Name;
     config.Name = "updated";
 
-    Assert.True(stub.Name.GetCount > 0);
-    Assert.True(stub.Name.SetCount > 0);
+    stub.Name.VerifyGet(Times.AtLeastOnce);
+    stub.Name.VerifySet(Times.AtLeastOnce);
 
     // Reset clears counts and callbacks
     stub.Name.Reset();
 
-    Assert.Equal(0, stub.Name.GetCount);
-    Assert.Equal(0, stub.Name.SetCount);
-    // Note: Reset also clears Value, OnGet, OnSet
+    stub.Name.VerifyGet(Times.Never);
+    stub.Name.VerifySet(Times.Never);
+    // Note: Reset clears OnGet and OnSet but preserves Value
 }
 ```
 <!-- endSnippet -->
 
-**Why Value is preserved:** Value represents test data configuration, not test execution state. Resetting execution state (counts, callbacks) shouldn't require reconfiguring test data.
+**Note on Reset behavior:** Reset() clears tracking counters, `LastSetValue`, `OnGet`, and `OnSet`. The `Value` property is preserved to maintain test data configuration between verification phases.
 
 ---
 
@@ -365,18 +369,21 @@ public void CompletePropertyExample_AllConfigurationApproaches()
 {
     var stub = new UserConfigCompleteStub();
 
+    // Track connection state with local variable
+    var isConnected = false;
+
     // Value: Static test data
     stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
-    // OnGet: State-dependent behavior
-    stub.IsConnected.OnGet = () => stub.Connect.WasCalled;
+    // OnGet: State-dependent behavior using tracked state
+    stub.IsConnected.OnGet = () => isConnected;
 
     // OnSet: Track all values written
     var connectionStrings = new List<string>();
-    stub.ConnectionString.OnSet = ((value) => connectionStrings.Add(value);
+    stub.ConnectionString.OnSet = (value) => connectionStrings.Add(value);
 
-    // Configure the Connect method
-    var connectTracking = stub.Connect.OnCall(() => { });
+    // Configure the Connect method to update state
+    var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });
 
     IUserConfigComplete service = stub;
 
@@ -390,7 +397,7 @@ public void CompletePropertyExample_AllConfigurationApproaches()
     service.ConnectionString = "Server=test";  // Write ConnectionString
 
     // Verification
-    Assert.Equal(1, stub.CurrentUser.GetCount);
+    stub.CurrentUser.VerifyGet(Times.Once);
     Assert.True(service.IsConnected);
     Assert.Single(connectionStrings);
     Assert.Equal("Server=test", stub.ConnectionString.LastSetValue);

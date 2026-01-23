@@ -22,7 +22,7 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 
 		private int _unconfiguredCallCount;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -31,8 +31,8 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Subscribe", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Subscribe", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -119,14 +119,14 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Subscribe", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Subscribe", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Subscribe", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Subscribe", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -138,7 +138,6 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
@@ -180,7 +179,7 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 
 			public MethodSequenceImpl(SubscribeInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -232,26 +231,23 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 	{
 		private global::System.EventHandler? _handler;
 
-		/// <summary>Number of times event was subscribed to.</summary>
-		internal int AddCount { get; private set; }
-
-		/// <summary>Number of times event subscription was removed.</summary>
-		internal int RemoveCount { get; private set; }
+		private int _addCount;
+		private int _removeCount;
 
 		/// <summary>Whether any handlers are subscribed.</summary>
 		public bool HasSubscribers => _handler != null;
 
 		/// <summary>Records an event subscription.</summary>
-		public void RecordAdd(global::System.EventHandler? value) { AddCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Combine(_handler, value); }
+		public void RecordAdd(global::System.EventHandler? value) { _addCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Combine(_handler, value); }
 
 		/// <summary>Records an event unsubscription.</summary>
-		public void RecordRemove(global::System.EventHandler? value) { RemoveCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Remove(_handler, value); }
+		public void RecordRemove(global::System.EventHandler? value) { _removeCount++; _handler = (global::System.EventHandler?)global::System.Delegate.Remove(_handler, value); }
 
 		/// <summary>Raises the event with the specified arguments.</summary>
 		public void Raise(object? sender, global::System.EventArgs e) => _handler?.Invoke(sender, e);
 
 		/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>
-		public void Reset() { AddCount = 0; RemoveCount = 0; _handler = null; }
+		public void Reset() { _addCount = 0; _removeCount = 0; _handler = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -262,8 +258,8 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
 		public void VerifyAdd(global::KnockOff.Times times)
 		{
-			if (!times.Validate(AddCount))
-				throw new global::KnockOff.VerificationException($"Event 'OnCompleted' add verification failed: expected {times}, but was called {AddCount} time(s).");
+			if (!times.Validate(_addCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnCompleted' add verification failed: expected {times}, but was called {_addCount} time(s).");
 		}
 
 		/// <summary>Verifies the event was unsubscribed at least once.</summary>
@@ -272,8 +268,8 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
 		public void VerifyRemove(global::KnockOff.Times times)
 		{
-			if (!times.Validate(RemoveCount))
-				throw new global::KnockOff.VerificationException($"Event 'OnCompleted' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+			if (!times.Validate(_removeCount))
+				throw new global::KnockOff.VerificationException($"Event 'OnCompleted' remove verification failed: expected {times}, but was called {_removeCount} time(s).");
 		}
 
 		/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
@@ -282,7 +278,7 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		/// <summary>Verifies the total event access count matches the Times constraint.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException($"Event 'OnCompleted' verification failed: expected {times}, but was called {totalCount} time(s).");
 		}
@@ -311,7 +307,7 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("OnCompleted", times, totalCount);
 			return null;
@@ -322,7 +318,7 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		{
 			if (!IsConfigured && !_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = AddCount + RemoveCount;
+			var totalCount = _addCount + _removeCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("OnCompleted", times, totalCount);
 			return null;

@@ -89,7 +89,7 @@ public class CallbackTests
 		var result = service.Name;
 
 		Assert.Equal("FromCallback", result);
-		Assert.Equal(1, knockOff.Name.GetCount);
+		knockOff.Name.VerifyGet(Times.Once);
 	}
 
 	[Fact]
@@ -107,7 +107,7 @@ public class CallbackTests
 		service.Name = "TestValue";
 
 		Assert.Equal("TestValue", capturedValue);
-		Assert.Equal(1, knockOff.Name.SetCount);
+		knockOff.Name.VerifySet(Times.Once);
 
 		// Since OnSet was used, backing was not updated
 		knockOff.Name.OnGet = null;
@@ -184,6 +184,6 @@ public class CallbackTests
 		var result = entity.Id;
 
 		Assert.Equal(999, result);
-		Assert.Equal(1, knockOff.Id.GetCount);
+		knockOff.Id.VerifyGet(Times.Once);
 	}
 }

@@ -36,10 +36,10 @@ partial class ConverterStub : global::KnockOff.Documentation.Samples.GenericMeth
 			return (ConvertTypedHandler<TSource, TTarget>)handler;
 		}
 
-		internal int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
+		private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);
 
 		/// <summary>All type argument(s) that were used in calls.</summary>
-		public global::System.Collections.Generic.IReadOnlyList<(global::System.Type, global::System.Type)> CalledTypeArguments => _typedHandlers.Keys.ToList();
+		public global::System.Collections.Generic.IReadOnlyList<(global::System.Type, global::System.Type)> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();
 
 		/// <summary>Resets all typed handlers.</summary>
 		public void Reset()
@@ -69,7 +69,6 @@ partial class ConverterStub : global::KnockOff.Documentation.Samples.GenericMeth
 
 			private int _callCount;
 			int IGenericMethodCallTracker.CallCount => _callCount;
-			internal int CallCount => _callCount;
 
 			/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>
 			public global::KnockOff.IMethodTracking OnCall(ConvertDelegate callback) { _onCall = callback; return this; }
@@ -89,8 +88,8 @@ partial class ConverterStub : global::KnockOff.Documentation.Samples.GenericMeth
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>

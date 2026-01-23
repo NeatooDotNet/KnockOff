@@ -11,7 +11,7 @@ partial class NeatooPropertyChangedDelegateTests
 		/// <summary>Interceptor for NeatooPropertyChanged delegate.</summary>
 		public sealed class NeatooPropertyChangedInterceptor
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The argument from the last invocation.</summary>
 			public global::Neatoo.NeatooPropertyChangedEventArgs? LastCallArg { get; private set; }
@@ -19,10 +19,10 @@ partial class NeatooPropertyChangedDelegateTests
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Func<global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task>? OnCall { get; set; }
 
-			public void RecordCall(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) { CallCount++; LastCallArg = propertyNameBreadCrumbs; }
+			public void RecordCall(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) { _callCount++; LastCallArg = propertyNameBreadCrumbs; }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -30,8 +30,8 @@ partial class NeatooPropertyChangedDelegateTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 

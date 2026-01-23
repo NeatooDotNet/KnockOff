@@ -385,14 +385,14 @@ public class ClassIndexerVerificationTests
 		_ = stub.Object["key2"];
 		stub.Object["key3"] = "value";
 
-		Assert.Equal(2, stub.Indexer.GetCount);
-		Assert.Equal(1, stub.Indexer.SetCount);
+		stub.Indexer.VerifyGet(Times.Exactly(2));
+		stub.Indexer.VerifySet(Times.Once);
 
 		stub.Indexer.Reset();
 
 		// Assert
-		Assert.Equal(0, stub.Indexer.GetCount);
-		Assert.Equal(0, stub.Indexer.SetCount);
+		stub.Indexer.VerifyGet(Times.Never);
+		stub.Indexer.VerifySet(Times.Never);
 	}
 
 	[Fact]

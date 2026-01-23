@@ -15,8 +15,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<bool>? OnGet { get; set; }
@@ -30,10 +29,10 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public ExecutedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -47,7 +46,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Executed", times, totalCount));
 		}
@@ -58,8 +57,8 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Executed (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Executed (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -73,7 +72,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Executed", times, totalCount);
 		}
 
@@ -81,7 +80,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Executed", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -96,8 +95,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<int>? OnGet { get; set; }
@@ -111,10 +109,10 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public RuleOrderInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -128,7 +126,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RuleOrder", times, totalCount));
 		}
@@ -139,8 +137,8 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RuleOrder (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RuleOrder (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -154,7 +152,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("RuleOrder", times, totalCount);
 		}
 
@@ -162,7 +160,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("RuleOrder", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -177,8 +175,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<uint>? OnGet { get; set; }
@@ -192,10 +189,10 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public UniqueIndexInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -209,7 +206,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("UniqueIndex", times, totalCount));
 		}
@@ -220,8 +217,8 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("UniqueIndex (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("UniqueIndex (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -235,7 +232,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("UniqueIndex", times, totalCount);
 		}
 
@@ -243,7 +240,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("UniqueIndex", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -258,8 +255,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.IRuleMessage>>? OnGet { get; set; }
@@ -273,10 +269,10 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public MessagesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -290,7 +286,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Messages", times, totalCount));
 		}
@@ -301,8 +297,8 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Messages (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Messages (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -316,7 +312,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Messages", times, totalCount);
 		}
 
@@ -324,7 +320,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Messages", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -339,8 +335,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<global::System.Collections.Generic.IReadOnlyList<global::Neatoo.Rules.ITriggerProperty>>? OnGet { get; set; }
@@ -354,10 +349,10 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public TriggerPropertiesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -371,7 +366,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("TriggerProperties", times, totalCount));
 		}
@@ -382,8 +377,8 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("TriggerProperties (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("TriggerProperties (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -397,7 +392,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("TriggerProperties", times, totalCount);
 		}
 
@@ -405,7 +400,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("TriggerProperties", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -431,7 +426,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		private int _unconfiguredCallCount;
 		private (global::Neatoo.IValidateBase? target, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
 		public (global::Neatoo.IValidateBase? target, global::System.Threading.CancellationToken? token)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -443,8 +438,8 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRule", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRule", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -531,14 +526,14 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("RunRule", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("RunRule", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("RunRule", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("RunRule", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -551,7 +546,6 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 			private (global::Neatoo.IValidateBase? target, global::System.Threading.CancellationToken? token) _lastArgs;
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::Neatoo.IValidateBase? target, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
@@ -599,7 +593,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 
 			public MethodSequenceImpl(RunRuleInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -664,7 +658,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		private int _unconfiguredCallCount;
 		private (global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex)? _unconfiguredLastArgs;
 
-		internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
 		public (global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -676,8 +670,8 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("OnRuleAdded", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("OnRuleAdded", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -766,14 +760,14 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("OnRuleAdded", times, CallCount);
+			return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("OnRuleAdded", times, TotalCallCount);
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("OnRuleAdded", global::KnockOff.Times.AtLeastOnce, CallCount);
+			return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("OnRuleAdded", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 		}
 
 		/// <summary>Tracks invocations for this callback registration.</summary>
@@ -786,7 +780,6 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 			private (global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex) _lastArgs;
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 			public (global::Neatoo.Rules.IRuleManager? ruleManager, uint? uniqueIndex) LastArgs => _lastArgs;
@@ -834,7 +827,7 @@ partial class RuleStubForAttr : global::Neatoo.Rules.IRule, global::KnockOff.IKn
 
 			public MethodSequenceImpl(OnRuleAddedInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

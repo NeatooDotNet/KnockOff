@@ -49,7 +49,7 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		private bool _isVerifiable_String_KnockOff_Documentation_Samples_User;
 		private global::KnockOff.Times? _verifiableTimes_String_KnockOff_Documentation_Samples_User;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_Int32_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_String_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Int32_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_Int32_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_String_KnockOff_Documentation_Samples_User?.CallCount ?? 0) + (_sequence_String_KnockOff_Documentation_Samples_User?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -57,8 +57,8 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Find", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Find", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for Find(). Returns tracking interface.</summary>
@@ -321,7 +321,6 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
@@ -365,7 +364,6 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 			private int _lastArg = default!;
 
 			internal int CallCount { get; private set; }
-
 
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public int LastArg => _lastArg;
@@ -417,7 +415,6 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Last argument passed to this callback. Default if never called.</summary>
 			public string LastArg => _lastArg;
 
@@ -464,7 +461,7 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			public MethodSequenceImpl_NoParams_Collections_Generic_List_KnockOff_Documentation_Samples_User(FindInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -516,7 +513,7 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			public MethodSequenceImpl_Int32_KnockOff_Documentation_Samples_User(FindInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -568,7 +565,7 @@ partial class SearchRepoStub : global::KnockOff.Documentation.Samples.Methods.IS
 
 			public MethodSequenceImpl_String_KnockOff_Documentation_Samples_User(FindInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

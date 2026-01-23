@@ -37,7 +37,7 @@ public partial class IPropertyInfoTests
         stub.PropertyInfo.Value = reflectedPropertyInfo;
 
         Assert.Same(reflectedPropertyInfo, propertyInfo.PropertyInfo);
-        Assert.Equal(1, stub.PropertyInfo.GetCount);
+        stub.PropertyInfo.VerifyGet(Times.Once);
     }
 
     [Fact]
@@ -146,8 +146,7 @@ public partial class IPropertyInfoTests
 
         propertyInfo.GetCustomAttributes();
 
-        stub.GetCustomAttributes.Verify();
-        Assert.Equal(1, stub.GetCustomAttributes.CallCount);
+        stub.GetCustomAttributes.Verify(Times.Once);
     }
 
     [Fact]
@@ -180,7 +179,7 @@ public partial class IPropertyInfoTests
 
         stub.Name.Reset();
 
-        Assert.Equal(0, stub.Name.GetCount);
+        stub.Name.VerifyGet(Times.Never);
     }
 
     [Fact]
@@ -196,7 +195,6 @@ public partial class IPropertyInfoTests
         stub.GetCustomAttributes.Reset();
 
         stub.GetCustomAttributes.Verify(Times.Never);
-        Assert.Equal(0, stub.GetCustomAttributes.CallCount);
     }
 
     #endregion
@@ -287,8 +285,7 @@ public partial class IPropertyInfoListTests
 
         list.GetPropertyInfo("Name");
 
-        stub.GetPropertyInfo.Verify();
-        Assert.Equal(1, stub.GetPropertyInfo.CallCount);
+        stub.GetPropertyInfo.Verify(Times.Once);
     }
 
     [Fact]

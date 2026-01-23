@@ -13,7 +13,7 @@ partial class EmailServiceTests
 		{
 			private global::System.Func<string, string, bool>? _onCall;
 
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The arguments from the last call.</summary>
 			public (string? to, string? subject)? LastCallArgs { get; private set; }
@@ -24,10 +24,10 @@ partial class EmailServiceTests
 			/// <summary>Gets the configured callback (internal use).</summary>
 			internal global::System.Func<string, string, bool>? Callback => _onCall;
 
-			public void RecordCall(string to, string subject) { CallCount++; LastCallArgs = (to, subject); }
+			public void RecordCall(string to, string subject) { _callCount++; LastCallArgs = (to, subject); }
 
 			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArgs = default; }
+			public void Reset() { _callCount = 0; LastCallArgs = default; }
 
 			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -35,8 +35,8 @@ partial class EmailServiceTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 			}
 
 			private bool _isVerifiable;
@@ -56,14 +56,14 @@ partial class EmailServiceTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Send", times, CallCount);
+				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Send", times, _callCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return CallCount >= 1 ? null : new global::KnockOff.VerificationFailure("Send", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Send", global::KnockOff.Times.AtLeastOnce, _callCount);
 			}
 		}
 

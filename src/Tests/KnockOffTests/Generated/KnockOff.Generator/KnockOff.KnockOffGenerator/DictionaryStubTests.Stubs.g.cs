@@ -15,8 +15,7 @@ partial class DictionaryStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -33,10 +32,10 @@ partial class DictionaryStubTests
 			internal global::System.Collections.IDictionary? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDictionary_IsFixedSizeInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -50,7 +49,7 @@ partial class DictionaryStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsFixedSize", times, totalCount));
 			}
@@ -61,8 +60,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsFixedSize (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsFixedSize (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -76,7 +75,7 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsFixedSize", times, totalCount);
 			}
 
@@ -84,7 +83,7 @@ partial class DictionaryStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsFixedSize", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -96,8 +95,7 @@ partial class DictionaryStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -114,10 +112,10 @@ partial class DictionaryStubTests
 			internal global::System.Collections.IDictionary? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDictionary_IsReadOnlyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -131,7 +129,7 @@ partial class DictionaryStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReadOnly", times, totalCount));
 			}
@@ -142,8 +140,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReadOnly (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsReadOnly (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -157,7 +155,7 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsReadOnly", times, totalCount);
 			}
 
@@ -165,7 +163,7 @@ partial class DictionaryStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsReadOnly", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -177,8 +175,7 @@ partial class DictionaryStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.ICollection>? OnGet { get; set; }
@@ -195,10 +192,10 @@ partial class DictionaryStubTests
 			internal global::System.Collections.IDictionary? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDictionary_KeysInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -212,7 +209,7 @@ partial class DictionaryStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Keys", times, totalCount));
 			}
@@ -223,8 +220,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Keys (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Keys (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -238,7 +235,7 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Keys", times, totalCount);
 			}
 
@@ -246,7 +243,7 @@ partial class DictionaryStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Keys", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -258,8 +255,7 @@ partial class DictionaryStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.ICollection>? OnGet { get; set; }
@@ -276,10 +272,10 @@ partial class DictionaryStubTests
 			internal global::System.Collections.IDictionary? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDictionary_ValuesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -293,7 +289,7 @@ partial class DictionaryStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Values", times, totalCount));
 			}
@@ -304,8 +300,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Values (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Values (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -319,7 +315,7 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Values", times, totalCount);
 			}
 
@@ -327,7 +323,7 @@ partial class DictionaryStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Values", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -339,8 +335,7 @@ partial class DictionaryStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<int>? OnGet { get; set; }
@@ -357,10 +352,10 @@ partial class DictionaryStubTests
 			internal global::System.Collections.ICollection? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDictionary_CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -374,7 +369,7 @@ partial class DictionaryStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count", times, totalCount));
 			}
@@ -385,8 +380,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -400,7 +395,7 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Count", times, totalCount);
 			}
 
@@ -408,7 +403,7 @@ partial class DictionaryStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Count", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -420,8 +415,7 @@ partial class DictionaryStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -438,10 +432,10 @@ partial class DictionaryStubTests
 			internal global::System.Collections.ICollection? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDictionary_IsSynchronizedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -455,7 +449,7 @@ partial class DictionaryStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSynchronized", times, totalCount));
 			}
@@ -466,8 +460,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSynchronized (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSynchronized (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -481,7 +475,7 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsSynchronized", times, totalCount);
 			}
 
@@ -489,7 +483,7 @@ partial class DictionaryStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsSynchronized", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -501,8 +495,7 @@ partial class DictionaryStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<object>? OnGet { get; set; }
@@ -519,10 +512,10 @@ partial class DictionaryStubTests
 			internal global::System.Collections.ICollection? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDictionary_SyncRootInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -536,7 +529,7 @@ partial class DictionaryStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("SyncRoot", times, totalCount));
 			}
@@ -547,8 +540,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("SyncRoot (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("SyncRoot (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -562,7 +555,7 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("SyncRoot", times, totalCount);
 			}
 
@@ -570,7 +563,7 @@ partial class DictionaryStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("SyncRoot", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -582,8 +575,7 @@ partial class DictionaryStubTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>The last key used to access the getter.</summary>
 			public object? LastGetKey { get; private set; }
@@ -596,8 +588,7 @@ partial class DictionaryStubTests
 				set { _onGet = value; if (value != null) _configured = true; }
 			}
 
-			/// <summary>Number of times the setter was accessed.</summary>
-			internal int SetCount { get; private set; }
+			private int _setCount;
 
 			/// <summary>The last key-value pair passed to the setter.</summary>
 			public (object Key, object? Value)? LastSetEntry { get; private set; }
@@ -611,10 +602,10 @@ partial class DictionaryStubTests
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet(object key) { GetCount++; LastGetKey = key; }
+			public void RecordGet(object key) { _getCount++; LastGetKey = key; }
 
 			/// <summary>Records a setter access.</summary>
-			public void RecordSet(object key, object? value) { SetCount++; LastSetEntry = (key, value); }
+			public void RecordSet(object key, object? value) { _setCount++; LastSetEntry = (key, value); }
 
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<object, object?> Backing { get; } = new();
@@ -623,7 +614,7 @@ partial class DictionaryStubTests
 			internal global::System.Collections.IDictionary? _source;
 
 			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; SetCount = 0; LastSetEntry = default; _source = null; }
+			public void Reset() { _getCount = 0; LastGetKey = default; _setCount = 0; LastSetEntry = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IDictionary_IndexerInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -637,7 +628,7 @@ partial class DictionaryStubTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer", times, totalCount));
 			}
@@ -648,8 +639,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (get)", times, _getCount));
 			}
 
 			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -658,8 +649,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifySet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(SetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (set)", times, SetCount));
+				if (!times.Validate(_setCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (set)", times, _setCount));
 			}
 
 			/// <summary>Whether this indexer was marked with Verifiable().</summary>
@@ -673,7 +664,7 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			}
 
@@ -681,7 +672,7 @@ partial class DictionaryStubTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount + SetCount;
+				var totalCount = _getCount + _setCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Indexer", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -704,7 +695,7 @@ partial class DictionaryStubTests
 			private int _unconfiguredCallCount;
 			private (object key, object? @value)? _unconfiguredLastArgs;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
 			public (object key, object? @value)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -716,8 +707,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Add", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Add", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -806,14 +797,14 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Add", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Add", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Add", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Add", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -826,7 +817,6 @@ partial class DictionaryStubTests
 				private (object key, object? @value) _lastArgs;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (object key, object? @value) LastArgs => _lastArgs;
@@ -874,7 +864,7 @@ partial class DictionaryStubTests
 
 				public MethodSequenceImpl(IDictionary_AddInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -938,7 +928,7 @@ partial class DictionaryStubTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -947,8 +937,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Clear", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Clear", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1035,14 +1025,14 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Clear", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Clear", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Clear", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Clear", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1054,7 +1044,6 @@ partial class DictionaryStubTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -1096,7 +1085,7 @@ partial class DictionaryStubTests
 
 				public MethodSequenceImpl(IDictionary_ClearInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1164,7 +1153,7 @@ partial class DictionaryStubTests
 			private int _unconfiguredCallCount;
 			private object? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public object? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1176,8 +1165,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Contains", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Contains", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1264,14 +1253,14 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Contains", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Contains", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Contains", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Contains", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1284,7 +1273,6 @@ partial class DictionaryStubTests
 				private object _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public object LastArg => _lastArg;
@@ -1332,7 +1320,7 @@ partial class DictionaryStubTests
 
 				public MethodSequenceImpl(IDictionary_ContainsInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1399,7 +1387,7 @@ partial class DictionaryStubTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1408,8 +1396,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1494,14 +1482,14 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetEnumerator", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetEnumerator", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetEnumerator", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1513,7 +1501,6 @@ partial class DictionaryStubTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -1555,7 +1542,7 @@ partial class DictionaryStubTests
 
 				public MethodSequenceImpl(IDictionary_GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1620,7 +1607,7 @@ partial class DictionaryStubTests
 			private int _unconfiguredCallCount;
 			private object? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public object? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -1632,8 +1619,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Remove", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Remove", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1722,14 +1709,14 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Remove", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Remove", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("Remove", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("Remove", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1742,7 +1729,6 @@ partial class DictionaryStubTests
 				private object _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public object LastArg => _lastArg;
@@ -1790,7 +1776,7 @@ partial class DictionaryStubTests
 
 				public MethodSequenceImpl(IDictionary_RemoveInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1855,7 +1841,7 @@ partial class DictionaryStubTests
 			private int _unconfiguredCallCount;
 			private (global::System.Array array, int index)? _unconfiguredLastArgs;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
 			public (global::System.Array array, int index)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
@@ -1867,8 +1853,8 @@ partial class DictionaryStubTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CopyTo", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("CopyTo", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -1957,14 +1943,14 @@ partial class DictionaryStubTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("CopyTo", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("CopyTo", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("CopyTo", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("CopyTo", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -1977,7 +1963,6 @@ partial class DictionaryStubTests
 				private (global::System.Array array, int index) _lastArgs;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (global::System.Array array, int index) LastArgs => _lastArgs;
@@ -2025,7 +2010,7 @@ partial class DictionaryStubTests
 
 				public MethodSequenceImpl(IDictionary_CopyToInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{

@@ -15,8 +15,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
 		public global::System.Func<int>? OnGet { get; set; }
@@ -30,10 +29,10 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		}
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => GetCount++;
+		public void RecordGet() => _getCount++;
 
 		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; _source = null; }
+		public void Reset() { _getCount = 0; _source = null; }
 
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 		public CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -47,7 +46,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count", times, totalCount));
 		}
@@ -58,8 +57,8 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, GetCount));
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, _getCount));
 		}
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -73,7 +72,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Count", times, totalCount);
 		}
 
@@ -81,7 +80,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Count", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 	}
@@ -92,8 +91,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::System.Collections.Generic.IReadOnlyList<string>? _source;
 
-		/// <summary>Number of times the getter was accessed.</summary>
-		internal int GetCount { get; private set; }
+		private int _getCount;
 
 		/// <summary>The key from the most recent getter access.</summary>
 		public int? LastGetKey { get; private set; }
@@ -102,13 +100,13 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		public global::System.Func<int, string>? OnGet { get; set; }
 
 		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int? index) { GetCount++; LastGetKey = index; }
+		public void RecordGet(int? index) { _getCount++; LastGetKey = index; }
 
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
 		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-		public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+		public void Reset() { _getCount = 0; LastGetKey = default; _source = null; }
 
 		private bool _isVerifiable;
 		private global::KnockOff.Times? _verifiableTimes;
@@ -119,8 +117,8 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Verifies the indexer getter access count matches the Times constraint.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(GetCount))
-				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {GetCount} time(s).");
+			if (!times.Validate(_getCount))
+				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {_getCount} time(s).");
 		}
 
 		/// <summary>Verifies the indexer was accessed at least once.</summary>
@@ -129,7 +127,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Verifies the total indexer access count matches the Times constraint.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException($"Indexer verification failed: expected {times}, but was called {totalCount} time(s).");
 		}
@@ -158,7 +156,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		{
 			if (!_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			return null;
@@ -169,7 +167,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		{
 			if (!IsConfigured && !_isVerifiable) return null;
 			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = GetCount;
+			var totalCount = _getCount;
 			if (!times.Validate(totalCount))
 				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			return null;
@@ -208,7 +206,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		private bool _isVerifiable_NoParams_Collections_IEnumerator;
 		private global::KnockOff.Times? _verifiableTimes_NoParams_Collections_IEnumerator;
 
-		internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
+		private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Collections_Generic_IEnumerator_string?.CallCount ?? 0) + (_sequence_NoParams_Collections_Generic_IEnumerator_string?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_NoParams_Collections_IEnumerator?.CallCount ?? 0) + (_sequence_NoParams_Collections_IEnumerator?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -216,8 +214,8 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			if (!times.Validate(CallCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, CallCount));
+			if (!times.Validate(TotalCallCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetEnumerator", times, TotalCallCount));
 		}
 
 		/// <summary>Configures callback for GetEnumerator(). Returns tracking interface.</summary>
@@ -405,7 +403,6 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
@@ -449,7 +446,6 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 
 			internal int CallCount { get; private set; }
 
-
 			/// <summary>Records a call to this callback.</summary>
 			public void RecordCall() => CallCount++;
 
@@ -490,7 +486,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 
 			public MethodSequenceImpl_NoParams_Collections_Generic_IEnumerator_string(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{
@@ -542,7 +538,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 
 			public MethodSequenceImpl_NoParams_Collections_IEnumerator(GetEnumeratorInterceptor interceptor) => _interceptor = interceptor;
 
-			internal int TotalCallCount
+			private int TotalCallCount
 			{
 				get
 				{

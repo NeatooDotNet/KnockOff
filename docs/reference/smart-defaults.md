@@ -6,7 +6,7 @@
 
 KnockOff determines what to return from a stub method using this priority:
 
-1. **OnCall callback** - Explicit configuration via `Interceptors.MethodName.OnCall = ...`
+1. **OnCall callback** - Explicit configuration via `MethodName.OnCall(...)`
 2. **User method** - Your implementation in the stub class
 3. **Source** - Delegation to another instance via `Source(T)`
 4. **Smart default** - Automatic default value (this document)
@@ -285,7 +285,7 @@ To override smart defaults:
 
 **Option 1: OnCall**
 ```csharp
-stub.Interceptors.GetUser.OnCall = _ => new User("Test");
+stub.GetUser.OnCall(() => new User("Test"));
 ```
 
 **Option 2: User method**

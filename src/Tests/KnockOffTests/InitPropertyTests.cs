@@ -1,3 +1,4 @@
+using KnockOff;
 using Xunit;
 
 namespace KnockOffTests;
@@ -101,7 +102,7 @@ public class InitPropertyStandaloneTests
 		_ = entity.Id;
 
 		// Assert
-		Assert.Equal(2, stub.Id.GetCount);
+		stub.Id.VerifyGet(Times.Exactly(2));
 	}
 
 	[Fact]
@@ -212,7 +213,7 @@ public class InitPropertyStandaloneTests
 		stub.Id.Reset();
 
 		// Assert - Reset() clears tracking but preserves configuration (Value)
-		Assert.Equal(0, stub.Id.GetCount);
+		stub.Id.VerifyGet(Times.Never);
 		Assert.Equal("reset-test", stub.Id.Value); // Value is preserved
 	}
 
@@ -236,12 +237,12 @@ public class InitPropertyStandaloneTests
 		// These compile-time checks verify the interceptor structure
 		// BUG: The following lines will fail to compile because the standalone
 		// interceptor is missing SetCount, LastSetValue, and RecordSet
-		Assert.Equal(0, stub.Id.SetCount);
+		stub.Id.VerifySet(Times.Never);
 		Assert.Null(stub.Id.LastSetValue);
 
 		// Verify RecordSet method exists and works
 		stub.Id.RecordSet("test-value");
-		Assert.Equal(1, stub.Id.SetCount);
+		stub.Id.VerifySet(Times.Once);
 		Assert.Equal("test-value", stub.Id.LastSetValue);
 	}
 }
@@ -306,7 +307,7 @@ public class InitPropertyInlineStubTests
 		_ = entity.Id;
 
 		// Assert
-		Assert.Equal(2, stub.Id.GetCount);
+		stub.Id.VerifyGet(Times.Exactly(2));
 	}
 
 	/// <summary>
@@ -330,12 +331,12 @@ public class InitPropertyInlineStubTests
 
 		// Assert - interceptor should have SetCount and LastSetValue fields
 		// These compile-time checks verify the interceptor structure
-		Assert.Equal(0, stub.Id.SetCount);
+		stub.Id.VerifySet(Times.Never);
 		Assert.Null(stub.Id.LastSetValue);
 
 		// Verify RecordSet method exists and works
 		stub.Id.RecordSet("test-value");
-		Assert.Equal(1, stub.Id.SetCount);
+		stub.Id.VerifySet(Times.Once);
 		Assert.Equal("test-value", stub.Id.LastSetValue);
 	}
 
@@ -351,7 +352,7 @@ public class InitPropertyInlineStubTests
 		stub.Id.RecordSet("third");
 
 		// Assert
-		Assert.Equal(3, stub.Id.SetCount);
+		stub.Id.VerifySet(Times.Exactly(3));
 		Assert.Equal("third", stub.Id.LastSetValue);
 	}
 
@@ -361,13 +362,13 @@ public class InitPropertyInlineStubTests
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
 		stub.Id.RecordSet("some-value");
-		Assert.Equal(1, stub.Id.SetCount);
+		stub.Id.VerifySet(Times.Once);
 
 		// Act
 		stub.Id.Reset();
 
 		// Assert
-		Assert.Equal(0, stub.Id.SetCount);
+		stub.Id.VerifySet(Times.Never);
 		Assert.Null(stub.Id.LastSetValue);
 	}
 
@@ -381,7 +382,7 @@ public class InitPropertyInlineStubTests
 		stub.Object.Title = "test-title";
 
 		// Assert - regular setter should track SetCount
-		Assert.Equal(1, stub.Title.SetCount);
+		stub.Title.VerifySet(Times.Once);
 		Assert.Equal("test-title", stub.Title.LastSetValue);
 	}
 }
@@ -491,7 +492,7 @@ public class ClassInitPropertyStubTests
 		_ = stub.Object.Id;
 
 		// Assert
-		Assert.Equal(2, stub.Id.GetCount);
+		stub.Id.VerifyGet(Times.Exactly(2));
 	}
 
 	[Fact]
@@ -560,7 +561,7 @@ public class ClassInitPropertyStubTests
 
 		// Assert
 		Assert.Equal("new-name", stub.Object.Name);
-		Assert.Equal(1, stub.Name.SetCount);
+		stub.Name.VerifySet(Times.Once);
 	}
 }
 
@@ -607,7 +608,7 @@ public class ClassRequiredPropertyStubTests
 
 		// Assert
 		Assert.Equal("set-after-construction", stub.Object.Id);
-		Assert.Equal(1, stub.Id.SetCount);
+		stub.Id.VerifySet(Times.Once);
 	}
 
 	[Fact]
@@ -662,10 +663,10 @@ public class ClassRequiredPropertyStubTests
 		stub.Object.Version = 1;
 
 		// Assert
-		Assert.Equal(1, stub.Id.GetCount);
-		Assert.Equal(2, stub.Name.GetCount);
-		Assert.Equal(1, stub.Name.SetCount);
-		Assert.Equal(1, stub.Version.SetCount);
+		stub.Id.VerifyGet(Times.Once);
+		stub.Name.VerifyGet(Times.Exactly(2));
+		stub.Name.VerifySet(Times.Once);
+		stub.Version.VerifySet(Times.Once);
 	}
 
 	[Fact]
@@ -680,7 +681,7 @@ public class ClassRequiredPropertyStubTests
 		stub.Id.Reset();
 
 		// Assert - Reset() clears tracking but preserves configuration (OnGet)
-		Assert.Equal(0, stub.Id.GetCount);
+		stub.Id.VerifyGet(Times.Never);
 		Assert.NotNull(stub.Id.OnGet); // OnGet is preserved
 		Assert.Equal("test", stub.Id.OnGet());
 	}

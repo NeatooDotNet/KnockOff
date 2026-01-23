@@ -48,8 +48,7 @@ public partial class IRuleOfTTests
 
         await rule.RunRule(validateStub, null);
 
-        stub.RunRule.Verify();
-        Assert.Equal(1, stub.RunRule.CallCount);
+        stub.RunRule.Verify(Times.Once);
     }
 
     [Fact]

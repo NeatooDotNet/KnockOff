@@ -89,8 +89,8 @@ public class GenericMethodBugTests
 		service.Process(true);
 
 		// Generic overload should use Of<T>() pattern
-		Assert.Equal(1, knockOff.ProcessGeneric.Of<double>().CallCount);
-		Assert.Equal(1, knockOff.ProcessGeneric.Of<bool>().CallCount);
+		knockOff.ProcessGeneric.Of<double>().Verify(Times.Once);
+		knockOff.ProcessGeneric.Of<bool>().Verify(Times.Once);
 	}
 
 	[Fact]
@@ -111,8 +111,8 @@ public class GenericMethodBugTests
 		// All should be tracked independently
 		stringTracking.Verify(Times.Once);  // Process(string)
 		intTracking.Verify(Times.Once);  // Process(int)
-		Assert.Equal(1, knockOff.ProcessGeneric.Of<string>().CallCount);
-		Assert.Equal(1, knockOff.ProcessGeneric.Of<int>().CallCount);
+		knockOff.ProcessGeneric.Of<string>().Verify(Times.Once);
+		knockOff.ProcessGeneric.Of<int>().Verify(Times.Once);
 
 		// Note: Process(string) and Process<string>() are DIFFERENT overloads
 		// even though T happens to be string

@@ -72,7 +72,7 @@ public void PassingStubObjectToMethod()
     // Pass stub.Object to method expecting EmailService
     UseEmailService(stub.Object);
 
-    Assert.True(stub.Send.WasCalled);
+    stub.Send.Verify();
 }
 ```
 <!-- endSnippet -->
@@ -90,23 +90,23 @@ OnCall callbacks receive only the method's parameters - they do not receive the 
 <!-- snippet: troubleshoot-oncall-signature -->
 ```cs
 [Fact]
-public void OnCallSignature_MatchesMethodParams()
+public void OnCallSignature_KoParameterFirst()
 {
     var stub = new TroubleshootRepoStub();
 
-    // CORRECT: Callback receives only the method parameter (id)
+    // ERROR (won't compile): Missing ko parameter
+    // stub.GetByIdAsync.OnCall((id) => Task.FromResult<User?>(null));
+
+    // CORRECT: Include ko as first parameter
     stub.GetByIdAsync.OnCall((id) =>
         Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 
-    // For methods with multiple parameters, include all of them
-    stub.FindAsync.OnCall((name, active) =>
-        Task.FromResult(new List<User>()));
-
-    // To access the stub inside a callback, use closure
+    // The ko parameter gives access to the stub instance
+    // Useful for accessing other interceptors or state
     stub.GetByIdAsync.OnCall((id) =>
     {
-        // Access stub via closure (not a callback parameter)
-        var wasCached = stub.GetFromCache.WasCalled;
+        // Can access other interceptors via ko
+        // ko is the stub instance itself
         return Task.FromResult<User?>(new User { Id = id });
     });
 }
@@ -171,11 +171,11 @@ public void FixOptions_ForRequiredReturnValues()
 
 ### OnGet not being called
 
-**Cause:** Value was set after OnGet was configured. Value takes precedence over OnGet.
+**Cause:** OnGet was cleared or set to null after configuration.
 
-When both Value and OnGet are configured, Value is used. This is by design—explicit values override callbacks.
+When `OnGet` is set, it takes precedence over `Value`. If OnGet is not returning the expected value, verify it hasn't been cleared.
 
-**Solution:** Check your configuration order. If you want OnGet to be used, don't set Value, or set Value to default after configuring OnGet.
+**Solution:** Ensure OnGet remains configured when you need dynamic property behavior.
 
 <!-- snippet: troubleshoot-onget-priority -->
 ```cs
@@ -236,11 +236,11 @@ public void Understanding_Property_Priority()
 
 ### Reset() doesn't clear Value
 
-**Cause:** By design, Reset() preserves the Value property. It only clears call tracking (WasCalled, Args, etc.).
+**Cause:** By design, Reset() preserves the Value property while clearing tracking counters, `LastSetValue`, `OnGet`, and `OnSet`.
 
-Reset() is intended to clear test verification state between test iterations, not to reset stub behavior configuration.
+Reset() is intended to clear test verification state between test phases, not to reset test data configuration.
 
-**Solution:** Manually set Value back to its default if you need to clear configured values.
+**Solution:** If you need to clear configured values, manually set Value back to its default.
 
 <!-- snippet: troubleshoot-reset-value -->
 ```cs
@@ -253,16 +253,16 @@ public void Reset_ClearsTracking_NotValue()
     // Configure Value
     stub.Host.Value = "configured-host";
 
-    // Access property to increment GetCount
+    // Access property to verify reads
     _ = config.Host;
     _ = config.Host;
-    Assert.Equal(2, stub.Host.GetCount);
+    stub.Host.VerifyGet(Times.Exactly(2));
 
     // Reset clears tracking
     stub.Host.Reset();
 
-    // GetCount is now 0
-    Assert.Equal(0, stub.Host.GetCount);
+    // Verify tracking was cleared
+    stub.Host.VerifyGet(Times.Never);
 
     // BUT Value is preserved after Reset
     // Note: Actually Reset() clears Value too in current implementation

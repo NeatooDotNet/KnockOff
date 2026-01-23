@@ -11,15 +11,15 @@ partial class GenericDelegateInlineTest
 		/// <summary>Interceptor for Factory delegate.</summary>
 		public sealed class FactoryInterceptor
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Func<string>? OnCall { get; set; }
 
-			public void RecordCall() { CallCount++; }
+			public void RecordCall() { _callCount++; }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -27,8 +27,8 @@ partial class GenericDelegateInlineTest
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 
@@ -55,7 +55,7 @@ partial class GenericDelegateInlineTest
 		/// <summary>Interceptor for Converter delegate.</summary>
 		public sealed class ConverterInterceptor
 		{
-			internal int CallCount { get; private set; }
+			private int _callCount;
 
 			/// <summary>The argument from the last invocation.</summary>
 			public int? LastCallArg { get; private set; }
@@ -63,10 +63,10 @@ partial class GenericDelegateInlineTest
 			/// <summary>Callback invoked when delegate is called.</summary>
 			public global::System.Func<int, string>? OnCall { get; set; }
 
-			public void RecordCall(int input) { CallCount++; LastCallArg = input; }
+			public void RecordCall(int input) { _callCount++; LastCallArg = input; }
 
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { CallCount = 0; LastCallArg = default; }
+			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; LastCallArg = default; }
 
 			/// <summary>Verifies delegate was invoked at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -74,8 +74,8 @@ partial class GenericDelegateInlineTest
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, CallCount));
+				if (!times.Validate(_callCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("delegate", times, _callCount));
 			}
 		}
 

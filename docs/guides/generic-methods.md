@@ -204,10 +204,7 @@ public void ResetTyped_ClearsOnlySpecificType()
     // Reset only User-specific state
     stub.GetById.Of<User>().Reset();
 
-    // User tracking is cleared (Verify Never passes)
     stub.GetById.Of<User>().Verify(Times.Never);
-
-    // Order tracking is preserved
     stub.GetById.Of<Order>().Verify(Times.Once);
 }
 ```
@@ -233,8 +230,9 @@ public void ResetAll_ClearsAllTypeSpecificState()
     // Reset all type-specific state
     stub.GetById.Reset();
 
-    // All tracking cleared
-    Assert.False(stub.GetById.WasCalled);
+    // Verify no calls after reset using Times.Never
+    stub.GetById.Of<User>().Verify(Times.Never);
+    stub.GetById.Of<Order>().Verify(Times.Never);
     Assert.Empty(stub.GetById.CalledTypeArguments);
 }
 ```

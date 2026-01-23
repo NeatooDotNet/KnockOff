@@ -12,12 +12,13 @@ var knockOff = new UserServiceKnockOff();
 IUserService service = knockOff;
 
 // Test property set/get with typed tracking
-// Properties still use direct property access for tracking
+// Properties use Verify API for validation
 Console.WriteLine("Property Tracking:");
 service.Name = "Test User";
 Console.WriteLine($"  Set Name to: {service.Name}");
-Console.WriteLine($"  SetCount: {knockOff.Name.SetCount}");
-Console.WriteLine($"  GetCount: {knockOff.Name.GetCount}");
+knockOff.Name.VerifySet(Times.Once);
+knockOff.Name.VerifyGet(Times.Once);
+Console.WriteLine($"  Verified: VerifySet(Times.Once) and VerifyGet(Times.Once) passed");
 // Strongly typed - no cast!
 string? lastSetValue = knockOff.Name.LastSetValue;
 Console.WriteLine($"  LastSetValue (typed): {lastSetValue}");
@@ -37,7 +38,8 @@ Console.WriteLine();
 Console.WriteLine("Method with single param (typed access):");
 var greeting = service.GetGreeting("World");
 Console.WriteLine($"  Result: {greeting}");
-Console.WriteLine($"  CallCount: {knockOff.GetGreeting2.CallCount}");
+knockOff.GetGreeting2.Verify(Times.Once);
+Console.WriteLine($"  Verified: Verify(Times.Once) passed");
 
 // User-defined method tracking has LastArg directly on the interceptor
 string lastArg = knockOff.GetGreeting2.LastArg;
@@ -65,9 +67,13 @@ Console.WriteLine();
 
 // Test Reset
 Console.WriteLine("Reset tracking:");
-Console.WriteLine($"  Before reset - Name.SetCount: {knockOff.Name.SetCount}");
+Console.WriteLine("  Before reset - testing VerifySet(Times.AtLeast(2))...");
+knockOff.Name.VerifySet(Times.AtLeast(2));  // Name was set twice (once in Property Tracking, once via cast)
+Console.WriteLine("  Verified!");
 knockOff.Name.Reset();
-Console.WriteLine($"  After reset - Name.SetCount: {knockOff.Name.SetCount}");
+Console.WriteLine("  After reset - testing VerifySet(Times.Never)...");
+knockOff.Name.VerifySet(Times.Never);
+Console.WriteLine("  Verified! Reset cleared tracking.");
 
 Console.WriteLine();
 Console.WriteLine("Done!");

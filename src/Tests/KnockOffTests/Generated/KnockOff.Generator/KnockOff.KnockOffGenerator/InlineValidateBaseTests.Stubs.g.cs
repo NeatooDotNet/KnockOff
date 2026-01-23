@@ -15,8 +15,7 @@ partial class InlineValidateBaseTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::Neatoo.IValidateBase?>? OnGet { get; set; }
@@ -33,10 +32,10 @@ partial class InlineValidateBaseTests
 			internal global::Neatoo.IValidateBase? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateBase_ParentInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -50,7 +49,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Parent", times, totalCount));
 			}
@@ -61,8 +60,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Parent (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Parent (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -76,7 +75,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Parent", times, totalCount);
 			}
 
@@ -84,7 +83,7 @@ partial class InlineValidateBaseTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Parent", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -96,8 +95,7 @@ partial class InlineValidateBaseTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -114,10 +112,10 @@ partial class InlineValidateBaseTests
 			internal global::Neatoo.IValidateBase? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateBase_IsPausedInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -131,7 +129,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsPaused", times, totalCount));
 			}
@@ -142,8 +140,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsPaused (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsPaused (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -157,7 +155,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsPaused", times, totalCount);
 			}
 
@@ -165,7 +163,7 @@ partial class InlineValidateBaseTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsPaused", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -177,8 +175,7 @@ partial class InlineValidateBaseTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -195,10 +192,10 @@ partial class InlineValidateBaseTests
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateBase_IsBusyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -212,7 +209,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsBusy", times, totalCount));
 			}
@@ -223,8 +220,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsBusy (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsBusy (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -238,7 +235,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsBusy", times, totalCount);
 			}
 
@@ -246,7 +243,7 @@ partial class InlineValidateBaseTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsBusy", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -258,8 +255,7 @@ partial class InlineValidateBaseTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -276,10 +272,10 @@ partial class InlineValidateBaseTests
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateBase_IsValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -293,7 +289,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsValid", times, totalCount));
 			}
@@ -304,8 +300,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsValid (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsValid (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -319,7 +315,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsValid", times, totalCount);
 			}
 
@@ -327,7 +323,7 @@ partial class InlineValidateBaseTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsValid", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -339,8 +335,7 @@ partial class InlineValidateBaseTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<bool>? OnGet { get; set; }
@@ -357,10 +352,10 @@ partial class InlineValidateBaseTests
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateBase_IsSelfValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -374,7 +369,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSelfValid", times, totalCount));
 			}
@@ -385,8 +380,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSelfValid (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSelfValid (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -400,7 +395,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsSelfValid", times, totalCount);
 			}
 
@@ -408,7 +403,7 @@ partial class InlineValidateBaseTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsSelfValid", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -420,8 +415,7 @@ partial class InlineValidateBaseTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _valueSet;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>Callback for getter. If set, returns its value.</summary>
 			public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
@@ -438,10 +432,10 @@ partial class InlineValidateBaseTests
 			internal global::Neatoo.IValidateMetaProperties? _source;
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => GetCount++;
+			public void RecordGet() => _getCount++;
 
 			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; _source = null; }
+			public void Reset() { _getCount = 0; _source = null; }
 
 			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateBase_PropertyMessagesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -455,7 +449,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyMessages", times, totalCount));
 			}
@@ -466,8 +460,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyMessages (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyMessages (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
@@ -481,7 +475,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("PropertyMessages", times, totalCount);
 			}
 
@@ -489,7 +483,7 @@ partial class InlineValidateBaseTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("PropertyMessages", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -501,8 +495,7 @@ partial class InlineValidateBaseTests
 			private global::KnockOff.Times? _verifiableTimes;
 			private bool _configured;
 
-			/// <summary>Number of times the getter was accessed.</summary>
-			internal int GetCount { get; private set; }
+			private int _getCount;
 
 			/// <summary>The last key used to access the getter.</summary>
 			public string? LastGetKey { get; private set; }
@@ -516,7 +509,7 @@ partial class InlineValidateBaseTests
 			}
 
 			/// <summary>Records a getter access.</summary>
-			public void RecordGet(string propertyName) { GetCount++; LastGetKey = propertyName; }
+			public void RecordGet(string propertyName) { _getCount++; LastGetKey = propertyName; }
 
 			/// <summary>Backing storage for this indexer.</summary>
 			public global::System.Collections.Generic.Dictionary<string, global::Neatoo.IValidateProperty> Backing { get; } = new();
@@ -525,7 +518,7 @@ partial class InlineValidateBaseTests
 			internal global::Neatoo.IValidateBase? _source;
 
 			/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-			public void Reset() { GetCount = 0; LastGetKey = default; _source = null; }
+			public void Reset() { _getCount = 0; LastGetKey = default; _source = null; }
 
 			/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
 			public IValidateBase_IndexerInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
@@ -539,7 +532,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer", times, totalCount));
 			}
@@ -550,8 +543,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(GetCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (get)", times, GetCount));
+				if (!times.Validate(_getCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (get)", times, _getCount));
 			}
 
 			/// <summary>Whether this indexer was marked with Verifiable().</summary>
@@ -565,7 +558,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
 			}
 
@@ -573,7 +566,7 @@ partial class InlineValidateBaseTests
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = GetCount;
+				var totalCount = _getCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Indexer", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
 		}
@@ -599,7 +592,7 @@ partial class InlineValidateBaseTests
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -611,8 +604,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetProperty", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("GetProperty", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -699,14 +692,14 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetProperty", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetProperty", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("GetProperty", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("GetProperty", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -719,7 +712,6 @@ partial class InlineValidateBaseTests
 				private string _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public string LastArg => _lastArg;
@@ -767,7 +759,7 @@ partial class InlineValidateBaseTests
 
 				public MethodSequenceImpl(IValidateBase_GetPropertyInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -835,7 +827,7 @@ partial class InlineValidateBaseTests
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
 			public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
@@ -847,8 +839,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("TryGetProperty", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("TryGetProperty", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -936,14 +928,14 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("TryGetProperty", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("TryGetProperty", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("TryGetProperty", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("TryGetProperty", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -956,7 +948,6 @@ partial class InlineValidateBaseTests
 				private string _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public string LastArg => _lastArg;
@@ -1004,7 +995,7 @@ partial class InlineValidateBaseTests
 
 				public MethodSequenceImpl(IValidateBase_TryGetPropertyInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1083,7 +1074,7 @@ partial class InlineValidateBaseTests
 			private bool _isVerifiable_Threading_CancellationToken_Threading_Tasks_Task;
 			private global::KnockOff.Times? _verifiableTimes_Threading_CancellationToken_Threading_Tasks_Task;
 
-			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_NoParams_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
+			private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_NoParams_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_NoParams_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -1091,8 +1082,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("WaitForTasks", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("WaitForTasks", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback for WaitForTasks(). Returns tracking interface.</summary>
@@ -1280,7 +1271,6 @@ partial class InlineValidateBaseTests
 
 				internal int CallCount { get; private set; }
 
-
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
 
@@ -1324,7 +1314,6 @@ partial class InlineValidateBaseTests
 				private global::System.Threading.CancellationToken _lastArg = default!;
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Last argument passed to this callback. Default if never called.</summary>
 				public global::System.Threading.CancellationToken LastArg => _lastArg;
@@ -1372,7 +1361,7 @@ partial class InlineValidateBaseTests
 
 				public MethodSequenceImpl_NoParams_Threading_Tasks_Task(IValidateBase_WaitForTasksInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1424,7 +1413,7 @@ partial class InlineValidateBaseTests
 
 				public MethodSequenceImpl_Threading_CancellationToken_Threading_Tasks_Task(IValidateBase_WaitForTasksInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1503,7 +1492,7 @@ partial class InlineValidateBaseTests
 			private bool _isVerifiable_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 			private global::KnockOff.Times? _verifiableTimes_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task;
 
-			internal int CallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
+			private int TotalCallCount => _unconfiguredCallCount + (_onCallTracking_String_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_String_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0) + (_onCallTracking_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.CallCount ?? 0) + (_sequence_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task?.Sum(s => s.Tracking.CallCount) ?? 0);
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -1511,8 +1500,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRules", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("RunRules", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback for RunRules(string, global::System.Threading.CancellationToken?). Returns tracking interface.</summary>
@@ -1701,7 +1690,6 @@ partial class InlineValidateBaseTests
 
 				internal int CallCount { get; private set; }
 
-
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (string propertyName, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
@@ -1752,7 +1740,6 @@ partial class InlineValidateBaseTests
 
 				internal int CallCount { get; private set; }
 
-
 				/// <summary>Last arguments passed to this callback. Default if never called.</summary>
 				public (global::Neatoo.RunRulesFlag runRules, global::System.Threading.CancellationToken? token) LastArgs => _lastArgs;
 
@@ -1799,7 +1786,7 @@ partial class InlineValidateBaseTests
 
 				public MethodSequenceImpl_String_Threading_CancellationToken_Threading_Tasks_Task(IValidateBase_RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1851,7 +1838,7 @@ partial class InlineValidateBaseTests
 
 				public MethodSequenceImpl_Neatoo_RunRulesFlag_Threading_CancellationToken_Threading_Tasks_Task(IValidateBase_RunRulesInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -1915,7 +1902,7 @@ partial class InlineValidateBaseTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1924,8 +1911,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ClearAllMessages", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ClearAllMessages", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2012,14 +1999,14 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("ClearAllMessages", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("ClearAllMessages", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("ClearAllMessages", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("ClearAllMessages", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2031,7 +2018,6 @@ partial class InlineValidateBaseTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -2073,7 +2059,7 @@ partial class InlineValidateBaseTests
 
 				public MethodSequenceImpl(IValidateBase_ClearAllMessagesInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -2137,7 +2123,7 @@ partial class InlineValidateBaseTests
 
 			private int _unconfiguredCallCount;
 
-			internal int CallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2146,8 +2132,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ClearSelfMessages", times, CallCount));
+				if (!times.Validate(TotalCallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ClearSelfMessages", times, TotalCallCount));
 			}
 
 			/// <summary>Configures callback that repeats indefinitely. Returns tracking interface for LastArg access.</summary>
@@ -2234,14 +2220,14 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("ClearSelfMessages", times, CallCount);
+				return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("ClearSelfMessages", times, TotalCallCount);
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				return global::KnockOff.Times.AtLeastOnce.Validate(CallCount) ? null : new global::KnockOff.VerificationFailure("ClearSelfMessages", global::KnockOff.Times.AtLeastOnce, CallCount);
+				return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure("ClearSelfMessages", global::KnockOff.Times.AtLeastOnce, TotalCallCount);
 			}
 
 			/// <summary>Tracks invocations for this callback registration.</summary>
@@ -2253,7 +2239,6 @@ partial class InlineValidateBaseTests
 
 
 				internal int CallCount { get; private set; }
-
 
 				/// <summary>Records a call to this callback.</summary>
 				public void RecordCall() => CallCount++;
@@ -2295,7 +2280,7 @@ partial class InlineValidateBaseTests
 
 				public MethodSequenceImpl(IValidateBase_ClearSelfMessagesInterceptor interceptor) => _interceptor = interceptor;
 
-				internal int TotalCallCount
+				private int TotalCallCount
 				{
 					get
 					{
@@ -2345,23 +2330,20 @@ partial class InlineValidateBaseTests
 		/// <summary>Interceptor for IValidateBase.PropertyChanged event.</summary>
 		public sealed class IValidateBase_PropertyChangedInterceptor
 		{
-			/// <summary>Number of times the event was subscribed to.</summary>
-			internal int AddCount { get; private set; }
-
-			/// <summary>Number of times the event was unsubscribed from.</summary>
-			internal int RemoveCount { get; private set; }
+			private int _addCount;
+			private int _removeCount;
 
 			/// <summary>The backing delegate for raising the event.</summary>
 			public global::System.ComponentModel.PropertyChangedEventHandler? Handler { get; private set; }
 
 			/// <summary>Records an event subscription.</summary>
-			public void RecordAdd(global::System.ComponentModel.PropertyChangedEventHandler? handler) { AddCount++; Handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Combine(Handler, handler); }
+			public void RecordAdd(global::System.ComponentModel.PropertyChangedEventHandler? handler) { _addCount++; Handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Combine(Handler, handler); }
 
 			/// <summary>Records an event unsubscription.</summary>
-			public void RecordRemove(global::System.ComponentModel.PropertyChangedEventHandler? handler) { RemoveCount++; Handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Remove(Handler, handler); }
+			public void RecordRemove(global::System.ComponentModel.PropertyChangedEventHandler? handler) { _removeCount++; Handler = (global::System.ComponentModel.PropertyChangedEventHandler?)global::System.Delegate.Remove(Handler, handler); }
 
 			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
+			public void Reset() { _addCount = 0; _removeCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;
@@ -2372,8 +2354,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
 			public void VerifyAdd(global::KnockOff.Times times)
 			{
-				if (!times.Validate(AddCount))
-					throw new global::KnockOff.VerificationException($"Event 'PropertyChanged' add verification failed: expected {times}, but was called {AddCount} time(s).");
+				if (!times.Validate(_addCount))
+					throw new global::KnockOff.VerificationException($"Event 'PropertyChanged' add verification failed: expected {times}, but was called {_addCount} time(s).");
 			}
 
 			/// <summary>Verifies the event was unsubscribed at least once.</summary>
@@ -2382,8 +2364,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
 			public void VerifyRemove(global::KnockOff.Times times)
 			{
-				if (!times.Validate(RemoveCount))
-					throw new global::KnockOff.VerificationException($"Event 'PropertyChanged' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+				if (!times.Validate(_removeCount))
+					throw new global::KnockOff.VerificationException($"Event 'PropertyChanged' remove verification failed: expected {times}, but was called {_removeCount} time(s).");
 			}
 
 			/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
@@ -2392,7 +2374,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies the total event access count matches the Times constraint.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException($"Event 'PropertyChanged' verification failed: expected {times}, but was called {totalCount} time(s).");
 			}
@@ -2421,7 +2403,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					return new global::KnockOff.VerificationFailure("PropertyChanged", times, totalCount);
 				return null;
@@ -2432,7 +2414,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!IsConfigured && !_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					return new global::KnockOff.VerificationFailure("PropertyChanged", times, totalCount);
 				return null;
@@ -2442,23 +2424,20 @@ partial class InlineValidateBaseTests
 		/// <summary>Interceptor for IValidateBase.NeatooPropertyChanged event.</summary>
 		public sealed class IValidateBase_NeatooPropertyChangedInterceptor
 		{
-			/// <summary>Number of times the event was subscribed to.</summary>
-			internal int AddCount { get; private set; }
-
-			/// <summary>Number of times the event was unsubscribed from.</summary>
-			internal int RemoveCount { get; private set; }
+			private int _addCount;
+			private int _removeCount;
 
 			/// <summary>The backing delegate for raising the event.</summary>
 			public global::Neatoo.NeatooPropertyChanged? Handler { get; private set; }
 
 			/// <summary>Records an event subscription.</summary>
-			public void RecordAdd(global::Neatoo.NeatooPropertyChanged? handler) { AddCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Combine(Handler, handler); }
+			public void RecordAdd(global::Neatoo.NeatooPropertyChanged? handler) { _addCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Combine(Handler, handler); }
 
 			/// <summary>Records an event unsubscription.</summary>
-			public void RecordRemove(global::Neatoo.NeatooPropertyChanged? handler) { RemoveCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(Handler, handler); }
+			public void RecordRemove(global::Neatoo.NeatooPropertyChanged? handler) { _removeCount++; Handler = (global::Neatoo.NeatooPropertyChanged?)global::System.Delegate.Remove(Handler, handler); }
 
 			/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>
-			public void Reset() { AddCount = 0; RemoveCount = 0; Handler = null; }
+			public void Reset() { _addCount = 0; _removeCount = 0; Handler = null; }
 
 			private bool _isVerifiable;
 			private global::KnockOff.Times? _verifiableTimes;
@@ -2469,8 +2448,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies the event subscription count matches the Times constraint.</summary>
 			public void VerifyAdd(global::KnockOff.Times times)
 			{
-				if (!times.Validate(AddCount))
-					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' add verification failed: expected {times}, but was called {AddCount} time(s).");
+				if (!times.Validate(_addCount))
+					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' add verification failed: expected {times}, but was called {_addCount} time(s).");
 			}
 
 			/// <summary>Verifies the event was unsubscribed at least once.</summary>
@@ -2479,8 +2458,8 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>
 			public void VerifyRemove(global::KnockOff.Times times)
 			{
-				if (!times.Validate(RemoveCount))
-					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' remove verification failed: expected {times}, but was called {RemoveCount} time(s).");
+				if (!times.Validate(_removeCount))
+					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' remove verification failed: expected {times}, but was called {_removeCount} time(s).");
 			}
 
 			/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>
@@ -2489,7 +2468,7 @@ partial class InlineValidateBaseTests
 			/// <summary>Verifies the total event access count matches the Times constraint.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException($"Event 'NeatooPropertyChanged' verification failed: expected {times}, but was called {totalCount} time(s).");
 			}
@@ -2518,7 +2497,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					return new global::KnockOff.VerificationFailure("NeatooPropertyChanged", times, totalCount);
 				return null;
@@ -2529,7 +2508,7 @@ partial class InlineValidateBaseTests
 			{
 				if (!IsConfigured && !_isVerifiable) return null;
 				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = AddCount + RemoveCount;
+				var totalCount = _addCount + _removeCount;
 				if (!times.Validate(totalCount))
 					return new global::KnockOff.VerificationFailure("NeatooPropertyChanged", times, totalCount);
 				return null;
