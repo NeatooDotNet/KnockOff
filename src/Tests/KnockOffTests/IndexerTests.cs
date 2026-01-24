@@ -46,11 +46,11 @@ public class IndexerTests
 		IPropertyStore store = knockOff;
 
 		var mockProperty = new PropertyInfo { Name = "FromCallback", Value = "Mocked" };
-		knockOff.Indexer.OnGet = (key) =>
+		knockOff.Indexer.OnGet((key) =>
 		{
 			if (key == "Special") return mockProperty;
 			return null;
-		};
+		});
 
 		var result = store["Special"];
 
@@ -65,12 +65,12 @@ public class IndexerTests
 		IPropertyStore store = knockOff;
 
 		var accessCount = 0;
-		knockOff.Indexer.OnGet = (key) =>
+		knockOff.Indexer.OnGet((key) =>
 		{
 			// Track access count via closure
 			accessCount++;
 			return new PropertyInfo { Name = key, Value = $"Accessed {accessCount} times" };
-		};
+		});
 
 		_ = store["First"];
 		var result = store["Second"];
@@ -117,10 +117,10 @@ public class IndexerTests
 		IReadWriteStore store = knockOff;
 
 		(string key, PropertyInfo? value)? capturedEntry = null;
-		knockOff.Indexer.OnSet = (key, value) =>
+		knockOff.Indexer.OnSet((key, value) =>
 		{
 			capturedEntry = (key, value);
-		};
+		});
 
 		var prop = new PropertyInfo { Name = "Intercepted", Value = "NotStored" };
 		store["MyKey"] = prop;
@@ -141,7 +141,7 @@ public class IndexerTests
 
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
 		knockOff.Indexer.Backing["Existing"] = prop;
-		knockOff.Indexer.OnGet = (key) => prop;
+		knockOff.Indexer.OnGet((key) => prop);
 
 		_ = store["Key1"];
 		_ = store["Key2"];
@@ -149,7 +149,6 @@ public class IndexerTests
 
 		knockOff.Indexer.VerifyGet(Times.Exactly(2));
 		knockOff.Indexer.VerifySet(Times.Once);
-		Assert.NotNull(knockOff.Indexer.OnGet);
 
 		knockOff.Indexer.Reset();
 
@@ -159,8 +158,9 @@ public class IndexerTests
 		knockOff.Indexer.VerifySet(Times.Never);
 		Assert.Null(knockOff.Indexer.LastSetEntry);
 
-		// Configuration is preserved (OnGet, OnSet, Backing dictionary)
-		Assert.NotNull(knockOff.Indexer.OnGet);
+		// Configuration is preserved - OnGet callback still works and Backing dictionary preserved
+		var retrieved = store["AfterReset"];
+		Assert.Same(prop, retrieved); // OnGet callback still returns our prop
 		Assert.True(knockOff.Indexer.Backing.ContainsKey("Existing"));
 	}
 

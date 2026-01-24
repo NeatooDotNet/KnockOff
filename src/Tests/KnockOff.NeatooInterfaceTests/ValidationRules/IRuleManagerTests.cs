@@ -331,7 +331,7 @@ public class IRuleManagerStandaloneTests
         IRuleManager ruleManager = stub;
 
         var rules = new List<IRule>();
-        stub.Rules.OnGet = () => rules;
+        stub.Rules.OnGet(() => rules);
 
         Assert.Same(rules, ruleManager.Rules);
     }

@@ -79,7 +79,7 @@ public class InlineStubTests
 	{
 		var stub = new InlineTestClass.Stubs.ISimpleService();
 		stub.Name.Value = "Default";
-		stub.Name.OnGet = () => "Override";
+		stub.Name.OnGet(() => "Override");
 
 		ISimpleService service = stub;
 		var name = service.Name;
@@ -748,7 +748,7 @@ public class ClassStubTests
 	public void ClassStub_Property_TracksGetter()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
-		stub.Name.OnGet = () => "Intercepted";
+		stub.Name.OnGet(() => "Intercepted");
 
 		var name = stub.Object.Name;
 
@@ -917,7 +917,7 @@ public class AbstractClassStubTests
 	public void AbstractStub_Property_ReturnsCallback_WhenSet()
 	{
 		var stub = new AbstractStubTestClass.Stubs.AbstractRepository();
-		stub.ConnectionString.OnGet = () => "Server=test";
+		stub.ConnectionString.OnGet(() => "Server=test");
 
 		var connectionString = stub.Object.ConnectionString;
 

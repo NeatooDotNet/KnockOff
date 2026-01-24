@@ -24,16 +24,16 @@ The `ko` parameter is redundant because:
 
 **Before:**
 ```csharp
-stub.GetUser.OnCall((id) => new User { Id = id });
-stub.IsActive.OnGet = () => true;
-stub.Name.OnSet = ((value) => { };
+stub.GetUser.OnCall((ko, id) => new User { Id = id });
+stub.IsActive.OnGet = (ko) => true;
+stub.Name.OnSet = (ko, value) => { };
 ```
 
 **After:**
 ```csharp
 stub.GetUser.OnCall((id) => new User { Id = id });
-stub.IsActive.OnGet = () => true;
-stub.Name.OnSet = (value) => { };
+stub.IsActive.OnGet(() => true);
+stub.Name.OnSet((value) => { });
 ```
 
 ---
@@ -743,19 +743,19 @@ stub.GetUser.OnCall((id) => new User { Id = id });
 **OnGet for properties:**
 ```csharp
 // Before (v1.x)
-stub.IsActive.OnGet = () => true;
+stub.IsActive.OnGet = (ko) => true;
 
 // After (v2.0)
-stub.IsActive.OnGet = () => true;
+stub.IsActive.OnGet(() => true);
 ```
 
 **OnSet for properties:**
 ```csharp
 // Before (v1.x)
-stub.Name.OnSet = ((value) => Console.WriteLine(value);
+stub.Name.OnSet = (ko, value) => Console.WriteLine(value);
 
 // After (v2.0)
-stub.Name.OnSet = (value) => Console.WriteLine(value);
+stub.Name.OnSet((value) => Console.WriteLine(value));
 ```
 
 **Accessing stub within callbacks:**

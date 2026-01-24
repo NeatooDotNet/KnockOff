@@ -8,18 +8,13 @@ partial class IValidateMetaPropertiesTests
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for IValidateMetaProperties.IsBusy.</summary>
+		/// <summary>Tracks and configures behavior for IsBusy.</summary>
 		public sealed class IValidateMetaProperties_IsBusyInterceptor
 		{
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
+			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private bool _valueSet;
-
-			private int _getCount;
-
-			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<bool>? OnGet { get; set; }
-
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
 			public bool Value
@@ -28,20 +23,86 @@ partial class IValidateMetaPropertiesTests
 				set { _value = value; _valueSet = true; }
 			}
 
-			/// <summary>Source object for delegation when OnGet is not set.</summary>
-			internal global::Neatoo.IValidateMetaProperties? _source;
+			private global::System.Func<bool>? _onGet;
+			private PropertyGetTrackingImpl? _onGetTracking;
+			private global::System.Collections.Generic.List<(global::System.Func<bool> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+			private int _getSequenceIndex;
+			private bool _isGetVerifiable;
+			private global::KnockOff.Times? _getVerifiableTimes;
+			private int _unconfiguredGetCount;
 
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => _getCount++;
+			private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { _getCount = 0; _source = null; }
+			/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<bool> callback)
+			{
+				_getSequence = null;
+				_getSequenceIndex = 0;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_onGet = callback;
+				_onGetTracking = new PropertyGetTrackingImpl(this);
+				return _onGetTracking;
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public IValidateMetaProperties_IsBusyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+			/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(global::System.Func<bool> callback)
+			{
+				_onGet = null;
+				_onGetTracking = null;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_getSequence = new global::System.Collections.Generic.List<(global::System.Func<bool> Callback, PropertyGetTrackingImpl Tracking)>();
+				var tracking = new PropertyGetTrackingImpl(this);
+				_getSequence.Add((callback, tracking));
+				_getSequenceIndex = 0;
+				return new PropertyGetSequenceImpl(this);
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public IValidateMetaProperties_IsBusyInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+			internal bool InvokeGet(bool strict)
+			{
+				if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+				{
+					var (callback, tracking) = _getSequence[_getSequenceIndex];
+					tracking.RecordCall();
+					_getSequenceIndex++;
+					return callback();
+				}
+
+				if (_onGet != null && _onGetTracking != null)
+				{
+					_onGetTracking.RecordCall();
+					return _onGet();
+				}
+
+				_unconfiguredGetCount++;
+
+				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsBusy (get)");
+					return _value;
+				}
+
+				if (_source is { } src) return src.IsBusy;
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsBusy");
+				return _value;
+			}
+
+			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset()
+			{
+				_unconfiguredGetCount = 0;
+				_onGetTracking?.Reset();
+				if (_getSequence != null)
+				{
+					foreach (var (_, tracking) in _getSequence)
+						tracking.Reset();
+				}
+				_getSequenceIndex = 0;
+				_source = null;
+			}
 
 			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -49,7 +110,7 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsBusy", times, totalCount));
 			}
@@ -60,46 +121,130 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_getCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsBusy (get)", times, _getCount));
+				if (!times.Validate(TotalGetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsBusy (get)", times, TotalGetCount));
 			}
 
-			/// <summary>Whether this property was marked with Verifiable().</summary>
-			internal bool IsVerifiable => _isVerifiable;
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IValidateMetaProperties_IsBusyInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
-			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
-			internal bool IsConfigured => _valueSet || OnGet != null;
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IValidateMetaProperties_IsBusyInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isGetVerifiable;
+
+			/// <summary>Whether this property has been configured.</summary>
+			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = _getCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsBusy", times, totalCount);
+				if (!(_isGetVerifiable)) return null;
+				if (_isGetVerifiable)
+				{
+					var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("IsBusy (get)", times, TotalGetCount);
+				}
+				return null;
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsBusy", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
+
+			/// <summary>Tracks invocations for getter callback registration.</summary>
+			private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
+			{
+				private readonly IValidateMetaProperties_IsBusyInterceptor _interceptor;
+
+				public PropertyGetTrackingImpl(IValidateMetaProperties_IsBusyInterceptor interceptor) => _interceptor = interceptor;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenGet chaining.</summary>
+			private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<bool>
+			{
+				private readonly IValidateMetaProperties_IsBusyInterceptor _interceptor;
+
+				public PropertyGetSequenceImpl(IValidateMetaProperties_IsBusyInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
+				{
+					var tracking = new PropertyGetTrackingImpl(_interceptor);
+					_interceptor._getSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._getSequence == null) return;
+					var sequenceLength = _interceptor._getSequence.Count;
+					var completedCount = _interceptor._getSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+			}
+
 		}
 
-		/// <summary>Interceptor for IValidateMetaProperties.IsValid.</summary>
+		/// <summary>Tracks and configures behavior for IsValid.</summary>
 		public sealed class IValidateMetaProperties_IsValidInterceptor
 		{
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
+			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private bool _valueSet;
-
-			private int _getCount;
-
-			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<bool>? OnGet { get; set; }
-
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
 			public bool Value
@@ -108,20 +253,86 @@ partial class IValidateMetaPropertiesTests
 				set { _value = value; _valueSet = true; }
 			}
 
-			/// <summary>Source object for delegation when OnGet is not set.</summary>
-			internal global::Neatoo.IValidateMetaProperties? _source;
+			private global::System.Func<bool>? _onGet;
+			private PropertyGetTrackingImpl? _onGetTracking;
+			private global::System.Collections.Generic.List<(global::System.Func<bool> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+			private int _getSequenceIndex;
+			private bool _isGetVerifiable;
+			private global::KnockOff.Times? _getVerifiableTimes;
+			private int _unconfiguredGetCount;
 
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => _getCount++;
+			private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { _getCount = 0; _source = null; }
+			/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<bool> callback)
+			{
+				_getSequence = null;
+				_getSequenceIndex = 0;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_onGet = callback;
+				_onGetTracking = new PropertyGetTrackingImpl(this);
+				return _onGetTracking;
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public IValidateMetaProperties_IsValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+			/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(global::System.Func<bool> callback)
+			{
+				_onGet = null;
+				_onGetTracking = null;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_getSequence = new global::System.Collections.Generic.List<(global::System.Func<bool> Callback, PropertyGetTrackingImpl Tracking)>();
+				var tracking = new PropertyGetTrackingImpl(this);
+				_getSequence.Add((callback, tracking));
+				_getSequenceIndex = 0;
+				return new PropertyGetSequenceImpl(this);
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public IValidateMetaProperties_IsValidInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+			internal bool InvokeGet(bool strict)
+			{
+				if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+				{
+					var (callback, tracking) = _getSequence[_getSequenceIndex];
+					tracking.RecordCall();
+					_getSequenceIndex++;
+					return callback();
+				}
+
+				if (_onGet != null && _onGetTracking != null)
+				{
+					_onGetTracking.RecordCall();
+					return _onGet();
+				}
+
+				_unconfiguredGetCount++;
+
+				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsValid (get)");
+					return _value;
+				}
+
+				if (_source is { } src) return src.IsValid;
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsValid");
+				return _value;
+			}
+
+			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset()
+			{
+				_unconfiguredGetCount = 0;
+				_onGetTracking?.Reset();
+				if (_getSequence != null)
+				{
+					foreach (var (_, tracking) in _getSequence)
+						tracking.Reset();
+				}
+				_getSequenceIndex = 0;
+				_source = null;
+			}
 
 			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -129,7 +340,7 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsValid", times, totalCount));
 			}
@@ -140,46 +351,130 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_getCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsValid (get)", times, _getCount));
+				if (!times.Validate(TotalGetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsValid (get)", times, TotalGetCount));
 			}
 
-			/// <summary>Whether this property was marked with Verifiable().</summary>
-			internal bool IsVerifiable => _isVerifiable;
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IValidateMetaProperties_IsValidInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
-			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
-			internal bool IsConfigured => _valueSet || OnGet != null;
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IValidateMetaProperties_IsValidInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isGetVerifiable;
+
+			/// <summary>Whether this property has been configured.</summary>
+			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = _getCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsValid", times, totalCount);
+				if (!(_isGetVerifiable)) return null;
+				if (_isGetVerifiable)
+				{
+					var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("IsValid (get)", times, TotalGetCount);
+				}
+				return null;
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsValid", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
+
+			/// <summary>Tracks invocations for getter callback registration.</summary>
+			private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
+			{
+				private readonly IValidateMetaProperties_IsValidInterceptor _interceptor;
+
+				public PropertyGetTrackingImpl(IValidateMetaProperties_IsValidInterceptor interceptor) => _interceptor = interceptor;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenGet chaining.</summary>
+			private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<bool>
+			{
+				private readonly IValidateMetaProperties_IsValidInterceptor _interceptor;
+
+				public PropertyGetSequenceImpl(IValidateMetaProperties_IsValidInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
+				{
+					var tracking = new PropertyGetTrackingImpl(_interceptor);
+					_interceptor._getSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._getSequence == null) return;
+					var sequenceLength = _interceptor._getSequence.Count;
+					var completedCount = _interceptor._getSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+			}
+
 		}
 
-		/// <summary>Interceptor for IValidateMetaProperties.IsSelfValid.</summary>
+		/// <summary>Tracks and configures behavior for IsSelfValid.</summary>
 		public sealed class IValidateMetaProperties_IsSelfValidInterceptor
 		{
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
+			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private bool _valueSet;
-
-			private int _getCount;
-
-			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<bool>? OnGet { get; set; }
-
 			private bool _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
 			public bool Value
@@ -188,20 +483,86 @@ partial class IValidateMetaPropertiesTests
 				set { _value = value; _valueSet = true; }
 			}
 
-			/// <summary>Source object for delegation when OnGet is not set.</summary>
-			internal global::Neatoo.IValidateMetaProperties? _source;
+			private global::System.Func<bool>? _onGet;
+			private PropertyGetTrackingImpl? _onGetTracking;
+			private global::System.Collections.Generic.List<(global::System.Func<bool> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+			private int _getSequenceIndex;
+			private bool _isGetVerifiable;
+			private global::KnockOff.Times? _getVerifiableTimes;
+			private int _unconfiguredGetCount;
 
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => _getCount++;
+			private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { _getCount = 0; _source = null; }
+			/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<bool> callback)
+			{
+				_getSequence = null;
+				_getSequenceIndex = 0;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_onGet = callback;
+				_onGetTracking = new PropertyGetTrackingImpl(this);
+				return _onGetTracking;
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public IValidateMetaProperties_IsSelfValidInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+			/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(global::System.Func<bool> callback)
+			{
+				_onGet = null;
+				_onGetTracking = null;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_getSequence = new global::System.Collections.Generic.List<(global::System.Func<bool> Callback, PropertyGetTrackingImpl Tracking)>();
+				var tracking = new PropertyGetTrackingImpl(this);
+				_getSequence.Add((callback, tracking));
+				_getSequenceIndex = 0;
+				return new PropertyGetSequenceImpl(this);
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public IValidateMetaProperties_IsSelfValidInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+			internal bool InvokeGet(bool strict)
+			{
+				if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+				{
+					var (callback, tracking) = _getSequence[_getSequenceIndex];
+					tracking.RecordCall();
+					_getSequenceIndex++;
+					return callback();
+				}
+
+				if (_onGet != null && _onGetTracking != null)
+				{
+					_onGetTracking.RecordCall();
+					return _onGet();
+				}
+
+				_unconfiguredGetCount++;
+
+				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsSelfValid (get)");
+					return _value;
+				}
+
+				if (_source is { } src) return src.IsSelfValid;
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsSelfValid");
+				return _value;
+			}
+
+			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset()
+			{
+				_unconfiguredGetCount = 0;
+				_onGetTracking?.Reset();
+				if (_getSequence != null)
+				{
+					foreach (var (_, tracking) in _getSequence)
+						tracking.Reset();
+				}
+				_getSequenceIndex = 0;
+				_source = null;
+			}
 
 			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -209,7 +570,7 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSelfValid", times, totalCount));
 			}
@@ -220,46 +581,130 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_getCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSelfValid (get)", times, _getCount));
+				if (!times.Validate(TotalGetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("IsSelfValid (get)", times, TotalGetCount));
 			}
 
-			/// <summary>Whether this property was marked with Verifiable().</summary>
-			internal bool IsVerifiable => _isVerifiable;
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IValidateMetaProperties_IsSelfValidInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
-			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
-			internal bool IsConfigured => _valueSet || OnGet != null;
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IValidateMetaProperties_IsSelfValidInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isGetVerifiable;
+
+			/// <summary>Whether this property has been configured.</summary>
+			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = _getCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("IsSelfValid", times, totalCount);
+				if (!(_isGetVerifiable)) return null;
+				if (_isGetVerifiable)
+				{
+					var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("IsSelfValid (get)", times, TotalGetCount);
+				}
+				return null;
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("IsSelfValid", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
+
+			/// <summary>Tracks invocations for getter callback registration.</summary>
+			private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
+			{
+				private readonly IValidateMetaProperties_IsSelfValidInterceptor _interceptor;
+
+				public PropertyGetTrackingImpl(IValidateMetaProperties_IsSelfValidInterceptor interceptor) => _interceptor = interceptor;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenGet chaining.</summary>
+			private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<bool>
+			{
+				private readonly IValidateMetaProperties_IsSelfValidInterceptor _interceptor;
+
+				public PropertyGetSequenceImpl(IValidateMetaProperties_IsSelfValidInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(global::System.Func<bool> callback)
+				{
+					var tracking = new PropertyGetTrackingImpl(_interceptor);
+					_interceptor._getSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._getSequence == null) return;
+					var sequenceLength = _interceptor._getSequence.Count;
+					var completedCount = _interceptor._getSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+			}
+
 		}
 
-		/// <summary>Interceptor for IValidateMetaProperties.PropertyMessages.</summary>
+		/// <summary>Tracks and configures behavior for PropertyMessages.</summary>
 		public sealed class IValidateMetaProperties_PropertyMessagesInterceptor
 		{
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
+			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+			internal global::Neatoo.IValidateMetaProperties? _source;
+
 			private bool _valueSet;
-
-			private int _getCount;
-
-			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? OnGet { get; set; }
-
 			private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
 			public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value
@@ -268,20 +713,86 @@ partial class IValidateMetaPropertiesTests
 				set { _value = value; _valueSet = true; }
 			}
 
-			/// <summary>Source object for delegation when OnGet is not set.</summary>
-			internal global::Neatoo.IValidateMetaProperties? _source;
+			private global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? _onGet;
+			private PropertyGetTrackingImpl? _onGetTracking;
+			private global::System.Collections.Generic.List<(global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+			private int _getSequenceIndex;
+			private bool _isGetVerifiable;
+			private global::KnockOff.Times? _getVerifiableTimes;
+			private int _unconfiguredGetCount;
 
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => _getCount++;
+			private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { _getCount = 0; _source = null; }
+			/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> callback)
+			{
+				_getSequence = null;
+				_getSequenceIndex = 0;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_onGet = callback;
+				_onGetTracking = new PropertyGetTrackingImpl(this);
+				return _onGetTracking;
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public IValidateMetaProperties_PropertyMessagesInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+			/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> OnGetSequence(global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> callback)
+			{
+				_onGet = null;
+				_onGetTracking = null;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_getSequence = new global::System.Collections.Generic.List<(global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> Callback, PropertyGetTrackingImpl Tracking)>();
+				var tracking = new PropertyGetTrackingImpl(this);
+				_getSequence.Add((callback, tracking));
+				_getSequenceIndex = 0;
+				return new PropertyGetSequenceImpl(this);
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public IValidateMetaProperties_PropertyMessagesInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+			internal global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> InvokeGet(bool strict)
+			{
+				if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+				{
+					var (callback, tracking) = _getSequence[_getSequenceIndex];
+					tracking.RecordCall();
+					_getSequenceIndex++;
+					return callback();
+				}
+
+				if (_onGet != null && _onGetTracking != null)
+				{
+					_onGetTracking.RecordCall();
+					return _onGet();
+				}
+
+				_unconfiguredGetCount++;
+
+				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("PropertyMessages (get)");
+					return _value;
+				}
+
+				if (_source is { } src) return src.PropertyMessages;
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "PropertyMessages");
+				return _value;
+			}
+
+			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset()
+			{
+				_unconfiguredGetCount = 0;
+				_onGetTracking?.Reset();
+				if (_getSequence != null)
+				{
+					foreach (var (_, tracking) in _getSequence)
+						tracking.Reset();
+				}
+				_getSequenceIndex = 0;
+				_source = null;
+			}
 
 			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -289,7 +800,7 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyMessages", times, totalCount));
 			}
@@ -300,32 +811,121 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_getCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyMessages (get)", times, _getCount));
+				if (!times.Validate(TotalGetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("PropertyMessages (get)", times, TotalGetCount));
 			}
 
-			/// <summary>Whether this property was marked with Verifiable().</summary>
-			internal bool IsVerifiable => _isVerifiable;
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IValidateMetaProperties_PropertyMessagesInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
-			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
-			internal bool IsConfigured => _valueSet || OnGet != null;
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IValidateMetaProperties_PropertyMessagesInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isGetVerifiable;
+
+			/// <summary>Whether this property has been configured.</summary>
+			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = _getCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("PropertyMessages", times, totalCount);
+				if (!(_isGetVerifiable)) return null;
+				if (_isGetVerifiable)
+				{
+					var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("PropertyMessages (get)", times, TotalGetCount);
+				}
+				return null;
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("PropertyMessages", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
+
+			/// <summary>Tracks invocations for getter callback registration.</summary>
+			private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
+			{
+				private readonly IValidateMetaProperties_PropertyMessagesInterceptor _interceptor;
+
+				public PropertyGetTrackingImpl(IValidateMetaProperties_PropertyMessagesInterceptor interceptor) => _interceptor = interceptor;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenGet chaining.</summary>
+			private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>
+			{
+				private readonly IValidateMetaProperties_PropertyMessagesInterceptor _interceptor;
+
+				public PropertyGetSequenceImpl(IValidateMetaProperties_PropertyMessagesInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> callback)
+				{
+					var tracking = new PropertyGetTrackingImpl(_interceptor);
+					_interceptor._getSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._getSequence == null) return;
+					var sequenceLength = _interceptor._getSequence.Count;
+					var completedCount = _interceptor._getSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+			}
+
 		}
 
 		/// <summary>Tracks and configures behavior for WaitForTasks.</summary>
@@ -1672,50 +2272,22 @@ partial class IValidateMetaPropertiesTests
 
 			bool global::Neatoo.IValidateMetaProperties.IsBusy
 			{
-				get
-				{
-					IsBusy.RecordGet();
-					if (IsBusy.OnGet is { } onGet) return onGet();
-					if (IsBusy._source is { } src) return src.IsBusy;
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsBusy");
-					return IsBusy.Value;
-				}
+				get => IsBusy.InvokeGet(Strict);
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsValid
 			{
-				get
-				{
-					IsValid.RecordGet();
-					if (IsValid.OnGet is { } onGet) return onGet();
-					if (IsValid._source is { } src) return src.IsValid;
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsValid");
-					return IsValid.Value;
-				}
+				get => IsValid.InvokeGet(Strict);
 			}
 
 			bool global::Neatoo.IValidateMetaProperties.IsSelfValid
 			{
-				get
-				{
-					IsSelfValid.RecordGet();
-					if (IsSelfValid.OnGet is { } onGet) return onGet();
-					if (IsSelfValid._source is { } src) return src.IsSelfValid;
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "IsSelfValid");
-					return IsSelfValid.Value;
-				}
+				get => IsSelfValid.InvokeGet(Strict);
 			}
 
 			global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> global::Neatoo.IValidateMetaProperties.PropertyMessages
 			{
-				get
-				{
-					PropertyMessages.RecordGet();
-					if (PropertyMessages.OnGet is { } onGet) return onGet();
-					if (PropertyMessages._source is { } src) return src.PropertyMessages;
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IValidateMetaProperties", "PropertyMessages");
-					return PropertyMessages.Value;
-				}
+				get => PropertyMessages.InvokeGet(Strict);
 			}
 
 			/// <summary>The global::Neatoo.IValidateMetaProperties instance. Use for passing to code expecting the interface.</summary>
@@ -1782,26 +2354,13 @@ partial class IValidateMetaPropertiesTests
 
 		}
 
-		/// <summary>Interceptor for IPropertyMessage.Property.</summary>
+		/// <summary>Tracks and configures behavior for Property.</summary>
 		public sealed class IPropertyMessage_PropertyInterceptor
 		{
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
+			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+			internal global::Neatoo.IPropertyMessage? _source;
+
 			private bool _valueSet;
-
-			private int _getCount;
-
-			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<global::Neatoo.IValidateProperty>? OnGet { get; set; }
-
-			private int _setCount;
-
-			/// <summary>The last value passed to the setter.</summary>
-			public global::Neatoo.IValidateProperty? LastSetValue { get; private set; }
-
-			/// <summary>Callback for setter.</summary>
-			public global::System.Action<global::Neatoo.IValidateProperty>? OnSet { get; set; }
-
 			private global::Neatoo.IValidateProperty _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
 			public global::Neatoo.IValidateProperty Value
@@ -1810,23 +2369,169 @@ partial class IValidateMetaPropertiesTests
 				set { _value = value; _valueSet = true; }
 			}
 
-			/// <summary>Source object for delegation when OnGet is not set.</summary>
-			internal global::Neatoo.IPropertyMessage? _source;
+			private global::System.Func<global::Neatoo.IValidateProperty>? _onGet;
+			private PropertyGetTrackingImpl? _onGetTracking;
+			private global::System.Collections.Generic.List<(global::System.Func<global::Neatoo.IValidateProperty> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+			private int _getSequenceIndex;
+			private bool _isGetVerifiable;
+			private global::KnockOff.Times? _getVerifiableTimes;
+			private int _unconfiguredGetCount;
 
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => _getCount++;
+			private global::System.Action<global::Neatoo.IValidateProperty>? _onSet;
+			private PropertySetTrackingImpl? _onSetTracking;
+			private global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateProperty> Callback, PropertySetTrackingImpl Tracking)>? _setSequence;
+			private int _setSequenceIndex;
+			private bool _isSetVerifiable;
+			private global::KnockOff.Times? _setVerifiableTimes;
+			private int _unconfiguredSetCount;
+			private global::Neatoo.IValidateProperty? _unconfiguredLastSetValue;
 
-			/// <summary>Records a setter access.</summary>
-			public void RecordSet(global::Neatoo.IValidateProperty? value) { _setCount++; LastSetValue = value; }
+			private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?.CallCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; _source = null; }
+			/// <summary>The value from the last setter call (from most recently called registration).</summary>
+			public global::Neatoo.IValidateProperty? LastSetValue { get { if ((_onSetTracking?.CallCount ?? 0) > 0) return _onSetTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking.CallCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; } }
 
-			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public IPropertyMessage_PropertyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+			/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<global::Neatoo.IValidateProperty> callback)
+			{
+				_getSequence = null;
+				_getSequenceIndex = 0;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_onGet = callback;
+				_onGetTracking = new PropertyGetTrackingImpl(this);
+				return _onGetTracking;
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public IPropertyMessage_PropertyInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+			/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateProperty> OnGetSequence(global::System.Func<global::Neatoo.IValidateProperty> callback)
+			{
+				_onGet = null;
+				_onGetTracking = null;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_getSequence = new global::System.Collections.Generic.List<(global::System.Func<global::Neatoo.IValidateProperty> Callback, PropertyGetTrackingImpl Tracking)>();
+				var tracking = new PropertyGetTrackingImpl(this);
+				_getSequence.Add((callback, tracking));
+				_getSequenceIndex = 0;
+				return new PropertyGetSequenceImpl(this);
+			}
+
+			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertySetTracking<global::Neatoo.IValidateProperty> OnSet(global::System.Action<global::Neatoo.IValidateProperty> callback)
+			{
+				_setSequence = null;
+				_setSequenceIndex = 0;
+				_isSetVerifiable = false;
+				_setVerifiableTimes = null;
+				_onSet = callback;
+				_onSetTracking = new PropertySetTrackingImpl(this);
+				return _onSetTracking;
+			}
+
+			/// <summary>Starts a setter callback sequence. Returns sequence for ThenSet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertySetSequence<global::Neatoo.IValidateProperty> OnSetSequence(global::System.Action<global::Neatoo.IValidateProperty> callback)
+			{
+				_onSet = null;
+				_onSetTracking = null;
+				_isSetVerifiable = false;
+				_setVerifiableTimes = null;
+				_setSequence = new global::System.Collections.Generic.List<(global::System.Action<global::Neatoo.IValidateProperty> Callback, PropertySetTrackingImpl Tracking)>();
+				var tracking = new PropertySetTrackingImpl(this);
+				_setSequence.Add((callback, tracking));
+				_setSequenceIndex = 0;
+				return new PropertySetSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+			internal global::Neatoo.IValidateProperty InvokeGet(bool strict)
+			{
+				if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+				{
+					var (callback, tracking) = _getSequence[_getSequenceIndex];
+					tracking.RecordCall();
+					_getSequenceIndex++;
+					return callback();
+				}
+
+				if (_onGet != null && _onGetTracking != null)
+				{
+					_onGetTracking.RecordCall();
+					return _onGet();
+				}
+
+				_unconfiguredGetCount++;
+
+				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Property (get)");
+					return _value;
+				}
+
+				if (_source is { } src) return src.Property;
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Property");
+				return _value;
+			}
+
+			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
+			internal void InvokeSet(bool strict, global::Neatoo.IValidateProperty value)
+			{
+				if (_setSequence != null && _setSequenceIndex < _setSequence.Count)
+				{
+					var (callback, tracking) = _setSequence[_setSequenceIndex];
+					tracking.RecordCall(value);
+					_setSequenceIndex++;
+					callback(value);
+					return;
+				}
+
+				if (_onSet != null && _onSetTracking != null)
+				{
+					_onSetTracking.RecordCall(value);
+					_onSet(value);
+					return;
+				}
+
+				_unconfiguredSetCount++;
+				_unconfiguredLastSetValue = value;
+
+				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Property (set)");
+					_value = value;
+					return;
+				}
+
+				if (_source is { } src) { src.Property = value; return; }
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Property");
+				_value = value;
+			}
+
+			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset()
+			{
+				_unconfiguredGetCount = 0;
+				_onGetTracking?.Reset();
+				if (_getSequence != null)
+				{
+					foreach (var (_, tracking) in _getSequence)
+						tracking.Reset();
+				}
+				_getSequenceIndex = 0;
+				_unconfiguredSetCount = 0;
+				_unconfiguredLastSetValue = default;
+				_onSetTracking?.Reset();
+				if (_setSequence != null)
+				{
+					foreach (var (_, tracking) in _setSequence)
+						tracking.Reset();
+				}
+				_setSequenceIndex = 0;
+				_source = null;
+			}
 
 			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -1834,7 +2539,7 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = _getCount + _setCount;
+				var totalCount = TotalGetCount + TotalSetCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Property", times, totalCount));
 			}
@@ -1845,8 +2550,8 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_getCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Property (get)", times, _getCount));
+				if (!times.Validate(TotalGetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Property (get)", times, TotalGetCount));
 			}
 
 			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -1855,54 +2560,226 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifySet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_setCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Property (set)", times, _setCount));
+				if (!times.Validate(TotalSetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Property (set)", times, TotalSetCount));
 			}
 
-			/// <summary>Whether this property was marked with Verifiable().</summary>
-			internal bool IsVerifiable => _isVerifiable;
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IPropertyMessage_PropertyInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; _isSetVerifiable = true; _setVerifiableTimes = null; return this; }
 
-			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
-			internal bool IsConfigured => _valueSet || OnGet != null || OnSet != null;
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IPropertyMessage_PropertyInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times; return this; }
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
+
+			/// <summary>Whether this property has been configured.</summary>
+			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = _getCount + _setCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Property", times, totalCount);
+				if (!(_isGetVerifiable || _isSetVerifiable)) return null;
+				if (_isGetVerifiable && _isSetVerifiable)
+				{
+					// Both marked verifiable - check combined count (either accessor satisfies)
+					var times = _getVerifiableTimes ?? _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					var totalCount = TotalGetCount + TotalSetCount;
+					return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Property", times, totalCount);
+				}
+				if (_isGetVerifiable && !_isSetVerifiable)
+				{
+					var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("Property (get)", times, TotalGetCount);
+				}
+				if (_isSetVerifiable && !_isGetVerifiable)
+				{
+					var times = _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalSetCount)) return new global::KnockOff.VerificationFailure("Property (set)", times, TotalSetCount);
+				}
+				return null;
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = _getCount + _setCount;
+				var totalCount = TotalGetCount + TotalSetCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Property", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
+
+			/// <summary>Tracks invocations for getter callback registration.</summary>
+			private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
+			{
+				private readonly IPropertyMessage_PropertyInterceptor _interceptor;
+
+				public PropertyGetTrackingImpl(IPropertyMessage_PropertyInterceptor interceptor) => _interceptor = interceptor;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenGet chaining.</summary>
+			private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateProperty>
+			{
+				private readonly IPropertyMessage_PropertyInterceptor _interceptor;
+
+				public PropertyGetSequenceImpl(IPropertyMessage_PropertyInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateProperty> ThenGet(global::System.Func<global::Neatoo.IValidateProperty> callback)
+				{
+					var tracking = new PropertyGetTrackingImpl(_interceptor);
+					_interceptor._getSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._getSequence == null) return;
+					var sequenceLength = _interceptor._getSequence.Count;
+					var completedCount = _interceptor._getSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateProperty> Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+			}
+
+			/// <summary>Tracks invocations for setter callback registration.</summary>
+			private sealed class PropertySetTrackingImpl : global::KnockOff.IPropertySetTracking<global::Neatoo.IValidateProperty>
+			{
+				private readonly IPropertyMessage_PropertyInterceptor _interceptor;
+
+				public PropertySetTrackingImpl(IPropertyMessage_PropertyInterceptor interceptor) => _interceptor = interceptor;
+
+				private global::Neatoo.IValidateProperty _lastValue = default!;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Last value passed to this setter callback. Default if never called.</summary>
+				public global::Neatoo.IValidateProperty LastValue => _lastValue;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(global::Neatoo.IValidateProperty value) { CallCount++; _lastValue = value; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastValue = default!; }
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property setter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetTracking<global::Neatoo.IValidateProperty> Verifiable()
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetTracking<global::Neatoo.IValidateProperty> Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenSet chaining.</summary>
+			private sealed class PropertySetSequenceImpl : global::KnockOff.IPropertySetSequence<global::Neatoo.IValidateProperty>
+			{
+				private readonly IPropertyMessage_PropertyInterceptor _interceptor;
+
+				public PropertySetSequenceImpl(IPropertyMessage_PropertyInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another setter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertySetSequence<global::Neatoo.IValidateProperty> ThenSet(global::System.Action<global::Neatoo.IValidateProperty> callback)
+				{
+					var tracking = new PropertySetTrackingImpl(_interceptor);
+					_interceptor._setSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._setSequence == null) return;
+					var sequenceLength = _interceptor._setSequence.Count;
+					var completedCount = _interceptor._setSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property setter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetSequence<global::Neatoo.IValidateProperty> Verifiable()
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = null;
+					return this;
+				}
+			}
+
 		}
 
-		/// <summary>Interceptor for IPropertyMessage.Message.</summary>
+		/// <summary>Tracks and configures behavior for Message.</summary>
 		public sealed class IPropertyMessage_MessageInterceptor
 		{
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
+			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
+			internal global::Neatoo.IPropertyMessage? _source;
+
 			private bool _valueSet;
-
-			private int _getCount;
-
-			/// <summary>Callback for getter. If set, returns its value.</summary>
-			public global::System.Func<string>? OnGet { get; set; }
-
-			private int _setCount;
-
-			/// <summary>The last value passed to the setter.</summary>
-			public string? LastSetValue { get; private set; }
-
-			/// <summary>Callback for setter.</summary>
-			public global::System.Action<string>? OnSet { get; set; }
-
 			private string _value = default!;
 			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
 			public string Value
@@ -1911,23 +2788,169 @@ partial class IValidateMetaPropertiesTests
 				set { _value = value; _valueSet = true; }
 			}
 
-			/// <summary>Source object for delegation when OnGet is not set.</summary>
-			internal global::Neatoo.IPropertyMessage? _source;
+			private global::System.Func<string>? _onGet;
+			private PropertyGetTrackingImpl? _onGetTracking;
+			private global::System.Collections.Generic.List<(global::System.Func<string> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+			private int _getSequenceIndex;
+			private bool _isGetVerifiable;
+			private global::KnockOff.Times? _getVerifiableTimes;
+			private int _unconfiguredGetCount;
 
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => _getCount++;
+			private global::System.Action<string>? _onSet;
+			private PropertySetTrackingImpl? _onSetTracking;
+			private global::System.Collections.Generic.List<(global::System.Action<string> Callback, PropertySetTrackingImpl Tracking)>? _setSequence;
+			private int _setSequenceIndex;
+			private bool _isSetVerifiable;
+			private global::KnockOff.Times? _setVerifiableTimes;
+			private int _unconfiguredSetCount;
+			private string? _unconfiguredLastSetValue;
 
-			/// <summary>Records a setter access.</summary>
-			public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
+			private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?.CallCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-			public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; _source = null; }
+			/// <summary>The value from the last setter call (from most recently called registration).</summary>
+			public string? LastSetValue { get { if ((_onSetTracking?.CallCount ?? 0) > 0) return _onSetTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking.CallCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; } }
 
-			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public IPropertyMessage_MessageInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+			/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<string> callback)
+			{
+				_getSequence = null;
+				_getSequenceIndex = 0;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_onGet = callback;
+				_onGetTracking = new PropertyGetTrackingImpl(this);
+				return _onGetTracking;
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public IPropertyMessage_MessageInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+			/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(global::System.Func<string> callback)
+			{
+				_onGet = null;
+				_onGetTracking = null;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_getSequence = new global::System.Collections.Generic.List<(global::System.Func<string> Callback, PropertyGetTrackingImpl Tracking)>();
+				var tracking = new PropertyGetTrackingImpl(this);
+				_getSequence.Add((callback, tracking));
+				_getSequenceIndex = 0;
+				return new PropertyGetSequenceImpl(this);
+			}
+
+			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
+			{
+				_setSequence = null;
+				_setSequenceIndex = 0;
+				_isSetVerifiable = false;
+				_setVerifiableTimes = null;
+				_onSet = callback;
+				_onSetTracking = new PropertySetTrackingImpl(this);
+				return _onSetTracking;
+			}
+
+			/// <summary>Starts a setter callback sequence. Returns sequence for ThenSet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertySetSequence<string> OnSetSequence(global::System.Action<string> callback)
+			{
+				_onSet = null;
+				_onSetTracking = null;
+				_isSetVerifiable = false;
+				_setVerifiableTimes = null;
+				_setSequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, PropertySetTrackingImpl Tracking)>();
+				var tracking = new PropertySetTrackingImpl(this);
+				_setSequence.Add((callback, tracking));
+				_setSequenceIndex = 0;
+				return new PropertySetSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+			internal string InvokeGet(bool strict)
+			{
+				if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+				{
+					var (callback, tracking) = _getSequence[_getSequenceIndex];
+					tracking.RecordCall();
+					_getSequenceIndex++;
+					return callback();
+				}
+
+				if (_onGet != null && _onGetTracking != null)
+				{
+					_onGetTracking.RecordCall();
+					return _onGet();
+				}
+
+				_unconfiguredGetCount++;
+
+				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Message (get)");
+					return _value;
+				}
+
+				if (_source is { } src) return src.Message;
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Message");
+				return _value;
+			}
+
+			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
+			internal void InvokeSet(bool strict, string value)
+			{
+				if (_setSequence != null && _setSequenceIndex < _setSequence.Count)
+				{
+					var (callback, tracking) = _setSequence[_setSequenceIndex];
+					tracking.RecordCall(value);
+					_setSequenceIndex++;
+					callback(value);
+					return;
+				}
+
+				if (_onSet != null && _onSetTracking != null)
+				{
+					_onSetTracking.RecordCall(value);
+					_onSet(value);
+					return;
+				}
+
+				_unconfiguredSetCount++;
+				_unconfiguredLastSetValue = value;
+
+				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Message (set)");
+					_value = value;
+					return;
+				}
+
+				if (_source is { } src) { src.Message = value; return; }
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Message");
+				_value = value;
+			}
+
+			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset()
+			{
+				_unconfiguredGetCount = 0;
+				_onGetTracking?.Reset();
+				if (_getSequence != null)
+				{
+					foreach (var (_, tracking) in _getSequence)
+						tracking.Reset();
+				}
+				_getSequenceIndex = 0;
+				_unconfiguredSetCount = 0;
+				_unconfiguredLastSetValue = default;
+				_onSetTracking?.Reset();
+				if (_setSequence != null)
+				{
+					foreach (var (_, tracking) in _setSequence)
+						tracking.Reset();
+				}
+				_setSequenceIndex = 0;
+				_source = null;
+			}
 
 			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -1935,7 +2958,7 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = _getCount + _setCount;
+				var totalCount = TotalGetCount + TotalSetCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Message", times, totalCount));
 			}
@@ -1946,8 +2969,8 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_getCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Message (get)", times, _getCount));
+				if (!times.Validate(TotalGetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Message (get)", times, TotalGetCount));
 			}
 
 			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -1956,32 +2979,217 @@ partial class IValidateMetaPropertiesTests
 			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifySet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_setCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Message (set)", times, _setCount));
+				if (!times.Validate(TotalSetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Message (set)", times, TotalSetCount));
 			}
 
-			/// <summary>Whether this property was marked with Verifiable().</summary>
-			internal bool IsVerifiable => _isVerifiable;
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public IPropertyMessage_MessageInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; _isSetVerifiable = true; _setVerifiableTimes = null; return this; }
 
-			/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
-			internal bool IsConfigured => _valueSet || OnGet != null || OnSet != null;
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public IPropertyMessage_MessageInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times; return this; }
+
+			/// <summary>Whether this property was marked with Verifiable().</summary>
+			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
+
+			/// <summary>Whether this property has been configured.</summary>
+			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = _getCount + _setCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Message", times, totalCount);
+				if (!(_isGetVerifiable || _isSetVerifiable)) return null;
+				if (_isGetVerifiable && _isSetVerifiable)
+				{
+					// Both marked verifiable - check combined count (either accessor satisfies)
+					var times = _getVerifiableTimes ?? _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					var totalCount = TotalGetCount + TotalSetCount;
+					return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Message", times, totalCount);
+				}
+				if (_isGetVerifiable && !_isSetVerifiable)
+				{
+					var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("Message (get)", times, TotalGetCount);
+				}
+				if (_isSetVerifiable && !_isGetVerifiable)
+				{
+					var times = _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalSetCount)) return new global::KnockOff.VerificationFailure("Message (set)", times, TotalSetCount);
+				}
+				return null;
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = _getCount + _setCount;
+				var totalCount = TotalGetCount + TotalSetCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Message", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
+
+			/// <summary>Tracks invocations for getter callback registration.</summary>
+			private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
+			{
+				private readonly IPropertyMessage_MessageInterceptor _interceptor;
+
+				public PropertyGetTrackingImpl(IPropertyMessage_MessageInterceptor interceptor) => _interceptor = interceptor;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenGet chaining.</summary>
+			private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<string>
+			{
+				private readonly IPropertyMessage_MessageInterceptor _interceptor;
+
+				public PropertyGetSequenceImpl(IPropertyMessage_MessageInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> ThenGet(global::System.Func<string> callback)
+				{
+					var tracking = new PropertyGetTrackingImpl(_interceptor);
+					_interceptor._getSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._getSequence == null) return;
+					var sequenceLength = _interceptor._getSequence.Count;
+					var completedCount = _interceptor._getSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+			}
+
+			/// <summary>Tracks invocations for setter callback registration.</summary>
+			private sealed class PropertySetTrackingImpl : global::KnockOff.IPropertySetTracking<string>
+			{
+				private readonly IPropertyMessage_MessageInterceptor _interceptor;
+
+				public PropertySetTrackingImpl(IPropertyMessage_MessageInterceptor interceptor) => _interceptor = interceptor;
+
+				private string _lastValue = default!;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Last value passed to this setter callback. Default if never called.</summary>
+				public string LastValue => _lastValue;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(string value) { CallCount++; _lastValue = value; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastValue = default!; }
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property setter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetTracking<string> Verifiable()
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetTracking<string> Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenSet chaining.</summary>
+			private sealed class PropertySetSequenceImpl : global::KnockOff.IPropertySetSequence<string>
+			{
+				private readonly IPropertyMessage_MessageInterceptor _interceptor;
+
+				public PropertySetSequenceImpl(IPropertyMessage_MessageInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another setter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertySetSequence<string> ThenSet(global::System.Action<string> callback)
+				{
+					var tracking = new PropertySetTrackingImpl(_interceptor);
+					_interceptor._setSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._setSequence == null) return;
+					var sequenceLength = _interceptor._setSequence.Count;
+					var completedCount = _interceptor._setSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property setter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetSequence<string> Verifiable()
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = null;
+					return this;
+				}
+			}
+
 		}
 
 		/// <summary>Stub implementation of global::Neatoo.IPropertyMessage.</summary>
@@ -1995,42 +3203,14 @@ partial class IValidateMetaPropertiesTests
 
 			global::Neatoo.IValidateProperty global::Neatoo.IPropertyMessage.Property
 			{
-				get
-				{
-					Property.RecordGet();
-					if (Property.OnGet is { } onGet) return onGet();
-					if (Property._source is { } src) return src.Property;
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
-					return Property.Value;
-				}
-				set
-				{
-					Property.RecordSet(value);
-					if (Property.OnSet is { } onSet) { onSet(value); return; }
-					if (Property._source is { } src) { src.Property = value; return; }
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Property");
-					Property.Value = value;
-				}
+				get => Property.InvokeGet(Strict);
+				set => Property.InvokeSet(Strict, value);
 			}
 
 			string global::Neatoo.IPropertyMessage.Message
 			{
-				get
-				{
-					Message.RecordGet();
-					if (Message.OnGet is { } onGet) return onGet();
-					if (Message._source is { } src) return src.Message;
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
-					return Message.Value;
-				}
-				set
-				{
-					Message.RecordSet(value);
-					if (Message.OnSet is { } onSet) { onSet(value); return; }
-					if (Message._source is { } src) { src.Message = value; return; }
-					if (Strict) throw global::KnockOff.StubException.NotConfigured("IPropertyMessage", "Message");
-					Message.Value = value;
-				}
+				get => Message.InvokeGet(Strict);
+				set => Message.InvokeSet(Strict, value);
 			}
 
 			/// <summary>The global::Neatoo.IPropertyMessage instance. Use for passing to code expecting the interface.</summary>

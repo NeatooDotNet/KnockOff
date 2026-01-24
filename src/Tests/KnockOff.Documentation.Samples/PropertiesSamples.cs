@@ -100,7 +100,7 @@ public class DynamicGetterTests
         var stub = new TimeProviderPropsStub();
 
         // OnGet callback returns dynamic value on each access
-        stub.Timestamp.OnGet = () => DateTime.UtcNow;
+        stub.Timestamp.OnGet(() => DateTime.UtcNow);
 
         ITimeProviderProps timeProvider = stub;
 
@@ -123,7 +123,7 @@ public class DynamicGetterTests
         var isInitialized = false;
 
         // OnGet checks the tracked state
-        stub.IsReady.OnGet = () => isInitialized;
+        stub.IsReady.OnGet(() => isInitialized);
         var initTracking = stub.Initialize.OnCall(() => { isInitialized = true; });
 
         IServiceWithInitProps service = stub;
@@ -151,7 +151,7 @@ public class SetterInterceptionTests
         var stub = new ConfigPropsStub();
 
         var setValues = new List<string>();
-        stub.Name.OnSet = (value) => setValues.Add(value);
+        stub.Name.OnSet((value) => setValues.Add(value));
 
         IConfigProps config = stub;
 
@@ -171,11 +171,11 @@ public class SetterInterceptionTests
         var stub = new ConfigPropsStub();
 
         // OnSet throws for invalid values
-        stub.Age.OnSet = (value) =>
+        stub.Age.OnSet((value) =>
         {
             if (value < 0)
                 throw new ArgumentException("Age cannot be negative");
-        };
+        });
 
         IConfigProps config = stub;
 
@@ -299,7 +299,7 @@ public class PropertyPriorityTests
         stub.Name.Value = "initial";
 
         // Then set OnGet - it takes precedence
-        stub.Name.OnGet = () => "dynamic";
+        stub.Name.OnGet(() => "dynamic");
 
         IConfigProps config = stub;
 
@@ -339,11 +339,11 @@ public class CompletePropertyExampleTests
         stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
         // OnGet: State-dependent behavior using tracked state
-        stub.IsConnected.OnGet = () => isConnected;
+        stub.IsConnected.OnGet(() => isConnected);
 
         // OnSet: Track all values written
         var connectionStrings = new List<string>();
-        stub.ConnectionString.OnSet = (value) => connectionStrings.Add(value);
+        stub.ConnectionString.OnSet((value) => connectionStrings.Add(value));
 
         // Configure the Connect method to update state
         var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });

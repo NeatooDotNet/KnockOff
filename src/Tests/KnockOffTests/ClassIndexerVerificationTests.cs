@@ -278,7 +278,7 @@ public class ClassIndexerVerificationTests
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
 		stub.Indexer.Verifiable();
-		stub.Count.OnGet = () => 10; // Also mark a property as configured
+		stub.Count.OnGet(() => 10); // Also mark a property as configured
 		// Don't access the indexer
 
 		// Act & Assert - Should fail because verifiable indexer wasn't accessed
@@ -308,7 +308,7 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.OnGet = (key) => $"value_{key}";
+		stub.Indexer.OnGet((key) => $"value_{key}");
 		// Don't access the indexer
 
 		// Act & Assert - Should fail because configured indexer wasn't accessed
@@ -320,7 +320,7 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.OnGet = (key) => $"value_{key}";
+		stub.Indexer.OnGet((key) => $"value_{key}");
 
 		// Act
 		_ = stub.Object["key"];
@@ -346,7 +346,7 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.OnSet = (key, value) => { };
+		stub.Indexer.OnSet((key, value) => { });
 		// Don't access the indexer
 
 		// Act & Assert - Should fail because OnSet makes it configured
@@ -400,15 +400,17 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.OnGet = (key) => "configured_value";
-		stub.Indexer.OnSet = (key, value) => { };
+		stub.Indexer.OnGet((key) => "configured_value");
+		var setWasCalled = false;
+		stub.Indexer.OnSet((key, value) => { setWasCalled = true; });
 
 		// Act
 		stub.Indexer.Reset();
 
-		// Assert - Configuration is preserved
-		Assert.NotNull(stub.Indexer.OnGet);
-		Assert.NotNull(stub.Indexer.OnSet);
+		// Assert - Configuration is preserved by verifying callbacks still work
+		Assert.Equal("configured_value", stub.Object["test_key"]);
+		stub.Object["key"] = "value";
+		Assert.True(setWasCalled);
 	}
 
 	[Fact]

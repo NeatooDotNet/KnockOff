@@ -204,4 +204,92 @@ internal static class ModelAdapters
 		}
 		return string.Join(", ", parts);
 	}
+
+	#region Property Adapters
+
+	/// <summary>
+	/// Converts a FlatPropertyModel to UnifiedPropertyInterceptorModel.
+	/// </summary>
+	public static UnifiedPropertyInterceptorModel ToUnifiedPropertyModel(FlatPropertyModel prop)
+	{
+		return new UnifiedPropertyInterceptorModel(
+			InterceptorClassName: prop.InterceptorClassName,
+			PropertyName: prop.MemberName,
+			DeclaringInterface: prop.DeclaringInterface,
+			ValueType: prop.ReturnType,
+			NullableValueType: prop.NullableReturnType,
+			DefaultExpression: prop.DefaultExpression,
+			HasGetter: prop.HasGetter,
+			HasSetter: prop.HasSetter,
+			IsInitOnly: prop.IsInitOnly);
+	}
+
+	/// <summary>
+	/// Converts an InlinePropertyModel to UnifiedPropertyInterceptorModel.
+	/// </summary>
+	public static UnifiedPropertyInterceptorModel ToUnifiedPropertyModel(Model.Inline.InlinePropertyModel prop)
+	{
+		return new UnifiedPropertyInterceptorModel(
+			InterceptorClassName: prop.InterceptorClassName,
+			PropertyName: prop.PropertyName,
+			DeclaringInterface: prop.DeclaringInterface,
+			ValueType: prop.ReturnType,
+			NullableValueType: prop.NullableReturnType,
+			DefaultExpression: "default!",
+			HasGetter: prop.HasGetter,
+			HasSetter: prop.HasSetter,
+			IsInitOnly: prop.IsInitOnly);
+	}
+
+	#endregion
+
+	#region Indexer Adapters
+
+	/// <summary>
+	/// Converts a FlatIndexerModel to UnifiedIndexerInterceptorModel.
+	/// </summary>
+	public static UnifiedIndexerInterceptorModel ToUnifiedIndexerModel(FlatIndexerModel indexer)
+	{
+		return new UnifiedIndexerInterceptorModel(
+			InterceptorClassName: indexer.InterceptorClassName,
+			IndexerName: "Indexer",
+			DeclaringInterface: indexer.DeclaringInterface,
+			KeyType: indexer.KeyType,
+			NullableKeyType: indexer.NullableKeyType,
+			KeyParamName: indexer.KeyParamName,
+			SingleKeyType: indexer.KeyType,
+			ValueType: indexer.ReturnType,
+			NullableValueType: indexer.NullableReturnType,
+			DefaultExpression: indexer.DefaultExpression,
+			HasGetter: indexer.HasGetter,
+			HasSetter: indexer.HasSetter,
+			ParameterSignature: $"{indexer.KeyType} {indexer.KeyParamName}",
+			ParameterTypes: indexer.KeyType,
+			KeyExpression: indexer.KeyParamName);
+	}
+
+	/// <summary>
+	/// Converts an InlineIndexerModel to UnifiedIndexerInterceptorModel.
+	/// </summary>
+	public static UnifiedIndexerInterceptorModel ToUnifiedIndexerModel(Model.Inline.InlineIndexerModel indexer)
+	{
+		return new UnifiedIndexerInterceptorModel(
+			InterceptorClassName: indexer.InterceptorClassName,
+			IndexerName: indexer.IndexerName,
+			DeclaringInterface: indexer.DeclaringInterface,
+			KeyType: indexer.KeyType,
+			NullableKeyType: indexer.NullableKeyType,
+			KeyParamName: "key",
+			SingleKeyType: indexer.SingleKeyType,
+			ValueType: indexer.ReturnType,
+			NullableValueType: indexer.ReturnType + "?", // Approximate nullable
+			DefaultExpression: "default!",
+			HasGetter: indexer.HasGetter,
+			HasSetter: indexer.HasSetter,
+			ParameterSignature: indexer.ParameterSignature,
+			ParameterTypes: indexer.ParameterTypes,
+			KeyExpression: indexer.KeyExpression);
+	}
+
+	#endregion
 }

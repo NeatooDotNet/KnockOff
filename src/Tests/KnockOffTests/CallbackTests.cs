@@ -84,7 +84,7 @@ public class CallbackTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.Name.OnGet = () => "FromCallback";
+		knockOff.Name.OnGet(() => "FromCallback");
 
 		var result = service.Name;
 
@@ -99,19 +99,18 @@ public class CallbackTests
 		ISampleService service = knockOff;
 
 		string? capturedValue = null;
-		knockOff.Name.OnSet = (value) =>
+		knockOff.Name.OnSet((value) =>
 		{
 			capturedValue = value;
-		};
+		});
 
 		service.Name = "TestValue";
 
 		Assert.Equal("TestValue", capturedValue);
 		knockOff.Name.VerifySet(Times.Once);
 
-		// Since OnSet was used, backing was not updated
-		knockOff.Name.OnGet = null;
-		var storedValue = service.Name;
+		// Since OnSet was used, backing Value was not updated
+		var storedValue = knockOff.Name.Value;
 		Assert.Equal("", storedValue);
 	}
 
@@ -179,7 +178,7 @@ public class CallbackTests
 		var knockOff = new AuditableEntityKnockOff();
 		IBaseEntity entity = knockOff;
 
-		knockOff.Id.OnGet = () => 999;
+		knockOff.Id.OnGet(() => 999);
 
 		var result = entity.Id;
 

@@ -118,7 +118,7 @@ public partial class IRuleMessagesTests
         IList<IRuleMessage> list = stub;
 
         var messageStub = new RuleMessageStubForList();
-        stub.Indexer.OnGet = (index) => messageStub;
+        stub.Indexer.OnGet((index) => messageStub);
 
         var result = list[0];
 

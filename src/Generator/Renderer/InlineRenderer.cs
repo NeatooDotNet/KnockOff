@@ -104,16 +104,41 @@ internal static class InlineRenderer
 
     private static void RenderInterfaceStub(CodeWriter w, InlineInterfaceStubModel iface)
     {
-        // Render interceptor classes first
+        // Use shared renderers for property and indexer interceptors
+        var typeParams = FormatTypeParameterList(iface.TypeParameters);
+        var constraints = FormatConstraints(iface.TypeParameters);
+        var previousIndent = w.Indent;
+        w.SetIndent(2);  // Inline stubs are nested 2 levels deep
+
+        // Render property interceptor classes using shared renderer
         foreach (var prop in iface.Properties)
         {
-            RenderPropertyInterceptorClass(w, prop, iface.StubClassName);
+            var unifiedModel = ModelAdapters.ToUnifiedPropertyModel(prop);
+            // Use property-specific type parameters (may differ from interface-level for open generics)
+            var options = new PropertyInterceptorRenderOptions(
+                BaseIndent: 2,
+                IncludeStrictParameter: true,
+                StrictAccessExpression: "strict",
+                InterceptorTypeParameters: prop.TypeParameterList,
+                InterceptorConstraints: prop.ConstraintClauses);
+            PropertyInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
         }
 
+        // Render indexer interceptor classes using shared renderer
         foreach (var indexer in iface.Indexers)
         {
-            RenderIndexerInterceptorClass(w, indexer, iface.StubClassName);
+            var unifiedModel = ModelAdapters.ToUnifiedIndexerModel(indexer);
+            // Use indexer-specific type parameters (may differ from interface-level for open generics)
+            var options = new IndexerInterceptorRenderOptions(
+                BaseIndent: 2,
+                IncludeStrictParameter: true,
+                StrictAccessExpression: "strict",
+                InterceptorTypeParameters: indexer.TypeParameterList,
+                InterceptorConstraints: indexer.ConstraintClauses);
+            IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
         }
+
+        w.SetIndent(previousIndent);
 
         // Render container classes for multi-indexer groups
         foreach (var group in iface.IndexerGroups)
@@ -128,7 +153,7 @@ internal static class InlineRenderer
         // Set indent level for nested class context (inside partial class and Stubs class)
         var methodTypeParams = FormatTypeParameterList(iface.TypeParameters);
         var methodConstraints = FormatConstraints(iface.TypeParameters);
-        var previousIndent = w.Indent;
+        previousIndent = w.Indent;
         w.SetIndent(2);  // Inline stubs are nested 2 levels deep
         foreach (var method in iface.Methods)
         {
@@ -153,11 +178,11 @@ internal static class InlineRenderer
         }
 
         // Render the stub class
-        var typeParamList = FormatTypeParameterList(iface.TypeParameters);
-        var constraints = FormatConstraints(iface.TypeParameters);
+        var stubTypeParamList = FormatTypeParameterList(iface.TypeParameters);
+        var stubConstraints = FormatConstraints(iface.TypeParameters);
 
         w.Line($"\t\t/// <summary>Stub implementation of {iface.BaseType}.</summary>");
-        w.Line($"\t\tpublic class {iface.StubClassName}{typeParamList} : {iface.BaseType}, global::KnockOff.IKnockOffStub{constraints}");
+        w.Line($"\t\tpublic class {iface.StubClassName}{stubTypeParamList} : {iface.BaseType}, global::KnockOff.IKnockOffStub{stubConstraints}");
         w.Line("\t\t{");
 
         // Interceptor properties
@@ -1048,18 +1073,16 @@ internal static class InlineRenderer
 
         if (impl.HasGetter)
         {
-            w.Line("\t\t\t\tget");
-            w.Line("\t\t\t\t{");
-            w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordGet();");
-            // Init-only properties don't support OnGet/OnSet or _source
-            if (!impl.IsInitOnly)
+            if (impl.IsInitOnly)
             {
-                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnGet is {{ }} onGet) return onGet();");
-                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) return src.{impl.MemberName};");
-                w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
+                // Init-only: use InvokeGet which handles the priority chain
+                w.Line($"\t\t\t\tget => {impl.InterceptorName}.InvokeGet(Strict);");
             }
-            w.Line($"\t\t\t\t\treturn {impl.InterceptorName}.Value;");
-            w.Line("\t\t\t\t}");
+            else
+            {
+                // Regular: use InvokeGet which handles the priority chain
+                w.Line($"\t\t\t\tget => {impl.InterceptorName}.InvokeGet(Strict);");
+            }
         }
 
         if (impl.HasSetter)
@@ -1067,23 +1090,16 @@ internal static class InlineRenderer
             var setterKeyword = impl.IsInitOnly ? "init" : "set";
             if (impl.SetterPragmaDisable != null)
                 w.Append(impl.SetterPragmaDisable);
-            w.Line($"\t\t\t\t{setterKeyword}");
-            w.Line("\t\t\t\t{");
-            // Init-only properties record the set and store value - no OnSet, _source or Strict checks
             if (impl.IsInitOnly)
             {
-                w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordSet(value);");
-                w.Line($"\t\t\t\t\t{impl.InterceptorName}.Value = value;");
+                // Init-only: record and set value directly (no InvokeSet for init accessor)
+                w.Line($"\t\t\t\t{setterKeyword} {{ {impl.InterceptorName}.RecordSet(value); {impl.InterceptorName}.Value = value; }}");
             }
             else
             {
-                w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordSet(value);");
-                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(value); return; }}");
-                w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) {{ src.{impl.MemberName} = value; return; }}");
-                w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"{impl.MemberName}\");");
-                w.Line($"\t\t\t\t\t{impl.InterceptorName}.Value = value;");
+                // Regular: use InvokeSet which handles the priority chain
+                w.Line($"\t\t\t\t{setterKeyword} => {impl.InterceptorName}.InvokeSet(Strict, value);");
             }
-            w.Line("\t\t\t\t}");
             if (impl.SetterPragmaRestore != null)
                 w.Line(impl.SetterPragmaRestore);
         }
@@ -1099,26 +1115,14 @@ internal static class InlineRenderer
 
         if (impl.HasGetter)
         {
-            w.Line("\t\t\t\tget");
-            w.Line("\t\t\t\t{");
-            w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordGet({impl.ArgumentList});");
-            w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnGet is {{ }} onGet) return onGet({impl.OnCallArgs});");
-            w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) return src[{impl.ArgumentList}];");
-            w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"this[]\");");
-            w.Line($"\t\t\t\t\treturn {impl.InterceptorName}.Backing.TryGetValue({impl.KeyArg}, out var v) ? v : {impl.DefaultExpression};");
-            w.Line("\t\t\t\t}");
+            // Use InvokeGet which handles the priority chain
+            w.Line($"\t\t\t\tget => {impl.InterceptorName}.InvokeGet(Strict, {impl.ArgumentList});");
         }
 
         if (impl.HasSetter)
         {
-            w.Line("\t\t\t\tset");
-            w.Line("\t\t\t\t{");
-            w.Line($"\t\t\t\t\t{impl.InterceptorName}.RecordSet({impl.ArgumentList}, value);");
-            w.Line($"\t\t\t\t\tif ({impl.InterceptorName}.OnSet is {{ }} onSet) {{ onSet({impl.OnCallArgs}, value); return; }}");
-            w.Line($"\t\t\t\t\tif ({impl.InterceptorName}._source is {{ }} src) {{ src[{impl.ArgumentList}] = value; return; }}");
-            w.Line($"\t\t\t\t\tif (Strict) throw global::KnockOff.StubException.NotConfigured(\"{impl.SimpleInterfaceName}\", \"this[]\");");
-            w.Line($"\t\t\t\t\t{impl.InterceptorName}.Backing[{impl.KeyArg}] = value;");
-            w.Line("\t\t\t\t}");
+            // Use InvokeSet which handles the priority chain
+            w.Line($"\t\t\t\tset => {impl.InterceptorName}.InvokeSet(Strict, {impl.ArgumentList}, value);");
         }
 
         w.Line("\t\t\t}");

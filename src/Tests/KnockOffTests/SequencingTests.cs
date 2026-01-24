@@ -302,7 +302,7 @@ public class IndexerOfXxxTests
     {
         var stub = new IndexerTestKnockOff();
 
-        stub.Indexer.OfString.OnGet = (key) => $"Value for {key}";
+        stub.Indexer.OfString.OnGet((key) => $"Value for {key}");
 
         IIndexerTestService svc = stub;
         Assert.Equal("Value for foo", svc["foo"]);
@@ -328,10 +328,10 @@ public class IndexerOfXxxTests
         var stub = new IndexerTestKnockOff();
         var callbackCalls = new System.Collections.Generic.List<(string key, string value)>();
 
-        stub.Indexer.OfString.OnSet = (key, value) =>
+        stub.Indexer.OfString.OnSet((key, value) =>
         {
             callbackCalls.Add((key, value));
-        };
+        });
 
         IIndexerTestService svc = stub;
         svc["a"] = "1";

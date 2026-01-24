@@ -49,7 +49,7 @@ public class InlineMultiIndexerTests
 	public void InlineStub_StringIndexer_OnGetCallback()
 	{
 		var stub = new InlineIndexerTestClass.Stubs.IMultiIndexerService();
-		stub.Indexer.OfString.OnGet = (key) => $"Value for {key}";
+		stub.Indexer.OfString.OnGet((key) => $"Value for {key}");
 
 		IMultiIndexerService svc = stub;
 		Assert.Equal("Value for foo", svc["foo"]);
@@ -79,10 +79,10 @@ public class InlineMultiIndexerTests
 		var stub = new InlineIndexerTestClass.Stubs.IMultiIndexerService();
 		var callbackCalls = new List<(string key, string value)>();
 
-		stub.Indexer.OfString.OnSet = (key, value) =>
+		stub.Indexer.OfString.OnSet((key, value) =>
 		{
 			callbackCalls.Add((key, value));
-		};
+		});
 
 		IMultiIndexerService svc = stub;
 		svc["a"] = "1";
