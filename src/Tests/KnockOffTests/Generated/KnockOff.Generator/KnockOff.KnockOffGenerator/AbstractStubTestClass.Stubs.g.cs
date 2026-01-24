@@ -11,15 +11,6 @@ partial class AbstractStubTestClass
 		/// <summary>Tracks and configures behavior for ConnectionString.</summary>
 		public sealed class AbstractRepository_ConnectionStringInterceptor
 		{
-			private bool _valueSet;
-			private string _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public string Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
-
 			private global::System.Func<string>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
 			private global::System.Collections.Generic.List<(global::System.Func<string> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -56,6 +47,12 @@ partial class AbstractStubTestClass
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal string InvokeGet(bool strict)
 			{
@@ -78,11 +75,11 @@ partial class AbstractStubTestClass
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ConnectionString (get)");
-					return _value;
+					return default!;
 				}
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ConnectionString");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -129,7 +126,7 @@ partial class AbstractStubTestClass
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -207,6 +204,9 @@ partial class AbstractStubTestClass
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()

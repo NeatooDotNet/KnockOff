@@ -33,7 +33,7 @@ public partial class IRuleTests
         var stub = new Stubs.IRule();
         IRule rule = stub;
 
-        stub.Executed.Value = true;
+        stub.Executed.OnGet(true);
 
         Assert.True(rule.Executed);
         stub.Executed.VerifyGet(Times.Once);
@@ -45,7 +45,7 @@ public partial class IRuleTests
         var stub = new Stubs.IRule();
         IRule rule = stub;
 
-        stub.RuleOrder.Value = 5;
+        stub.RuleOrder.OnGet(5);
 
         Assert.Equal(5, rule.RuleOrder);
     }
@@ -56,7 +56,7 @@ public partial class IRuleTests
         var stub = new Stubs.IRule();
         IRule rule = stub;
 
-        stub.UniqueIndex.Value = 42;
+        stub.UniqueIndex.OnGet(42);
 
         Assert.Equal(42u, rule.UniqueIndex);
     }
@@ -68,7 +68,7 @@ public partial class IRuleTests
         IRule rule = stub;
 
         var messages = new List<IRuleMessage>();
-        stub.Messages.Value = messages;
+        stub.Messages.OnGet(messages);
 
         Assert.Same(messages, rule.Messages);
     }
@@ -80,7 +80,7 @@ public partial class IRuleTests
         IRule rule = stub;
 
         var triggers = new List<ITriggerProperty>();
-        stub.TriggerProperties.Value = triggers;
+        stub.TriggerProperties.OnGet(triggers);
 
         Assert.Same(triggers, rule.TriggerProperties);
     }
@@ -197,7 +197,7 @@ public partial class IRuleTests
         var stub = new Stubs.IRule();
         IRule rule = stub;
 
-        stub.Executed.Value = true;
+        stub.Executed.OnGet(true);
         _ = rule.Executed;
         _ = rule.Executed;
 
@@ -275,7 +275,7 @@ public class IRuleStandaloneTests
         var stub = new RuleStub();
         IRule rule = stub;
 
-        stub.Executed.Value = true;
+        stub.Executed.OnGet(true);
 
         Assert.True(rule.Executed);
     }

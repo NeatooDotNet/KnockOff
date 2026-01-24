@@ -42,7 +42,7 @@ public partial class IRequiredRuleTests
         var stub = new Stubs.IRequiredRule();
         IRequiredRule rule = stub;
 
-        stub.ErrorMessage.Value = "This field is required.";
+        stub.ErrorMessage.OnGet("This field is required.");
 
         Assert.Equal("This field is required.", rule.ErrorMessage);
         stub.ErrorMessage.VerifyGet(Times.Once);
@@ -69,7 +69,7 @@ public partial class IRequiredRuleTests
         var stub = new Stubs.IRequiredRule();
         IRequiredRule rule = stub;
 
-        stub.Executed.Value = true;
+        stub.Executed.OnGet(true);
 
         Assert.True(rule.Executed);
     }
@@ -80,7 +80,7 @@ public partial class IRequiredRuleTests
         var stub = new Stubs.IRequiredRule();
         IRequiredRule rule = stub;
 
-        stub.RuleOrder.Value = 0; // Required rules typically run first
+        stub.RuleOrder.OnGet(0); // Required rules typically run first
 
         Assert.Equal(0, rule.RuleOrder);
     }
@@ -91,7 +91,7 @@ public partial class IRequiredRuleTests
         var stub = new Stubs.IRequiredRule();
         IRequiredRule rule = stub;
 
-        stub.UniqueIndex.Value = 100u;
+        stub.UniqueIndex.OnGet(100u);
 
         Assert.Equal(100u, rule.UniqueIndex);
     }
@@ -106,7 +106,7 @@ public partial class IRequiredRuleTests
         {
             new RuleMessage("Name", "Name is required.")
         };
-        stub.Messages.Value = messages;
+        stub.Messages.OnGet(messages);
 
         Assert.Same(messages, rule.Messages);
     }
@@ -118,7 +118,7 @@ public partial class IRequiredRuleTests
         IRequiredRule rule = stub;
 
         var triggers = new List<ITriggerProperty>();
-        stub.TriggerProperties.Value = triggers;
+        stub.TriggerProperties.OnGet(triggers);
 
         Assert.Same(triggers, rule.TriggerProperties);
     }
@@ -182,7 +182,7 @@ public partial class IRequiredRuleTests
         var stub = new Stubs.IRequiredRule();
         IRequiredRule rule = stub;
 
-        stub.ErrorMessage.Value = "Test";
+        stub.ErrorMessage.OnGet("Test");
         _ = rule.ErrorMessage;
         _ = rule.ErrorMessage;
 
@@ -249,7 +249,7 @@ public class IRequiredRuleStandaloneTests
         var stub = new RequiredRuleStub();
         IRequiredRule rule = stub;
 
-        stub.ErrorMessage.Value = "Required field";
+        stub.ErrorMessage.OnGet("Required field");
 
         Assert.Equal("Required field", rule.ErrorMessage);
     }
@@ -260,7 +260,7 @@ public class IRequiredRuleStandaloneTests
         var stub = new RequiredRuleStub();
         IRule rule = stub;
 
-        stub.Executed.Value = true;
+        stub.Executed.OnGet(true);
 
         Assert.True(rule.Executed);
     }

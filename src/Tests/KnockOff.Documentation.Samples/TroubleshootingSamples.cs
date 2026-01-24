@@ -179,7 +179,7 @@ public class NoCallbackConfiguredTests
         IConfigSvc config = stub;
 
         // Fix Option 1: Use Value property for properties
-        stub.Host.Value = "localhost";
+        stub.Host.OnGet("localhost");
         Assert.Equal("localhost", config.Host);
 
         // Fix Option 2: Use OnGet for dynamic behavior
@@ -197,25 +197,26 @@ public class OnGetPriorityTests
 {
     #region troubleshoot-onget-priority
     [Fact]
-    public void OnGet_TakesPrecedence_OverValue()
+    public void OnGet_MostRecentTakesPrecedence()
     {
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Configure OnGet - returns tracking for verification
+        // Configure OnGet with callback
         stub.Host.OnGet(() => "from-callback");
 
         // Access uses OnGet
         Assert.Equal("from-callback", config.Host);
 
-        // Set Value explicitly - but OnGet still takes precedence
-        stub.Host.Value = "from-value";
+        // OnGet with value overrides previous callback
+        stub.Host.OnGet("from-value");
 
-        // When OnGet IS set, it takes priority over Value
-        Assert.Equal("from-callback", config.Host);
+        // Most recent OnGet configuration wins
+        Assert.Equal("from-value", config.Host);
 
-        // Note: Once OnGet is configured, it cannot be cleared.
-        // For different behavior, create a new stub instance.
+        // OnGet with callback can override again
+        stub.Host.OnGet(() => "back-to-callback");
+        Assert.Equal("back-to-callback", config.Host);
     }
 
     [Fact]
@@ -226,21 +227,22 @@ public class OnGetPriorityTests
 
         // Priority order (from highest to lowest):
         // 1. OnGetSequence (if configured and not exhausted)
-        // 2. OnGet callback (if configured)
+        // 2. OnGet callback/value (most recent takes precedence)
         // 3. Source delegation (if configured)
         // 4. Strict mode check (throws if enabled and nothing configured)
-        // 5. Value property (fallback)
+        // 5. Default (fallback)
 
-        // Just Value - no OnGet configured
-        stub.Port.Value = 80;
+        // OnGet with value
+        stub.Port.OnGet(80);
         Assert.Equal(80, config.Port);
 
-        // OnGet overrides Value once configured
+        // OnGet with callback overrides previous value
         stub.Port.OnGet(() => 443);
         Assert.Equal(443, config.Port);
 
-        // Value is still accessible directly on the interceptor
-        Assert.Equal(80, stub.Port.Value);
+        // OnGet with value overrides previous callback
+        stub.Port.OnGet(8080);
+        Assert.Equal(8080, config.Port);
     }
     #endregion
 }
@@ -253,13 +255,13 @@ public class ResetBehaviorTests
 {
     #region troubleshoot-reset-value
     [Fact]
-    public void Reset_ClearsTracking_NotValue()
+    public void Reset_ClearsTracking_ButPreservesConfiguration()
     {
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Configure Value
-        stub.Host.Value = "configured-host";
+        // Configure value via OnGet
+        stub.Host.OnGet("configured-host");
 
         // Access property to verify reads
         _ = config.Host;
@@ -272,18 +274,8 @@ public class ResetBehaviorTests
         // Verify tracking was cleared
         stub.Host.VerifyGet(Times.Never);
 
-        // BUT Value is preserved after Reset
-        // Note: Actually Reset() clears Value too in current implementation
-        // Let's verify current behavior:
-        _ = config.Host; // Access again to see what Value is
-
-        // To truly preserve Value across resets, store and restore:
-        stub.Host.Value = "my-host";
-        var savedHost = stub.Host.Value;
-        stub.Host.Reset();
-        stub.Host.Value = savedHost;
-
-        Assert.Equal("my-host", config.Host);
+        // OnGet configuration is preserved after Reset
+        Assert.Equal("configured-host", config.Host);
     }
 
     [Fact]
@@ -292,10 +284,10 @@ public class ResetBehaviorTests
         var stub = new ConfigSvcStub();
 
         // Set Value
-        stub.Port.Value = 8080;
+        stub.Port.OnGet(8080);
 
         // To clear Value, set to default
-        stub.Port.Value = default;
+        stub.Port.OnGet(default(int));
 
         // Now accessing will use smart defaults
         IConfigSvc config = stub;

@@ -14,15 +14,6 @@ partial class AsyncResultStubTests
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.IAsyncResult? _source;
 
-			private bool _valueSet;
-			private object? _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public object? Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
-
 			private global::System.Func<object?>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
 			private global::System.Collections.Generic.List<(global::System.Func<object?> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -59,6 +50,12 @@ partial class AsyncResultStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(object? value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<object?> OnGetSequence(object? value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal object? InvokeGet(bool strict)
 			{
@@ -81,13 +78,13 @@ partial class AsyncResultStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("AsyncState (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.AsyncState;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "AsyncState");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -135,7 +132,7 @@ partial class AsyncResultStubTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -214,6 +211,9 @@ partial class AsyncResultStubTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<object?> ThenGet(object? value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -243,15 +243,6 @@ partial class AsyncResultStubTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.IAsyncResult? _source;
-
-			private bool _valueSet;
-			private global::System.Threading.WaitHandle _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Threading.WaitHandle Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<global::System.Threading.WaitHandle>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -289,6 +280,12 @@ partial class AsyncResultStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Threading.WaitHandle value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Threading.WaitHandle> OnGetSequence(global::System.Threading.WaitHandle value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal global::System.Threading.WaitHandle InvokeGet(bool strict)
 			{
@@ -311,13 +308,13 @@ partial class AsyncResultStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("AsyncWaitHandle (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.AsyncWaitHandle;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "AsyncWaitHandle");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -365,7 +362,7 @@ partial class AsyncResultStubTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -444,6 +441,9 @@ partial class AsyncResultStubTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Threading.WaitHandle> ThenGet(global::System.Threading.WaitHandle value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -473,15 +473,6 @@ partial class AsyncResultStubTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.IAsyncResult? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -519,6 +510,12 @@ partial class AsyncResultStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -541,13 +538,13 @@ partial class AsyncResultStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CompletedSynchronously (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.CompletedSynchronously;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CompletedSynchronously");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -595,7 +592,7 @@ partial class AsyncResultStubTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -674,6 +671,9 @@ partial class AsyncResultStubTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -703,15 +703,6 @@ partial class AsyncResultStubTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.IAsyncResult? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -749,6 +740,12 @@ partial class AsyncResultStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -771,13 +768,13 @@ partial class AsyncResultStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsCompleted (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsCompleted;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsCompleted");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -825,7 +822,7 @@ partial class AsyncResultStubTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -903,6 +900,9 @@ partial class AsyncResultStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()

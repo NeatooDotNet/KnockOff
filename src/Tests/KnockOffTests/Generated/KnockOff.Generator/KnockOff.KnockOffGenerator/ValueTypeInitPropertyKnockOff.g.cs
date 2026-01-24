@@ -10,12 +10,7 @@ partial class ValueTypeInitPropertyKnockOff : global::KnockOffTests.IValueTypeIn
 	{
 		private bool _valueSet;
 		private int _value = default!;
-		/// <summary>The configured value for Count. Setting this marks the property as configured.</summary>
-		public int Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
+		internal void SetValue(int value) { _value = value; _valueSet = true; }
 
 		private global::System.Func<int>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -58,6 +53,12 @@ partial class ValueTypeInitPropertyKnockOff : global::KnockOffTests.IValueTypeIn
 			_getSequenceIndex = 0;
 			return new PropertyGetSequenceImpl(this);
 		}
+
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
 
 		/// <summary>Records an init setter access.</summary>
 		public void RecordSet(int? value) { _setCount++; LastSetValue = value; }
@@ -223,6 +224,9 @@ partial class ValueTypeInitPropertyKnockOff : global::KnockOffTests.IValueTypeIn
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -267,7 +271,7 @@ partial class ValueTypeInitPropertyKnockOff : global::KnockOffTests.IValueTypeIn
 	int global::KnockOffTests.IValueTypeInitProperty.Count
 	{
 		get => Count.InvokeGet(Strict);
-		init { Count.RecordSet(value); Count.Value = value; }
+		init { Count.RecordSet(value); Count.SetValue(value); }
 	}
 
 }

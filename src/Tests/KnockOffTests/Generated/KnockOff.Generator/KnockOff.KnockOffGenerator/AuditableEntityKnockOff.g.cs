@@ -13,12 +13,6 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 
 		private bool _valueSet;
 		private global::System.DateTime? _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public global::System.DateTime? Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<global::System.DateTime?>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -69,6 +63,12 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(global::System.DateTime? value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<global::System.DateTime?> OnGetSequence(global::System.DateTime? value) => OnGetSequence(() => value);
+
 		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertySetTracking<global::System.DateTime?> OnSet(global::System.Action<global::System.DateTime?> callback)
 		{
@@ -117,13 +117,13 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("ModifiedAt (get)");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			if (_source is { } src) return src.ModifiedAt;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "ModifiedAt");
-			return _value;
+			return _valueSet ? _value : default!;
 		}
 
 		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -151,7 +151,6 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("ModifiedAt (set)");
-				_value = value;
 				return;
 			}
 
@@ -159,6 +158,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "ModifiedAt");
 			_value = value;
+			_valueSet = true;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -225,7 +225,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -315,6 +315,9 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.DateTime?> ThenGet(global::System.DateTime? value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
@@ -431,13 +434,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		internal global::KnockOff.Tests.IAuditableEntity? _source;
 
 		private bool _valueSet;
-		private string _value = "";
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public string Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
+		private string _value = default!;
 
 		private global::System.Func<string>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -488,6 +485,12 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
 		{
@@ -536,13 +539,13 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("ModifiedBy (get)");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			if (_source is { } src) return src.ModifiedBy;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "ModifiedBy");
-			return _value;
+			return _valueSet ? _value : default!;
 		}
 
 		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -570,7 +573,6 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("ModifiedBy (set)");
-				_value = value;
 				return;
 			}
 
@@ -578,6 +580,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "ModifiedBy");
 			_value = value;
+			_valueSet = true;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -644,7 +647,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -734,6 +737,9 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
@@ -849,15 +855,6 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Tests.IBaseEntity? _source;
 
-		private bool _valueSet;
-		private int _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public int Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
-
 		private global::System.Func<int>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
 		private global::System.Collections.Generic.List<(global::System.Func<int> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -894,6 +891,12 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal int InvokeGet(bool strict)
 		{
@@ -916,13 +919,13 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Id (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.Id;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Id");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -970,7 +973,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1049,6 +1052,9 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -1078,15 +1084,6 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Tests.IBaseEntity? _source;
-
-		private bool _valueSet;
-		private global::System.DateTime _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public global::System.DateTime Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<global::System.DateTime>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -1124,6 +1121,12 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(global::System.DateTime value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<global::System.DateTime> OnGetSequence(global::System.DateTime value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal global::System.DateTime InvokeGet(bool strict)
 		{
@@ -1146,13 +1149,13 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("CreatedAt (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.CreatedAt;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "CreatedAt");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1200,7 +1203,7 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1278,6 +1281,9 @@ partial class AuditableEntityKnockOff : global::KnockOff.Tests.IAuditableEntity,
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.DateTime> ThenGet(global::System.DateTime value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()

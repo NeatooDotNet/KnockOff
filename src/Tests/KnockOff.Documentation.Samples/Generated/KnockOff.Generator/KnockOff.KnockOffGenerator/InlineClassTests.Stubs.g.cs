@@ -13,12 +13,6 @@ partial class InlineClassTests
 		{
 			private bool _valueSet;
 			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -69,6 +63,12 @@ partial class InlineClassTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 			public global::KnockOff.IPropertySetTracking<bool> OnSet(global::System.Action<bool> callback)
 			{
@@ -117,11 +117,11 @@ partial class InlineClassTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsConnected (get)");
-					return _value;
+					return _valueSet ? _value : default!;
 				}
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsConnected");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -149,12 +149,12 @@ partial class InlineClassTests
 				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsConnected (set)");
-					_value = value;
 					return;
 				}
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsConnected");
 				_value = value;
+				_valueSet = true;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -220,7 +220,7 @@ partial class InlineClassTests
 			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -310,6 +310,9 @@ partial class InlineClassTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()

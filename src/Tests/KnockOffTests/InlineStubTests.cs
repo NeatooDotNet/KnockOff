@@ -17,7 +17,7 @@ public class InlineStubTests
 	public void InlineStub_Property_TracksGetter()
 	{
 		var stub = new InlineTestClass.Stubs.ISimpleService();
-		stub.Name.Value = "Test";
+		stub.Name.OnGet("Test");
 
 		ISimpleService service = stub;
 		var name = service.Name;
@@ -78,7 +78,7 @@ public class InlineStubTests
 	public void InlineStub_OnGet_OverridesValue()
 	{
 		var stub = new InlineTestClass.Stubs.ISimpleService();
-		stub.Name.Value = "Default";
+		stub.Name.OnGet("Default");
 		stub.Name.OnGet(() => "Override");
 
 		ISimpleService service = stub;

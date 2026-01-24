@@ -98,7 +98,7 @@ public class GenericStandaloneStubTests
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
 		IGenericRepository<User> repo = stub;
-		stub.Count.Value = 5;
+		stub.Count.OnGet(5);
 
 		// Act
 		var value = repo.Count;

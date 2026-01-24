@@ -34,7 +34,7 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
 
         var rules = new List<IRule>();
-        stub.Rules.Value = rules;
+        stub.Rules.OnGet(rules);
 
         Assert.Same(rules, ruleManager.Rules);
         stub.Rules.VerifyGet(Times.Once);

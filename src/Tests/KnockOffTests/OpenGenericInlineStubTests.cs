@@ -49,7 +49,7 @@ public class OpenGenericInlineStubTests
 		var stub = new OpenGenericInterfaceTest.Stubs.IOGRepository<int>();
 		IOGRepository<int> repo = stub;
 
-		stub.Count.Value = 42;
+		stub.Count.OnGet(42);
 		var count = repo.Count;
 
 		stub.Count.VerifyGet(Times.Once);

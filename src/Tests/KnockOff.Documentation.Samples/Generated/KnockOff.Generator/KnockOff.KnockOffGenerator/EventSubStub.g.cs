@@ -111,7 +111,7 @@ partial class EventSubStub : global::KnockOff.Documentation.Samples.Events.IEven
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>

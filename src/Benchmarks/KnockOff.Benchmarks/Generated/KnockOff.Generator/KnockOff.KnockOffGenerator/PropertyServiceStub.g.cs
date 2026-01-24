@@ -12,13 +12,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		internal global::KnockOff.Benchmarks.Interfaces.IPropertyService? _source;
 
 		private bool _valueSet;
-		private string _value = "";
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public string Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
+		private string _value = default!;
 
 		private global::System.Func<string>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -69,6 +63,12 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
 		{
@@ -117,13 +117,13 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Name (get)");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			if (_source is { } src) return src.Name;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Name");
-			return _value;
+			return _valueSet ? _value : default!;
 		}
 
 		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -151,7 +151,6 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Name (set)");
-				_value = value;
 				return;
 			}
 
@@ -159,6 +158,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Name");
 			_value = value;
+			_valueSet = true;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -225,7 +225,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -315,6 +315,9 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
@@ -430,15 +433,6 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IPropertyService? _source;
 
-		private bool _valueSet;
-		private int _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public int Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
-
 		private global::System.Func<int>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
 		private global::System.Collections.Generic.List<(global::System.Func<int> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -475,6 +469,12 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal int InvokeGet(bool strict)
 		{
@@ -497,13 +497,13 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("ReadOnlyValue (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.ReadOnlyValue;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "ReadOnlyValue");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -551,7 +551,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -630,6 +630,9 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -659,15 +662,6 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IPropertyService? _source;
-
-		private bool _valueSet;
-		private int _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public int Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Action<int>? _onSet;
 		private PropertySetTrackingImpl? _onSetTracking;
@@ -734,14 +728,12 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("WriteOnlyValue (set)");
-				_value = value;
 				return;
 			}
 
 			if (_source is { } src) { src.WriteOnlyValue = value; return; }
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "WriteOnlyValue");
-			_value = value;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -790,7 +782,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 		internal bool IsVerifiable => _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()

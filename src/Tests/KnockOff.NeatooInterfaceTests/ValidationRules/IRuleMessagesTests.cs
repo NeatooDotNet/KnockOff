@@ -106,7 +106,7 @@ public partial class IRuleMessagesTests
         var stub = new Stubs.IRuleMessages();
         IList<IRuleMessage> list = stub;
 
-        stub.Count.Value = 5;
+        stub.Count.OnGet(5);
 
         Assert.Equal(5, list.Count);
     }
@@ -211,7 +211,7 @@ public partial class IRuleMessagesTests
         var stub = new Stubs.IRuleMessages();
         ICollection<IRuleMessage> collection = stub;
 
-        stub.IsReadOnly.Value = true;
+        stub.IsReadOnly.OnGet(true);
 
         Assert.True(collection.IsReadOnly);
     }
@@ -329,7 +329,7 @@ public class IRuleMessagesStandaloneTests
         var stub = new RuleMessagesStub();
         IRuleMessages messages = stub;
 
-        stub.Count.Value = 10;
+        stub.Count.OnGet(10);
 
         Assert.Equal(10, messages.Count);
     }

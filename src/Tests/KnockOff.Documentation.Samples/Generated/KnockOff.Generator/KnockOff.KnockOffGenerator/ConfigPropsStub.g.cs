@@ -12,13 +12,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		internal global::KnockOff.Documentation.Samples.Properties.IConfigProps? _source;
 
 		private bool _valueSet;
-		private string _value = "";
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public string Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
+		private string _value = default!;
 
 		private global::System.Func<string>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -69,6 +63,12 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
 		{
@@ -117,13 +117,13 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Name (get)");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			if (_source is { } src) return src.Name;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Name");
-			return _value;
+			return _valueSet ? _value : default!;
 		}
 
 		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -151,7 +151,6 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Name (set)");
-				_value = value;
 				return;
 			}
 
@@ -159,6 +158,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Name");
 			_value = value;
+			_valueSet = true;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -225,7 +225,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -315,6 +315,9 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
@@ -432,12 +435,6 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 
 		private bool _valueSet;
 		private int _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public int Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<int>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -488,6 +485,12 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
+
 		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertySetTracking<int> OnSet(global::System.Action<int> callback)
 		{
@@ -536,13 +539,13 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Age (get)");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			if (_source is { } src) return src.Age;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Age");
-			return _value;
+			return _valueSet ? _value : default!;
 		}
 
 		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -570,7 +573,6 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Age (set)");
-				_value = value;
 				return;
 			}
 
@@ -578,6 +580,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Age");
 			_value = value;
+			_valueSet = true;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -644,7 +647,7 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -734,6 +737,9 @@ partial class ConfigPropsStub : global::KnockOff.Documentation.Samples.Propertie
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()

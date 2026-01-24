@@ -57,7 +57,7 @@ public class StaticValueTests
         var stub = new UserConfigPropsStub();
 
         // Set a static value for the property via the interceptor
-        stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
+        stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
         IUserConfigProps config = stub;
         var user = config.CurrentUser;
@@ -74,9 +74,9 @@ public class StaticValueTests
         var stub = new UserConfigPropsStub();
 
         // Configure several properties before test execution
-        stub.UserId.Value = 42;
-        stub.Email.Value = "test@example.com";
-        stub.CurrentUser.Value = new User { Id = 42, Name = "Test User" };
+        stub.UserId.OnGet(42);
+        stub.Email.OnGet("test@example.com");
+        stub.CurrentUser.OnGet(new User { Id = 42, Name = "Test User" });
 
         IUserConfigProps config = stub;
 
@@ -93,6 +93,25 @@ public class StaticValueTests
 
 public class DynamicGetterTests
 {
+    #region properties-onget-value-vs-callback
+    [Fact]
+    public void OnGet_ValueVsCallback()
+    {
+        var stub = new ConfigPropsStub();
+
+        // VALUE: Simple syntax for static values
+        stub.Name.OnGet("StaticName");
+
+        // CALLBACK: For computed or dynamic values
+        stub.Age.OnGet(() => DateTime.Now.Year - 2000);
+
+        IConfigProps config = stub;
+
+        Assert.Equal("StaticName", config.Name);
+        Assert.True(config.Age >= 0); // Dynamic value
+    }
+    #endregion
+
     #region properties-onget-dynamic
     [Fact]
     public void OnGet_ReturnsComputedValue()
@@ -199,7 +218,7 @@ public class PropertyVerificationTests
     public void VerifyGet_TracksPropertyReads()
     {
         var stub = new ConfigPropsStub();
-        stub.Age.Value = 42;
+        stub.Age.OnGet(42);
 
         IConfigProps service = stub;
 
@@ -235,7 +254,7 @@ public class PropertyVerificationTests
         var stub = new ConfigPropsStub();
 
         // Mark property as verifiable
-        stub.Name.Value = "test";
+        stub.Name.OnGet("test");
         stub.Name.Verifiable();
         stub.Age.Verifiable();
 
@@ -256,6 +275,26 @@ public class PropertyVerificationTests
 
 public class PropertySequenceTests
 {
+    #region properties-ongetsequence-value
+    [Fact]
+    public void OnGetSequence_ValueSyntax()
+    {
+        var stub = new ConfigPropsStub();
+
+        // OnGetSequence with value - simpler syntax for static values
+        // Note: First value uses OnGetSequence(value), chain uses callback syntax
+        stub.Name.OnGetSequence("First")
+            .ThenGet(() => "Second")
+            .ThenGet(() => "Third");
+
+        IConfigProps config = stub;
+
+        Assert.Equal("First", config.Name);
+        Assert.Equal("Second", config.Name);
+        Assert.Equal("Third", config.Name);
+    }
+    #endregion
+
     #region properties-ongetsequence-basic
     [Fact]
     public void OnGetSequence_ReturnsDifferentValuesOnSuccessiveReads()
@@ -350,7 +389,7 @@ public class PropertyResetTests
     {
         var stub = new ConfigPropsStub();
 
-        stub.Name.Value = "test";
+        stub.Name.OnGet("test");
 
         IConfigProps config = stub;
 
@@ -384,7 +423,7 @@ public class PropertyPriorityTests
         var stub = new ConfigPropsStub();
 
         // Set a static value
-        stub.Name.Value = "initial";
+        stub.Name.OnGet("initial");
 
         // Then set OnGet - it takes precedence
         stub.Name.OnGet(() => "dynamic");
@@ -424,7 +463,7 @@ public class CompletePropertyExampleTests
         var isConnected = false;
 
         // Value: Static test data
-        stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
+        stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
         // OnGet: State-dependent behavior using tracked state
         stub.IsConnected.OnGet(() => isConnected);

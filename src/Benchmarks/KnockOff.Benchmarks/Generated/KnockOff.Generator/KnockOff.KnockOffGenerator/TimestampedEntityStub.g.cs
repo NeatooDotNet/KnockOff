@@ -11,15 +11,6 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity? _source;
 
-		private bool _valueSet;
-		private global::System.DateTime _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public global::System.DateTime Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
-
 		private global::System.Func<global::System.DateTime>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
 		private global::System.Collections.Generic.List<(global::System.Func<global::System.DateTime> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -56,6 +47,12 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(global::System.DateTime value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<global::System.DateTime> OnGetSequence(global::System.DateTime value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal global::System.DateTime InvokeGet(bool strict)
 		{
@@ -78,13 +75,13 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("CreatedAt (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.CreatedAt;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "CreatedAt");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -132,7 +129,7 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -211,6 +208,9 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.DateTime> ThenGet(global::System.DateTime value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -240,15 +240,6 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.ITimestampedEntity? _source;
-
-		private bool _valueSet;
-		private global::System.DateTime? _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public global::System.DateTime? Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<global::System.DateTime?>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -286,6 +277,12 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(global::System.DateTime? value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<global::System.DateTime?> OnGetSequence(global::System.DateTime? value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal global::System.DateTime? InvokeGet(bool strict)
 		{
@@ -308,13 +305,13 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("UpdatedAt (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.UpdatedAt;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "UpdatedAt");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -362,7 +359,7 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -441,6 +438,9 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.DateTime?> ThenGet(global::System.DateTime? value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -470,15 +470,6 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Benchmarks.Interfaces.IBaseEntity? _source;
-
-		private bool _valueSet;
-		private int _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public int Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<int>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -516,6 +507,12 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal int InvokeGet(bool strict)
 		{
@@ -538,13 +535,13 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Id (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.Id;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Id");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -592,7 +589,7 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -670,6 +667,9 @@ partial class TimestampedEntityStub : global::KnockOff.Benchmarks.Interfaces.ITi
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()

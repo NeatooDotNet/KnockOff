@@ -109,9 +109,9 @@ public class CallbackTests
 		Assert.Equal("TestValue", capturedValue);
 		knockOff.Name.VerifySet(Times.Once);
 
-		// Since OnSet was used, backing Value was not updated
-		var storedValue = knockOff.Name.Value;
-		Assert.Equal("", storedValue);
+		// Since OnSet was used (without OnGet), getter returns default
+		var storedValue = service.Name;
+		Assert.Equal(default, storedValue);
 	}
 
 	[Fact]

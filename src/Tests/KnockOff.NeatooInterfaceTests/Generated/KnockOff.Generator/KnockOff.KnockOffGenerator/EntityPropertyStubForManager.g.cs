@@ -13,12 +13,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 
 		private bool _valueSet;
 		private bool _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public bool Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<bool>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -69,6 +63,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertySetTracking<bool> OnSet(global::System.Action<bool> callback)
 		{
@@ -117,13 +117,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsPaused (get)");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			if (_source is { } src) return src.IsPaused;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsPaused");
-			return _value;
+			return _valueSet ? _value : default!;
 		}
 
 		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -151,7 +151,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsPaused (set)");
-				_value = value;
 				return;
 			}
 
@@ -159,6 +158,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsPaused");
 			_value = value;
+			_valueSet = true;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -225,7 +225,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -315,6 +315,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
@@ -430,15 +433,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IEntityProperty? _source;
 
-		private bool _valueSet;
-		private bool _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public bool Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
-
 		private global::System.Func<bool>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
 		private global::System.Collections.Generic.List<(global::System.Func<bool> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -475,6 +469,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal bool InvokeGet(bool strict)
 		{
@@ -497,13 +497,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsModified (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.IsModified;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsModified");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -551,7 +551,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -630,6 +630,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -659,15 +662,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IEntityProperty? _source;
-
-		private bool _valueSet;
-		private bool _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public bool Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<bool>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -705,6 +699,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal bool InvokeGet(bool strict)
 		{
@@ -727,13 +727,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsSelfModified (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.IsSelfModified;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsSelfModified");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -781,7 +781,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -860,6 +860,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -889,15 +892,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IEntityProperty? _source;
-
-		private bool _valueSet;
-		private string _value = "";
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public string Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<string>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -935,6 +929,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal string InvokeGet(bool strict)
 		{
@@ -957,13 +957,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("DisplayName (get)");
-				return _value;
+				return "";
 			}
 
 			if (_source is { } src) return src.DisplayName;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "DisplayName");
-			return _value;
+			return "";
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1011,7 +1011,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1090,6 +1090,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -1119,15 +1122,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
-
-		private bool _valueSet;
-		private string _value = "";
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public string Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<string>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -1165,6 +1159,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal string InvokeGet(bool strict)
 		{
@@ -1187,13 +1187,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Name (get)");
-				return _value;
+				return "";
 			}
 
 			if (_source is { } src) return src.Name;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Name");
-			return _value;
+			return "";
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1241,7 +1241,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1320,6 +1320,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -1352,12 +1355,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 
 		private bool _valueSet;
 		private object? _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public object? Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<object?>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -1408,6 +1405,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(object? value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<object?> OnGetSequence(object? value) => OnGetSequence(() => value);
+
 		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertySetTracking<object?> OnSet(global::System.Action<object?> callback)
 		{
@@ -1456,13 +1459,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Value (get)");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			if (_source is { } src) return src.Value;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Value");
-			return _value;
+			return _valueSet ? _value : default!;
 		}
 
 		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -1490,7 +1493,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Value (set)");
-				_value = value;
 				return;
 			}
 
@@ -1498,6 +1500,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Value");
 			_value = value;
+			_valueSet = true;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1564,7 +1567,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1654,6 +1657,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<object?> ThenGet(object? value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
@@ -1769,15 +1775,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
 
-		private bool _valueSet;
-		private global::System.Threading.Tasks.Task _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public global::System.Threading.Tasks.Task Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
-
 		private global::System.Func<global::System.Threading.Tasks.Task>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
 		private global::System.Collections.Generic.List<(global::System.Func<global::System.Threading.Tasks.Task> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -1814,6 +1811,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(global::System.Threading.Tasks.Task value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<global::System.Threading.Tasks.Task> OnGetSequence(global::System.Threading.Tasks.Task value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal global::System.Threading.Tasks.Task InvokeGet(bool strict)
 		{
@@ -1836,13 +1839,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Task (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.Task;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Task");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1890,7 +1893,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1969,6 +1972,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Threading.Tasks.Task> ThenGet(global::System.Threading.Tasks.Task value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -1998,15 +2004,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
-
-		private bool _valueSet;
-		private bool _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public bool Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<bool>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -2044,6 +2041,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal bool InvokeGet(bool strict)
 		{
@@ -2066,13 +2069,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsBusy (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.IsBusy;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsBusy");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2120,7 +2123,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2199,6 +2202,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -2228,15 +2234,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
-
-		private bool _valueSet;
-		private bool _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public bool Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<bool>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -2274,6 +2271,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal bool InvokeGet(bool strict)
 		{
@@ -2296,13 +2299,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsReadOnly (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.IsReadOnly;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsReadOnly");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2350,7 +2353,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2429,6 +2432,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -2458,15 +2464,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
-
-		private bool _valueSet;
-		private global::System.Type _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public global::System.Type Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<global::System.Type>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -2504,6 +2501,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(global::System.Type value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<global::System.Type> OnGetSequence(global::System.Type value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal global::System.Type InvokeGet(bool strict)
 		{
@@ -2526,13 +2529,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Type (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.Type;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Type");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2580,7 +2583,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2659,6 +2662,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Type> ThenGet(global::System.Type value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -2688,15 +2694,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
-
-		private bool _valueSet;
-		private string? _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public string? Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<string?>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -2734,6 +2731,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(string? value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<string?> OnGetSequence(string? value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal string? InvokeGet(bool strict)
 		{
@@ -2756,13 +2759,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("StringValue (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.StringValue;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "StringValue");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2810,7 +2813,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2889,6 +2892,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string?> ThenGet(string? value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -2918,15 +2924,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
-
-		private bool _valueSet;
-		private bool _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public bool Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<bool>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -2964,6 +2961,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal bool InvokeGet(bool strict)
 		{
@@ -2986,13 +2989,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsSelfValid (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.IsSelfValid;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsSelfValid");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -3040,7 +3043,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3119,6 +3122,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -3148,15 +3154,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
-
-		private bool _valueSet;
-		private bool _value = default!;
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public bool Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<bool>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -3194,6 +3191,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal bool InvokeGet(bool strict)
 		{
@@ -3216,13 +3219,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsValid (get)");
-				return _value;
+				return default!;
 			}
 
 			if (_source is { } src) return src.IsValid;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsValid");
-			return _value;
+			return default!;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -3270,7 +3273,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3349,6 +3352,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -3378,15 +3384,6 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::Neatoo.IValidateProperty? _source;
-
-		private bool _valueSet;
-		private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
 
 		private global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -3424,6 +3421,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> OnGetSequence(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => OnGetSequence(() => value);
+
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> InvokeGet(bool strict)
 		{
@@ -3446,13 +3449,13 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("PropertyMessages (get)");
-				return _value;
+				return new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 			}
 
 			if (_source is { } src) return src.PropertyMessages;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "PropertyMessages");
-			return _value;
+			return new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -3500,7 +3503,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3578,6 +3581,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
@@ -3709,7 +3715,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -3936,7 +3942,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -4070,6 +4076,10 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		private SetValueDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private global::System.Threading.Tasks.Task _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(SetValueDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -4079,10 +4089,10 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		private int _unconfiguredCallCount;
 		private object? _unconfiguredLastArg;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public object? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public object? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -4102,9 +4112,27 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<object?> OnCall(global::System.Threading.Tasks.Task value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -4112,6 +4140,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(SetValueDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -4130,6 +4161,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				tracking.RecordCall(newValue);
 				_sequenceIndex++;
 				return callback(newValue);
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall(newValue);
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -4171,8 +4208,8 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -4405,7 +4442,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -4639,7 +4676,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -4873,7 +4910,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -5007,6 +5044,10 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		private WaitForTasksDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private global::System.Threading.Tasks.Task _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(WaitForTasksDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -5015,7 +5056,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5035,9 +5076,27 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(global::System.Threading.Tasks.Task value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5045,6 +5104,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(WaitForTasksDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5063,6 +5125,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -5102,8 +5170,8 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -5229,6 +5297,10 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		private GetAwaiterDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private global::System.Runtime.CompilerServices.TaskAwaiter _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(GetAwaiterDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -5237,7 +5309,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5257,9 +5329,27 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(global::System.Runtime.CompilerServices.TaskAwaiter value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5267,6 +5357,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(GetAwaiterDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5285,6 +5378,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -5324,8 +5423,8 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -5451,6 +5550,10 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		private RunRulesDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private global::System.Threading.Tasks.Task _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(RunRulesDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -5460,10 +5563,10 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		private int _unconfiguredCallCount;
 		private (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? _unconfiguredLastArgs;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)? LastCallArgs { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArgs; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5483,9 +5586,27 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(global::Neatoo.RunRulesFlag? runRules, global::System.Threading.CancellationToken? token)> OnCall(global::System.Threading.Tasks.Task value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5493,6 +5614,9 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(RunRulesDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5511,6 +5635,12 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 				tracking.RecordCall((runRules, token));
 				_sequenceIndex++;
 				return callback(runRules, token);
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall((runRules, token));
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -5552,8 +5682,8 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()

@@ -21,6 +21,9 @@ partial class NeatooPropertyChangedDelegateTests
 			/// <summary>Configures callback invoked when delegate is called.</summary>
 			public void OnCall(global::System.Func<global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task> callback) { _onCall = callback; }
 
+			/// <summary>Configures return value for delegate. Always returns the specified value.</summary>
+			public void OnCall(global::System.Threading.Tasks.Task value) { _onCall = (_) => value; }
+
 			public void RecordCall(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) { _callCount++; LastCallArg = propertyNameBreadCrumbs; }
 
 			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>

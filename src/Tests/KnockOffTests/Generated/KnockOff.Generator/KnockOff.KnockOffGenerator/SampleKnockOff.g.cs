@@ -12,13 +12,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		internal global::KnockOff.Tests.ISampleService? _source;
 
 		private bool _valueSet;
-		private string _value = "";
-		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-		public string Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
+		private string _value = default!;
 
 		private global::System.Func<string>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -69,6 +63,12 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			return new PropertyGetSequenceImpl(this);
 		}
 
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
 		{
@@ -117,13 +117,13 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Name (get)");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			if (_source is { } src) return src.Name;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Name");
-			return _value;
+			return _valueSet ? _value : default!;
 		}
 
 		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -151,7 +151,6 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Name (set)");
-				_value = value;
 				return;
 			}
 
@@ -159,6 +158,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Name");
 			_value = value;
+			_valueSet = true;
 		}
 
 		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -225,7 +225,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -315,6 +315,9 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 				_interceptor._getSequence!.Add((callback, tracking));
 				return this;
 			}
+
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
 
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
@@ -530,7 +533,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -757,7 +760,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -891,6 +894,10 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		private GetOptionalDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private string? _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(GetOptionalDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -899,7 +906,7 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -919,9 +926,27 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(string? value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -929,6 +954,9 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(GetOptionalDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -947,6 +975,12 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -986,8 +1020,8 @@ partial class SampleKnockOff : global::KnockOff.Tests.ISampleService, global::Kn
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()

@@ -17,6 +17,10 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		private GetCountDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private int _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(GetCountDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -25,7 +29,7 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -45,9 +49,27 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(int value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -55,6 +77,9 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(GetCountDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -73,6 +98,12 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -112,8 +143,8 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -239,6 +270,10 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		private IsEnabledDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private bool _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(IsEnabledDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -247,7 +282,7 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -267,9 +302,27 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(bool value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -277,6 +330,9 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(IsEnabledDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -295,6 +351,12 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -334,8 +396,8 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -461,6 +523,10 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		private GetRateDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private decimal _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(GetRateDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -469,7 +535,7 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -489,9 +555,27 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(decimal value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -499,6 +583,9 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(GetRateDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -517,6 +604,12 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -556,8 +649,8 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -683,6 +776,10 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		private GetTimestampDelegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private global::System.DateTime _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(GetTimestampDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -691,7 +788,7 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -711,9 +808,27 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(global::System.DateTime value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -721,6 +836,9 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(GetTimestampDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -739,6 +857,12 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -778,8 +902,8 @@ partial class ValueTypeServiceStub : global::KnockOff.Documentation.Samples.Smar
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
