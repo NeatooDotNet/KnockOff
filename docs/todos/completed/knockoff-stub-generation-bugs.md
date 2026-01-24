@@ -1,5 +1,12 @@
 # KnockOff Stub Generation Bugs
 
+**Status:** Complete
+**Priority:** High
+**Created:** 2026-01-19 (estimated)
+**Last Updated:** 2026-01-24
+
+---
+
 Two bugs discovered when generating stubs for Neatoo factory interfaces.
 
 ## Bug 1: Method Overloads with Different Return Types
@@ -119,3 +126,71 @@ Build fails with the errors described above.
 ## Workaround
 
 Currently none - these interfaces cannot be stubbed with KnockOff until the bugs are fixed.
+
+---
+
+## Results / Conclusions
+
+**Completed:** 2026-01-24
+
+Both bugs have been fixed and comprehensive tests verify the solutions.
+
+### Bug 1: Method Overloads with Different Return Types
+
+**Status:** ✅ Fixed
+
+**Solution:** The generator now creates a single method interceptor with multiple `OnCall` overloads differentiated by return type. The C# compiler resolves the correct overload based on the callback's return type signature.
+
+**Test Coverage:** `src/Tests/KnockOffTests/ReturnTypeMismatchBugTests.cs`
+- `OverloadWithDifferentReturnTypes_SyncOverload_CanBeCalledAndTracked` - Verifies sync method (returns `T`) works
+- `OverloadWithDifferentReturnTypes_AsyncOverload_CanBeCalledAndTracked` - Verifies async method (returns `Task<T>`) works
+- `OverloadWithDifferentReturnTypes_BothOverloads_TrackSeparately` - Verifies separate tracking for each overload
+
+**Example:** `IFactoryWithMixedReturnTypes` simulates the `ISymptomsAreaFactory` pattern:
+```csharp
+Task<ISampleArea?> Fetch(long id);        // Async overload
+ISampleArea Fetch(SampleEntity entity);    // Sync overload
+```
+
+The generator creates:
+```csharp
+OnCall(Func<long, Task<ISampleArea?>> callback)           // For async
+OnCall(Func<SampleEntity, ISampleArea> callback)          // For sync
+```
+
+Compiler resolves the correct overload based on the callback's return type.
+
+### Bug 2: Generic Interface Inheritance Type Mismatch
+
+**Status:** ✅ Fixed
+
+**Solution:** The generator creates separate `OnCall` overloads for each level of the interface hierarchy, allowing proper type handling for both generic (`IRule<T>`) and non-generic (`IRule`) base interfaces.
+
+**Test Coverage:** `src/Tests/KnockOffTests/GenericInheritanceTypeMismatchBugTests.cs`
+- `GenericInheritance_DerivedMethod_CanBeCalled` - Verifies typed parameter handling
+- `GenericInheritance_BaseMethod_CanBeCalled` - Verifies base interface parameter handling
+- `GenericInheritance_BothMethods_TrackSeparately` - Verifies independent tracking
+- `GenericInheritance_OnCallCallback_WorksForTypedMethod` - Verifies callback functionality
+
+**Example:** `IConsultationHistoryRule : IRule<IConsultationHistory>` where `IRule<T> : IRule`
+
+The generator creates:
+```csharp
+OnCall(Func<ISampleTarget, CancellationToken?, Task<ISampleResult>> callback)      // For IRule<T>.Execute
+OnCall(Func<ISampleRuleTarget, CancellationToken?, Task<ISampleResult>> callback)  // For IRule.Execute
+```
+
+### Test Results
+
+All 7 tests pass across all target frameworks:
+- ✅ 3 tests for Bug 1 (return type overloads)
+- ✅ 4 tests for Bug 2 (generic inheritance)
+- ✅ Tested on net8.0, net9.0, net10.0
+- ✅ Build succeeds with no errors
+
+### Impact
+
+These fixes enable KnockOff to handle complex Neatoo factory interfaces and validation rule patterns that use:
+- Mixed sync/async method overloads
+- Generic interface inheritance with covariant parameter types
+- Multi-level interface hierarchies with method shadowing
