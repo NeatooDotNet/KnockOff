@@ -183,7 +183,7 @@ public class NoCallbackConfiguredTests
         Assert.Equal("localhost", config.Host);
 
         // Fix Option 2: Use OnGet for dynamic behavior
-        stub.Port.OnGet = () => 8080;
+        stub.Port.OnGet(() => 8080);
         Assert.Equal(8080, config.Port);
     }
     #endregion
@@ -197,30 +197,25 @@ public class OnGetPriorityTests
 {
     #region troubleshoot-onget-priority
     [Fact]
-    public void Value_TakesPrecedence_WhenBothConfigured()
+    public void OnGet_TakesPrecedence_OverValue()
     {
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Configure OnGet
-        stub.Host.OnGet = () => "from-callback";
+        // Configure OnGet - returns tracking for verification
+        stub.Host.OnGet(() => "from-callback");
 
         // Access uses OnGet
         Assert.Equal("from-callback", config.Host);
 
-        // Set Value explicitly
+        // Set Value explicitly - but OnGet still takes precedence
         stub.Host.Value = "from-value";
-
-        // Now access uses Value (when OnGet is not set, Value is used)
-        // Actually, OnGet takes precedence when set
-        // Let's demonstrate the actual behavior:
 
         // When OnGet IS set, it takes priority over Value
         Assert.Equal("from-callback", config.Host);
 
-        // To use Value instead of OnGet, clear OnGet
-        stub.Host.OnGet = null;
-        Assert.Equal("from-value", config.Host);
+        // Note: Once OnGet is configured, it cannot be cleared.
+        // For different behavior, create a new stub instance.
     }
 
     [Fact]
@@ -229,22 +224,23 @@ public class OnGetPriorityTests
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Priority order:
-        // 1. OnGet callback (if set)
-        // 2. Source delegation (if configured)
-        // 3. Value property
+        // Priority order (from highest to lowest):
+        // 1. OnGetSequence (if configured and not exhausted)
+        // 2. OnGet callback (if configured)
+        // 3. Source delegation (if configured)
+        // 4. Strict mode check (throws if enabled and nothing configured)
+        // 5. Value property (fallback)
 
-        // Just Value
+        // Just Value - no OnGet configured
         stub.Port.Value = 80;
         Assert.Equal(80, config.Port);
 
-        // OnGet overrides Value
-        stub.Port.OnGet = () => 443;
+        // OnGet overrides Value once configured
+        stub.Port.OnGet(() => 443);
         Assert.Equal(443, config.Port);
 
-        // Clear OnGet to use Value again
-        stub.Port.OnGet = null;
-        Assert.Equal(80, config.Port);
+        // Value is still accessible directly on the interceptor
+        Assert.Equal(80, stub.Port.Value);
     }
     #endregion
 }

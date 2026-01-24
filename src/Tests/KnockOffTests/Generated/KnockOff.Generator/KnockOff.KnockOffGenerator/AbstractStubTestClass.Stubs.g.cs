@@ -8,34 +8,95 @@ partial class AbstractStubTestClass
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for AbstractRepository.ConnectionString.</summary>
+		/// <summary>Tracks and configures behavior for ConnectionString.</summary>
 		public sealed class AbstractRepository_ConnectionStringInterceptor
 		{
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
-			private bool _configured;
-
-			private int _getCount;
-
-			private global::System.Func<string>? _onGet;
-			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<string>? OnGet
+			private bool _valueSet;
+			private string _value = default!;
+			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+			public string Value
 			{
-				get => _onGet;
-				set { _onGet = value; if (value != null) _configured = true; }
+				get => _value;
+				set { _value = value; _valueSet = true; }
 			}
 
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => _getCount++;
+			private global::System.Func<string>? _onGet;
+			private PropertyGetTrackingImpl? _onGetTracking;
+			private global::System.Collections.Generic.List<(global::System.Func<string> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+			private int _getSequenceIndex;
+			private bool _isGetVerifiable;
+			private global::KnockOff.Times? _getVerifiableTimes;
+			private int _unconfiguredGetCount;
 
-			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
-			public void Reset() { _getCount = 0; }
+			private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
 
-			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public AbstractRepository_ConnectionStringInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+			/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<string> callback)
+			{
+				_getSequence = null;
+				_getSequenceIndex = 0;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_onGet = callback;
+				_onGetTracking = new PropertyGetTrackingImpl(this);
+				return _onGetTracking;
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public AbstractRepository_ConnectionStringInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+			/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(global::System.Func<string> callback)
+			{
+				_onGet = null;
+				_onGetTracking = null;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_getSequence = new global::System.Collections.Generic.List<(global::System.Func<string> Callback, PropertyGetTrackingImpl Tracking)>();
+				var tracking = new PropertyGetTrackingImpl(this);
+				_getSequence.Add((callback, tracking));
+				_getSequenceIndex = 0;
+				return new PropertyGetSequenceImpl(this);
+			}
+
+			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+			internal string InvokeGet(bool strict)
+			{
+				if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+				{
+					var (callback, tracking) = _getSequence[_getSequenceIndex];
+					tracking.RecordCall();
+					_getSequenceIndex++;
+					return callback();
+				}
+
+				if (_onGet != null && _onGetTracking != null)
+				{
+					_onGetTracking.RecordCall();
+					return _onGet();
+				}
+
+				_unconfiguredGetCount++;
+
+				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("ConnectionString (get)");
+					return _value;
+				}
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "ConnectionString");
+				return _value;
+			}
+
+			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset()
+			{
+				_unconfiguredGetCount = 0;
+				_onGetTracking?.Reset();
+				if (_getSequence != null)
+				{
+					foreach (var (_, tracking) in _getSequence)
+						tracking.Reset();
+				}
+				_getSequenceIndex = 0;
+			}
 
 			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -43,7 +104,7 @@ partial class AbstractStubTestClass
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ConnectionString", times, totalCount));
 			}
@@ -54,242 +115,330 @@ partial class AbstractStubTestClass
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_getCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ConnectionString (get)", times, _getCount));
+				if (!times.Validate(TotalGetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("ConnectionString (get)", times, TotalGetCount));
 			}
+
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public AbstractRepository_ConnectionStringInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
+
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public AbstractRepository_ConnectionStringInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
-			internal bool IsVerifiable => _isVerifiable;
+			internal bool IsVerifiable => _isGetVerifiable;
 
-			/// <summary>Whether this property has been configured (callbacks registered).</summary>
-			internal bool IsConfigured => _configured;
+			/// <summary>Whether this property has been configured.</summary>
+			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = _getCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("ConnectionString", times, totalCount);
+				if (!(_isGetVerifiable)) return null;
+				if (_isGetVerifiable)
+				{
+					var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("ConnectionString (get)", times, TotalGetCount);
+				}
+				return null;
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = _getCount;
+				var totalCount = TotalGetCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("ConnectionString", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
-		}
 
-		/// <summary>Interceptor for AbstractRepository.Connect.</summary>
-		public sealed class AbstractRepository_ConnectInterceptor : global::KnockOff.IMethodTracking
-		{
-			private global::System.Action? _onCall;
-
-			private int _callCount;
-
-			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
-
-			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action? Callback => _onCall;
-
-			public void RecordCall() { _callCount++; }
-
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { _callCount = 0; }
-
-			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
-			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
-
-			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
-			public void Verify(global::KnockOff.Times times)
+			/// <summary>Tracks invocations for getter callback registration.</summary>
+			private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
 			{
-				if (!times.Validate(_callCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
-			}
+				private readonly AbstractRepository_ConnectionStringInterceptor _interceptor;
 
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
+				public PropertyGetTrackingImpl(AbstractRepository_ConnectionStringInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+				internal int CallCount { get; private set; }
 
-			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
 
-			internal bool IsVerifiable => _isVerifiable;
-			internal bool IsConfigured => _onCall != null;
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
 
-			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
-			internal global::KnockOff.VerificationFailure? CheckVerification()
-			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Connect", times, _callCount);
-			}
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
 
-			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
-			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
-			{
-				if (!IsConfigured) return null;
-				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Connect", global::KnockOff.Times.AtLeastOnce, _callCount);
-			}
-		}
-
-		/// <summary>Interceptor for AbstractRepository.Execute.</summary>
-		public sealed class AbstractRepository_ExecuteInterceptor : global::KnockOff.IMethodTracking
-		{
-			private global::System.Func<string, int>? _onCall;
-
-			private int _callCount;
-
-			/// <summary>The argument from the last call.</summary>
-			public string? LastCallArg { get; private set; }
-
-			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Func<string, int> callback) { _onCall = callback; return this; }
-
-			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Func<string, int>? Callback => _onCall;
-
-			public void RecordCall(string command) { _callCount++; LastCallArg = command; }
-
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { _callCount = 0; LastCallArg = default; }
-
-			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
-			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
-
-			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
-			public void Verify(global::KnockOff.Times times)
-			{
-				if (!times.Validate(_callCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
-			}
-
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
-
-			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
-
-			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
-
-			internal bool IsVerifiable => _isVerifiable;
-			internal bool IsConfigured => _onCall != null;
-
-			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
-			internal global::KnockOff.VerificationFailure? CheckVerification()
-			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Execute", times, _callCount);
-			}
-
-			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
-			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
-			{
-				if (!IsConfigured) return null;
-				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Execute", global::KnockOff.Times.AtLeastOnce, _callCount);
-			}
-		}
-
-		/// <summary>Stub for global::KnockOff.Tests.AbstractRepository via composition.</summary>
-		public class AbstractRepository : global::KnockOff.IKnockOffStub
-		{
-			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
-			public bool Strict { get; set; }
-
-			/// <summary>Interceptor for ConnectionString.</summary>
-			public AbstractRepository_ConnectionStringInterceptor ConnectionString { get; } = new();
-			/// <summary>Interceptor for Connect.</summary>
-			public AbstractRepository_ConnectInterceptor Connect { get; } = new();
-			/// <summary>Interceptor for Execute.</summary>
-			public AbstractRepository_ExecuteInterceptor Execute { get; } = new();
-
-			/// <summary>The global::KnockOff.Tests.AbstractRepository instance. Pass this to code expecting the target class.</summary>
-			public global::KnockOff.Tests.AbstractRepository Object { get; }
-
-			public AbstractRepository()
-			{
-				Object = new Impl(this);
-			}
-
-			/// <summary>Resets all interceptor state.</summary>
-			public void ResetInterceptors()
-			{
-				ConnectionString.Reset();
-				Connect.Reset();
-				Execute.Reset();
-			}
-
-			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
-			public void Verify()
-			{
-				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
-
-				if (ConnectionString.CheckVerification() is { } connectionstringFailure) failures.Add(connectionstringFailure);
-				if (Connect.CheckVerification() is { } connectFailure) failures.Add(connectFailure);
-				if (Execute.CheckVerification() is { } executeFailure) failures.Add(executeFailure);
-
-				if (failures.Count > 0)
-					throw new global::KnockOff.VerificationException(failures);
-			}
-
-			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
-			public void VerifyAll()
-			{
-				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
-
-				if (ConnectionString.CheckVerificationAll() is { } connectionstringFailure) failures.Add(connectionstringFailure);
-				if (Connect.CheckVerificationAll() is { } connectFailure) failures.Add(connectFailure);
-				if (Execute.CheckVerificationAll() is { } executeFailure) failures.Add(executeFailure);
-
-				if (failures.Count > 0)
-					throw new global::KnockOff.VerificationException(failures);
-			}
-
-			/// <summary>Internal implementation that inherits from global::KnockOff.Tests.AbstractRepository.</summary>
-			private sealed class Impl : global::KnockOff.Tests.AbstractRepository
-			{
-				private readonly AbstractRepository _stub;
-
-				public Impl(AbstractRepository stub) : base()
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
 				{
-					_stub = stub;
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
 				}
 
-				/// <inheritdoc />
-				public override string ConnectionString
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable()
 				{
-					get
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenGet chaining.</summary>
+			private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<string>
+			{
+				private readonly AbstractRepository_ConnectionStringInterceptor _interceptor;
+
+				public PropertyGetSequenceImpl(AbstractRepository_ConnectionStringInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> ThenGet(global::System.Func<string> callback)
+				{
+					var tracking = new PropertyGetTrackingImpl(_interceptor);
+					_interceptor._getSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._getSequence == null) return;
+					var sequenceLength = _interceptor._getSequence.Count;
+					var completedCount = _interceptor._getSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+			}
+
+		}
+
+				/// <summary>Interceptor for AbstractRepository.Connect.</summary>
+				public sealed class AbstractRepository_ConnectInterceptor : global::KnockOff.IMethodTracking
+				{
+					private global::System.Action? _onCall;
+
+					private int _callCount;
+
+					/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+					public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
+
+					/// <summary>Gets the configured callback (internal use).</summary>
+					internal global::System.Action? Callback => _onCall;
+
+			public void RecordCall() { _callCount++; 		}
+
+					/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; 		}
+
+					/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+					public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+					/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+					public void Verify(global::KnockOff.Times times)
 					{
-						_stub?.ConnectionString.RecordGet();
-						if (_stub?.ConnectionString.OnGet is { } onGet) return onGet();
-						return default!;
+						if (!times.Validate(_callCount))
+							throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
+					}
+
+					private bool _isVerifiable;
+					private global::KnockOff.Times? _verifiableTimes;
+
+					/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+					public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+					/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+					public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+					internal bool IsVerifiable => _isVerifiable;
+					internal bool IsConfigured => _onCall != null;
+
+					/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+					internal global::KnockOff.VerificationFailure? CheckVerification()
+					{
+						if (!_isVerifiable) return null;
+						var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+						return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Connect", times, _callCount);
+					}
+
+					/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+					internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+					{
+						if (!IsConfigured) return null;
+						return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Connect", global::KnockOff.Times.AtLeastOnce, _callCount);
 					}
 				}
 
-				/// <inheritdoc />
-				public override void Connect()
+				/// <summary>Interceptor for AbstractRepository.Execute.</summary>
+				public sealed class AbstractRepository_ExecuteInterceptor : global::KnockOff.IMethodTracking
 				{
-					_stub?.Connect.RecordCall();
-					if (_stub?.Connect.Callback is { } onCall) { onCall(); return; }
+					private global::System.Func<string, int>? _onCall;
+
+					private int _callCount;
+
+					/// <summary>The argument from the last call.</summary>
+					public string? LastCallArg { get; private set; }
+
+					/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+					public global::KnockOff.IMethodTracking OnCall(global::System.Func<string, int> callback) { _onCall = callback; return this; }
+
+					/// <summary>Gets the configured callback (internal use).</summary>
+					internal global::System.Func<string, int>? Callback => _onCall;
+
+			public void RecordCall(string command) { _callCount++; LastCallArg = command; 		}
+
+					/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; LastCallArg = default; 		}
+
+					/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+					public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+					/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+					public void Verify(global::KnockOff.Times times)
+					{
+						if (!times.Validate(_callCount))
+							throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
+					}
+
+					private bool _isVerifiable;
+					private global::KnockOff.Times? _verifiableTimes;
+
+					/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+					public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+					/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+					public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+					internal bool IsVerifiable => _isVerifiable;
+					internal bool IsConfigured => _onCall != null;
+
+					/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+					internal global::KnockOff.VerificationFailure? CheckVerification()
+					{
+						if (!_isVerifiable) return null;
+						var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+						return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("Execute", times, _callCount);
+					}
+
+					/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+					internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+					{
+						if (!IsConfigured) return null;
+						return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("Execute", global::KnockOff.Times.AtLeastOnce, _callCount);
+					}
 				}
 
-				/// <inheritdoc />
-				public override int Execute(string command)
+				/// <summary>Stub for global::KnockOff.Tests.AbstractRepository via composition.</summary>
+				public class AbstractRepository : global::KnockOff.IKnockOffStub
 				{
-					_stub?.Execute.RecordCall(command);
-					if (_stub?.Execute.Callback is { } onCall) return onCall(command);
-					return default!;
+					/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+					public bool Strict { get; set; }
+
+					/// <summary>Interceptor for ConnectionString.</summary>
+					public AbstractRepository_ConnectionStringInterceptor ConnectionString { get; } = new();
+					/// <summary>Interceptor for Connect.</summary>
+					public AbstractRepository_ConnectInterceptor Connect { get; } = new();
+					/// <summary>Interceptor for Execute.</summary>
+					public AbstractRepository_ExecuteInterceptor Execute { get; } = new();
+
+					/// <summary>The global::KnockOff.Tests.AbstractRepository instance. Pass this to code expecting the target class.</summary>
+					public global::KnockOff.Tests.AbstractRepository Object { get; }
+
+					public AbstractRepository()
+					{
+						Object = new Impl(this);
+					}
+
+					/// <summary>Resets all interceptor state.</summary>
+					public void ResetInterceptors()
+					{
+						ConnectionString.Reset();
+						Connect.Reset();
+						Execute.Reset();
+					}
+
+					/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+					public void Verify()
+					{
+						var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+						if (ConnectionString.CheckVerification() is { } connectionstringFailure) failures.Add(connectionstringFailure);
+						if (Connect.CheckVerification() is { } connectFailure) failures.Add(connectFailure);
+						if (Execute.CheckVerification() is { } executeFailure) failures.Add(executeFailure);
+
+						if (failures.Count > 0)
+							throw new global::KnockOff.VerificationException(failures);
+					}
+
+					/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+					public void VerifyAll()
+					{
+						var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+						if (ConnectionString.CheckVerificationAll() is { } connectionstringFailure) failures.Add(connectionstringFailure);
+						if (Connect.CheckVerificationAll() is { } connectFailure) failures.Add(connectFailure);
+						if (Execute.CheckVerificationAll() is { } executeFailure) failures.Add(executeFailure);
+
+						if (failures.Count > 0)
+							throw new global::KnockOff.VerificationException(failures);
+					}
+
+					/// <summary>Internal implementation that inherits from global::KnockOff.Tests.AbstractRepository.</summary>
+					private sealed class Impl : global::KnockOff.Tests.AbstractRepository
+					{
+						private readonly AbstractRepository _stub;
+
+						public Impl(AbstractRepository stub) : base()
+						{
+							_stub = stub;
+						}
+
+						/// <inheritdoc />
+						public override string ConnectionString
+						{
+							get
+							{
+								if (_stub == null) return default!;
+								return _stub.ConnectionString.InvokeGet(_stub.Strict);
+							}
+						}
+
+						/// <inheritdoc />
+						public override void Connect()
+						{
+							_stub?.Connect.RecordCall();
+							if (_stub?.Connect.Callback is { } onCall) { onCall(); return; }
+						}
+
+						/// <inheritdoc />
+						public override int Execute(string command)
+						{
+							_stub?.Execute.RecordCall(command);
+							if (_stub?.Execute.Callback is { } onCall) return onCall(command);
+							return default!;
+						}
+
+					}
 				}
 
 			}
 		}
-
-	}
-}

@@ -40,8 +40,8 @@ stub.Name.OnSet = (ko, value) => { };
 **After:**
 ```csharp
 stub.GetUser.OnCall((id) => new User { Id = id });
-stub.IsActive.OnGet = () => true;
-stub.Name.OnSet = (value) => { };
+stub.IsActive.OnGet(() => true);
+stub.Name.OnSet((value) => { });
 ```
 
 ---

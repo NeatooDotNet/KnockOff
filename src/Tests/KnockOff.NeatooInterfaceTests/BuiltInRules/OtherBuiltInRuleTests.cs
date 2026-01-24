@@ -322,7 +322,7 @@ public partial class IRangeRuleTests
         var stub = new Stubs.IRangeRule();
         IRangeRule rule = stub;
 
-        stub.Minimum.OnGet = () => 10.5m; // Decimal value
+        stub.Minimum.OnGet(() => 10.5m); // Decimal value
 
         Assert.Equal(10.5m, rule.Minimum);
     }
@@ -333,7 +333,7 @@ public partial class IRangeRuleTests
         var stub = new Stubs.IRangeRule();
         IRangeRule rule = stub;
 
-        stub.Maximum.OnGet = () => DateTime.Today; // DateTime value
+        stub.Maximum.OnGet(() => DateTime.Today); // DateTime value
 
         Assert.Equal(DateTime.Today, rule.Maximum);
     }

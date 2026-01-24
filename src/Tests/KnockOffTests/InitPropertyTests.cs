@@ -475,7 +475,7 @@ public class ClassInitPropertyStubTests
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithVirtualInit();
 
 		// Act - set via OnGet callback
-		stub.Id.OnGet = () => "test-id";
+		stub.Id.OnGet(() => "test-id");
 
 		// Assert
 		Assert.Equal("test-id", stub.Object.Id);
@@ -526,7 +526,7 @@ public class ClassInitPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithAbstractInit();
-		stub.Id.OnGet = () => "abstract-id";
+		stub.Id.OnGet(() => "abstract-id");
 
 		// Act
 		var result = stub.Object.Id;
@@ -540,9 +540,9 @@ public class ClassInitPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithMixedInit();
-		stub.Id.OnGet = () => "mixed-id";
-		stub.Name.OnGet = () => "mixed-name";
-		stub.Version.OnGet = () => 42;
+		stub.Id.OnGet(() => "mixed-id");
+		stub.Name.OnGet(() => "mixed-name");
+		stub.Version.OnGet(() => 42);
 
 		// Act & Assert
 		Assert.Equal("mixed-id", stub.Object.Id);
@@ -588,7 +588,7 @@ public class ClassRequiredPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithRequiredProperty();
-		stub.Id.OnGet = () => "required-id";
+		stub.Id.OnGet(() => "required-id");
 
 		// Act
 		var result = stub.Object.Id;
@@ -625,7 +625,7 @@ public class ClassRequiredPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithRequiredInit();
-		stub.Id.OnGet = () => "required-init-id";
+		stub.Id.OnGet(() => "required-init-id");
 
 		// Act
 		var result = stub.Object.Id;
@@ -639,9 +639,9 @@ public class ClassRequiredPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithMultipleRequired();
-		stub.Id.OnGet = () => "multi-req-id";
-		stub.Name.OnGet = () => "multi-req-name";
-		stub.Version.OnGet = () => 99;
+		stub.Id.OnGet(() => "multi-req-id");
+		stub.Name.OnGet(() => "multi-req-name");
+		stub.Version.OnGet(() => 99);
 
 		// Act & Assert
 		Assert.Equal("multi-req-id", stub.Object.Id);
@@ -674,15 +674,15 @@ public class ClassRequiredPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithRequiredProperty();
-		stub.Id.OnGet = () => "test";
+		stub.Id.OnGet(() => "test");
 		_ = stub.Object.Id;
 
 		// Act
 		stub.Id.Reset();
 
-		// Assert - Reset() clears tracking but preserves configuration (OnGet)
+		// Assert - Reset() clears tracking but preserves configuration (OnGet callback)
 		stub.Id.VerifyGet(Times.Never);
-		Assert.NotNull(stub.Id.OnGet); // OnGet is preserved
-		Assert.Equal("test", stub.Id.OnGet());
+		// OnGet callback is preserved - verify by calling getter again
+		Assert.Equal("test", stub.Object.Id);
 	}
 }

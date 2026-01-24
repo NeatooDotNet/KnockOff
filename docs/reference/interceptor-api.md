@@ -174,20 +174,21 @@ public void PropertyInterceptor_CompleteApiDemonstration()
     Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
 
     // OnGet replaces Value with callback return
-    // Note: OnGet takes the stub as first parameter (ko)
-    stub.Timeout.OnGet = () => 30;
+    // OnGet() returns IPropertyGetTracking for verification
+    stub.Timeout.OnGet(() => 30);
     var timeout = repository.Timeout;
     Assert.Equal(30, timeout);
 
     // OnSet provides custom setter behavior
+    // OnSet() returns IPropertySetTracking for verification
     // Note: OnSet takes (value) - does NOT automatically update Value
     var setWasCalled = false;
-    stub.Timeout.OnSet = (val) =>
+    stub.Timeout.OnSet((val) =>
     {
         setWasCalled = true;
         // Manually update Value if needed:
         // stub.Timeout.Value = val;
-    };
+    });
     repository.Timeout = 60;
     Assert.True(setWasCalled);
     // Value is NOT updated because OnSet didn't do it
@@ -270,20 +271,21 @@ public void IndexerInterceptor_CompleteApiDemonstration()
     Assert.Equal("Charlie", lastEntry.Value.Value?.Name);
 
     // OnGet overrides Backing lookup
-    // Note: OnGet takes (key)
-    stub.Indexer.OnGet = (k) => new User { Id = k, Name = "FromCallback" };
+    // OnGet() returns IIndexerGetTracking for verification
+    stub.Indexer.OnGet((k) => new User { Id = k, Name = "FromCallback" });
     var fromCallback = repository[999];
     Assert.Equal("FromCallback", fromCallback?.Name);
 
     // OnSet overrides Backing storage
+    // OnSet() returns IIndexerSetTracking for verification
     // Note: OnSet takes (key, value) - does NOT automatically update Backing
     var onSetCalled = false;
-    stub.Indexer.OnSet = (k, v) =>
+    stub.Indexer.OnSet((k, v) =>
     {
         onSetCalled = true;
         // Manually update Backing if needed:
         // stub.Indexer.Backing[k] = v;
-    };
+    });
     repository[4] = new User { Id = 4, Name = "Dave" };
     Assert.True(onSetCalled);
     // Backing[4] is NOT set because OnSet didn't do it

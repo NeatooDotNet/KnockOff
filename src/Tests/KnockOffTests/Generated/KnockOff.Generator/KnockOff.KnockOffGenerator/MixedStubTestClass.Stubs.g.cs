@@ -8,50 +8,176 @@ partial class MixedStubTestClass
 	/// <summary>Contains stub implementations for inline stub pattern.</summary>
 	public static class Stubs
 	{
-		/// <summary>Interceptor for MixedService.VirtualProperty.</summary>
+		/// <summary>Tracks and configures behavior for VirtualProperty.</summary>
 		public sealed class MixedService_VirtualPropertyInterceptor
 		{
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
-			private bool _configured;
-
-			private int _getCount;
+			private bool _valueSet;
+			private string _value = default!;
+			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
+			public string Value
+			{
+				get => _value;
+				set { _value = value; _valueSet = true; }
+			}
 
 			private global::System.Func<string>? _onGet;
-			/// <summary>Callback for getter. If set, returns its value instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Func<string>? OnGet
-			{
-				get => _onGet;
-				set { _onGet = value; if (value != null) _configured = true; }
-			}
-
-			private int _setCount;
-
-			/// <summary>The last value passed to the setter.</summary>
-			public string? LastSetValue { get; private set; }
+			private PropertyGetTrackingImpl? _onGetTracking;
+			private global::System.Collections.Generic.List<(global::System.Func<string> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+			private int _getSequenceIndex;
+			private bool _isGetVerifiable;
+			private global::KnockOff.Times? _getVerifiableTimes;
+			private int _unconfiguredGetCount;
 
 			private global::System.Action<string>? _onSet;
-			/// <summary>Callback for setter. If set, called instead of base. Setting this marks the property as configured.</summary>
-			public global::System.Action<string>? OnSet
+			private PropertySetTrackingImpl? _onSetTracking;
+			private global::System.Collections.Generic.List<(global::System.Action<string> Callback, PropertySetTrackingImpl Tracking)>? _setSequence;
+			private int _setSequenceIndex;
+			private bool _isSetVerifiable;
+			private global::KnockOff.Times? _setVerifiableTimes;
+			private int _unconfiguredSetCount;
+			private string? _unconfiguredLastSetValue;
+
+			private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?.CallCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking.CallCount; return sum; } }
+
+			/// <summary>The value from the last setter call (from most recently called registration).</summary>
+			public string? LastSetValue { get { if ((_onSetTracking?.CallCount ?? 0) > 0) return _onSetTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking.CallCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; } }
+
+			/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<string> callback)
 			{
-				get => _onSet;
-				set { _onSet = value; if (value != null) _configured = true; }
+				_getSequence = null;
+				_getSequenceIndex = 0;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_onGet = callback;
+				_onGetTracking = new PropertyGetTrackingImpl(this);
+				return _onGetTracking;
 			}
 
-			/// <summary>Records a getter access.</summary>
-			public void RecordGet() => _getCount++;
+			/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(global::System.Func<string> callback)
+			{
+				_onGet = null;
+				_onGetTracking = null;
+				_isGetVerifiable = false;
+				_getVerifiableTimes = null;
+				_getSequence = new global::System.Collections.Generic.List<(global::System.Func<string> Callback, PropertyGetTrackingImpl Tracking)>();
+				var tracking = new PropertyGetTrackingImpl(this);
+				_getSequence.Add((callback, tracking));
+				_getSequenceIndex = 0;
+				return new PropertyGetSequenceImpl(this);
+			}
 
-			/// <summary>Records a setter access.</summary>
-			public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
+			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
+			{
+				_setSequence = null;
+				_setSequenceIndex = 0;
+				_isSetVerifiable = false;
+				_setVerifiableTimes = null;
+				_onSet = callback;
+				_onSetTracking = new PropertySetTrackingImpl(this);
+				return _onSetTracking;
+			}
 
-			/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
-			public void Reset() { _getCount = 0; _setCount = 0; LastSetValue = default; }
+			/// <summary>Starts a setter callback sequence. Returns sequence for ThenSet chaining. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertySetSequence<string> OnSetSequence(global::System.Action<string> callback)
+			{
+				_onSet = null;
+				_onSetTracking = null;
+				_isSetVerifiable = false;
+				_setVerifiableTimes = null;
+				_setSequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, PropertySetTrackingImpl Tracking)>();
+				var tracking = new PropertySetTrackingImpl(this);
+				_setSequence.Add((callback, tracking));
+				_setSequenceIndex = 0;
+				return new PropertySetSequenceImpl(this);
+			}
 
-			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public MixedService_VirtualPropertyInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+			internal string InvokeGet(bool strict)
+			{
+				if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+				{
+					var (callback, tracking) = _getSequence[_getSequenceIndex];
+					tracking.RecordCall();
+					_getSequenceIndex++;
+					return callback();
+				}
 
-			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public MixedService_VirtualPropertyInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+				if (_onGet != null && _onGetTracking != null)
+				{
+					_onGetTracking.RecordCall();
+					return _onGet();
+				}
+
+				_unconfiguredGetCount++;
+
+				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("VirtualProperty (get)");
+					return _value;
+				}
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VirtualProperty");
+				return _value;
+			}
+
+			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
+			internal void InvokeSet(bool strict, string value)
+			{
+				if (_setSequence != null && _setSequenceIndex < _setSequence.Count)
+				{
+					var (callback, tracking) = _setSequence[_setSequenceIndex];
+					tracking.RecordCall(value);
+					_setSequenceIndex++;
+					callback(value);
+					return;
+				}
+
+				if (_onSet != null && _onSetTracking != null)
+				{
+					_onSetTracking.RecordCall(value);
+					_onSet(value);
+					return;
+				}
+
+				_unconfiguredSetCount++;
+				_unconfiguredLastSetValue = value;
+
+				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
+				{
+					if (strict) throw global::KnockOff.StubException.SequenceExhausted("VirtualProperty (set)");
+					_value = value;
+					return;
+				}
+
+				if (strict) throw global::KnockOff.StubException.NotConfigured("", "VirtualProperty");
+				_value = value;
+			}
+
+			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			public void Reset()
+			{
+				_unconfiguredGetCount = 0;
+				_onGetTracking?.Reset();
+				if (_getSequence != null)
+				{
+					foreach (var (_, tracking) in _getSequence)
+						tracking.Reset();
+				}
+				_getSequenceIndex = 0;
+				_unconfiguredSetCount = 0;
+				_unconfiguredLastSetValue = default;
+				_onSetTracking?.Reset();
+				if (_setSequence != null)
+				{
+					foreach (var (_, tracking) in _setSequence)
+						tracking.Reset();
+				}
+				_setSequenceIndex = 0;
+			}
 
 			/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -59,7 +185,7 @@ partial class MixedStubTestClass
 			/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void Verify(global::KnockOff.Times times)
 			{
-				var totalCount = _getCount + _setCount;
+				var totalCount = TotalGetCount + TotalSetCount;
 				if (!times.Validate(totalCount))
 					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty", times, totalCount));
 			}
@@ -70,8 +196,8 @@ partial class MixedStubTestClass
 			/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifyGet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_getCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty (get)", times, _getCount));
+				if (!times.Validate(TotalGetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty (get)", times, TotalGetCount));
 			}
 
 			/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
@@ -80,177 +206,363 @@ partial class MixedStubTestClass
 			/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 			public void VerifySet(global::KnockOff.Times times)
 			{
-				if (!times.Validate(_setCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty (set)", times, _setCount));
+				if (!times.Validate(TotalSetCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("VirtualProperty (set)", times, TotalSetCount));
 			}
+
+			/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public MixedService_VirtualPropertyInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; _isSetVerifiable = true; _setVerifiableTimes = null; return this; }
+
+			/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public MixedService_VirtualPropertyInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times; return this; }
 
 			/// <summary>Whether this property was marked with Verifiable().</summary>
-			internal bool IsVerifiable => _isVerifiable;
+			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
-			/// <summary>Whether this property has been configured (callbacks registered).</summary>
-			internal bool IsConfigured => _configured;
+			/// <summary>Whether this property has been configured.</summary>
+			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
 			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = _getCount + _setCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("VirtualProperty", times, totalCount);
+				if (!(_isGetVerifiable || _isSetVerifiable)) return null;
+				if (_isGetVerifiable && _isSetVerifiable)
+				{
+					// Both marked verifiable - check combined count (either accessor satisfies)
+					var times = _getVerifiableTimes ?? _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					var totalCount = TotalGetCount + TotalSetCount;
+					return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("VirtualProperty", times, totalCount);
+				}
+				if (_isGetVerifiable && !_isSetVerifiable)
+				{
+					var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("VirtualProperty (get)", times, TotalGetCount);
+				}
+				if (_isSetVerifiable && !_isGetVerifiable)
+				{
+					var times = _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+					if (!times.Validate(TotalSetCount)) return new global::KnockOff.VerificationFailure("VirtualProperty (set)", times, TotalSetCount);
+				}
+				return null;
 			}
 
 			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 			{
 				if (!IsConfigured) return null;
-				var totalCount = _getCount + _setCount;
+				var totalCount = TotalGetCount + TotalSetCount;
 				return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("VirtualProperty", global::KnockOff.Times.AtLeastOnce, totalCount);
 			}
-		}
 
-		/// <summary>Interceptor for MixedService.VirtualMethod.</summary>
-		public sealed class MixedService_VirtualMethodInterceptor : global::KnockOff.IMethodTracking
-		{
-			private global::System.Action? _onCall;
-
-			private int _callCount;
-
-			/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
-			public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
-
-			/// <summary>Gets the configured callback (internal use).</summary>
-			internal global::System.Action? Callback => _onCall;
-
-			public void RecordCall() { _callCount++; }
-
-			/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
-			public void Reset() { _callCount = 0; }
-
-			/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
-			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
-
-			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
-			public void Verify(global::KnockOff.Times times)
+			/// <summary>Tracks invocations for getter callback registration.</summary>
+			private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
 			{
-				if (!times.Validate(_callCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
-			}
+				private readonly MixedService_VirtualPropertyInterceptor _interceptor;
 
-			private bool _isVerifiable;
-			private global::KnockOff.Times? _verifiableTimes;
+				public PropertyGetTrackingImpl(MixedService_VirtualPropertyInterceptor interceptor) => _interceptor = interceptor;
 
-			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+				internal int CallCount { get; private set; }
 
-			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall() => CallCount++;
 
-			internal bool IsVerifiable => _isVerifiable;
-			internal bool IsConfigured => _onCall != null;
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() => CallCount = 0;
 
-			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
-			internal global::KnockOff.VerificationFailure? CheckVerification()
-			{
-				if (!_isVerifiable) return null;
-				var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("VirtualMethod", times, _callCount);
-			}
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
 
-			/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
-			internal global::KnockOff.VerificationFailure? CheckVerificationAll()
-			{
-				if (!IsConfigured) return null;
-				return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("VirtualMethod", global::KnockOff.Times.AtLeastOnce, _callCount);
-			}
-		}
-
-		/// <summary>Stub for global::KnockOff.Tests.MixedService via composition.</summary>
-		public class MixedService : global::KnockOff.IKnockOffStub
-		{
-			/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
-			public bool Strict { get; set; }
-
-			/// <summary>Interceptor for VirtualProperty.</summary>
-			public MixedService_VirtualPropertyInterceptor VirtualProperty { get; } = new();
-			/// <summary>Interceptor for VirtualMethod.</summary>
-			public MixedService_VirtualMethodInterceptor VirtualMethod { get; } = new();
-
-			/// <summary>The global::KnockOff.Tests.MixedService instance. Pass this to code expecting the target class.</summary>
-			public global::KnockOff.Tests.MixedService Object { get; }
-
-			public MixedService()
-			{
-				Object = new Impl(this);
-			}
-
-			/// <summary>Resets all interceptor state.</summary>
-			public void ResetInterceptors()
-			{
-				VirtualProperty.Reset();
-				VirtualMethod.Reset();
-			}
-
-			/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
-			public void Verify()
-			{
-				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
-
-				if (VirtualProperty.CheckVerification() is { } virtualpropertyFailure) failures.Add(virtualpropertyFailure);
-				if (VirtualMethod.CheckVerification() is { } virtualmethodFailure) failures.Add(virtualmethodFailure);
-
-				if (failures.Count > 0)
-					throw new global::KnockOff.VerificationException(failures);
-			}
-
-			/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
-			public void VerifyAll()
-			{
-				var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
-
-				if (VirtualProperty.CheckVerificationAll() is { } virtualpropertyFailure) failures.Add(virtualpropertyFailure);
-				if (VirtualMethod.CheckVerificationAll() is { } virtualmethodFailure) failures.Add(virtualmethodFailure);
-
-				if (failures.Count > 0)
-					throw new global::KnockOff.VerificationException(failures);
-			}
-
-			/// <summary>Internal implementation that inherits from global::KnockOff.Tests.MixedService.</summary>
-			private sealed class Impl : global::KnockOff.Tests.MixedService
-			{
-				private readonly MixedService _stub;
-
-				public Impl(MixedService stub) : base()
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
 				{
-					_stub = stub;
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
 				}
 
-				/// <inheritdoc />
-				public override string VirtualProperty
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable()
 				{
-					get
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenGet chaining.</summary>
+			private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<string>
+			{
+				private readonly MixedService_VirtualPropertyInterceptor _interceptor;
+
+				public PropertyGetSequenceImpl(MixedService_VirtualPropertyInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> ThenGet(global::System.Func<string> callback)
+				{
+					var tracking = new PropertyGetTrackingImpl(_interceptor);
+					_interceptor._getSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._getSequence == null) return;
+					var sequenceLength = _interceptor._getSequence.Count;
+					var completedCount = _interceptor._getSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> Verifiable()
+				{
+					_interceptor._isGetVerifiable = true;
+					_interceptor._getVerifiableTimes = null;
+					return this;
+				}
+			}
+
+			/// <summary>Tracks invocations for setter callback registration.</summary>
+			private sealed class PropertySetTrackingImpl : global::KnockOff.IPropertySetTracking<string>
+			{
+				private readonly MixedService_VirtualPropertyInterceptor _interceptor;
+
+				public PropertySetTrackingImpl(MixedService_VirtualPropertyInterceptor interceptor) => _interceptor = interceptor;
+
+				private string _lastValue = default!;
+
+				internal int CallCount { get; private set; }
+
+				/// <summary>Last value passed to this setter callback. Default if never called.</summary>
+				public string LastValue => _lastValue;
+
+				/// <summary>Records a call to this callback.</summary>
+				public void RecordCall(string value) { CallCount++; _lastValue = value; }
+
+				/// <summary>Resets tracking state.</summary>
+				public void Reset() { CallCount = 0; _lastValue = default!; }
+
+				/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+				public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+				/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+				public void Verify(global::KnockOff.Times times)
+				{
+					if (!times.Validate(CallCount))
+						throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property setter", times, CallCount));
+				}
+
+				/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetTracking<string> Verifiable()
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = null;
+					return this;
+				}
+
+				/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetTracking<string> Verifiable(global::KnockOff.Times times)
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = times;
+					return this;
+				}
+			}
+
+			/// <summary>Sequence implementation for ThenSet chaining.</summary>
+			private sealed class PropertySetSequenceImpl : global::KnockOff.IPropertySetSequence<string>
+			{
+				private readonly MixedService_VirtualPropertyInterceptor _interceptor;
+
+				public PropertySetSequenceImpl(MixedService_VirtualPropertyInterceptor interceptor) => _interceptor = interceptor;
+
+				/// <summary>Adds another setter callback to the sequence. Each callback runs exactly once.</summary>
+				public global::KnockOff.IPropertySetSequence<string> ThenSet(global::System.Action<string> callback)
+				{
+					var tracking = new PropertySetTrackingImpl(_interceptor);
+					_interceptor._setSequence!.Add((callback, tracking));
+					return this;
+				}
+
+				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+				public void Verify()
+				{
+					if (_interceptor._setSequence == null) return;
+					var sequenceLength = _interceptor._setSequence.Count;
+					var completedCount = _interceptor._setSequenceIndex;
+					if (completedCount < sequenceLength)
+						throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property setter", sequenceLength, completedCount));
+				}
+
+				/// <summary>Resets all tracking in the sequence.</summary>
+				public void Reset() => _interceptor.Reset();
+
+				/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+				public global::KnockOff.IPropertySetSequence<string> Verifiable()
+				{
+					_interceptor._isSetVerifiable = true;
+					_interceptor._setVerifiableTimes = null;
+					return this;
+				}
+			}
+
+		}
+
+				/// <summary>Interceptor for MixedService.VirtualMethod.</summary>
+				public sealed class MixedService_VirtualMethodInterceptor : global::KnockOff.IMethodTracking
+				{
+					private global::System.Action? _onCall;
+
+					private int _callCount;
+
+					/// <summary>Sets the callback invoked when method is called. Returns this interceptor for tracking.</summary>
+					public global::KnockOff.IMethodTracking OnCall(global::System.Action callback) { _onCall = callback; return this; }
+
+					/// <summary>Gets the configured callback (internal use).</summary>
+					internal global::System.Action? Callback => _onCall;
+
+			public void RecordCall() { _callCount++; 		}
+
+					/// <summary>Resets tracking state (CallCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
+			public void Reset() { _callCount = 0; 		}
+
+					/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>
+					public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+					/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+					public void Verify(global::KnockOff.Times times)
 					{
-						_stub?.VirtualProperty.RecordGet();
-						if (_stub?.VirtualProperty.OnGet is { } onGet) return onGet();
-						return base.VirtualProperty;
+						if (!times.Validate(_callCount))
+							throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("method", times, _callCount));
 					}
-					set
+
+					private bool _isVerifiable;
+					private global::KnockOff.Times? _verifiableTimes;
+
+					/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+					public global::KnockOff.IMethodTracking Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+
+					/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+					public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+
+					internal bool IsVerifiable => _isVerifiable;
+					internal bool IsConfigured => _onCall != null;
+
+					/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
+					internal global::KnockOff.VerificationFailure? CheckVerification()
 					{
-						_stub?.VirtualProperty.RecordSet(value);
-						if (_stub?.VirtualProperty.OnSet is { } onSet) onSet(value);
-						else base.VirtualProperty = value;
+						if (!_isVerifiable) return null;
+						var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+						return times.Validate(_callCount) ? null : new global::KnockOff.VerificationFailure("VirtualMethod", times, _callCount);
+					}
+
+					/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
+					internal global::KnockOff.VerificationFailure? CheckVerificationAll()
+					{
+						if (!IsConfigured) return null;
+						return _callCount >= 1 ? null : new global::KnockOff.VerificationFailure("VirtualMethod", global::KnockOff.Times.AtLeastOnce, _callCount);
 					}
 				}
 
-				/// <inheritdoc />
-				public override void VirtualMethod()
+				/// <summary>Stub for global::KnockOff.Tests.MixedService via composition.</summary>
+				public class MixedService : global::KnockOff.IKnockOffStub
 				{
-					_stub?.VirtualMethod.RecordCall();
-					if (_stub?.VirtualMethod.Callback is { } onCall) { onCall(); return; }
-					base.VirtualMethod();
+					/// <summary>When true, unconfigured method calls throw StubException instead of returning default. Not yet implemented for class stubs.</summary>
+					public bool Strict { get; set; }
+
+					/// <summary>Interceptor for VirtualProperty.</summary>
+					public MixedService_VirtualPropertyInterceptor VirtualProperty { get; } = new();
+					/// <summary>Interceptor for VirtualMethod.</summary>
+					public MixedService_VirtualMethodInterceptor VirtualMethod { get; } = new();
+
+					/// <summary>The global::KnockOff.Tests.MixedService instance. Pass this to code expecting the target class.</summary>
+					public global::KnockOff.Tests.MixedService Object { get; }
+
+					public MixedService()
+					{
+						Object = new Impl(this);
+					}
+
+					/// <summary>Resets all interceptor state.</summary>
+					public void ResetInterceptors()
+					{
+						VirtualProperty.Reset();
+						VirtualMethod.Reset();
+					}
+
+					/// <summary>Verifies all members marked with .Verifiable() were invoked as expected. Throws VerificationException with all failures if any fail.</summary>
+					public void Verify()
+					{
+						var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+						if (VirtualProperty.CheckVerification() is { } virtualpropertyFailure) failures.Add(virtualpropertyFailure);
+						if (VirtualMethod.CheckVerification() is { } virtualmethodFailure) failures.Add(virtualmethodFailure);
+
+						if (failures.Count > 0)
+							throw new global::KnockOff.VerificationException(failures);
+					}
+
+					/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>
+					public void VerifyAll()
+					{
+						var failures = new global::System.Collections.Generic.List<global::KnockOff.VerificationFailure>();
+
+						if (VirtualProperty.CheckVerificationAll() is { } virtualpropertyFailure) failures.Add(virtualpropertyFailure);
+						if (VirtualMethod.CheckVerificationAll() is { } virtualmethodFailure) failures.Add(virtualmethodFailure);
+
+						if (failures.Count > 0)
+							throw new global::KnockOff.VerificationException(failures);
+					}
+
+					/// <summary>Internal implementation that inherits from global::KnockOff.Tests.MixedService.</summary>
+					private sealed class Impl : global::KnockOff.Tests.MixedService
+					{
+						private readonly MixedService _stub;
+
+						public Impl(MixedService stub) : base()
+						{
+							_stub = stub;
+						}
+
+						/// <inheritdoc />
+						public override string VirtualProperty
+						{
+							get
+							{
+								if (_stub == null) return base.VirtualProperty;
+								if (_stub.VirtualProperty.IsConfigured) return _stub.VirtualProperty.InvokeGet(_stub.Strict);
+								_stub.VirtualProperty.InvokeGet(_stub.Strict);
+								return base.VirtualProperty;
+							}
+							set
+							{
+								if (_stub == null) { base.VirtualProperty = value; return; }
+								_stub.VirtualProperty.InvokeSet(_stub.Strict, value);
+								if (!_stub.VirtualProperty.IsConfigured) base.VirtualProperty = value;
+							}
+						}
+
+						/// <inheritdoc />
+						public override void VirtualMethod()
+						{
+							_stub?.VirtualMethod.RecordCall();
+							if (_stub?.VirtualMethod.Callback is { } onCall) { onCall(); return; }
+							base.VirtualMethod();
+						}
+
+					}
 				}
 
 			}
 		}
-
-	}
-}

@@ -66,16 +66,30 @@ internal static class FlatRenderer
 				RenderGenericMethodInterfaces(w);
 
 			// Interceptor classes (deduplicated by interceptor name)
+			var propertyOptions = new PropertyInterceptorRenderOptions(
+				BaseIndent: 0,
+				IncludeStrictParameter: true,
+				StrictAccessExpression: "strict");
 			foreach (var prop in unit.Properties)
 			{
 				if (renderedInterceptorClasses.Add(prop.InterceptorClassName))
-					RenderPropertyInterceptorClass(w, prop, classNameWithTypeParams);
+				{
+					var unifiedModel = ModelAdapters.ToUnifiedPropertyModel(prop);
+					PropertyInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, propertyOptions);
+				}
 			}
 
+			var indexerOptions = new IndexerInterceptorRenderOptions(
+				BaseIndent: 0,
+				IncludeStrictParameter: true,
+				StrictAccessExpression: "strict");
 			foreach (var indexer in unit.Indexers)
 			{
 				if (renderedInterceptorClasses.Add(indexer.InterceptorClassName))
-					RenderIndexerInterceptorClass(w, indexer, classNameWithTypeParams);
+				{
+					var unifiedModel = ModelAdapters.ToUnifiedIndexerModel(indexer);
+					IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, indexerOptions);
+				}
 			}
 
 			// Render indexer container classes for groups with multiple indexers
@@ -2300,23 +2314,23 @@ internal static class FlatRenderer
 		{
 			if (prop.IsInitOnly)
 			{
-				// Init-only: read from interceptor's Value, record access
-				w.Line($"get {{ {prop.InterceptorName}.RecordGet(); return {prop.InterceptorName}.Value; }}");
+				// Init-only: use InvokeGet for getter, but init setter still records and sets value directly
+				w.Line($"get => {prop.InterceptorName}.InvokeGet(Strict);");
 				w.Line($"init {{ {prop.InterceptorName}.RecordSet(value); {prop.InterceptorName}.Value = value; }}");
 			}
 			else
 			{
-				// Priority chain: OnGet/OnSet > Source > Strict > Value
+				// Regular properties: use InvokeGet/InvokeSet which handle the priority chain
 				if (prop.HasGetter)
 				{
-					w.Line($"get {{ {prop.InterceptorName}.RecordGet(); if ({prop.InterceptorName}.OnGet is {{ }} onGet) return onGet(); if ({prop.InterceptorName}._source is {{ }} src) return src.{prop.MemberName}; if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); return {prop.InterceptorName}.Value; }}");
+					w.Line($"get => {prop.InterceptorName}.InvokeGet(Strict);");
 				}
 
 				if (prop.HasSetter)
 				{
 					if (prop.SetterPragmaDisable != null)
 						w.Append(prop.SetterPragmaDisable);
-					w.Line($"set {{ {prop.InterceptorName}.RecordSet(value); if ({prop.InterceptorName}.OnSet is {{ }} onSet) {{ onSet(value); return; }} if ({prop.InterceptorName}._source is {{ }} src) {{ src.{prop.MemberName} = value; return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{prop.SimpleInterfaceName}\", \"{prop.MemberName}\"); {prop.InterceptorName}.Value = value; }}");
+					w.Line($"set => {prop.InterceptorName}.InvokeSet(Strict, value);");
 					if (prop.SetterPragmaRestore != null)
 						w.Line(prop.SetterPragmaRestore);
 				}
@@ -2362,15 +2376,15 @@ internal static class FlatRenderer
 		w.Line($"{indexer.ReturnType} {indexer.DeclaringInterface}.this[{indexer.KeyType} {indexer.KeyParamName}]");
 		using (w.Braces())
 		{
-			// Priority chain: OnGet/OnSet > Source > Strict > Backing
+			// Use InvokeGet/InvokeSet which handle the priority chain
 			if (indexer.HasGetter)
 			{
-				w.Line($"get {{ {accessExpr}.RecordGet({indexer.KeyParamName}); if ({accessExpr}.OnGet is {{ }} onGet) return onGet({indexer.KeyParamName}); if ({accessExpr}._source is {{ }} src) return src[{indexer.KeyParamName}]; if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); return {accessExpr}.Backing.TryGetValue({indexer.KeyParamName}, out var v) ? v : {indexer.DefaultExpression}; }}");
+				w.Line($"get => {accessExpr}.InvokeGet(Strict, {indexer.KeyParamName});");
 			}
 
 			if (indexer.HasSetter)
 			{
-				w.Line($"set {{ {accessExpr}.RecordSet({indexer.KeyParamName}, value); if ({accessExpr}.OnSet is {{ }} onSet) {{ onSet({indexer.KeyParamName}, value); return; }} if ({accessExpr}._source is {{ }} src) {{ src[{indexer.KeyParamName}] = value; return; }} if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{indexer.SimpleInterfaceName}\", \"this[]\"); {accessExpr}.Backing[{indexer.KeyParamName}] = value; }}");
+				w.Line($"set => {accessExpr}.InvokeSet(Strict, {indexer.KeyParamName}, value);");
 			}
 		}
 		w.Line();

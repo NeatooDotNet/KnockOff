@@ -44,7 +44,7 @@ public partial class ITriggerPropertyTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty trigger = stub;
 
-        stub.PropertyName.OnGet = () => "DynamicProperty";
+        stub.PropertyName.OnGet(() => "DynamicProperty");
 
         Assert.Equal("DynamicProperty", trigger.PropertyName);
     }
