@@ -111,7 +111,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -338,7 +338,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -572,7 +572,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -806,7 +806,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -1040,7 +1040,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -1174,6 +1174,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		private Method6Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private int _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(Method6Delegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -1182,7 +1186,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1202,9 +1206,27 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(int value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1212,6 +1234,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(Method6Delegate Callback, MethodTrackingImpl Tracking)>();
@@ -1230,6 +1255,12 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -1269,8 +1300,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1396,6 +1427,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		private Method7Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private string _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(Method7Delegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -1404,7 +1439,7 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 
 		private int _unconfiguredCallCount;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1424,9 +1459,27 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking OnCall(string value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1434,6 +1487,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(Method7Delegate Callback, MethodTrackingImpl Tracking)>();
@@ -1452,6 +1508,12 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 				tracking.RecordCall();
 				_sequenceIndex++;
 				return callback();
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall();
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -1491,8 +1553,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1618,6 +1680,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		private Method8Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private int _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(Method8Delegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -1627,10 +1693,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		private int _unconfiguredCallCount;
 		private int? _unconfiguredLastArg;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1650,9 +1716,27 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<int> OnCall(int value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1660,6 +1744,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(Method8Delegate Callback, MethodTrackingImpl Tracking)>();
@@ -1678,6 +1765,12 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 				tracking.RecordCall(param);
 				_sequenceIndex++;
 				return callback(param);
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall(param);
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -1719,8 +1812,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1853,6 +1946,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		private Method9Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private string _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(Method9Delegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -1862,10 +1959,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		private int _unconfiguredCallCount;
 		private string? _unconfiguredLastArg;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>The argument from the last call (from most recently called registration).</summary>
-		public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+		public string? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1885,9 +1982,27 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTracking<string> OnCall(string value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1895,6 +2010,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(Method9Delegate Callback, MethodTrackingImpl Tracking)>();
@@ -1913,6 +2031,12 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 				tracking.RecordCall(param);
 				_sequenceIndex++;
 				return callback(param);
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall(param);
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -1954,8 +2078,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2088,6 +2212,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		private Method10Delegate? _onCall;
 		private MethodTrackingImpl? _onCallTracking;
 
+		private bool _onCallValue = default!;
+		private bool _hasOnCallValue;
+		private MethodTrackingImpl? _onCallValueTracking;
+
 		private global::System.Collections.Generic.List<(Method10Delegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 		private int _sequenceIndex;
 
@@ -2097,10 +2225,10 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		private int _unconfiguredCallCount;
 		private (int? a, string? b)? _unconfiguredLastArgs;
 
-		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+		private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 		/// <summary>The arguments from the last call (from most recently called registration).</summary>
-		public (int? a, string? b)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+		public (int? a, string? b)? LastCallArgs { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArgs; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
 		/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2120,9 +2248,27 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 			_sequenceIndex = 0;
 			_isVerifiable = false;
 			_verifiableTimes = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_onCall = callback;
 			_onCallTracking = new MethodTrackingImpl(this);
 			return _onCallTracking;
+		}
+
+		/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IMethodTrackingArgs<(int? a, string? b)> OnCall(bool value)
+		{
+			_sequence = null;
+			_sequenceIndex = 0;
+			_isVerifiable = false;
+			_verifiableTimes = null;
+			_onCall = null;
+			_onCallTracking = null;
+			_hasOnCallValue = true;
+			_onCallValue = value;
+			_onCallValueTracking = new MethodTrackingImpl(this);
+			return _onCallValueTracking;
 		}
 
 		/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -2130,6 +2276,9 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		{
 			_onCall = null;
 			_onCallTracking = null;
+			_hasOnCallValue = false;
+			_onCallValue = default!;
+			_onCallValueTracking = null;
 			_isVerifiable = false;
 			_verifiableTimes = null;
 			_sequence = new global::System.Collections.Generic.List<(Method10Delegate Callback, MethodTrackingImpl Tracking)>();
@@ -2148,6 +2297,12 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 				tracking.RecordCall((a, b));
 				_sequenceIndex++;
 				return callback(a, b);
+			}
+
+			if (_hasOnCallValue && _onCallValueTracking != null)
+			{
+				_onCallValueTracking.RecordCall((a, b));
+				return _onCallValue;
 			}
 
 			if (_onCall != null && _onCallTracking != null)
@@ -2189,8 +2344,8 @@ partial class MediumServiceStub : global::KnockOff.Benchmarks.Interfaces.IMedium
 		/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 		internal bool IsVerifiable => _isVerifiable;
 
-		/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-		internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+		/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+		internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()

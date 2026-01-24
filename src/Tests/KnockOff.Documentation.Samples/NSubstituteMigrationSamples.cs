@@ -240,10 +240,10 @@ public class PropertySetupKnockOffTests
     {
         var stub = new NSubUserRepoStub();
 
-        // KnockOff: Use .Value for read/write properties
-        stub.ConnectionString.Value = "server=localhost";
-        // For read-only properties, also use .Value
-        stub.IsConnected.Value = true;
+        // KnockOff: Use OnGet(value) for all properties
+        stub.ConnectionString.OnGet("server=localhost");
+        // For read-only properties, also use OnGet(value)
+        stub.IsConnected.OnGet(true);
 
         INSubUserRepo repository = stub;
 

@@ -61,7 +61,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsDeleted.Value = false;
+        stub.IsDeleted.OnGet(false);
 
         _ = entity.IsDeleted;
         _ = entity.IsDeleted;
@@ -76,7 +76,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsModified.Value = true;
+        stub.IsModified.OnGet(true);
 
         Assert.True(entity.IsModified);
     }
@@ -87,7 +87,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsSelfModified.Value = true;
+        stub.IsSelfModified.OnGet(true);
 
         Assert.True(entity.IsSelfModified);
     }
@@ -98,7 +98,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsChild.Value = true;
+        stub.IsChild.OnGet(true);
 
         Assert.True(entity.IsChild);
     }
@@ -109,7 +109,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsSavable.Value = true;
+        stub.IsSavable.OnGet(true);
 
         Assert.True(entity.IsSavable);
     }
@@ -230,7 +230,7 @@ public class EntityBaseStandaloneTests
         IEntityBase entity = stub;
 
         // IsBusy is now on IValidateMetaProperties
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(entity.IsBusy);
     }
@@ -242,7 +242,7 @@ public class EntityBaseStandaloneTests
         var deleteTracking = stub.Delete.OnCall(() => { });
         IEntityBase entity = stub;
 
-        stub.IsNew.Value = true;
+        stub.IsNew.OnGet(true);
 
         // Perform some operations
         _ = entity.IsNew;
@@ -279,7 +279,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.IsValid.Value = true;
+        stub.IsValid.OnGet(true);
 
         Assert.True(validate.IsValid);
     }
@@ -290,7 +290,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.IsSelfValid.Value = false;
+        stub.IsSelfValid.OnGet(false);
 
         Assert.False(validate.IsSelfValid);
     }
@@ -301,7 +301,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.IsPaused.Value = true;
+        stub.IsPaused.OnGet(true);
 
         Assert.True(validate.IsPaused);
     }
@@ -423,7 +423,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.IsValid.Value = true;
+        stub.IsValid.OnGet(true);
 
         Assert.True(validate.IsValid);
         stub.IsValid.VerifyGet(Times.Once);
@@ -446,7 +446,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.IsPaused.Value = true;
+        stub.IsPaused.OnGet(true);
 
         Assert.True(validate.IsPaused);
     }
@@ -458,7 +458,7 @@ public partial class InlineValidateBaseTests
         var parentStub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.Parent.Value = parentStub;
+        stub.Parent.OnGet(parentStub);
 
         Assert.Same(parentStub, validate.Parent);
     }
@@ -585,7 +585,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(validate.IsBusy);
     }
@@ -708,7 +708,7 @@ public partial class InlineRuleManagerTests
         Neatoo.Rules.IRuleManager ruleManager = stub;
 
         var rules = new List<Neatoo.Rules.IRule>();
-        stub.Rules.Value = rules;
+        stub.Rules.OnGet(rules);
 
         Assert.Same(rules, ruleManager.Rules);
         stub.Rules.VerifyGet(Times.Once);
@@ -840,7 +840,7 @@ public partial class MultipleInlineTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.IsValid.Value = true;
+        stub.IsValid.OnGet(true);
 
         Assert.True(validate.IsValid);
     }
@@ -880,7 +880,7 @@ public partial class NestedClassTests
         var stub = new NestedEntityStub();
         IEntityBase entity = stub;
 
-        stub.IsNew.Value = true;
+        stub.IsNew.OnGet(true);
 
         Assert.True(entity.IsNew);
     }
@@ -891,7 +891,7 @@ public partial class NestedClassTests
         var stub = new NestedValidateStub();
         IValidateBase validate = stub;
 
-        stub.IsValid.Value = true;
+        stub.IsValid.OnGet(true);
 
         Assert.True(validate.IsValid);
     }
@@ -911,7 +911,7 @@ public partial class NestedInlineTests
             var stub = new Stubs.IValidateBase();
             IValidateBase validate = stub;
 
-            stub.IsValid.Value = true;
+            stub.IsValid.OnGet(true);
 
             Assert.True(validate.IsValid);
         }
@@ -930,7 +930,7 @@ public partial class NestedInlineTests
             var stub = new Stubs.IEntityBase();
             IEntityBase entity = stub;
 
-            stub.IsValid.Value = true;
+            stub.IsValid.OnGet(true);
 
             Assert.True(entity.IsValid);
         }

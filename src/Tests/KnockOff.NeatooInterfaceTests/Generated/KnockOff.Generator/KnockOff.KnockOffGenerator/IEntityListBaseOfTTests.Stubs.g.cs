@@ -14,15 +14,6 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IValidateListBase<global::Neatoo.IEntityBase>? _source;
 
-			private bool _valueSet;
-			private global::Neatoo.IValidateBase? _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::Neatoo.IValidateBase? Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
-
 			private global::System.Func<global::Neatoo.IValidateBase?>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
 			private global::System.Collections.Generic.List<(global::System.Func<global::Neatoo.IValidateBase?> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -59,6 +50,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::Neatoo.IValidateBase? value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> OnGetSequence(global::Neatoo.IValidateBase? value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal global::Neatoo.IValidateBase? InvokeGet(bool strict)
 			{
@@ -81,13 +78,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Parent (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.Parent;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Parent");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -135,7 +132,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -214,6 +211,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::Neatoo.IValidateBase?> ThenGet(global::Neatoo.IValidateBase? value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -243,15 +243,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>? _source;
-
-			private bool _valueSet;
-			private int _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public int Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<int>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -289,6 +280,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal int InvokeGet(bool strict)
 			{
@@ -311,13 +308,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Count (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.Count;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Count");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -365,7 +362,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -444,6 +441,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -473,15 +473,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.Collections.Generic.ICollection<global::Neatoo.IEntityBase>? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -519,6 +510,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -541,13 +538,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsReadOnly (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsReadOnly;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsReadOnly");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -595,7 +592,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -674,6 +671,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -703,15 +703,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -749,6 +740,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -771,13 +768,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsBusy (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsBusy;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsBusy");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -825,7 +822,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -904,6 +901,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -933,15 +933,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -979,6 +970,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -1001,13 +998,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsValid (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsValid;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsValid");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1055,7 +1052,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1134,6 +1131,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -1163,15 +1163,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -1209,6 +1200,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -1231,13 +1228,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsSelfValid (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsSelfValid;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsSelfValid");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1285,7 +1282,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1364,6 +1361,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -1393,15 +1393,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IValidateMetaProperties? _source;
-
-			private bool _valueSet;
-			private global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -1439,6 +1430,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> OnGetSequence(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> InvokeGet(bool strict)
 			{
@@ -1461,13 +1458,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("PropertyMessages (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.PropertyMessages;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "PropertyMessages");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1515,7 +1512,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1594,6 +1591,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage>> ThenGet(global::System.Collections.Generic.IReadOnlyCollection<global::Neatoo.IPropertyMessage> value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -1623,15 +1623,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IEntityMetaProperties? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -1669,6 +1660,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -1691,13 +1688,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsChild (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsChild;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsChild");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1745,7 +1742,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1824,6 +1821,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -1853,15 +1853,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IEntityMetaProperties? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -1899,6 +1890,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -1921,13 +1918,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsModified (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsModified;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsModified");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1975,7 +1972,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2054,6 +2051,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -2083,15 +2083,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IEntityMetaProperties? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -2129,6 +2120,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -2151,13 +2148,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsSelfModified (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsSelfModified;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsSelfModified");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2205,7 +2202,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2284,6 +2281,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -2313,15 +2313,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IEntityMetaProperties? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -2359,6 +2350,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -2381,13 +2378,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsMarkedModified (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsMarkedModified;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsMarkedModified");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2435,7 +2432,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2514,6 +2511,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -2543,15 +2543,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.IEntityMetaProperties? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -2589,6 +2580,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -2611,13 +2608,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsSavable (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsSavable;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsSavable");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2665,7 +2662,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2744,6 +2741,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -2773,15 +2773,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.RemoteFactory.IFactorySaveMeta? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -2819,6 +2810,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -2841,13 +2838,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsDeleted (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsDeleted;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsDeleted");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2895,7 +2892,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2974,6 +2971,9 @@ partial class IEntityListBaseOfTTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -3003,15 +3003,6 @@ partial class IEntityListBaseOfTTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::Neatoo.RemoteFactory.IFactorySaveMeta? _source;
-
-			private bool _valueSet;
-			private bool _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public bool Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<bool>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -3049,6 +3040,12 @@ partial class IEntityListBaseOfTTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(bool value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<bool> OnGetSequence(bool value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal bool InvokeGet(bool strict)
 			{
@@ -3071,13 +3068,13 @@ partial class IEntityListBaseOfTTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsNew (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsNew;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsNew");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -3125,7 +3122,7 @@ partial class IEntityListBaseOfTTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3203,6 +3200,9 @@ partial class IEntityListBaseOfTTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<bool> ThenGet(bool value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -3765,7 +3765,7 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -3899,6 +3899,10 @@ partial class IEntityListBaseOfTTests
 			private IndexOfDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private int _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(IndexOfDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -3908,10 +3912,10 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.IEntityBase? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::Neatoo.IEntityBase? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::Neatoo.IEntityBase? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3931,9 +3935,27 @@ partial class IEntityListBaseOfTTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::Neatoo.IEntityBase> OnCall(int value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -3941,6 +3963,9 @@ partial class IEntityListBaseOfTTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(IndexOfDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -3959,6 +3984,12 @@ partial class IEntityListBaseOfTTests
 					tracking.RecordCall(item);
 					_sequenceIndex++;
 					return callback(item);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(item);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -4000,8 +4031,8 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -4234,7 +4265,7 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -4468,7 +4499,7 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -4696,7 +4727,7 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -4823,6 +4854,10 @@ partial class IEntityListBaseOfTTests
 			private ContainsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private bool _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(ContainsDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -4832,10 +4867,10 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.IEntityBase? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::Neatoo.IEntityBase? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::Neatoo.IEntityBase? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -4855,9 +4890,27 @@ partial class IEntityListBaseOfTTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::Neatoo.IEntityBase> OnCall(bool value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -4865,6 +4918,9 @@ partial class IEntityListBaseOfTTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(ContainsDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -4883,6 +4939,12 @@ partial class IEntityListBaseOfTTests
 					tracking.RecordCall(item);
 					_sequenceIndex++;
 					return callback(item);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(item);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -4924,8 +4986,8 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -5158,7 +5220,7 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -5292,6 +5354,10 @@ partial class IEntityListBaseOfTTests
 			private RemoveDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private bool _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(RemoveDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -5301,10 +5367,10 @@ partial class IEntityListBaseOfTTests
 			private int _unconfiguredCallCount;
 			private global::Neatoo.IEntityBase? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public global::Neatoo.IEntityBase? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public global::Neatoo.IEntityBase? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5324,9 +5390,27 @@ partial class IEntityListBaseOfTTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<global::Neatoo.IEntityBase> OnCall(bool value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5334,6 +5418,9 @@ partial class IEntityListBaseOfTTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(RemoveDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5352,6 +5439,12 @@ partial class IEntityListBaseOfTTests
 					tracking.RecordCall(item);
 					_sequenceIndex++;
 					return callback(item);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(item);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -5393,8 +5486,8 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -5527,6 +5620,10 @@ partial class IEntityListBaseOfTTests
 			private GetEnumeratorDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetEnumeratorDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -5535,7 +5632,7 @@ partial class IEntityListBaseOfTTests
 
 			private int _unconfiguredCallCount;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5555,9 +5652,27 @@ partial class IEntityListBaseOfTTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Collections.Generic.IEnumerator<global::Neatoo.IEntityBase> value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5565,6 +5680,9 @@ partial class IEntityListBaseOfTTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetEnumeratorDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5583,6 +5701,12 @@ partial class IEntityListBaseOfTTests
 					tracking.RecordCall();
 					_sequenceIndex++;
 					return callback();
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall();
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -5622,8 +5746,8 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -6686,7 +6810,7 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -6907,7 +7031,7 @@ partial class IEntityListBaseOfTTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>

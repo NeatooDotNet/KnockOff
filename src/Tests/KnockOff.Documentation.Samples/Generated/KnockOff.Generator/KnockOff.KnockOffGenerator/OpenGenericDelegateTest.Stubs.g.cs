@@ -18,6 +18,9 @@ partial class OpenGenericDelegateTest
 			/// <summary>Configures callback invoked when delegate is called.</summary>
 			public void OnCall(global::System.Func<T> callback) { _onCall = callback; }
 
+			/// <summary>Configures return value for delegate. Always returns the specified value.</summary>
+			public void OnCall(T value) { _onCall = () => value; }
+
 			public void RecordCall() { _callCount++; }
 
 			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
@@ -63,6 +66,9 @@ partial class OpenGenericDelegateTest
 
 			/// <summary>Configures callback invoked when delegate is called.</summary>
 			public void OnCall(global::System.Func<T> callback) { _onCall = callback; }
+
+			/// <summary>Configures return value for delegate. Always returns the specified value.</summary>
+			public void OnCall(T value) { _onCall = () => value; }
 
 			public void RecordCall() { _callCount++; }
 

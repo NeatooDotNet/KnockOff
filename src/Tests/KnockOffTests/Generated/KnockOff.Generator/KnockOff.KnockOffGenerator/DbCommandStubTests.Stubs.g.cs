@@ -16,12 +16,6 @@ partial class DbCommandStubTests
 
 			private bool _valueSet;
 			private string _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public string Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<string>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -72,6 +66,12 @@ partial class DbCommandStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 			public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
 			{
@@ -120,13 +120,13 @@ partial class DbCommandStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CommandText (get)");
-					return _value;
+					return _valueSet ? _value : default!;
 				}
 
 				if (_source is { } src) return src.CommandText;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CommandText");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -154,7 +154,6 @@ partial class DbCommandStubTests
 				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CommandText (set)");
-					_value = value;
 					return;
 				}
 
@@ -162,6 +161,7 @@ partial class DbCommandStubTests
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CommandText");
 				_value = value;
+				_valueSet = true;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -228,7 +228,7 @@ partial class DbCommandStubTests
 			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -318,6 +318,9 @@ partial class DbCommandStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -435,12 +438,6 @@ partial class DbCommandStubTests
 
 			private bool _valueSet;
 			private int _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public int Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<int>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -491,6 +488,12 @@ partial class DbCommandStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
+
 			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 			public global::KnockOff.IPropertySetTracking<int> OnSet(global::System.Action<int> callback)
 			{
@@ -539,13 +542,13 @@ partial class DbCommandStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CommandTimeout (get)");
-					return _value;
+					return _valueSet ? _value : default!;
 				}
 
 				if (_source is { } src) return src.CommandTimeout;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CommandTimeout");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -573,7 +576,6 @@ partial class DbCommandStubTests
 				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CommandTimeout (set)");
-					_value = value;
 					return;
 				}
 
@@ -581,6 +583,7 @@ partial class DbCommandStubTests
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CommandTimeout");
 				_value = value;
+				_valueSet = true;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -647,7 +650,7 @@ partial class DbCommandStubTests
 			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -737,6 +740,9 @@ partial class DbCommandStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -854,12 +860,6 @@ partial class DbCommandStubTests
 
 			private bool _valueSet;
 			private global::System.Data.CommandType _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Data.CommandType Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<global::System.Data.CommandType>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -910,6 +910,12 @@ partial class DbCommandStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Data.CommandType value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Data.CommandType> OnGetSequence(global::System.Data.CommandType value) => OnGetSequence(() => value);
+
 			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 			public global::KnockOff.IPropertySetTracking<global::System.Data.CommandType> OnSet(global::System.Action<global::System.Data.CommandType> callback)
 			{
@@ -958,13 +964,13 @@ partial class DbCommandStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CommandType (get)");
-					return _value;
+					return _valueSet ? _value : default!;
 				}
 
 				if (_source is { } src) return src.CommandType;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CommandType");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -992,7 +998,6 @@ partial class DbCommandStubTests
 				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("CommandType (set)");
-					_value = value;
 					return;
 				}
 
@@ -1000,6 +1005,7 @@ partial class DbCommandStubTests
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "CommandType");
 				_value = value;
+				_valueSet = true;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1066,7 +1072,7 @@ partial class DbCommandStubTests
 			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1156,6 +1162,9 @@ partial class DbCommandStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Data.CommandType> ThenGet(global::System.Data.CommandType value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -1273,12 +1282,6 @@ partial class DbCommandStubTests
 
 			private bool _valueSet;
 			private global::System.Data.IDbConnection? _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Data.IDbConnection? Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<global::System.Data.IDbConnection?>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -1329,6 +1332,12 @@ partial class DbCommandStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Data.IDbConnection? value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Data.IDbConnection?> OnGetSequence(global::System.Data.IDbConnection? value) => OnGetSequence(() => value);
+
 			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 			public global::KnockOff.IPropertySetTracking<global::System.Data.IDbConnection?> OnSet(global::System.Action<global::System.Data.IDbConnection?> callback)
 			{
@@ -1377,13 +1386,13 @@ partial class DbCommandStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Connection (get)");
-					return _value;
+					return _valueSet ? _value : default!;
 				}
 
 				if (_source is { } src) return src.Connection;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Connection");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -1411,7 +1420,6 @@ partial class DbCommandStubTests
 				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Connection (set)");
-					_value = value;
 					return;
 				}
 
@@ -1419,6 +1427,7 @@ partial class DbCommandStubTests
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Connection");
 				_value = value;
+				_valueSet = true;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1485,7 +1494,7 @@ partial class DbCommandStubTests
 			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1575,6 +1584,9 @@ partial class DbCommandStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Data.IDbConnection?> ThenGet(global::System.Data.IDbConnection? value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -1690,15 +1702,6 @@ partial class DbCommandStubTests
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.Data.IDbCommand? _source;
 
-			private bool _valueSet;
-			private global::System.Data.IDataParameterCollection _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Data.IDataParameterCollection Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
-
 			private global::System.Func<global::System.Data.IDataParameterCollection>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
 			private global::System.Collections.Generic.List<(global::System.Func<global::System.Data.IDataParameterCollection> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -1735,6 +1738,12 @@ partial class DbCommandStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Data.IDataParameterCollection value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Data.IDataParameterCollection> OnGetSequence(global::System.Data.IDataParameterCollection value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal global::System.Data.IDataParameterCollection InvokeGet(bool strict)
 			{
@@ -1757,13 +1766,13 @@ partial class DbCommandStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Parameters (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.Parameters;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Parameters");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1811,7 +1820,7 @@ partial class DbCommandStubTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1890,6 +1899,9 @@ partial class DbCommandStubTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Data.IDataParameterCollection> ThenGet(global::System.Data.IDataParameterCollection value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -1922,12 +1934,6 @@ partial class DbCommandStubTests
 
 			private bool _valueSet;
 			private global::System.Data.IDbTransaction? _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Data.IDbTransaction? Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<global::System.Data.IDbTransaction?>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -1978,6 +1984,12 @@ partial class DbCommandStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Data.IDbTransaction? value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Data.IDbTransaction?> OnGetSequence(global::System.Data.IDbTransaction? value) => OnGetSequence(() => value);
+
 			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 			public global::KnockOff.IPropertySetTracking<global::System.Data.IDbTransaction?> OnSet(global::System.Action<global::System.Data.IDbTransaction?> callback)
 			{
@@ -2026,13 +2038,13 @@ partial class DbCommandStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Transaction (get)");
-					return _value;
+					return _valueSet ? _value : default!;
 				}
 
 				if (_source is { } src) return src.Transaction;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Transaction");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -2060,7 +2072,6 @@ partial class DbCommandStubTests
 				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Transaction (set)");
-					_value = value;
 					return;
 				}
 
@@ -2068,6 +2079,7 @@ partial class DbCommandStubTests
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Transaction");
 				_value = value;
+				_valueSet = true;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2134,7 +2146,7 @@ partial class DbCommandStubTests
 			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2224,6 +2236,9 @@ partial class DbCommandStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Data.IDbTransaction?> ThenGet(global::System.Data.IDbTransaction? value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -2341,12 +2356,6 @@ partial class DbCommandStubTests
 
 			private bool _valueSet;
 			private global::System.Data.UpdateRowSource _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Data.UpdateRowSource Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<global::System.Data.UpdateRowSource>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -2397,6 +2406,12 @@ partial class DbCommandStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Data.UpdateRowSource value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Data.UpdateRowSource> OnGetSequence(global::System.Data.UpdateRowSource value) => OnGetSequence(() => value);
+
 			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 			public global::KnockOff.IPropertySetTracking<global::System.Data.UpdateRowSource> OnSet(global::System.Action<global::System.Data.UpdateRowSource> callback)
 			{
@@ -2445,13 +2460,13 @@ partial class DbCommandStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("UpdatedRowSource (get)");
-					return _value;
+					return _valueSet ? _value : default!;
 				}
 
 				if (_source is { } src) return src.UpdatedRowSource;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "UpdatedRowSource");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -2479,7 +2494,6 @@ partial class DbCommandStubTests
 				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("UpdatedRowSource (set)");
-					_value = value;
 					return;
 				}
 
@@ -2487,6 +2501,7 @@ partial class DbCommandStubTests
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "UpdatedRowSource");
 				_value = value;
+				_valueSet = true;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -2553,7 +2568,7 @@ partial class DbCommandStubTests
 			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2643,6 +2658,9 @@ partial class DbCommandStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Data.UpdateRowSource> ThenGet(global::System.Data.UpdateRowSource value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -2858,7 +2876,7 @@ partial class DbCommandStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -2985,6 +3003,10 @@ partial class DbCommandStubTests
 			private CreateParameterDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private global::System.Data.IDbDataParameter _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(CreateParameterDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -2993,7 +3015,7 @@ partial class DbCommandStubTests
 
 			private int _unconfiguredCallCount;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3013,9 +3035,27 @@ partial class DbCommandStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(global::System.Data.IDbDataParameter value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -3023,6 +3063,9 @@ partial class DbCommandStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(CreateParameterDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -3041,6 +3084,12 @@ partial class DbCommandStubTests
 					tracking.RecordCall();
 					_sequenceIndex++;
 					return callback();
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall();
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -3080,8 +3129,8 @@ partial class DbCommandStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3207,6 +3256,10 @@ partial class DbCommandStubTests
 			private ExecuteNonQueryDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private int _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(ExecuteNonQueryDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -3215,7 +3268,7 @@ partial class DbCommandStubTests
 
 			private int _unconfiguredCallCount;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3235,9 +3288,27 @@ partial class DbCommandStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(int value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -3245,6 +3316,9 @@ partial class DbCommandStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(ExecuteNonQueryDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -3263,6 +3337,12 @@ partial class DbCommandStubTests
 					tracking.RecordCall();
 					_sequenceIndex++;
 					return callback();
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall();
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -3302,8 +3382,8 @@ partial class DbCommandStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3847,6 +3927,10 @@ partial class DbCommandStubTests
 			private ExecuteScalarDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private object? _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(ExecuteScalarDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -3855,7 +3939,7 @@ partial class DbCommandStubTests
 
 			private int _unconfiguredCallCount;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3875,9 +3959,27 @@ partial class DbCommandStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking OnCall(object? value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -3885,6 +3987,9 @@ partial class DbCommandStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(ExecuteScalarDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -3903,6 +4008,12 @@ partial class DbCommandStubTests
 					tracking.RecordCall();
 					_sequenceIndex++;
 					return callback();
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall();
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -3942,8 +4053,8 @@ partial class DbCommandStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -4163,7 +4274,7 @@ partial class DbCommandStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -4384,7 +4495,7 @@ partial class DbCommandStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>

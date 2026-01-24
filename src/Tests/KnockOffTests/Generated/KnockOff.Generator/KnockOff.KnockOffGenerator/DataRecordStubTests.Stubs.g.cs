@@ -14,15 +14,6 @@ partial class DataRecordStubTests
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.Data.IDataRecord? _source;
 
-			private bool _valueSet;
-			private int _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public int Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
-
 			private global::System.Func<int>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
 			private global::System.Collections.Generic.List<(global::System.Func<int> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -59,6 +50,12 @@ partial class DataRecordStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal int InvokeGet(bool strict)
 			{
@@ -81,13 +78,13 @@ partial class DataRecordStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("FieldCount (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.FieldCount;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "FieldCount");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -135,7 +132,7 @@ partial class DataRecordStubTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -213,6 +210,9 @@ partial class DataRecordStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -758,6 +758,10 @@ partial class DataRecordStubTests
 			private GetBooleanDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private bool _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetBooleanDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -767,10 +771,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -790,9 +794,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(bool value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -800,6 +822,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetBooleanDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -818,6 +843,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -859,8 +890,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -993,6 +1024,10 @@ partial class DataRecordStubTests
 			private GetByteDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private byte _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetByteDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -1002,10 +1037,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1025,9 +1060,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(byte value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1035,6 +1088,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetByteDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -1053,6 +1109,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -1094,8 +1156,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1228,6 +1290,10 @@ partial class DataRecordStubTests
 			private GetBytesDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private long _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetBytesDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -1237,10 +1303,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private (int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)? _unconfiguredLastArgs;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
-			public (int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+			public (int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)? LastCallArgs { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArgs; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1260,9 +1326,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int i, long fieldOffset, byte[]? buffer, int bufferoffset, int length)> OnCall(long value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1270,6 +1354,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetBytesDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -1288,6 +1375,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall((i, fieldOffset, buffer, bufferoffset, length));
 					_sequenceIndex++;
 					return callback(i, fieldOffset, buffer, bufferoffset, length);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall((i, fieldOffset, buffer, bufferoffset, length));
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -1329,8 +1422,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1463,6 +1556,10 @@ partial class DataRecordStubTests
 			private GetCharDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private char _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetCharDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -1472,10 +1569,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1495,9 +1592,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(char value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1505,6 +1620,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetCharDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -1523,6 +1641,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -1564,8 +1688,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1698,6 +1822,10 @@ partial class DataRecordStubTests
 			private GetCharsDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private long _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetCharsDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -1707,10 +1835,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private (int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)? _unconfiguredLastArgs;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The arguments from the last call (from most recently called registration).</summary>
-			public (int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)? LastCallArgs { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
+			public (int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)? LastCallArgs { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArgs; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1730,9 +1858,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTrackingArgs<(int i, long fieldoffset, char[]? buffer, int bufferoffset, int length)> OnCall(long value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1740,6 +1886,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetCharsDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -1758,6 +1907,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall((i, fieldoffset, buffer, bufferoffset, length));
 					_sequenceIndex++;
 					return callback(i, fieldoffset, buffer, bufferoffset, length);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall((i, fieldoffset, buffer, bufferoffset, length));
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -1799,8 +1954,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1933,6 +2088,10 @@ partial class DataRecordStubTests
 			private GetDataDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private global::System.Data.IDataReader _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetDataDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -1942,10 +2101,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -1965,9 +2124,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Data.IDataReader value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -1975,6 +2152,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetDataDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -1993,6 +2173,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -2034,8 +2220,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2168,6 +2354,10 @@ partial class DataRecordStubTests
 			private GetDataTypeNameDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private string _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetDataTypeNameDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -2177,10 +2367,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2200,9 +2390,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(string value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -2210,6 +2418,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetDataTypeNameDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -2228,6 +2439,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -2269,8 +2486,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2403,6 +2620,10 @@ partial class DataRecordStubTests
 			private GetDateTimeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private global::System.DateTime _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetDateTimeDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -2412,10 +2633,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2435,9 +2656,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(global::System.DateTime value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -2445,6 +2684,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetDateTimeDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -2463,6 +2705,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -2504,8 +2752,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2638,6 +2886,10 @@ partial class DataRecordStubTests
 			private GetDecimalDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private decimal _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetDecimalDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -2647,10 +2899,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2670,9 +2922,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(decimal value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -2680,6 +2950,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetDecimalDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -2698,6 +2971,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -2739,8 +3018,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -2873,6 +3152,10 @@ partial class DataRecordStubTests
 			private GetDoubleDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private double _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetDoubleDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -2882,10 +3165,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -2905,9 +3188,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(double value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -2915,6 +3216,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetDoubleDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -2933,6 +3237,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -2974,8 +3284,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3108,6 +3418,10 @@ partial class DataRecordStubTests
 			private GetFieldTypeDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private global::System.Type _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetFieldTypeDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -3117,10 +3431,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3140,9 +3454,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Type value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -3150,6 +3482,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetFieldTypeDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -3168,6 +3503,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -3209,8 +3550,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3343,6 +3684,10 @@ partial class DataRecordStubTests
 			private GetFloatDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private float _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetFloatDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -3352,10 +3697,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3375,9 +3720,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(float value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -3385,6 +3748,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetFloatDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -3403,6 +3769,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -3444,8 +3816,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3578,6 +3950,10 @@ partial class DataRecordStubTests
 			private GetGuidDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private global::System.Guid _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetGuidDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -3587,10 +3963,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3610,9 +3986,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(global::System.Guid value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -3620,6 +4014,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetGuidDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -3638,6 +4035,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -3679,8 +4082,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -3813,6 +4216,10 @@ partial class DataRecordStubTests
 			private GetInt16Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private short _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetInt16Delegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -3822,10 +4229,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -3845,9 +4252,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(short value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -3855,6 +4280,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetInt16Delegate Callback, MethodTrackingImpl Tracking)>();
@@ -3873,6 +4301,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -3914,8 +4348,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -4048,6 +4482,10 @@ partial class DataRecordStubTests
 			private GetInt32Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private int _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetInt32Delegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -4057,10 +4495,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -4080,9 +4518,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(int value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -4090,6 +4546,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetInt32Delegate Callback, MethodTrackingImpl Tracking)>();
@@ -4108,6 +4567,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -4149,8 +4614,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -4283,6 +4748,10 @@ partial class DataRecordStubTests
 			private GetInt64Delegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private long _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetInt64Delegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -4292,10 +4761,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -4315,9 +4784,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(long value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -4325,6 +4812,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetInt64Delegate Callback, MethodTrackingImpl Tracking)>();
@@ -4343,6 +4833,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -4384,8 +4880,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -4518,6 +5014,10 @@ partial class DataRecordStubTests
 			private GetNameDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private string _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetNameDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -4527,10 +5027,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -4550,9 +5050,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(string value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -4560,6 +5078,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetNameDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -4578,6 +5099,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -4619,8 +5146,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -4753,6 +5280,10 @@ partial class DataRecordStubTests
 			private GetOrdinalDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private int _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetOrdinalDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -4762,10 +5293,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private string? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public string? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public string? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -4785,9 +5316,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<string> OnCall(int value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -4795,6 +5344,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetOrdinalDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -4813,6 +5365,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(name);
 					_sequenceIndex++;
 					return callback(name);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(name);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -4854,8 +5412,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -4988,6 +5546,10 @@ partial class DataRecordStubTests
 			private GetStringDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private string _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetStringDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -4997,10 +5559,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5020,9 +5582,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(string value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5030,6 +5610,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetStringDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5048,6 +5631,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -5089,8 +5678,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -5223,6 +5812,10 @@ partial class DataRecordStubTests
 			private GetValueDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private object _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetValueDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -5232,10 +5825,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5255,9 +5848,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(object value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5265,6 +5876,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetValueDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5283,6 +5897,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -5324,8 +5944,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -5458,6 +6078,10 @@ partial class DataRecordStubTests
 			private GetValuesDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private int _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(GetValuesDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -5467,10 +6091,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private object[]? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public object[]? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public object[]? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5490,9 +6114,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<object[]> OnCall(int value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5500,6 +6142,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(GetValuesDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5518,6 +6163,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(values);
 					_sequenceIndex++;
 					return callback(values);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(values);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -5559,8 +6210,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -5693,6 +6344,10 @@ partial class DataRecordStubTests
 			private IsDBNullDelegate? _onCall;
 			private MethodTrackingImpl? _onCallTracking;
 
+			private bool _onCallValue = default!;
+			private bool _hasOnCallValue;
+			private MethodTrackingImpl? _onCallValueTracking;
+
 			private global::System.Collections.Generic.List<(IsDBNullDelegate Callback, MethodTrackingImpl Tracking)>? _sequence;
 			private int _sequenceIndex;
 
@@ -5702,10 +6357,10 @@ partial class DataRecordStubTests
 			private int _unconfiguredCallCount;
 			private int? _unconfiguredLastArg;
 
-			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
+			private int TotalCallCount { get { var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0) + (_onCallValueTracking?.CallCount ?? 0); if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; } }
 
 			/// <summary>The argument from the last call (from most recently called registration).</summary>
-			public int? LastCallArg { get { if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
+			public int? LastCallArg { get { if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; } }
 
 
 			/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>
@@ -5725,9 +6380,27 @@ partial class DataRecordStubTests
 				_sequenceIndex = 0;
 				_isVerifiable = false;
 				_verifiableTimes = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_onCall = callback;
 				_onCallTracking = new MethodTrackingImpl(this);
 				return _onCallTracking;
+			}
+
+			/// <summary>Configures return value that repeats indefinitely. Returns tracking interface.</summary>
+			public global::KnockOff.IMethodTracking<int> OnCall(bool value)
+			{
+				_sequence = null;
+				_sequenceIndex = 0;
+				_isVerifiable = false;
+				_verifiableTimes = null;
+				_onCall = null;
+				_onCallTracking = null;
+				_hasOnCallValue = true;
+				_onCallValue = value;
+				_onCallValueTracking = new MethodTrackingImpl(this);
+				return _onCallValueTracking;
 			}
 
 			/// <summary>Starts a callback sequence. Returns sequence for ThenCall chaining. Each callback runs exactly once.</summary>
@@ -5735,6 +6408,9 @@ partial class DataRecordStubTests
 			{
 				_onCall = null;
 				_onCallTracking = null;
+				_hasOnCallValue = false;
+				_onCallValue = default!;
+				_onCallValueTracking = null;
 				_isVerifiable = false;
 				_verifiableTimes = null;
 				_sequence = new global::System.Collections.Generic.List<(IsDBNullDelegate Callback, MethodTrackingImpl Tracking)>();
@@ -5753,6 +6429,12 @@ partial class DataRecordStubTests
 					tracking.RecordCall(i);
 					_sequenceIndex++;
 					return callback(i);
+				}
+
+				if (_hasOnCallValue && _onCallValueTracking != null)
+				{
+					_onCallValueTracking.RecordCall(i);
+					return _onCallValue;
 				}
 
 				if (_onCall != null && _onCallTracking != null)
@@ -5794,8 +6476,8 @@ partial class DataRecordStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
-			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
+			internal bool IsConfigured => _hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()

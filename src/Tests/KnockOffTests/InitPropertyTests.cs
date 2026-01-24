@@ -80,9 +80,9 @@ public class InitPropertyStandaloneTests
 	[Fact]
 	public void InitProperty_CanSetValueForTesting()
 	{
-		// Arrange - backing Value property is { get; set; } for test convenience
+		// Arrange - use OnGet to configure the return value
 		var stub = new EntityWithInitPropertyKnockOff();
-		stub.Id.Value = "test-123";
+		stub.Id.OnGet("test-123");
 
 		// Assert - value is returned through interface
 		IEntityWithInitProperty entity = stub;
@@ -94,7 +94,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new EntityWithInitPropertyKnockOff();
-		stub.Id.Value = "tracked-value";
+		stub.Id.OnGet("tracked-value");
 
 		// Act
 		IEntityWithInitProperty entity = stub;
@@ -110,12 +110,12 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new DocumentWithMixedPropertiesKnockOff();
-		stub.Id.Value = "doc-1";
-		stub.Title.Value = "Initial Title";
-		stub.Version.Value = 1;
+		stub.Id.OnGet("doc-1");
+		stub.Title.OnGet("Initial Title");
+		stub.Version.OnGet(1);
 
-		// Act - change Title (set property can be modified)
-		stub.Title.Value = "Updated Title";
+		// Act - change Title (set property can be modified via OnGet)
+		stub.Title.OnGet("Updated Title");
 
 		// Assert
 		IDocumentWithMixedProperties doc = stub;
@@ -129,7 +129,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new NullableInitPropertyKnockOff();
-		stub.Name.Value = null;
+		stub.Name.OnGet((string?)null);
 
 		// Assert
 		INullableInitProperty entity = stub;
@@ -141,7 +141,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new NullableInitPropertyKnockOff();
-		stub.Name.Value = "Test Name";
+		stub.Name.OnGet("Test Name");
 
 		// Assert
 		INullableInitProperty entity = stub;
@@ -153,7 +153,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new ValueTypeInitPropertyKnockOff();
-		stub.Count.Value = 42;
+		stub.Count.OnGet(42);
 
 		// Assert
 		IValueTypeInitProperty entity = stub;
@@ -165,7 +165,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new NullableValueTypeInitPropertyKnockOff();
-		stub.Revision.Value = null;
+		stub.Revision.OnGet((int?)null);
 
 		// Assert
 		INullableValueTypeInitProperty entity = stub;
@@ -177,7 +177,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new NullableValueTypeInitPropertyKnockOff();
-		stub.Revision.Value = 5;
+		stub.Revision.OnGet(5);
 
 		// Assert
 		INullableValueTypeInitProperty entity = stub;
@@ -189,9 +189,9 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new MultipleInitPropertiesKnockOff();
-		stub.Id.Value = "multi-1";
-		stub.Name.Value = "Test Entity";
-		stub.Version.Value = 3;
+		stub.Id.OnGet("multi-1");
+		stub.Name.OnGet("Test Entity");
+		stub.Version.OnGet(3);
 
 		// Assert
 		IMultipleInitProperties entity = stub;
@@ -205,16 +205,16 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new EntityWithInitPropertyKnockOff();
-		stub.Id.Value = "reset-test";
+		stub.Id.OnGet("reset-test");
 		IEntityWithInitProperty entity = stub;
 		_ = entity.Id; // trigger get
 
 		// Act
 		stub.Id.Reset();
 
-		// Assert - Reset() clears tracking but preserves configuration (Value)
+		// Assert - Reset() clears tracking but preserves configuration (OnGet callback)
 		stub.Id.VerifyGet(Times.Never);
-		Assert.Equal("reset-test", stub.Id.Value); // Value is preserved
+		Assert.Equal("reset-test", entity.Id); // Configuration is preserved, verify through interface
 	}
 
 	/// <summary>
@@ -257,7 +257,7 @@ public class InitPropertyInlineStubTests
 	{
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
-		stub.Id.Value = "inline-test-123";
+		stub.Id.OnGet("inline-test-123");
 
 		// Assert
 		IEntityWithInitProperty entity = stub;
@@ -269,12 +269,12 @@ public class InitPropertyInlineStubTests
 	{
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.IDocumentWithMixedProperties();
-		stub.Id.Value = "inline-doc-1";
-		stub.Title.Value = "Initial";
-		stub.Version.Value = 1;
+		stub.Id.OnGet("inline-doc-1");
+		stub.Title.OnGet("Initial");
+		stub.Version.OnGet(1);
 
 		// Act
-		stub.Title.Value = "Updated";
+		stub.Title.OnGet("Updated");
 
 		// Assert
 		IDocumentWithMixedProperties doc = stub;
@@ -287,7 +287,7 @@ public class InitPropertyInlineStubTests
 	{
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.INullableInitProperty();
-		stub.Name.Value = "inline-name";
+		stub.Name.OnGet("inline-name");
 
 		// Assert
 		INullableInitProperty entity = stub;
@@ -299,7 +299,7 @@ public class InitPropertyInlineStubTests
 	{
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
-		stub.Id.Value = "tracked";
+		stub.Id.OnGet("tracked");
 
 		// Act
 		IEntityWithInitProperty entity = stub;

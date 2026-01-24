@@ -1092,8 +1092,8 @@ internal static class InlineRenderer
                 w.Append(impl.SetterPragmaDisable);
             if (impl.IsInitOnly)
             {
-                // Init-only: record and set value directly (no InvokeSet for init accessor)
-                w.Line($"\t\t\t\t{setterKeyword} {{ {impl.InterceptorName}.RecordSet(value); {impl.InterceptorName}.Value = value; }}");
+                // Init-only: record and set value via SetValue (no InvokeSet for init accessor)
+                w.Line($"\t\t\t\t{setterKeyword} {{ {impl.InterceptorName}.RecordSet(value); {impl.InterceptorName}.SetValue(value); }}");
             }
             else
             {
@@ -1282,6 +1282,18 @@ internal static class InlineRenderer
         w.Line($"\t\t\t/// <summary>Configures callback invoked when delegate is called.</summary>");
         w.Line($"\t\t\tpublic void OnCall({del.OnCallType} callback) {{ _onCall = callback; }}");
         w.Line();
+
+        // OnCall value overload - wraps value in lambda (non-void delegates only)
+        if (!del.IsVoid)
+        {
+            // Generate underscore parameters to ignore arguments: () => value, (_) => value, (_, _) => value, etc.
+            var ignoredParams = del.Parameters.Count == 0
+                ? ""
+                : string.Join(", ", Enumerable.Range(0, del.Parameters.Count).Select(_ => "_"));
+            w.Line($"\t\t\t/// <summary>Configures return value for delegate. Always returns the specified value.</summary>");
+            w.Line($"\t\t\tpublic void OnCall({del.ReturnType} value) {{ _onCall = ({ignoredParams}) => value; }}");
+            w.Line();
+        }
 
         // RecordCall method
         if (del.Parameters.Count == 0)

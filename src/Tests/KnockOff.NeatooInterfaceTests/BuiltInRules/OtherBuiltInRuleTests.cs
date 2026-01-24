@@ -40,7 +40,7 @@ public partial class IMaxLengthRuleTests
         var stub = new Stubs.IMaxLengthRule();
         IMaxLengthRule rule = stub;
 
-        stub.ErrorMessage.Value = "Max length exceeded.";
+        stub.ErrorMessage.OnGet("Max length exceeded.");
 
         Assert.Equal("Max length exceeded.", rule.ErrorMessage);
     }
@@ -51,7 +51,7 @@ public partial class IMaxLengthRuleTests
         var stub = new Stubs.IMaxLengthRule();
         IMaxLengthRule rule = stub;
 
-        stub.Length.Value = 100;
+        stub.Length.OnGet(100);
 
         Assert.Equal(100, rule.Length);
     }
@@ -80,7 +80,7 @@ public class IMaxLengthRuleStandaloneTests
         var stub = new MaxLengthRuleStub();
         IMaxLengthRule rule = stub;
 
-        stub.Length.Value = 50;
+        stub.Length.OnGet(50);
 
         Assert.Equal(50, rule.Length);
     }
@@ -113,7 +113,7 @@ public partial class IMinLengthRuleTests
         var stub = new Stubs.IMinLengthRule();
         IMinLengthRule rule = stub;
 
-        stub.ErrorMessage.Value = "Min length not met.";
+        stub.ErrorMessage.OnGet("Min length not met.");
 
         Assert.Equal("Min length not met.", rule.ErrorMessage);
     }
@@ -124,7 +124,7 @@ public partial class IMinLengthRuleTests
         var stub = new Stubs.IMinLengthRule();
         IMinLengthRule rule = stub;
 
-        stub.Length.Value = 5;
+        stub.Length.OnGet(5);
 
         Assert.Equal(5, rule.Length);
     }
@@ -157,7 +157,7 @@ public partial class IStringLengthRuleTests
         var stub = new Stubs.IStringLengthRule();
         IStringLengthRule rule = stub;
 
-        stub.ErrorMessage.Value = "String length invalid.";
+        stub.ErrorMessage.OnGet("String length invalid.");
 
         Assert.Equal("String length invalid.", rule.ErrorMessage);
     }
@@ -168,7 +168,7 @@ public partial class IStringLengthRuleTests
         var stub = new Stubs.IStringLengthRule();
         IStringLengthRule rule = stub;
 
-        stub.MinimumLength.Value = 2;
+        stub.MinimumLength.OnGet(2);
 
         Assert.Equal(2, rule.MinimumLength);
     }
@@ -179,7 +179,7 @@ public partial class IStringLengthRuleTests
         var stub = new Stubs.IStringLengthRule();
         IStringLengthRule rule = stub;
 
-        stub.MaximumLength.Value = 50;
+        stub.MaximumLength.OnGet(50);
 
         Assert.Equal(50, rule.MaximumLength);
     }
@@ -212,7 +212,7 @@ public partial class IEmailAddressRuleTests
         var stub = new Stubs.IEmailAddressRule();
         IEmailAddressRule rule = stub;
 
-        stub.ErrorMessage.Value = "Invalid email address.";
+        stub.ErrorMessage.OnGet("Invalid email address.");
 
         Assert.Equal("Invalid email address.", rule.ErrorMessage);
     }
@@ -245,7 +245,7 @@ public partial class IRegularExpressionRuleTests
         var stub = new Stubs.IRegularExpressionRule();
         IRegularExpressionRule rule = stub;
 
-        stub.ErrorMessage.Value = "Pattern mismatch.";
+        stub.ErrorMessage.OnGet("Pattern mismatch.");
 
         Assert.Equal("Pattern mismatch.", rule.ErrorMessage);
     }
@@ -256,7 +256,7 @@ public partial class IRegularExpressionRuleTests
         var stub = new Stubs.IRegularExpressionRule();
         IRegularExpressionRule rule = stub;
 
-        stub.Pattern.Value = @"^\d{5}(-\d{4})?$";
+        stub.Pattern.OnGet(@"^\d{5}(-\d{4})?$");
 
         Assert.Equal(@"^\d{5}(-\d{4})?$", rule.Pattern);
     }
@@ -289,7 +289,7 @@ public partial class IRangeRuleTests
         var stub = new Stubs.IRangeRule();
         IRangeRule rule = stub;
 
-        stub.ErrorMessage.Value = "Value out of range.";
+        stub.ErrorMessage.OnGet("Value out of range.");
 
         Assert.Equal("Value out of range.", rule.ErrorMessage);
     }
@@ -300,7 +300,7 @@ public partial class IRangeRuleTests
         var stub = new Stubs.IRangeRule();
         IRangeRule rule = stub;
 
-        stub.Minimum.Value = 0;
+        stub.Minimum.OnGet(0);
 
         Assert.Equal(0, rule.Minimum);
     }
@@ -311,7 +311,7 @@ public partial class IRangeRuleTests
         var stub = new Stubs.IRangeRule();
         IRangeRule rule = stub;
 
-        stub.Maximum.Value = 100;
+        stub.Maximum.OnGet(100);
 
         Assert.Equal(100, rule.Maximum);
     }

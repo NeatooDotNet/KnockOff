@@ -128,7 +128,7 @@ public class SetupPropertyKnockOffTests
     {
         var stub = new MoqUserRepoStub();
 
-        stub.ConnectionString.Value = "server=localhost";
+        stub.ConnectionString.OnGet("server=localhost");
 
         IMoqUserRepo repository = stub;
         var connStr = repository.ConnectionString;

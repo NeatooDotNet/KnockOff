@@ -51,7 +51,7 @@ public partial class IValidatePropertyManagerTests
         var stub = new Stubs.IValidatePropertyManager();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(manager.IsBusy);
         stub.IsBusy.VerifyGet(Times.Once);
@@ -63,7 +63,7 @@ public partial class IValidatePropertyManagerTests
         var stub = new Stubs.IValidatePropertyManager();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.IsSelfValid.Value = true;
+        stub.IsSelfValid.OnGet(true);
 
         Assert.True(manager.IsSelfValid);
     }
@@ -74,7 +74,7 @@ public partial class IValidatePropertyManagerTests
         var stub = new Stubs.IValidatePropertyManager();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.IsValid.Value = false;
+        stub.IsValid.OnGet(false);
 
         Assert.False(manager.IsValid);
     }
@@ -86,7 +86,7 @@ public partial class IValidatePropertyManagerTests
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
         var messages = new List<IPropertyMessage>();
-        stub.PropertyMessages.Value = messages;
+        stub.PropertyMessages.OnGet(messages);
 
         Assert.Same(messages, manager.PropertyMessages);
     }
@@ -97,7 +97,7 @@ public partial class IValidatePropertyManagerTests
         var stub = new Stubs.IValidatePropertyManager();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.IsPaused.Value = true;
+        stub.IsPaused.OnGet(true);
 
         Assert.True(manager.IsPaused);
     }
@@ -287,7 +287,7 @@ public partial class IValidatePropertyManagerTests
         var stub = new Stubs.IValidatePropertyManager();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
         _ = manager.IsBusy;
         _ = manager.IsBusy;
 
@@ -352,7 +352,7 @@ public class IValidatePropertyManagerStandaloneTests
         var stub = new ValidatePropertyManagerStub();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(manager.IsBusy);
     }
