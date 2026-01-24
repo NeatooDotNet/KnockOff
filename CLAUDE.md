@@ -90,3 +90,33 @@ Use "create objects then test them" pattern:
 ## Versioning
 
 KnockOff is pre-1.0. All changes, including breaking changes, bump the minor version only.
+
+## Documentation
+
+### Documentation Pipeline
+
+Documentation uses a two-agent pipeline with MarkdownSnippets for code synchronization:
+
+1. **docs-architect** (Sonnet) - Creates documentation structure with snippet placeholders
+2. **docs-code-samples** (Opus) - Creates compilable sample code in `src/docs/samples/`
+
+### Documentation Structure
+
+```
+README.md                    # Project overview, quick start
+docs/
+├── getting-started.md       # Installation, first usage
+├── guides/                  # Feature guides (methods, properties, etc.)
+├── reference/               # API reference
+└── migration/               # Migration guides
+```
+
+**Excluded:** `docs/todos/`, `docs/plans/`, `docs/release-notes/`
+
+### Sample Code Location
+
+Documentation samples live in `src/docs/samples/` (not `src/Tests/KnockOff.Documentation.Samples/`).
+
+### MarkdownSnippets
+
+Code samples use `#region snippet-name` markers in C# and `<!-- snippet: snippet-name -->` placeholders in markdown. Run `mdsnippets` to sync.
