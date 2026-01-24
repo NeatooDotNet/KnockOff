@@ -51,16 +51,10 @@ internal static class PropertyInterceptorRenderer
 	{
 		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
 
-		// Value storage (init-only - setting Value marks the property as configured)
+		// Internal value storage (init-only - used by init setter to store value)
 		w.Line("private bool _valueSet;");
 		w.Line($"private {model.ValueType} _value = default!;");
-		w.Line($"/// <summary>The configured value for {model.PropertyName}. Setting this marks the property as configured.</summary>");
-		w.Line($"public {model.ValueType} Value");
-		using (w.Braces())
-		{
-			w.Line("get => _value;");
-			w.Line("set { _value = value; _valueSet = true; }");
-		}
+		w.Line("internal void SetValue(" + model.ValueType + " value) { _value = value; _valueSet = true; }");
 		w.Line();
 
 		// Getter tracking and sequence storage
@@ -121,6 +115,16 @@ internal static class PropertyInterceptorRenderer
 		}
 		w.Line();
 
+		// OnGet(value) - wrapper method for value-based configuration
+		w.Line($"/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>");
+		w.Line($"public global::KnockOff.IPropertyGetTracking OnGet({model.ValueType} value) => OnGet(() => value);");
+		w.Line();
+
+		// OnGetSequence(value) - wrapper method for value-based sequence start
+		w.Line($"/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>");
+		w.Line($"public global::KnockOff.IPropertyGetSequence<{model.ValueType}> OnGetSequence({model.ValueType} value) => OnGetSequence(() => value);");
+		w.Line();
+
 		// RecordSet - tracks init setter invocation (for verification)
 		w.Line("/// <summary>Records an init setter access.</summary>");
 		w.Line($"public void RecordSet({model.NullableValueType} value) {{ _setCount++; LastSetValue = value; }}");
@@ -178,17 +182,14 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 		}
 
-		// Value storage
-		w.Line("private bool _valueSet;");
-		w.Line($"private {model.ValueType} _value{GetDefaultValueSuffix(model.DefaultExpression)}");
-		w.Line($"/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>");
-		w.Line($"public {model.ValueType} Value");
-		using (w.Braces())
+		// Backing field for property round-trip storage (set via interface, then get returns it)
+		// This enables basic property behavior where setting a value allows getting it back
+		if (model.HasSetter && model.HasGetter)
 		{
-			w.Line("get => _value;");
-			w.Line("set { _value = value; _valueSet = true; }");
+			w.Line("private bool _valueSet;");
+			w.Line($"private {model.ValueType} _value = default!;");
+			w.Line();
 		}
-		w.Line();
 
 		// Getter storage and tracking (if has getter)
 		if (model.HasGetter)
@@ -270,6 +271,16 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_getSequenceIndex = 0;");
 				w.Line("return new PropertyGetSequenceImpl(this);");
 			}
+			w.Line();
+
+			// OnGet(value) - wrapper method for value-based configuration
+			w.Line($"/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetTracking OnGet({model.ValueType} value) => OnGet(() => value);");
+			w.Line();
+
+			// OnGetSequence(value) - wrapper method for value-based sequence start
+			w.Line($"/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{model.ValueType}> OnGetSequence({model.ValueType} value) => OnGetSequence(() => value);");
 			w.Line();
 		}
 
@@ -383,7 +394,22 @@ internal static class PropertyInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.PropertyName} (get)\");");
-				w.Line("return _value;");
+				// Init-only: return _value (set by init setter)
+				// Regular with setter: return backing value if set, otherwise default
+				// Getter-only: use smart default (from DefaultExpression)
+				if (model.IsInitOnly)
+				{
+					w.Line("return _value;");
+				}
+				else if (model.HasSetter)
+				{
+					w.Line("return _valueSet ? _value : default!;");
+				}
+				else
+				{
+					// Getter-only property: use smart default
+					w.Line($"return {model.DefaultExpression};");
+				}
 			}
 			w.Line();
 
@@ -397,8 +423,23 @@ internal static class PropertyInterceptorRenderer
 			// Priority 4: Strict mode check
 			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.PropertyName}\");");
 
-			// Priority 5: Return Value
-			w.Line("return _value;");
+			// Priority 5: Return fallback value
+			// Init-only: return _value (set by init setter)
+			// Regular with setter: return backing value if set, otherwise default
+			// Getter-only: use smart default (from DefaultExpression)
+			if (model.IsInitOnly)
+			{
+				w.Line("return _value;");
+			}
+			else if (model.HasSetter)
+			{
+				w.Line("return _valueSet ? _value : default!;");
+			}
+			else
+			{
+				// Getter-only property: use smart default
+				w.Line($"return {model.DefaultExpression};");
+			}
 		}
 		w.Line();
 	}
@@ -446,7 +487,6 @@ internal static class PropertyInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.PropertyName} (set)\");");
-				w.Line("_value = value;");
 				w.Line("return;");
 			}
 			w.Line();
@@ -461,8 +501,12 @@ internal static class PropertyInterceptorRenderer
 			// Priority 4: Strict mode check
 			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.PropertyName}\");");
 
-			// Priority 5: Update Value
-			w.Line("_value = value;");
+			// Store in backing field for round-trip storage (when property has both getter and setter)
+			if (model.HasGetter)
+			{
+				w.Line("_value = value;");
+				w.Line("_valueSet = true;");
+			}
 		}
 		w.Line();
 	}
@@ -684,10 +728,11 @@ internal static class PropertyInterceptorRenderer
 			? "_isGetVerifiable || _isSetVerifiable"
 			: (model.HasGetter ? "_isGetVerifiable" : "_isSetVerifiable");
 
-		var isConfiguredParts = new System.Collections.Generic.List<string> { "_valueSet" };
+		// IsConfigured checks OnGet/OnSet - no longer includes _valueSet since .Value API is removed
+		var isConfiguredParts = new System.Collections.Generic.List<string>();
 		if (model.HasGetter) isConfiguredParts.Add("_onGet != null || (_getSequence?.Count ?? 0) > 0");
 		if (model.HasSetter) isConfiguredParts.Add("_onSet != null || (_setSequence?.Count ?? 0) > 0");
-		var isConfiguredExpr = string.Join(" || ", isConfiguredParts);
+		var isConfiguredExpr = isConfiguredParts.Count > 0 ? string.Join(" || ", isConfiguredParts) : "false";
 
 		var totalCountExpr = model.HasGetter && model.HasSetter
 			? "TotalGetCount + TotalSetCount"
@@ -924,6 +969,11 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_interceptor._getSequence!.Add((callback, tracking));");
 				w.Line("return this;");
 			}
+			w.Line();
+
+			// ThenGet(value) - wrapper method for value-based sequence chaining
+			w.Line($"/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet({valueType} value) => ThenGet(() => value);");
 			w.Line();
 
 			w.Line("/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>");

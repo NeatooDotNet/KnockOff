@@ -116,7 +116,7 @@ public class PropertyInterceptorApiTests
         var stub = new ApiPropertyRepoStub();
 
         // Set Value directly - returned by getter
-        stub.ConnectionString.Value = "Server=localhost";
+        stub.ConnectionString.OnGet("Server=localhost");
 
         IApiPropertyRepo repository = stub;
 
@@ -150,7 +150,7 @@ public class PropertyInterceptorApiTests
         {
             setWasCalled = true;
             // Manually update Value if needed:
-            // stub.Timeout.Value = val;
+            // stub.Timeout.OnGet(val);
         });
         repository.Timeout = 60;
         Assert.True(setWasCalled);

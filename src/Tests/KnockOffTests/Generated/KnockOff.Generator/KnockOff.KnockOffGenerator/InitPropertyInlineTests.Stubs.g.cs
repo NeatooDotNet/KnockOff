@@ -13,12 +13,7 @@ partial class InitPropertyInlineTests
 		{
 			private bool _valueSet;
 			private string _value = default!;
-			/// <summary>The configured value for Id. Setting this marks the property as configured.</summary>
-			public string Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
+			internal void SetValue(string value) { _value = value; _valueSet = true; }
 
 			private global::System.Func<string>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -61,6 +56,12 @@ partial class InitPropertyInlineTests
 				_getSequenceIndex = 0;
 				return new PropertyGetSequenceImpl(this);
 			}
+
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
 
 			/// <summary>Records an init setter access.</summary>
 			public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
@@ -226,6 +227,9 @@ partial class InitPropertyInlineTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -259,7 +263,7 @@ partial class InitPropertyInlineTests
 			string global::KnockOffTests.IEntityWithInitProperty.Id
 			{
 				get => Id.InvokeGet(Strict);
-				init { Id.RecordSet(value); Id.Value = value; }
+				init { Id.RecordSet(value); Id.SetValue(value); }
 			}
 
 			/// <summary>The global::KnockOffTests.IEntityWithInitProperty instance. Use for passing to code expecting the interface.</summary>
@@ -309,12 +313,7 @@ partial class InitPropertyInlineTests
 		{
 			private bool _valueSet;
 			private string _value = default!;
-			/// <summary>The configured value for Id. Setting this marks the property as configured.</summary>
-			public string Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
+			internal void SetValue(string value) { _value = value; _valueSet = true; }
 
 			private global::System.Func<string>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -357,6 +356,12 @@ partial class InitPropertyInlineTests
 				_getSequenceIndex = 0;
 				return new PropertyGetSequenceImpl(this);
 			}
+
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
 
 			/// <summary>Records an init setter access.</summary>
 			public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
@@ -522,6 +527,9 @@ partial class InitPropertyInlineTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -554,12 +562,6 @@ partial class InitPropertyInlineTests
 
 			private bool _valueSet;
 			private string _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public string Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<string>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -610,6 +612,12 @@ partial class InitPropertyInlineTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(string value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
+
 			/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
 			public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
 			{
@@ -658,13 +666,13 @@ partial class InitPropertyInlineTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Title (get)");
-					return _value;
+					return _valueSet ? _value : default!;
 				}
 
 				if (_source is { } src) return src.Title;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Title");
-				return _value;
+				return _valueSet ? _value : default!;
 			}
 
 			/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
@@ -692,7 +700,6 @@ partial class InitPropertyInlineTests
 				if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Title (set)");
-					_value = value;
 					return;
 				}
 
@@ -700,6 +707,7 @@ partial class InitPropertyInlineTests
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Title");
 				_value = value;
+				_valueSet = true;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -766,7 +774,7 @@ partial class InitPropertyInlineTests
 			internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -856,6 +864,9 @@ partial class InitPropertyInlineTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string> ThenGet(string value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -971,15 +982,6 @@ partial class InitPropertyInlineTests
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::KnockOffTests.IDocumentWithMixedProperties? _source;
 
-			private bool _valueSet;
-			private int _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public int Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
-
 			private global::System.Func<int>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
 			private global::System.Collections.Generic.List<(global::System.Func<int> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -1016,6 +1018,12 @@ partial class InitPropertyInlineTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(int value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal int InvokeGet(bool strict)
 			{
@@ -1038,13 +1046,13 @@ partial class InitPropertyInlineTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Version (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.Version;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Version");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -1092,7 +1100,7 @@ partial class InitPropertyInlineTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -1171,6 +1179,9 @@ partial class InitPropertyInlineTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<int> ThenGet(int value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -1210,7 +1221,7 @@ partial class InitPropertyInlineTests
 			string global::KnockOffTests.IDocumentWithMixedProperties.Id
 			{
 				get => Id.InvokeGet(Strict);
-				init { Id.RecordSet(value); Id.Value = value; }
+				init { Id.RecordSet(value); Id.SetValue(value); }
 			}
 
 			string global::KnockOffTests.IDocumentWithMixedProperties.Title
@@ -1277,12 +1288,7 @@ partial class InitPropertyInlineTests
 		{
 			private bool _valueSet;
 			private string? _value = default!;
-			/// <summary>The configured value for Name. Setting this marks the property as configured.</summary>
-			public string? Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
+			internal void SetValue(string? value) { _value = value; _valueSet = true; }
 
 			private global::System.Func<string?>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -1325,6 +1331,12 @@ partial class InitPropertyInlineTests
 				_getSequenceIndex = 0;
 				return new PropertyGetSequenceImpl(this);
 			}
+
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(string? value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<string?> OnGetSequence(string? value) => OnGetSequence(() => value);
 
 			/// <summary>Records an init setter access.</summary>
 			public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
@@ -1490,6 +1502,9 @@ partial class InitPropertyInlineTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<string?> ThenGet(string? value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -1523,7 +1538,7 @@ partial class InitPropertyInlineTests
 			string? global::KnockOffTests.INullableInitProperty.Name
 			{
 				get => Name.InvokeGet(Strict);
-				init { Name.RecordSet(value); Name.Value = value; }
+				init { Name.RecordSet(value); Name.SetValue(value); }
 			}
 
 			/// <summary>The global::KnockOffTests.INullableInitProperty instance. Use for passing to code expecting the interface.</summary>

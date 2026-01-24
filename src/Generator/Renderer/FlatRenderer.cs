@@ -2314,9 +2314,9 @@ internal static class FlatRenderer
 		{
 			if (prop.IsInitOnly)
 			{
-				// Init-only: use InvokeGet for getter, but init setter still records and sets value directly
+				// Init-only: use InvokeGet for getter, but init setter records and sets value via SetValue
 				w.Line($"get => {prop.InterceptorName}.InvokeGet(Strict);");
-				w.Line($"init {{ {prop.InterceptorName}.RecordSet(value); {prop.InterceptorName}.Value = value; }}");
+				w.Line($"init {{ {prop.InterceptorName}.RecordSet(value); {prop.InterceptorName}.SetValue(value); }}");
 			}
 			else
 			{

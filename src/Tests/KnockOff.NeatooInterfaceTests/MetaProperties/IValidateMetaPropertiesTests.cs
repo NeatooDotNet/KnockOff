@@ -34,7 +34,7 @@ public partial class IValidateMetaPropertiesTests
         var stub = new Stubs.IValidateMetaProperties();
         IValidateMetaProperties meta = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(meta.IsBusy);
         stub.IsBusy.VerifyGet(Times.Once);
@@ -57,7 +57,7 @@ public partial class IValidateMetaPropertiesTests
         var stub = new Stubs.IValidateMetaProperties();
         IValidateMetaProperties meta = stub;
 
-        stub.IsValid.Value = true;
+        stub.IsValid.OnGet(true);
 
         Assert.True(meta.IsValid);
     }
@@ -68,7 +68,7 @@ public partial class IValidateMetaPropertiesTests
         var stub = new Stubs.IValidateMetaProperties();
         IValidateMetaProperties meta = stub;
 
-        stub.IsSelfValid.Value = false;
+        stub.IsSelfValid.OnGet(false);
 
         Assert.False(meta.IsSelfValid);
     }
@@ -80,7 +80,7 @@ public partial class IValidateMetaPropertiesTests
         IValidateMetaProperties meta = stub;
 
         var messages = new List<IPropertyMessage>();
-        stub.PropertyMessages.Value = messages;
+        stub.PropertyMessages.OnGet(messages);
 
         Assert.Same(messages, meta.PropertyMessages);
     }
@@ -188,7 +188,7 @@ public partial class IValidateMetaPropertiesTests
         var stub = new Stubs.IValidateMetaProperties();
         IValidateMetaProperties meta = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
         _ = meta.IsBusy;
         _ = meta.IsBusy;
 
@@ -244,7 +244,7 @@ public class IValidateMetaPropertiesStandaloneTests
         var stub = new ValidateMetaPropertiesStub();
         IValidateMetaProperties meta = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(meta.IsBusy);
     }
@@ -271,7 +271,7 @@ public class IValidateMetaPropertiesStandaloneTests
         IValidateMetaProperties meta = stub;
 
         var propertyMessageStub = new IValidateMetaPropertiesTests.Stubs.IPropertyMessage();
-        propertyMessageStub.Message.Value = "Required";
+        propertyMessageStub.Message.OnGet("Required");
         var messages = new List<IPropertyMessage> { propertyMessageStub };
         stub.PropertyMessages.OnGet(() => messages);
 

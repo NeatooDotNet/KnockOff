@@ -14,15 +14,6 @@ partial class DbTransactionStubTests
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.Data.IDbTransaction? _source;
 
-			private bool _valueSet;
-			private global::System.Data.IDbConnection? _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Data.IDbConnection? Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
-
 			private global::System.Func<global::System.Data.IDbConnection?>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
 			private global::System.Collections.Generic.List<(global::System.Func<global::System.Data.IDbConnection?> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -59,6 +50,12 @@ partial class DbTransactionStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Data.IDbConnection? value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Data.IDbConnection?> OnGetSequence(global::System.Data.IDbConnection? value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal global::System.Data.IDbConnection? InvokeGet(bool strict)
 			{
@@ -81,13 +78,13 @@ partial class DbTransactionStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("Connection (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.Connection;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "Connection");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -135,7 +132,7 @@ partial class DbTransactionStubTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -214,6 +211,9 @@ partial class DbTransactionStubTests
 					return this;
 				}
 
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Data.IDbConnection?> ThenGet(global::System.Data.IDbConnection? value) => ThenGet(() => value);
+
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
 				{
@@ -243,15 +243,6 @@ partial class DbTransactionStubTests
 		{
 			/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 			internal global::System.Data.IDbTransaction? _source;
-
-			private bool _valueSet;
-			private global::System.Data.IsolationLevel _value = default!;
-			/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
-			public global::System.Data.IsolationLevel Value
-			{
-				get => _value;
-				set { _value = value; _valueSet = true; }
-			}
 
 			private global::System.Func<global::System.Data.IsolationLevel>? _onGet;
 			private PropertyGetTrackingImpl? _onGetTracking;
@@ -289,6 +280,12 @@ partial class DbTransactionStubTests
 				return new PropertyGetSequenceImpl(this);
 			}
 
+			/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+			public global::KnockOff.IPropertyGetTracking OnGet(global::System.Data.IsolationLevel value) => OnGet(() => value);
+
+			/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<global::System.Data.IsolationLevel> OnGetSequence(global::System.Data.IsolationLevel value) => OnGetSequence(() => value);
+
 			/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 			internal global::System.Data.IsolationLevel InvokeGet(bool strict)
 			{
@@ -311,13 +308,13 @@ partial class DbTransactionStubTests
 				if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 				{
 					if (strict) throw global::KnockOff.StubException.SequenceExhausted("IsolationLevel (get)");
-					return _value;
+					return default!;
 				}
 
 				if (_source is { } src) return src.IsolationLevel;
 
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "IsolationLevel");
-				return _value;
+				return default!;
 			}
 
 			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
@@ -365,7 +362,7 @@ partial class DbTransactionStubTests
 			internal bool IsVerifiable => _isGetVerifiable;
 
 			/// <summary>Whether this property has been configured.</summary>
-			internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+			internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 			internal global::KnockOff.VerificationFailure? CheckVerification()
@@ -443,6 +440,9 @@ partial class DbTransactionStubTests
 					_interceptor._getSequence!.Add((callback, tracking));
 					return this;
 				}
+
+				/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+				public global::KnockOff.IPropertyGetSequence<global::System.Data.IsolationLevel> ThenGet(global::System.Data.IsolationLevel value) => ThenGet(() => value);
 
 				/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 				public void Verify()
@@ -574,7 +574,7 @@ partial class DbTransactionStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -795,7 +795,7 @@ partial class DbTransactionStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
@@ -1016,7 +1016,7 @@ partial class DbTransactionStubTests
 			/// <summary>Whether this interceptor was marked with Verifiable().</summary>
 			internal bool IsVerifiable => _isVerifiable;
 
-			/// <summary>Whether this interceptor has been configured (OnCall or OnCallSequence).</summary>
+			/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>
 			internal bool IsConfigured => _onCall != null || (_sequence?.Count ?? 0) > 0;
 
 			/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>

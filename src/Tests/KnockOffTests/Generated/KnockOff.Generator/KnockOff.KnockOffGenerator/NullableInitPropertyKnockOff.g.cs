@@ -10,12 +10,7 @@ partial class NullableInitPropertyKnockOff : global::KnockOffTests.INullableInit
 	{
 		private bool _valueSet;
 		private string? _value = default!;
-		/// <summary>The configured value for Name. Setting this marks the property as configured.</summary>
-		public string? Value
-		{
-			get => _value;
-			set { _value = value; _valueSet = true; }
-		}
+		internal void SetValue(string? value) { _value = value; _valueSet = true; }
 
 		private global::System.Func<string?>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -58,6 +53,12 @@ partial class NullableInitPropertyKnockOff : global::KnockOffTests.INullableInit
 			_getSequenceIndex = 0;
 			return new PropertyGetSequenceImpl(this);
 		}
+
+		/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(string? value) => OnGet(() => value);
+
+		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
+		public global::KnockOff.IPropertyGetSequence<string?> OnGetSequence(string? value) => OnGetSequence(() => value);
 
 		/// <summary>Records an init setter access.</summary>
 		public void RecordSet(string? value) { _setCount++; LastSetValue = value; }
@@ -223,6 +224,9 @@ partial class NullableInitPropertyKnockOff : global::KnockOffTests.INullableInit
 				return this;
 			}
 
+			/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<string?> ThenGet(string? value) => ThenGet(() => value);
+
 			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
 			public void Verify()
 			{
@@ -267,7 +271,7 @@ partial class NullableInitPropertyKnockOff : global::KnockOffTests.INullableInit
 	string? global::KnockOffTests.INullableInitProperty.Name
 	{
 		get => Name.InvokeGet(Strict);
-		init { Name.RecordSet(value); Name.Value = value; }
+		init { Name.RecordSet(value); Name.SetValue(value); }
 	}
 
 }

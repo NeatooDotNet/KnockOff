@@ -43,7 +43,7 @@ public partial class IValidateListBaseTests
         IValidateListBase list = stub;
 
         var parentStub = new ValidateBaseStubForList();
-        stub.Parent.Value = parentStub;
+        stub.Parent.OnGet(parentStub);
 
         Assert.Same(parentStub, list.Parent);
         stub.Parent.VerifyGet(Times.Once);
@@ -55,7 +55,7 @@ public partial class IValidateListBaseTests
         var stub = new Stubs.IValidateListBase();
         IValidateListBase list = stub;
 
-        stub.Parent.Value = null;
+        stub.Parent.OnGet((IValidateBase?)null);
 
         Assert.Null(list.Parent);
     }
@@ -66,7 +66,7 @@ public partial class IValidateListBaseTests
         var stub = new Stubs.IValidateListBase();
         IValidateListBase list = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(list.IsBusy);
     }
@@ -77,7 +77,7 @@ public partial class IValidateListBaseTests
         var stub = new Stubs.IValidateListBase();
         IValidateListBase list = stub;
 
-        stub.IsValid.Value = false;
+        stub.IsValid.OnGet(false);
 
         Assert.False(list.IsValid);
     }
@@ -88,7 +88,7 @@ public partial class IValidateListBaseTests
         var stub = new Stubs.IValidateListBase();
         IValidateListBase list = stub;
 
-        stub.IsSelfValid.Value = false;
+        stub.IsSelfValid.OnGet(false);
 
         Assert.False(list.IsSelfValid);
     }
@@ -100,7 +100,7 @@ public partial class IValidateListBaseTests
         IValidateListBase list = stub;
 
         var messages = new List<IPropertyMessage>();
-        stub.PropertyMessages.Value = messages;
+        stub.PropertyMessages.OnGet(messages);
 
         Assert.Same(messages, list.PropertyMessages);
     }
@@ -190,7 +190,7 @@ public partial class IValidateListBaseTests
         IValidateListBase list = stub;
 
         var parentStub = new ValidateBaseStubForList();
-        stub.Parent.Value = parentStub;
+        stub.Parent.OnGet(parentStub);
         _ = list.Parent;
         _ = list.Parent;
 
@@ -286,7 +286,7 @@ public partial class IValidateListBaseOfTTests
         IValidateListBase<IValidateBase> list = stub;
 
         var parentStub = new ValidateBaseStubForListT();
-        stub.Parent.Value = parentStub;
+        stub.Parent.OnGet(parentStub);
 
         Assert.Same(parentStub, list.Parent);
     }
@@ -299,7 +299,7 @@ public partial class IValidateListBaseOfTTests
         var stub = new Stubs.IValidateListBase();
         IValidateListBase<IValidateBase> list = stub;
 
-        stub.Count.Value = 5;
+        stub.Count.OnGet(5);
 
         Assert.Equal(5, list.Count);
     }

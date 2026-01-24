@@ -114,6 +114,7 @@ public void VerifyCalls_WithVerifiable()
 - **[Interceptor API](docs/reference/interceptor-api.md)** - Complete reference for `OnCall`, `OnGet`, `OnSet`, and `Value`
 - **[Source Delegation](docs/guides/source-delegation.md)** - Delegate stub behavior to real implementations
 - **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step guide for migrating existing tests
+- **[Migration from NSubstitute](docs/migration/from-nsubstitute.md)** - Honest comparison and migration guide
 
 ---
 

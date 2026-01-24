@@ -35,13 +35,31 @@ public partial class AsyncRepoStub : IAsyncRepo { }
 
 public class TaskMethodTests
 {
+    #region async-task-value-overload
+    [Fact]
+    public async Task TaskResult_ValueOverload_AutoWraps()
+    {
+        var stub = new AsyncUserSvcStub();
+
+        // VALUE OVERLOAD: KnockOff auto-wraps the value in Task.FromResult
+        // This is the simplest syntax for returning async values
+        stub.GetUserAsync.OnCall(new User { Id = 42, Name = "Alice" });
+
+        IAsyncUserSvc service = stub;
+        var user = await service.GetUserAsync(42);
+
+        Assert.NotNull(user);
+        Assert.Equal("Alice", user.Name);
+    }
+    #endregion
+
     #region async-task-result
     [Fact]
     public async Task TaskResult_ReturnedWithFromResult()
     {
         var stub = new AsyncUserSvcStub();
 
-        // Use Task.FromResult to return a value synchronously
+        // CALLBACK: Use Task.FromResult when you need dynamic logic
         stub.GetUserAsync.OnCall((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 

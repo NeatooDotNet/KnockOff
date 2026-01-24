@@ -130,6 +130,55 @@ public void Send_WhenCalled_TracksMessage()
 ```
 <!-- endSnippet -->
 
+## Configuring Return Values
+
+### Value Overloads - Simple Syntax
+
+For methods and properties that return values, KnockOff provides convenient value overloads that let you specify the return value directly:
+
+```csharp
+// Instead of writing callbacks for simple returns:
+stub.GetById.OnCall((id) => new User { Id = id, Name = "Alice" });
+
+// You can use the value overload:
+stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+```
+
+### Properties - OnGet/OnSet
+
+Configure property behavior with `OnGet` for getters and `OnSet` for setters:
+
+```csharp
+// Return a fixed value from the getter
+stub.Name.OnGet("Alice");
+
+// Track setter calls
+stub.Name.OnSet((value) => Console.WriteLine($"Name set to: {value}"));
+```
+
+### Async Methods - Auto-Wrapping
+
+For async methods returning `Task<T>` or `ValueTask<T>`, KnockOff automatically wraps your value:
+
+```csharp
+// Value is automatically wrapped in Task.FromResult
+stub.GetUserAsync.OnCall(new User { Name = "Alice" });
+
+// Equivalent to:
+stub.GetUserAsync.OnCall(() => Task.FromResult(new User { Name = "Alice" }));
+```
+
+### When to Use Callbacks vs Values
+
+| Syntax | Use When |
+|--------|----------|
+| `.OnCall(value)` | Returning a fixed value |
+| `.OnCall(callback)` | Computing values based on arguments, side effects, or tracking |
+| `.OnGet(value)` | Property returns a fixed value |
+| `.OnGet(callback)` | Property computes value dynamically |
+
+Both syntaxes return tracking objects for call verification.
+
 ## Understanding Generated Code
 
 ### Where to Find Generated Files

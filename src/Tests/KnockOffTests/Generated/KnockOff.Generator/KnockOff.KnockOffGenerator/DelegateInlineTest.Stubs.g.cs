@@ -114,6 +114,9 @@ partial class DelegateInlineTest
 			/// <summary>Configures callback invoked when delegate is called.</summary>
 			public void OnCall(global::System.Func<int, int> callback) { _onCall = callback; }
 
+			/// <summary>Configures return value for delegate. Always returns the specified value.</summary>
+			public void OnCall(int value) { _onCall = (_) => value; }
+
 			public void RecordCall(int input) { _callCount++; LastCallArg = input; }
 
 			/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>
@@ -162,6 +165,9 @@ partial class DelegateInlineTest
 
 			/// <summary>Configures callback invoked when delegate is called.</summary>
 			public void OnCall(global::System.Func<string, int, string> callback) { _onCall = callback; }
+
+			/// <summary>Configures return value for delegate. Always returns the specified value.</summary>
+			public void OnCall(string value) { _onCall = (_, _) => value; }
 
 			public void RecordCall(string name, int age) { _callCount++; LastCallArgs = (name, age); }
 

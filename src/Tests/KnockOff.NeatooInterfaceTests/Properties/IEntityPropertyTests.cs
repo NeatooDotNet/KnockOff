@@ -40,7 +40,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.IsPaused.Value = true;
+        stub.IsPaused.OnGet(true);
 
         Assert.True(property.IsPaused);
         stub.IsPaused.VerifyGet(Times.Once);
@@ -64,7 +64,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.IsModified.Value = true;
+        stub.IsModified.OnGet(true);
 
         Assert.True(property.IsModified);
     }
@@ -75,7 +75,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.IsSelfModified.Value = true;
+        stub.IsSelfModified.OnGet(true);
 
         Assert.True(property.IsSelfModified);
     }
@@ -86,7 +86,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.DisplayName.Value = "Customer Name";
+        stub.DisplayName.OnGet("Customer Name");
 
         Assert.Equal("Customer Name", property.DisplayName);
     }
@@ -146,7 +146,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.Name.Value = "EntityPropertyName";
+        stub.Name.OnGet("EntityPropertyName");
 
         Assert.Equal("EntityPropertyName", property.Name);
     }
@@ -157,7 +157,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.Value.Value = "EntityValue";
+        stub.Value.OnGet("EntityValue");
 
         Assert.Equal("EntityValue", property.Value);
     }
@@ -168,7 +168,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(property.IsBusy);
     }
@@ -179,7 +179,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.IsValid.Value = false;
+        stub.IsValid.OnGet(false);
 
         Assert.False(property.IsValid);
     }
@@ -231,7 +231,7 @@ public partial class IEntityPropertyTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty property = stub;
 
-        stub.IsModified.Value = true;
+        stub.IsModified.OnGet(true);
         _ = property.IsModified;
         _ = property.IsModified;
 
@@ -296,7 +296,7 @@ public class IEntityPropertyStandaloneTests
         var stub = new EntityPropertyStub();
         IEntityProperty property = stub;
 
-        stub.IsModified.Value = true;
+        stub.IsModified.OnGet(true);
 
         Assert.True(property.IsModified);
     }
@@ -307,7 +307,7 @@ public class IEntityPropertyStandaloneTests
         var stub = new EntityPropertyStub();
         IEntityProperty property = stub;
 
-        stub.DisplayName.Value = "Standalone Display Name";
+        stub.DisplayName.OnGet("Standalone Display Name");
 
         Assert.Equal("Standalone Display Name", property.DisplayName);
     }
@@ -358,7 +358,7 @@ public partial class IEntityPropertyOfTTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty<string> property = stub;
 
-        stub.Value.Value = "TypedEntityValue";
+        stub.Value.OnGet("TypedEntityValue");
 
         Assert.Equal("TypedEntityValue", property.Value);
     }
@@ -381,7 +381,7 @@ public partial class IEntityPropertyOfTTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty<string> property = stub;
 
-        stub.IsModified.Value = true;
+        stub.IsModified.OnGet(true);
 
         Assert.True(property.IsModified);
     }
@@ -392,7 +392,7 @@ public partial class IEntityPropertyOfTTests
         var stub = new Stubs.IEntityProperty();
         IEntityProperty<string> property = stub;
 
-        stub.IsPaused.Value = true;
+        stub.IsPaused.OnGet(true);
 
         Assert.True(property.IsPaused);
     }

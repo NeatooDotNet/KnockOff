@@ -115,6 +115,43 @@ public class MethodConfigurationTests
     }
     #endregion
 
+    #region methods-oncall-value
+    [Fact]
+    public void MethodWithReturn_ConfiguredWithValue()
+    {
+        var stub = new LogSvcMethodsStub();
+
+        // Value overload - simpler syntax when you don't need callback logic
+        // Just pass the return value directly
+        var tracking = stub.GetUserName.OnCall("StaticUser");
+
+        ILogSvcMethods logger = stub;
+        var name = logger.GetUserName(42);
+
+        Assert.Equal("StaticUser", name);
+        tracking.Verify();
+    }
+    #endregion
+
+    #region methods-oncall-value-vs-callback
+    [Fact]
+    public void ValueVsCallback_ChooseBasedOnNeed()
+    {
+        var stub = new LogSvcMethodsStub();
+
+        // Use VALUE when returning a fixed result:
+        stub.GetUserName.OnCall("Alice");
+
+        // Use CALLBACK when you need:
+        // - Dynamic values based on arguments
+        // - Side effects
+        // - Conditional logic
+        stub.GetUserName.OnCall((userId) => userId > 100 ? "Admin" : "User");
+
+        // Both return tracking objects for verification
+    }
+    #endregion
+
     #region methods-oncall-multi-param
     [Fact]
     public void MethodWithMultipleParams_AllAvailableInOnCall()

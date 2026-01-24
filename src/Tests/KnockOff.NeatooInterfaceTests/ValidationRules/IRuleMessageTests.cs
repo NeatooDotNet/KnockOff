@@ -32,7 +32,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.RuleIndex.Value = 42u;
+        stub.RuleIndex.OnGet(42u);
 
         Assert.Equal(42u, message.RuleIndex);
         stub.RuleIndex.VerifyGet(Times.Once);
@@ -44,7 +44,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.PropertyName.Value = "TestProperty";
+        stub.PropertyName.OnGet("TestProperty");
 
         Assert.Equal("TestProperty", message.PropertyName);
     }
@@ -55,7 +55,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.Message.Value = "Error message";
+        stub.Message.OnGet("Error message");
 
         Assert.Equal("Error message", message.Message);
     }
@@ -66,7 +66,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.Message.Value = null;
+        stub.Message.OnGet((string?)null);
 
         Assert.Null(message.Message);
     }
@@ -126,7 +126,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.RuleIndex.Value = 1;
+        stub.RuleIndex.OnGet(1);
         _ = message.RuleIndex;
         _ = message.RuleIndex;
         _ = message.RuleIndex;
@@ -170,7 +170,7 @@ public class IRuleMessageStandaloneTests
         var stub = new RuleMessageStub();
         IRuleMessage message = stub;
 
-        stub.RuleIndex.Value = 5u;
+        stub.RuleIndex.OnGet(5u);
 
         Assert.Equal(5u, message.RuleIndex);
     }
@@ -181,7 +181,7 @@ public class IRuleMessageStandaloneTests
         var stub = new RuleMessageStub();
         IRuleMessage message = stub;
 
-        stub.PropertyName.Value = "Name";
+        stub.PropertyName.OnGet("Name");
 
         Assert.Equal("Name", message.PropertyName);
     }
@@ -192,7 +192,7 @@ public class IRuleMessageStandaloneTests
         var stub = new RuleMessageStub();
         IRuleMessage message = stub;
 
-        stub.Message.Value = "Validation error";
+        stub.Message.OnGet("Validation error");
 
         Assert.Equal("Validation error", message.Message);
     }

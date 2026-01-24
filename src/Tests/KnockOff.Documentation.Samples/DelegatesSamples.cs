@@ -204,13 +204,31 @@ public class OnCallConfigurationTests
     }
     #endregion
 
+    #region delegate-stub-oncall-value
+    [Fact]
+    public void OnCallValue_ReturnsFixedValue()
+    {
+        var stub = new DelegateStubTests.Stubs.Formatter();
+
+        // VALUE OVERLOAD: Pass the return value directly (simpler syntax)
+        stub.Interceptor.OnCall("FORMATTED");
+
+        // Invoke through the delegate
+        Formatter format = stub;
+        var result = format("any input");
+
+        // Returns the fixed value regardless of input
+        Assert.Equal("FORMATTED", result);
+    }
+    #endregion
+
     #region delegate-stub-oncall-return
     [Fact]
     public void OnCallReturn_ReturnsComputedValue()
     {
         var stub = new DelegateStubTests.Stubs.Formatter();
 
-        // Configure to return computed value based on input
+        // CALLBACK: Configure to return computed value based on input
         stub.Interceptor.OnCall((input) => input.ToUpperInvariant());
 
         // Invoke through the delegate

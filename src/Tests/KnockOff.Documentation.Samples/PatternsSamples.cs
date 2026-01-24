@@ -213,7 +213,7 @@ public partial class PatternComparisonTests
         // Stand-Alone: Reusable email stub
         var emailStub = new EmailSvcPatternStub();
         emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
-        emailStub.IsConfigured.Value = true;
+        emailStub.IsConfigured.OnGet(true);
 
         // Inline Interface: Test-local logger stub
         var loggerStub = new Stubs.ILogSvc();

@@ -43,7 +43,7 @@ public partial class IEntityListBaseTests
         IEntityListBase list = stub;
 
         var rootStub = new ValidateBaseStubForEntityList();
-        stub.Root.Value = rootStub;
+        stub.Root.OnGet(rootStub);
 
         Assert.Same(rootStub, list.Root);
         stub.Root.VerifyGet(Times.Once);
@@ -55,7 +55,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.Root.Value = null;
+        stub.Root.OnGet((IValidateBase?)null);
 
         Assert.Null(list.Root);
     }
@@ -66,7 +66,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsModified.Value = true;
+        stub.IsModified.OnGet(true);
 
         Assert.True(list.IsModified);
     }
@@ -77,7 +77,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsSelfModified.Value = true;
+        stub.IsSelfModified.OnGet(true);
 
         Assert.True(list.IsSelfModified);
     }
@@ -88,7 +88,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsChild.Value = true;
+        stub.IsChild.OnGet(true);
 
         Assert.True(list.IsChild);
     }
@@ -99,7 +99,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsSavable.Value = true;
+        stub.IsSavable.OnGet(true);
 
         Assert.True(list.IsSavable);
     }
@@ -113,7 +113,7 @@ public partial class IEntityListBaseTests
         IEntityListBase list = stub;
 
         var parentStub = new ValidateBaseStubForEntityList();
-        stub.Parent.Value = parentStub;
+        stub.Parent.OnGet(parentStub);
 
         Assert.Same(parentStub, list.Parent);
     }
@@ -124,7 +124,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsBusy.Value = true;
+        stub.IsBusy.OnGet(true);
 
         Assert.True(list.IsBusy);
     }
@@ -135,7 +135,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsValid.Value = false;
+        stub.IsValid.OnGet(false);
 
         Assert.False(list.IsValid);
     }
@@ -214,7 +214,7 @@ public partial class IEntityListBaseTests
         IEntityListBase list = stub;
 
         var rootStub = new ValidateBaseStubForEntityList();
-        stub.Root.Value = rootStub;
+        stub.Root.OnGet(rootStub);
         _ = list.Root;
         _ = list.Root;
 
@@ -285,7 +285,7 @@ public class IEntityListBaseStandaloneTests
         var stub = new EntityListBaseStub();
         IEntityListBase list = stub;
 
-        stub.IsModified.Value = true;
+        stub.IsModified.OnGet(true);
 
         Assert.True(list.IsModified);
     }
@@ -328,7 +328,7 @@ public partial class IEntityListBaseOfTTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase<IEntityBase> list = stub;
 
-        stub.IsModified.Value = true;
+        stub.IsModified.OnGet(true);
 
         Assert.True(list.IsModified);
     }
@@ -341,7 +341,7 @@ public partial class IEntityListBaseOfTTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase<IEntityBase> list = stub;
 
-        stub.Count.Value = 10;
+        stub.Count.OnGet(10);
 
         Assert.Equal(10, list.Count);
     }
