@@ -1,0 +1,9 @@
+{
+  "name": "csharp-docs",
+  "version": "0.1.0",
+  "description": "Documentation management for C# open source frameworks with MarkdownSnippets integration",
+  "author": {
+    "name": "NeatooDotNet"
+  },
+  "keywords": ["documentation", "csharp", "dotnet", "markdownsnippets", "samples"]
+}
