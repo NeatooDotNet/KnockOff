@@ -1276,9 +1276,11 @@ internal static class InlineRenderer
             w.Line();
         }
 
-        // OnCall callback
-        w.Line($"\t\t\t/// <summary>Callback invoked when delegate is called.</summary>");
-        w.Line($"\t\t\tpublic {del.OnCallType}? OnCall {{ get; set; }}");
+        // OnCall callback - internal field and public method (method syntax for API consistency)
+        w.Line($"\t\t\tinternal {del.OnCallType}? _onCall;");
+        w.Line();
+        w.Line($"\t\t\t/// <summary>Configures callback invoked when delegate is called.</summary>");
+        w.Line($"\t\t\tpublic void OnCall({del.OnCallType} callback) {{ _onCall = callback; }}");
         w.Line();
 
         // RecordCall method
@@ -1353,12 +1355,12 @@ internal static class InlineRenderer
         if (del.IsVoid)
         {
             var onCallArgs = del.InvokeArgumentList;
-            w.Line($"\t\t\t\tif (Interceptor.OnCall is {{ }} onCall) onCall({onCallArgs});");
+            w.Line($"\t\t\t\tif (Interceptor._onCall is {{ }} onCall) onCall({onCallArgs});");
         }
         else
         {
             var onCallArgs = del.InvokeArgumentList;
-            w.Line($"\t\t\t\tif (Interceptor.OnCall is {{ }} onCall) return onCall({onCallArgs});");
+            w.Line($"\t\t\t\tif (Interceptor._onCall is {{ }} onCall) return onCall({onCallArgs});");
             w.Line($"\t\t\t\treturn {del.DefaultExpression};");
         }
         w.Line("\t\t\t}");

@@ -286,11 +286,26 @@ Use sequences when a property should return different values across multiple rea
 When you need a property to return different values on successive reads, use `OnGetSequence`:
 
 <!-- snippet: properties-ongetsequence-basic -->
-<!--
-Demonstrate: Property returning different values on successive reads
-Show: OnGetSequence() initial callback, ThenGet() for subsequent values
-Result: First read returns first value, second read returns second value, etc.
--->
+```cs
+[Fact]
+public void OnGetSequence_ReturnsDifferentValuesOnSuccessiveReads()
+{
+    var stub = new ConfigPropsStub();
+
+    // OnGetSequence configures different return values for each read
+    stub.Name
+        .OnGetSequence(() => "First")
+        .ThenGet(() => "Second")
+        .ThenGet(() => "Third");
+
+    IConfigProps config = stub;
+
+    // Each read returns the next value in the sequence
+    Assert.Equal("First", config.Name);
+    Assert.Equal("Second", config.Name);
+    Assert.Equal("Third", config.Name);
+}
+```
 <!-- endSnippet -->
 
 **When to use OnGetSequence:**
@@ -304,11 +319,32 @@ Result: First read returns first value, second read returns second value, etc.
 When you need different behavior for successive property writes, use `OnSetSequence`:
 
 <!-- snippet: properties-onsetsequence-basic -->
-<!--
-Demonstrate: Property reacting differently to successive writes
-Show: OnSetSequence() initial callback, ThenSet() for subsequent writes
-Result: First write triggers first callback, second write triggers second callback, etc.
--->
+```cs
+[Fact]
+public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
+{
+    var stub = new ConfigPropsStub();
+
+    var firstWriteValue = "";
+    var secondWriteValue = "";
+
+    // OnSetSequence configures different callbacks for each write
+    stub.Name
+        .OnSetSequence((value) => { firstWriteValue = $"First: {value}"; })
+        .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
+
+    IConfigProps config = stub;
+
+    // First write triggers first callback
+    config.Name = "Alpha";
+    Assert.Equal("First: Alpha", firstWriteValue);
+    Assert.Equal("", secondWriteValue);
+
+    // Second write triggers second callback
+    config.Name = "Beta";
+    Assert.Equal("Second: Beta", secondWriteValue);
+}
+```
 <!-- endSnippet -->
 
 **When to use OnSetSequence:**
@@ -340,11 +376,38 @@ Both `OnGetSequence` and `OnSetSequence` return tracking interfaces that support
 - After exhausting the sequence, subsequent writes do nothing (non-strict) or throw (strict mode)
 
 <!-- snippet: properties-sequence-verification -->
-<!--
-Demonstrate: Verifying properties configured with sequences
-Show: OnGetSequence/OnSetSequence with VerifyGet/VerifySet
-Result: Verification works the same whether using single callbacks or sequences
--->
+```cs
+[Fact]
+public void Sequence_VerifiesLikeRegularCallbacks()
+{
+    var stub = new ConfigPropsStub();
+
+    // Configure sequences
+    var getSequence = stub.Name
+        .OnGetSequence(() => "A")
+        .ThenGet(() => "B");
+
+    var setSequence = stub.Age
+        .OnSetSequence((v) => { })
+        .ThenSet((v) => { });
+
+    IConfigProps config = stub;
+
+    // Access properties
+    _ = config.Name;
+    _ = config.Name;
+    config.Age = 1;
+    config.Age = 2;
+
+    // Verify sequence was fully consumed
+    getSequence.Verify();
+    setSequence.Verify();
+
+    // VerifyGet/VerifySet work the same with sequences
+    stub.Name.VerifyGet(Times.Exactly(2));
+    stub.Age.VerifySet(Times.Exactly(2));
+}
+```
 <!-- endSnippet -->
 
 ---

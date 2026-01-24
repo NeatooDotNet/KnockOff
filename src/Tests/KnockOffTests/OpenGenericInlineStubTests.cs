@@ -167,7 +167,7 @@ public partial class OpenGenericDelegateTests
 	public void SingleTypeParam_InterceptorTracksInvocations()
 	{
 		var stub = new Stubs.OGFactory<string>();
-		stub.Interceptor.OnCall = () => "test-value";
+		stub.Interceptor.OnCall(() => "test-value");
 
 		OGFactory<string> factory = stub;
 		var result = factory();
@@ -181,7 +181,7 @@ public partial class OpenGenericDelegateTests
 	{
 		// TResult has 'class' constraint - string satisfies it
 		var stub = new Stubs.OGConverter<int, bool, string>();
-		stub.Interceptor.OnCall = (input) => input.ToString();
+		stub.Interceptor.OnCall((input) => input.ToString());
 
 		OGConverter<int, bool, string> converter = stub;
 		var result = converter(42);

@@ -756,7 +756,7 @@ public partial class InlineDelegateTests
 
         // Must set OnCall to return Task.CompletedTask, otherwise await on null
         // TODO: Generator should return Task.CompletedTask for async delegates by default
-        stub.Interceptor.OnCall = (args) => Task.CompletedTask;
+        stub.Interceptor.OnCall((args) => Task.CompletedTask);
 
         // NeatooPropertyChanged takes only 1 arg: NeatooPropertyChangedEventArgs
         // EventArgs constructor: (propertyName, source)
@@ -773,7 +773,7 @@ public partial class InlineDelegateTests
         NeatooPropertyChanged del = stub;
 
         // Must set OnCall to return Task.CompletedTask
-        stub.Interceptor.OnCall = (args) => Task.CompletedTask;
+        stub.Interceptor.OnCall((args) => Task.CompletedTask);
 
         await del(new NeatooPropertyChangedEventArgs("Prop1", this));
         await del(new NeatooPropertyChangedEventArgs("Prop2", this));
@@ -791,12 +791,12 @@ public partial class InlineDelegateTests
         string? capturedPropertyName = null;
 
         // OnCall takes (stub, args) - only 2 parameters
-        stub.Interceptor.OnCall = (args) =>
+        stub.Interceptor.OnCall((args) =>
         {
             callbackExecuted = true;
             capturedPropertyName = args.PropertyName;
             return Task.CompletedTask;
-        };
+        });
 
         await del(new NeatooPropertyChangedEventArgs("CapturedProp", this));
 
@@ -811,7 +811,7 @@ public partial class InlineDelegateTests
         NeatooPropertyChanged del = stub;
 
         // Must set OnCall to return Task.CompletedTask
-        stub.Interceptor.OnCall = (args) => Task.CompletedTask;
+        stub.Interceptor.OnCall((args) => Task.CompletedTask);
 
         await del(new NeatooPropertyChangedEventArgs("Prop", this));
 

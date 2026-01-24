@@ -136,6 +136,49 @@ public partial class InlineClassTests
 }
 
 // =============================================================================
+// Inline Delegate Pattern
+// =============================================================================
+
+#region patterns-inline-delegate-basic
+// Define delegate types
+public delegate bool ValidationRule(string value);
+public delegate T Factory<T>();
+
+[KnockOff<ValidationRule>]
+[KnockOff<Factory<User>>]
+public partial class InlineDelegateTests
+{
+    // The generator creates Stubs.ValidationRule and Stubs.Factory<User>
+}
+#endregion
+
+public partial class InlineDelegateTests
+{
+    #region patterns-inline-delegate-usage
+    [Fact]
+    public void InlineDelegateStub_TracksInvocationsAndConfiguresBehavior()
+    {
+        // Arrange - create delegate stub
+        var ruleStub = new Stubs.ValidationRule();
+
+        // Configure behavior via Interceptor.OnCall
+        ruleStub.Interceptor.OnCall((value) => value != "invalid");
+
+        // Act - implicit conversion to delegate type
+        ValidationRule rule = ruleStub;
+        bool result1 = rule("valid");
+        bool result2 = rule("invalid");
+
+        // Assert - verify calls and behavior
+        Assert.True(result1);
+        Assert.False(result2);
+        ruleStub.Interceptor.Verify(Times.Exactly(2));
+        Assert.Equal("invalid", ruleStub.Interceptor.LastCallArg);
+    }
+    #endregion
+}
+
+// =============================================================================
 // Complete Example - All Three Patterns Together
 // =============================================================================
 
