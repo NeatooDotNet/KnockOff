@@ -23,11 +23,26 @@ Indexers in KnockOff work similarly to properties but with key-based access. Eac
 The simplest way to configure an indexer is to populate the backing dictionary before your test runs.
 
 <!-- snippet: indexers-backing-basic -->
-<!--
-Demonstrate: Populating indexer backing dictionary with test data
-Show: Indexer.Backing[key] = value, then access via interface
-Result: Indexer returns values from backing dictionary
--->
+```cs
+[Fact]
+public void Backing_BasicUsage()
+{
+    var stub = new UserCacheStub();
+
+    // Populate the backing dictionary with test data
+    stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
+    stub.Indexer.Backing[2] = new User { Id = 2, Name = "Bob" };
+
+    IUserCache cache = stub;
+
+    // Access via the interface returns values from backing dictionary
+    var user1 = cache[1];
+    var user2 = cache[2];
+
+    Assert.Equal("Alice", user1?.Name);
+    Assert.Equal("Bob", user2?.Name);
+}
+```
 <!-- endSnippet -->
 
 When the indexer is accessed via the interface, KnockOff uses the backing dictionary by default:
@@ -35,11 +50,27 @@ When the indexer is accessed via the interface, KnockOff uses the backing dictio
 - **Set**: Stores to `Backing[key]`
 
 <!-- snippet: indexers-backing-multiple -->
-<!--
-Demonstrate: Pre-populating multiple entries in backing dictionary
-Show: Multiple Backing[key] = value assignments
-Result: All keys accessible via interface indexer
--->
+```cs
+[Fact]
+public void Backing_MultipleEntries()
+{
+    var stub = new ConfigStoreStub();
+
+    // Pre-populate multiple configuration values
+    stub.Indexer.Backing["ConnectionString"] = "Server=localhost;Database=Test";
+    stub.Indexer.Backing["ApiKey"] = "abc123";
+    stub.Indexer.Backing["Timeout"] = "30";
+    stub.Indexer.Backing["MaxRetries"] = "3";
+
+    IConfigStore config = stub;
+
+    // All keys are accessible via the interface indexer
+    Assert.Equal("Server=localhost;Database=Test", config["ConnectionString"]);
+    Assert.Equal("abc123", config["ApiKey"]);
+    Assert.Equal("30", config["Timeout"]);
+    Assert.Equal("3", config["MaxRetries"]);
+}
+```
 <!-- endSnippet -->
 
 **When to use Backing:**
@@ -55,21 +86,57 @@ Result: All keys accessible via interface indexer
 Use `OnGet` when an indexer's value should be computed at access time based on the key.
 
 <!-- snippet: indexers-onget-computed -->
-<!--
-Demonstrate: Indexer getter that computes values based on key
-Show: OnGet((key) => computedValue) method syntax
-Result: Each key access computes a fresh value
--->
+```cs
+[Fact]
+public void OnGet_ComputedValue()
+{
+    var stub = new ConfigStoreStub();
+
+    // OnGet computes values based on the key
+    stub.Indexer.OnGet((key) => $"Value for {key}");
+
+    IConfigStore config = stub;
+
+    // Each access computes a fresh value from the key
+    Assert.Equal("Value for ApiKey", config["ApiKey"]);
+    Assert.Equal("Value for Timeout", config["Timeout"]);
+}
+```
 <!-- endSnippet -->
 
 OnGet receives the key as a parameter and returns the value:
 
 <!-- snippet: indexers-onget-stateful -->
-<!--
-Demonstrate: Indexer getter that depends on other stub state
-Show: OnGet accessing tracked state to determine return value
-Result: Indexer behavior changes based on test execution
--->
+```cs
+[Fact]
+public void OnGet_StatefulBehavior()
+{
+    var stub = new ProductInventoryStub();
+
+    // Track inventory state with local variable
+    var inventory = new Dictionary<string, int>
+    {
+        ["SKU-001"] = 10,
+        ["SKU-002"] = 5
+    };
+
+    // OnGet checks the tracked state to determine return value
+    stub.Indexer.OnGet((sku) => inventory.GetValueOrDefault(sku, 0));
+
+    IProductInventory store = stub;
+
+    // Indexer behavior depends on test state
+    Assert.Equal(10, store["SKU-001"]);
+    Assert.Equal(5, store["SKU-002"]);
+    Assert.Equal(0, store["SKU-999"]); // Not in inventory
+
+    // Modify state
+    inventory["SKU-001"] = 8;
+
+    // Indexer reflects updated state
+    Assert.Equal(8, store["SKU-001"]);
+}
+```
 <!-- endSnippet -->
 
 **When to use OnGet:**
@@ -87,21 +154,65 @@ Result: Indexer behavior changes based on test execution
 Use `OnSet` to intercept indexer writes. This allows tracking writes or validating keys and values during tests.
 
 <!-- snippet: indexers-onset-tracking -->
-<!--
-Demonstrate: OnSet tracking all written key-value pairs
-Show: OnSet((key, value) => { }) method syntax capturing to list
-Result: All writes tracked for verification
--->
+```cs
+[Fact]
+public void OnSet_TrackingWrites()
+{
+    var stub = new ConfigStoreStub();
+
+    // Track all key-value pairs written to the indexer
+    var writtenPairs = new List<(string key, string value)>();
+    stub.Indexer.OnSet((key, value) =>
+    {
+        writtenPairs.Add((key, value));
+    });
+
+    IConfigStore config = stub;
+
+    config["ApiKey"] = "secret123";
+    config["Timeout"] = "60";
+    config["MaxRetries"] = "5";
+
+    // All writes are tracked for verification
+    Assert.Equal(3, writtenPairs.Count);
+    Assert.Contains(("ApiKey", "secret123"), writtenPairs);
+    Assert.Contains(("Timeout", "60"), writtenPairs);
+    Assert.Contains(("MaxRetries", "5"), writtenPairs);
+}
+```
 <!-- endSnippet -->
 
 You can also use `OnSet` to simulate validation logic:
 
 <!-- snippet: indexers-onset-validation -->
-<!--
-Demonstrate: OnSet simulating validation that throws for invalid keys
-Show: OnSet checking key validity and throwing exceptions
-Result: Invalid keys cause exceptions during indexer writes
--->
+```cs
+[Fact]
+public void OnSet_Validation()
+{
+    var stub = new ProductInventoryStub();
+
+    // OnSet validates keys and throws for invalid ones
+    var validSkus = new HashSet<string> { "SKU-001", "SKU-002", "SKU-003" };
+    stub.Indexer.OnSet((sku, quantity) =>
+    {
+        if (!validSkus.Contains(sku))
+            throw new ArgumentException($"Invalid SKU: {sku}");
+        if (quantity < 0)
+            throw new ArgumentException("Quantity cannot be negative");
+    });
+
+    IProductInventory inventory = stub;
+
+    // Valid key and value works
+    inventory["SKU-001"] = 10;
+
+    // Invalid key throws
+    Assert.Throws<ArgumentException>(() => inventory["INVALID-SKU"] = 5);
+
+    // Invalid value throws
+    Assert.Throws<ArgumentException>(() => inventory["SKU-002"] = -1);
+}
+```
 <!-- endSnippet -->
 
 **When to use OnSet:**
@@ -121,21 +232,59 @@ Indexer interceptors support verification similar to properties.
 ### Using Verify() on Indexers
 
 <!-- snippet: indexers-verify-access -->
-<!--
-Demonstrate: Verifying indexer was accessed
-Show: VerifyGet(Times), VerifySet(Times) on Indexer interceptor
-Result: Verification passes if access counts match expectations
--->
+```cs
+[Fact]
+public void Verify_IndexerAccess()
+{
+    var stub = new ConfigStoreStub();
+    stub.Indexer.Backing["ApiKey"] = "secret";
+
+    IConfigStore config = stub;
+
+    // Access the indexer
+    _ = config["ApiKey"];
+    _ = config["ApiKey"];
+    config["Timeout"] = "30";
+
+    // VerifyGet checks getter was called expected number of times
+    stub.Indexer.VerifyGet(Times.Exactly(2));
+
+    // VerifySet checks setter was called expected number of times
+    stub.Indexer.VerifySet(Times.Once);
+}
+```
 <!-- endSnippet -->
 
 ### Capturing Last Access
 
 <!-- snippet: indexers-capture-last -->
-<!--
-Demonstrate: Capturing the last accessed key and set entry
-Show: LastGetKey, LastSetEntry properties
-Result: Access to most recently used key and value
--->
+```cs
+[Fact]
+public void CaptureLastAccess()
+{
+    var stub = new ConfigStoreStub();
+    stub.Indexer.Backing["First"] = "1";
+    stub.Indexer.Backing["Second"] = "2";
+
+    IConfigStore config = stub;
+
+    // Read multiple keys
+    _ = config["First"];
+    _ = config["Second"];
+
+    // LastGetKey captures the most recent getter key
+    Assert.Equal("Second", stub.Indexer.LastGetKey);
+
+    // Write to the indexer
+    config["ApiKey"] = "secret";
+    config["Timeout"] = "60";
+
+    // LastSetEntry captures the most recent setter key-value pair
+    Assert.NotNull(stub.Indexer.LastSetEntry);
+    Assert.Equal("Timeout", stub.Indexer.LastSetEntry.Value.Key);
+    Assert.Equal("60", stub.Indexer.LastSetEntry.Value.Value);
+}
+```
 <!-- endSnippet -->
 
 **Available verification methods:**
@@ -158,11 +307,26 @@ Use sequences when an indexer should return different values for the same key ac
 When you need an indexer to return different values on successive reads of the same key:
 
 <!-- snippet: indexers-ongetsequence-basic -->
-<!--
-Demonstrate: Indexer returning different values on successive reads
-Show: OnGetSequence((key) => first).ThenGet((key) => second)
-Result: First access returns first value, second access returns second value
--->
+```cs
+[Fact]
+public void OnGetSequence_DifferentValuesPerAccess()
+{
+    var stub = new ConfigStoreStub();
+
+    // Configure sequence: first access returns "cached", second returns "fresh"
+    stub.Indexer
+        .OnGetSequence((key) => "cached")
+        .ThenGet((key) => "fresh");
+
+    IConfigStore config = stub;
+
+    // First access returns first value
+    Assert.Equal("cached", config["Data"]);
+
+    // Second access returns second value
+    Assert.Equal("fresh", config["Data"]);
+}
+```
 <!-- endSnippet -->
 
 **When to use OnGetSequence:**
@@ -175,11 +339,38 @@ Result: First access returns first value, second access returns second value
 When you need different behavior for successive indexer writes:
 
 <!-- snippet: indexers-onsetsequence-basic -->
-<!--
-Demonstrate: Indexer reacting differently to successive writes
-Show: OnSetSequence((k, v) => reject).ThenSet((k, v) => accept)
-Result: First write fails validation, second write succeeds
--->
+```cs
+[Fact]
+public void OnSetSequence_DifferentBehaviorPerWrite()
+{
+    var stub = new ProductInventoryStub();
+
+    var attemptCount = 0;
+
+    // First write fails validation, second write succeeds
+    stub.Indexer
+        .OnSetSequence((sku, qty) =>
+        {
+            attemptCount++;
+            throw new InvalidOperationException("Service unavailable");
+        })
+        .ThenSet((sku, qty) =>
+        {
+            attemptCount++;
+            // Second attempt succeeds
+        });
+
+    IProductInventory inventory = stub;
+
+    // First write throws
+    Assert.Throws<InvalidOperationException>(() => inventory["SKU-001"] = 10);
+
+    // Second write succeeds
+    inventory["SKU-001"] = 10;
+
+    Assert.Equal(2, attemptCount);
+}
+```
 <!-- endSnippet -->
 
 **When to use OnSetSequence:**
@@ -204,11 +395,39 @@ Result: First write fails validation, second write succeeds
 When an interface has multiple indexer overloads (different key types), KnockOff generates separate interceptor properties:
 
 <!-- snippet: indexers-multiple-overloads -->
-<!--
-Demonstrate: Interface with multiple indexer signatures
-Show: Indexer, Indexer_1, Indexer_2 properties on stub
-Result: Each overload has its own interceptor with independent backing dictionary
--->
+```cs
+[Fact]
+public void MultipleIndexerOverloads()
+{
+    var stub = new MultiKeyStoreStub();
+
+    // Each indexer overload has its own interceptor
+    // String key indexer: stub.Indexer.OfString
+    // Int key indexer: stub.Indexer.OfInt32
+
+    // Configure string indexer
+    stub.Indexer.OfString.Backing["name"] = "Alice";
+    stub.Indexer.OfString.Backing["email"] = "alice@example.com";
+
+    // Configure int indexer
+    stub.Indexer.OfInt32.Backing[0] = 100;
+    stub.Indexer.OfInt32.Backing[1] = 200;
+
+    IMultiKeyStore store = stub;
+
+    // Access string indexer
+    Assert.Equal("Alice", store["name"]);
+    Assert.Equal("alice@example.com", store["email"]);
+
+    // Access int indexer
+    Assert.Equal(100, store[0]);
+    Assert.Equal(200, store[1]);
+
+    // Each overload tracks independently
+    stub.Indexer.OfString.VerifyGet(Times.Exactly(2));
+    stub.Indexer.OfInt32.VerifyGet(Times.Exactly(2));
+}
+```
 <!-- endSnippet -->
 
 Overloads are numbered in the order they appear in the interface definition:
@@ -227,11 +446,24 @@ When both `Backing` and `OnGet`/`OnSet` are configured:
 - **OnSet takes precedence**: Callback is invoked, `Backing` is NOT updated automatically
 
 <!-- snippet: indexers-priority -->
-<!--
-Demonstrate: OnGet/OnSet taking precedence over Backing
-Show: Populate Backing, then set OnGet - callback wins
-Result: OnGet callback value returned instead of Backing value
--->
+```cs
+[Fact]
+public void OnGet_TakesPrecedenceOverBacking()
+{
+    var stub = new ConfigStoreStub();
+
+    // First, populate the backing dictionary
+    stub.Indexer.Backing["ApiKey"] = "from-backing";
+
+    // Then set OnGet - it takes precedence over Backing
+    stub.Indexer.OnGet((key) => "from-callback");
+
+    IConfigStore config = stub;
+
+    // OnGet callback value is returned, not backing value
+    Assert.Equal("from-callback", config["ApiKey"]);
+}
+```
 <!-- endSnippet -->
 
 **Design principle:** Callbacks override default backing dictionary behavior. If you want both, your callback must explicitly update `Backing`:
@@ -250,11 +482,41 @@ stub.Indexer.OnSet((key, value) => {
 Calling `Reset()` on an indexer interceptor clears all counters and callbacks but **preserves the Backing dictionary**.
 
 <!-- snippet: indexers-reset -->
-<!--
-Demonstrate: Reset() clearing tracking but preserving Backing
-Show: Reset(), then verify counts are zero but Backing data remains
-Result: Tracking cleared, test data preserved
--->
+```cs
+[Fact]
+public void Reset_ClearsTrackingPreservesBacking()
+{
+    var stub = new ConfigStoreStub();
+
+    // Setup: populate backing and access indexer
+    stub.Indexer.Backing["ApiKey"] = "secret";
+    stub.Indexer.Backing["Timeout"] = "30";
+
+    IConfigStore config = stub;
+
+    _ = config["ApiKey"];
+    config["NewKey"] = "value";
+
+    // Verify access counts before reset
+    stub.Indexer.VerifyGet(Times.Once);
+    stub.Indexer.VerifySet(Times.Once);
+    Assert.Equal("ApiKey", stub.Indexer.LastGetKey);
+    Assert.NotNull(stub.Indexer.LastSetEntry);
+
+    // Reset clears tracking state
+    stub.Indexer.Reset();
+
+    // Tracking counts are cleared
+    stub.Indexer.VerifyGet(Times.Never);
+    stub.Indexer.VerifySet(Times.Never);
+    Assert.Null(stub.Indexer.LastGetKey);
+    Assert.Null(stub.Indexer.LastSetEntry);
+
+    // Backing data is preserved
+    Assert.Equal("secret", config["ApiKey"]);
+    Assert.True(stub.Indexer.Backing.ContainsKey("Timeout"));
+}
+```
 <!-- endSnippet -->
 
 **Note on Reset behavior:** Reset() clears tracking counters, `LastGetKey`, `LastSetEntry`, `OnGet`, and `OnSet`. The `Backing` dictionary is preserved to maintain test data configuration between verification phases.
@@ -283,11 +545,65 @@ Choose your configuration approach based on the test scenario:
 This example demonstrates all indexer configuration approaches in a realistic test scenario.
 
 <!-- snippet: indexers-complete-example -->
-<!--
-Demonstrate: Complete indexer usage in a test
-Show: Backing, OnGet, OnSet, verification, and sequences
-Result: Comprehensive example showing all configuration patterns
--->
+```cs
+[Fact]
+public void CompleteIndexerExample_AllPatterns()
+{
+    // Scenario: Testing a cache service that loads users by ID
+
+    var stub = new UserCacheStub();
+
+    // 1. Backing Dictionary: Pre-populate known test data
+    stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice", Email = "alice@example.com" };
+    stub.Indexer.Backing[2] = new User { Id = 2, Name = "Bob", Email = "bob@example.com" };
+
+    IUserCache cache = stub;
+
+    // Basic access via backing dictionary
+    var alice = cache[1];
+    Assert.Equal("Alice", alice?.Name);
+
+    // 2. OnGet: Configure dynamic behavior for cache misses
+    stub.Indexer.OnGet((id) =>
+    {
+        // Simulate loading from database for unknown IDs
+        if (id == 999)
+            return new User { Id = 999, Name = "Dynamic User", Email = "dynamic@example.com" };
+        return null;
+    });
+
+    var dynamicUser = cache[999];
+    Assert.Equal("Dynamic User", dynamicUser?.Name);
+
+    // Unknown IDs return null
+    Assert.Null(cache[404]);
+
+    // 3. Verification: Check access patterns
+    stub.Indexer.VerifyGet(Times.AtLeast(3));
+    Assert.Equal(404, stub.Indexer.LastGetKey);
+
+    // 4. OnSet: Track cache updates
+    var cacheUpdates = new List<(int id, User? user)>();
+    stub.Indexer.OnSet((id, user) =>
+    {
+        cacheUpdates.Add((id, user));
+    });
+
+    cache[3] = new User { Id = 3, Name = "Charlie" };
+    cache[4] = new User { Id = 4, Name = "Diana" };
+
+    Assert.Equal(2, cacheUpdates.Count);
+    stub.Indexer.VerifySet(Times.Exactly(2));
+
+    // 5. Reset for next test phase
+    stub.Indexer.Reset();
+    stub.Indexer.VerifyGet(Times.Never);
+    stub.Indexer.VerifySet(Times.Never);
+
+    // Backing data still available after reset
+    Assert.True(stub.Indexer.Backing.ContainsKey(1));
+}
+```
 <!-- endSnippet -->
 
 ---

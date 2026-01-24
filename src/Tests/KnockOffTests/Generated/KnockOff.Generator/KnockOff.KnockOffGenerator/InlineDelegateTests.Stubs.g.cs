@@ -16,8 +16,10 @@ partial class InlineDelegateTests
 			/// <summary>The argument from the last invocation.</summary>
 			public global::Neatoo.NeatooPropertyChangedEventArgs? LastCallArg { get; private set; }
 
-			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task>? OnCall { get; set; }
+			internal global::System.Func<global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task>? _onCall;
+
+			/// <summary>Configures callback invoked when delegate is called.</summary>
+			public void OnCall(global::System.Func<global::Neatoo.NeatooPropertyChangedEventArgs, global::System.Threading.Tasks.Task> callback) { _onCall = callback; }
 
 			public void RecordCall(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs) { _callCount++; LastCallArg = propertyNameBreadCrumbs; }
 
@@ -47,7 +49,7 @@ partial class InlineDelegateTests
 			private global::System.Threading.Tasks.Task Invoke(global::Neatoo.NeatooPropertyChangedEventArgs propertyNameBreadCrumbs)
 			{
 				Interceptor.RecordCall(propertyNameBreadCrumbs);
-				if (Interceptor.OnCall is { } onCall) return onCall(propertyNameBreadCrumbs);
+				if (Interceptor._onCall is { } onCall) return onCall(propertyNameBreadCrumbs);
 				return global::System.Threading.Tasks.Task.CompletedTask;
 			}
 

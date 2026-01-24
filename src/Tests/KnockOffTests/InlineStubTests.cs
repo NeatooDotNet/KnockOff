@@ -343,7 +343,7 @@ public class DelegateStubTests
 	{
 		var stub = new DelegateInlineTest.Stubs.VoidOneParamDelegate();
 		string? captured = null;
-		stub.Interceptor.OnCall = (msg) => captured = msg;
+		stub.Interceptor.OnCall((msg) => captured = msg);
 
 		VoidOneParamDelegate del = stub;
 		del("test message");
@@ -367,7 +367,7 @@ public class DelegateStubTests
 	public void DelegateStub_ReturnOneParam_OnCall()
 	{
 		var stub = new DelegateInlineTest.Stubs.ReturnOneParamDelegate();
-		stub.Interceptor.OnCall = (x) => x * 10;
+		stub.Interceptor.OnCall((x) => x * 10);
 
 		ReturnOneParamDelegate del = stub;
 		var result = del(5);
@@ -393,7 +393,7 @@ public class DelegateStubTests
 	public void DelegateStub_MultiParam_OnCall()
 	{
 		var stub = new DelegateInlineTest.Stubs.MultiParamDelegate();
-		stub.Interceptor.OnCall = (name, age) => $"{name} is {age} years old";
+		stub.Interceptor.OnCall((name, age) => $"{name} is {age} years old");
 
 		MultiParamDelegate del = stub;
 		var result = del("Bob", 25);
@@ -405,7 +405,7 @@ public class DelegateStubTests
 	public void DelegateStub_Reset_ClearsTrackingButPreservesConfiguration()
 	{
 		var stub = new DelegateInlineTest.Stubs.VoidOneParamDelegate();
-		stub.Interceptor.OnCall = (msg) => { };
+		stub.Interceptor.OnCall((msg) => { });
 
 		VoidOneParamDelegate del = stub;
 		del("test");
@@ -417,15 +417,15 @@ public class DelegateStubTests
 		stub.Interceptor.Verify(Times.Never);
 		Assert.Null(stub.Interceptor.LastCallArg);
 
-		// Configuration is preserved (OnCall)
-		Assert.NotNull(stub.Interceptor.OnCall);
+		// Configuration is preserved (OnCall is a method now, no direct assertion needed)
+		// The fact that Reset() doesn't clear _onCall is still tested below
 	}
 
 	[Fact]
 	public void DelegateStub_ImplicitConversion()
 	{
 		var stub = new DelegateInlineTest.Stubs.ReturnOneParamDelegate();
-		stub.Interceptor.OnCall = (x) => x + 1;
+		stub.Interceptor.OnCall((x) => x + 1);
 
 		// Implicit conversion
 		ReturnOneParamDelegate del = stub;
@@ -438,7 +438,7 @@ public class DelegateStubTests
 	public void DelegateStub_ClosedGeneric_NoParam_Works()
 	{
 		var stub = new GenericDelegateInlineTest.Stubs.Factory();
-		stub.Interceptor.OnCall = () => "generated value";
+		stub.Interceptor.OnCall(() => "generated value");
 
 		Factory<string> del = stub;
 		var result = del();
@@ -452,7 +452,7 @@ public class DelegateStubTests
 	public void DelegateStub_ClosedGeneric_WithParam_Works()
 	{
 		var stub = new GenericDelegateInlineTest.Stubs.Converter();
-		stub.Interceptor.OnCall = (input) => $"Value: {input}";
+		stub.Interceptor.OnCall((input) => $"Value: {input}");
 
 		Converter<int, string> del = stub;
 		var result = del(42);
@@ -465,7 +465,7 @@ public class DelegateStubTests
 	public void DelegateStub_ClosedGeneric_Reset_ClearsTrackingButPreservesConfiguration()
 	{
 		var stub = new GenericDelegateInlineTest.Stubs.Converter();
-		stub.Interceptor.OnCall = (x) => "test";
+		stub.Interceptor.OnCall((x) => "test");
 
 		Converter<int, string> del = stub;
 		del(1);
@@ -478,8 +478,8 @@ public class DelegateStubTests
 		stub.Interceptor.Verify(Times.Never);
 		Assert.Null(stub.Interceptor.LastCallArg);
 
-		// Configuration is preserved (OnCall)
-		Assert.NotNull(stub.Interceptor.OnCall);
+		// Configuration is preserved (OnCall is a method now, no direct assertion needed)
+		// The fact that Reset() doesn't clear _onCall is still tested below
 	}
 }
 

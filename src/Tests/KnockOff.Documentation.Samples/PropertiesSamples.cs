@@ -251,6 +251,94 @@ public class PropertyVerificationTests
 }
 
 // =============================================================================
+// Sequence Behavior Samples
+// =============================================================================
+
+public class PropertySequenceTests
+{
+    #region properties-ongetsequence-basic
+    [Fact]
+    public void OnGetSequence_ReturnsDifferentValuesOnSuccessiveReads()
+    {
+        var stub = new ConfigPropsStub();
+
+        // OnGetSequence configures different return values for each read
+        stub.Name
+            .OnGetSequence(() => "First")
+            .ThenGet(() => "Second")
+            .ThenGet(() => "Third");
+
+        IConfigProps config = stub;
+
+        // Each read returns the next value in the sequence
+        Assert.Equal("First", config.Name);
+        Assert.Equal("Second", config.Name);
+        Assert.Equal("Third", config.Name);
+    }
+    #endregion
+
+    #region properties-onsetsequence-basic
+    [Fact]
+    public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
+    {
+        var stub = new ConfigPropsStub();
+
+        var firstWriteValue = "";
+        var secondWriteValue = "";
+
+        // OnSetSequence configures different callbacks for each write
+        stub.Name
+            .OnSetSequence((value) => { firstWriteValue = $"First: {value}"; })
+            .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
+
+        IConfigProps config = stub;
+
+        // First write triggers first callback
+        config.Name = "Alpha";
+        Assert.Equal("First: Alpha", firstWriteValue);
+        Assert.Equal("", secondWriteValue);
+
+        // Second write triggers second callback
+        config.Name = "Beta";
+        Assert.Equal("Second: Beta", secondWriteValue);
+    }
+    #endregion
+
+    #region properties-sequence-verification
+    [Fact]
+    public void Sequence_VerifiesLikeRegularCallbacks()
+    {
+        var stub = new ConfigPropsStub();
+
+        // Configure sequences
+        var getSequence = stub.Name
+            .OnGetSequence(() => "A")
+            .ThenGet(() => "B");
+
+        var setSequence = stub.Age
+            .OnSetSequence((v) => { })
+            .ThenSet((v) => { });
+
+        IConfigProps config = stub;
+
+        // Access properties
+        _ = config.Name;
+        _ = config.Name;
+        config.Age = 1;
+        config.Age = 2;
+
+        // Verify sequence was fully consumed
+        getSequence.Verify();
+        setSequence.Verify();
+
+        // VerifyGet/VerifySet work the same with sequences
+        stub.Name.VerifyGet(Times.Exactly(2));
+        stub.Age.VerifySet(Times.Exactly(2));
+    }
+    #endregion
+}
+
+// =============================================================================
 // Reset Sample
 // =============================================================================
 

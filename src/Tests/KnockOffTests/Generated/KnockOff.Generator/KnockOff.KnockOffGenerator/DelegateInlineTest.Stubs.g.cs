@@ -13,8 +13,10 @@ partial class DelegateInlineTest
 		{
 			private int _callCount;
 
-			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Action? OnCall { get; set; }
+			internal global::System.Action? _onCall;
+
+			/// <summary>Configures callback invoked when delegate is called.</summary>
+			public void OnCall(global::System.Action callback) { _onCall = callback; }
 
 			public void RecordCall() { _callCount++; }
 
@@ -44,7 +46,7 @@ partial class DelegateInlineTest
 			private void Invoke()
 			{
 				Interceptor.RecordCall();
-				if (Interceptor.OnCall is { } onCall) onCall();
+				if (Interceptor._onCall is { } onCall) onCall();
 			}
 
 			/// <summary>Implicit conversion to global::KnockOff.Tests.VoidNoParamDelegate.</summary>
@@ -59,8 +61,10 @@ partial class DelegateInlineTest
 			/// <summary>The argument from the last invocation.</summary>
 			public string? LastCallArg { get; private set; }
 
-			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Action<string>? OnCall { get; set; }
+			internal global::System.Action<string>? _onCall;
+
+			/// <summary>Configures callback invoked when delegate is called.</summary>
+			public void OnCall(global::System.Action<string> callback) { _onCall = callback; }
 
 			public void RecordCall(string message) { _callCount++; LastCallArg = message; }
 
@@ -90,7 +94,7 @@ partial class DelegateInlineTest
 			private void Invoke(string message)
 			{
 				Interceptor.RecordCall(message);
-				if (Interceptor.OnCall is { } onCall) onCall(message);
+				if (Interceptor._onCall is { } onCall) onCall(message);
 			}
 
 			/// <summary>Implicit conversion to global::KnockOff.Tests.VoidOneParamDelegate.</summary>
@@ -105,8 +109,10 @@ partial class DelegateInlineTest
 			/// <summary>The argument from the last invocation.</summary>
 			public int? LastCallArg { get; private set; }
 
-			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<int, int>? OnCall { get; set; }
+			internal global::System.Func<int, int>? _onCall;
+
+			/// <summary>Configures callback invoked when delegate is called.</summary>
+			public void OnCall(global::System.Func<int, int> callback) { _onCall = callback; }
 
 			public void RecordCall(int input) { _callCount++; LastCallArg = input; }
 
@@ -136,7 +142,7 @@ partial class DelegateInlineTest
 			private int Invoke(int input)
 			{
 				Interceptor.RecordCall(input);
-				if (Interceptor.OnCall is { } onCall) return onCall(input);
+				if (Interceptor._onCall is { } onCall) return onCall(input);
 				return default!;
 			}
 
@@ -152,8 +158,10 @@ partial class DelegateInlineTest
 			/// <summary>The arguments from the last invocation.</summary>
 			public (string? name, int? age)? LastCallArgs { get; private set; }
 
-			/// <summary>Callback invoked when delegate is called.</summary>
-			public global::System.Func<string, int, string>? OnCall { get; set; }
+			internal global::System.Func<string, int, string>? _onCall;
+
+			/// <summary>Configures callback invoked when delegate is called.</summary>
+			public void OnCall(global::System.Func<string, int, string> callback) { _onCall = callback; }
 
 			public void RecordCall(string name, int age) { _callCount++; LastCallArgs = (name, age); }
 
@@ -183,7 +191,7 @@ partial class DelegateInlineTest
 			private string Invoke(string name, int age)
 			{
 				Interceptor.RecordCall(name, age);
-				if (Interceptor.OnCall is { } onCall) return onCall(name, age);
+				if (Interceptor._onCall is { } onCall) return onCall(name, age);
 				return default!;
 			}
 

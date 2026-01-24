@@ -11,6 +11,7 @@ KnockOff supports three patterns for creating test stubs. Each pattern solves di
 | Quick, test-local stub | Inline Interface |
 | No extra stub files | Inline Interface |
 | Stub a class (not interface) | Inline Class |
+| Stub a delegate type | Inline Delegate |
 
 ---
 
@@ -217,18 +218,89 @@ public void InlineClassStub_UsesObjectProperty()
 
 ---
 
+## Inline Delegate Pattern
+
+The Inline Delegate pattern generates a stub for delegate types. This allows testing code that accepts delegates as parameters, such as validation rules, factories, or callbacks.
+
+### When to Use
+
+- You need to stub a delegate type
+- You want to track delegate invocations
+- You need to configure delegate behavior in tests
+- You are testing validation rules, factories, or event handlers
+
+### Basic Setup
+
+<!-- snippet: patterns-inline-delegate-basic -->
+```cs
+// Define delegate types
+public delegate bool ValidationRule(string value);
+public delegate T Factory<T>();
+
+[KnockOff<ValidationRule>]
+[KnockOff<Factory<User>>]
+public partial class InlineDelegateTests
+{
+    // The generator creates Stubs.ValidationRule and Stubs.Factory<User>
+}
+```
+<!-- endSnippet -->
+
+### Usage in Tests
+
+<!-- snippet: patterns-inline-delegate-usage -->
+```cs
+[Fact]
+public void InlineDelegateStub_TracksInvocationsAndConfiguresBehavior()
+{
+    // Arrange - create delegate stub
+    var ruleStub = new Stubs.ValidationRule();
+
+    // Configure behavior via Interceptor.OnCall
+    ruleStub.Interceptor.OnCall((value) => value != "invalid");
+
+    // Act - implicit conversion to delegate type
+    ValidationRule rule = ruleStub;
+    bool result1 = rule("valid");
+    bool result2 = rule("invalid");
+
+    // Assert - verify calls and behavior
+    Assert.True(result1);
+    Assert.False(result2);
+    ruleStub.Interceptor.Verify(Times.Exactly(2));
+    Assert.Equal("invalid", ruleStub.Interceptor.LastCallArg);
+}
+```
+<!-- endSnippet -->
+
+### Benefits
+
+- **Implicit conversion**: Stub converts to delegate type automatically
+- **Invocation tracking**: Access `CallCount`, `LastCallArg`, `LastCallArgs`
+- **Behavior configuration**: Use `OnCall` to define custom logic
+- **Verification**: Use `Verify()` and `Times` constraints
+
+### Trade-offs
+
+- **Interceptor property**: Access tracking via `stub.Interceptor` (not direct properties)
+- **Test-local only**: Cannot reuse across multiple test classes
+- **Named delegates only**: Cannot stub inline `Func<T>` or `Action<T>` directly
+
+---
+
 ## Pattern Comparison
 
-| Feature | Stand-Alone | Inline Interface | Inline Class |
-|---------|-------------|------------------|--------------|
-| **Reusable across test files** | Yes | No | No |
-| **Custom user methods** | Yes | No | No |
-| **Extra file required** | Yes | No | No |
-| **Supports interfaces** | Yes | Yes | No |
-| **Supports classes** | No | No | Yes |
-| **IntelliSense visible** | Yes | Within test class | Within test class |
-| **Instantiation syntax** | `new MyStub()` | `new Stubs.IFoo()` | `new Stubs.Foo().Object` |
-| **Best for** | Shared stubs | Local stubs | Class stubs |
+| Feature | Stand-Alone | Inline Interface | Inline Class | Inline Delegate |
+|---------|-------------|------------------|--------------|-----------------|
+| **Reusable across test files** | Yes | No | No | No |
+| **Custom user methods** | Yes | No | No | No |
+| **Extra file required** | Yes | No | No | No |
+| **Supports interfaces** | Yes | Yes | No | No |
+| **Supports classes** | No | No | Yes | No |
+| **Supports delegates** | No | No | No | Yes |
+| **IntelliSense visible** | Yes | Within test class | Within test class | Within test class |
+| **Instantiation syntax** | `new MyStub()` | `new Stubs.IFoo()` | `new Stubs.Foo().Object` | `new Stubs.DelegateName()` |
+| **Best for** | Shared stubs | Local stubs | Class stubs | Delegate stubs |
 
 ---
 
@@ -236,15 +308,19 @@ public void InlineClassStub_UsesObjectProperty()
 
 Follow this decision tree:
 
-1. **Do you need to stub a class (not an interface)?**
-   - Yes → **Inline Class** pattern
+1. **Do you need to stub a delegate type?**
+   - Yes → **Inline Delegate** pattern
    - No → Continue to step 2
 
-2. **Do you need the stub in multiple test files?**
-   - Yes → **Stand-Alone** pattern
+2. **Do you need to stub a class (not an interface)?**
+   - Yes → **Inline Class** pattern
    - No → Continue to step 3
 
-3. **Do you need custom methods on the stub?**
+3. **Do you need the stub in multiple test files?**
+   - Yes → **Stand-Alone** pattern
+   - No → Continue to step 4
+
+4. **Do you need custom methods on the stub?**
    - Yes → **Stand-Alone** pattern
    - No → **Inline Interface** pattern
 
@@ -257,6 +333,9 @@ Follow this decision tree:
 | Quick stub for single test class | Inline Interface |
 | Stub a `DbContext` with virtual `DbSet` properties | Inline Class |
 | Stub an abstract base class | Inline Class |
+| Stub a validation rule delegate | Inline Delegate |
+| Stub a factory function delegate | Inline Delegate |
+| Stub an event handler delegate | Inline Delegate |
 
 ---
 
@@ -315,4 +394,5 @@ public partial class PatternComparisonTests
 - **[Getting Started](../getting-started.md)** - Learn basic stub creation
 - **[Methods Guide](methods.md)** - Configure method behavior with OnCall
 - **[Properties Guide](properties.md)** - Work with property interceptors
+- **[Delegates Guide](delegates.md)** - Stub delegate types for callbacks and validation
 - **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete API documentation
