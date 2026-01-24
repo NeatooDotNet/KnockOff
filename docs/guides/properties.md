@@ -84,7 +84,7 @@ public void OnGet_ReturnsComputedValue()
     var stub = new TimeProviderPropsStub();
 
     // OnGet callback returns dynamic value on each access
-    stub.Timestamp.OnGet = () => DateTime.UtcNow;
+    stub.Timestamp.OnGet(() => DateTime.UtcNow);
 
     ITimeProviderProps timeProvider = stub;
 
@@ -111,7 +111,7 @@ public void OnGet_DependsOnOtherInterceptorState()
     var isInitialized = false;
 
     // OnGet checks the tracked state
-    stub.IsReady.OnGet = () => isInitialized;
+    stub.IsReady.OnGet(() => isInitialized);
     var initTracking = stub.Initialize.OnCall(() => { isInitialized = true; });
 
     IServiceWithInitProps service = stub;
@@ -146,7 +146,7 @@ public void OnSet_TracksAllWrittenValues()
     var stub = new ConfigPropsStub();
 
     var setValues = new List<string>();
-    stub.Name.OnSet = (value) => setValues.Add(value);
+    stub.Name.OnSet((value) => setValues.Add(value));
 
     IConfigProps config = stub;
 
@@ -170,11 +170,11 @@ public void OnSet_SimulatesValidation()
     var stub = new ConfigPropsStub();
 
     // OnSet throws for invalid values
-    stub.Age.OnSet = (value) =>
+    stub.Age.OnSet((value) =>
     {
         if (value < 0)
             throw new ArgumentException("Age cannot be negative");
-    };
+    });
 
     IConfigProps config = stub;
 
@@ -277,6 +277,78 @@ public void Verifiable_MarksPropertyForVerification()
 
 ---
 
+## Sequence Behavior
+
+Use sequences when a property should return different values across multiple reads or react differently to multiple writes. Sequences are configured with `OnGetSequence` and `OnSetSequence`, which return tracking objects that support `ThenGet` and `ThenSet` chaining.
+
+### Return Value Sequences (OnGetSequence)
+
+When you need a property to return different values on successive reads, use `OnGetSequence`:
+
+<!-- snippet: properties-ongetsequence-basic -->
+<!--
+Demonstrate: Property returning different values on successive reads
+Show: OnGetSequence() initial callback, ThenGet() for subsequent values
+Result: First read returns first value, second read returns second value, etc.
+-->
+<!-- endSnippet -->
+
+**When to use OnGetSequence:**
+- Testing pagination where page numbers change
+- Simulating changing state over time
+- Testing retry logic that checks status repeatedly
+- Verifying behavior with different data on successive calls
+
+### Setter Sequences (OnSetSequence)
+
+When you need different behavior for successive property writes, use `OnSetSequence`:
+
+<!-- snippet: properties-onsetsequence-basic -->
+<!--
+Demonstrate: Property reacting differently to successive writes
+Show: OnSetSequence() initial callback, ThenSet() for subsequent writes
+Result: First write triggers first callback, second write triggers second callback, etc.
+-->
+<!-- endSnippet -->
+
+**When to use OnSetSequence:**
+- Testing validation that changes over time
+- Simulating connection state changes
+- Testing error recovery (first write fails, second succeeds)
+
+### Sequence vs. Single Callbacks
+
+| Use Case | Use This | Why |
+|----------|----------|-----|
+| Property always returns same value | `OnGet(() => value)` | Simple, no sequence needed |
+| Property returns different values per read | `OnGetSequence(() => first).ThenGet(() => second)` | Different values on successive reads |
+| Property setter should validate differently | `OnSetSequence((v) => validate1(v)).ThenSet((v) => validate2(v))` | Different behavior per write |
+| Property behavior changes based on test state | `OnGet(() => computedValue)` | Callback computes on each access |
+
+### Sequence Tracking
+
+Both `OnGetSequence` and `OnSetSequence` return tracking interfaces that support verification:
+
+**OnGetSequence returns IPropertyGetTracking\<T\>:**
+- Use `.ThenGet(() => value)` to chain additional get behaviors
+- Each callback in the sequence is called once in order
+- After exhausting the sequence, behavior depends on strict mode (see Troubleshooting)
+
+**OnSetSequence returns IPropertySetTracking\<T\>:**
+- Use `.ThenSet((value) => { })` to chain additional set behaviors
+- Each callback in the sequence is called once in order
+- After exhausting the sequence, subsequent writes do nothing (non-strict) or throw (strict mode)
+
+<!-- snippet: properties-sequence-verification -->
+<!--
+Demonstrate: Verifying properties configured with sequences
+Show: OnGetSequence/OnSetSequence with VerifyGet/VerifySet
+Result: Verification works the same whether using single callbacks or sequences
+-->
+<!-- endSnippet -->
+
+---
+
 ## Value vs OnGet Priority
 
 When both `Value` and `OnGet` are configured, `OnGet` takes precedence. Setting `OnGet` replaces any previously set `Value`.
@@ -292,7 +364,7 @@ public void OnGet_TakesPrecedenceOverValue()
     stub.Name.Value = "initial";
 
     // Then set OnGet - it takes precedence
-    stub.Name.OnGet = () => "dynamic";
+    stub.Name.OnGet(() => "dynamic");
 
     IConfigProps config = stub;
 
@@ -333,7 +405,7 @@ public void Reset_ClearsCountsButPreservesValue()
 
     stub.Name.VerifyGet(Times.Never);
     stub.Name.VerifySet(Times.Never);
-    // Note: Reset clears OnGet and OnSet but preserves Value
+    // Note: Reset also clears Value, OnGet, OnSet
 }
 ```
 <!-- endSnippet -->
@@ -349,11 +421,13 @@ Choose your configuration approach based on the test scenario:
 | Scenario | Use This | Example |
 |----------|----------|---------|
 | Property should return fixed test data | `Value` | `stub.UserId.Value = 42;` |
-| Property should return current time/random value | `OnGet` | `stub.Now.OnGet = () => DateTime.UtcNow;` |
-| Property depends on other stub state | `OnGet` | `stub.IsReady.OnGet = () => stub.Init.WasCalled;` |
-| Track all values written to property | `OnSet` | `stub.Name.OnSet = (v) => list.Add(v);` |
-| Simulate validation in dependency | `OnSet` | `stub.Age.OnSet = (v) => Validate(v);` |
-| Verify property was accessed N times | Verification | `Assert.Equal(2, stub.UserId.GetCount);` |
+| Property should return current time/random value | `OnGet` | `stub.Now.OnGet(() => DateTime.UtcNow);` |
+| Property depends on other stub state | `OnGet` | `stub.IsReady.OnGet(() => stub.Init.WasCalled);` |
+| Property returns different values per read | `OnGetSequence` | `stub.Status.OnGetSequence(() => "Pending").ThenGet(() => "Complete");` |
+| Track all values written to property | `OnSet` | `stub.Name.OnSet((v) => list.Add(v));` |
+| Simulate validation in dependency | `OnSet` | `stub.Age.OnSet((v) => Validate(v));` |
+| Setter behavior changes across writes | `OnSetSequence` | `stub.Config.OnSetSequence((v) => Reject(v)).ThenSet((v) => Accept(v));` |
+| Verify property was accessed N times | Verification | `stub.UserId.VerifyGet(Times.Exactly(2));` |
 | Verify last value written | Verification | `Assert.Equal("x", stub.Name.LastSetValue);` |
 
 ---
@@ -376,11 +450,11 @@ public void CompletePropertyExample_AllConfigurationApproaches()
     stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
 
     // OnGet: State-dependent behavior using tracked state
-    stub.IsConnected.OnGet = () => isConnected;
+    stub.IsConnected.OnGet(() => isConnected);
 
     // OnSet: Track all values written
     var connectionStrings = new List<string>();
-    stub.ConnectionString.OnSet = (value) => connectionStrings.Add(value);
+    stub.ConnectionString.OnSet((value) => connectionStrings.Add(value));
 
     // Configure the Connect method to update state
     var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });
@@ -412,9 +486,10 @@ public void CompletePropertyExample_AllConfigurationApproaches()
 1. **Start with Value** - It covers most scenarios and keeps tests simple
 2. **Use OnGet for computed values** - Time-dependent or state-dependent returns
 3. **Use OnSet for tracking** - When you need to verify writes or simulate validation
-4. **OnGet replaces Value** - You can upgrade from static to dynamic without conflicts
-5. **Reset() preserves Value** - Clears execution state but not test data configuration
-6. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like method verification
+4. **Use sequences for changing behavior** - OnGetSequence/OnSetSequence when values or behavior differ across calls
+5. **OnGet replaces Value** - You can upgrade from static to dynamic without conflicts
+6. **Reset() preserves Value** - Clears execution state but not test data configuration
+7. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like method verification
 
 ---
 

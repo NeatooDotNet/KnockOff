@@ -49,7 +49,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.IsNew.OnGet = () => true;
+        stub.IsNew.OnGet(() => true);
 
         Assert.True(entity.IsNew);
         stub.IsNew.VerifyGet(Times.Once);
@@ -120,7 +120,7 @@ public class EntityBaseStandaloneTests
         var stub = new EntityBaseStub();
         IEntityBase entity = stub;
 
-        stub.Indexer.OfString.OnGet = (propertyName) => null!;
+        stub.Indexer.OfString.OnGet((propertyName) => null!);
 
         _ = entity["FirstName"];
         _ = entity["LastName"];
@@ -192,7 +192,7 @@ public class EntityBaseStandaloneTests
 
         var modified = new[] { "FirstName", "LastName" };
         // ModifiedProperties is on IEntityBase interceptor, not IEntityMetaProperties
-        stub.ModifiedProperties.OnGet = () => modified;
+        stub.ModifiedProperties.OnGet(() => modified);
 
         Assert.Equal(modified, entity.ModifiedProperties);
     }
@@ -205,7 +205,7 @@ public class EntityBaseStandaloneTests
         IEntityBase entity = stub;
 
         // Parent is now on IValidateBase (IBase was removed in Neatoo 10.6)
-        stub.Parent.OnGet = () => parentStub;
+        stub.Parent.OnGet(() => parentStub);
 
         Assert.Same(parentStub, entity.Parent);
     }
@@ -313,7 +313,7 @@ public class ValidateBaseStandaloneTests
         IValidateBase validate = stub;
 
         var messages = new List<IPropertyMessage>();
-        stub.PropertyMessages.OnGet = () => messages;
+        stub.PropertyMessages.OnGet(() => messages);
 
         Assert.Same(messages, validate.PropertyMessages);
     }
@@ -389,7 +389,7 @@ public class ValidateBaseStandaloneTests
         var stub = new ValidateBaseStub();
         IValidateBase validate = stub;
 
-        stub.Indexer.OnGet = (name) => null!;
+        stub.Indexer.OnGet((name) => null!);
 
         _ = validate["Email"];
 
@@ -435,7 +435,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.IsValid.OnGet = () => true;
+        stub.IsValid.OnGet(() => true);
 
         Assert.True(validate.IsValid);
     }
@@ -469,7 +469,7 @@ public partial class InlineValidateBaseTests
         var stub = new Stubs.IValidateBase();
         IValidateBase validate = stub;
 
-        stub.Indexer.OnGet = (name) => null!;
+        stub.Indexer.OnGet((name) => null!);
 
         _ = validate["PropertyName"];
 

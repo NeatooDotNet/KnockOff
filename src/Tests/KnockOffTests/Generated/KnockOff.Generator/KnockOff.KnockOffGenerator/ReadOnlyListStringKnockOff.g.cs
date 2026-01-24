@@ -11,15 +11,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::System.Collections.Generic.IReadOnlyCollection<string>? _source;
 
-		private bool _isVerifiable;
-		private global::KnockOff.Times? _verifiableTimes;
 		private bool _valueSet;
-
-		private int _getCount;
-
-		/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>
-		public global::System.Func<int>? OnGet { get; set; }
-
 		private int _value = default!;
 		/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>
 		public int Value
@@ -28,17 +20,86 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 			set { _value = value; _valueSet = true; }
 		}
 
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet() => _getCount++;
+		private global::System.Func<int>? _onGet;
+		private PropertyGetTrackingImpl? _onGetTracking;
+		private global::System.Collections.Generic.List<(global::System.Func<int> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
+		private int _getSequenceIndex;
+		private bool _isGetVerifiable;
+		private global::KnockOff.Times? _getVerifiableTimes;
+		private int _unconfiguredGetCount;
 
-		/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>
-		public void Reset() { _getCount = 0; _source = null; }
+		private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-		public CountInterceptor Verifiable() { _isVerifiable = true; _verifiableTimes = null; return this; }
+		/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<int> callback)
+		{
+			_getSequence = null;
+			_getSequenceIndex = 0;
+			_isGetVerifiable = false;
+			_getVerifiableTimes = null;
+			_onGet = callback;
+			_onGetTracking = new PropertyGetTrackingImpl(this);
+			return _onGetTracking;
+		}
 
-		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-		public CountInterceptor Verifiable(global::KnockOff.Times times) { _isVerifiable = true; _verifiableTimes = times; return this; }
+		/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(global::System.Func<int> callback)
+		{
+			_onGet = null;
+			_onGetTracking = null;
+			_isGetVerifiable = false;
+			_getVerifiableTimes = null;
+			_getSequence = new global::System.Collections.Generic.List<(global::System.Func<int> Callback, PropertyGetTrackingImpl Tracking)>();
+			var tracking = new PropertyGetTrackingImpl(this);
+			_getSequence.Add((callback, tracking));
+			_getSequenceIndex = 0;
+			return new PropertyGetSequenceImpl(this);
+		}
+
+		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+		internal int InvokeGet(bool strict)
+		{
+			if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+			{
+				var (callback, tracking) = _getSequence[_getSequenceIndex];
+				tracking.RecordCall();
+				_getSequenceIndex++;
+				return callback();
+			}
+
+			if (_onGet != null && _onGetTracking != null)
+			{
+				_onGetTracking.RecordCall();
+				return _onGet();
+			}
+
+			_unconfiguredGetCount++;
+
+			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Count (get)");
+				return _value;
+			}
+
+			if (_source is { } src) return src.Count;
+
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Count");
+			return _value;
+		}
+
+		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		public void Reset()
+		{
+			_unconfiguredGetCount = 0;
+			_onGetTracking?.Reset();
+			if (_getSequence != null)
+			{
+				foreach (var (_, tracking) in _getSequence)
+					tracking.Reset();
+			}
+			_getSequenceIndex = 0;
+			_source = null;
+		}
 
 		/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
@@ -46,7 +107,7 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = _getCount;
+			var totalCount = TotalGetCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count", times, totalCount));
 		}
@@ -57,32 +118,121 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void VerifyGet(global::KnockOff.Times times)
 		{
-			if (!times.Validate(_getCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, _getCount));
+			if (!times.Validate(TotalGetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Count (get)", times, TotalGetCount));
 		}
 
-		/// <summary>Whether this property was marked with Verifiable().</summary>
-		internal bool IsVerifiable => _isVerifiable;
+		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+		public CountInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
-		/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>
-		internal bool IsConfigured => _valueSet || OnGet != null;
+		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+		public CountInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
+
+		/// <summary>Whether this property was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isGetVerifiable;
+
+		/// <summary>Whether this property has been configured.</summary>
+		internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			if (!_isVerifiable) return null;
-			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = _getCount;
-			return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Count", times, totalCount);
+			if (!(_isGetVerifiable)) return null;
+			if (_isGetVerifiable)
+			{
+				var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("Count (get)", times, TotalGetCount);
+			}
+			return null;
 		}
 
 		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = _getCount;
+			var totalCount = TotalGetCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Count", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
+
+		/// <summary>Tracks invocations for getter callback registration.</summary>
+		private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking
+		{
+			private readonly CountInterceptor _interceptor;
+
+			public PropertyGetTrackingImpl(CountInterceptor interceptor) => _interceptor = interceptor;
+
+			internal int CallCount { get; private set; }
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall() => CallCount++;
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() => CallCount = 0;
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property getter", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IPropertyGetTracking Verifiable()
+			{
+				_interceptor._isGetVerifiable = true;
+				_interceptor._getVerifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isGetVerifiable = true;
+				_interceptor._getVerifiableTimes = times;
+				return this;
+			}
+		}
+
+		/// <summary>Sequence implementation for ThenGet chaining.</summary>
+		private sealed class PropertyGetSequenceImpl : global::KnockOff.IPropertyGetSequence<int>
+		{
+			private readonly CountInterceptor _interceptor;
+
+			public PropertyGetSequenceImpl(CountInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> ThenGet(global::System.Func<int> callback)
+			{
+				var tracking = new PropertyGetTrackingImpl(_interceptor);
+				_interceptor._getSequence!.Add((callback, tracking));
+				return this;
+			}
+
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
+			{
+				if (_interceptor._getSequence == null) return;
+				var sequenceLength = _interceptor._getSequence.Count;
+				var completedCount = _interceptor._getSequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property getter", sequenceLength, completedCount));
+			}
+
+			/// <summary>Resets all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IPropertyGetSequence<int> Verifiable()
+			{
+				_interceptor._isGetVerifiable = true;
+				_interceptor._getVerifiableTimes = null;
+				return this;
+			}
+		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for indexer.</summary>
@@ -91,87 +241,234 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::System.Collections.Generic.IReadOnlyList<string>? _source;
 
-		private int _getCount;
-
-		/// <summary>The key from the most recent getter access.</summary>
-		public int? LastGetKey { get; private set; }
-
-		/// <summary>Callback invoked when the getter is accessed.</summary>
-		public global::System.Func<int, string>? OnGet { get; set; }
-
-		/// <summary>Records a getter access.</summary>
-		public void RecordGet(int? index) { _getCount++; LastGetKey = index; }
-
 		/// <summary>Backing storage for this indexer.</summary>
 		public global::System.Collections.Generic.Dictionary<int, string> Backing { get; } = new();
 
-		/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
-		public void Reset() { _getCount = 0; LastGetKey = default; _source = null; }
+		private global::System.Func<int, string>? _onGet;
+		private IndexerGetTrackingImpl? _onGetTracking;
+		private global::System.Collections.Generic.List<(global::System.Func<int, string> Callback, IndexerGetTrackingImpl Tracking)>? _getSequence;
+		private int _getSequenceIndex;
+		private bool _isGetVerifiable;
+		private global::KnockOff.Times? _getVerifiableTimes;
+		private int _unconfiguredGetCount;
+		private int? _unconfiguredLastGetKey;
 
-		private bool _isVerifiable;
-		private global::KnockOff.Times? _verifiableTimes;
+		private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
 
-		/// <summary>Verifies the indexer getter was accessed at least once.</summary>
-		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+		/// <summary>The key from the last getter access (from most recently called registration).</summary>
+		public int? LastGetKey { get { if ((_onGetTracking?.CallCount ?? 0) > 0) return _onGetTracking!.LastKey; if (_getSequence != null) for (int i = _getSequence.Count - 1; i >= 0; i--) if (_getSequence[i].Tracking.CallCount > 0) return _getSequence[i].Tracking.LastKey; return _unconfiguredGetCount > 0 ? _unconfiguredLastGetKey : default; } }
 
-		/// <summary>Verifies the indexer getter access count matches the Times constraint.</summary>
-		public void VerifyGet(global::KnockOff.Times times)
+		/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
+		public global::KnockOff.IIndexerGetTracking<int> OnGet(global::System.Func<int, string> callback)
 		{
-			if (!times.Validate(_getCount))
-				throw new global::KnockOff.VerificationException($"Indexer getter verification failed: expected {times}, but was called {_getCount} time(s).");
+			_getSequence = null;
+			_getSequenceIndex = 0;
+			_isGetVerifiable = false;
+			_getVerifiableTimes = null;
+			_onGet = callback;
+			_onGetTracking = new IndexerGetTrackingImpl(this);
+			return _onGetTracking;
 		}
 
-		/// <summary>Verifies the indexer was accessed at least once.</summary>
+		/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>
+		public global::KnockOff.IIndexerGetSequence<int, string> OnGetSequence(global::System.Func<int, string> callback)
+		{
+			_onGet = null;
+			_onGetTracking = null;
+			_isGetVerifiable = false;
+			_getVerifiableTimes = null;
+			_getSequence = new global::System.Collections.Generic.List<(global::System.Func<int, string> Callback, IndexerGetTrackingImpl Tracking)>();
+			var tracking = new IndexerGetTrackingImpl(this);
+			_getSequence.Add((callback, tracking));
+			_getSequenceIndex = 0;
+			return new IndexerGetSequenceImpl(this);
+		}
+
+		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
+		internal string InvokeGet(bool strict, int index)
+		{
+			if (_getSequence != null && _getSequenceIndex < _getSequence.Count)
+			{
+				var (callback, tracking) = _getSequence[_getSequenceIndex];
+				tracking.RecordCall(index);
+				_getSequenceIndex++;
+				return callback(index);
+			}
+
+			if (_onGet != null && _onGetTracking != null)
+			{
+				_onGetTracking.RecordCall(index);
+				return _onGet(index);
+			}
+
+			_unconfiguredGetCount++;
+			_unconfiguredLastGetKey = index;
+
+			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
+			{
+				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Indexer (get)");
+			}
+
+			if (Backing.TryGetValue(index, out var backingValue)) return backingValue;
+
+			if (_source is { } src) return src[index];
+
+			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Indexer");
+			return default!;
+		}
+
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>
+		public void Reset()
+		{
+			_unconfiguredGetCount = 0;
+			_unconfiguredLastGetKey = default;
+			_onGetTracking?.Reset();
+			if (_getSequence != null)
+			{
+				foreach (var (_, tracking) in _getSequence)
+					tracking.Reset();
+			}
+			_getSequenceIndex = 0;
+			_source = null;
+		}
+
+		/// <summary>Verifies the indexer was accessed at least once. Throws VerificationException if not.</summary>
 		public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
 
-		/// <summary>Verifies the total indexer access count matches the Times constraint.</summary>
+		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = _getCount;
+			var totalCount = TotalGetCount;
 			if (!times.Validate(totalCount))
-				throw new global::KnockOff.VerificationException($"Indexer verification failed: expected {times}, but was called {totalCount} time(s).");
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer", times, totalCount));
+		}
+
+		/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>
+		public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);
+
+		/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
+		public void VerifyGet(global::KnockOff.Times times)
+		{
+			if (!times.Validate(TotalGetCount))
+				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Indexer (get)", times, TotalGetCount));
 		}
 
 		/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-		public IndexerInterceptor Verifiable()
-		{
-			_isVerifiable = true;
-			_verifiableTimes = global::KnockOff.Times.AtLeastOnce;
-			return this;
-		}
+		public IndexerInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this indexer for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-		public IndexerInterceptor Verifiable(global::KnockOff.Times times)
-		{
-			_isVerifiable = true;
-			_verifiableTimes = times;
-			return this;
-		}
+		public IndexerInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
 
-		internal bool IsVerifiable => _isVerifiable;
-		internal bool IsConfigured => OnGet != null || Backing.Count > 0;
+		/// <summary>Whether this indexer was marked with Verifiable().</summary>
+		internal bool IsVerifiable => _isGetVerifiable;
 
-		/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>
+		/// <summary>Whether this indexer has been configured.</summary>
+		internal bool IsConfigured => Backing.Count > 0 || _onGet != null || (_getSequence?.Count ?? 0) > 0;
+
+		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			if (!_isVerifiable) return null;
-			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = _getCount;
-			if (!times.Validate(totalCount))
-				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
+			if (!(_isGetVerifiable)) return null;
+			if (_isGetVerifiable)
+			{
+				var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
+				if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("Indexer (get)", times, TotalGetCount);
+			}
 			return null;
 		}
 
-		/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>
+		/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
-			if (!IsConfigured && !_isVerifiable) return null;
-			var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-			var totalCount = _getCount;
-			if (!times.Validate(totalCount))
-				return new global::KnockOff.VerificationFailure("Indexer", times, totalCount);
-			return null;
+			if (!IsConfigured) return null;
+			var totalCount = TotalGetCount;
+			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Indexer", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
+
+		/// <summary>Tracks invocations for getter callback registration.</summary>
+		private sealed class IndexerGetTrackingImpl : global::KnockOff.IIndexerGetTracking<int>
+		{
+			private readonly IndexerInterceptor _interceptor;
+
+			public IndexerGetTrackingImpl(IndexerInterceptor interceptor) => _interceptor = interceptor;
+
+			private int _lastKey = default!;
+
+			internal int CallCount { get; private set; }
+
+			/// <summary>Last key passed to this getter callback. Default if never called.</summary>
+			public int LastKey => _lastKey;
+
+			/// <summary>Records a call to this callback.</summary>
+			public void RecordCall(int key) { CallCount++; _lastKey = key; }
+
+			/// <summary>Resets tracking state.</summary>
+			public void Reset() { CallCount = 0; _lastKey = default!; }
+
+			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
+			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
+
+			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
+			public void Verify(global::KnockOff.Times times)
+			{
+				if (!times.Validate(CallCount))
+					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("indexer getter", times, CallCount));
+			}
+
+			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IIndexerGetTracking<int> Verifiable()
+			{
+				_interceptor._isGetVerifiable = true;
+				_interceptor._getVerifiableTimes = null;
+				return this;
+			}
+
+			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
+			public global::KnockOff.IIndexerGetTracking<int> Verifiable(global::KnockOff.Times times)
+			{
+				_interceptor._isGetVerifiable = true;
+				_interceptor._getVerifiableTimes = times;
+				return this;
+			}
+		}
+
+		/// <summary>Sequence implementation for ThenGet chaining.</summary>
+		private sealed class IndexerGetSequenceImpl : global::KnockOff.IIndexerGetSequence<int, string>
+		{
+			private readonly IndexerInterceptor _interceptor;
+
+			public IndexerGetSequenceImpl(IndexerInterceptor interceptor) => _interceptor = interceptor;
+
+			/// <summary>Adds another getter callback to the sequence. Each callback runs exactly once.</summary>
+			public global::KnockOff.IIndexerGetSequence<int, string> ThenGet(global::System.Func<int, string> callback)
+			{
+				var tracking = new IndexerGetTrackingImpl(_interceptor);
+				_interceptor._getSequence!.Add((callback, tracking));
+				return this;
+			}
+
+			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
+			public void Verify()
+			{
+				if (_interceptor._getSequence == null) return;
+				var sequenceLength = _interceptor._getSequence.Count;
+				var completedCount = _interceptor._getSequenceIndex;
+				if (completedCount < sequenceLength)
+					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("indexer getter", sequenceLength, completedCount));
+			}
+
+			/// <summary>Resets all tracking in the sequence.</summary>
+			public void Reset() => _interceptor.Reset();
+
+			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
+			public global::KnockOff.IIndexerGetSequence<int, string> Verifiable()
+			{
+				_interceptor._isGetVerifiable = true;
+				_interceptor._getVerifiableTimes = null;
+				return this;
+			}
+		}
+
 	}
 
 	/// <summary>Tracks and configures behavior for GetEnumerator.</summary>
@@ -666,12 +963,12 @@ partial class ReadOnlyListStringKnockOff : global::System.Collections.Generic.IR
 
 	int global::System.Collections.Generic.IReadOnlyCollection<string>.Count
 	{
-		get { Count.RecordGet(); if (Count.OnGet is { } onGet) return onGet(); if (Count._source is { } src) return src.Count; if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyCollection<string>", "Count"); return Count.Value; }
+		get => Count.InvokeGet(Strict);
 	}
 
 	string global::System.Collections.Generic.IReadOnlyList<string>.this[int index]
 	{
-		get { Indexer.RecordGet(index); if (Indexer.OnGet is { } onGet) return onGet(index); if (Indexer._source is { } src) return src[index]; if (Strict) throw global::KnockOff.StubException.NotConfigured("IReadOnlyList<string>", "this[]"); return Indexer.Backing.TryGetValue(index, out var v) ? v : default!; }
+		get => Indexer.InvokeGet(Strict, index);
 	}
 
 	global::System.Collections.Generic.IEnumerator<string> global::System.Collections.Generic.IEnumerable<string>.GetEnumerator()

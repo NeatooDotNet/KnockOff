@@ -176,7 +176,7 @@ public partial class IValidatePropertyManagerTests
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
         var propertyStub = new ValidatePropertyStubForManager();
-        stub.Indexer.OnGet = (name) => propertyStub;
+        stub.Indexer.OnGet((name) => propertyStub);
 
         _ = manager["PropertyName"];
 

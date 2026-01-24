@@ -155,7 +155,7 @@ public void Property_ReflectsMethodCallState()
     var isConnected = false;
 
     // IsConnected returns the tracked state
-    stub.IsConnected.OnGet = () => isConnected;
+    stub.IsConnected.OnGet(() => isConnected);
 
     // Connect() updates the tracked state
     var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });
@@ -306,7 +306,7 @@ public void Cache_SimulatesRealisticBehavior()
     });
 
     // Stats: Return current counts
-    stub.Stats.OnGet = () => new CacheStats { Hits = hits, Misses = misses };
+    stub.Stats.OnGet(() => new CacheStats { Hits = hits, Misses = misses });
 
     ICache cacheService = stub;
 

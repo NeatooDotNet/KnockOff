@@ -195,7 +195,7 @@ public partial class IEntityPropertyManagerTests
         IEntityPropertyManager manager = stub;
 
         var propertyStub = new EntityPropertyStubForManager();
-        stub.Indexer.OnGet = (name) => propertyStub;
+        stub.Indexer.OnGet((name) => propertyStub);
 
         _ = manager["PropertyName"];
 

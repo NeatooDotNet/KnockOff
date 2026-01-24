@@ -242,7 +242,7 @@ public class IValidateListBaseStandaloneTests
         IValidateListBase list = stub;
 
         var parentStub = new ValidateBaseStubForList();
-        stub.Parent.OnGet = () => parentStub;
+        stub.Parent.OnGet(() => parentStub);
 
         Assert.Same(parentStub, list.Parent);
     }
@@ -311,7 +311,7 @@ public partial class IValidateListBaseOfTTests
         IValidateListBase<IValidateBase> list = stub;
 
         var itemStub = new ValidateBaseStubForListT();
-        stub.Indexer.OnGet = (index) => itemStub;
+        stub.Indexer.OnGet((index) => itemStub);
 
         _ = list[0];
 

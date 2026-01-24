@@ -54,7 +54,7 @@ public partial class IRequiredRuleTests
         var stub = new Stubs.IRequiredRule();
         IRequiredRule rule = stub;
 
-        stub.ErrorMessage.OnGet = () => "Dynamic error message";
+        stub.ErrorMessage.OnGet(() => "Dynamic error message");
 
         Assert.Equal("Dynamic error message", rule.ErrorMessage);
     }

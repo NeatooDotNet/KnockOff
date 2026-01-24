@@ -46,7 +46,7 @@ public partial class IValidateMetaPropertiesTests
         var stub = new Stubs.IValidateMetaProperties();
         IValidateMetaProperties meta = stub;
 
-        stub.IsBusy.OnGet = () => true;
+        stub.IsBusy.OnGet(() => true);
 
         Assert.True(meta.IsBusy);
     }
@@ -273,7 +273,7 @@ public class IValidateMetaPropertiesStandaloneTests
         var propertyMessageStub = new IValidateMetaPropertiesTests.Stubs.IPropertyMessage();
         propertyMessageStub.Message.Value = "Required";
         var messages = new List<IPropertyMessage> { propertyMessageStub };
-        stub.PropertyMessages.OnGet = () => messages;
+        stub.PropertyMessages.OnGet(() => messages);
 
         Assert.Same(messages, meta.PropertyMessages);
     }

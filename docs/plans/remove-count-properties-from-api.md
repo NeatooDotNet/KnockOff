@@ -290,12 +290,12 @@ stub.Name.VerifySet(Times.Once);
 **For callback-based assertions:**
 ```csharp
 // Before - callback uses CallCount
-stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
+stub.IsConnected.OnGet(() => stub.Connect.CallCount > 0);
 
 // After - use WasCalled or track state differently
 var connected = false;
 stub.Connect.OnCall(_ => { connected = true; return Task.CompletedTask; });
-stub.IsConnected.OnGet = () => connected;
+stub.IsConnected.OnGet(() => connected);
 ```
 
 ### Phase 3: Regenerate and Verify
@@ -618,14 +618,14 @@ Event interceptors:
 
 **Note for callback-based usages**: These use `CallCount` inside callbacks to determine behavior:
 ```csharp
-stub.IsConnected.OnGet = () => stub.Connect.CallCount > 0;
+stub.IsConnected.OnGet(() => stub.Connect.CallCount > 0);
 ```
 
 **Migration approach**: Use local state tracking:
 ```csharp
 var connected = false;
 stub.Connect.OnCall(_ => { connected = true; return Task.CompletedTask; });
-stub.IsConnected.OnGet = () => connected;
+stub.IsConnected.OnGet(() => connected);
 ```
 
 **Checkpoint**: Run `dotnet test src/Tests/KnockOff.Documentation.Samples.Tests` - should pass
