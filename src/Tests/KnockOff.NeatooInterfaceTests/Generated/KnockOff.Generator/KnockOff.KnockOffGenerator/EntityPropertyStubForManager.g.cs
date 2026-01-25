@@ -161,7 +161,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			_valueSet = true;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -506,7 +506,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -736,7 +736,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -966,7 +966,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return "";
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -1196,7 +1196,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return "";
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -1503,7 +1503,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			_valueSet = true;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -1848,7 +1848,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -2078,7 +2078,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -2308,7 +2308,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -2538,7 +2538,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -2768,7 +2768,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -2998,7 +2998,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -3228,7 +3228,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -3458,7 +3458,7 @@ partial class EntityPropertyStubForManager : global::Neatoo.IEntityProperty, glo
 			return new global::System.Collections.Generic.List<global::Neatoo.IPropertyMessage>();
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;

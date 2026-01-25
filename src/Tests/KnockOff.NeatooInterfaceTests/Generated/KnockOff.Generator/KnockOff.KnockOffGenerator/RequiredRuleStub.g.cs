@@ -84,7 +84,7 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 			return "";
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -314,7 +314,7 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -544,7 +544,7 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -774,7 +774,7 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -1004,7 +1004,7 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 			return new global::System.Collections.Generic.List<global::Neatoo.Rules.IRuleMessage>();
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -1234,7 +1234,7 @@ partial class RequiredRuleStub : global::Neatoo.Rules.Rules.IRequiredRule, globa
 			return new global::System.Collections.Generic.List<global::Neatoo.Rules.ITriggerProperty>();
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;

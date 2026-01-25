@@ -92,7 +92,7 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 			return _value;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -338,7 +338,7 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 			return _value;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -584,7 +584,7 @@ partial class MultipleInitPropertiesKnockOff : global::KnockOffTests.IMultipleIn
 			return _value;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;

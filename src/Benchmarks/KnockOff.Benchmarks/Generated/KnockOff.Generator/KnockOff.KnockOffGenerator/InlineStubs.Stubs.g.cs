@@ -1867,7 +1867,7 @@ partial class InlineStubs
 				_valueSet = true;
 			}
 
-			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredGetCount = 0;
@@ -2212,7 +2212,7 @@ partial class InlineStubs
 				return default!;
 			}
 
-			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredGetCount = 0;
@@ -2442,7 +2442,7 @@ partial class InlineStubs
 				if (strict) throw global::KnockOff.StubException.NotConfigured("", "WriteOnlyValue");
 			}
 
-			/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+			/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 			public void Reset()
 			{
 				_unconfiguredSetCount = 0;

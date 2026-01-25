@@ -86,7 +86,7 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -316,7 +316,7 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -546,7 +546,7 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -776,7 +776,7 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 			return new global::System.Collections.Generic.List<global::Neatoo.Rules.IRuleMessage>();
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -1006,7 +1006,7 @@ partial class TestRule : global::Neatoo.Rules.IRule, global::KnockOff.IKnockOffS
 			return new global::System.Collections.Generic.List<global::Neatoo.Rules.ITriggerProperty>();
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;

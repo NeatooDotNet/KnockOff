@@ -161,7 +161,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			_valueSet = true;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -506,7 +506,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			return default!;
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -736,7 +736,7 @@ partial class PropertyServiceStub : global::KnockOff.Benchmarks.Interfaces.IProp
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "WriteOnlyValue");
 		}
 
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredSetCount = 0;
