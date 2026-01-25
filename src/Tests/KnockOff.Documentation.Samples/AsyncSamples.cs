@@ -102,6 +102,24 @@ public class TaskMethodTests
 
 public class ValueTaskMethodTests
 {
+    #region async-valuetask-value-overload
+    [Fact]
+    public async Task ValueTaskResult_ValueOverload_AutoWraps()
+    {
+        var stub = new AsyncUserSvcStub();
+
+        // VALUE OVERLOAD: KnockOff auto-wraps the value in new ValueTask<T>(value)
+        // This is the simplest syntax for returning async values
+        stub.GetCachedUserAsync.OnCall(new User { Id = 42, Name = "Cached" });
+
+        IAsyncUserSvc service = stub;
+        var user = await service.GetCachedUserAsync(42);
+
+        Assert.NotNull(user);
+        Assert.Equal("Cached", user.Name);
+    }
+    #endregion
+
     #region async-valuetask
     [Fact]
     public async Task ValueTaskResult_ReturnedDirectly()

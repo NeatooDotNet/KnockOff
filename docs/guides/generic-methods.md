@@ -1,3 +1,5 @@
+[Home](../../README.md) / [Guides](../guides/) / Generic Methods
+
 # Working with Generic Methods
 
 Generic methods present unique challenges when stubbing. Unlike non-generic methods where you configure a single behavior, generic methods can be called with different type arguments—each potentially requiring different configuration and verification.
@@ -5,6 +7,8 @@ Generic methods present unique challenges when stubbing. Unlike non-generic meth
 KnockOff solves this with the `.Of<T>()` accessor pattern, giving you type-specific control while maintaining aggregate tracking across all type arguments.
 
 **Critical concept**: Use `.Of<T>()` to access type-specific configuration and verification for generic methods. Base properties like `CalledTypeArguments` track calls across all type arguments.
+
+**OnCall and verification**: The `OnCall` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Times)` to verify call counts. Each type argument has independent OnCall configuration—configuring `.Of<User>().OnCall(...)` does not affect `.Of<Order>().OnCall(...)`.
 
 ---
 
@@ -28,7 +32,16 @@ In tests, you might call `GetById<User>(1)` and `GetById<Order>(2)`. These are t
 
 ## Type-Specific Configuration
 
-Use `.Of<T>()` to configure behavior for a specific type argument.
+Use `.Of<T>()` to access the type-specific interceptor, then call `OnCall` to configure behavior for that type argument.
+
+### OnCall Signature and Return Value
+
+The `OnCall` method accepts a callback matching the method signature and returns `IMethodTracking` for verification:
+- **Callback parameters**: Match the original method parameters
+- **Callback return type**: Matches the method's return type with the specific type argument substituted
+- **Return value**: `IMethodTracking` object providing `.Verify(Times)` (see [Verification Guide](verification.md))
+
+**Key point**: `OnCall` is type-specific—each type argument needs its own configuration. The returned `IMethodTracking` object is used to verify calls for that specific type argument.
 
 <!-- snippet: generic-configure-single -->
 ```cs
@@ -47,7 +60,7 @@ Assert.Equal("Test User", user.Name);
 ```
 <!-- endSnippet -->
 
-You can configure multiple types independently:
+You can configure multiple types independently. Each `OnCall` is specific to its type argument:
 
 <!-- snippet: generic-configure-multiple -->
 ```cs
@@ -74,7 +87,7 @@ Assert.Equal(99.99m, order?.Amount);
 
 ## Type-Specific Verification
 
-After execution, verify calls per type using the same `.Of<T>()` accessor:
+After execution, verify calls per type using the same `.Of<T>()` accessor. The `OnCall` method returns an `IMethodTracking` object that provides verification capabilities.
 
 <!-- snippet: generic-verify-typed -->
 ```cs
@@ -270,8 +283,10 @@ Assert.Contains(typeof(Order), stub.Serialize.CalledTypeArguments);
 
 ## Key Takeaways
 
-- **`.Of<T>()`** provides type-specific access to `OnCall`, `Verify`, `LastCallArg`, and `Reset()`
-- **Base properties** (`CalledTypeArguments`) track calls across all types
+- **`.Of<T>()`** provides type-specific access to the interceptor for a specific type argument
+- **`OnCall`** configures the callback for that type—parameters match the method signature, return type matches with type arguments substituted
+- **`OnCall` returns `IMethodTracking`** enabling verification via `.Verify(Times)`
+- **Base properties** (`CalledTypeArguments`, `Reset()`) track and manage calls across all types
 - **Multiple type parameters** use `.Of<T1, T2, ...>()` matching the method signature
 - **Verification** uses `tracking.Verify(Times)` for type-specific call count assertions
 - **Reset behavior** differs: `.Of<T>().Reset()` is type-specific, `.Reset()` clears everything
@@ -282,3 +297,7 @@ Generic methods work seamlessly with all KnockOff patterns—Stand-Alone, Inline
 ---
 
 Next: [Advanced Callbacks](advanced-callbacks.md) for complex callback scenarios and state management.
+
+---
+
+**UPDATED:** 2026-01-25

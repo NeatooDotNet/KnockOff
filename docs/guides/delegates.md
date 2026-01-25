@@ -85,6 +85,23 @@ public void MultiParam_TracksLastCallArgs()
 
 Use `stub.Interceptor.OnCall(...)` to configure custom behavior when the delegate is invoked.
 
+**Important:** Each call to `OnCall` replaces the previous configuration. The most recent `OnCall` wins.
+
+### OnCall Overloads
+
+Delegates with return values support two OnCall overloads:
+
+| Overload | Signature | Use Case | Example |
+|----------|-----------|----------|---------|
+| **Value** | `OnCall(TReturn value)` | Return fixed value regardless of input | `stub.Interceptor.OnCall("SUCCESS")` |
+| **Callback** | `OnCall(Func<...> callback)` | Compute return value from input | `stub.Interceptor.OnCall((x) => x * 2)` |
+
+Void delegates (`Action`, `Action<T>`) support only the callback overload:
+
+| Overload | Signature | Use Case | Example |
+|----------|-----------|----------|---------|
+| **Callback** | `OnCall(Action callback)` | Execute side effects | `stub.Interceptor.OnCall(() => counter++)` |
+
 ### OnCall for Void Delegates
 
 <!-- snippet: delegate-stub-oncall-void -->
@@ -110,7 +127,7 @@ public void OnCallVoid_ExecutesCustomLogic()
 
 ### OnCall with Fixed Return Value
 
-For delegates that return values, you can configure a fixed return value using the value overload:
+For delegates that return values, configure a fixed return value using the value overload. The value is returned regardless of input arguments.
 
 <!-- snippet: delegate-stub-oncall-value -->
 ```cs
@@ -132,9 +149,16 @@ public void OnCallValue_ReturnsFixedValue()
 ```
 <!-- endSnippet -->
 
+**Use the value overload when:**
+- Return value is constant across all invocations
+- You need simpler test setup
+- Input arguments don't affect the result
+
+**Signature:** `OnCall(TReturn value)` where `TReturn` is the delegate's return type.
+
 ### OnCall with Computed Return Value
 
-For more complex scenarios, use a callback to compute the return value based on the input:
+Use the callback overload to compute the return value based on input arguments. The callback receives the same parameters as the delegate and returns the result.
 
 <!-- snippet: delegate-stub-oncall-return -->
 ```cs
@@ -155,6 +179,13 @@ public void OnCallReturn_ReturnsComputedValue()
 }
 ```
 <!-- endSnippet -->
+
+**Use the callback overload when:**
+- Return value depends on input arguments
+- You need conditional logic or computation
+- You need to capture or transform input
+
+**Signature:** `OnCall(Func<TArg1, ..., TReturn> callback)` matching the delegate signature.
 
 ### OnCall with Multiple Parameters
 
@@ -606,3 +637,7 @@ public void CompleteExample_ValidationWithMultipleRules()
 - **[Stub Patterns](stub-patterns.md)** - Learn about Stand-Alone, Inline Interface, and Inline Class patterns
 - **[Methods Guide](methods.md)** - Configure method behavior with OnCall
 - **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete API documentation
+
+---
+
+**UPDATED:** 2026-01-25

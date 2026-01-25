@@ -112,15 +112,57 @@ public void OnCallSignature_MustMatchParameters()
 
 ---
 
+### Using OnCall with Static Values
+
+**When to use:** You want to return the same value for every call without writing a callback function.
+
+KnockOff provides `OnCall(value)` overloads for methods and `OnGet(value)` for properties, allowing you to configure a static return value directly.
+
+**Solution:** Use the value overload instead of a callback when the return value is constant.
+
+<!-- snippet: troubleshoot-oncall-value -->
+```cs
+[Fact]
+public void OnCall_WithStaticValue()
+{
+    var stub = new TroubleshootRepoStub();
+
+    // Instead of: stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
+    // Use OnCall(value) when the return value doesn't depend on parameters:
+    stub.GetById.OnCall(new User { Id = 999, Name = "Static User" });
+
+    ITroubleshootRepo repository = stub;
+    var user1 = repository.GetById(1);
+    var user2 = repository.GetById(2);
+
+    // Both calls return the same value
+    Assert.Equal(999, user1?.Id);
+    Assert.Equal(999, user2?.Id);
+    Assert.Equal("Static User", user1?.Name);
+}
+```
+<!-- endSnippet -->
+
+**Available on:**
+- **Methods**: `stub.MethodName.OnCall(value)` - Returns the same value for every call
+- **Properties**: `stub.PropertyName.OnGet(value)` - Returns the same value for every get
+- **Sequences**: `stub.MethodName.OnCallSequence(value).ThenCall(value)` - Each value in sequence
+
+**Key difference from callbacks:**
+- **OnCall(value)**: Simple, concise for constant returns
+- **OnCall(callback)**: Dynamic behavior based on parameters or state
+
+---
+
 ## Runtime Errors
 
 ### InvalidOperationException: No callback configured
 
-**Cause:** A method or property with a non-nullable return type was invoked without a callback or user-defined method configured.
+**Cause:** A method with a non-nullable reference return type (like `string`, non-nullable `User`) was invoked without configuration.
 
-KnockOff cannot infer what value to return for non-nullable types. You must explicitly configure the return value using OnCall, OnGet, or by implementing a user-defined method.
+KnockOff throws this exception for methods returning non-nullable reference types when no callback is configured. Properties and nullable types use default values instead.
 
-**Solution:** Configure the return value using OnCall for methods, OnGet for properties, or implement a user-defined method that the generator will detect.
+**Solution:** Configure the return value using `OnCall` for methods or `OnGet` for properties.
 
 <!-- snippet: troubleshoot-no-callback -->
 ```cs
@@ -231,9 +273,9 @@ public void Understanding_Property_Priority()
 
 ### Reset() doesn't clear OnGet configuration
 
-**Cause:** By design, Reset() clears tracking counters and `LastSetValue`, but preserves `OnGet` and `OnSet` configuration.
+**Cause:** By design, Reset() clears tracking counters but preserves `OnGet` and `OnSet` configuration.
 
-Reset() is intended to clear test verification state between test phases, not to reset test data configuration.
+Reset() is intended to clear test verification state between test phases, not to reconfigure stub behavior.
 
 **Solution:** If you need to clear configured values, manually call OnGet with a default value or reconfigure the stub.
 
@@ -364,3 +406,7 @@ When creating a new issue, please provide:
 The more context you provide, the faster we can help resolve the issue.
 
 **GitHub Issues:** https://github.com/neatoodotnet/KnockOff/issues
+
+---
+
+**UPDATED:** 2026-01-25

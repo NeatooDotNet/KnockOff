@@ -16,7 +16,7 @@ public interface IMoqUserRepo
 }
 
 // =============================================================================
-// KnockOff Stub (replaces Mock<IMoqUserRepo>)
+// KnockOff Stub Declaration
 // =============================================================================
 
 #region moq-migration-stub-declaration
@@ -25,7 +25,7 @@ public partial class MoqUserRepoStub : IMoqUserRepo { }
 #endregion
 
 // =============================================================================
-// Creating Stubs - Side-by-Side Comparison
+// Mock Creation Samples
 // =============================================================================
 
 public class CreateStubMoqTests
@@ -57,7 +57,31 @@ public class CreateStubKnockOffTests
 }
 
 // =============================================================================
-// Setup Method Returns - Side-by-Side Comparison
+// Mock Creation - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class MockCreationCombinedSamples
+{
+    [Fact]
+    public void MockCreation_Comparison()
+    {
+        #region moq-to-knockoff-mock-creation
+        // MOQ:
+        var mock = new Mock<IMoqUserRepo>();
+        IMoqUserRepo moqRepo = mock.Object;
+
+        // KNOCKOFF:
+        var stub = new MoqUserRepoStub();
+        IMoqUserRepo knockoffRepo = stub;
+        #endregion
+
+        Assert.NotNull(moqRepo);
+        Assert.NotNull(knockoffRepo);
+    }
+}
+
+// =============================================================================
+// Method Setup Samples
 // =============================================================================
 
 public class SetupMethodMoqTests
@@ -101,7 +125,33 @@ public class SetupMethodKnockOffTests
 }
 
 // =============================================================================
-// Setup Property - Side-by-Side Comparison
+// Method Setup - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class MethodReturnsCombinedSamples
+{
+    [Fact]
+    public void MethodReturns_Comparison()
+    {
+        var testUser = new User { Id = 42, Name = "Alice" };
+
+        #region moq-to-knockoff-method-returns
+        // MOQ:
+        var mock = new Mock<IMoqUserRepo>();
+        mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(testUser);
+
+        // KNOCKOFF:
+        var stub = new MoqUserRepoStub();
+        stub.GetUser.OnCall((id) => testUser);
+        #endregion
+
+        Assert.Equal("Alice", mock.Object.GetUser(1)?.Name);
+        Assert.Equal("Alice", ((IMoqUserRepo)stub).GetUser(1)?.Name);
+    }
+}
+
+// =============================================================================
+// Property Setup Samples
 // =============================================================================
 
 public class SetupPropertyMoqTests
@@ -141,7 +191,31 @@ public class SetupPropertyKnockOffTests
 }
 
 // =============================================================================
-// Verify Calls - Side-by-Side Comparison
+// Property Setup - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class PropertySetupCombinedSamples
+{
+    [Fact]
+    public void PropertySetup_Comparison()
+    {
+        #region moq-to-knockoff-property-setup
+        // MOQ:
+        var mock = new Mock<IMoqUserRepo>();
+        mock.Setup(x => x.ConnectionString).Returns("server=localhost");
+
+        // KNOCKOFF:
+        var stub = new MoqUserRepoStub();
+        stub.ConnectionString.OnGet("server=localhost");
+        #endregion
+
+        Assert.Equal("server=localhost", mock.Object.ConnectionString);
+        Assert.Equal("server=localhost", ((IMoqUserRepo)stub).ConnectionString);
+    }
+}
+
+// =============================================================================
+// Verification Samples
 // =============================================================================
 
 public class VerifyCallsMoqTests
@@ -184,7 +258,37 @@ public class VerifyCallsKnockOffTests
 }
 
 // =============================================================================
-// Async Methods - Side-by-Side Comparison
+// Verification - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class VerificationCombinedSamples
+{
+    [Fact]
+    public void Verification_Comparison()
+    {
+        #region moq-to-knockoff-verification
+        // MOQ:
+        var mock = new Mock<IMoqUserRepo>();
+        mock.Object.SaveUser(new User { Name = "Bob" });
+        mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Once());
+
+        // KNOCKOFF (batch verification):
+        var stub = new MoqUserRepoStub();
+        stub.SaveUser.OnCall((user) => { }).Verifiable();
+        ((IMoqUserRepo)stub).SaveUser(new User { Name = "Bob" });
+        stub.Verify();
+
+        // KNOCKOFF (individual verification):
+        var stub2 = new MoqUserRepoStub();
+        var tracking = stub2.SaveUser.OnCall((user) => { });
+        ((IMoqUserRepo)stub2).SaveUser(new User { Name = "Bob" });
+        tracking.Verify(Times.Once);
+        #endregion
+    }
+}
+
+// =============================================================================
+// Async Method Samples
 // =============================================================================
 
 public class AsyncMethodMoqTests
@@ -228,7 +332,36 @@ public class AsyncMethodKnockOffTests
 }
 
 // =============================================================================
-// Callbacks - Side-by-Side Comparison
+// Async Methods - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class AsyncMethodsCombinedSamples
+{
+    [Fact]
+    public async Task AsyncMethod_Comparison()
+    {
+        var testUser = new User { Id = 42, Name = "Alice" };
+
+        #region moq-to-knockoff-async-methods
+        // MOQ:
+        var mock = new Mock<IMoqUserRepo>();
+        mock.Setup(x => x.GetUserAsync(It.IsAny<int>())).ReturnsAsync(testUser);
+
+        // KNOCKOFF:
+        var stub = new MoqUserRepoStub();
+        stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+        #endregion
+
+        var moqResult = await mock.Object.GetUserAsync(42);
+        var knockoffResult = await ((IMoqUserRepo)stub).GetUserAsync(42);
+
+        Assert.Equal("Alice", moqResult?.Name);
+        Assert.Equal("Alice", knockoffResult?.Name);
+    }
+}
+
+// =============================================================================
+// Callback Samples
 // =============================================================================
 
 public class CallbackMoqTests
@@ -280,7 +413,38 @@ public class CallbackKnockOffTests
 }
 
 // =============================================================================
-// Argument Matching - Side-by-Side Comparison
+// Callbacks - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class CallbacksCombinedSamples
+{
+    [Fact]
+    public void Callback_Comparison()
+    {
+        var moqSavedUsers = new List<User>();
+        var knockoffSavedUsers = new List<User>();
+
+        #region moq-to-knockoff-callbacks
+        // MOQ:
+        var mock = new Mock<IMoqUserRepo>();
+        mock.Setup(x => x.SaveUser(It.IsAny<User>()))
+            .Callback<User>(u => moqSavedUsers.Add(u));
+
+        // KNOCKOFF:
+        var stub = new MoqUserRepoStub();
+        stub.SaveUser.OnCall((user) => knockoffSavedUsers.Add(user));
+        #endregion
+
+        mock.Object.SaveUser(new User { Name = "Alice" });
+        ((IMoqUserRepo)stub).SaveUser(new User { Name = "Alice" });
+
+        Assert.Single(moqSavedUsers);
+        Assert.Single(knockoffSavedUsers);
+    }
+}
+
+// =============================================================================
+// Argument Matching Samples
 // =============================================================================
 
 public class ArgumentMatchingMoqTests
@@ -328,7 +492,97 @@ public class ArgumentMatchingKnockOffTests
 }
 
 // =============================================================================
-// Complete Example - Moq Version
+// Argument Matching - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class ArgumentMatchingCombinedSamples
+{
+    [Fact]
+    public void ArgumentMatching_Comparison()
+    {
+        #region moq-to-knockoff-argument-matching
+        // MOQ:
+        var mock = new Mock<IMoqUserRepo>();
+        mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
+            .Returns<int>(id => new User { Id = id, Name = "Valid" });
+
+        // KNOCKOFF:
+        var stub = new MoqUserRepoStub();
+        stub.GetUser.OnCall((id) =>
+            id > 0 ? new User { Id = id, Name = "Valid" } : null);
+        #endregion
+
+        Assert.NotNull(mock.Object.GetUser(1));
+        Assert.Null(mock.Object.GetUser(-1));
+        Assert.NotNull(((IMoqUserRepo)stub).GetUser(1));
+        Assert.Null(((IMoqUserRepo)stub).GetUser(-1));
+    }
+}
+
+// =============================================================================
+// Sequence Pattern - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class SequencePatternCombinedSamples
+{
+    [Fact]
+    public void Sequence_Comparison()
+    {
+        var firstUser = new User { Id = 1, Name = "First" };
+        var secondUser = new User { Id = 2, Name = "Second" };
+
+        #region moq-to-knockoff-sequence-pattern
+        // MOQ:
+        var mock = new Mock<IMoqUserRepo>();
+        mock.SetupSequence(x => x.GetUser(It.IsAny<int>()))
+            .Returns(firstUser)
+            .Returns(secondUser);
+
+        // KNOCKOFF:
+        var stub = new MoqUserRepoStub();
+        int callCount = 0;
+        stub.GetUser.OnCall((id) =>
+        {
+            callCount++;
+            return callCount == 1 ? firstUser : secondUser;
+        });
+        #endregion
+
+        Assert.Equal("First", mock.Object.GetUser(1)?.Name);
+        Assert.Equal("Second", mock.Object.GetUser(1)?.Name);
+        Assert.Equal("First", ((IMoqUserRepo)stub).GetUser(1)?.Name);
+        Assert.Equal("Second", ((IMoqUserRepo)stub).GetUser(1)?.Name);
+    }
+}
+
+// =============================================================================
+// Using Statements - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class UsingStatementsCombinedSamples
+{
+    [Fact]
+    public void UsingStatements_Demonstration()
+    {
+        #region moq-to-knockoff-using-statements
+        // BEFORE (Moq):
+        // using Moq;
+
+        // AFTER (KnockOff):
+        // using KnockOff;
+        #endregion
+
+        // Both work in this file since we have both using statements
+        var mock = new Mock<IMoqUserRepo>();
+        var stub = new MoqUserRepoStub();
+
+        Assert.NotNull(mock.Object);
+        Assert.NotNull(stub);
+    }
+}
+
+// =============================================================================
+// Complete Example - Service Under Test
 // =============================================================================
 
 public class UserServiceMigration
@@ -350,6 +604,10 @@ public class UserServiceMigration
         _repository.SaveUser(user);
     }
 }
+
+// =============================================================================
+// Complete Example - Moq Version
+// =============================================================================
 
 public class CompleteMoqTests
 {
@@ -438,4 +696,39 @@ public class CompleteKnockOffTests
         tracking.Verify(Times.Once);
     }
     #endregion
+}
+
+// =============================================================================
+// Complete Migration - Combined (for skills/commands documentation)
+// =============================================================================
+
+public class CompleteMigrationCombinedExample
+{
+    [Fact]
+    public async Task CompleteMigration_Demonstration()
+    {
+        #region moq-to-knockoff-complete-migration
+        // ========== MOQ VERSION ==========
+        var mockRepo = new Mock<IMoqUserRepo>();
+        var moqService = new UserServiceMigration(mockRepo.Object);
+
+        var user = new User { Id = 1, Name = "Alice" };
+        mockRepo.Setup(x => x.GetUserAsync(1)).ReturnsAsync(user);
+
+        var moqResult = await moqService.GetUserAsync(1);
+        mockRepo.Verify(x => x.GetUserAsync(1), Moq.Times.Once());
+
+        // ========== KNOCKOFF VERSION ==========
+        var stub = new MoqUserRepoStub();
+        var knockoffService = new UserServiceMigration(stub);
+
+        stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
+
+        var knockoffResult = await knockoffService.GetUserAsync(1);
+        stub.Verify();
+        #endregion
+
+        Assert.Equal("Alice", moqResult?.Name);
+        Assert.Equal("Alice", knockoffResult?.Name);
+    }
 }

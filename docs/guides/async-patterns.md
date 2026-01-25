@@ -1,10 +1,10 @@
 # Async Patterns
 
-KnockOff fully supports async methods, allowing you to configure `Task<T>` and `ValueTask<T>` return values directly from the `OnCall` callback. This guide shows common async patterns for unit testing.
+KnockOff fully supports async methods, allowing you to configure `Task<T>` and `ValueTask<T>` return values using the `OnCall` API. You can use either the **value overload** (recommended for simple values) or the **callback overload** (for dynamic logic). This guide shows common async patterns for unit testing.
 
 **See also:**
 - [Method Interceptors](methods.md) - Core `OnCall` callback patterns
-- [Verification](verification.md) - Details on `Verifiable()` and `stub.Verify()`
+- [Verification Guide](verification.md) - Details on `Verifiable()` and `stub.Verify()`
 
 ---
 
@@ -92,7 +92,35 @@ public async Task TaskVoid_ReturnedWithCompletedTask()
 
 ## ValueTask<T> Methods
 
-For methods returning `ValueTask<T>`, construct the value task directly:
+### Value Overload (Recommended)
+
+For simple ValueTask values, KnockOff auto-wraps values in `ValueTask<T>`:
+
+<!-- snippet: async-valuetask-value-overload -->
+```cs
+[Fact]
+public async Task ValueTaskResult_ValueOverload_AutoWraps()
+{
+    var stub = new AsyncUserSvcStub();
+
+    // VALUE OVERLOAD: KnockOff auto-wraps the value in new ValueTask<T>(value)
+    // This is the simplest syntax for returning async values
+    stub.GetCachedUserAsync.OnCall(new User { Id = 42, Name = "Cached" });
+
+    IAsyncUserSvc service = stub;
+    var user = await service.GetCachedUserAsync(42);
+
+    Assert.NotNull(user);
+    Assert.Equal("Cached", user.Name);
+}
+```
+<!-- endSnippet -->
+
+This is the simplest syntax when you don't need dynamic logic based on parameters.
+
+### Callback Overload
+
+For ValueTask methods where you need dynamic logic, construct the value task in the callback:
 
 <!-- snippet: async-valuetask -->
 ```cs
@@ -238,10 +266,11 @@ public async Task AsyncService_SuccessScenario()
 
 **For simple, static values:**
 - Use the value overload: `stub.GetUserAsync.OnCall(someUser)`
-- KnockOff auto-wraps in `Task.FromResult`
+- KnockOff auto-wraps in `Task.FromResult` (Task) or `new ValueTask<T>(value)` (ValueTask)
 
 **For dynamic logic or parameter-based values:**
-- Use callback with `Task.FromResult`: `stub.GetUserAsync.OnCall((id) => Task.FromResult(...))`
+- Task: Use callback with `Task.FromResult`: `stub.GetUserAsync.OnCall((id) => Task.FromResult(...))`
+- ValueTask: Use callback with `new ValueTask<T>(value)`: `stub.GetCachedAsync.OnCall((id) => new ValueTask<T>(...))`
 
 **For simulating async behavior:**
 - Use async lambda: `stub.GetUserAsync.OnCall(async (id) => { await Task.Delay(...); return ...; })`
@@ -253,9 +282,17 @@ public async Task AsyncService_SuccessScenario()
 
 ## Key Takeaways
 
-- Use the value overload for simple, static async values (automatically wrapped in `Task.FromResult`)
-- Use `Task.FromResult(value)` in callbacks when you need parameter-based logic
-- Use `Task.CompletedTask` for async void methods
-- Use async lambdas to simulate delays or complex async behavior
-- Use `Task.FromException<T>` or throw directly to simulate failures
-- All interceptor features (call counts, argument tracking) work with async methods
+- **Value overload (recommended)**: Use `OnCall(value)` for simple, static async values
+  - Task<T> automatically wraps in `Task.FromResult(value)`
+  - ValueTask<T> automatically wraps in `new ValueTask<T>(value)`
+- **Callback overload**: Use when you need dynamic logic based on parameters
+  - Task<T>: Return `Task.FromResult(value)`
+  - ValueTask<T>: Return `new ValueTask<T>(value)`
+  - Task (void): Return `Task.CompletedTask`
+- **Async lambdas**: Use to simulate delays or complex async behavior
+- **Simulating failures**: Use `Task.FromException<T>` or throw directly in callback
+- **All interceptor features** (call counts, argument tracking, verification) work with async methods
+
+---
+
+**UPDATED:** 2026-01-25

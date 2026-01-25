@@ -203,7 +203,62 @@ public void Returns_KnockOffApproach()
 
 ---
 
-## Step 4: Configure Returns with Argument Access
+## Step 4: Configure ReturnsForAnyArgs
+
+Replace `.ReturnsForAnyArgs()` with standard `OnCall`.
+
+**NSubstitute:**
+
+<!-- snippet: nsub-migration-returns-anyargs-nsub -->
+```cs
+[Fact]
+public void ReturnsForAnyArgs_NSubstituteApproach()
+{
+    var substitute = Substitute.For<INSubUserRepo>();
+    var testUser = new User { Id = 1, Name = "Default" };
+
+    // ReturnsForAnyArgs: matches any argument combination
+    substitute.GetUser(default).ReturnsForAnyArgs(testUser);
+
+    INSubUserRepo repository = substitute;
+    var user1 = repository.GetUser(1);
+    var user2 = repository.GetUser(999);
+
+    Assert.Equal("Default", user1?.Name);
+    Assert.Equal("Default", user2?.Name);
+}
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+
+<!-- snippet: nsub-migration-returns-anyargs-knockoff -->
+```cs
+[Fact]
+public void ReturnsForAnyArgs_KnockOffApproach()
+{
+    var stub = new NSubUserRepoStub();
+    var testUser = new User { Id = 1, Name = "Default" };
+
+    // KnockOff: OnCall inherently matches any arguments
+    // (no separate "ForAnyArgs" needed)
+    stub.GetUser.OnCall((id) => testUser);
+
+    INSubUserRepo repository = stub;
+    var user1 = repository.GetUser(1);
+    var user2 = repository.GetUser(999);
+
+    Assert.Equal("Default", user1?.Name);
+    Assert.Equal("Default", user2?.Name);
+}
+```
+<!-- endSnippet -->
+
+**Trade-off:** NSubstitute has an explicit `.ReturnsForAnyArgs()` method that makes intent clear. KnockOff's `OnCall` inherently matches any arguments, so no special method is needed. This is simpler but less declarative.
+
+---
+
+## Step 5: Configure Returns with Argument Access
 
 Replace `callInfo.Arg<T>()` with direct argument access.
 
@@ -264,7 +319,7 @@ public void ReturnsWithArgs_KnockOffApproach()
 
 ---
 
-## Step 5: Configure Properties
+## Step 6: Configure Properties
 
 Replace property `.Returns()` with `.Value` assignments.
 
@@ -315,7 +370,7 @@ public void PropertySetup_KnockOffApproach()
 
 ---
 
-## Step 6: Verify Calls (Received)
+## Step 7: Verify Calls (Received)
 
 Replace `.Received()` with `Verifiable()` + `Verify()` or direct `Verify(Times)`.
 
@@ -366,7 +421,7 @@ public void Received_KnockOffApproach()
 
 ---
 
-## Step 7: Verify No Calls (DidNotReceive)
+## Step 8: Verify No Calls (DidNotReceive)
 
 Replace `.DidNotReceive()` with `Times.Never`.
 
@@ -411,7 +466,126 @@ public void DidNotReceive_KnockOffApproach()
 
 ---
 
-## Step 8: Side Effects (When...Do)
+## Step 9: Verify with Specific Arguments
+
+Replace `.Received()` with specific arguments with argument capture or `LastCallArg`.
+
+**NSubstitute:**
+
+<!-- snippet: nsub-migration-received-args-nsub -->
+```cs
+[Fact]
+public void ReceivedWithArgs_NSubstituteApproach()
+{
+    var substitute = Substitute.For<INSubUserRepo>();
+
+    INSubUserRepo repository = substitute;
+    repository.GetUser(42);
+    repository.GetUser(99);
+
+    // NSubstitute: Verify specific argument was used
+    substitute.Received().GetUser(42);
+    substitute.Received().GetUser(99);
+    substitute.DidNotReceive().GetUser(1);
+}
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+
+<!-- snippet: nsub-migration-received-args-knockoff -->
+```cs
+[Fact]
+public void ReceivedWithArgs_KnockOffApproach()
+{
+    var stub = new NSubUserRepoStub();
+    var calledIds = new List<int>();
+
+    // Capture arguments for later verification
+    stub.GetUser.OnCall((id) =>
+    {
+        calledIds.Add(id);
+        return null;
+    });
+
+    INSubUserRepo repository = stub;
+    repository.GetUser(42);
+    repository.GetUser(99);
+
+    // KnockOff: Inspect captured arguments
+    Assert.Contains(42, calledIds);
+    Assert.Contains(99, calledIds);
+    Assert.DoesNotContain(1, calledIds);
+
+    // Or use LastCallArg for the most recent call
+    Assert.Equal(99, stub.GetUser.LastCallArg);
+}
+```
+<!-- endSnippet -->
+
+**Trade-off:** NSubstitute's `.Received().GetUser(42)` is declarative and readable. KnockOff requires capturing arguments in the callback or using `LastCallArg` to inspect the most recent call. This is more manual but gives full access to call history.
+
+---
+
+## Step 10: Multiple Arguments
+
+Replace multiple `Arg.*` matchers with named callback parameters.
+
+**NSubstitute:**
+
+<!-- snippet: nsub-migration-multiargs-nsub -->
+```cs
+[Fact]
+public void MultipleArgs_NSubstituteApproach()
+{
+    var substitute = Substitute.For<INSubUserRepo>();
+
+    // NSubstitute: Multiple Arg matchers
+    substitute.FindUsers(Arg.Any<string>(), Arg.Is<int>(x => x > 0))
+        .Returns(callInfo => new[]
+        {
+            new User { Name = callInfo.ArgAt<string>(0) }
+        });
+
+    INSubUserRepo repository = substitute;
+    var users = repository.FindUsers("Alice", 10);
+
+    Assert.Single(users);
+    Assert.Equal("Alice", users.First().Name);
+}
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+
+<!-- snippet: nsub-migration-multiargs-knockoff -->
+```cs
+[Fact]
+public void MultipleArgs_KnockOffApproach()
+{
+    var stub = new NSubUserRepoStub();
+
+    // KnockOff: Named parameters directly in delegate
+    stub.FindUsers.OnCall((name, limit) =>
+    {
+        if (limit <= 0) return Enumerable.Empty<User>();
+        return new[] { new User { Name = name } };
+    });
+
+    INSubUserRepo repository = stub;
+    var users = repository.FindUsers("Alice", 10);
+
+    Assert.Single(users);
+    Assert.Equal("Alice", users.First().Name);
+}
+```
+<!-- endSnippet -->
+
+**Trade-off:** NSubstitute's `Arg.Any<T>()` and `Arg.Is<T>()` per parameter are declarative but verbose. KnockOff provides typed, named parameters directly in the callback signature, which is cleaner and gives immediate access to all arguments.
+
+---
+
+## Step 11: Side Effects (When...Do)
 
 Replace `.When().Do()` with logic in `OnCall`.
 
@@ -471,7 +645,7 @@ public void WhenDo_KnockOffApproach()
 
 ---
 
-## Step 9: Returns with Side Effects
+## Step 12: Returns with Side Effects
 
 Replace `.Returns().AndDoes()` with combined logic in `OnCall`.
 
@@ -531,7 +705,7 @@ public void ReturnsAndDoes_KnockOffApproach()
 
 ---
 
-## Step 10: Argument Matchers
+## Step 13: Argument Matchers
 
 Replace `Arg.Is<T>()` with conditional logic in callbacks.
 
@@ -591,7 +765,7 @@ public void ArgMatchers_KnockOffApproach()
 
 ---
 
-## Step 11: Async Methods
+## Step 14: Async Methods
 
 Replace seamless async `.Returns()` with explicit `Task.FromResult()`.
 
@@ -643,7 +817,7 @@ public async Task AsyncMethod_KnockOffApproach()
 
 ---
 
-## Step 12: Clearing Call History
+## Step 15: Clearing Call History
 
 Replace `.ClearReceivedCalls()` with `.Reset()`.
 
@@ -698,7 +872,7 @@ public void ClearReceived_KnockOffApproach()
 
 ---
 
-## Step 13: Throwing Exceptions
+## Step 16: Throwing Exceptions
 
 Replace exception `.Returns()` with throw in callback.
 
@@ -1054,3 +1228,7 @@ KnockOff earns its place when:
 ---
 
 **Need help?** Open an issue on [GitHub](https://github.com/neatoodotnet/KnockOff/issues) or check existing discussions.
+
+---
+
+**UPDATED:** 2026-01-25

@@ -134,7 +134,7 @@ internal static class PropertyInterceptorRenderer
 		RenderInvokeGet(w, model, options);
 
 		// Reset method
-		w.Line("/// <summary>Resets tracking state but preserves configuration (Value, OnGet) and verifiable marking.</summary>");
+		w.Line("/// <summary>Resets tracking state but preserves configuration (OnGet) and verifiable marking.</summary>");
 		w.Line("public void Reset()");
 		using (w.Braces())
 		{
@@ -520,7 +520,7 @@ internal static class PropertyInterceptorRenderer
 		UnifiedPropertyInterceptorModel model,
 		bool hasSourceField)
 	{
-		w.Line("/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>");
+		w.Line("/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>");
 		w.Line("public void Reset()");
 		using (w.Braces())
 		{

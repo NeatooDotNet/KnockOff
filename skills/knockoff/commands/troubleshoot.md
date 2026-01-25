@@ -4,19 +4,48 @@ argument-hint: [file-path or issue description]
 allowed-tools: Read, Edit, Glob, Grep, Bash, AskUserQuestion
 ---
 
-Diagnose and fix KnockOff issues. Follow this workflow:
+[← Back to Commands](../README.md) | [KnockOff Usage](../skills/knockoff-usage/SKILL.md)
+
+# Troubleshoot
+
+Diagnose and fix KnockOff issues. This command helps identify and resolve common problems with stub generation, compilation errors, verification issues, and runtime behavior.
+
+## Troubleshooting Workflow
+
+Follow these steps systematically:
+
+1. **Gather Information** - Understand the specific issue and context
+2. **Check Common Issues** - Match symptoms to known problems
+3. **Examine Generated Code** - Review actual generator output
+4. **Check Build Output** - Look for diagnostics and errors
+5. **Provide Solution** - Explain and apply fixes
+
+---
 
 ## Step 1: Gather Information
 
-If $ARGUMENTS contains a file path, read that file.
-If $ARGUMENTS describes an issue, note it.
-Otherwise, use AskUserQuestion to ask:
+**If $ARGUMENTS contains a file path:**
+- Read that file using Read tool
+- Look for KnockOff attributes and common error patterns
+
+**If $ARGUMENTS describes an issue:**
+- Note the specific symptoms
+- Check for error codes (CS#### or KO###)
+
+**Otherwise, use AskUserQuestion to ask:**
 - "What issue are you experiencing?" with options:
   1. Build errors / compilation fails
   2. Stub not generating
   3. Method/property not found on stub
   4. Verification failing
-  5. Other (describe)
+  5. Performance issues (slow build, hangs)
+  6. IntelliSense not showing generated members
+  7. Other (describe)
+
+**Gather context:**
+- Which pattern is being used? (Stand-Alone, Inline Interface, Inline Class)
+- Error message if available
+- File path if relevant
 
 ## Step 2: Check for Common Issues
 
@@ -28,23 +57,25 @@ Otherwise, use AskUserQuestion to ask:
 - Generator output conflicts with manual code
 
 **Diagnosis:**
-Search for KnockOff attributes without partial:
-```
-Grep: "\[KnockOff" in *.cs files
-```
-Check if matching classes are marked `partial`.
+Search for KnockOff attributes without partial using Grep: `"\[KnockOff"` in `*.cs` files. Check if matching classes are marked `partial`.
 
 **Fix:**
 Add `partial` keyword to class declaration:
-```csharp
-// Before
-[KnockOff]
-public class MyStub : IInterface { }
 
-// After
-[KnockOff]
-public partial class MyStub : IInterface { }
+<!-- snippet: troubleshoot-missing-partial-before -->
+```cs
+// ERROR: Without `partial`, you get CS0102 duplicate member errors
+// public class MyStub : IUserService { }
 ```
+<!-- endSnippet -->
+
+<!-- snippet: troubleshoot-missing-partial-after -->
+```cs
+// CORRECT: Add `partial` keyword to class declaration
+[KnockOff]
+public partial class CorrectUserServiceStub : IUserService { }
+```
+<!-- endSnippet -->
 
 ### Issue: Wrong OnCall Signature
 
@@ -58,16 +89,26 @@ Compare the OnCall callback parameters with the interface method signature.
 
 **Fix:**
 Match callback parameters to method signature:
-```csharp
-// Interface: User GetUser(int id, bool includeDeleted)
 
-// Wrong
-stub.GetUser.OnCall(() => user);
-stub.GetUser.OnCall((id) => user);
+<!-- snippet: troubleshoot-oncall-signature-wrong -->
+```cs
+// Interface method: User GetUser(int id, bool includeDeleted)
 
-// Correct
-stub.GetUser.OnCall((id, includeDeleted) => user);
+// ERROR: Wrong - no parameters (CS1593)
+// stub.GetUser.OnCall(() => new User());
+
+// ERROR: Wrong - only one parameter (CS1593)
+// stub.GetUser.OnCall((id) => new User());
 ```
+<!-- endSnippet -->
+
+<!-- snippet: troubleshoot-oncall-signature-correct -->
+```cs
+// CORRECT: Match all parameters from method signature
+stub.GetUser.OnCall((int id, bool includeDeleted) =>
+    new User { Id = id, Name = includeDeleted ? "All" : "Active" });
+```
+<!-- endSnippet -->
 
 ### Issue: Stub Not Generating
 
@@ -114,14 +155,31 @@ Check if using Inline Class pattern without `.Object`.
 
 **Fix:**
 For class stubs (not interface stubs), use `.Object`:
-```csharp
-// Wrong
-MyClass instance = new Stubs.MyClass();
 
-// Correct
-var stub = new Stubs.MyClass();
-MyClass instance = stub.Object;
+<!-- snippet: troubleshoot-class-stub-wrong -->
+```cs
+// When stubbing a CLASS (not interface), assignment fails:
+// var stub = new Stubs.EmailService();
+// EmailService service = stub;  // ERROR: Cannot convert Stubs.EmailService to EmailService
 ```
+<!-- endSnippet -->
+
+<!-- snippet: troubleshoot-class-stub-correct -->
+```cs
+[Fact]
+public void ClassStub_UseObjectProperty()
+{
+    var stub = new Stubs.EmailService();
+    stub.Send.OnCall((to, subject) => true);
+
+    // Use .Object to get the typed instance
+    EmailService service = stub.Object;
+
+    var result = service.Send("test@example.com", "Hello");
+    Assert.True(result);
+}
+```
+<!-- endSnippet -->
 
 ### Issue: Async Method Returns Wrong Type
 
@@ -134,16 +192,26 @@ Check if returning raw value instead of Task.
 
 **Fix:**
 Return Task-wrapped values for async methods:
-```csharp
-// Wrong
-stub.GetUserAsync.OnCall((id) => user);
 
-// Correct
-stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
+<!-- snippet: troubleshoot-async-return-wrong -->
+```cs
+// Interface: Task<User?> GetUserAsync(int id)
 
-// For void async
-stub.SaveAsync.OnCall((data) => Task.CompletedTask);
+// ERROR: Returning unwrapped value (CS0029)
+// stub.GetUserAsync.OnCall((id) => new User());
 ```
+<!-- endSnippet -->
+
+<!-- snippet: troubleshoot-async-return-correct -->
+```cs
+// CORRECT: Return Task.FromResult for async methods
+stub.GetUserAsync.OnCall((int id) =>
+    Task.FromResult<User?>(new User { Id = id }));
+
+// For Task (void async), use Task.CompletedTask:
+stub.SaveAsync.OnCall((user) => Task.CompletedTask);
+```
+<!-- endSnippet -->
 
 ### Issue: Verification Fails Unexpectedly
 
@@ -158,24 +226,56 @@ stub.SaveAsync.OnCall((data) => Task.CompletedTask);
 
 **Fix:**
 1. Set up OnCall before acting:
-```csharp
-// Setup FIRST
-stub.GetUser.OnCall((id) => user).Verifiable();
 
-// Then act
-repo.GetUser(1);
+<!-- snippet: troubleshoot-verification-setup-order -->
+```cs
+[Fact]
+public void Verification_SetupBeforeAct()
+{
+    var stub = new UserServiceStub();
 
-// Then verify
-stub.Verify();
+    // ARRANGE: Configure OnCall with Verifiable BEFORE acting
+    stub.GetUserAsync.OnCall((id) =>
+        Task.FromResult<User?>(new User { Id = id }))
+        .Verifiable();
+
+    IUserService service = stub;
+
+    // ACT: Call the method
+    service.GetUserAsync(42).Wait();
+
+    // ASSERT: Verify the call was made
+    stub.Verify();
+}
 ```
+<!-- endSnippet -->
 
 2. Ensure using same instance:
-```csharp
-var stub = new UserRepoStub();
-var service = new UserService(stub);  // Pass stub
-service.DoWork();
-stub.Verify();  // Verify same stub
+
+<!-- snippet: troubleshoot-verification-same-instance -->
+```cs
+[Fact]
+public void Verification_SameInstanceThroughout()
+{
+    // Create stub once
+    var stub = new UserServiceStub();
+
+    // Configure the stub
+    stub.GetUserAsync.OnCall((id) =>
+        Task.FromResult<User?>(new User { Id = id }))
+        .Verifiable();
+
+    // Pass same stub to service constructor
+    var service = new NotificationService(stub);
+
+    // Act via the service (which uses the stub)
+    service.NotifyUser(1).Wait();
+
+    // Verify on the original stub instance
+    stub.Verify();
+}
 ```
+<!-- endSnippet -->
 
 ### Issue: Generic Method Type Arguments
 
@@ -189,15 +289,169 @@ Generic methods may need explicit type handling.
 **Fix:**
 Check the generated code in Generated/ folder to see the exact interceptor API for generic methods. Generic methods may have specialized overloads.
 
+### Issue: Multiple Interfaces with Same Method Names
+
+**Symptoms:**
+- Unclear which interface's method is being tracked
+- Need to verify calls separately per interface
+
+**Diagnosis:**
+Check if stub implements multiple interfaces with identical method signatures.
+
+**Fix:**
+When multiple interfaces share the same method signature, KnockOff generates a single shared interceptor. All calls route through this interceptor regardless of which interface you call through:
+
+<!-- snippet: troubleshoot-multiple-interfaces -->
+```cs
+[Fact]
+public void MultipleInterfaces_SharedInterceptor()
+{
+    var stub = new BothStub();
+
+    // When multiple interfaces share the same method signature,
+    // KnockOff generates a single shared interceptor
+    stub.DoWork.OnCall(() => { }).Verifiable();
+
+    // Calls through either interface use the same interceptor
+    IFoo foo = stub;
+    foo.DoWork();
+
+    IBar bar = stub;
+    bar.DoWork();
+
+    // Verify tracks calls from both interfaces combined
+    stub.DoWork.Verify(Times.Exactly(2));
+}
+```
+<!-- endSnippet -->
+
+### Issue: Properties Not Generating Set Interceptor
+
+**Symptoms:**
+- No Set interceptor for property
+- Cannot verify property writes
+
+**Diagnosis:**
+Check if property is read-only (no setter in interface).
+
+**Fix:**
+Read-only properties only generate Get interceptors. To verify writes, the interface property must have a setter:
+
+<!-- snippet: troubleshoot-property-readonly -->
+```cs
+[Fact]
+public void Property_ReadOnlyVsReadWrite()
+{
+    // Read-only property (get only in interface): Only OnGet available
+    var readOnlyStub = new ReadOnlyConfigStub();
+    readOnlyStub.Version.OnGet("1.0.0");
+
+    IReadOnlyConfig readOnlyConfig = readOnlyStub;
+    Assert.Equal("1.0.0", readOnlyConfig.Version);
+
+    // Read-write property ({ get; set; } in interface): OnGet AND OnSet available
+    var readWriteStub = new ReadWriteConfigStub();
+    readWriteStub.Version.OnGet("2.0.0");
+
+    IReadWriteConfig readWriteConfig = readWriteStub;
+
+    // Read the property (triggers get)
+    var version = readWriteConfig.Version;
+    Assert.Equal("2.0.0", version);
+
+    // Write the property (triggers set)
+    readWriteConfig.Version = "3.0.0";
+
+    // Can verify both get and set
+    readWriteStub.Version.VerifyGet(Times.Once);
+    readWriteStub.Version.VerifySet(Times.Once);
+}
+```
+<!-- endSnippet -->
+
+### Issue: OutOfMemoryException or Build Hangs
+
+**Symptoms:**
+- Build never completes
+- OutOfMemoryException during compilation
+- Visual Studio freezes
+
+**Diagnosis:**
+Check for circular references or very large interface hierarchies.
+
+**Fix:**
+1. Check if interface inherits from many base interfaces
+2. Look for recursive generic type parameters
+3. Simplify interface hierarchy if possible
+4. Report issue if encountered with specific scenario
+
+### Issue: InternalsVisibleTo Not Working
+
+**Symptoms:**
+- Cannot access internal interfaces from test project
+- Inline pattern fails with internal types
+
+**Diagnosis:**
+Check if InternalsVisibleTo is configured correctly.
+
+**Fix:**
+Add to source project's .csproj or AssemblyInfo.cs:
+
+<!-- snippet: troubleshoot-internals-visible-to -->
+```cs
+// In your SOURCE project (not test project), add to AssemblyInfo.cs or .csproj:
+//
+// AssemblyInfo.cs:
+// [assembly: InternalsVisibleTo("YourTestProject")]
+//
+// Or in .csproj:
+// <ItemGroup>
+//   <InternalsVisibleToSuffix Include="YourTestProject" />
+// </ItemGroup>
+//
+// Then internal interfaces can be stubbed in your test project:
+// internal interface IInternalService { }
+//
+// [KnockOff]
+// public partial class InternalServiceStub : IInternalService { }
+```
+<!-- endSnippet -->
+
+### Issue: IntelliSense Not Showing Generated Members
+
+**Symptoms:**
+- Red squiggles under interceptor properties
+- IDE shows error but build succeeds
+- Generated members don't appear in autocomplete
+
+**Diagnosis:**
+Source generator output not being picked up by IDE.
+
+**Fix:**
+1. **Rebuild the project**: Use `dotnet build` or IDE rebuild
+2. **Restart OmniSharp** (VS Code): Command Palette → "OmniSharp: Restart OmniSharp"
+3. **Restart Visual Studio**: Close and reopen solution
+4. **Check generated files exist**: Look in Generated/ folder
+5. **Verify generator runs**: Check build output for source generator messages
+
+**Note:** This is a known limitation of source generators in some IDEs. The code will compile correctly even if IntelliSense shows errors.
+
 ## Step 3: Check Generated Code
 
 If issue persists, examine the generated code:
 
-1. Find Generated/ folder in test project
-2. Look for files matching the stub name
-3. Review actual generated API
+1. Use Glob to find Generated/ folder in test project: `**/Generated/**/*.g.cs`
+2. Use Grep to search for files matching the stub name or interface name
+3. Read the generated file to review actual generated API
+4. Compare expected interceptors vs actual generated interceptors
 
-The generated code shows exactly what interceptors and methods are available.
+**What to look for in generated code:**
+- Interface member names → Interceptor property names
+- Method signatures → OnCall delegate signatures
+- Return types → Expected callback return types
+- Generic type parameters → Specialized overloads
+
+The generated code is the source of truth for the actual API surface.
 
 ## Step 4: Check Build Output
 
@@ -206,7 +460,8 @@ Run build and check for:
 - Generator errors
 - Missing references
 
-```
+Use Bash to run:
+```bash
 dotnet build --verbosity normal
 ```
 
@@ -222,13 +477,44 @@ After diagnosis:
 
 ## Quick Diagnostic Checklist
 
-Run through these checks:
-- [ ] Class marked `partial`?
+Run through these checks systematically:
+
+**Basic Setup:**
+- [ ] Class marked `partial`? (Stand-Alone pattern only)
 - [ ] Attribute spelled correctly? (`[KnockOff]` or `[KnockOff<T>]`)
 - [ ] Interface/class accessible from test project?
 - [ ] Using statements present?
 - [ ] Project references correct?
-- [ ] Clean build performed recently?
-- [ ] OnCall signature matches method signature?
-- [ ] Async methods returning Task?
-- [ ] Class stubs using .Object?
+
+**Build Issues:**
+- [ ] Clean build performed recently? (`dotnet clean && dotnet build`)
+- [ ] Check Error List for KO### diagnostics
+- [ ] Generated/ folder contains expected files?
+
+**Runtime Issues:**
+- [ ] OnCall signature matches method signature (all parameters)?
+- [ ] Async methods returning Task/Task<T>?
+- [ ] Class stubs using .Object property?
+- [ ] Verification setup before action?
+- [ ] Same stub instance used throughout test?
+
+**Advanced Issues:**
+- [ ] Generic methods - checked generated code for exact API?
+- [ ] Multiple interfaces - shared interceptor for same method name?
+- [ ] Properties - does interface define setter?
+- [ ] InternalsVisibleTo configured for internal types?
+
+## Common Error Code Reference
+
+**CS0102** - Type already contains definition → Missing `partial` keyword
+**CS1593** - Delegate parameter mismatch → Wrong OnCall signature
+**CS0246** - Type not found → Missing reference or using statement
+**CS0029** - Cannot convert type → Wrong pattern (interface vs class stub)
+
+**KO001** - Interface not found → Check type accessibility
+**KO002** - Multiple candidates → Disambiguate type reference
+**KO003** - Unsupported member type → Check diagnostics for details
+
+---
+
+**UPDATED:** 2026-01-25

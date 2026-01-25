@@ -76,12 +76,12 @@ public partial class SearchRepoStub : ISearchRepo { }
 
 public class MethodConfigurationTests
 {
-    #region methods-oncall-void
     [Fact]
     public void VoidMethod_ConfiguredWithOnCall()
     {
         var stub = new LogSvcMethodsStub();
 
+        #region methods-oncall-void
         // OnCall for void methods uses Action<...params>
         var logged = new List<string>();
         var tracking = stub.LogMessage.OnCall((message) =>
@@ -95,15 +95,15 @@ public class MethodConfigurationTests
         Assert.Single(logged);
         Assert.Equal("Hello, World!", logged[0]);
         tracking.Verify();
+        #endregion
     }
-    #endregion
 
-    #region methods-oncall-return
     [Fact]
     public void MethodWithReturn_ConfiguredWithOnCall()
     {
         var stub = new LogSvcMethodsStub();
 
+        #region methods-oncall-return
         // OnCall with return value: Func<...params, TReturn>
         var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
 
@@ -112,15 +112,15 @@ public class MethodConfigurationTests
 
         Assert.Equal("TestUser", name);
         tracking.Verify();
+        #endregion
     }
-    #endregion
 
-    #region methods-oncall-value
     [Fact]
     public void MethodWithReturn_ConfiguredWithValue()
     {
         var stub = new LogSvcMethodsStub();
 
+        #region methods-oncall-value
         // Value overload - simpler syntax when you don't need callback logic
         // Just pass the return value directly
         var tracking = stub.GetUserName.OnCall("StaticUser");
@@ -130,15 +130,15 @@ public class MethodConfigurationTests
 
         Assert.Equal("StaticUser", name);
         tracking.Verify();
+        #endregion
     }
-    #endregion
 
-    #region methods-oncall-value-vs-callback
     [Fact]
     public void ValueVsCallback_ChooseBasedOnNeed()
     {
         var stub = new LogSvcMethodsStub();
 
+        #region methods-oncall-value-vs-callback
         // Use VALUE when returning a fixed result:
         stub.GetUserName.OnCall("Alice");
 
@@ -149,15 +149,15 @@ public class MethodConfigurationTests
         stub.GetUserName.OnCall((userId) => userId > 100 ? "Admin" : "User");
 
         // Both return tracking objects for verification
+        #endregion
     }
-    #endregion
 
-    #region methods-oncall-multi-param
     [Fact]
     public void MethodWithMultipleParams_AllAvailableInOnCall()
     {
         var stub = new AuthSvcMethodsStub();
 
+        #region methods-oncall-multi-param
         // All method parameters are passed to the callback in order
         var tracking = stub.ValidateCredentials.OnCall((username, password) =>
             username == "admin" && password == "secret");
@@ -169,8 +169,8 @@ public class MethodConfigurationTests
 
         // Verify exactly 2 calls were made
         tracking.Verify(Times.Exactly(2));
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -179,11 +179,12 @@ public class MethodConfigurationTests
 
 public class MethodVerificationTests
 {
-    #region methods-verify-wascalled
     [Fact]
     public void Verify_VerifiesMethodInvocation()
     {
         var stub = new SaveRepoMethodsStub();
+
+        #region methods-verify-wascalled
         stub.Save.OnCall((entity) => { }).Verifiable();
 
         ISaveRepoMethods repository = stub;
@@ -191,14 +192,15 @@ public class MethodVerificationTests
 
         // Verify() checks all members marked with .Verifiable()
         stub.Verify();
+        #endregion
     }
-    #endregion
 
-    #region methods-verify-times
     [Fact]
     public void Verify_WithTimesConstraint()
     {
         var stub = new NotifierMethodsStub();
+
+        #region methods-verify-times
         var tracking = stub.Notify.OnCall((message) => { });
 
         INotifierMethods notifier = stub;
@@ -212,14 +214,15 @@ public class MethodVerificationTests
 
         // Verify exact call count using Times
         tracking.Verify(Times.Exactly(2));
+        #endregion
     }
-    #endregion
 
-    #region methods-verify-callcount
     [Fact]
     public void Verify_ExactCallCount()
     {
         var stub = new NotifierMethodsStub();
+
+        #region methods-verify-callcount
         var tracking = stub.Notify.OnCall((message) => { });
 
         INotifierMethods notifier = stub;
@@ -233,15 +236,15 @@ public class MethodVerificationTests
 
         // Verify exactly 2 calls (throws if different)
         tracking.Verify(Times.Exactly(2));
+        #endregion
     }
-    #endregion
 
-    #region methods-verify-verifiable
     [Fact]
     public void Verifiable_BatchVerification()
     {
         var stub = new SaveRepoMethodsStub();
 
+        #region methods-verify-verifiable
         // Mark expected calls
         stub.Save.OnCall((entity) => { }).Verifiable(Times.Once);
         stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
@@ -252,8 +255,8 @@ public class MethodVerificationTests
 
         // Verify all marked methods (throws if any not called correctly)
         stub.Verify();
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -262,11 +265,12 @@ public class MethodVerificationTests
 
 public class ArgumentCaptureTests
 {
-    #region methods-capture-single
     [Fact]
     public void LastArg_CapturesSingleParameter()
     {
         var stub = new UserRepoMethodsStub();
+
+        #region methods-capture-single
         var tracking = stub.GetUser.OnCall((userId) => new User { Id = userId });
 
         IUserRepoMethods repository = stub;
@@ -275,14 +279,15 @@ public class ArgumentCaptureTests
         // LastArg captures the most recent call's argument (from tracking)
         int capturedId = tracking.LastArg;
         Assert.Equal(42, capturedId);
+        #endregion
     }
-    #endregion
 
-    #region methods-capture-multiple
     [Fact]
     public void LastArgs_CapturesAllParameters()
     {
         var stub = new AuthSvcMethodsStub();
+
+        #region methods-capture-multiple
         var tracking = stub.ValidateCredentials.OnCall((username, password) => true);
 
         IAuthSvcMethods auth = stub;
@@ -292,8 +297,8 @@ public class ArgumentCaptureTests
         var (username, password) = tracking.LastArgs;
         Assert.Equal("admin", username);
         Assert.Equal("secret123", password);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -302,11 +307,12 @@ public class ArgumentCaptureTests
 
 public class MethodResetTests
 {
-    #region methods-reset
     [Fact]
     public void Reset_ClearsTrackingState()
     {
         var stub = new ProcessorMethodsStub();
+
+        #region methods-reset
         var tracking = stub.ProcessData.OnCall((data) => { });
 
         IProcessorMethods processor = stub;
@@ -320,8 +326,8 @@ public class MethodResetTests
 
         // After reset, Verify(Times.Never) passes via tracking
         tracking.Verify(Times.Never);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -360,10 +366,10 @@ public class UserService
 
 public class CompleteMethodExampleTests
 {
-    #region methods-complete-example
     [Fact]
     public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
     {
+        #region methods-complete-example
         // Arrange
         var stub = new CompleteUserRepoStub();
 
@@ -388,8 +394,8 @@ public class CompleteMethodExampleTests
         // Verify saved user has new email via the tracking args
         var savedUser = saveTracking.LastArg;
         Assert.Equal("new@test.com", savedUser.Email);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -398,12 +404,12 @@ public class CompleteMethodExampleTests
 
 public class OverloadedMethodTests
 {
-    #region methods-overloads
     [Fact]
     public void Overloads_DistinguishedByCallbackSignature()
     {
         var stub = new SearchRepoStub();
 
+        #region methods-overloads
         // Overloads are distinguished by the callback parameter types
         // The fully-typed lambda tells KnockOff which overload to configure
         var findAllTracking = stub.Find.OnCall(() =>
@@ -426,6 +432,6 @@ public class OverloadedMethodTests
         // Access last arguments via tracking objects
         Assert.Equal(42, findByIdTracking.LastArg);
         Assert.Equal("Alice", findByNameTracking.LastArg);
+        #endregion
     }
-    #endregion
 }

@@ -1,3 +1,5 @@
+[Home](../../README.md) > [Reference](./README.md) > Attribute Options
+
 # Attribute Options
 
 The `[KnockOff]` attribute supports three distinct patterns for creating test stubs. Each pattern has specific requirements and generates different output to suit various testing scenarios.
@@ -177,9 +179,44 @@ All patterns support the same interceptor API for configuring behavior, tracking
 
 ---
 
+## Strict Mode
+
+Both attribute patterns support a `Strict` property that controls how stubs handle unconfigured members.
+
+**Behavior:**
+- When `Strict = true`, unconfigured method calls throw `StubException` instead of returning default values
+- Helps catch unexpected interactions during tests by failing fast
+- Can be set via attribute property or constructor parameter
+
+**Usage:**
+
+```csharp
+// Set via attribute property (default for all instances)
+[KnockOff(Strict = true)]
+public partial class UserRepoStub : IUserRepository { }
+
+// Or via generic attribute
+[KnockOff<IUserRepository>(Strict = true)]
+public partial class MyTests { }
+
+// Override per instance via constructor
+var stub = new Stubs.IUserRepository(strict: true);
+```
+
+**When to use strict mode:**
+- During test development to catch missing configurations
+- For critical tests where unexpected calls indicate bugs
+- When you want explicit control over all stub interactions
+
+---
+
 ## See Also
 
 - [Getting Started](../getting-started.md) - First steps with KnockOff and basic stub creation
 - [Interceptor API Reference](interceptor-api.md) - Complete reference for configuring stubs
 - [Methods Guide](../guides/methods.md) - Configure method behavior and callbacks
 - [Properties Guide](../guides/properties.md) - Work with property interceptors
+
+---
+
+**UPDATED:** 2026-01-25

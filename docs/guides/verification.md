@@ -594,3 +594,7 @@ When verification fails, KnockOff throws an exception with a clear message indic
 - [Events Guide](events.md) - Raise and verify events
 - [Delegates Guide](delegates.md) - Configure and verify delegate invocations
 - [Interceptor API Reference](../reference/interceptor-api.md) - Complete API documentation
+
+---
+
+**UPDATED:** 2026-01-25

@@ -181,9 +181,12 @@ After migrating, confirm:
 
 ## Related Documentation
 
-- [Configuring Properties](../guides/configuring-properties.md) - Full guide to property configuration
-- [Property Verification](../guides/property-verification.md) - Tracking property access
+- [Property Configuration Guide](../guides/properties.md) - Full guide to property configuration and verification
 
 ## Questions?
 
 If you encounter issues migrating, please open an issue on the KnockOff GitHub repository.
+
+---
+
+**UPDATED:** 2026-01-25

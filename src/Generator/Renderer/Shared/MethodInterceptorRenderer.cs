@@ -1040,7 +1040,7 @@ internal static class MethodInterceptorRenderer
 
 	/// <summary>
 	/// Renders aggregate tracking properties for backward compatibility (single-signature).
-	/// These allow the old pattern: stub.Method.WasCalled, stub.Method.CallCount
+	/// These provide LastCallArg/LastCallArgs for argument tracking.
 	/// </summary>
 	private static void RenderBackwardCompatibleTrackingProperties(
 		CodeWriter w,

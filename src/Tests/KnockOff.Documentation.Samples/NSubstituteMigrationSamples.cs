@@ -646,7 +646,7 @@ public class ReceivedWithArgsKnockOffTests
         Assert.Contains(99, calledIds);
         Assert.DoesNotContain(1, calledIds);
 
-        // Or use LastArg for the most recent call
+        // Or use LastCallArg for the most recent call
         Assert.Equal(99, stub.GetUser.LastCallArg);
     }
     #endregion

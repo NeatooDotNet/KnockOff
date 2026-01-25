@@ -34,13 +34,13 @@ public void Source_DelegatesToRealImplementation()
 ```
 <!-- endSnippet -->
 
-**How it works**: When you set a source, KnockOff's interceptors check for callbacks first. If no `OnCall` or user method is configured for a member, the interceptor forwards the call to the source implementation.
+**How it works**: When you set a source, KnockOff's interceptors check for configuration first. If no `OnCall` callback or `OnCall` value is configured for a member, the interceptor forwards the call to the source implementation.
 
 ---
 
 ## Partial Delegation
 
-You can override specific methods while delegating the rest to the source. Set the source for baseline behavior, then use `OnCall` to customize specific members:
+You can override specific methods while delegating the rest to the source. Set the source for baseline behavior, then use `OnCall` (callback or value) to customize specific members:
 
 <!-- snippet: source-partial-override -->
 ```cs
@@ -138,7 +138,7 @@ This is useful when you need source delegation for test setup but want to verify
 - Partially stubbing complex interfaces where manually configuring every member is impractical
 
 **Do NOT use `Source(T)` when:**
-- You need full control over all stub behavior (use pure stubbing with `OnCall` or user methods)
+- You need full control over all stub behavior (use pure stubbing with `OnCall`)
 - Testing in complete isolation with no real dependencies
 - The source implementation has side effects you want to avoid (database calls, external APIs, etc.)
 
@@ -148,12 +148,17 @@ This is useful when you need source delegation for test setup but want to verify
 
 KnockOff's interceptors evaluate member calls in this priority order:
 
-1. **OnCall callback** - Highest priority, set via `stub.Method.OnCall(...)`
-2. **User method** - Detected methods you define in the stub class
-3. **Source delegation** - Set via `stub.Source(realImplementation)`
-4. **Smart default** - Lowest priority, KnockOff's built-in return value generation
+1. **Sequence (OnCallSequence)** - Active sequence steps run first
+2. **OnCall value** - Direct return value, set via `stub.Method.OnCall(value)`
+3. **OnCall callback** - Callback, set via `stub.Method.OnCall((args) => result)`
+4. **Source delegation** - Set via `stub.Source(realImplementation)`
+5. **Smart default** - Lowest priority, KnockOff's built-in return value generation
 
-The first match wins. This means you can set a source for baseline behavior, override specific members with user methods, and further customize with `OnCall` when needed.
+The first match wins. This means you can set a source for baseline behavior and selectively override specific members with `OnCall` when needed.
+
+**Important**: `OnCall` (both callback and value overloads) take complete control once configured. If `OnCall` is set, the source is never consulted for that member, even if the callback returns `null` or a default value.
+
+**Note**: The Flat/Stand-Alone pattern (`[KnockOff] partial class Stub : IInterface`) also supports user-defined methods, which execute between OnCall and Source in the priority chain. See the [User Methods Guide](user-methods.md) for details on this pattern-specific feature.
 
 <!-- snippet: source-priority -->
 ```cs
@@ -167,6 +172,16 @@ var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
 Assert.Equal(42, fromOnCall);
 ```
 <!-- endSnippet -->
+
+You can use either the callback overload (`OnCall(callback)`) or the value overload (`OnCall(value)`) to override the source. The value overload is simpler when you need a fixed return value:
+
+```csharp
+// Value overload - simpler for fixed values
+stub.GetPriority.OnCall(99);
+
+// Callback overload - use when you need logic or side effects
+stub.GetPriority.OnCall((user) => user.IsActive ? 1 : 0);
+```
 
 Understanding priority order is crucial for predictable stub behavior when mixing delegation patterns.
 
@@ -203,7 +218,38 @@ This example demonstrates source delegation's strength: you get real implementat
 
 ---
 
+## OnCall API Reference
+
+The `OnCall` method has two overloads for configuring method behavior:
+
+### OnCall(callback)
+Pass a delegate that matches the method signature. Use when you need:
+- Dynamic values based on arguments
+- Conditional logic
+- Side effects
+
+```csharp
+stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+```
+
+### OnCall(value)
+Pass a direct return value. Use when you need:
+- Fixed return values
+- Simpler syntax without callback boilerplate
+
+```csharp
+stub.GetById.OnCall(new User { Id = 1, Name = "Fixed User" });
+```
+
+Both overloads return `IMethodTracking<T>` for verification and tracking.
+
+---
+
 **Next Steps:**
-- [Advanced Callbacks Guide](advanced-callbacks.md) - Using `OnCall` to configure complex stub behavior
+- [Method Interceptors Guide](methods.md) - Complete guide to `OnCall` callback and value overloads
 - [User Methods Guide](user-methods.md) - Defining methods in your stub class for custom behavior
 - [Verification Patterns](verification.md) - Assert on stub interactions and call tracking
+
+---
+
+**UPDATED:** 2026-01-25

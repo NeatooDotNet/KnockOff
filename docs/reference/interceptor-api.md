@@ -30,21 +30,32 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `WasCalled` | `bool` | True if the method was called at least once |
-| `LastCallArg` | `T` | The argument from the most recent call (single-parameter methods only) |
-| `LastCallArgs` | `(T1, T2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
+| `LastCallArg` | `T?` | The argument from the most recent call (single-parameter methods only). Nullable. Returns default if never called. |
+| `LastCallArgs` | `(T1?, T2?, ...)?` | Nullable tuple of arguments from the most recent call (multi-parameter methods). Returns default if never called. |
 
 ### Configuration Methods
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnCall(delegate)` | `IMethodTracking<...>` | Set callback invoked when method is called. Returns tracking interface for verification. |
+| `OnCall(delegate)` | `IMethodTracking<T>` or `IMethodTrackingArgs<(T1?, T2?, ...)>` | Configure callback invoked when method is called. Returns tracking interface for verification. |
+| `OnCall(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value. Returns tracking interface. Available only for methods with return values. |
+| `OnCallSequence(delegate)` | `IMethodSequence<TDelegate>` | Start a callback sequence. Each callback runs exactly once. Chain with `ThenCall()`. |
 
-### OnCall Delegate Signatures
+**Return type details**:
+- Single-parameter methods return `IMethodTracking<T>` with `LastArg` property
+- Multi-parameter methods return `IMethodTrackingArgs<(T1?, T2?, ...)>` with `LastArgs` property
+- Void methods and return methods both support callbacks
 
-The delegate type passed to `OnCall()` varies based on method signature:
+**Value overload benefits**:
+- Simpler syntax when returning a fixed value
+- Still returns tracking object for verification
+- Not available for void methods (no return value to configure)
 
-| Method Signature | OnCall Type |
+### OnCall Callback Signatures
+
+The delegate type for the callback overload varies based on method signature:
+
+| Method Signature | OnCall Callback Type |
 |-----------------|-------------|
 | `void M()` | `Action` |
 | `void M(T arg)` | `Action<T>` |
@@ -53,7 +64,11 @@ The delegate type passed to `OnCall()` varies based on method signature:
 | `R M(T arg)` | `Func<T, R>` |
 | `R M(T1 a, T2 b)` | `Func<T1, T2, R>` |
 
-When a callback is configured via `OnCall()`, the callback is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
+**When to use each overload**:
+- **Value overload** (`OnCall(value)`): Returning a fixed value
+- **Callback overload** (`OnCall(callback)`): Dynamic values based on arguments, conditional logic, or side effects
+
+When a callback is configured, it is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
 
 ### Verification Methods
 
@@ -66,49 +81,37 @@ When a callback is configured via `OnCall()`, the callback is invoked instead of
 
 ### Methods
 
-- `void Reset()` - Clears `WasCalled`, `LastCallArg`, `LastCallArgs`, and configured callback
+- `void Reset()` - Clears tracking state, `LastCallArg`/`LastCallArgs`, configured callbacks, and sequence state. Does NOT reset verifiable marking.
 
 ### Example
 
-<!-- snippet: api-method-interceptor -->
+<!-- snippet: method-interceptor-complete-api-demo -->
 ```cs
-[Fact]
-public void MethodInterceptor_CompleteApiDemonstration()
-{
-    var stub = new ApiMethodRepoStub();
+// Configure void method with OnCall and mark verifiable
+stub.Save.OnCall((user) => { }).Verifiable();
 
-    // Configure void method with OnCall and mark verifiable
-    var saveTracking = stub.Save.OnCall((user) => { }).Verifiable();
+// Configure return method with OnCall
+var getTracking = stub.GetById.OnCall((id) =>
+    new User { Id = id, Name = $"User{id}" }).Verifiable();
 
-    // Configure return method with OnCall and mark verifiable
-    var getTracking = stub.GetById.OnCall((id) =>
-        new User { Id = id, Name = $"User{id}" }).Verifiable();
+// Configure multi-parameter method
+var updateTracking = stub.Update.OnCall((id, name) => { }).Verifiable();
 
-    // Configure multi-parameter method and mark verifiable
-    var updateTracking = stub.Update.OnCall((id, name) => { }).Verifiable();
+// Exercise the stub
+repository.Save(new User { Id = 1, Name = "Alice" });
+var user = repository.GetById(42);
+repository.Update(1, "UpdatedName");
 
-    IApiMethodRepo repository = stub;
+// Batch verify all Verifiable() interceptors
+stub.Verify();
 
-    // Exercise the stub
-    repository.Save(new User { Id = 1, Name = "Alice" });
-    var user = repository.GetById(42);
-    repository.Update(1, "UpdatedName");
+// Tracking object's LastArg for single-parameter methods
+Assert.Equal(42, getTracking.LastArg);
 
-    // Verify all methods were called
-    stub.Verify();
-
-    // Access last argument (single parameter) via tracking
-    Assert.Equal(42, getTracking.LastArg);
-
-    // Access last arguments (multi parameter via tracking)
-    var (id, name) = updateTracking.LastArgs;
-    Assert.Equal(1, id);
-    Assert.Equal("UpdatedName", name);
-
-    // Verify return value was computed by callback
-    Assert.NotNull(user);
-    Assert.Equal("User42", user.Name);
-}
+// Tracking object's LastArgs tuple for multi-parameter methods
+var (id, name) = updateTracking.LastArgs;
+Assert.Equal(1, id);
+Assert.Equal("UpdatedName", name);
 ```
 <!-- endSnippet -->
 
@@ -120,91 +123,87 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 
 ### Properties
 
+**Note**: Properties do NOT have a `Value` property. Use `OnGet()` to configure the getter return value.
+
 | Property | Type | Description |
 |----------|------|-------------|
-| `Value` | `T` | Backing value returned by property getter |
-| `LastSetValue` | `T` | The value from the most recent setter call |
+| `LastSetValue` | `T?` | The value from the most recent setter call. Nullable. Returns default if never set. |
 
 ### Configuration Methods
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnGet(Func<T>)` | `IPropertyGetTracking<T>` | Set callback invoked when property is read. Returns tracking interface for verification. |
-| `OnSet(Action<T>)` | `IPropertySetTracking<T>` | Set callback invoked when property is written. Returns tracking interface for verification. |
+| `OnGet(Func<T>)` | `IPropertyGetTracking` | Configure callback invoked when property is read. Returns tracking interface for verification. |
+| `OnGet(T value)` | `IPropertyGetTracking` | Configure getter to return the specified value. Convenience overload for `OnGet(() => value)`. |
+| `OnGetSequence(Func<T>)` | `IPropertyGetSequence<T>` | Start a getter callback sequence. Each callback runs exactly once. Chain with `ThenGet()`. |
+| `OnSet(Action<T>)` | `IPropertySetTracking<T>` | Configure callback invoked when property is written. Returns tracking interface for verification. |
+| `OnSetSequence(Action<T>)` | `IPropertySetSequence<T>` | Start a setter callback sequence. Each callback runs exactly once. Chain with `ThenSet()`. |
 
 ### Verification Methods
 
 | Method | Description |
 |--------|-------------|
+| `Verify()` | Verify property was accessed (get or set) at least once (throws if not) |
+| `Verify(Times)` | Verify total property access count (get + set) matches Times constraint |
 | `VerifyGet()` | Verify property getter was called at least once (throws if not) |
 | `VerifyGet(Times)` | Verify property getter was called according to Times constraint |
 | `VerifySet()` | Verify property setter was called at least once (throws if not) |
 | `VerifySet(Times)` | Verify property setter was called according to Times constraint |
-| `MarkVerifiableGet()` | Mark getter for batch verification with default constraint (AtLeastOnce) |
-| `MarkVerifiableGet(Times)` | Mark getter for batch verification with specific Times constraint |
-| `MarkVerifiableSet()` | Mark setter for batch verification with default constraint (AtLeastOnce) |
-| `MarkVerifiableSet(Times)` | Mark setter for batch verification with specific Times constraint |
+| `Verifiable()` | Mark property for batch verification with default constraint (AtLeastOnce). Returns this for fluent chaining. |
+| `Verifiable(Times)` | Mark property for batch verification with specific Times constraint. Returns this for fluent chaining. |
+
+**Note**: `Verifiable()` marks BOTH getter and setter. Use tracking object's `Verifiable()` to mark only getter or setter.
 
 ### Behavior Notes
 
-- **OnGet replaces Value**: When a callback is configured via `OnGet()`, the callback's return value is used instead of `Value`
-- **OnSet doesn't update Value**: Configuring `OnSet()` does NOT automatically update `Value`. If you want `Value` updated, your callback must do it explicitly
+- **OnGet configures the getter**: When a callback is configured via `OnGet()`, the callback's return value is used by the property getter
+- **OnSet doesn't update the getter**: Configuring `OnSet()` does NOT automatically change what the getter returns. The getter and setter are independent unless you explicitly link them in your callback
 - **Init-only properties**: Setters for `init` properties are tracked like regular setters
 - **Fluent returns**: Both `OnGet()` and `OnSet()` return tracking interfaces, allowing verification on the returned object
+- **No backing field**: Unlike Moq's `.Object` pattern, there is no automatic backing field. You must configure the getter to return a value
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastSetValue`, `OnGet`, and `OnSet`. Does NOT reset `Value`
+- `void Reset()` - Clears tracking state (call counts), `LastSetValue`, configured callbacks (`OnGet`/`OnSet`), and sequence state. Does NOT reset verifiable marking.
 
 ### Example
 
-<!-- snippet: api-property-interceptor -->
+<!-- snippet: property-interceptor-complete-api-demo -->
 ```cs
-[Fact]
-public void PropertyInterceptor_CompleteApiDemonstration()
+// Value: Direct value for getter
+stub.ConnectionString.OnGet("Server=localhost");
+
+// OnGet callback: Dynamic value
+stub.Timeout.OnGet(() => 30);
+
+// Exercise getter
+var conn = repository.ConnectionString;
+var timeout = repository.Timeout;
+
+// VerifyGet: Check read count
+stub.ConnectionString.VerifyGet(Times.Once);
+stub.Timeout.VerifyGet(Times.Once);
+
+// Exercise setter
+repository.ConnectionString = "Server=production";
+repository.Timeout = 60;
+
+// VerifySet: Check write count
+stub.ConnectionString.VerifySet(Times.Once);
+
+// LastSetValue: Captured value from setter
+Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
+
+// IMPORTANT: OnSet does NOT auto-update getter value
+var setWasCalled = false;
+stub.Timeout.OnSet((val) =>
 {
-    var stub = new ApiPropertyRepoStub();
-
-    // Configure getter to return a specific value
-    stub.ConnectionString.OnGet("Server=localhost");
-
-    IApiPropertyRepo repository = stub;
-
-    // Read property - returns configured value
-    var conn = repository.ConnectionString;
-    Assert.Equal("Server=localhost", conn);
-
-    // Verify property was read
-    stub.ConnectionString.VerifyGet(Times.Once);
-
-    // Write property
-    repository.ConnectionString = "Server=production";
-
-    // Verify property was written
-    stub.ConnectionString.VerifySet(Times.Once);
-
-    // LastSetValue captures what was written
-    Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
-
-    // OnGet can take a callback or direct value
-    // OnGet() returns IPropertyGetTracking for verification
-    stub.Timeout.OnGet(() => 30);
-    var timeout = repository.Timeout;
-    Assert.Equal(30, timeout);
-
-    // OnSet provides custom setter behavior
-    // OnSet() returns IPropertySetTracking for verification
-    // Note: OnSet callback does NOT automatically update the getter
-    var setWasCalled = false;
-    stub.Timeout.OnSet((val) =>
-    {
-        setWasCalled = true;
-        // Update getter if needed: stub.Timeout.OnGet(val);
-    });
-    repository.Timeout = 60;
-    Assert.True(setWasCalled);
-    // Getter still returns 30 (OnSet didn't reconfigure OnGet)
-}
+    setWasCalled = true;
+    // To update getter: stub.Timeout.OnGet(val);
+});
+repository.Timeout = 90;
+Assert.True(setWasCalled);
+// Getter still returns 30 - OnSet didn't change it
 ```
 <!-- endSnippet -->
 
@@ -226,89 +225,81 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnGet(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey, TValue>` | Set callback invoked when indexer is read. Returns tracking interface for verification. |
-| `OnSet(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Set callback invoked when indexer is written. Returns tracking interface for verification. |
+| `OnGet(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey, TValue>` | Configure callback invoked when indexer is read. Returns tracking interface for verification. |
+| `OnGetSequence(Func<TKey, TValue>)` | `IIndexerGetSequence<TKey, TValue>` | Start a getter callback sequence. Each callback runs exactly once. Chain with `ThenGet()`. |
+| `OnSet(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configure callback invoked when indexer is written. Returns tracking interface for verification. |
+| `OnSetSequence(Action<TKey, TValue>)` | `IIndexerSetSequence<TKey, TValue>` | Start a setter callback sequence. Each callback runs exactly once. Chain with `ThenSet()`. |
 
 ### Verification Methods
 
 | Method | Description |
 |--------|-------------|
+| `Verify()` | Verify indexer was accessed (get or set) at least once (throws if not) |
+| `Verify(Times)` | Verify total indexer access count (get + set) matches Times constraint |
 | `VerifyGet()` | Verify indexer getter was called at least once (throws if not) |
 | `VerifyGet(Times)` | Verify indexer getter was called according to Times constraint |
 | `VerifySet()` | Verify indexer setter was called at least once (throws if not) |
 | `VerifySet(Times)` | Verify indexer setter was called according to Times constraint |
+| `Verifiable()` | Mark indexer for batch verification with default constraint (AtLeastOnce). Returns this for fluent chaining. |
+| `Verifiable(Times)` | Mark indexer for batch verification with specific Times constraint. Returns this for fluent chaining. |
 
 ### Behavior Notes
 
-- **Backing dictionary**: By default, get returns `Backing[key]` and set stores to `Backing[key]`
-- **OnGet override**: When a callback is configured via `OnGet()`, the callback's return value is used instead of `Backing`
-- **OnSet override**: When a callback is configured via `OnSet()`, the callback is invoked. `Backing` is NOT updated automatically unless your callback does it
+- **Backing dictionary**: By default, getter reads from `Backing[key]` and setter stores to `Backing[key]`
+- **OnGet replaces Backing lookup**: When a callback is configured via `OnGet()`, the callback's return value is used instead of `Backing` lookup
+- **OnSet doesn't update Backing**: When a callback is configured via `OnSet()`, the callback is invoked but `Backing` is NOT updated automatically unless your callback does it explicitly
 - **Fluent returns**: Both `OnGet()` and `OnSet()` return tracking interfaces, allowing verification on the returned object
 - **Nullable tracking**: `LastGetKey` and `LastSetEntry` are nullable to handle cases where no calls have been made yet
+- **No automatic synchronization**: `OnGet` and `OnSet` callbacks are independent. If you want them to share state, you must coordinate them explicitly
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, and `OnSet`. Does NOT clear `Backing`
+- `void Reset()` - Clears tracking state (call counts), `LastGetKey`, `LastSetEntry`, configured callbacks (`OnGet`/`OnSet`), and sequence state. Does NOT clear `Backing` dictionary or verifiable marking.
 
 ### Example
 
-<!-- snippet: api-indexer-interceptor -->
+<!-- snippet: indexer-interceptor-complete-api-demo -->
 ```cs
-[Fact]
-public void IndexerInterceptor_CompleteApiDemonstration()
+// Backing dictionary: Default storage for indexer
+stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
+stub.Indexer.Backing[2] = new User { Id = 2, Name = "Bob" };
+
+// Read uses Backing by default
+var user1 = repository[1];
+Assert.Equal("Alice", user1?.Name);
+
+// VerifyGet: Check read count
+stub.Indexer.VerifyGet(Times.Once);
+
+// LastGetKey: Key from most recent get
+Assert.Equal(1, stub.Indexer.LastGetKey);
+
+// Write uses Backing by default
+repository[3] = new User { Id = 3, Name = "Charlie" };
+
+// VerifySet: Check write count
+stub.Indexer.VerifySet(Times.Once);
+
+// LastSetEntry: Key-value tuple from most recent set
+var lastEntry = stub.Indexer.LastSetEntry;
+Assert.Equal(3, lastEntry?.Key);
+Assert.Equal("Charlie", lastEntry?.Value?.Name);
+
+// OnGet: Override Backing lookup
+stub.Indexer.OnGet((key) => new User { Id = key, Name = "FromCallback" });
+var fromCallback = repository[999];
+Assert.Equal("FromCallback", fromCallback?.Name);
+
+// IMPORTANT: OnSet does NOT auto-update Backing
+var onSetCalled = false;
+stub.Indexer.OnSet((key, value) =>
 {
-    var stub = new ApiIndexerRepoStub();
-
-    // Populate Backing dictionary directly
-    stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
-    stub.Indexer.Backing[2] = new User { Id = 2, Name = "Bob" };
-
-    IApiIndexerRepo repository = stub;
-
-    // Read from indexer - uses Backing by default
-    var user1 = repository[1];
-    Assert.NotNull(user1);
-    Assert.Equal("Alice", user1.Name);
-
-    // Verify indexer was read
-    stub.Indexer.VerifyGet(Times.Once);
-
-    // LastGetKey captures the key used
-    Assert.Equal(1, stub.Indexer.LastGetKey);
-
-    // Write to indexer - updates Backing by default
-    repository[3] = new User { Id = 3, Name = "Charlie" };
-
-    // Verify indexer was written
-    stub.Indexer.VerifySet(Times.Once);
-
-    // LastSetEntry captures key and value (nullable tuple)
-    var lastEntry = stub.Indexer.LastSetEntry;
-    Assert.NotNull(lastEntry);
-    Assert.Equal(3, lastEntry.Value.Key);
-    Assert.Equal("Charlie", lastEntry.Value.Value?.Name);
-
-    // OnGet overrides Backing lookup
-    // OnGet() returns IIndexerGetTracking for verification
-    stub.Indexer.OnGet((k) => new User { Id = k, Name = "FromCallback" });
-    var fromCallback = repository[999];
-    Assert.Equal("FromCallback", fromCallback?.Name);
-
-    // OnSet overrides Backing storage
-    // OnSet() returns IIndexerSetTracking for verification
-    // Note: OnSet takes (key, value) - does NOT automatically update Backing
-    var onSetCalled = false;
-    stub.Indexer.OnSet((k, v) =>
-    {
-        onSetCalled = true;
-        // Manually update Backing if needed:
-        // stub.Indexer.Backing[k] = v;
-    });
-    repository[4] = new User { Id = 4, Name = "Dave" };
-    Assert.True(onSetCalled);
-    // Backing[4] is NOT set because OnSet didn't do it
-    Assert.False(stub.Indexer.Backing.ContainsKey(4));
-}
+    onSetCalled = true;
+    // To update Backing: stub.Indexer.Backing[key] = value;
+});
+repository[4] = new User { Id = 4 };
+Assert.True(onSetCalled);
+Assert.False(stub.Indexer.Backing.ContainsKey(4)); // Not in Backing
 ```
 <!-- endSnippet -->
 
@@ -328,6 +319,8 @@ Generated for interface events. Tracks add/remove operations, checks for subscri
 
 | Method | Description |
 |--------|-------------|
+| `Verify()` | Verify event was accessed (add or remove) at least once (throws if not) |
+| `Verify(Times)` | Verify total event access count (add + remove) matches Times constraint |
 | `VerifyAdd()` | Verify event was subscribed at least once (throws if not) |
 | `VerifyAdd(Times)` | Verify event was subscribed according to Times constraint |
 | `VerifyRemove()` | Verify event was unsubscribed at least once (throws if not) |
@@ -349,51 +342,50 @@ The `Raise` method signature varies based on the event delegate type:
 
 Calling `Raise` invokes all subscribed handlers with the provided arguments.
 
-#### Reset
+#### Other Methods
 
-- `void Reset()` - Clears tracking state. Does NOT remove subscribers
+| Method | Description |
+|--------|-------------|
+| `void Reset()` | Clears tracking state (add/remove counts) and removes all active subscribers. Does NOT reset verifiable marking. |
+| `TInterceptor Verifiable()` | Mark for batch verification with default constraint (AtLeastOnce). Returns this for fluent chaining. |
+| `TInterceptor Verifiable(Times)` | Mark for batch verification with specific Times constraint. Returns this for fluent chaining. |
+
+**Note**: `Verifiable()` verifies the total access count (add + remove operations combined).
 
 ### Example
 
-<!-- snippet: api-event-interceptor -->
+<!-- snippet: event-interceptor-complete-api-demo -->
 ```cs
-[Fact]
-public void EventInterceptor_CompleteApiDemonstration()
-{
-    var stub = new ApiEventRepoStub();
-    IApiEventRepo repository = stub;
+// Subscribe to EventHandler event
+var changedInvoked = false;
+repository.Changed += (sender, e) => changedInvoked = true;
 
-    // Subscribe to EventHandler event
-    var changedInvoked = false;
-    repository.Changed += (sender, e) => changedInvoked = true;
+// VerifyAdd: Check subscription occurred
+stub.Changed.VerifyAdd(Times.Once);
 
-    // Verify subscription occurred
-    stub.Changed.VerifyAdd(Times.Once);
+// HasSubscribers: Active subscription check
+Assert.True(stub.Changed.HasSubscribers);
 
-    // HasSubscribers indicates active subscriptions
-    Assert.True(stub.Changed.HasSubscribers);
+// Raise: Fire event to all subscribers
+stub.Changed.Raise(repository, EventArgs.Empty);
+Assert.True(changedInvoked);
 
-    // Raise fires all subscribers
-    stub.Changed.Raise(repository, EventArgs.Empty);
-    Assert.True(changedInvoked);
+// Unsubscribe tracking
+EventHandler handler = (sender, e) => { };
+repository.Changed += handler;
+repository.Changed -= handler;
 
-    // Unsubscribe
-    EventHandler handler = (sender, e) => { };
-    repository.Changed += handler;
-    stub.Changed.VerifyAdd(Times.Exactly(2));
+// VerifyRemove: Check unsubscription count
+stub.Changed.VerifyRemove(Times.Once);
 
-    repository.Changed -= handler;
-    stub.Changed.VerifyRemove(Times.Once);
+// Action<T> events: Same API, different Raise signature
+User? addedUser = null;
+repository.UserAdded += user => addedUser = user;
 
-    // Action<T> events work similarly
-    User? addedUser = null;
-    repository.UserAdded += user => addedUser = user;
-
-    // Raise with typed argument
-    stub.UserAdded.Raise(new User { Id = 1, Name = "Alice" });
-    Assert.NotNull(addedUser);
-    Assert.Equal("Alice", addedUser.Name);
-}
+// Raise with typed argument
+stub.UserAdded.Raise(new User { Id = 1, Name = "Alice" });
+Assert.NotNull(addedUser);
+Assert.Equal("Alice", addedUser.Name);
 ```
 <!-- endSnippet -->
 
@@ -409,7 +401,6 @@ Available directly on the interceptor instance:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `WasCalled` | `bool` | True if the method was called with any type arguments |
 | `CalledTypeArguments` | `IReadOnlyList<Type>` | List of all type arguments used in calls (in order of first use) |
 
 ### Typed Access
@@ -420,7 +411,6 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `WasCalled` | `bool` | True if the method was called with these type arguments |
 | `LastCallArg` | `TArg` | The argument from the most recent call with these type arguments (single-parameter methods) |
 | `LastCallArgs` | `(TArg1, TArg2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
 
@@ -428,9 +418,15 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnCall(delegate)` | `IGenericMethodTracking<...>` | Set callback invoked when method is called with these type arguments. Returns tracking interface for verification. |
+| `OnCall(delegate)` | `IMethodTracking<T>` or `IMethodTrackingArgs<(...)>` | Configure callback invoked when method is called with these type arguments. Returns tracking interface for verification. |
+| `OnCall(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value for these type arguments. Returns tracking interface. Available only for methods with return values. |
+| `OnCallSequence(delegate)` | `IMethodSequence<TDelegate>` | Start a callback sequence for these type arguments. Each callback runs exactly once. Chain with `ThenCall()`. |
 
 The callback delegate type follows the same signature rules as non-generic method interceptors (see Method Interceptor section).
+
+**Return type details**:
+- Single-parameter methods return `IMethodTracking<T>` with `LastArg` property
+- Multi-parameter methods return `IMethodTrackingArgs<(T1?, T2?, ...)>` with `LastArgs` property
 
 #### Typed Verification Methods
 
@@ -443,54 +439,45 @@ The callback delegate type follows the same signature rules as non-generic metho
 
 ### Methods
 
-- **Base Reset**: `void Reset()` - Clears all tracking and callbacks across all type arguments
-- **Typed Reset**: `void Of<T>().Reset()` - Clears tracking and callback only for the specific type argument(s)
+- **Base Reset**: `void Reset()` - Clears all tracking, callbacks, and sequence state across all type arguments. Does NOT reset verifiable marking.
+- **Typed Reset**: `void Of<T>().Reset()` - Clears tracking, callbacks, and sequence state only for the specific type argument(s). Other type arguments are preserved.
 
 ### Example
 
-<!-- snippet: api-generic-interceptor -->
+<!-- snippet: generic-method-interceptor-complete-api-demo -->
 ```cs
-[Fact]
-public void GenericMethodInterceptor_CompleteApiDemonstration()
-{
-    var stub = new ApiGenericRepoStub();
+// .Of<T>(): Access typed interceptor for specific type argument
+stub.GetById.Of<User>().OnCall((id) =>
+    new User { Id = id, Name = $"User{id}" });
 
-    // Configure OnCall for specific type arguments
-    var userTracking = stub.GetById.Of<User>().OnCall((id) =>
-        new User { Id = id, Name = $"User{id}" });
+stub.GetById.Of<Product>().OnCall((id) =>
+    new Product { Id = id, Name = $"Product{id}" });
 
-    var productTracking = stub.GetById.Of<Product>().OnCall((id) =>
-        new Product { Id = id, Name = $"Product{id}" });
+// Call with different type arguments
+var user1 = repository.GetById<User>(1);
+var product = repository.GetById<Product>(2);
+var user2 = repository.GetById<User>(3);
 
-    IApiGenericRepo repository = stub;
+// CalledTypeArguments: List of all type arguments used
+Assert.Contains(typeof(User), stub.GetById.CalledTypeArguments);
+Assert.Contains(typeof(Product), stub.GetById.CalledTypeArguments);
 
-    // Call with different type arguments
-    var user = repository.GetById<User>(1);
-    var product = repository.GetById<Product>(2);
-    var user2 = repository.GetById<User>(3);
+// Typed verification: Per-type call counts
+stub.GetById.Of<User>().Verify(Times.Exactly(2));
+stub.GetById.Of<Product>().Verify(Times.Once);
 
-    // Verify calls via tracking with Times
-    userTracking.Verify(Times.Exactly(2));
-    productTracking.Verify(Times.Once);
+// Typed LastCallArg: Per-type argument capture
+Assert.Equal(3, stub.GetById.Of<User>().LastCallArg);
+Assert.Equal(2, stub.GetById.Of<Product>().LastCallArg);
 
-    // CalledTypeArguments lists all types used
-    Assert.Contains(typeof(User), stub.GetById.CalledTypeArguments);
-    Assert.Contains(typeof(Product), stub.GetById.CalledTypeArguments);
+// Typed Reset: Clears only specific type
+stub.GetById.Of<User>().Reset();
+stub.GetById.Of<User>().Verify(Times.Never);
+stub.GetById.Of<Product>().Verify(Times.Once); // Preserved
 
-    // LastCallArg for specific type (captures the 'id' parameter)
-    Assert.Equal(3, stub.GetById.Of<User>().LastCallArg);
-    Assert.Equal(2, stub.GetById.Of<Product>().LastCallArg);
-
-    // Reset typed tracking only
-    stub.GetById.Of<User>().Reset();
-    stub.GetById.Of<User>().Verify(Times.Never);
-    productTracking.Verify(Times.Once); // Preserved
-
-    // Reset all tracking
-    stub.GetById.Reset();
-    stub.GetById.Of<User>().Verify(Times.Never);
-    stub.GetById.Of<Product>().Verify(Times.Never);
-}
+// Base Reset: Clears all type arguments
+stub.GetById.Reset();
+stub.GetById.Of<Product>().Verify(Times.Never);
 ```
 <!-- endSnippet -->
 
@@ -502,14 +489,17 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | Tracking state, `LastCallArg`, `LastCallArgs`, `OnCall` | N/A |
-| **Property** | Tracking state, `LastSetValue`, `OnGet`, `OnSet` | `Value` |
-| **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet` | `Backing` dictionary |
-| **Event** | Tracking state | Active subscribers |
-| **Generic Method (Base)** | All tracking and callbacks across all type arguments | N/A |
-| **Generic Method (Typed)** | Tracking and callback for specific type argument(s) only | Tracking for other type arguments |
+| **Method** | Tracking state, `LastCallArg`, `LastCallArgs`, callbacks, sequences | Verifiable marking |
+| **Property** | Tracking state, `LastSetValue`, `OnGet`, `OnSet`, sequences | Verifiable marking |
+| **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet`, sequences | `Backing` dictionary, verifiable marking |
+| **Event** | Add/remove counts, active subscribers | Verifiable marking |
+| **Generic Method (Base)** | All tracking, callbacks, sequences across all type arguments | Verifiable marking |
+| **Generic Method (Typed)** | Tracking, callbacks, sequences for specific type argument(s) only | Tracking for other type arguments, verifiable marking |
 
-**Key Principle**: `Reset()` clears tracking and callbacks, but preserves state that represents "what the stub currently is" (property values, backing dictionaries, event subscribers).
+**Key Principles**:
+- `Reset()` clears tracking (counts, arguments) and runtime state (callbacks, sequences, subscribers)
+- `Reset()` does NOT clear verifiable marking (intentional test setup)
+- `Reset()` does NOT clear backing storage (`Backing` dictionary for indexers)
 
 ---
 
@@ -521,13 +511,44 @@ All `Verify()` and `Verifiable()` methods accept an optional `Times` constraint.
 |-----------|-------------|
 | `Times.AtLeastOnce` | Called one or more times (default for `Verifiable()`) |
 | `Times.Once` | Called exactly once |
+| `Times.Twice` | Called exactly twice |
 | `Times.Never` | Never called |
 | `Times.Exactly(n)` | Called exactly n times |
 | `Times.AtLeast(n)` | Called n or more times |
 | `Times.AtMost(n)` | Called n or fewer times |
-| `Times.Between(min, max)` | Called between min and max times (inclusive) |
 
 See the [Verification Guide](../guides/verification.md) for detailed examples.
+
+---
+
+## Tracking Objects vs Interceptors
+
+When you call `OnCall()`, `OnGet()`, or `OnSet()`, KnockOff returns a tracking object that provides access to captured arguments and verification methods.
+
+**Key distinction**:
+- **Interceptor**: The main object (e.g., `stub.GetById`) that configures behavior
+- **Tracking object**: The return value from `OnCall()` (e.g., `IMethodTracking<int>`) that captures arguments and supports verification
+
+**Example**:
+```csharp
+var stub = new ApiMethodRepoStub();
+
+// Interceptor: stub.GetById
+// Tracking object: getTracking
+var getTracking = stub.GetById.OnCall((id) => new User { Id = id });
+
+// Access LastArg on the tracking object, not the interceptor
+Assert.Equal(42, getTracking.LastArg);
+
+// Both support verification
+stub.GetById.Verify(Times.Once);      // Interceptor verification
+getTracking.Verify(Times.Once);       // Tracking object verification
+```
+
+**Why this matters**:
+- `LastArg`/`LastArgs` live on the tracking object, not the interceptor
+- If you configure multiple callbacks (e.g., via sequence), each gets its own tracking object
+- The interceptor's `LastCallArg`/`LastCallArgs` properties aggregate across all registrations
 
 ---
 
@@ -540,3 +561,7 @@ See the [Verification Guide](../guides/verification.md) for detailed examples.
 - [Events Guide](../guides/events.md) - Work with event interceptors
 - [Generic Methods Guide](../guides/generic-methods.md) - Work with generic method interceptors
 - [Verification Guide](../guides/verification.md) - Assert on stub interactions
+
+---
+
+**UPDATED:** 2026-01-25

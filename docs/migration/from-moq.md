@@ -33,9 +33,9 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 |-------------|---------------------|
 | `new Mock<IFoo>()` | `new FooStub()` with `[KnockOff] partial class FooStub : IFoo` |
 | `mock.Object` | `stub` (direct instance) |
-| `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall(() => value)` |
+| `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall((args) => value)` |
 | `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
-| `.ReturnsAsync(value)` | `stub.Method.OnCall(() => Task.FromResult(value))` |
+| `.ReturnsAsync(value)` | `stub.Method.OnCall((args) => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
 | `.Verify(x => x.Method(), Times.Once)` | `var t = stub.Method.OnCall(...); t.Verify(Times.Once)` |
 | `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
@@ -110,7 +110,11 @@ public partial class MoqUserRepoStub : IMoqUserRepo { }
 
 Place this declaration in your test file. The generator fills in the explicit interface implementations and interceptor properties.
 
-**Alternative:** You can also use the inline pattern `[KnockOff<IFoo>] partial class FooStub` without implementing the interface—both patterns work the same way. This guide uses the standalone pattern for consistency with Moq's explicit interface usage.
+**Alternative patterns:** KnockOff also supports inline patterns that don't require implementing the interface explicitly:
+- `[KnockOff<IFoo>] partial class FooStub` - inline interface pattern
+- `[KnockOff<FooClass>] partial class FooStub` - inline class pattern
+
+This guide uses the standalone pattern (`[KnockOff]` with explicit interface implementation) for consistency with Moq's style, but all patterns are functionally equivalent.
 
 ---
 
@@ -169,7 +173,7 @@ public void SetupMethod_KnockOffApproach()
 
 ## Step 4: Configure Properties
 
-Replace property `.Setup().Returns()` with `.Value` assignments.
+Replace property `.Setup().Returns()` with `.OnGet()` calls.
 
 **Moq:**
 
@@ -263,8 +267,8 @@ public void VerifyCalls_KnockOffApproach()
 
 **Key differences:**
 - Moq uses `mock.Verify(expression, times)` with expression trees
-- KnockOff uses `tracking.Verify(times)` on the object returned by `OnCall`
-- KnockOff also supports `.Verifiable()` + `stub.Verify()` for batch verification
+- KnockOff uses `.Verifiable()` + `stub.Verify()` for batch verification
+- KnockOff also supports direct verification: `stub.SaveUser.Verify(Times.Once)`
 - Both support the same `Times` matchers (Once, AtLeastOnce, Exactly, etc.)
 
 ---
@@ -573,17 +577,19 @@ stub.GetUser.OnCall(() => user);
 stub.GetUser.OnCall((id) => user);
 ```
 
-### Forgetting `.Object` Equivalence for Class Stubs
+### No `.Object` Property Needed
 
-**Problem:** Expecting to access a wrapper object when using class stubs.
+**Key difference:** Moq uses `mock.Object` to get the instance, KnockOff stubs are the instance.
 
 ```csharp
 // Moq: needed .Object
 var service = new UserService(mock.Object);
 
-// KnockOff: use stub directly
+// KnockOff: use stub directly (it implements the interface)
 var service = new UserService(stub);
 ```
+
+**Note:** KnockOff stubs do have an `.Object` property for compatibility, but it just returns `this` - you rarely need it.
 
 ---
 
@@ -598,3 +604,7 @@ var service = new UserService(stub);
 ---
 
 **Need help?** Open an issue on [GitHub](https://github.com/neatoodotnet/KnockOff/issues) or check existing discussions.
+
+---
+
+**UPDATED:** 2026-01-25

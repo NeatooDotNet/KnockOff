@@ -1,3 +1,5 @@
+[knockoff-usage](../SKILL.md) > [references](README.md) > moq-migration
+
 # Migrating from Moq to KnockOff
 
 Switching from Moq to KnockOff means moving from per-test mock setup to reusable stub classes. You gain the ability to share stubs across tests while still customizing behavior per-test—while trading Moq's runtime flexibility for source-generated, explicit stub implementations.
@@ -34,7 +36,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `new Mock<IFoo>()` | `new FooStub()` with `[KnockOff<IFoo>] partial class FooStub` |
 | `mock.Object` | `stub` (direct instance) |
 | `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall(() => value)` |
-| `.Setup(x => x.Property).Returns(value)` | `stub.Property.Value = value` |
+| `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
 | `.ReturnsAsync(value)` | `stub.Method.OnCall(() => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` or `stub.Method.Verify(Times.Once)` |
@@ -151,7 +153,7 @@ public void SetupMethod_KnockOffApproach()
 
 ## Step 4: Configure Properties
 
-Replace property `.Setup().Returns()` with `.Value` assignments.
+Replace property `.Setup().Returns()` with `OnGet()` calls.
 
 **Moq:**
 
@@ -178,7 +180,7 @@ public void SetupProperty_KnockOffApproach()
 {
     var stub = new UserRepositoryStub();
 
-    stub.ConnectionString.Value = "server=localhost";
+    stub.ConnectionString.OnGet("server=localhost");
 
     IUserRepository repository = stub;
     var connStr = repository.ConnectionString;
@@ -189,8 +191,8 @@ public void SetupProperty_KnockOffApproach()
 
 **Key differences:**
 - Moq treats properties like methods in setup
-- KnockOff provides a `.Value` property on the interceptor
-- KnockOff also tracks `GetCount` and `SetCount` for verification
+- KnockOff provides `OnGet()` and `OnSet()` methods on the property interceptor
+- KnockOff also provides `VerifyGet()` and `VerifySet()` for separate getter/setter verification
 
 ---
 
@@ -571,16 +573,19 @@ stub.GetUserAsync.OnCall((id) => user);
 stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
 ```
 
-### Property Value vs Method OnCall
+### Property Configuration
 
-**Problem:** Using `OnCall` for properties instead of `.Value`.
+**Problem:** Forgetting properties use `OnGet()` and `OnSet()`, not `OnCall()`.
 
 ```csharp
-// Wrong: properties use .Value, not OnCall
+// Wrong: OnCall is for methods
 stub.ConnectionString.OnCall(() => "connection");
 
-// Correct
-stub.ConnectionString.Value = "connection";
+// Correct: use OnGet for property getters
+stub.ConnectionString.OnGet("connection");
+
+// For setters, use OnSet
+stub.ConnectionString.OnSet((value) => { /* handle set */ });
 ```
 
 ### Void Methods Need Empty Delegate Body
@@ -633,10 +638,14 @@ Use this checklist when migrating a test file from Moq to KnockOff:
 - [ ] Ensure stub classes are marked `partial`
 - [ ] Replace `Mock<T>` field declarations with stub types
 - [ ] Remove `.Object` property accesses
-- [ ] Convert `.Setup().Returns()` to `.OnCall()`
-- [ ] Convert property setups to `.Value = `
+- [ ] Convert method `.Setup().Returns()` to `.OnCall()`
+- [ ] Convert property setups to `.OnGet()` and `.OnSet()`
 - [ ] Convert `.ReturnsAsync()` to `Task.FromResult()`
 - [ ] Move `.Callback()` logic into `OnCall` delegates
 - [ ] Replace `It.IsAny<T>()` with callback parameter inspection
 - [ ] Convert `.Verify()` calls to `tracking.Verify()`, `stub.Method.Verify()`, or batch `stub.Verify()`
 - [ ] Update `using` statements (remove Moq, add KnockOff namespace if needed)
+
+---
+
+**UPDATED:** 2026-01-25

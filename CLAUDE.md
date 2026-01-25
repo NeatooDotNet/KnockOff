@@ -108,14 +108,24 @@ docs/
 ├── getting-started.md       # Installation, first usage
 ├── guides/                  # Feature guides (methods, properties, etc.)
 ├── reference/               # API reference
-└── migration/               # Migration guides
+├── migration/               # Migration guides
+└── troubleshooting.md       # Troubleshooting guide
+skills/knockoff/
+├── commands/                # Slash command documentation
+└── skills/knockoff-usage/
+    ├── SKILL.md             # Skill overview
+    └── references/          # Plugin reference documentation
 ```
 
-**Excluded:** `docs/todos/`, `docs/plans/`, `docs/release-notes/`
+**All documentation files** (README.md, docs/, skills/) **use MarkdownSnippets** with compilable sample code.
+
+**Excluded from documentation pipeline:** `docs/todos/`, `docs/plans/`, `docs/release-notes/`, `.claude/`
 
 ### Sample Code Location
 
-Documentation samples live in `src/docs/samples/` (not `src/Tests/KnockOff.Documentation.Samples/`).
+Documentation samples live in `src/Tests/KnockOff.Documentation.Samples/`.
+
+All code samples are compiled and tested on net8.0, net9.0, and net10.0.
 
 ### MarkdownSnippets
 

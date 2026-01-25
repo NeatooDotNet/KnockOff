@@ -4,8 +4,6 @@ Indexers in KnockOff work similarly to properties but with key-based access. Eac
 
 **Quick reference:** For simple test data scenarios, use the `Backing` dictionary. For dynamic or computed values, use `OnGet` callbacks. For write validation or tracking, use `OnSet` callbacks.
 
-<!-- TODO: Add section explaining how indexer configuration works across all three KnockOff patterns: Stand-Alone/Flat ([KnockOff] on class), Inline Interface ([KnockOff<IFoo>]), and Inline Class ([KnockOff<SomeClass>]). Show how to access indexer interceptors in each pattern. -->
-
 ---
 
 ## Configuration Approaches
@@ -436,8 +434,6 @@ public void MultipleIndexerOverloads()
 ```
 <!-- endSnippet -->
 
-<!-- TODO: Update sample to show actual generated property names - check how multiple indexer overloads are named by the generator (e.g., OfString, OfInt32 vs numeric suffixes) -->
-
 Overloads use type-based naming in the order they appear in the interface definition:
 - String key indexer: `stub.Indexer.OfString`
 - Int32 key indexer: `stub.Indexer.OfInt32`
@@ -552,7 +548,7 @@ public void Reset_ClearsTrackingPreservesBacking()
 ```
 <!-- endSnippet -->
 
-**Reset behavior:** Calling `Reset()` clears all tracking counters, `LastGetKey`, `LastSetEntry`, callbacks (`OnGet`, `OnSet`), and sequence configurations. However, the `Backing` dictionary is intentionally preserved so test data remains available across verification phases within the same test.
+**Reset behavior:** Calling `Reset()` clears all tracking counters, `LastGetKey`, `LastSetEntry`, and resets sequence position to the beginning. However, callbacks (`OnGet`, `OnSet`), sequence configurations, and the `Backing` dictionary are all preserved. This allows you to verify behavior, reset tracking state, and re-run the same test scenario without reconfiguring callbacks.
 
 ---
 
@@ -648,9 +644,9 @@ public void CompleteIndexerExample_AllPatterns()
 3. **Use OnSet for tracking** - When you need to verify writes or simulate validation
 4. **Use sequences for changing behavior** - OnGetSequence/OnSetSequence when values or behavior differ across calls
 5. **OnGet/OnSet override Backing** - Callbacks take precedence over dictionary lookups
-6. **Reset() preserves Backing** - Clears execution state but not test data
+6. **Reset() preserves Backing and callbacks** - Clears tracking state but not configuration
 7. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like property verification
-8. **Multiple overloads** - Each indexer signature gets its own interceptor (Indexer, Indexer_1, etc.)
+8. **Multiple overloads** - Each indexer signature gets its own interceptor (OfString, OfInt32, etc.)
 
 ---
 
@@ -659,3 +655,7 @@ public void CompleteIndexerExample_AllPatterns()
 - [Method Configuration Guide](methods.md) - Configure method behavior and callbacks
 - [Verification Patterns](verification.md) - Assert on stub interactions
 - [Interceptor API Reference](../reference/interceptor-api.md) - Complete interceptor API documentation
+
+---
+
+**UPDATED:** 2026-01-25

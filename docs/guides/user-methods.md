@@ -1,3 +1,5 @@
+[Home](../../README.md) / [Guides](../guides/) / User Methods
+
 # User Methods
 
 User methods let you define default stub behavior at compile time by writing protected methods in your stub class. They provide reusable defaults across tests while remaining testable through tracking interceptors.
@@ -57,7 +59,7 @@ When you define a protected method matching an interface member signature:
 3. Your protected method implementation provides the behavior
 4. Tests verify calls through the interceptor using `Verify()` and `LastArg`
 
-User methods provide permanent compile-time behavior. To override them, use `Source()` delegation (see the [Source Delegation guide](source-delegation.md)).
+User methods provide permanent compile-time behavior. If you need runtime-configurable behavior, use a regular stub without user methods (see [When You Need Runtime-Configurable Behavior](#when-you-need-runtime-configurable-behavior) below).
 
 <!-- snippet: user-methods-priority -->
 ```cs
@@ -99,7 +101,7 @@ public void UserMethod_InterceptorTracksCallsOnly()
     Assert.True(isActive);
 
     // User method interceptors are tracking-only
-    // They don't have OnCall - use Source delegation to override
+    // They don't have OnCall - use a regular stub when you need OnCall
     stub.IsActive2.Verify(Times.Once);
     Assert.Equal(42, stub.IsActive2.LastArg);
 }
@@ -142,9 +144,9 @@ This is useful when reusing a stub instance across multiple test phases or when 
 
 ---
 
-## Overriding User Method Behavior
+## When You Need Runtime-Configurable Behavior
 
-User method interceptors do not have `OnCall`. To override user method behavior in specific tests, use `Source()` delegation.
+User method interceptors do not have `OnCall` because the protected method defines the behavior at compile time. If you need runtime-configurable behavior for specific tests, use a regular stub without user methods:
 
 <!-- snippet: user-methods-source-override -->
 ```cs
@@ -173,7 +175,7 @@ public void WhenOverrideNeeded_UseRegularStubWithOnCall()
 ```
 <!-- endSnippet -->
 
-The `Source()` method allows you to delegate to a different implementation for the entire interface. See the [Source Delegation guide](source-delegation.md) for details.
+User methods provide permanent compile-time behavior. If a test requires different behavior, create a separate stub class without user methods and use `OnCall` to configure it. See the [Methods guide](methods.md) for `OnCall` patterns.
 
 ---
 
@@ -247,5 +249,11 @@ public void MultipleCallsTrackedCorrectly()
 - They provide compile-time behavior that cannot be changed with `OnCall`
 - Interceptors provide tracking only: `Verify()`, `LastArg`, `Reset()`
 - No `OnCall` available on user method interceptors
-- To override behavior, use `Source()` delegation (see [Source Delegation guide](source-delegation.md))
+- If you need runtime-configurable behavior, use a regular stub without user methods
 - Ideal for shared test data and common "happy path" scenarios where behavior is constant
+
+Next: [Source Delegation](source-delegation.md) for partial stubbing patterns where you want to delegate to a real implementation.
+
+---
+
+**UPDATED:** 2026-01-25

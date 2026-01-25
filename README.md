@@ -63,8 +63,8 @@ public void KnockOff_CompileTimeSetup()
 
 - **Shared stubs** - Define once, use across entire project with per-test customization
 - **Source generation** - Zero reflection overhead, compile-time safety
-- **Explicit configuration** - Clear interceptor API (`OnCall`, `OnGet`, `OnSet`, `Value`)
-- **Verification** - Track call counts, arguments, and validate expected calls
+- **Flexible configuration** - Configure methods with `OnCall(callback)` or `OnCall(value)`, properties with `OnGet`/`OnSet`
+- **Verification** - Track call counts, capture arguments, validate with `Times` constraints
 - **Source delegation** - Delegate stub behavior to real implementations
 - **Three stub patterns** - Stand-alone, inline interface, and inline class
 
@@ -100,6 +100,10 @@ public class QuickStartCreateStubTests
 
 ### Configure Behavior
 
+Configure methods with `OnCall` using either a callback or a value:
+
+**Callback syntax** - Use when you need parameter-based logic:
+
 <!-- snippet: readme-quickstart-configure -->
 ```cs
 [Fact]
@@ -119,7 +123,77 @@ public void ConfigureStub_WithOnCall()
 ```
 <!-- endSnippet -->
 
+**Value syntax** - Simpler when returning a fixed value:
+
+<!-- snippet: getting-started-value-overloads -->
+```cs
+[Fact]
+public void GetById_ValueOverload_SimplerSyntax()
+{
+    var stub = new UserRepoStub();
+
+    // Value overload - pass the return value directly
+    stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+
+    // Callback syntax - use when you need argument-based logic
+    stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
+
+    IUserRepo repository = stub;
+    var user = repository.GetById(1);
+
+    Assert.Equal("Dynamic", user!.Name);
+}
+```
+<!-- endSnippet -->
+
+Both forms return a tracking object for verification and argument capture.
+
+**OnCall API Summary:**
+
+| Method Type           | Callback Form                | Value Form       | Returns                  |
+|-----------------------|------------------------------|------------------|--------------------------|
+| With return value     | `OnCall((args) => value)`    | `OnCall(value)`  | `IMethodTracking<TArg>` |
+| Void method           | `OnCall((args) => { })`      | N/A              | `IMethodTracking<TArg>` |
+
+Both forms return a tracking object that provides:
+- `.Verifiable()` and `.Verifiable(Times)` - Mark for batch verification
+- `.Verify()` and `.Verify(Times)` - Verify call count immediately
+- `.LastArg` or `.LastArgs` - Capture arguments from most recent call
+
+### Configure Properties
+
+Properties use `OnGet` and `OnSet` for configuration:
+
+<!-- snippet: getting-started-property-configuration -->
+```cs
+[Fact]
+public void Property_OnGetAndOnSet()
+{
+    var stub = new UserConfigStub();
+
+    // OnGet - configure what the getter returns
+    stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+
+    // OnSet - track or validate setter calls
+    User? capturedUser = null;
+    stub.CurrentUser.OnSet((user) => capturedUser = user);
+
+    IUserConfig config = stub;
+
+    // Reading uses OnGet
+    var user = config.CurrentUser;
+    Assert.Equal("Alice", user!.Name);
+
+    // Writing uses OnSet
+    config.CurrentUser = new User { Id = 2, Name = "Bob" };
+    Assert.Equal("Bob", capturedUser!.Name);
+}
+```
+<!-- endSnippet -->
+
 ### Verify Calls
+
+Mark methods with `.Verifiable()` and batch verify with `stub.Verify()`:
 
 <!-- snippet: readme-quickstart-verify -->
 ```cs
@@ -188,7 +262,7 @@ See the [Getting Started Guide](docs/getting-started.md) for detailed setup inst
 
 - **[Getting Started](docs/getting-started.md)** - Installation and your first stub
 - **[Stub Patterns](docs/guides/stub-patterns.md)** - Stand-alone, inline interface, and inline class patterns
-- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete reference for `OnCall`, `OnGet`, `OnSet`, and `Value`
+- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete reference for `OnCall`, `OnGet`, and `OnSet`
 - **[Source Delegation](docs/guides/source-delegation.md)** - Delegate stub behavior to real implementations
 - **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step guide for migrating existing tests
 - **[Migration from NSubstitute](docs/migration/from-nsubstitute.md)** - Honest comparison and migration guide
@@ -208,3 +282,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 - **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/NeatooDotNet/KnockOff/issues)
 - **Pull Requests**: Submit PRs for bug fixes, features, or documentation improvements
 - **Discussions**: Join the conversation in [GitHub Discussions](https://github.com/NeatooDotNet/KnockOff/discussions)
+
+---
+
+**UPDATED:** 2026-01-25

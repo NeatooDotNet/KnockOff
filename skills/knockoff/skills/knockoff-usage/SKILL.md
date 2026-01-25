@@ -4,6 +4,8 @@ description: This skill should be used when the user asks about "KnockOff stubs"
 version: 1.0.0
 ---
 
+[← Back to Skills](../) | [Commands](../../commands/) | [References](references/)
+
 # KnockOff Usage Guide
 
 KnockOff is a Roslyn Source Generator that creates reusable test stubs at compile time. The key benefit: define a stub class once and share it across your entire project, with each test configuring the same stub instance differently. Unlike runtime mocking frameworks that require per-test setup, KnockOff generates explicit implementations using partial classes—enabling stub reusability while providing compile-time safety and zero reflection overhead.
@@ -12,8 +14,8 @@ KnockOff is a Roslyn Source Generator that creates reusable test stubs at compil
 
 **Source-generated stubs:** Mark a class with `[KnockOff]` or `[KnockOff<T>]` and the generator creates:
 - Explicit interface implementations for all members
-- Interceptor objects for tracking calls and configuring behavior
-- Properties named after the interface for accessing interceptors
+- Interceptor classes for tracking calls and configuring behavior
+- Public interceptor properties for each interface member (named after the member: `GetById`, `SaveUser`, etc.)
 
 **Three patterns:** KnockOff supports three stub creation patterns. Choose based on reusability needs and target type.
 
@@ -25,59 +27,122 @@ KnockOff is a Roslyn Source Generator that creates reusable test stubs at compil
 
 Create a dedicated stub class implementing an interface. Best for reusable stubs shared across test files.
 
-```csharp
-[KnockOff]
-public partial class UserRepoStub : IUserRepo
+<!-- snippet: skill-standalone-pattern-define -->
+```cs
+public interface ISkillUserRepo
 {
-    // Generator fills in implementations
-    // Optionally add user methods for default behavior
+    User? GetById(int id);
+    void Save(User user);
 }
+
+[KnockOff]
+public partial class SkillUserRepoStub : ISkillUserRepo { }
 ```
+<!-- endSnippet -->
 
 **Usage:**
-```csharp
-var stub = new UserRepoStub();
-stub.GetUser.OnCall((id) => new User { Id = id });
-IUserRepo repo = stub;
+<!-- snippet: skill-standalone-pattern-usage -->
+```cs
+[Fact]
+public void StandaloneStub_ConfigureAndVerify()
+{
+    // Create the stub
+    var stub = new SkillUserRepoStub();
+
+    // Configure behavior
+    stub.GetById.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+    stub.Save.OnCall((user) => { }).Verifiable();
+
+    // Use as interface
+    ISkillUserRepo repo = stub;
+    var user = repo.GetById(42);
+    repo.Save(user!);
+
+    // Verify calls
+    stub.Verify();
+}
 ```
+<!-- endSnippet -->
 
 ### Inline Interface Pattern
 
 Generate a stub scoped to the test class. Best for test-local stubs with no extra files.
 
-```csharp
-[KnockOff<IUserRepo>]
-public partial class MyTests
+<!-- snippet: skill-inline-interface-pattern-define -->
+```cs
+[KnockOff<ISkillEmailSvc>]
+public partial class SkillEmailSvcTests
 {
-    // Generator creates Stubs.IUserRepo
+    // Generator creates Stubs.ISkillEmailSvc inside this class
 }
 ```
+<!-- endSnippet -->
 
 **Usage:**
-```csharp
-var stub = new Stubs.IUserRepo();
-stub.GetUser.OnCall((id) => new User { Id = id });
-IUserRepo repo = stub;
+<!-- snippet: skill-inline-interface-pattern-usage -->
+```cs
+[Fact]
+public void InlineInterfaceStub_ConfigureAndVerify()
+{
+    // Create stub from nested Stubs class
+    var stub = new Stubs.ISkillEmailSvc();
+
+    // Configure behavior
+    stub.Send.OnCall((to, subject) => true).Verifiable();
+
+    // Use as interface
+    ISkillEmailSvc email = stub;
+    var result = email.Send("test@example.com", "Hello");
+
+    // Verify
+    Assert.True(result);
+    stub.Verify();
+}
 ```
+<!-- endSnippet -->
 
 ### Inline Class Pattern
 
 Generate a stub for classes with virtual/abstract members. Best when stubbing classes without extracting interfaces.
 
-```csharp
-[KnockOff<UserServiceBase>]
-public partial class MyTests
+<!-- snippet: skill-inline-class-pattern-define -->
+```cs
+public class SkillDataSvc
 {
-    // Generator creates Stubs.UserServiceBase
+    public virtual string? GetData(int id) => null;
+    public virtual bool IsConnected { get; set; }
+}
+
+[KnockOff<SkillDataSvc>]
+public partial class SkillDataSvcTests
+{
+    // Generator creates Stubs.SkillDataSvc inside this class
 }
 ```
+<!-- endSnippet -->
 
 **Usage:**
-```csharp
-var stub = new Stubs.UserServiceBase();
-stub.GetUser.OnCall((id) => new User { Id = id });
-UserServiceBase service = stub.Object;  // Note: use .Object for class stubs
+<!-- snippet: skill-inline-class-pattern-usage -->
+```cs
+[Fact]
+public void InlineClassStub_UseObjectProperty()
+{
+    // Create stub from nested Stubs class
+    var stub = new Stubs.SkillDataSvc();
+
+    // Configure behavior
+    stub.GetData.OnCall((id) => $"Data-{id}").Verifiable();
+
+    // Use .Object to get the actual class instance
+    SkillDataSvc service = stub.Object;
+    var data = service.GetData(42);
+
+    // Verify
+    Assert.Equal("Data-42", data);
+    stub.Verify();
+}
 ```
+<!-- endSnippet -->
 
 ## Pattern Selection Guide
 
@@ -94,45 +159,33 @@ UserServiceBase service = stub.Object;  // Note: use .Object for class stubs
 
 Configure method return values and behavior using value or callback overloads:
 
-```csharp
-// Value overload - fixed return value
-stub.GetUser.OnCall(new User { Id = 42, Name = "Test" });
+<!-- snippet: skill-method-oncall-examples -->
+```cs
+// VALUE syntax - for fixed return values
+stub.GetValue.OnCall("default-value");
 
-// Callback overload - compute based on arguments
-stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test" });
+// CALLBACK syntax - for dynamic values based on arguments
+stub.GetValue.OnCall((key) => key == "debug" ? "true" : "false");
 
-// Void methods - callbacks for side effects
-stub.SaveUser.OnCall((user) => { /* side effects */ });
-
-// Async methods - value auto-wraps in Task
-stub.GetUserAsync.OnCall(new User { Id = 42, Name = "Alice" });
-
-// Async with callback - return unwrapped value
-stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Dynamic" });
-
-// Conditional logic in callbacks
-stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id } : null);
+// Void methods use Action callback
+stub.SetValue.OnCall((key, value) => { /* track or validate */ });
 ```
+<!-- endSnippet -->
 
-### Properties with Value, OnGet, and OnSet
+### Properties with OnGet and OnSet
 
-```csharp
-// Value property - simple backing value (most common)
-stub.ConnectionString.Value = "server=localhost";
+<!-- snippet: skill-property-configuration-examples -->
+```cs
+// OnGet with value - simplest syntax
+stub.Timeout.OnGet(30);
 
-// OnGet with value - fixed return value
-stub.IsConnected.OnGet(true);
+// OnGet with callback - for computed values
+stub.ApiKey.OnGet(() => Environment.GetEnvironmentVariable("API_KEY") ?? "test-key");
 
-// OnGet with callback - dynamic getter
-stub.IsConnected.OnGet(() => DateTime.Now.Hour < 18);
-
-// OnSet - track or validate setter calls
-stub.CurrentUser.OnSet((value) => { /* handle set */ });
-
-// Combined - both getter and setter
-stub.MaxRetries.OnGet(3);
-stub.MaxRetries.OnSet((value) => { /* validate */ });
+// OnSet - intercept property writes
+stub.ApiKey.OnSet((value) => { /* validate or track */ });
 ```
+<!-- endSnippet -->
 
 ## Verification
 
@@ -140,43 +193,53 @@ stub.MaxRetries.OnSet((value) => { /* validate */ });
 
 Mark members for batch verification:
 
-```csharp
-// Setup with Verifiable()
-stub.GetUser.OnCall((id) => user).Verifiable();
-stub.SaveUser.OnCall((u) => { }).Verifiable();
+<!-- snippet: skill-verifiable-batch -->
+```cs
+// Mark methods as verifiable
+stub.Log.OnCall((msg) => { }).Verifiable();
+stub.LogError.OnCall((msg) => { }).Verifiable();
 
-// Act
-repo.GetUser(1);
-repo.SaveUser(user);
+ISkillLogger logger = stub;
+logger.Log("Starting");
+logger.LogError("Oops");
 
-// Verify all marked members were called
+// Single Verify() checks all marked members
 stub.Verify();
 ```
+<!-- endSnippet -->
 
 ### Using Times Constraints
 
-```csharp
-var tracking = stub.GetUser.OnCall((id) => user).Verifiable();
+<!-- snippet: skill-times-constraints -->
+```cs
+// Verify specific call counts
+var tracking = stub.Log.OnCall((msg) => { });
 
-// After acting...
-tracking.Verify(Times.Once);           // Called exactly once
-tracking.Verify(Times.Twice);          // Called exactly twice
-tracking.Verify(Times.Exactly(3));     // Called exactly N times
-tracking.Verify(Times.AtLeastOnce);    // Called one or more times
-tracking.Verify(Times.AtLeast(3));     // Called N or more times
-tracking.Verify(Times.AtMost(5));      // Called N or fewer times
-tracking.Verify(Times.Never);          // Never called
+ISkillLogger logger = stub;
+logger.Log("First");
+logger.Log("Second");
+
+tracking.Verify(Times.Exactly(2));  // Exactly 2 calls
+tracking.Verify(Times.AtLeast(1));  // At least 1 call
+// Times.Once, Times.Never, Times.AtMost(n) also available
 ```
+<!-- endSnippet -->
 
 ### Accessing Call Arguments
 
-```csharp
-var tracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
+<!-- snippet: skill-accessing-arguments -->
+```cs
+var tracking = stub.Notify.OnCall((userId, message) => { });
 
-// After acting...
-var lastArgs = tracking.LastArgs;
-Assert.Equal("Alice", lastArgs.user.Name);
+ISkillNotifier notifier = stub;
+notifier.Notify(42, "Hello");
+
+// Access arguments from tracking object
+var (userId, message) = tracking.LastArgs;
+Assert.Equal(42, userId);
+Assert.Equal("Hello", message);
 ```
+<!-- endSnippet -->
 
 ## Best Practices
 
@@ -223,54 +286,52 @@ Assert.Equal("Alice", lastArgs.user.Name);
 
 **Problem:** Stub class not marked `partial` causes duplicate member errors.
 
-```csharp
-// Wrong
+<!-- snippet: skill-gotcha-missing-partial -->
+```cs
+// CORRECT: Include 'partial' keyword
 [KnockOff]
-class UserRepoStub : IUserRepo { }
-
-// Correct
-[KnockOff]
-partial class UserRepoStub : IUserRepo { }
+public partial class SkillFooStub : ISkillFoo { }
 ```
+<!-- endSnippet -->
 
 ### Wrong OnCall Signature
 
 **Problem:** Callback signature doesn't match method parameters.
 
-```csharp
-// Wrong - GetUser(int id) expects (int) callback
-stub.GetUser.OnCall(() => user);
-
-// Correct
-stub.GetUser.OnCall((id) => user);
+<!-- snippet: skill-gotcha-wrong-signature -->
+```cs
+// CORRECT: Callback signature matches method parameters exactly
+stub.Process.OnCall((int id, string name) => { /* ... */ });
 ```
+<!-- endSnippet -->
 
 ### Forgetting .Object for Class Stubs
 
 **Problem:** Using inline class stub directly instead of `.Object`.
 
-```csharp
-// Wrong - stub is a wrapper
-var service = new UserService(stub);
-
-// Correct - use .Object to get actual instance
-var service = new UserService(stub.Object);
+<!-- snippet: skill-gotcha-missing-object -->
+```cs
+// CORRECT: Use .Object for inline class stubs
+SkillAbstractBase service = stub.Object;
+_ = service.GetName();
 ```
+<!-- endSnippet -->
 
 ### Using Task.FromResult in Async Callbacks
 
 **No longer required:** KnockOff auto-wraps values for async methods.
 
-```csharp
-// Value overload - auto-wrapped (preferred)
-stub.GetUserAsync.OnCall(user);
+<!-- snippet: skill-gotcha-async-autowrap -->
+```cs
+// CORRECT: KnockOff auto-wraps - just pass the value directly
+stub.GetUserAsync.OnCall(new User { Id = 1, Name = "Alice" });
 
-// Callback - auto-wrapped (preferred)
-stub.GetUserAsync.OnCall((id) => user);
-
-// Explicit Task.FromResult - still works but unnecessary
-stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
+// No need for Task.FromResult with value overload
+ISkillAsyncSvc service = stub;
+var user = await service.GetUserAsync(1);
+Assert.Equal("Alice", user!.Name);
 ```
+<!-- endSnippet -->
 
 ## Moq Migration Quick Reference
 
@@ -279,7 +340,7 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
 | `new Mock<IFoo>()` | `new FooStub()` or `new Stubs.IFoo()` |
 | `mock.Object` | `stub` (direct) or `stub.Object` (class stubs) |
 | `.Setup(x => x.Method()).Returns(val)` | `stub.Method.OnCall(val)` or `stub.Method.OnCall(() => val)` |
-| `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.Value = val` or `stub.Prop.OnGet(val)` |
+| `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.OnGet(val)` |
 | `.ReturnsAsync(val)` | `stub.Method.OnCall(val)` (auto-wraps) |
 | `.Callback(x => ...)` | Logic inside OnCall callback |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` |
@@ -292,7 +353,7 @@ For detailed documentation, consult the reference files in `references/`:
 
 - **`references/patterns.md`** - Complete guide to all three stub patterns with examples
 - **`references/methods.md`** - Method interceptor configuration, verification, and argument capture
-- **`references/properties.md`** - Property interceptors with Value, OnGet, OnSet
+- **`references/properties.md`** - Property interceptors with OnGet, OnSet, and sequences
 - **`references/api-reference.md`** - Complete interceptor API (methods, properties, indexers, events, generics)
 - **`references/moq-migration.md`** - Step-by-step Moq to KnockOff migration guide
 
@@ -305,10 +366,15 @@ For detailed documentation, consult the reference files in `references/`:
 - Check for analyzer errors in build output
 
 **Interceptor property not found:**
-- Generated properties are named after the interface (e.g., `IUserRepo`)
-- For multiple interfaces, each gets its own property
+- Generated properties are named after each interface member (e.g., `GetById`, `SaveUser`)
+- For stand-alone stubs, interceptor properties are directly on the stub class
+- For inline stubs, access through the generated `Stubs` nested class
 - Check Generated/ folder for actual generated code
 
 **Type mismatch in OnCall:**
 - Ensure callback parameters match interface method signature exactly
 - For generic methods, specify type arguments explicitly
+
+---
+
+**UPDATED:** 2026-01-25

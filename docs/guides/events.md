@@ -1,3 +1,5 @@
+[Home](../../README.md) / [Guides](../guides/) / Events
+
 # Working with Events
 
 KnockOff generates event interceptors that let you raise events from your test stubs and verify subscription behavior. Event interceptors support `EventHandler`, `EventHandler<T>`, `Action`, `Action<T>`, and custom delegate types.
@@ -60,9 +62,9 @@ Assert.True(stub.OnCompleted.HasSubscribers);
 ```
 <!-- endSnippet -->
 
-### Counting Add Operations
+### Verifying Subscribe Operations
 
-Use `AddCount` to track how many times handlers have been added to the event.
+Use `VerifyAdd` to verify how many times handlers have been subscribed to the event.
 
 <!-- snippet: events-verify-addcount -->
 ```cs
@@ -78,7 +80,7 @@ stub.OnCompleted.VerifyAdd(Times.Exactly(2));
 
 ## Verifying Unsubscriptions
 
-Use `RemoveCount` to verify how many times handlers have been unsubscribed from the event.
+Use `VerifyRemove` to verify how many times handlers have been unsubscribed from the event.
 
 <!-- snippet: events-verify-unsubscribe -->
 ```cs
@@ -89,6 +91,29 @@ subscriber.OnCompleted -= handler;
 stub.OnCompleted.VerifyRemove(Times.Once);
 ```
 <!-- endSnippet -->
+
+---
+
+## Batch Verification with Verifiable
+
+Mark event interceptors with `Verifiable()` to include them in batch verification via `stub.Verify()`. This allows verifying multiple members at once instead of calling individual `Verify()` methods.
+
+<!-- snippet: events-verifiable -->
+```cs
+// Mark event for batch verification
+stub.OnCompleted.Verifiable();
+
+// Subscribe to the event (satisfies Verifiable)
+subscriber.OnCompleted += (sender, args) => { };
+
+// Verify() checks all members marked with .Verifiable()
+stub.Verify();
+```
+<!-- endSnippet -->
+
+**What Verifiable tracks**: The total event access count (add + remove operations combined). If you need to verify subscriptions and unsubscriptions separately, use `VerifyAdd(Times)` or `VerifyRemove(Times)` directly instead.
+
+**Default behavior**: Calling `.Verifiable()` without arguments marks the event to be verified with `Times.AtLeastOnce` when `stub.Verify()` is called.
 
 ---
 
@@ -109,7 +134,7 @@ Assert.False(stub.OnCompleted.HasSubscribers);
 ```
 <!-- endSnippet -->
 
-**Important**: After calling `Reset()`, both the tracking counters and subscribers are cleared, so `HasSubscribers` will return `false`.
+**Important**: After calling `Reset()`, both the tracking counters and active subscribers are cleared, so `HasSubscribers` will return `false`.
 
 ---
 
@@ -157,3 +182,7 @@ Assert.False(stub.DataReceived.HasSubscribers);
 - Learn about [method interceptors](methods.md) for verifying method calls
 - Explore [property interceptors](properties.md) for property access tracking
 - Review [interceptor API reference](../reference/interceptor-api.md) for all available members
+
+---
+
+**UPDATED:** 2026-01-25

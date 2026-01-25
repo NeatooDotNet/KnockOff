@@ -11,7 +11,7 @@ KnockOff determines what to return from a stub method using this priority:
 3. **Source** - Delegation to another instance via `Source(T)`
 4. **Smart default** - Automatic default value (this document)
 
-If none of the above are configured, KnockOff provides a sensible default value based on the return type.
+Smart defaults apply only when none of the higher-priority options (OnCall, user method, or Source) are configured.
 
 ---
 
@@ -320,3 +320,9 @@ stub.Source(realRepository);
 - [Interceptor API Reference](interceptor-api.md) - OnCall and other explicit configuration
 - [User Methods](../guides/user-methods.md) - Custom implementations
 - [Source Delegation](../guides/source-delegation.md) - Delegating to real instances
+- [Getting Started](../getting-started.md) - First steps with KnockOff
+- [Reference Documentation](../README.md) - Complete API reference
+
+---
+
+**UPDATED:** 2026-01-25

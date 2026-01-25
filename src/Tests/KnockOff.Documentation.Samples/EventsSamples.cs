@@ -131,6 +131,31 @@ public class SubscriptionVerificationTests
 }
 
 // =============================================================================
+// Batch Verification with Verifiable
+// =============================================================================
+
+public class EventVerifiableTests
+{
+    [Fact]
+    public void Verifiable_IncludesEventInBatchVerification()
+    {
+        var stub = new EventSubStub();
+        IEventSub subscriber = stub;
+
+        #region events-verifiable
+        // Mark event for batch verification
+        stub.OnCompleted.Verifiable();
+
+        // Subscribe to the event (satisfies Verifiable)
+        subscriber.OnCompleted += (sender, args) => { };
+
+        // Verify() checks all members marked with .Verifiable()
+        stub.Verify();
+        #endregion
+    }
+}
+
+// =============================================================================
 // Reset Events
 // =============================================================================
 

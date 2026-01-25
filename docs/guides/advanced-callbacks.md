@@ -1,3 +1,5 @@
+[Guides](../README.md#guides) > Advanced Callback Patterns
+
 # Advanced Callback Patterns
 
 When simple `OnCall` configuration isn't enough, callbacks give you complete control over stub behavior. This guide covers practical patterns for sequential returns, conditional logic, exceptions, state tracking, and side effects.
@@ -345,3 +347,7 @@ public void Cache_SimulatesRealisticBehavior()
 - **Keep tests readable**: Complex callbacks might indicate your test is doing too much—consider splitting it
 
 These patterns let you simulate sophisticated dependency behavior without needing heavyweight mocking frameworks or test doubles.
+
+---
+
+**UPDATED:** 2026-01-25

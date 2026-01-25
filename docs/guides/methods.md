@@ -1,3 +1,5 @@
+[Guides](../docs/guides) > Method Interceptors
+
 # Method Interceptors
 
 Method interceptors track calls, capture arguments, and configure return values for interface methods in your stub. Each method on the stubbed interface gets a corresponding interceptor property that provides verification and configuration capabilities.
@@ -14,52 +16,58 @@ Configure void methods using `OnCall` with an `Action` that matches the method p
 
 <!-- snippet: methods-oncall-void -->
 ```cs
-[Fact]
-public void VoidMethod_ConfiguredWithOnCall()
+// OnCall for void methods uses Action<...params>
+var logged = new List<string>();
+var tracking = stub.LogMessage.OnCall((message) =>
 {
-    var stub = new LogSvcMethodsStub();
+    logged.Add(message);
+});
 
-    // OnCall for void methods uses Action<...params>
-    var logged = new List<string>();
-    var tracking = stub.LogMessage.OnCall((message) =>
-    {
-        logged.Add(message);
-    });
+ILogSvcMethods logger = stub;
+logger.LogMessage("Hello, World!");
 
-    ILogSvcMethods logger = stub;
-    logger.LogMessage("Hello, World!");
-
-    Assert.Single(logged);
-    Assert.Equal("Hello, World!", logged[0]);
-    tracking.Verify();
-}
+Assert.Single(logged);
+Assert.Equal("Hello, World!", logged[0]);
+tracking.Verify();
 ```
 <!-- endSnippet -->
 
 ### Methods with Return Values
 
-Configure methods that return values using `OnCall` with a `Func` that matches the method's parameters and return type:
+Configure methods that return values using `OnCall`. You have two options:
+
+**1. Callback syntax** - Use a `Func` for dynamic values or conditional logic:
 
 <!-- snippet: methods-oncall-return -->
 ```cs
-[Fact]
-public void MethodWithReturn_ConfiguredWithOnCall()
-{
-    var stub = new LogSvcMethodsStub();
+// OnCall with return value: Func<...params, TReturn>
+var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
 
-    // OnCall with return value: Func<...params, TReturn>
-    var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
+ILogSvcMethods logger = stub;
+var name = logger.GetUserName(42);
 
-    ILogSvcMethods logger = stub;
-    var name = logger.GetUserName(42);
-
-    Assert.Equal("TestUser", name);
-    tracking.Verify();
-}
+Assert.Equal("TestUser", name);
+tracking.Verify();
 ```
 <!-- endSnippet -->
 
-The callback signature matches the method signature: one parameter (`userId`) returning a `string`.
+**2. Value syntax** - Pass the return value directly for fixed results:
+
+<!-- snippet: methods-oncall-value -->
+```cs
+// Value overload - simpler syntax when you don't need callback logic
+// Just pass the return value directly
+var tracking = stub.GetUserName.OnCall("StaticUser");
+
+ILogSvcMethods logger = stub;
+var name = logger.GetUserName(42);
+
+Assert.Equal("StaticUser", name);
+tracking.Verify();
+```
+<!-- endSnippet -->
+
+Choose the value syntax when returning a constant, or the callback syntax when you need to inspect parameters or apply logic.
 
 ### Methods with Multiple Parameters
 
@@ -67,23 +75,17 @@ The callback signature includes all method parameters in the same order:
 
 <!-- snippet: methods-oncall-multi-param -->
 ```cs
-[Fact]
-public void MethodWithMultipleParams_AllAvailableInOnCall()
-{
-    var stub = new AuthSvcMethodsStub();
+// All method parameters are passed to the callback in order
+var tracking = stub.ValidateCredentials.OnCall((username, password) =>
+    username == "admin" && password == "secret");
 
-    // All method parameters are passed to the callback in order
-    var tracking = stub.ValidateCredentials.OnCall((username, password) =>
-        username == "admin" && password == "secret");
+IAuthSvcMethods auth = stub;
 
-    IAuthSvcMethods auth = stub;
+Assert.True(auth.ValidateCredentials("admin", "secret"));
+Assert.False(auth.ValidateCredentials("user", "wrong"));
 
-    Assert.True(auth.ValidateCredentials("admin", "secret"));
-    Assert.False(auth.ValidateCredentials("user", "wrong"));
-
-    // Verify exactly 2 calls were made
-    tracking.Verify(Times.Exactly(2));
-}
+// Verify exactly 2 calls were made
+tracking.Verify(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -95,7 +97,7 @@ KnockOff provides two verification patterns:
 1. **Individual tracking**: Store the object returned by `OnCall` and call `.Verify()` on it
 2. **Batch verification**: Mark interceptors with `.Verifiable()` then call `stub.Verify()` once
 
-The tracking object returned by `OnCall` provides access to `Verify()`, `LastCallArg`/`LastCallArgs`, and call count information.
+The tracking object returned by `OnCall` provides access to `Verify()`, `LastArg`/`LastArgs`, and call count information.
 
 ### Using Verify()
 
@@ -103,18 +105,13 @@ Call `.Verify()` on the tracking object returned by `OnCall` to verify that spec
 
 <!-- snippet: methods-verify-wascalled -->
 ```cs
-[Fact]
-public void Verify_VerifiesMethodInvocation()
-{
-    var stub = new SaveRepoMethodsStub();
-    stub.Save.OnCall((entity) => { }).Verifiable();
+stub.Save.OnCall((entity) => { }).Verifiable();
 
-    ISaveRepoMethods repository = stub;
-    repository.Save(new User { Id = 1 });
+ISaveRepoMethods repository = stub;
+repository.Save(new User { Id = 1 });
 
-    // Verify() checks all members marked with .Verifiable()
-    stub.Verify();
-}
+// Verify() checks all members marked with .Verifiable()
+stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -124,24 +121,19 @@ Use `Times` to specify exact call count requirements. Available options include 
 
 <!-- snippet: methods-verify-callcount -->
 ```cs
-[Fact]
-public void Verify_ExactCallCount()
+var tracking = stub.Notify.OnCall((message) => { });
+
+INotifierMethods notifier = stub;
+
+// Simulate processing a 2-item collection
+var items = new[] { "item1", "item2" };
+foreach (var item in items)
 {
-    var stub = new NotifierMethodsStub();
-    var tracking = stub.Notify.OnCall((message) => { });
-
-    INotifierMethods notifier = stub;
-
-    // Simulate processing a 2-item collection
-    var items = new[] { "item1", "item2" };
-    foreach (var item in items)
-    {
-        notifier.Notify($"Processing {item}");
-    }
-
-    // Verify exactly 2 calls (throws if different)
-    tracking.Verify(Times.Exactly(2));
+    notifier.Notify($"Processing {item}");
 }
+
+// Verify exactly 2 calls (throws if different)
+tracking.Verify(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -151,22 +143,16 @@ For batch verification of multiple methods, mark each with `.Verifiable()` then 
 
 <!-- snippet: methods-verify-verifiable -->
 ```cs
-[Fact]
-public void Verifiable_BatchVerification()
-{
-    var stub = new SaveRepoMethodsStub();
+// Mark expected calls
+stub.Save.OnCall((entity) => { }).Verifiable(Times.Once);
+stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 
-    // Mark expected calls
-    stub.Save.OnCall((entity) => { }).Verifiable(Times.Once);
-    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+ISaveRepoMethods repository = stub;
+repository.Save(new User { Id = 1 });
+repository.GetById(1);
 
-    ISaveRepoMethods repository = stub;
-    repository.Save(new User { Id = 1 });
-    repository.GetById(1);
-
-    // Verify all marked methods (throws if any not called correctly)
-    stub.Verify();
-}
+// Verify all marked methods (throws if any not called correctly)
+stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -176,46 +162,36 @@ public void Verifiable_BatchVerification()
 
 ### Single Parameter Methods
 
-Access the last call's argument using `LastCallArg`:
+Access the last call's argument using `LastArg`:
 
 <!-- snippet: methods-capture-single -->
 ```cs
-[Fact]
-public void LastArg_CapturesSingleParameter()
-{
-    var stub = new UserRepoMethodsStub();
-    var tracking = stub.GetUser.OnCall((userId) => new User { Id = userId });
+var tracking = stub.GetUser.OnCall((userId) => new User { Id = userId });
 
-    IUserRepoMethods repository = stub;
-    repository.GetUser(42);
+IUserRepoMethods repository = stub;
+repository.GetUser(42);
 
-    // LastArg captures the most recent call's argument (from tracking)
-    int capturedId = tracking.LastArg;
-    Assert.Equal(42, capturedId);
-}
+// LastArg captures the most recent call's argument (from tracking)
+int capturedId = tracking.LastArg;
+Assert.Equal(42, capturedId);
 ```
 <!-- endSnippet -->
 
 ### Multiple Parameter Methods
 
-Access arguments using the `LastCallArgs` named tuple:
+Access arguments using the `LastArgs` named tuple:
 
 <!-- snippet: methods-capture-multiple -->
 ```cs
-[Fact]
-public void LastArgs_CapturesAllParameters()
-{
-    var stub = new AuthSvcMethodsStub();
-    var tracking = stub.ValidateCredentials.OnCall((username, password) => true);
+var tracking = stub.ValidateCredentials.OnCall((username, password) => true);
 
-    IAuthSvcMethods auth = stub;
-    auth.ValidateCredentials("admin", "secret123");
+IAuthSvcMethods auth = stub;
+auth.ValidateCredentials("admin", "secret123");
 
-    // LastArgs is a named tuple with all parameters (from tracking)
-    var (username, password) = tracking.LastArgs;
-    Assert.Equal("admin", username);
-    Assert.Equal("secret123", password);
-}
+// LastArgs is a named tuple with all parameters (from tracking)
+var (username, password) = tracking.LastArgs;
+Assert.Equal("admin", username);
+Assert.Equal("secret123", password);
 ```
 <!-- endSnippet -->
 
@@ -227,34 +203,28 @@ When an interface has overloaded methods, KnockOff generates numbered suffixes f
 
 <!-- snippet: methods-overloads -->
 ```cs
-[Fact]
-public void Overloads_DistinguishedByCallbackSignature()
-{
-    var stub = new SearchRepoStub();
+// Overloads are distinguished by the callback parameter types
+// The fully-typed lambda tells KnockOff which overload to configure
+var findAllTracking = stub.Find.OnCall(() =>
+    new List<User>()).Verifiable();
+var findByIdTracking = stub.Find.OnCall((int id) =>
+    new User { Id = id, Name = "ById" }).Verifiable();
+var findByNameTracking = stub.Find.OnCall((string name) =>
+    new User { Id = 1, Name = name }).Verifiable();
 
-    // Overloads are distinguished by the callback parameter types
-    // The fully-typed lambda tells KnockOff which overload to configure
-    var findAllTracking = stub.Find.OnCall(() =>
-        new List<User>()).Verifiable();
-    var findByIdTracking = stub.Find.OnCall((int id) =>
-        new User { Id = id, Name = "ById" }).Verifiable();
-    var findByNameTracking = stub.Find.OnCall((string name) =>
-        new User { Id = 1, Name = name }).Verifiable();
+ISearchRepo repo = stub;
 
-    ISearchRepo repo = stub;
+// Call each overload
+repo.Find();
+repo.Find(42);
+repo.Find("Alice");
 
-    // Call each overload
-    repo.Find();
-    repo.Find(42);
-    repo.Find("Alice");
+// Verify all overloads were called
+stub.Verify();
 
-    // Verify all overloads were called
-    stub.Verify();
-
-    // Access last arguments via tracking objects
-    Assert.Equal(42, findByIdTracking.LastArg);
-    Assert.Equal("Alice", findByNameTracking.LastArg);
-}
+// Access last arguments via tracking objects
+Assert.Equal(42, findByIdTracking.LastArg);
+Assert.Equal("Alice", findByNameTracking.LastArg);
 ```
 <!-- endSnippet -->
 
@@ -268,24 +238,19 @@ Clear tracking state and remove callbacks using `Reset()`:
 
 <!-- snippet: methods-reset -->
 ```cs
-[Fact]
-public void Reset_ClearsTrackingState()
-{
-    var stub = new ProcessorMethodsStub();
-    var tracking = stub.ProcessData.OnCall((data) => { });
+var tracking = stub.ProcessData.OnCall((data) => { });
 
-    IProcessorMethods processor = stub;
-    processor.ProcessData("initial");
+IProcessorMethods processor = stub;
+processor.ProcessData("initial");
 
-    // Verify one call was made
-    tracking.Verify(Times.Once);
+// Verify one call was made
+tracking.Verify(Times.Once);
 
-    // Reset clears CallCount on the interceptor
-    stub.ProcessData.Reset();
+// Reset clears CallCount on the interceptor
+stub.ProcessData.Reset();
 
-    // After reset, Verify(Times.Never) passes via tracking
-    tracking.Verify(Times.Never);
-}
+// After reset, Verify(Times.Never) passes via tracking
+tracking.Verify(Times.Never);
 ```
 <!-- endSnippet -->
 
@@ -299,34 +264,30 @@ This example demonstrates method configuration, argument capturing, and verifica
 
 <!-- snippet: methods-complete-example -->
 ```cs
-[Fact]
-public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
-{
-    // Arrange
-    var stub = new CompleteUserRepoStub();
+// Arrange
+var stub = new CompleteUserRepoStub();
 
-    var testUser = new User { Id = 1, Name = "Alice", Email = "old@test.com" };
-    var getTracking = stub.GetUser.OnCall((id) => id == 1 ? testUser : null).Verifiable();
-    var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
+var testUser = new User { Id = 1, Name = "Alice", Email = "old@test.com" };
+var getTracking = stub.GetUser.OnCall((id) => id == 1 ? testUser : null).Verifiable();
+var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
 
-    var service = new UserService(stub);
+var service = new UserService(stub);
 
-    // Act
-    var result = service.UpdateUserEmail(1, "new@test.com");
+// Act
+var result = service.UpdateUserEmail(1, "new@test.com");
 
-    // Assert
-    Assert.True(result);
+// Assert
+Assert.True(result);
 
-    // Verify both methods were called
-    stub.Verify();
+// Verify both methods were called
+stub.Verify();
 
-    // Verify GetUser was called with correct ID
-    Assert.Equal(1, getTracking.LastArg);
+// Verify GetUser was called with correct ID
+Assert.Equal(1, getTracking.LastArg);
 
-    // Verify saved user has new email via the tracking args
-    var savedUser = saveTracking.LastArg;
-    Assert.Equal("new@test.com", savedUser.Email);
-}
+// Verify saved user has new email via the tracking args
+var savedUser = saveTracking.LastArg;
+Assert.Equal("new@test.com", savedUser.Email);
 ```
 <!-- endSnippet -->
 
@@ -334,11 +295,16 @@ public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
 
 ## Key Takeaways
 
+- **OnCall options**: Use `OnCall(callback)` for dynamic values or `OnCall(value)` for fixed return values
 - **OnCall signature**: Callback matches method signature—receives only the method parameters
 - **Verification patterns**: Individual tracking with `tracking.Verify(Times)` or batch verification with `.Verifiable()` then `stub.Verify()`
 - **Times options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`
-- **Argument capture**: `LastCallArg` for single parameters, `LastCallArgs` tuple for multiple
+- **Argument capture**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Configure using fully-typed lambda to distinguish which overload
 - **Reset**: Clears call count, captured arguments, and removes callbacks
 
 Next: [Property Interceptors](properties.md) for get/set tracking and configuration.
+
+---
+
+**UPDATED:** 2026-01-25

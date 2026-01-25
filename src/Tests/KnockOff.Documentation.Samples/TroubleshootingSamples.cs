@@ -13,8 +13,8 @@ public interface ITroubleshootRepo
 
 public interface IConfigSvc
 {
-    string Host { get; set; }
-    int Port { get; set; }
+    string Host { get; }
+    int Port { get; }
 }
 
 public class EmailService
@@ -22,11 +22,7 @@ public class EmailService
     public virtual bool Send(string to, string subject) => false;
 }
 
-// =============================================================================
-// Stubs for Troubleshooting Samples
-// =============================================================================
-
-// Correct: partial keyword is required
+// A stub that demonstrates the correct pattern
 [KnockOff]
 public partial class TroubleshootRepoStub : ITroubleshootRepo { }
 
@@ -35,10 +31,10 @@ public partial class ConfigSvcStub : IConfigSvc { }
 
 // Class stub for .Object property demonstration
 [KnockOff<EmailService>]
-public partial class EmailServiceTests { }
+public partial class TroubleshootEmailServiceTests { }
 
 // =============================================================================
-// Partial Keyword Required
+// Issue: Missing Partial Keyword
 // =============================================================================
 
 #region troubleshoot-partial
@@ -50,27 +46,11 @@ public partial class EmailServiceTests { }
 public partial class TroubleshootGoodStub : ITroubleshootRepo { }
 #endregion
 
-public class PartialKeywordTests
-{
-    [Fact]
-    public void PartialKeyword_AllowsGeneratedCodeToMerge()
-    {
-        // TroubleshootGoodStub compiles because it's partial
-        var stub = new TroubleshootGoodStub();
-        stub.GetById.OnCall((id) => new User { Id = id });
-
-        ITroubleshootRepo repository = stub;
-        var user = repository.GetById(1);
-
-        Assert.NotNull(user);
-    }
-}
-
 // =============================================================================
-// Object Property for Class Stubs
+// Issue: Class Stubs Need .Object Property
 // =============================================================================
 
-public partial class EmailServiceTests
+public partial class TroubleshootEmailServiceTests
 {
     #region troubleshoot-object
     [Fact]
@@ -114,7 +94,7 @@ public partial class EmailServiceTests
 }
 
 // =============================================================================
-// OnCall Signature - Parameter Types
+// Issue: OnCall Signature Must Match Method Parameters
 // =============================================================================
 
 public class OnCallSignatureTests
@@ -142,10 +122,38 @@ public class OnCallSignatureTests
 }
 
 // =============================================================================
-// No Callback Configured
+// Using OnCall with Static Values
 // =============================================================================
 
-public class NoCallbackConfiguredTests
+public class OnCallValueTests
+{
+    #region troubleshoot-oncall-value
+    [Fact]
+    public void OnCall_WithStaticValue()
+    {
+        var stub = new TroubleshootRepoStub();
+
+        // Instead of: stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
+        // Use OnCall(value) when the return value doesn't depend on parameters:
+        stub.GetById.OnCall(new User { Id = 999, Name = "Static User" });
+
+        ITroubleshootRepo repository = stub;
+        var user1 = repository.GetById(1);
+        var user2 = repository.GetById(2);
+
+        // Both calls return the same value
+        Assert.Equal(999, user1?.Id);
+        Assert.Equal(999, user2?.Id);
+        Assert.Equal("Static User", user1?.Name);
+    }
+    #endregion
+}
+
+// =============================================================================
+// Issue: No Callback Configured
+// =============================================================================
+
+public class NoCallbackTests
 {
     #region troubleshoot-no-callback
     [Fact]
@@ -187,7 +195,7 @@ public class NoCallbackConfiguredTests
 }
 
 // =============================================================================
-// OnGet Priority
+// Issue: OnGet Priority
 // =============================================================================
 
 public class OnGetPriorityTests
@@ -245,7 +253,7 @@ public class OnGetPriorityTests
 }
 
 // =============================================================================
-// Reset Behavior
+// Issue: Reset Behavior
 // =============================================================================
 
 public class ResetBehaviorTests
@@ -294,7 +302,7 @@ public class ResetBehaviorTests
 }
 
 // =============================================================================
-// Build Commands
+// Build Commands (for documentation reference)
 // =============================================================================
 
 #region troubleshoot-build-commands
@@ -304,4 +312,301 @@ public class ResetBehaviorTests
 // If issues persist, clean first:
 // dotnet clean
 // dotnet build
+#endregion
+
+// =============================================================================
+// Additional Troubleshooting Samples (preserved from original)
+// =============================================================================
+
+public interface IUserService
+{
+    User GetUser(int id, bool includeDeleted);
+    Task<User?> GetUserAsync(int id);
+    Task SaveAsync(User user);
+}
+
+public interface IFoo
+{
+    void DoWork();
+}
+
+public interface IBar
+{
+    void DoWork();
+}
+
+public interface IReadOnlyConfig
+{
+    string Version { get; }
+}
+
+public interface IReadWriteConfig
+{
+    string Version { get; set; }
+}
+
+// A service that depends on IUserService for verification tests
+public class NotificationService
+{
+    private readonly IUserService _userService;
+
+    public NotificationService(IUserService userService)
+    {
+        _userService = userService;
+    }
+
+    public async Task NotifyUser(int userId)
+    {
+        var user = await _userService.GetUserAsync(userId);
+        if (user != null)
+        {
+            // Notification logic
+        }
+    }
+}
+
+[KnockOff]
+public partial class UserServiceStub : IUserService { }
+
+[KnockOff]
+public partial class FooStub : IFoo { }
+
+[KnockOff]
+public partial class BarStub : IBar { }
+
+[KnockOff]
+public partial class ReadOnlyConfigStub : IReadOnlyConfig { }
+
+[KnockOff]
+public partial class ReadWriteConfigStub : IReadWriteConfig { }
+
+// =============================================================================
+// Additional Samples (used by skills/commands documentation)
+// =============================================================================
+
+#region troubleshoot-missing-partial-before
+// ERROR: Without `partial`, you get CS0102 duplicate member errors
+// public class MyStub : IUserService { }
+#endregion
+
+#region troubleshoot-missing-partial-after
+// CORRECT: Add `partial` keyword to class declaration
+[KnockOff]
+public partial class CorrectUserServiceStub : IUserService { }
+#endregion
+
+public class OnCallSignatureAdditionalTests
+{
+    [Fact]
+    public void OnCallSignature_WrongAndCorrect()
+    {
+        var stub = new UserServiceStub();
+
+        #region troubleshoot-oncall-signature-wrong
+        // Interface method: User GetUser(int id, bool includeDeleted)
+
+        // ERROR: Wrong - no parameters (CS1593)
+        // stub.GetUser.OnCall(() => new User());
+
+        // ERROR: Wrong - only one parameter (CS1593)
+        // stub.GetUser.OnCall((id) => new User());
+        #endregion
+
+        #region troubleshoot-oncall-signature-correct
+        // CORRECT: Match all parameters from method signature
+        stub.GetUser.OnCall((int id, bool includeDeleted) =>
+            new User { Id = id, Name = includeDeleted ? "All" : "Active" });
+        #endregion
+
+        IUserService service = stub;
+        var user = service.GetUser(1, false);
+        Assert.NotNull(user);
+        Assert.Equal(1, user.Id);
+    }
+}
+
+// Class stub for .Object property demonstration (additional)
+[KnockOff<EmailService>]
+public partial class EmailServiceAdditionalTests { }
+
+public partial class EmailServiceAdditionalTests
+{
+    #region troubleshoot-class-stub-wrong
+    // When stubbing a CLASS (not interface), assignment fails:
+    // var stub = new Stubs.EmailService();
+    // EmailService service = stub;  // ERROR: Cannot convert Stubs.EmailService to EmailService
+    #endregion
+
+    #region troubleshoot-class-stub-correct
+    [Fact]
+    public void ClassStub_UseObjectProperty()
+    {
+        var stub = new Stubs.EmailService();
+        stub.Send.OnCall((to, subject) => true);
+
+        // Use .Object to get the typed instance
+        EmailService service = stub.Object;
+
+        var result = service.Send("test@example.com", "Hello");
+        Assert.True(result);
+    }
+    #endregion
+}
+
+public class AsyncReturnTests
+{
+    [Fact]
+    public void AsyncReturn_WrongAndCorrect()
+    {
+        var stub = new UserServiceStub();
+
+        #region troubleshoot-async-return-wrong
+        // Interface: Task<User?> GetUserAsync(int id)
+
+        // ERROR: Returning unwrapped value (CS0029)
+        // stub.GetUserAsync.OnCall((id) => new User());
+        #endregion
+
+        #region troubleshoot-async-return-correct
+        // CORRECT: Return Task.FromResult for async methods
+        stub.GetUserAsync.OnCall((int id) =>
+            Task.FromResult<User?>(new User { Id = id }));
+
+        // For Task (void async), use Task.CompletedTask:
+        stub.SaveAsync.OnCall((user) => Task.CompletedTask);
+        #endregion
+
+        IUserService service = stub;
+        var result = service.GetUserAsync(1).Result;
+        Assert.NotNull(result);
+    }
+}
+
+public class VerificationTests
+{
+    #region troubleshoot-verification-setup-order
+    [Fact]
+    public void Verification_SetupBeforeAct()
+    {
+        var stub = new UserServiceStub();
+
+        // ARRANGE: Configure OnCall with Verifiable BEFORE acting
+        stub.GetUserAsync.OnCall((id) =>
+            Task.FromResult<User?>(new User { Id = id }))
+            .Verifiable();
+
+        IUserService service = stub;
+
+        // ACT: Call the method
+        service.GetUserAsync(42).Wait();
+
+        // ASSERT: Verify the call was made
+        stub.Verify();
+    }
+    #endregion
+
+    #region troubleshoot-verification-same-instance
+    [Fact]
+    public void Verification_SameInstanceThroughout()
+    {
+        // Create stub once
+        var stub = new UserServiceStub();
+
+        // Configure the stub
+        stub.GetUserAsync.OnCall((id) =>
+            Task.FromResult<User?>(new User { Id = id }))
+            .Verifiable();
+
+        // Pass same stub to service constructor
+        var service = new NotificationService(stub);
+
+        // Act via the service (which uses the stub)
+        service.NotifyUser(1).Wait();
+
+        // Verify on the original stub instance
+        stub.Verify();
+    }
+    #endregion
+}
+
+// Stub implementing multiple interfaces with same method name
+public interface IBoth : IFoo, IBar { }
+
+[KnockOff]
+public partial class BothStub : IBoth { }
+
+public class MultipleInterfaceTests
+{
+    #region troubleshoot-multiple-interfaces
+    [Fact]
+    public void MultipleInterfaces_SharedInterceptor()
+    {
+        var stub = new BothStub();
+
+        // When multiple interfaces share the same method signature,
+        // KnockOff generates a single shared interceptor
+        stub.DoWork.OnCall(() => { }).Verifiable();
+
+        // Calls through either interface use the same interceptor
+        IFoo foo = stub;
+        foo.DoWork();
+
+        IBar bar = stub;
+        bar.DoWork();
+
+        // Verify tracks calls from both interfaces combined
+        stub.DoWork.Verify(Times.Exactly(2));
+    }
+    #endregion
+}
+
+public class PropertySetterTests
+{
+    #region troubleshoot-property-readonly
+    [Fact]
+    public void Property_ReadOnlyVsReadWrite()
+    {
+        // Read-only property (get only in interface): Only OnGet available
+        var readOnlyStub = new ReadOnlyConfigStub();
+        readOnlyStub.Version.OnGet("1.0.0");
+
+        IReadOnlyConfig readOnlyConfig = readOnlyStub;
+        Assert.Equal("1.0.0", readOnlyConfig.Version);
+
+        // Read-write property ({ get; set; } in interface): OnGet AND OnSet available
+        var readWriteStub = new ReadWriteConfigStub();
+        readWriteStub.Version.OnGet("2.0.0");
+
+        IReadWriteConfig readWriteConfig = readWriteStub;
+
+        // Read the property (triggers get)
+        var version = readWriteConfig.Version;
+        Assert.Equal("2.0.0", version);
+
+        // Write the property (triggers set)
+        readWriteConfig.Version = "3.0.0";
+
+        // Can verify both get and set
+        readWriteStub.Version.VerifyGet(Times.Once);
+        readWriteStub.Version.VerifySet(Times.Once);
+    }
+    #endregion
+}
+
+#region troubleshoot-internals-visible-to
+// In your SOURCE project (not test project), add to AssemblyInfo.cs or .csproj:
+//
+// AssemblyInfo.cs:
+// [assembly: InternalsVisibleTo("YourTestProject")]
+//
+// Or in .csproj:
+// <ItemGroup>
+//   <InternalsVisibleToSuffix Include="YourTestProject" />
+// </ItemGroup>
+//
+// Then internal interfaces can be stubbed in your test project:
+// internal interface IInternalService { }
+//
+// [KnockOff]
+// public partial class InternalServiceStub : IInternalService { }
 #endregion

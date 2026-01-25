@@ -4,9 +4,25 @@ argument-hint: [file-path]
 allowed-tools: Read, Write, Edit, Glob, Grep, AskUserQuestion
 ---
 
-Migrate Moq-based tests to KnockOff. Follow this workflow:
+# Migrate from Moq to KnockOff
 
-## Step 1: Find Moq Usage
+**Navigation:** [KnockOff Usage](../skills/knockoff-usage/) > Commands > Migrate from Moq
+
+Convert Moq-based unit tests to use KnockOff stubs. This command analyzes your test files, identifies Moq patterns, and transforms them into equivalent KnockOff code.
+
+## What This Command Does
+
+This automated migration tool:
+- Scans for Moq usage in test files
+- Analyzes mock declarations, setups, callbacks, and verifications
+- Creates KnockOff stub classes (Stand-Alone or Inline pattern)
+- Transforms Moq fluent API calls to KnockOff callback syntax
+- Updates using statements
+- Preserves test behavior while improving readability
+
+## Migration Workflow
+
+### Step 1: Find Moq Usage
 
 If $ARGUMENTS is provided, read that file.
 Otherwise, search for Moq usage in the codebase:
@@ -17,7 +33,7 @@ Grep for: "using Moq" or "new Mock<" or "mock.Setup"
 
 Present found files and ask which to migrate.
 
-## Step 2: Analyze Moq Patterns
+### Step 2: Analyze Moq Patterns
 
 Read the target file and identify:
 
@@ -29,7 +45,7 @@ Read the target file and identify:
 6. **Verifications**: `.Verify(x => x.Method(), Times.Once())`
 7. **Verifiable chains**: `.Verifiable()` + `mock.Verify()`
 
-## Step 3: Create KnockOff Stubs
+### Step 3: Create KnockOff Stubs
 
 For each `Mock<IInterface>` found:
 
@@ -38,104 +54,154 @@ For each `Mock<IInterface>` found:
 3. For Stand-Alone: Create `{InterfaceName}Stub.cs` file
 4. For Inline: Add `[KnockOff<IInterface>]` to test class
 
-## Step 4: Transform Patterns
+### Step 4: Transform Patterns
 
 Apply these transformations:
 
-### Mock Creation
-```csharp
-// Moq
-var mock = new Mock<IUserRepo>();
-IUserRepo repo = mock.Object;
+#### Mock Creation
 
-// KnockOff (Stand-Alone)
-var stub = new UserRepoStub();
-IUserRepo repo = stub;
+<!-- snippet: moq-to-knockoff-mock-creation -->
+```cs
+// MOQ:
+var mock = new Mock<IMoqUserRepo>();
+IMoqUserRepo moqRepo = mock.Object;
 
-// KnockOff (Inline)
-var stub = new Stubs.IUserRepo();
-IUserRepo repo = stub;
+// KNOCKOFF:
+var stub = new MoqUserRepoStub();
+IMoqUserRepo knockoffRepo = stub;
 ```
+<!-- endSnippet -->
 
-### Method Setup with Returns
-```csharp
-// Moq
-mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(user);
+#### Method Setup with Returns
 
-// KnockOff
-stub.GetUser.OnCall((id) => user);
+<!-- snippet: moq-to-knockoff-method-returns -->
+```cs
+// MOQ:
+var mock = new Mock<IMoqUserRepo>();
+mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(testUser);
+
+// KNOCKOFF:
+var stub = new MoqUserRepoStub();
+stub.GetUser.OnCall((id) => testUser);
 ```
+<!-- endSnippet -->
 
-### Property Setup
-```csharp
-// Moq
+#### Property Setup
+
+<!-- snippet: moq-to-knockoff-property-setup -->
+```cs
+// MOQ:
+var mock = new Mock<IMoqUserRepo>();
 mock.Setup(x => x.ConnectionString).Returns("server=localhost");
 
-// KnockOff
-stub.ConnectionString.Value = "server=localhost";
+// KNOCKOFF:
+var stub = new MoqUserRepoStub();
+stub.ConnectionString.OnGet("server=localhost");
 ```
+<!-- endSnippet -->
 
-### Async Methods
-```csharp
-// Moq
-mock.Setup(x => x.GetUserAsync(It.IsAny<int>())).ReturnsAsync(user);
+#### Async Methods
 
-// KnockOff
-stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
+<!-- snippet: moq-to-knockoff-async-methods -->
+```cs
+// MOQ:
+var mock = new Mock<IMoqUserRepo>();
+mock.Setup(x => x.GetUserAsync(It.IsAny<int>())).ReturnsAsync(testUser);
+
+// KNOCKOFF:
+var stub = new MoqUserRepoStub();
+stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 ```
+<!-- endSnippet -->
 
-### Callbacks
-```csharp
-// Moq
+#### Callbacks
+
+<!-- snippet: moq-to-knockoff-callbacks -->
+```cs
+// MOQ:
+var mock = new Mock<IMoqUserRepo>();
 mock.Setup(x => x.SaveUser(It.IsAny<User>()))
-    .Callback<User>(u => savedUsers.Add(u));
+    .Callback<User>(u => moqSavedUsers.Add(u));
 
-// KnockOff
-stub.SaveUser.OnCall((user) => {
-    savedUsers.Add(user);
+// KNOCKOFF:
+var stub = new MoqUserRepoStub();
+stub.SaveUser.OnCall((user) => knockoffSavedUsers.Add(user));
+```
+<!-- endSnippet -->
+
+#### Verification
+
+<!-- snippet: moq-to-knockoff-verification -->
+```cs
+// MOQ:
+var mock = new Mock<IMoqUserRepo>();
+mock.Object.SaveUser(new User { Name = "Bob" });
+mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Once());
+
+// KNOCKOFF (batch verification):
+var stub = new MoqUserRepoStub();
+stub.SaveUser.OnCall((user) => { }).Verifiable();
+((IMoqUserRepo)stub).SaveUser(new User { Name = "Bob" });
+stub.Verify();
+
+// KNOCKOFF (individual verification):
+var stub2 = new MoqUserRepoStub();
+var tracking = stub2.SaveUser.OnCall((user) => { });
+((IMoqUserRepo)stub2).SaveUser(new User { Name = "Bob" });
+tracking.Verify(Times.Once);
+```
+<!-- endSnippet -->
+
+#### Argument Matching
+
+<!-- snippet: moq-to-knockoff-argument-matching -->
+```cs
+// MOQ:
+var mock = new Mock<IMoqUserRepo>();
+mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
+    .Returns<int>(id => new User { Id = id, Name = "Valid" });
+
+// KNOCKOFF:
+var stub = new MoqUserRepoStub();
+stub.GetUser.OnCall((id) =>
+    id > 0 ? new User { Id = id, Name = "Valid" } : null);
+```
+<!-- endSnippet -->
+
+#### Sequence/SetupSequence
+
+<!-- snippet: moq-to-knockoff-sequence-pattern -->
+```cs
+// MOQ:
+var mock = new Mock<IMoqUserRepo>();
+mock.SetupSequence(x => x.GetUser(It.IsAny<int>()))
+    .Returns(firstUser)
+    .Returns(secondUser);
+
+// KNOCKOFF:
+var stub = new MoqUserRepoStub();
+int callCount = 0;
+stub.GetUser.OnCall((id) =>
+{
+    callCount++;
+    return callCount == 1 ? firstUser : secondUser;
 });
 ```
+<!-- endSnippet -->
 
-### Verification
-```csharp
-// Moq
-mock.Verify(x => x.SaveUser(It.IsAny<User>()), Times.Once());
+### Step 5: Update Using Statements
 
-// KnockOff - Option 1: With tracking
-var tracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
-// ... after act ...
-tracking.Verify(Times.Once);
+<!-- snippet: moq-to-knockoff-using-statements -->
+```cs
+// BEFORE (Moq):
+// using Moq;
 
-// KnockOff - Option 2: Batch verify
-stub.SaveUser.OnCall((user) => { }).Verifiable();
-// ... after act ...
-stub.Verify();
+// AFTER (KnockOff):
+// using KnockOff;
 ```
+<!-- endSnippet -->
 
-### Argument Matching
-```csharp
-// Moq
-mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
-    .Returns<int>(id => new User { Id = id });
-
-// KnockOff - conditional logic in callback
-stub.GetUser.OnCall((id) =>
-    id > 0 ? new User { Id = id } : null);
-```
-
-## Step 5: Update Using Statements
-
-Replace:
-```csharp
-using Moq;
-```
-
-With:
-```csharp
-using KnockOff;
-```
-
-## Step 6: Apply Changes
+### Step 6: Apply Changes
 
 Present the before/after for each transformation.
 Ask for confirmation before applying edits.
@@ -147,7 +213,7 @@ Use Edit tool to:
 4. Transform Verify calls
 5. Remove `.Object` where using interface stubs directly
 
-## Step 7: Verify Build
+### Step 7: Verify Build
 
 After migration, remind the user to:
 1. Build the project to trigger source generation
@@ -156,21 +222,49 @@ After migration, remind the user to:
 
 ## Common Issues to Watch For
 
-**Multiple setups for same method:**
-KnockOff uses last OnCall, not chained setups. Combine logic into single callback.
+### Multiple Setups for Same Method
 
-**It.IsAny<T>() patterns:**
-Remove these - KnockOff callbacks receive all arguments naturally.
+KnockOff uses the last OnCall, not chained setups. Combine logic into a single callback with conditional logic.
 
-**Sequence/SetupSequence:**
-KnockOff doesn't have built-in sequence support. Use stateful callbacks:
-```csharp
-var callCount = 0;
-stub.GetUser.OnCall((id) => {
-    callCount++;
-    return callCount == 1 ? user1 : user2;
-});
-```
+### It.IsAny<T>() Patterns
 
-**Mock<T> passed to constructors:**
+Remove these - KnockOff callbacks receive all arguments naturally through typed parameters.
+
+#### Sequence/SetupSequence
+
+KnockOff doesn't have built-in sequence support. See the sequence pattern example above - use stateful callbacks with counter variables.
+
+### Mock<T> Passed to Constructors
+
 Change `mock.Object` to just `stub` (for interfaces) or `stub.Object` (for classes).
+
+## Complete Migration Example
+
+This consolidated example shows a full test migration from Moq to KnockOff:
+
+<!-- snippet: moq-to-knockoff-complete-migration -->
+```cs
+// ========== MOQ VERSION ==========
+var mockRepo = new Mock<IMoqUserRepo>();
+var moqService = new UserServiceMigration(mockRepo.Object);
+
+var user = new User { Id = 1, Name = "Alice" };
+mockRepo.Setup(x => x.GetUserAsync(1)).ReturnsAsync(user);
+
+var moqResult = await moqService.GetUserAsync(1);
+mockRepo.Verify(x => x.GetUserAsync(1), Moq.Times.Once());
+
+// ========== KNOCKOFF VERSION ==========
+var stub = new MoqUserRepoStub();
+var knockoffService = new UserServiceMigration(stub);
+
+stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
+
+var knockoffResult = await knockoffService.GetUserAsync(1);
+stub.Verify();
+```
+<!-- endSnippet -->
+
+---
+
+**UPDATED:** 2026-01-25

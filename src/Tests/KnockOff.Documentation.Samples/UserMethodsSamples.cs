@@ -87,7 +87,7 @@ public class UserMethodOverrideTests
         Assert.True(isActive);
 
         // User method interceptors are tracking-only
-        // They don't have OnCall - use Source delegation to override
+        // They don't have OnCall - use a regular stub when you need OnCall
         stub.IsActive2.Verify(Times.Once);
         Assert.Equal(42, stub.IsActive2.LastArg);
     }
@@ -124,12 +124,12 @@ public class UserMethodResetTests
 }
 
 // =============================================================================
-// Source Override - Use a regular stub when you need override capability
+// Runtime-Configurable Behavior - Use a regular stub when OnCall is needed
 // =============================================================================
 
 /// <summary>
-/// When you need to override behavior, use a regular stub with OnCall
-/// instead of user methods. User methods are for permanent defaults.
+/// When you need runtime-configurable behavior, use a stub without user methods.
+/// User method interceptors don't have OnCall - the protected method IS the behavior.
 /// </summary>
 [KnockOff]
 public partial class OverridableRepoStub : IUserMethodsRepo { }

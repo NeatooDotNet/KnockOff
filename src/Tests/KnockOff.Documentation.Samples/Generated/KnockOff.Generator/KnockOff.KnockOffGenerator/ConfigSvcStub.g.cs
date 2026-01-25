@@ -11,9 +11,6 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Troubleshooting.IConfigSvc? _source;
 
-		private bool _valueSet;
-		private string _value = default!;
-
 		private global::System.Func<string>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
 		private global::System.Collections.Generic.List<(global::System.Func<string> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;
@@ -22,20 +19,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		private global::KnockOff.Times? _getVerifiableTimes;
 		private int _unconfiguredGetCount;
 
-		private global::System.Action<string>? _onSet;
-		private PropertySetTrackingImpl? _onSetTracking;
-		private global::System.Collections.Generic.List<(global::System.Action<string> Callback, PropertySetTrackingImpl Tracking)>? _setSequence;
-		private int _setSequenceIndex;
-		private bool _isSetVerifiable;
-		private global::KnockOff.Times? _setVerifiableTimes;
-		private int _unconfiguredSetCount;
-		private string? _unconfiguredLastSetValue;
-
 		private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
-		private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?.CallCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking.CallCount; return sum; } }
-
-		/// <summary>The value from the last setter call (from most recently called registration).</summary>
-		public string? LastSetValue { get { if ((_onSetTracking?.CallCount ?? 0) > 0) return _onSetTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking.CallCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; } }
 
 		/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<string> callback)
@@ -69,32 +53,6 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
 		public global::KnockOff.IPropertyGetSequence<string> OnGetSequence(string value) => OnGetSequence(() => value);
 
-		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
-		public global::KnockOff.IPropertySetTracking<string> OnSet(global::System.Action<string> callback)
-		{
-			_setSequence = null;
-			_setSequenceIndex = 0;
-			_isSetVerifiable = false;
-			_setVerifiableTimes = null;
-			_onSet = callback;
-			_onSetTracking = new PropertySetTrackingImpl(this);
-			return _onSetTracking;
-		}
-
-		/// <summary>Starts a setter callback sequence. Returns sequence for ThenSet chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IPropertySetSequence<string> OnSetSequence(global::System.Action<string> callback)
-		{
-			_onSet = null;
-			_onSetTracking = null;
-			_isSetVerifiable = false;
-			_setVerifiableTimes = null;
-			_setSequence = new global::System.Collections.Generic.List<(global::System.Action<string> Callback, PropertySetTrackingImpl Tracking)>();
-			var tracking = new PropertySetTrackingImpl(this);
-			_setSequence.Add((callback, tracking));
-			_setSequenceIndex = 0;
-			return new PropertySetSequenceImpl(this);
-		}
-
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal string InvokeGet(bool strict)
 		{
@@ -117,51 +75,16 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Host (get)");
-				return _valueSet ? _value : default!;
+				return "";
 			}
 
 			if (_source is { } src) return src.Host;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Host");
-			return _valueSet ? _value : default!;
+			return "";
 		}
 
-		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
-		internal void InvokeSet(bool strict, string value)
-		{
-			if (_setSequence != null && _setSequenceIndex < _setSequence.Count)
-			{
-				var (callback, tracking) = _setSequence[_setSequenceIndex];
-				tracking.RecordCall(value);
-				_setSequenceIndex++;
-				callback(value);
-				return;
-			}
-
-			if (_onSet != null && _onSetTracking != null)
-			{
-				_onSetTracking.RecordCall(value);
-				_onSet(value);
-				return;
-			}
-
-			_unconfiguredSetCount++;
-			_unconfiguredLastSetValue = value;
-
-			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
-			{
-				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Host (set)");
-				return;
-			}
-
-			if (_source is { } src) { src.Host = value; return; }
-
-			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Host");
-			_value = value;
-			_valueSet = true;
-		}
-
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -172,15 +95,6 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 					tracking.Reset();
 			}
 			_getSequenceIndex = 0;
-			_unconfiguredSetCount = 0;
-			_unconfiguredLastSetValue = default;
-			_onSetTracking?.Reset();
-			if (_setSequence != null)
-			{
-				foreach (var (_, tracking) in _setSequence)
-					tracking.Reset();
-			}
-			_setSequenceIndex = 0;
 			_source = null;
 		}
 
@@ -190,7 +104,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = TotalGetCount + TotalSetCount;
+			var totalCount = TotalGetCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Host", times, totalCount));
 		}
@@ -205,48 +119,26 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Host (get)", times, TotalGetCount));
 		}
 
-		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
-		public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);
-
-		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
-		public void VerifySet(global::KnockOff.Times times)
-		{
-			if (!times.Validate(TotalSetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Host (set)", times, TotalSetCount));
-		}
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-		public HostInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; _isSetVerifiable = true; _setVerifiableTimes = null; return this; }
+		public HostInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-		public HostInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times; return this; }
+		public HostInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
-		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
+		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			if (!(_isGetVerifiable || _isSetVerifiable)) return null;
-			if (_isGetVerifiable && _isSetVerifiable)
-			{
-				// Both marked verifiable - check combined count (either accessor satisfies)
-				var times = _getVerifiableTimes ?? _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = TotalGetCount + TotalSetCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Host", times, totalCount);
-			}
-			if (_isGetVerifiable && !_isSetVerifiable)
+			if (!(_isGetVerifiable)) return null;
+			if (_isGetVerifiable)
 			{
 				var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
 				if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("Host (get)", times, TotalGetCount);
-			}
-			if (_isSetVerifiable && !_isGetVerifiable)
-			{
-				var times = _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				if (!times.Validate(TotalSetCount)) return new global::KnockOff.VerificationFailure("Host (set)", times, TotalSetCount);
 			}
 			return null;
 		}
@@ -255,7 +147,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = TotalGetCount + TotalSetCount;
+			var totalCount = TotalGetCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Host", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 
@@ -341,90 +233,6 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 			}
 		}
 
-		/// <summary>Tracks invocations for setter callback registration.</summary>
-		private sealed class PropertySetTrackingImpl : global::KnockOff.IPropertySetTracking<string>
-		{
-			private readonly HostInterceptor _interceptor;
-
-			public PropertySetTrackingImpl(HostInterceptor interceptor) => _interceptor = interceptor;
-
-			private string _lastValue = default!;
-
-			internal int CallCount { get; private set; }
-
-			/// <summary>Last value passed to this setter callback. Default if never called.</summary>
-			public string LastValue => _lastValue;
-
-			/// <summary>Records a call to this callback.</summary>
-			public void RecordCall(string value) { CallCount++; _lastValue = value; }
-
-			/// <summary>Resets tracking state.</summary>
-			public void Reset() { CallCount = 0; _lastValue = default!; }
-
-			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
-			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
-
-			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
-			public void Verify(global::KnockOff.Times times)
-			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property setter", times, CallCount));
-			}
-
-			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IPropertySetTracking<string> Verifiable()
-			{
-				_interceptor._isSetVerifiable = true;
-				_interceptor._setVerifiableTimes = null;
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public global::KnockOff.IPropertySetTracking<string> Verifiable(global::KnockOff.Times times)
-			{
-				_interceptor._isSetVerifiable = true;
-				_interceptor._setVerifiableTimes = times;
-				return this;
-			}
-		}
-
-		/// <summary>Sequence implementation for ThenSet chaining.</summary>
-		private sealed class PropertySetSequenceImpl : global::KnockOff.IPropertySetSequence<string>
-		{
-			private readonly HostInterceptor _interceptor;
-
-			public PropertySetSequenceImpl(HostInterceptor interceptor) => _interceptor = interceptor;
-
-			/// <summary>Adds another setter callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IPropertySetSequence<string> ThenSet(global::System.Action<string> callback)
-			{
-				var tracking = new PropertySetTrackingImpl(_interceptor);
-				_interceptor._setSequence!.Add((callback, tracking));
-				return this;
-			}
-
-			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
-			public void Verify()
-			{
-				if (_interceptor._setSequence == null) return;
-				var sequenceLength = _interceptor._setSequence.Count;
-				var completedCount = _interceptor._setSequenceIndex;
-				if (completedCount < sequenceLength)
-					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property setter", sequenceLength, completedCount));
-			}
-
-			/// <summary>Resets all tracking in the sequence.</summary>
-			public void Reset() => _interceptor.Reset();
-
-			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IPropertySetSequence<string> Verifiable()
-			{
-				_interceptor._isSetVerifiable = true;
-				_interceptor._setVerifiableTimes = null;
-				return this;
-			}
-		}
-
 	}
 
 	/// <summary>Tracks and configures behavior for Port.</summary>
@@ -432,9 +240,6 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 	{
 		/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>
 		internal global::KnockOff.Documentation.Samples.Troubleshooting.IConfigSvc? _source;
-
-		private bool _valueSet;
-		private int _value = default!;
 
 		private global::System.Func<int>? _onGet;
 		private PropertyGetTrackingImpl? _onGetTracking;
@@ -444,20 +249,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		private global::KnockOff.Times? _getVerifiableTimes;
 		private int _unconfiguredGetCount;
 
-		private global::System.Action<int>? _onSet;
-		private PropertySetTrackingImpl? _onSetTracking;
-		private global::System.Collections.Generic.List<(global::System.Action<int> Callback, PropertySetTrackingImpl Tracking)>? _setSequence;
-		private int _setSequenceIndex;
-		private bool _isSetVerifiable;
-		private global::KnockOff.Times? _setVerifiableTimes;
-		private int _unconfiguredSetCount;
-		private int? _unconfiguredLastSetValue;
-
 		private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }
-		private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?.CallCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking.CallCount; return sum; } }
-
-		/// <summary>The value from the last setter call (from most recently called registration).</summary>
-		public int? LastSetValue { get { if ((_onSetTracking?.CallCount ?? 0) > 0) return _onSetTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking.CallCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; } }
 
 		/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>
 		public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<int> callback)
@@ -491,32 +283,6 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>
 		public global::KnockOff.IPropertyGetSequence<int> OnGetSequence(int value) => OnGetSequence(() => value);
 
-		/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>
-		public global::KnockOff.IPropertySetTracking<int> OnSet(global::System.Action<int> callback)
-		{
-			_setSequence = null;
-			_setSequenceIndex = 0;
-			_isSetVerifiable = false;
-			_setVerifiableTimes = null;
-			_onSet = callback;
-			_onSetTracking = new PropertySetTrackingImpl(this);
-			return _onSetTracking;
-		}
-
-		/// <summary>Starts a setter callback sequence. Returns sequence for ThenSet chaining. Each callback runs exactly once.</summary>
-		public global::KnockOff.IPropertySetSequence<int> OnSetSequence(global::System.Action<int> callback)
-		{
-			_onSet = null;
-			_onSetTracking = null;
-			_isSetVerifiable = false;
-			_setVerifiableTimes = null;
-			_setSequence = new global::System.Collections.Generic.List<(global::System.Action<int> Callback, PropertySetTrackingImpl Tracking)>();
-			var tracking = new PropertySetTrackingImpl(this);
-			_setSequence.Add((callback, tracking));
-			_setSequenceIndex = 0;
-			return new PropertySetSequenceImpl(this);
-		}
-
 		/// <summary>Invokes the configured getter callback. Called by explicit interface implementation.</summary>
 		internal int InvokeGet(bool strict)
 		{
@@ -539,51 +305,16 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 			if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)
 			{
 				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Port (get)");
-				return _valueSet ? _value : default!;
+				return default!;
 			}
 
 			if (_source is { } src) return src.Port;
 
 			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Port");
-			return _valueSet ? _value : default!;
+			return default!;
 		}
 
-		/// <summary>Invokes the configured setter callback. Called by explicit interface implementation.</summary>
-		internal void InvokeSet(bool strict, int value)
-		{
-			if (_setSequence != null && _setSequenceIndex < _setSequence.Count)
-			{
-				var (callback, tracking) = _setSequence[_setSequenceIndex];
-				tracking.RecordCall(value);
-				_setSequenceIndex++;
-				callback(value);
-				return;
-			}
-
-			if (_onSet != null && _onSetTracking != null)
-			{
-				_onSetTracking.RecordCall(value);
-				_onSet(value);
-				return;
-			}
-
-			_unconfiguredSetCount++;
-			_unconfiguredLastSetValue = value;
-
-			if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)
-			{
-				if (strict) throw global::KnockOff.StubException.SequenceExhausted("Port (set)");
-				return;
-			}
-
-			if (_source is { } src) { src.Port = value; return; }
-
-			if (strict) throw global::KnockOff.StubException.NotConfigured("", "Port");
-			_value = value;
-			_valueSet = true;
-		}
-
-		/// <summary>Resets tracking state but preserves configuration (Value, OnGet, OnSet) and verifiable marking.</summary>
+		/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>
 		public void Reset()
 		{
 			_unconfiguredGetCount = 0;
@@ -594,15 +325,6 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 					tracking.Reset();
 			}
 			_getSequenceIndex = 0;
-			_unconfiguredSetCount = 0;
-			_unconfiguredLastSetValue = default;
-			_onSetTracking?.Reset();
-			if (_setSequence != null)
-			{
-				foreach (var (_, tracking) in _setSequence)
-					tracking.Reset();
-			}
-			_setSequenceIndex = 0;
 			_source = null;
 		}
 
@@ -612,7 +334,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>
 		public void Verify(global::KnockOff.Times times)
 		{
-			var totalCount = TotalGetCount + TotalSetCount;
+			var totalCount = TotalGetCount;
 			if (!times.Validate(totalCount))
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Port", times, totalCount));
 		}
@@ -627,48 +349,26 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Port (get)", times, TotalGetCount));
 		}
 
-		/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>
-		public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);
-
-		/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>
-		public void VerifySet(global::KnockOff.Times times)
-		{
-			if (!times.Validate(TotalSetCount))
-				throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("Port (set)", times, TotalSetCount));
-		}
-
 		/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-		public PortInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; _isSetVerifiable = true; _setVerifiableTimes = null; return this; }
+		public PortInterceptor Verifiable() { _isGetVerifiable = true; _getVerifiableTimes = null; return this; }
 
 		/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-		public PortInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times; return this; }
+		public PortInterceptor Verifiable(global::KnockOff.Times times) { _isGetVerifiable = true; _getVerifiableTimes = times; return this; }
 
 		/// <summary>Whether this property was marked with Verifiable().</summary>
-		internal bool IsVerifiable => _isGetVerifiable || _isSetVerifiable;
+		internal bool IsVerifiable => _isGetVerifiable;
 
 		/// <summary>Whether this property has been configured.</summary>
-		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0 || _onSet != null || (_setSequence?.Count ?? 0) > 0;
+		internal bool IsConfigured => _onGet != null || (_getSequence?.Count ?? 0) > 0;
 
 		/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>
 		internal global::KnockOff.VerificationFailure? CheckVerification()
 		{
-			if (!(_isGetVerifiable || _isSetVerifiable)) return null;
-			if (_isGetVerifiable && _isSetVerifiable)
-			{
-				// Both marked verifiable - check combined count (either accessor satisfies)
-				var times = _getVerifiableTimes ?? _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				var totalCount = TotalGetCount + TotalSetCount;
-				return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure("Port", times, totalCount);
-			}
-			if (_isGetVerifiable && !_isSetVerifiable)
+			if (!(_isGetVerifiable)) return null;
+			if (_isGetVerifiable)
 			{
 				var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
 				if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure("Port (get)", times, TotalGetCount);
-			}
-			if (_isSetVerifiable && !_isGetVerifiable)
-			{
-				var times = _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;
-				if (!times.Validate(TotalSetCount)) return new global::KnockOff.VerificationFailure("Port (set)", times, TotalSetCount);
 			}
 			return null;
 		}
@@ -677,7 +377,7 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 		internal global::KnockOff.VerificationFailure? CheckVerificationAll()
 		{
 			if (!IsConfigured) return null;
-			var totalCount = TotalGetCount + TotalSetCount;
+			var totalCount = TotalGetCount;
 			return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure("Port", global::KnockOff.Times.AtLeastOnce, totalCount);
 		}
 
@@ -763,90 +463,6 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 			}
 		}
 
-		/// <summary>Tracks invocations for setter callback registration.</summary>
-		private sealed class PropertySetTrackingImpl : global::KnockOff.IPropertySetTracking<int>
-		{
-			private readonly PortInterceptor _interceptor;
-
-			public PropertySetTrackingImpl(PortInterceptor interceptor) => _interceptor = interceptor;
-
-			private int _lastValue = default!;
-
-			internal int CallCount { get; private set; }
-
-			/// <summary>Last value passed to this setter callback. Default if never called.</summary>
-			public int LastValue => _lastValue;
-
-			/// <summary>Records a call to this callback.</summary>
-			public void RecordCall(int value) { CallCount++; _lastValue = value; }
-
-			/// <summary>Resets tracking state.</summary>
-			public void Reset() { CallCount = 0; _lastValue = default!; }
-
-			/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>
-			public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);
-
-			/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>
-			public void Verify(global::KnockOff.Times times)
-			{
-				if (!times.Validate(CallCount))
-					throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure("property setter", times, CallCount));
-			}
-
-			/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IPropertySetTracking<int> Verifiable()
-			{
-				_interceptor._isSetVerifiable = true;
-				_interceptor._setVerifiableTimes = null;
-				return this;
-			}
-
-			/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>
-			public global::KnockOff.IPropertySetTracking<int> Verifiable(global::KnockOff.Times times)
-			{
-				_interceptor._isSetVerifiable = true;
-				_interceptor._setVerifiableTimes = times;
-				return this;
-			}
-		}
-
-		/// <summary>Sequence implementation for ThenSet chaining.</summary>
-		private sealed class PropertySetSequenceImpl : global::KnockOff.IPropertySetSequence<int>
-		{
-			private readonly PortInterceptor _interceptor;
-
-			public PropertySetSequenceImpl(PortInterceptor interceptor) => _interceptor = interceptor;
-
-			/// <summary>Adds another setter callback to the sequence. Each callback runs exactly once.</summary>
-			public global::KnockOff.IPropertySetSequence<int> ThenSet(global::System.Action<int> callback)
-			{
-				var tracking = new PropertySetTrackingImpl(_interceptor);
-				_interceptor._setSequence!.Add((callback, tracking));
-				return this;
-			}
-
-			/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>
-			public void Verify()
-			{
-				if (_interceptor._setSequence == null) return;
-				var sequenceLength = _interceptor._setSequence.Count;
-				var completedCount = _interceptor._setSequenceIndex;
-				if (completedCount < sequenceLength)
-					throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete("property setter", sequenceLength, completedCount));
-			}
-
-			/// <summary>Resets all tracking in the sequence.</summary>
-			public void Reset() => _interceptor.Reset();
-
-			/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>
-			public global::KnockOff.IPropertySetSequence<int> Verifiable()
-			{
-				_interceptor._isSetVerifiable = true;
-				_interceptor._setVerifiableTimes = null;
-				return this;
-			}
-		}
-
 	}
 
 	/// <summary>Interceptor for Host. Configure via .Value, track via .GetCount.</summary>
@@ -874,13 +490,11 @@ partial class ConfigSvcStub : global::KnockOff.Documentation.Samples.Troubleshoo
 	string global::KnockOff.Documentation.Samples.Troubleshooting.IConfigSvc.Host
 	{
 		get => Host.InvokeGet(Strict);
-		set => Host.InvokeSet(Strict, value);
 	}
 
 	int global::KnockOff.Documentation.Samples.Troubleshooting.IConfigSvc.Port
 	{
 		get => Port.InvokeGet(Strict);
-		set => Port.InvokeSet(Strict, value);
 	}
 
 }

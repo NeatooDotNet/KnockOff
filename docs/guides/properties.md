@@ -8,6 +8,7 @@ Properties in KnockOff can be configured two ways: **static values** for test da
 
 **Static Value (Recommended for Test Data)**
 - Use `Property.OnGet(value)` before running test
+- Syntactic sugar for `OnGet(() => value)` - creates a callback that returns the value
 - Use when the property should return a fixed value
 - Simple, readable, and covers most test scenarios
 
@@ -21,6 +22,8 @@ Properties in KnockOff can be configured two ways: **static values** for test da
 ## Static Values (Recommended for Test Data)
 
 The simplest way to configure a property is to use `OnGet(value)` with a static value before your test runs. This is ideal for pre-populating dependencies with test data.
+
+**Note:** `OnGet(value)` is syntactic sugar that internally creates `OnGet(() => value)`. Both forms return the same tracking interface and work identically.
 
 <!-- snippet: properties-value-basic -->
 ```cs
@@ -271,9 +274,7 @@ public void Verifiable_MarksPropertyForVerification()
 - `Verifiable(Times)` - Mark property for batch verification with specific Times constraint
 
 **Available inspection properties:**
-- `GetCount` - Number of times property was read
-- `SetCount` - Number of times property was written
-- `LastSetValue` - The most recent value written (null if never set)
+- `LastSetValue` - The most recent value written to the property setter
 
 ---
 
@@ -283,7 +284,33 @@ Use sequences when a property should return different values across multiple rea
 
 ### Return Value Sequences (OnGetSequence)
 
-When you need a property to return different values on successive reads, use `OnGetSequence`:
+When you need a property to return different values on successive reads, use `OnGetSequence`.
+
+**Value overloads:** Both `OnGetSequence(value)` and `ThenGet(value)` accept static values as shorthand for callback syntax. Use whichever reads better for your scenario.
+
+<!-- snippet: properties-ongetsequence-value -->
+```cs
+[Fact]
+public void OnGetSequence_ValueSyntax()
+{
+    var stub = new ConfigPropsStub();
+
+    // OnGetSequence with value - simpler syntax for static values
+    // Note: First value uses OnGetSequence(value), chain uses callback syntax
+    stub.Name.OnGetSequence("First")
+        .ThenGet(() => "Second")
+        .ThenGet(() => "Third");
+
+    IConfigProps config = stub;
+
+    Assert.Equal("First", config.Name);
+    Assert.Equal("Second", config.Name);
+    Assert.Equal("Third", config.Name);
+}
+```
+<!-- endSnippet -->
+
+You can also mix value and callback syntax in the same sequence:
 
 <!-- snippet: properties-ongetsequence-basic -->
 ```cs
@@ -363,14 +390,14 @@ public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
 
 ### Sequence Tracking
 
-Both `OnGetSequence` and `OnSetSequence` return tracking interfaces that support verification:
+Both `OnGetSequence` and `OnSetSequence` return sequence-specific interfaces that support chaining and verification:
 
-**OnGetSequence returns IPropertyGetTracking\<T\>:**
+**OnGetSequence returns IPropertyGetSequence\<T\>:**
 - Use `.ThenGet(() => value)` to chain additional get behaviors
 - Each callback in the sequence is called once in order
 - After exhausting the sequence, behavior depends on strict mode (see Troubleshooting)
 
-**OnSetSequence returns IPropertySetTracking\<T\>:**
+**OnSetSequence returns IPropertySetSequence\<T\>:**
 - Use `.ThenSet((value) => { })` to chain additional set behaviors
 - Each callback in the sequence is called once in order
 - After exhausting the sequence, subsequent writes do nothing (non-strict) or throw (strict mode)
@@ -443,7 +470,7 @@ public void OnGet_TakesPrecedenceOverValue()
 
 ## Resetting Properties
 
-Calling `Reset()` on a property interceptor clears all counters, callbacks, and configured values.
+Calling `Reset()` on a property interceptor clears tracking state but preserves the configured callbacks.
 
 <!-- snippet: properties-reset -->
 ```cs
@@ -473,7 +500,7 @@ public void Reset_ClearsCountsButPreservesValue()
 ```
 <!-- endSnippet -->
 
-**Note on Reset behavior:** Reset() clears tracking counters, `LastSetValue`, and all configured callbacks (`OnGet`, `OnSet`, sequences). After reset, the property returns to its default unconfigured state.
+**Note on Reset behavior:** Reset() clears call counts, `LastSetValue`, and resets sequence positions to the start, but **preserves** all configured callbacks (`OnGet`, `OnSet`, sequences). The callbacks remain configured and will execute again on subsequent property access.
 
 ---
 
@@ -485,7 +512,7 @@ Choose your configuration approach based on the test scenario:
 |----------|----------|---------|
 | Property should return fixed test data | `OnGet(value)` | `stub.UserId.OnGet(42);` |
 | Property should return current time/random value | `OnGet(callback)` | `stub.Now.OnGet(() => DateTime.UtcNow);` |
-| Property depends on other stub state | `OnGet(callback)` | `stub.IsReady.OnGet(() => stub.Init.WasCalled);` |
+| Property depends on other stub state | `OnGet(callback)` | `stub.IsReady.OnGet(() => isInitialized);` |
 | Property returns different values per read | `OnGetSequence` | `stub.Status.OnGetSequence(() => "Pending").ThenGet(() => "Complete");` |
 | Track all values written to property | `OnSet` | `stub.Name.OnSet((v) => list.Add(v));` |
 | Simulate validation in dependency | `OnSet` | `stub.Age.OnSet((v) => Validate(v));` |
@@ -551,7 +578,7 @@ public void CompletePropertyExample_AllConfigurationApproaches()
 3. **Use OnSet for tracking** - When you need to verify writes or simulate validation
 4. **Use sequences for changing behavior** - OnGetSequence/OnSetSequence when values or behavior differ across calls
 5. **Last OnGet wins** - You can upgrade from static values to dynamic callbacks by calling OnGet again
-6. **Reset() clears everything** - Clears execution state, callbacks, and configured values
+6. **Reset() preserves configuration** - Clears call counts and sequence position, but preserves OnGet/OnSet callbacks
 7. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like method verification
 
 ---
@@ -560,3 +587,7 @@ public void CompletePropertyExample_AllConfigurationApproaches()
 - [Method Configuration Guide](methods.md) - Configure method behavior and callbacks
 - [Verification Patterns](verification.md) - Assert on stub interactions
 - [Interceptor API Reference](../reference/interceptor-api.md) - Complete interceptor API documentation
+
+---
+
+**UPDATED:** 2026-01-25

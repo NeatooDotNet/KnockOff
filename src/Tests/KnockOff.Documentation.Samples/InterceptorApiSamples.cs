@@ -37,6 +37,40 @@ public interface IApiGenericRepo
     void Save<T>(T item) where T : class;
 }
 
+// Interface for overview example with all five member types
+public interface IApiOverviewRepo
+{
+    // Method
+    void Save(object item);
+
+    // Generic method
+    T? GetById<T>(int id) where T : class;
+
+    // Property
+    string Name { get; set; }
+
+    // Indexer
+    object? this[string key] { get; set; }
+
+    // Event
+    event EventHandler? Changed;
+}
+
+// Interface for Times and batch verification examples
+public interface IApiUserRepo
+{
+    User? GetById(int id);
+    void Save(User user);
+    void Delete(int id);
+}
+
+// Class for Inline Class pattern demo
+public class ApiServiceClass
+{
+    public virtual User? GetUser(int id) => null;
+    public virtual void SaveUser(User user) { }
+}
+
 // =============================================================================
 // Stubs for Interceptor API Samples
 // =============================================================================
@@ -56,51 +90,169 @@ public partial class ApiEventRepoStub : IApiEventRepo { }
 [KnockOff]
 public partial class ApiGenericRepoStub : IApiGenericRepo { }
 
+[KnockOff]
+public partial class ApiOverviewRepoStub : IApiOverviewRepo { }
+
+[KnockOff]
+public partial class ApiUserRepoStub : IApiUserRepo { }
+
+// =============================================================================
+// Overview Quick Example - All Five Interceptor Types
+// =============================================================================
+
+public class OverviewQuickExampleTests
+{
+    [Fact]
+    public void InterceptorOverview_AllFiveTypes()
+    {
+        var stub = new ApiOverviewRepoStub();
+        IApiOverviewRepo repo = stub;
+
+        #region interceptor-overview-quick-example
+        // Method interceptor
+        stub.Save.OnCall((item) => { }).Verifiable();
+
+        // Generic method interceptor
+        stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
+
+        // Property interceptor
+        stub.Name.OnGet("TestRepo");
+
+        // Indexer interceptor
+        stub.Indexer.Backing["key1"] = new User { Id = 1 };
+
+        // Event interceptor
+        repo.Changed += (s, e) => { };
+        stub.Changed.VerifyAdd();
+        #endregion
+
+        // Exercise the stub
+        repo.Save(new User());
+        var user = repo.GetById<User>(1);
+        var name = repo.Name;
+        var item = repo["key1"];
+
+        stub.Verify();
+    }
+}
+
+// =============================================================================
+// Access Patterns - Standalone, Inline Interface, Inline Class
+// =============================================================================
+
+public class AccessPatternsTests
+{
+    [Fact]
+    public void Standalone_PatternAccess()
+    {
+        #region api-access-standalone-pattern
+        // Standalone: [KnockOff] on class implementing IUserRepo
+        var stub = new ApiUserRepoStub();
+
+        // Interceptor accessed via interface-named property
+        stub.GetById.OnCall((id) => new User { Id = id });
+        stub.Save.OnCall((user) => { }).Verifiable();
+
+        IApiUserRepo repository = stub;
+        repository.Save(new User { Id = 1 });
+
+        stub.Verify();
+        #endregion
+    }
+}
+
+// Partial class required for inline patterns
+[KnockOff<IApiUserRepo>]
+[KnockOff<ApiServiceClass>]
+public partial class InlinePatternTests
+{
+}
+
+public partial class InlinePatternTests
+{
+    [Fact]
+    public void InlineInterface_PatternAccess()
+    {
+        #region api-access-inline-interface-pattern
+        // Inline Interface: [KnockOff<IApiUserRepo>] generates Stubs.IApiUserRepo
+        var stub = new Stubs.IApiUserRepo();
+
+        // Same interceptor API as standalone
+        stub.GetById.OnCall((id) => new User { Id = id });
+        stub.Save.OnCall((user) => { }).Verifiable();
+
+        IApiUserRepo repository = stub;
+        repository.Save(new User { Id = 1 });
+
+        stub.Verify();
+        #endregion
+    }
+
+    [Fact]
+    public void InlineClass_PatternAccess()
+    {
+        #region api-access-inline-class-pattern
+        // Inline Class: [KnockOff<ApiServiceClass>] generates Stubs.ApiServiceClass
+        var stub = new Stubs.ApiServiceClass();
+
+        // Interceptors accessed via class-named container
+        stub.GetUser.OnCall((id) => new User { Id = id, Name = "FromStub" });
+        stub.SaveUser.OnCall((user) => { }).Verifiable();
+
+        // Use .Object to get the actual class instance
+        ApiServiceClass service = stub.Object;
+        var user = service.GetUser(1);
+        service.SaveUser(user!);
+
+        stub.Verify();
+        #endregion
+    }
+}
+
 // =============================================================================
 // Method Interceptor API
 // =============================================================================
 
 public class MethodInterceptorApiTests
 {
-    #region api-method-interceptor
     [Fact]
     public void MethodInterceptor_CompleteApiDemonstration()
     {
         var stub = new ApiMethodRepoStub();
+        IApiMethodRepo repository = stub;
 
+        #region method-interceptor-complete-api-demo
         // Configure void method with OnCall and mark verifiable
-        var saveTracking = stub.Save.OnCall((user) => { }).Verifiable();
+        stub.Save.OnCall((user) => { }).Verifiable();
 
-        // Configure return method with OnCall and mark verifiable
+        // Configure return method with OnCall
         var getTracking = stub.GetById.OnCall((id) =>
             new User { Id = id, Name = $"User{id}" }).Verifiable();
 
-        // Configure multi-parameter method and mark verifiable
+        // Configure multi-parameter method
         var updateTracking = stub.Update.OnCall((id, name) => { }).Verifiable();
-
-        IApiMethodRepo repository = stub;
 
         // Exercise the stub
         repository.Save(new User { Id = 1, Name = "Alice" });
         var user = repository.GetById(42);
         repository.Update(1, "UpdatedName");
 
-        // Verify all methods were called
+        // Batch verify all Verifiable() interceptors
         stub.Verify();
 
-        // Access last argument (single parameter) via tracking
+        // Tracking object's LastArg for single-parameter methods
         Assert.Equal(42, getTracking.LastArg);
 
-        // Access last arguments (multi parameter via tracking)
+        // Tracking object's LastArgs tuple for multi-parameter methods
         var (id, name) = updateTracking.LastArgs;
         Assert.Equal(1, id);
         Assert.Equal("UpdatedName", name);
+        #endregion
 
-        // Verify return value was computed by callback
+        // Additional assertions outside snippet
         Assert.NotNull(user);
         Assert.Equal("User42", user.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -109,53 +261,52 @@ public class MethodInterceptorApiTests
 
 public class PropertyInterceptorApiTests
 {
-    #region api-property-interceptor
     [Fact]
     public void PropertyInterceptor_CompleteApiDemonstration()
     {
         var stub = new ApiPropertyRepoStub();
-
-        // Configure getter to return a specific value
-        stub.ConnectionString.OnGet("Server=localhost");
-
         IApiPropertyRepo repository = stub;
 
-        // Read property - returns configured value
+        #region property-interceptor-complete-api-demo
+        // Value: Direct value for getter
+        stub.ConnectionString.OnGet("Server=localhost");
+
+        // OnGet callback: Dynamic value
+        stub.Timeout.OnGet(() => 30);
+
+        // Exercise getter
         var conn = repository.ConnectionString;
-        Assert.Equal("Server=localhost", conn);
+        var timeout = repository.Timeout;
 
-        // Verify property was read
+        // VerifyGet: Check read count
         stub.ConnectionString.VerifyGet(Times.Once);
+        stub.Timeout.VerifyGet(Times.Once);
 
-        // Write property
+        // Exercise setter
         repository.ConnectionString = "Server=production";
+        repository.Timeout = 60;
 
-        // Verify property was written
+        // VerifySet: Check write count
         stub.ConnectionString.VerifySet(Times.Once);
 
-        // LastSetValue captures what was written
+        // LastSetValue: Captured value from setter
         Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
 
-        // OnGet can take a callback or direct value
-        // OnGet() returns IPropertyGetTracking for verification
-        stub.Timeout.OnGet(() => 30);
-        var timeout = repository.Timeout;
-        Assert.Equal(30, timeout);
-
-        // OnSet provides custom setter behavior
-        // OnSet() returns IPropertySetTracking for verification
-        // Note: OnSet callback does NOT automatically update the getter
+        // IMPORTANT: OnSet does NOT auto-update getter value
         var setWasCalled = false;
         stub.Timeout.OnSet((val) =>
         {
             setWasCalled = true;
-            // Update getter if needed: stub.Timeout.OnGet(val);
+            // To update getter: stub.Timeout.OnGet(val);
         });
-        repository.Timeout = 60;
+        repository.Timeout = 90;
         Assert.True(setWasCalled);
-        // Getter still returns 30 (OnSet didn't reconfigure OnGet)
+        // Getter still returns 30 - OnSet didn't change it
+        #endregion
+
+        Assert.Equal("Server=localhost", conn);
+        Assert.Equal(30, timeout);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -164,63 +315,55 @@ public class PropertyInterceptorApiTests
 
 public class IndexerInterceptorApiTests
 {
-    #region api-indexer-interceptor
     [Fact]
     public void IndexerInterceptor_CompleteApiDemonstration()
     {
         var stub = new ApiIndexerRepoStub();
+        IApiIndexerRepo repository = stub;
 
-        // Populate Backing dictionary directly
+        #region indexer-interceptor-complete-api-demo
+        // Backing dictionary: Default storage for indexer
         stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
         stub.Indexer.Backing[2] = new User { Id = 2, Name = "Bob" };
 
-        IApiIndexerRepo repository = stub;
-
-        // Read from indexer - uses Backing by default
+        // Read uses Backing by default
         var user1 = repository[1];
-        Assert.NotNull(user1);
-        Assert.Equal("Alice", user1.Name);
+        Assert.Equal("Alice", user1?.Name);
 
-        // Verify indexer was read
+        // VerifyGet: Check read count
         stub.Indexer.VerifyGet(Times.Once);
 
-        // LastGetKey captures the key used
+        // LastGetKey: Key from most recent get
         Assert.Equal(1, stub.Indexer.LastGetKey);
 
-        // Write to indexer - updates Backing by default
+        // Write uses Backing by default
         repository[3] = new User { Id = 3, Name = "Charlie" };
 
-        // Verify indexer was written
+        // VerifySet: Check write count
         stub.Indexer.VerifySet(Times.Once);
 
-        // LastSetEntry captures key and value (nullable tuple)
+        // LastSetEntry: Key-value tuple from most recent set
         var lastEntry = stub.Indexer.LastSetEntry;
-        Assert.NotNull(lastEntry);
-        Assert.Equal(3, lastEntry.Value.Key);
-        Assert.Equal("Charlie", lastEntry.Value.Value?.Name);
+        Assert.Equal(3, lastEntry?.Key);
+        Assert.Equal("Charlie", lastEntry?.Value?.Name);
 
-        // OnGet overrides Backing lookup
-        // OnGet() returns IIndexerGetTracking for verification
-        stub.Indexer.OnGet((k) => new User { Id = k, Name = "FromCallback" });
+        // OnGet: Override Backing lookup
+        stub.Indexer.OnGet((key) => new User { Id = key, Name = "FromCallback" });
         var fromCallback = repository[999];
         Assert.Equal("FromCallback", fromCallback?.Name);
 
-        // OnSet overrides Backing storage
-        // OnSet() returns IIndexerSetTracking for verification
-        // Note: OnSet takes (key, value) - does NOT automatically update Backing
+        // IMPORTANT: OnSet does NOT auto-update Backing
         var onSetCalled = false;
-        stub.Indexer.OnSet((k, v) =>
+        stub.Indexer.OnSet((key, value) =>
         {
             onSetCalled = true;
-            // Manually update Backing if needed:
-            // stub.Indexer.Backing[k] = v;
+            // To update Backing: stub.Indexer.Backing[key] = value;
         });
-        repository[4] = new User { Id = 4, Name = "Dave" };
+        repository[4] = new User { Id = 4 };
         Assert.True(onSetCalled);
-        // Backing[4] is NOT set because OnSet didn't do it
-        Assert.False(stub.Indexer.Backing.ContainsKey(4));
+        Assert.False(stub.Indexer.Backing.ContainsKey(4)); // Not in Backing
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -229,36 +372,36 @@ public class IndexerInterceptorApiTests
 
 public class EventInterceptorApiTests
 {
-    #region api-event-interceptor
     [Fact]
     public void EventInterceptor_CompleteApiDemonstration()
     {
         var stub = new ApiEventRepoStub();
         IApiEventRepo repository = stub;
 
+        #region event-interceptor-complete-api-demo
         // Subscribe to EventHandler event
         var changedInvoked = false;
         repository.Changed += (sender, e) => changedInvoked = true;
 
-        // Verify subscription occurred
+        // VerifyAdd: Check subscription occurred
         stub.Changed.VerifyAdd(Times.Once);
 
-        // HasSubscribers indicates active subscriptions
+        // HasSubscribers: Active subscription check
         Assert.True(stub.Changed.HasSubscribers);
 
-        // Raise fires all subscribers
+        // Raise: Fire event to all subscribers
         stub.Changed.Raise(repository, EventArgs.Empty);
         Assert.True(changedInvoked);
 
-        // Unsubscribe
+        // Unsubscribe tracking
         EventHandler handler = (sender, e) => { };
         repository.Changed += handler;
-        stub.Changed.VerifyAdd(Times.Exactly(2));
-
         repository.Changed -= handler;
+
+        // VerifyRemove: Check unsubscription count
         stub.Changed.VerifyRemove(Times.Once);
 
-        // Action<T> events work similarly
+        // Action<T> events: Same API, different Raise signature
         User? addedUser = null;
         repository.UserAdded += user => addedUser = user;
 
@@ -266,8 +409,8 @@ public class EventInterceptorApiTests
         stub.UserAdded.Raise(new User { Id = 1, Name = "Alice" });
         Assert.NotNull(addedUser);
         Assert.Equal("Alice", addedUser.Name);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -276,49 +419,47 @@ public class EventInterceptorApiTests
 
 public class GenericMethodInterceptorApiTests
 {
-    #region api-generic-interceptor
     [Fact]
     public void GenericMethodInterceptor_CompleteApiDemonstration()
     {
         var stub = new ApiGenericRepoStub();
-
-        // Configure OnCall for specific type arguments
-        var userTracking = stub.GetById.Of<User>().OnCall((id) =>
-            new User { Id = id, Name = $"User{id}" });
-
-        var productTracking = stub.GetById.Of<Product>().OnCall((id) =>
-            new Product { Id = id, Name = $"Product{id}" });
-
         IApiGenericRepo repository = stub;
 
+        #region generic-method-interceptor-complete-api-demo
+        // .Of<T>(): Access typed interceptor for specific type argument
+        stub.GetById.Of<User>().OnCall((id) =>
+            new User { Id = id, Name = $"User{id}" });
+
+        stub.GetById.Of<Product>().OnCall((id) =>
+            new Product { Id = id, Name = $"Product{id}" });
+
         // Call with different type arguments
-        var user = repository.GetById<User>(1);
+        var user1 = repository.GetById<User>(1);
         var product = repository.GetById<Product>(2);
         var user2 = repository.GetById<User>(3);
 
-        // Verify calls via tracking with Times
-        userTracking.Verify(Times.Exactly(2));
-        productTracking.Verify(Times.Once);
-
-        // CalledTypeArguments lists all types used
+        // CalledTypeArguments: List of all type arguments used
         Assert.Contains(typeof(User), stub.GetById.CalledTypeArguments);
         Assert.Contains(typeof(Product), stub.GetById.CalledTypeArguments);
 
-        // LastCallArg for specific type (captures the 'id' parameter)
+        // Typed verification: Per-type call counts
+        stub.GetById.Of<User>().Verify(Times.Exactly(2));
+        stub.GetById.Of<Product>().Verify(Times.Once);
+
+        // Typed LastCallArg: Per-type argument capture
         Assert.Equal(3, stub.GetById.Of<User>().LastCallArg);
         Assert.Equal(2, stub.GetById.Of<Product>().LastCallArg);
 
-        // Reset typed tracking only
+        // Typed Reset: Clears only specific type
         stub.GetById.Of<User>().Reset();
         stub.GetById.Of<User>().Verify(Times.Never);
-        productTracking.Verify(Times.Once); // Preserved
+        stub.GetById.Of<Product>().Verify(Times.Once); // Preserved
 
-        // Reset all tracking
+        // Base Reset: Clears all type arguments
         stub.GetById.Reset();
-        stub.GetById.Of<User>().Verify(Times.Never);
         stub.GetById.Of<Product>().Verify(Times.Never);
+        #endregion
     }
-    #endregion
 }
 
 // Support class for generic samples
@@ -326,4 +467,79 @@ public class Product
 {
     public int Id { get; set; }
     public string Name { get; set; } = "";
+}
+
+// =============================================================================
+// Times Constraint Examples
+// =============================================================================
+
+public class TimesConstraintTests
+{
+    [Fact]
+    public void TimesConstraint_AllMethods()
+    {
+        var stub = new ApiUserRepoStub();
+        IApiUserRepo repository = stub;
+
+        // Setup
+        stub.GetById.OnCall((id) => new User { Id = id });
+        stub.Save.OnCall((user) => { });
+        stub.Delete.OnCall((id) => { });
+
+        #region times-constraint-usage-examples
+        // Times.Never - Expected 0 calls
+        stub.Delete.Verify(Times.Never);
+
+        // Exercise stub
+        repository.GetById(1);
+        repository.Save(new User { Id = 1 });
+        repository.Save(new User { Id = 2 });
+
+        // Times.Once - Expected exactly 1 call
+        stub.GetById.Verify(Times.Once);
+
+        // Times.AtLeastOnce - Expected 1+ calls
+        stub.Save.Verify(Times.AtLeastOnce);
+
+        // Times.Exactly(n) - Expected exactly n calls
+        stub.Save.Verify(Times.Exactly(2));
+
+        // Times.AtLeast(n) - Expected n+ calls
+        stub.Save.Verify(Times.AtLeast(1));
+
+        // Times.AtMost(n) - Expected 0 to n calls
+        stub.GetById.Verify(Times.AtMost(5));
+        #endregion
+    }
+}
+
+// =============================================================================
+// Batch Verification Workflow
+// =============================================================================
+
+public class BatchVerificationTests
+{
+    [Fact]
+    public void BatchVerification_Workflow()
+    {
+        var stub = new ApiUserRepoStub();
+        IApiUserRepo repository = stub;
+
+        #region batch-verification-workflow-example
+        // Step 1: Mark interceptors with Verifiable()
+        stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+        stub.Save.OnCall((user) => { }).Verifiable(Times.Exactly(2));
+        stub.Delete.OnCall((id) => { }).Verifiable(Times.Never);
+
+        // Step 2: Exercise the stub through the interface
+        var user = repository.GetById(1);
+        repository.Save(user!);
+        repository.Save(new User { Id = 2 });
+        // Note: Delete is NOT called (expected per Times.Never)
+
+        // Step 3: Single Verify() call validates all marked interceptors
+        stub.Verify();
+        // Throws if any Verifiable() constraint is violated
+        #endregion
+    }
 }

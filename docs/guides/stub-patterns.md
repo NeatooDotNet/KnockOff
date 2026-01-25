@@ -1,3 +1,5 @@
+[Home](../../README.md) > [Guides](.) > Stub Patterns
+
 # Stub Patterns
 
 KnockOff supports three fundamental patterns for creating test stubs: Stand-Alone, Inline Interface, and Inline Class. Each pattern solves different testing scenarios with varying trade-offs in reusability, ceremony, and capabilities.
@@ -398,3 +400,7 @@ public partial class PatternComparisonTests
 - **[Properties Guide](properties.md)** - Work with property interceptors
 - **[Delegates Guide](delegates.md)** - Stub delegate types for callbacks and validation
 - **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete API documentation
+
+---
+
+**UPDATED:** 2026-01-25

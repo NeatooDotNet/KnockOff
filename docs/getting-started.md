@@ -10,7 +10,13 @@ KnockOff is a Roslyn Source Generator that creates unit test stubs at compile ti
 
 ## Installation
 
-Add the KnockOff package to your test project:
+Add the KnockOff package to your test project using the .NET CLI:
+
+```bash
+dotnet add package KnockOff
+```
+
+Or add directly to your `.csproj` file:
 
 <!-- snippet: getting-started-install -->
 ```cs
@@ -52,8 +58,8 @@ public partial class UserRepoStub : IUserRepo
 
 When you build, KnockOff generates:
 - Explicit interface implementations for all members
-- Interceptor objects for tracking calls and configuring behavior
-- Properties named after your interface (e.g., `IUserRepo`) for accessing interceptors
+- Interceptor classes for tracking calls and configuring behavior
+- Public interceptor properties for each interface member (e.g., `GetById`, `SaveUser`)
 
 ### Use the Stub in Tests
 
@@ -132,11 +138,13 @@ public void Send_WhenCalled_TracksMessage()
 ```
 <!-- endSnippet -->
 
-## Configuring Return Values
+## Understanding OnCall
 
-### Value Overloads - Simple Syntax
+The `OnCall` method is the core API for configuring stub behavior. It provides two syntaxes: value-based for simple cases and callback-based for dynamic behavior.
 
-For methods and properties that return values, KnockOff provides convenient value overloads that let you specify the return value directly.
+### OnCall with Values - Simple Return Values
+
+When your method needs to return a fixed value, use the value overload. KnockOff generates an `OnCall(TReturn value)` overload for all methods that return values:
 
 <!-- snippet: getting-started-value-overloads -->
 ```cs
@@ -159,9 +167,37 @@ public void GetById_ValueOverload_SimplerSyntax()
 ```
 <!-- endSnippet -->
 
+**Key benefits of OnCall(value)**:
+- Simpler syntax when you don't need dynamic logic
+- Still returns a tracking object for verification
+- Works with async methods (auto-wraps in Task.FromResult)
+
+### OnCall with Callbacks - Dynamic Behavior
+
+When you need to compute values based on arguments, perform side effects, or implement conditional logic, use the callback overload:
+
+```cs
+// Use VALUE when returning a fixed result
+stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+
+// Use CALLBACK when you need:
+// - Dynamic values based on arguments
+// - Side effects
+// - Conditional logic
+stub.GetById.OnCall((id) => id > 100 ? adminUser : regularUser);
+
+// Both return tracking objects for verification
+```
+
+**When to use callbacks**:
+- Computing return values based on input arguments
+- Implementing conditional logic
+- Tracking or validating argument values
+- Performing side effects (like updating test state)
+
 ### Properties - OnGet/OnSet
 
-Configure property behavior with `OnGet` for getters and `OnSet` for setters.
+Properties use `OnGet` for getters and `OnSet` for setters. Both support value and callback overloads:
 
 <!-- snippet: getting-started-property-configuration -->
 ```cs
@@ -192,7 +228,7 @@ public void Property_OnGetAndOnSet()
 
 ### Async Methods - Auto-Wrapping
 
-For async methods returning `Task<T>` or `ValueTask<T>`, KnockOff automatically wraps your value.
+For async methods returning `Task<T>` or `ValueTask<T>`, the value overload automatically wraps your value in the appropriate async type:
 
 <!-- snippet: getting-started-async-wrapping -->
 ```cs
@@ -212,16 +248,18 @@ public async Task AsyncMethod_ValueAutoWrapped()
 ```
 <!-- endSnippet -->
 
-### When to Use Callbacks vs Values
+You don't need to manually wrap values in `Task.FromResult` - KnockOff handles this for you.
 
-| Syntax | Use When |
-|--------|----------|
-| `.OnCall(value)` | Returning a fixed value |
-| `.OnCall(callback)` | Computing values based on arguments, side effects, or tracking |
-| `.OnGet(value)` | Property returns a fixed value |
-| `.OnGet(callback)` | Property computes value dynamically |
+### Decision Guide: Value vs Callback
 
-Both syntaxes return tracking objects for call verification.
+| Syntax | Use When | Example |
+|--------|----------|---------|
+| `.OnCall(value)` | Returning a fixed value | `stub.GetStatus.OnCall("OK")` |
+| `.OnCall(callback)` | Computing values from arguments | `stub.GetUser.OnCall((id) => users[id])` |
+| `.OnCall(callback)` | Conditional logic | `stub.IsValid.OnCall((x) => x > 0)` |
+| `.OnCall(callback)` | Side effects or tracking | `stub.Save.OnCall((u) => saved.Add(u))` |
+
+**Important**: Both syntaxes return tracking objects, so you can verify calls regardless of which you use.
 
 ## Understanding Generated Code
 
@@ -241,7 +279,7 @@ For each stub, KnockOff generates:
 
 1. **Explicit interface implementations** - Every interface member is implemented explicitly
 2. **Interceptor classes** - Per-member classes that track calls, arguments, and return values
-3. **Container properties** - Interface-named properties that provide access to interceptors (e.g., `IUserRepo`)
+3. **Interceptor properties** - Public properties for each interface member (e.g., `GetById`, `SaveUser`) that expose the interceptor API
 
 The generated code is readable C# that mirrors your interface structure. You can review it in the `Generated/` folder to understand how KnockOff implements your stub.
 
@@ -253,3 +291,7 @@ Now that you've created your first stubs, explore more features:
 - **[Methods](guides/methods.md)** - Configure method behavior with OnCall, track arguments, handle async methods
 - **[Properties](guides/properties.md)** - Use OnGet/OnSet for properties, track access, configure backing values
 - **[Interceptor API Reference](reference/interceptor-api.md)** - Complete reference for the interceptor API
+
+---
+
+**UPDATED:** 2026-01-25
