@@ -26,6 +26,8 @@ Add the KnockOff package to your test project:
 
 The stand-alone pattern uses the `[KnockOff]` attribute on a partial class that implements your test interface.
 
+**Note**: The examples below use a simple `User` class (with `Id` and `Name` properties) for demonstration purposes. In your tests, substitute your own domain types.
+
 ### Define the Stub
 
 First, define a test interface and create a partial class that implements it:
@@ -51,7 +53,7 @@ public partial class UserRepoStub : IUserRepo
 When you build, KnockOff generates:
 - Explicit interface implementations for all members
 - Interceptor objects for tracking calls and configuring behavior
-- Properties named after your interface (e.g., `IUserRepository`) for accessing interceptors
+- Properties named after your interface (e.g., `IUserRepo`) for accessing interceptors
 
 ### Use the Stub in Tests
 
@@ -134,39 +136,81 @@ public void Send_WhenCalled_TracksMessage()
 
 ### Value Overloads - Simple Syntax
 
-For methods and properties that return values, KnockOff provides convenient value overloads that let you specify the return value directly:
+For methods and properties that return values, KnockOff provides convenient value overloads that let you specify the return value directly.
 
-```csharp
-// Instead of writing callbacks for simple returns:
-stub.GetById.OnCall((id) => new User { Id = id, Name = "Alice" });
+<!-- snippet: getting-started-value-overloads -->
+```cs
+[Fact]
+public void GetById_ValueOverload_SimplerSyntax()
+{
+    var stub = new UserRepoStub();
 
-// You can use the value overload:
-stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+    // Value overload - pass the return value directly
+    stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+
+    // Callback syntax - use when you need argument-based logic
+    stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
+
+    IUserRepo repository = stub;
+    var user = repository.GetById(1);
+
+    Assert.Equal("Dynamic", user!.Name);
+}
 ```
+<!-- endSnippet -->
 
 ### Properties - OnGet/OnSet
 
-Configure property behavior with `OnGet` for getters and `OnSet` for setters:
+Configure property behavior with `OnGet` for getters and `OnSet` for setters.
 
-```csharp
-// Return a fixed value from the getter
-stub.Name.OnGet("Alice");
+<!-- snippet: getting-started-property-configuration -->
+```cs
+[Fact]
+public void Property_OnGetAndOnSet()
+{
+    var stub = new UserConfigStub();
 
-// Track setter calls
-stub.Name.OnSet((value) => Console.WriteLine($"Name set to: {value}"));
+    // OnGet - configure what the getter returns
+    stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+
+    // OnSet - track or validate setter calls
+    User? capturedUser = null;
+    stub.CurrentUser.OnSet((user) => capturedUser = user);
+
+    IUserConfig config = stub;
+
+    // Reading uses OnGet
+    var user = config.CurrentUser;
+    Assert.Equal("Alice", user!.Name);
+
+    // Writing uses OnSet
+    config.CurrentUser = new User { Id = 2, Name = "Bob" };
+    Assert.Equal("Bob", capturedUser!.Name);
+}
 ```
+<!-- endSnippet -->
 
 ### Async Methods - Auto-Wrapping
 
-For async methods returning `Task<T>` or `ValueTask<T>`, KnockOff automatically wraps your value:
+For async methods returning `Task<T>` or `ValueTask<T>`, KnockOff automatically wraps your value.
 
-```csharp
-// Value is automatically wrapped in Task.FromResult
-stub.GetUserAsync.OnCall(new User { Name = "Alice" });
+<!-- snippet: getting-started-async-wrapping -->
+```cs
+[Fact]
+public async Task AsyncMethod_ValueAutoWrapped()
+{
+    var stub = new AsyncUserRepoStub();
 
-// Equivalent to:
-stub.GetUserAsync.OnCall(() => Task.FromResult(new User { Name = "Alice" }));
+    // Value overload - KnockOff wraps in Task.FromResult automatically
+    stub.GetUserAsync.OnCall(new User { Id = 1, Name = "Alice" });
+
+    IAsyncUserRepo repository = stub;
+    var user = await repository.GetUserAsync(1);
+
+    Assert.Equal("Alice", user!.Name);
+}
 ```
+<!-- endSnippet -->
 
 ### When to Use Callbacks vs Values
 
@@ -183,13 +227,13 @@ Both syntaxes return tracking objects for call verification.
 
 ### Where to Find Generated Files
 
-KnockOff outputs generated code to your project's `Generated/` folder. You can view these files in your IDE:
+KnockOff outputs generated code to your project's `Generated/` folder at the project root. You can view these files in your IDE:
 
 - **Visual Studio**: Expand Dependencies → Analyzers → KnockOff.SourceGenerator
 - **Rider**: Navigate to the Generated folder in the project structure
-- **File System**: `obj/{Configuration}/{TargetFramework}/generated/KnockOff.SourceGenerator/`
+- **File System**: Look in the `Generated/` folder within your test project directory
 
-Generated files are also committed to source control (in the `Generated/` folder) so you can track changes in diffs and PRs.
+Generated files are committed to source control so you can track changes in diffs and PRs.
 
 ### What Gets Generated
 
@@ -197,7 +241,7 @@ For each stub, KnockOff generates:
 
 1. **Explicit interface implementations** - Every interface member is implemented explicitly
 2. **Interceptor classes** - Per-member classes that track calls, arguments, and return values
-3. **Container properties** - Interface-named properties that provide access to interceptors (e.g., `IUserRepository`)
+3. **Container properties** - Interface-named properties that provide access to interceptors (e.g., `IUserRepo`)
 
 The generated code is readable C# that mirrors your interface structure. You can review it in the `Generated/` folder to understand how KnockOff implements your stub.
 

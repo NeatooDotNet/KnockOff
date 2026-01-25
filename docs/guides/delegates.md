@@ -108,7 +108,33 @@ public void OnCallVoid_ExecutesCustomLogic()
 ```
 <!-- endSnippet -->
 
-### OnCall for Return Delegates
+### OnCall with Fixed Return Value
+
+For delegates that return values, you can configure a fixed return value using the value overload:
+
+<!-- snippet: delegate-stub-oncall-value -->
+```cs
+[Fact]
+public void OnCallValue_ReturnsFixedValue()
+{
+    var stub = new DelegateStubTests.Stubs.Formatter();
+
+    // VALUE OVERLOAD: Pass the return value directly (simpler syntax)
+    stub.Interceptor.OnCall("FORMATTED");
+
+    // Invoke through the delegate
+    Formatter format = stub;
+    var result = format("any input");
+
+    // Returns the fixed value regardless of input
+    Assert.Equal("FORMATTED", result);
+}
+```
+<!-- endSnippet -->
+
+### OnCall with Computed Return Value
+
+For more complex scenarios, use a callback to compute the return value based on the input:
 
 <!-- snippet: delegate-stub-oncall-return -->
 ```cs
@@ -117,7 +143,7 @@ public void OnCallReturn_ReturnsComputedValue()
 {
     var stub = new DelegateStubTests.Stubs.Formatter();
 
-    // Configure to return computed value based on input
+    // CALLBACK: Configure to return computed value based on input
     stub.Interceptor.OnCall((input) => input.ToUpperInvariant());
 
     // Invoke through the delegate

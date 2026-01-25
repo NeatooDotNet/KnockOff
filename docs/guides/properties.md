@@ -7,20 +7,20 @@ Properties in KnockOff can be configured two ways: **static values** for test da
 ## Configuration Approaches
 
 **Static Value (Recommended for Test Data)**
-- Set `Property.Value` before running test
+- Use `Property.OnGet(value)` before running test
 - Use when the property should return a fixed value
 - Simple, readable, and covers most test scenarios
 
 **Dynamic Callbacks (For Complex Scenarios)**
-- Set `Property.OnGet` to compute values at runtime
-- Set `Property.OnSet` to intercept and validate writes
+- Use `Property.OnGet(() => callback)` to compute values at runtime
+- Use `Property.OnSet((value) => callback)` to intercept and validate writes
 - Use when values depend on state, time, or other factors
 
 ---
 
 ## Static Values (Recommended for Test Data)
 
-The simplest way to configure a property is to assign a value before your test runs. This is ideal for pre-populating dependencies with test data.
+The simplest way to configure a property is to use `OnGet(value)` with a static value before your test runs. This is ideal for pre-populating dependencies with test data.
 
 <!-- snippet: properties-value-basic -->
 ```cs
@@ -30,7 +30,7 @@ public void Value_SetsPropertyReturnValue()
     var stub = new UserConfigPropsStub();
 
     // Set a static value for the property via the interceptor
-    stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
+    stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
     IUserConfigProps config = stub;
     var user = config.CurrentUser;
@@ -51,9 +51,9 @@ public void Value_ConfigureMultipleProperties()
     var stub = new UserConfigPropsStub();
 
     // Configure several properties before test execution
-    stub.UserId.Value = 42;
-    stub.Email.Value = "test@example.com";
-    stub.CurrentUser.Value = new User { Id = 42, Name = "Test User" };
+    stub.UserId.OnGet(42);
+    stub.Email.OnGet("test@example.com");
+    stub.CurrentUser.OnGet(new User { Id = 42, Name = "Test User" });
 
     IUserConfigProps config = stub;
 
@@ -64,7 +64,7 @@ public void Value_ConfigureMultipleProperties()
 ```
 <!-- endSnippet -->
 
-**When to use Value:**
+**When to use OnGet with static values:**
 - Pre-populating repository stub data
 - Configuring service dependencies with fixed values
 - Setting up DTOs or configuration objects
@@ -74,7 +74,7 @@ public void Value_ConfigureMultipleProperties()
 
 ## Dynamic Getters
 
-Use `OnGet` when a property's value should be computed at access time. The callback receives the stub instance as a parameter.
+Use `OnGet(() => callback)` when a property's value should be computed at access time. The callback is invoked each time the property is accessed.
 
 <!-- snippet: properties-onget-dynamic -->
 ```cs
@@ -207,7 +207,7 @@ Property interceptors support verification similar to methods.
 public void VerifyGet_TracksPropertyReads()
 {
     var stub = new ConfigPropsStub();
-    stub.Age.Value = 42;
+    stub.Age.OnGet(42);
 
     IConfigProps service = stub;
 
@@ -249,7 +249,7 @@ public void Verifiable_MarksPropertyForVerification()
     var stub = new ConfigPropsStub();
 
     // Mark property as verifiable
-    stub.Name.Value = "test";
+    stub.Name.OnGet("test");
     stub.Name.Verifiable();
     stub.Age.Verifiable();
 
@@ -267,8 +267,8 @@ public void Verifiable_MarksPropertyForVerification()
 **Available verification methods:**
 - `VerifyGet(Times)` - Verify property getter was called
 - `VerifySet(Times)` - Verify property setter was called
-- `MarkVerifiableGet(Times)` - Mark getter for batch verification
-- `MarkVerifiableSet(Times)` - Mark setter for batch verification
+- `Verifiable()` - Mark property for batch verification (verifies both getter and setter)
+- `Verifiable(Times)` - Mark property for batch verification with specific Times constraint
 
 **Available inspection properties:**
 - `GetCount` - Number of times property was read
@@ -356,7 +356,7 @@ public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
 
 | Use Case | Use This | Why |
 |----------|----------|-----|
-| Property always returns same value | `OnGet(() => value)` | Simple, no sequence needed |
+| Property always returns same value | `OnGet(value)` or `OnGet(() => value)` | Simple, no sequence needed |
 | Property returns different values per read | `OnGetSequence(() => first).ThenGet(() => second)` | Different values on successive reads |
 | Property setter should validate differently | `OnSetSequence((v) => validate1(v)).ThenSet((v) => validate2(v))` | Different behavior per write |
 | Property behavior changes based on test state | `OnGet(() => computedValue)` | Callback computes on each access |
@@ -412,9 +412,9 @@ public void Sequence_VerifiesLikeRegularCallbacks()
 
 ---
 
-## Value vs OnGet Priority
+## OnGet Priority (Value vs Callback)
 
-When both `Value` and `OnGet` are configured, `OnGet` takes precedence. Setting `OnGet` replaces any previously set `Value`.
+When you call `OnGet` multiple times, the last call wins. You can start with a static value using `OnGet(value)` and later upgrade to a dynamic callback using `OnGet(() => callback)`.
 
 <!-- snippet: properties-priority -->
 ```cs
@@ -424,26 +424,26 @@ public void OnGet_TakesPrecedenceOverValue()
     var stub = new ConfigPropsStub();
 
     // Set a static value
-    stub.Name.Value = "initial";
+    stub.Name.OnGet("initial");
 
     // Then set OnGet - it takes precedence
     stub.Name.OnGet(() => "dynamic");
 
     IConfigProps config = stub;
 
-    // OnGet wins over Value
+    // Callback syntax takes precedence (last call wins)
     Assert.Equal("dynamic", config.Name);
 }
 ```
 <!-- endSnippet -->
 
-**Design principle:** This allows upgrading from simple Value configuration to dynamic OnGet behavior without removing the Value assignment first.
+**Design principle:** This allows upgrading from simple static value configuration to dynamic callback behavior without removing the previous assignment first.
 
 ---
 
 ## Resetting Properties
 
-Calling `Reset()` on a property interceptor clears all counters and callbacks but **preserves the Value**.
+Calling `Reset()` on a property interceptor clears all counters, callbacks, and configured values.
 
 <!-- snippet: properties-reset -->
 ```cs
@@ -452,7 +452,7 @@ public void Reset_ClearsCountsButPreservesValue()
 {
     var stub = new ConfigPropsStub();
 
-    stub.Name.Value = "test";
+    stub.Name.OnGet("test");
 
     IConfigProps config = stub;
 
@@ -468,12 +468,12 @@ public void Reset_ClearsCountsButPreservesValue()
 
     stub.Name.VerifyGet(Times.Never);
     stub.Name.VerifySet(Times.Never);
-    // Note: Reset also clears Value, OnGet, OnSet
+    // Note: Reset clears tracking counters and all configured callbacks
 }
 ```
 <!-- endSnippet -->
 
-**Note on Reset behavior:** Reset() clears tracking counters, `LastSetValue`, `OnGet`, and `OnSet`. The `Value` property is preserved to maintain test data configuration between verification phases.
+**Note on Reset behavior:** Reset() clears tracking counters, `LastSetValue`, and all configured callbacks (`OnGet`, `OnSet`, sequences). After reset, the property returns to its default unconfigured state.
 
 ---
 
@@ -483,9 +483,9 @@ Choose your configuration approach based on the test scenario:
 
 | Scenario | Use This | Example |
 |----------|----------|---------|
-| Property should return fixed test data | `Value` | `stub.UserId.Value = 42;` |
-| Property should return current time/random value | `OnGet` | `stub.Now.OnGet(() => DateTime.UtcNow);` |
-| Property depends on other stub state | `OnGet` | `stub.IsReady.OnGet(() => stub.Init.WasCalled);` |
+| Property should return fixed test data | `OnGet(value)` | `stub.UserId.OnGet(42);` |
+| Property should return current time/random value | `OnGet(callback)` | `stub.Now.OnGet(() => DateTime.UtcNow);` |
+| Property depends on other stub state | `OnGet(callback)` | `stub.IsReady.OnGet(() => stub.Init.WasCalled);` |
 | Property returns different values per read | `OnGetSequence` | `stub.Status.OnGetSequence(() => "Pending").ThenGet(() => "Complete");` |
 | Track all values written to property | `OnSet` | `stub.Name.OnSet((v) => list.Add(v));` |
 | Simulate validation in dependency | `OnSet` | `stub.Age.OnSet((v) => Validate(v));` |
@@ -509,8 +509,8 @@ public void CompletePropertyExample_AllConfigurationApproaches()
     // Track connection state with local variable
     var isConnected = false;
 
-    // Value: Static test data
-    stub.CurrentUser.Value = new User { Id = 1, Name = "Alice" };
+    // OnGet with static value: Fixed test data
+    stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
     // OnGet: State-dependent behavior using tracked state
     stub.IsConnected.OnGet(() => isConnected);
@@ -546,12 +546,12 @@ public void CompletePropertyExample_AllConfigurationApproaches()
 
 ## Key Takeaways
 
-1. **Start with Value** - It covers most scenarios and keeps tests simple
-2. **Use OnGet for computed values** - Time-dependent or state-dependent returns
+1. **Start with OnGet(value)** - Static value syntax covers most scenarios and keeps tests simple
+2. **Use OnGet(callback) for computed values** - Time-dependent or state-dependent returns
 3. **Use OnSet for tracking** - When you need to verify writes or simulate validation
 4. **Use sequences for changing behavior** - OnGetSequence/OnSetSequence when values or behavior differ across calls
-5. **OnGet replaces Value** - You can upgrade from static to dynamic without conflicts
-6. **Reset() preserves Value** - Clears execution state but not test data configuration
+5. **Last OnGet wins** - You can upgrade from static values to dynamic callbacks by calling OnGet again
+6. **Reset() clears everything** - Clears execution state, callbacks, and configured values
 7. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like method verification
 
 ---

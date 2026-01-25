@@ -41,10 +41,10 @@ public partial class SerializerStub : ISerializer { }
 
 public class ConfigureSingleTypeTests
 {
-    #region generic-configure-single
     [Fact]
     public void ConfigureSingleType_WithOfT()
     {
+        #region generic-configure-single
         var stub = new RepositoryStub();
 
         // Configure behavior for User type
@@ -57,16 +57,16 @@ public class ConfigureSingleTypeTests
         Assert.NotNull(user);
         Assert.Equal(42, user.Id);
         Assert.Equal("Test User", user.Name);
+        #endregion
     }
-    #endregion
 }
 
 public class ConfigureMultipleTypesTests
 {
-    #region generic-configure-multiple
     [Fact]
     public void ConfigureMultipleTypes_IndependentCallbacks()
     {
+        #region generic-configure-multiple
         var stub = new RepositoryStub();
 
         // Configure different behavior for each type
@@ -83,8 +83,8 @@ public class ConfigureMultipleTypesTests
 
         Assert.Equal("User", user?.Name);
         Assert.Equal(99.99m, order?.Amount);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -93,10 +93,10 @@ public class ConfigureMultipleTypesTests
 
 public class VerifyTypedCallsTests
 {
-    #region generic-verify-typed
     [Fact]
     public void VerifyTypedCalls_WithTimesConstraint()
     {
+        #region generic-verify-typed
         var stub = new RepositoryStub();
 
         var tracking = stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
@@ -109,16 +109,16 @@ public class VerifyTypedCallsTests
         // Verify calls for specific type using Times
         tracking.Verify(Times.Exactly(2));
         Assert.Equal(2, stub.GetById.Of<User>().LastCallArg);
+        #endregion
     }
-    #endregion
 }
 
 public class VerifyAggregateCallsTests
 {
-    #region generic-verify-aggregate
     [Fact]
     public void VerifyAggregateCalls_VerifyPerType()
     {
+        #region generic-verify-aggregate
         var stub = new RepositoryStub();
 
         var userTracking = stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
@@ -133,8 +133,8 @@ public class VerifyAggregateCallsTests
         // Verify each type was called using tracking
         userTracking.Verify(Times.Exactly(2));
         orderTracking.Verify(Times.Once);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -143,10 +143,10 @@ public class VerifyAggregateCallsTests
 
 public class MultipleTypeParametersTests
 {
-    #region generic-multi-param
     [Fact]
     public void MultipleTypeParameters_OfT1T2()
     {
+        #region generic-multi-param
         var stub = new ConverterStub();
 
         // Configure for string -> int conversion
@@ -164,8 +164,8 @@ public class MultipleTypeParametersTests
 
         Assert.Equal(42, intResult);
         Assert.Equal("100", strResult);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -174,10 +174,10 @@ public class MultipleTypeParametersTests
 
 public class CalledTypeArgumentsTests
 {
-    #region generic-called-types
     [Fact]
     public void CalledTypeArguments_TracksUsedTypes()
     {
+        #region generic-called-types
         var stub = new RepositoryStub();
 
         stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
@@ -193,8 +193,8 @@ public class CalledTypeArgumentsTests
         Assert.Equal(2, types.Count);
         Assert.Contains(typeof(User), types);
         Assert.Contains(typeof(Order), types);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -203,10 +203,10 @@ public class CalledTypeArgumentsTests
 
 public class ResetTypedTests
 {
-    #region generic-reset-typed
     [Fact]
     public void ResetTyped_ClearsOnlySpecificType()
     {
+        #region generic-reset-typed
         var stub = new RepositoryStub();
 
         stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
@@ -222,16 +222,16 @@ public class ResetTypedTests
 
         stub.GetById.Of<User>().Verify(Times.Never);
         stub.GetById.Of<Order>().Verify(Times.Once);
+        #endregion
     }
-    #endregion
 }
 
 public class ResetAllTests
 {
-    #region generic-reset-all
     [Fact]
     public void ResetAll_ClearsAllTypeSpecificState()
     {
+        #region generic-reset-all
         var stub = new RepositoryStub();
 
         stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
@@ -249,8 +249,8 @@ public class ResetAllTests
         stub.GetById.Of<User>().Verify(Times.Never);
         stub.GetById.Of<Order>().Verify(Times.Never);
         Assert.Empty(stub.GetById.CalledTypeArguments);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -259,10 +259,10 @@ public class ResetAllTests
 
 public class CompleteGenericExampleTests
 {
-    #region generic-complete-example
     [Fact]
     public void Serializer_FullGenericWorkflow()
     {
+        #region generic-complete-example
         var stub = new SerializerStub();
 
         // Configure Serialize for different types
@@ -298,6 +298,6 @@ public class CompleteGenericExampleTests
         // Verify called type arguments
         Assert.Contains(typeof(User), stub.Serialize.CalledTypeArguments);
         Assert.Contains(typeof(Order), stub.Serialize.CalledTypeArguments);
+        #endregion
     }
-    #endregion
 }

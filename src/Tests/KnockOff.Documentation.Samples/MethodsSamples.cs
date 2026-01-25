@@ -82,7 +82,7 @@ public class MethodConfigurationTests
     {
         var stub = new LogSvcMethodsStub();
 
-        // OnCall for void methods uses Action<TStub, ...params>
+        // OnCall for void methods uses Action<...params>
         var logged = new List<string>();
         var tracking = stub.LogMessage.OnCall((message) =>
         {
@@ -104,7 +104,7 @@ public class MethodConfigurationTests
     {
         var stub = new LogSvcMethodsStub();
 
-        // OnCall with return value: first param is stub (ko), then method params
+        // OnCall with return value: Func<...params, TReturn>
         var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
 
         ILogSvcMethods logger = stub;
@@ -158,7 +158,7 @@ public class MethodConfigurationTests
     {
         var stub = new AuthSvcMethodsStub();
 
-        // All method parameters follow the stub instance (ko)
+        // All method parameters are passed to the callback in order
         var tracking = stub.ValidateCredentials.OnCall((username, password) =>
             username == "admin" && password == "secret");
 

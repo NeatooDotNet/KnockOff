@@ -83,32 +83,29 @@ public void PassingStubObjectToMethod()
 
 **Cause:** The OnCall callback signature doesn't match the method's parameters.
 
-OnCall callbacks receive only the method's parameters - they do not receive the stub instance as a parameter.
+OnCall callbacks receive only the method's parameters. The callback must match the parameter types exactly.
 
 **Solution:** Ensure your callback signature matches the method parameters exactly.
 
 <!-- snippet: troubleshoot-oncall-signature -->
 ```cs
 [Fact]
-public void OnCallSignature_KoParameterFirst()
+public void OnCallSignature_MustMatchParameters()
 {
     var stub = new TroubleshootRepoStub();
 
-    // ERROR (won't compile): Missing ko parameter
-    // stub.GetByIdAsync.OnCall((id) => Task.FromResult<User?>(null));
+    // ERROR (won't compile): Wrong parameter type
+    // stub.GetByIdAsync.OnCall((string id) => Task.FromResult<User?>(null));
 
-    // CORRECT: Include ko as first parameter
-    stub.GetByIdAsync.OnCall((id) =>
+    // CORRECT: Match parameter type (int id)
+    stub.GetByIdAsync.OnCall((int id) =>
         Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 
-    // The ko parameter gives access to the stub instance
-    // Useful for accessing other interceptors or state
-    stub.GetByIdAsync.OnCall((id) =>
-    {
-        // Can access other interceptors via ko
-        // ko is the stub instance itself
-        return Task.FromResult<User?>(new User { Id = id });
-    });
+    ITroubleshootRepo repository = stub;
+    var user = repository.GetByIdAsync(42).Result;
+
+    Assert.NotNull(user);
+    Assert.Equal(42, user.Id);
 }
 ```
 <!-- endSnippet -->
@@ -123,7 +120,7 @@ public void OnCallSignature_KoParameterFirst()
 
 KnockOff cannot infer what value to return for non-nullable types. You must explicitly configure the return value using OnCall, OnGet, or by implementing a user-defined method.
 
-**Solution:** Configure the return value using OnCall, OnGet, Value, or implement a user-defined method that the generator will detect.
+**Solution:** Configure the return value using OnCall for methods, OnGet for properties, or implement a user-defined method that the generator will detect.
 
 <!-- snippet: troubleshoot-no-callback -->
 ```cs
@@ -154,11 +151,11 @@ public void FixOptions_ForRequiredReturnValues()
     var stub = new ConfigSvcStub();
     IConfigSvc config = stub;
 
-    // Fix Option 1: Use Value property for properties
-    stub.Host.Value = "localhost";
+    // Fix Option 1: Use OnGet with a static value
+    stub.Host.OnGet("localhost");
     Assert.Equal("localhost", config.Host);
 
-    // Fix Option 2: Use OnGet for dynamic behavior
+    // Fix Option 2: Use OnGet with callback for dynamic behavior
     stub.Port.OnGet(() => 8080);
     Assert.Equal(8080, config.Port);
 }
@@ -171,34 +168,35 @@ public void FixOptions_ForRequiredReturnValues()
 
 ### OnGet not being called
 
-**Cause:** OnGet was cleared or set to null after configuration.
+**Cause:** OnGet was overridden or reconfigured after initial setup.
 
-When `OnGet` is set, it takes precedence over `Value`. If OnGet is not returning the expected value, verify it hasn't been cleared.
+Each call to `OnGet` replaces the previous configuration. The most recent OnGet call determines the property's behavior.
 
-**Solution:** Ensure OnGet remains configured when you need dynamic property behavior.
+**Solution:** Ensure you don't accidentally override OnGet configuration. Check that subsequent OnGet calls are intentional.
 
 <!-- snippet: troubleshoot-onget-priority -->
 ```cs
 [Fact]
-public void OnGet_TakesPrecedence_OverValue()
+public void OnGet_MostRecentTakesPrecedence()
 {
     var stub = new ConfigSvcStub();
     IConfigSvc config = stub;
 
-    // Configure OnGet - returns tracking for verification
+    // Configure OnGet with callback
     stub.Host.OnGet(() => "from-callback");
 
     // Access uses OnGet
     Assert.Equal("from-callback", config.Host);
 
-    // Set Value explicitly - but OnGet still takes precedence
-    stub.Host.Value = "from-value";
+    // OnGet with value overrides previous callback
+    stub.Host.OnGet("from-value");
 
-    // When OnGet IS set, it takes priority over Value
-    Assert.Equal("from-callback", config.Host);
+    // Most recent OnGet configuration wins
+    Assert.Equal("from-value", config.Host);
 
-    // Note: Once OnGet is configured, it cannot be cleared.
-    // For different behavior, create a new stub instance.
+    // OnGet with callback can override again
+    stub.Host.OnGet(() => "back-to-callback");
+    Assert.Equal("back-to-callback", config.Host);
 }
 
 [Fact]
@@ -209,45 +207,46 @@ public void Understanding_Property_Priority()
 
     // Priority order (from highest to lowest):
     // 1. OnGetSequence (if configured and not exhausted)
-    // 2. OnGet callback (if configured)
+    // 2. OnGet callback/value (most recent takes precedence)
     // 3. Source delegation (if configured)
     // 4. Strict mode check (throws if enabled and nothing configured)
-    // 5. Value property (fallback)
+    // 5. Default (fallback)
 
-    // Just Value - no OnGet configured
-    stub.Port.Value = 80;
+    // OnGet with value
+    stub.Port.OnGet(80);
     Assert.Equal(80, config.Port);
 
-    // OnGet overrides Value once configured
+    // OnGet with callback overrides previous value
     stub.Port.OnGet(() => 443);
     Assert.Equal(443, config.Port);
 
-    // Value is still accessible directly on the interceptor
-    Assert.Equal(80, stub.Port.Value);
+    // OnGet with value overrides previous callback
+    stub.Port.OnGet(8080);
+    Assert.Equal(8080, config.Port);
 }
 ```
 <!-- endSnippet -->
 
 ---
 
-### Reset() doesn't clear Value
+### Reset() doesn't clear OnGet configuration
 
-**Cause:** By design, Reset() preserves the Value property while clearing tracking counters, `LastSetValue`, `OnGet`, and `OnSet`.
+**Cause:** By design, Reset() clears tracking counters and `LastSetValue`, but preserves `OnGet` and `OnSet` configuration.
 
 Reset() is intended to clear test verification state between test phases, not to reset test data configuration.
 
-**Solution:** If you need to clear configured values, manually set Value back to its default.
+**Solution:** If you need to clear configured values, manually call OnGet with a default value or reconfigure the stub.
 
 <!-- snippet: troubleshoot-reset-value -->
 ```cs
 [Fact]
-public void Reset_ClearsTracking_NotValue()
+public void Reset_ClearsTracking_ButPreservesConfiguration()
 {
     var stub = new ConfigSvcStub();
     IConfigSvc config = stub;
 
-    // Configure Value
-    stub.Host.Value = "configured-host";
+    // Configure value via OnGet
+    stub.Host.OnGet("configured-host");
 
     // Access property to verify reads
     _ = config.Host;
@@ -260,32 +259,22 @@ public void Reset_ClearsTracking_NotValue()
     // Verify tracking was cleared
     stub.Host.VerifyGet(Times.Never);
 
-    // BUT Value is preserved after Reset
-    // Note: Actually Reset() clears Value too in current implementation
-    // Let's verify current behavior:
-    _ = config.Host; // Access again to see what Value is
-
-    // To truly preserve Value across resets, store and restore:
-    stub.Host.Value = "my-host";
-    var savedHost = stub.Host.Value;
-    stub.Host.Reset();
-    stub.Host.Value = savedHost;
-
-    Assert.Equal("my-host", config.Host);
+    // OnGet configuration is preserved after Reset
+    Assert.Equal("configured-host", config.Host);
 }
 
 [Fact]
-public void ManuallyClearing_Value()
+public void ManuallyClearing_OnGetConfiguration()
 {
     var stub = new ConfigSvcStub();
 
-    // Set Value
-    stub.Port.Value = 8080;
+    // Configure with OnGet
+    stub.Port.OnGet(8080);
 
-    // To clear Value, set to default
-    stub.Port.Value = default;
+    // To clear, reconfigure with default value
+    stub.Port.OnGet(default(int));
 
-    // Now accessing will use smart defaults
+    // Now returns default value
     IConfigSvc config = stub;
     Assert.Equal(0, config.Port);
 }
@@ -308,15 +297,17 @@ In Visual Studio:
 - Right-click the test project → Rebuild
 
 In CLI:
-```bash
-dotnet build
-```
 
-If the issue persists after rebuild, try cleaning first:
-```bash
-dotnet clean
-dotnet build
+<!-- snippet: troubleshoot-build-commands -->
+```cs
+// Rebuild to trigger source generator:
+// dotnet build
+
+// If issues persist, clean first:
+// dotnet clean
+// dotnet build
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -334,7 +325,7 @@ Common diagnostics:
 - **KO002:** Unsupported member type
 - **KO003:** Interface not found
 
-Check the [diagnostics reference](./diagnostics.md) for detailed explanations of each diagnostic code.
+Review the build output messages for specific guidance on resolving each diagnostic.
 
 ---
 

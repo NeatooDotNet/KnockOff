@@ -16,6 +16,8 @@ public interface INullableService
 {
     string? GetOptionalName();
     User? FindUserById(int id);
+    int? GetOptionalCount();
+    bool? GetOptionalFlag();
 }
 
 public interface IConfigService
@@ -46,10 +48,26 @@ public interface ICollectionService
     ISet<string> GetUniqueKeys();
 }
 
+/// <summary>
+/// A class WITHOUT a parameterless constructor - used to demonstrate
+/// that smart defaults throw for types that cannot be instantiated.
+/// </summary>
+public class UserWithRequiredCtor
+{
+    public int Id { get; }
+    public string Name { get; }
+
+    public UserWithRequiredCtor(int id, string name)
+    {
+        Id = id;
+        Name = name;
+    }
+}
+
 public interface IUserFactory
 {
-    // User class (from shared types) has no parameterless constructor
-    User GetUser();
+    // UserWithRequiredCtor has no parameterless constructor
+    UserWithRequiredCtor GetUser();
 }
 
 public interface IAsyncDefaultsService
@@ -132,6 +150,12 @@ public class NullableSmartDefaultsTests
 
         // User? returns null
         Assert.Null(service.FindUserById(42));
+
+        // int? returns null
+        Assert.Null(service.GetOptionalCount());
+
+        // bool? returns null
+        Assert.Null(service.GetOptionalFlag());
     }
     #endregion
 }
@@ -219,15 +243,21 @@ public class NoConstructorSmartDefaultsTests
         var stub = new UserFactoryStub();
         IUserFactory factory = stub;
 
-        // User has no parameterless constructor, so smart defaults can't create one
-        // Without OnCall, user method, or Source, it throws
+        // UserWithRequiredCtor has no parameterless constructor, so smart defaults can't create one
+        // Without OnCall, user method, or Source, calling this method throws
 
-        // Note: The actual behavior depends on how the generator handles this.
-        // In strict mode, it would throw. In non-strict, it returns default (null).
-        // For non-nullable return types without ctor, configure explicitly.
+        var exception = Assert.Throws<InvalidOperationException>(() => factory.GetUser());
+        Assert.Contains("No implementation provided", exception.Message);
+    }
+
+    [Fact]
+    public void TypeWithoutCtor_WorksWithConfiguration()
+    {
+        var stub = new UserFactoryStub();
+        IUserFactory factory = stub;
 
         // Configure OnCall to provide value
-        stub.GetUser.OnCall(() => new User { Id = 1, Name = "Configured" });
+        stub.GetUser.OnCall(() => new UserWithRequiredCtor(1, "Configured"));
 
         var user = factory.GetUser();
         Assert.NotNull(user);

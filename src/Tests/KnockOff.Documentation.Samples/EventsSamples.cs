@@ -33,14 +33,13 @@ public partial class EventSubStub : IEventSub { }
 
 public class RaisingEventsTests
 {
-    #region events-raise-eventhandler
     [Fact]
     public void Raise_EventHandler_NotifiesSubscribers()
     {
         var stub = new EventPubStub();
-
         DataEventArgs? receivedArgs = null;
 
+        #region events-raise-eventhandler
         // Subscribe to the event through the interface
         IEventPub publisher = stub;
         publisher.DataReceived += (sender, args) =>
@@ -51,29 +50,28 @@ public class RaisingEventsTests
         // Raise the event using the interceptor
         var eventArgs = new DataEventArgs { Data = "Test Data" };
         stub.DataReceived.Raise(stub, eventArgs);
+        #endregion
 
         Assert.NotNull(receivedArgs);
         Assert.Equal("Test Data", receivedArgs.Data);
     }
-    #endregion
 
-    #region events-raise-action
     [Fact]
     public void Raise_Action_NotifiesSubscribers()
     {
         var stub = new EventPubStub();
-
         string? receivedStatus = null;
 
+        #region events-raise-action
         IEventPub publisher = stub;
         publisher.StatusChanged += status => receivedStatus = status;
 
         // Raise Action<T> event with single argument
         stub.StatusChanged.Raise("Connected");
+        #endregion
 
         Assert.Equal("Connected", receivedStatus);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -82,14 +80,13 @@ public class RaisingEventsTests
 
 public class SubscriptionVerificationTests
 {
-    #region events-verify-subscribe
     [Fact]
     public void HasSubscribers_VerifiesActiveSubscriptions()
     {
         var stub = new EventSubStub();
-
         IEventSub subscriber = stub;
 
+        #region events-verify-subscribe
         // Initially no subscribers
         Assert.False(stub.OnCompleted.HasSubscribers);
 
@@ -98,42 +95,39 @@ public class SubscriptionVerificationTests
 
         // Now has subscribers
         Assert.True(stub.OnCompleted.HasSubscribers);
+        #endregion
     }
-    #endregion
 
-    #region events-verify-addcount
     [Fact]
     public void AddCount_TracksSubscriptionOperations()
     {
         var stub = new EventSubStub();
-
         IEventSub subscriber = stub;
 
+        #region events-verify-addcount
         subscriber.OnCompleted += (sender, args) => { };
         subscriber.OnCompleted += (sender, args) => { };
 
         // VerifyAdd tracks subscribe operations
         stub.OnCompleted.VerifyAdd(Times.Exactly(2));
+        #endregion
     }
-    #endregion
 
-    #region events-verify-unsubscribe
     [Fact]
     public void RemoveCount_TracksUnsubscribeOperations()
     {
         var stub = new EventSubStub();
-
         IEventSub subscriber = stub;
-
         EventHandler handler = (sender, args) => { };
 
+        #region events-verify-unsubscribe
         subscriber.OnCompleted += handler;
         subscriber.OnCompleted -= handler;
 
         // VerifyRemove tracks unsubscribe operations
         stub.OnCompleted.VerifyRemove(Times.Once);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -142,20 +136,18 @@ public class SubscriptionVerificationTests
 
 public class EventResetTests
 {
-    #region events-reset
     [Fact]
     public void Reset_ClearsCountsAndSubscribers()
     {
         var stub = new EventSubStub();
-
         IEventSub subscriber = stub;
-
         EventHandler handler = (sender, args) => { };
         subscriber.OnCompleted += handler;
 
         stub.OnCompleted.VerifyAdd(Times.Once);
         Assert.True(stub.OnCompleted.HasSubscribers);
 
+        #region events-reset
         // Reset clears counts and subscribers
         stub.OnCompleted.Reset();
 
@@ -164,8 +156,8 @@ public class EventResetTests
 
         // Subscribers are also cleared
         Assert.False(stub.OnCompleted.HasSubscribers);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -174,10 +166,10 @@ public class EventResetTests
 
 public class CompleteEventExampleTests
 {
-    #region events-complete-example
     [Fact]
     public void Event_FullWorkflow_SubscribeRaiseUnsubscribe()
     {
+        #region events-complete-example
         var stub = new EventPubStub();
 
         DataEventArgs? receivedArgs = null;
@@ -206,6 +198,6 @@ public class CompleteEventExampleTests
         publisher.DataReceived -= handler;
         stub.DataReceived.VerifyRemove(Times.Once);
         Assert.False(stub.DataReceived.HasSubscribers);
+        #endregion
     }
-    #endregion
 }

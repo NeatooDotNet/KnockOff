@@ -115,12 +115,12 @@ public class PropertyInterceptorApiTests
     {
         var stub = new ApiPropertyRepoStub();
 
-        // Set Value directly - returned by getter
+        // Configure getter to return a specific value
         stub.ConnectionString.OnGet("Server=localhost");
 
         IApiPropertyRepo repository = stub;
 
-        // Read property - uses Value
+        // Read property - returns configured value
         var conn = repository.ConnectionString;
         Assert.Equal("Server=localhost", conn);
 
@@ -136,7 +136,7 @@ public class PropertyInterceptorApiTests
         // LastSetValue captures what was written
         Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
 
-        // OnGet replaces Value with callback return
+        // OnGet can take a callback or direct value
         // OnGet() returns IPropertyGetTracking for verification
         stub.Timeout.OnGet(() => 30);
         var timeout = repository.Timeout;
@@ -144,18 +144,16 @@ public class PropertyInterceptorApiTests
 
         // OnSet provides custom setter behavior
         // OnSet() returns IPropertySetTracking for verification
-        // Note: OnSet takes (value) - does NOT automatically update Value
+        // Note: OnSet callback does NOT automatically update the getter
         var setWasCalled = false;
         stub.Timeout.OnSet((val) =>
         {
             setWasCalled = true;
-            // Manually update Value if needed:
-            // stub.Timeout.OnGet(val);
+            // Update getter if needed: stub.Timeout.OnGet(val);
         });
         repository.Timeout = 60;
         Assert.True(setWasCalled);
-        // Value is NOT updated because OnSet didn't do it
-        // (OnGet returns 30 from callback, not Value)
+        // Getter still returns 30 (OnSet didn't reconfigure OnGet)
     }
     #endregion
 }

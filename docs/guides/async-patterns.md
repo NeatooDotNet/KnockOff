@@ -2,11 +2,43 @@
 
 KnockOff fully supports async methods, allowing you to configure `Task<T>` and `ValueTask<T>` return values directly from the `OnCall` callback. This guide shows common async patterns for unit testing.
 
+**See also:**
+- [Method Interceptors](methods.md) - Core `OnCall` callback patterns
+- [Verification](verification.md) - Details on `Verifiable()` and `stub.Verify()`
+
 ---
 
 ## Task<T> Methods
 
-For async methods returning `Task<T>`, use `Task.FromResult` to return immediate values:
+### Value Overload (Recommended)
+
+For simple async values, KnockOff auto-wraps values in `Task.FromResult`:
+
+<!-- snippet: async-task-value-overload -->
+```cs
+[Fact]
+public async Task TaskResult_ValueOverload_AutoWraps()
+{
+    var stub = new AsyncUserSvcStub();
+
+    // VALUE OVERLOAD: KnockOff auto-wraps the value in Task.FromResult
+    // This is the simplest syntax for returning async values
+    stub.GetUserAsync.OnCall(new User { Id = 42, Name = "Alice" });
+
+    IAsyncUserSvc service = stub;
+    var user = await service.GetUserAsync(42);
+
+    Assert.NotNull(user);
+    Assert.Equal("Alice", user.Name);
+}
+```
+<!-- endSnippet -->
+
+This is the simplest syntax when you don't need dynamic logic based on parameters.
+
+### Callback Overload
+
+For async methods where you need dynamic logic or parameter-based values, use `Task.FromResult` in the callback:
 
 <!-- snippet: async-task-result -->
 ```cs
@@ -15,7 +47,7 @@ public async Task TaskResult_ReturnedWithFromResult()
 {
     var stub = new AsyncUserSvcStub();
 
-    // Use Task.FromResult to return a value synchronously
+    // CALLBACK: Use Task.FromResult when you need dynamic logic
     stub.GetUserAsync.OnCall((id) =>
         Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 
@@ -145,7 +177,7 @@ public async Task TaskFromException_ReturnsFaultedTask()
 
 ### Throwing Directly
 
-Alternatively, throw exceptions directly in the `OnCall` callback:
+Alternatively, throw exceptions directly in the `OnCall` callback. Both approaches produce the same result - the exception is thrown when the method is awaited:
 
 <!-- snippet: async-throw -->
 ```cs
@@ -173,7 +205,7 @@ public async Task ThrowDirectly_InOnCallCallback()
 
 ## Complete Example
 
-Here's a full test demonstrating async success and failure scenarios:
+This example demonstrates stubbing an async repository for testing a service layer. It combines multiple async method stubs with verification:
 
 <!-- snippet: async-complete-example -->
 ```cs
@@ -202,10 +234,27 @@ public async Task AsyncService_SuccessScenario()
 
 ---
 
+## Choosing Your Approach
+
+**For simple, static values:**
+- Use the value overload: `stub.GetUserAsync.OnCall(someUser)`
+- KnockOff auto-wraps in `Task.FromResult`
+
+**For dynamic logic or parameter-based values:**
+- Use callback with `Task.FromResult`: `stub.GetUserAsync.OnCall((id) => Task.FromResult(...))`
+
+**For simulating async behavior:**
+- Use async lambda: `stub.GetUserAsync.OnCall(async (id) => { await Task.Delay(...); return ...; })`
+
+**For simulating failures:**
+- Use `Task.FromException<T>(exception)` or throw directly in callback
+
+---
+
 ## Key Takeaways
 
-- `OnCall` returns `Task<T>` or `ValueTask<T>` directly for async methods
-- Use `Task.FromResult(value)` for immediate async values
+- Use the value overload for simple, static async values (automatically wrapped in `Task.FromResult`)
+- Use `Task.FromResult(value)` in callbacks when you need parameter-based logic
 - Use `Task.CompletedTask` for async void methods
 - Use async lambdas to simulate delays or complex async behavior
 - Use `Task.FromException<T>` or throw directly to simulate failures

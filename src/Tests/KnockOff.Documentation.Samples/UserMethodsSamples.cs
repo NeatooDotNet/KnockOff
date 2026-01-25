@@ -25,7 +25,7 @@ public partial class UserMethodsRepoStub : IUserMethodsRepo { }
 public partial class UserMethodsRepoStub
 {
     // Protected method matches interface method signature
-    // This becomes the default behavior when no OnCall is set
+    // This becomes the behavior (user method interceptors have no OnCall)
     protected User? GetUserById(int id)
     {
         return new User { Id = id, Name = "Default User" };
@@ -119,6 +119,45 @@ public class UserMethodResetTests
         var balance = repository.GetBalance(2);
         Assert.Equal(100.00m, balance);
         stub.GetBalance2.Verify(Times.Once);
+    }
+    #endregion
+}
+
+// =============================================================================
+// Source Override - Use a regular stub when you need override capability
+// =============================================================================
+
+/// <summary>
+/// When you need to override behavior, use a regular stub with OnCall
+/// instead of user methods. User methods are for permanent defaults.
+/// </summary>
+[KnockOff]
+public partial class OverridableRepoStub : IUserMethodsRepo { }
+
+public class SourceOverrideTests
+{
+    #region user-methods-source-override
+    [Fact]
+    public void WhenOverrideNeeded_UseRegularStubWithOnCall()
+    {
+        // Use a stub WITHOUT user methods when you need OnCall
+        var stub = new OverridableRepoStub();
+
+        // Configure specific behavior with OnCall
+        stub.GetUserById.OnCall((id) => new User { Id = id, Name = "Overridden" });
+        stub.IsActive.OnCall(true);
+        stub.GetBalance.OnCall(999.99m);
+
+        IUserMethodsRepo repository = stub;
+
+        // OnCall provides the behavior
+        var user = repository.GetUserById(1);
+        Assert.Equal("Overridden", user!.Name);
+        Assert.True(repository.IsActive(1));
+        Assert.Equal(999.99m, repository.GetBalance(1));
+
+        // Still get full verification
+        stub.GetUserById.Verify(Times.Once);
     }
     #endregion
 }

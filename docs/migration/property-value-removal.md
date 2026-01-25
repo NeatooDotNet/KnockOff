@@ -11,74 +11,95 @@ KnockOff 10.24.0 removes the `.Value` property from property interceptors and re
 
 ### Old API (Removed)
 
-```csharp
-// Set a static value for a property
-stub.Name.Value = "Alice";
-
-// Access the configured value
-var value = stub.Name.Value;
+<!-- snippet: property-value-old-api -->
+```cs
+// OLD API (no longer compiles in 10.24.0+):
+//
+// stub.Name.Value = "Alice";           // Set property return value
+// var name = stub.Name.Value;          // Read configured value
 ```
+<!-- endSnippet -->
 
 ### New API
 
-```csharp
-// Use OnGet to configure the getter return value
+<!-- snippet: property-value-new-api -->
+```cs
+// NEW API: Configure property return value with OnGet
 stub.Name.OnGet("Alice");
-
-// Value is no longer directly accessible - configure via OnGet
 ```
+<!-- endSnippet -->
 
 ## Migration Steps
 
 ### 1. Replace `.Value = x` with `.OnGet(x)`
 
 **Before:**
-```csharp
-var stub = new UserStub();
-stub.Name.Value = "Alice";
-stub.Age.Value = 30;
-stub.IsActive.Value = true;
+<!-- snippet: migration-value-to-onget-before -->
+```cs
+// BEFORE (10.23.x and earlier):
+//
+// stub.ConnectionString.Value = "Server=localhost";
+// stub.Timeout.Value = 30;
+// stub.IsEnabled.Value = true;
 ```
+<!-- endSnippet -->
 
 **After:**
-```csharp
-var stub = new UserStub();
-stub.Name.OnGet("Alice");
-stub.Age.OnGet(30);
-stub.IsActive.OnGet(true);
+<!-- snippet: migration-value-to-onget-after -->
+```cs
+// AFTER (10.24.0+):
+stub.ConnectionString.OnGet("Server=localhost");
+stub.Timeout.OnGet(30);
+stub.IsEnabled.OnGet(true);
 ```
+<!-- endSnippet -->
 
 ### 2. Replace `.Value` reads with test assertions
 
 If you were reading `.Value` to verify what was configured, that's no longer needed. The new API configures behavior directly without storing accessible state.
 
 **Before:**
-```csharp
-stub.Name.Value = "Alice";
-Assert.Equal("Alice", stub.Name.Value); // Verify configuration
+<!-- snippet: migration-value-read-before -->
+```cs
+// BEFORE (10.23.x and earlier):
+//
+// stub.Name.Value = "Expected";
+// Assert.Equal("Expected", stub.Name.Value);  // Reading .Value
 ```
+<!-- endSnippet -->
 
 **After:**
-```csharp
-stub.Name.OnGet("Alice");
-// Configuration is implicit - just use the stub
-IUserService service = stub;
-Assert.Equal("Alice", service.Name); // Test through the interface
+<!-- snippet: migration-value-read-after -->
+```cs
+// AFTER: Configure with OnGet, verify through interface
+stub.Name.OnGet("Expected");
+
+IMigrationUserService service = stub;
+Assert.Equal("Expected", service.Name);
 ```
+<!-- endSnippet -->
 
 ### 3. Dynamic values use OnGet with callback
 
 If you were using `.Value` with the expectation it would be read each time, use `OnGet` with a callback for dynamic behavior:
 
 **Before (if expecting dynamic behavior):**
-```csharp
-stub.Timestamp.Value = DateTime.UtcNow; // Only captures time at assignment
+<!-- snippet: migration-dynamic-value-before -->
+```cs
+// BEFORE (10.23.x and earlier):
+// Value was captured once at assignment time
+//
+// stub.LastUpdated.Value = DateTime.UtcNow;
 ```
+<!-- endSnippet -->
 
 **After (for truly dynamic values):**
-```csharp
-stub.Timestamp.OnGet(() => DateTime.UtcNow); // Evaluates each time
+<!-- snippet: migration-dynamic-value-after -->
+```cs
+// AFTER: Use callback for values evaluated on each access
+stub.LastUpdated.OnGet(() => DateTime.UtcNow);
 ```
+<!-- endSnippet -->
 
 ## Why This Change?
 
@@ -109,43 +130,59 @@ error CS1061: 'NameInterceptor' does not contain a definition for 'Value'
 
 ### Simple Property
 
-```csharp
-// Before
-stub.Status.Value = "Active";
-
-// After
-stub.Status.OnGet("Active");
+<!-- snippet: migration-example-simple-property -->
+```cs
+// BEFORE: stub.Name.Value = "Alice";
+// AFTER:
+stub.Name.OnGet("Alice");
 ```
+<!-- endSnippet -->
 
 ### Nullable Property
 
-```csharp
-// Before
-stub.CurrentUser.Value = null;
-
-// After
-stub.CurrentUser.OnGet((User?)null);
+<!-- snippet: migration-example-nullable-property -->
+```cs
+// BEFORE: stub.Email.Value = null;
+// AFTER: Cast null to the property type for OnGet
+stub.Email.OnGet((string?)null);
 ```
+<!-- endSnippet -->
 
 ### Value Type Property
 
-```csharp
-// Before
-stub.Count.Value = 42;
-
-// After
-stub.Count.OnGet(42);
+<!-- snippet: migration-example-value-type-property -->
+```cs
+// BEFORE: stub.Age.Value = 42;
+// AFTER:
+stub.Age.OnGet(42);
 ```
+<!-- endSnippet -->
 
 ### Boolean Property
 
-```csharp
-// Before
-stub.IsEnabled.Value = true;
-
-// After
-stub.IsEnabled.OnGet(true);
+<!-- snippet: migration-example-boolean-property -->
+```cs
+// BEFORE: stub.IsActive.Value = true;
+// AFTER:
+stub.IsActive.OnGet(true);
 ```
+<!-- endSnippet -->
+
+## Verifying Your Migration
+
+After migrating, confirm:
+
+1. **Build succeeds** - All `.Value` references should cause compile errors until replaced
+2. **Tests pass** - Behavior remains unchanged, only syntax differs
+3. **Search for `.Value`** - Grep your test files to find any missed instances:
+   ```bash
+   grep -r "\.Value\s*=" tests/
+   ```
+
+## Related Documentation
+
+- [Configuring Properties](../guides/configuring-properties.md) - Full guide to property configuration
+- [Property Verification](../guides/property-verification.md) - Tracking property access
 
 ## Questions?
 

@@ -50,9 +50,11 @@ public void ValueTypes_ReturnDefault()
 
 ---
 
-## Nullable Reference Types
+## Nullable Types
 
-Nullable reference types (`string?`, `T?`) return `null`:
+Nullable types (both reference and value types) return `null`:
+- Nullable reference types: `string?`, `T?`
+- Nullable value types: `int?`, `bool?`, `DateTime?`
 
 <!-- snippet: smart-defaults-nullable -->
 ```cs
@@ -69,11 +71,17 @@ public void NullableTypes_ReturnNull()
 
     // User? returns null
     Assert.Null(service.FindUserById(42));
+
+    // int? returns null
+    Assert.Null(service.GetOptionalCount());
+
+    // bool? returns null
+    Assert.Null(service.GetOptionalFlag());
 }
 ```
 <!-- endSnippet -->
 
-This matches C#'s nullable reference type semantics where null is an expected value.
+This matches C#'s nullable type semantics where null is an expected value for both nullable reference types and nullable value types.
 
 ---
 
@@ -166,7 +174,9 @@ Empty collections prevent null reference exceptions in test code that iterates o
 
 ## Non-Nullable Without Constructor
 
-Non-nullable reference types **without** a parameterless constructor cannot be instantiated automatically. When no configuration is provided, the stub method throws `InvalidOperationException`:
+Non-nullable reference types **without** a parameterless constructor cannot be instantiated automatically. When no configuration is provided, the stub method throws `InvalidOperationException`.
+
+This fail-fast behavior prevents subtle bugs from returning null where the type system says null is invalid.
 
 <!-- snippet: smart-defaults-throw -->
 ```cs
@@ -176,15 +186,21 @@ public void TypeWithoutCtor_ThrowsWithoutConfiguration()
     var stub = new UserFactoryStub();
     IUserFactory factory = stub;
 
-    // User has no parameterless constructor, so smart defaults can't create one
-    // Without OnCall, user method, or Source, it throws
+    // UserWithRequiredCtor has no parameterless constructor, so smart defaults can't create one
+    // Without OnCall, user method, or Source, calling this method throws
 
-    // Note: The actual behavior depends on how the generator handles this.
-    // In strict mode, it would throw. In non-strict, it returns default (null).
-    // For non-nullable return types without ctor, configure explicitly.
+    var exception = Assert.Throws<InvalidOperationException>(() => factory.GetUser());
+    Assert.Contains("No implementation provided", exception.Message);
+}
+
+[Fact]
+public void TypeWithoutCtor_WorksWithConfiguration()
+{
+    var stub = new UserFactoryStub();
+    IUserFactory factory = stub;
 
     // Configure OnCall to provide value
-    stub.GetUser.OnCall(() => new User { Id = 1, Name = "Configured" });
+    stub.GetUser.OnCall(() => new UserWithRequiredCtor(1, "Configured"));
 
     var user = factory.GetUser();
     Assert.NotNull(user);
@@ -193,12 +209,10 @@ public void TypeWithoutCtor_ThrowsWithoutConfiguration()
 ```
 <!-- endSnippet -->
 
-**When this happens:**
+**How to fix:**
 - **Configure OnCall** - Provide explicit return value
 - **Implement user method** - Add your own implementation in the stub class
 - **Use Source** - Delegate to a real instance
-
-This fail-fast behavior prevents subtle bugs from returning null where the type system says null is invalid.
 
 ---
 
@@ -215,6 +229,7 @@ This fail-fast behavior prevents subtle bugs from returning null where the type 
 | Custom struct | Default-initialized | All fields set to their defaults |
 | `string?` | `null` | Nullable reference type |
 | `T?` (class) | `null` | Nullable reference type |
+| `int?`, `bool?`, etc. | `null` | Nullable value type |
 | `T` with `new()` constraint | `new T()` | Has parameterless constructor |
 | `IEnumerable<T>` | `new List<T>()` | Empty list |
 | `ICollection<T>` | `new List<T>()` | Empty list |
@@ -302,6 +317,6 @@ stub.Source(realRepository);
 
 ## See Also
 
-- [OnCall Reference](oncall.md) - Explicit configuration
+- [Interceptor API Reference](interceptor-api.md) - OnCall and other explicit configuration
 - [User Methods](../guides/user-methods.md) - Custom implementations
 - [Source Delegation](../guides/source-delegation.md) - Delegating to real instances

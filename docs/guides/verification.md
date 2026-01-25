@@ -128,11 +128,13 @@ The `Times` struct supports these verification modes:
 
 - `Times.AtLeastOnce` - Default, at least one call
 - `Times.Once` - Exactly one call
+- `Times.Twice` - Exactly two calls
 - `Times.Exactly(n)` - Exactly N calls
 - `Times.AtLeast(n)` - At least N calls
 - `Times.AtMost(n)` - At most N calls
-- `Times.Between(min, max, Range)` - Between min and max calls (inclusive or exclusive)
 - `Times.Never` - Zero calls
+
+**Note:** For most scenarios, use `Times.Once`, `Times.AtLeast(n)`, or `Times.Never`.
 
 ---
 
@@ -142,24 +144,7 @@ Use `.Verifiable()` to mark interceptors as requiring verification, then call `s
 
 ### Basic Marked Verification
 
-<!-- snippet: verify-verifiable -->
-```cs
-[Fact]
-public void Verifiable_MarksForBatchVerification()
-{
-    var stub = new RepoVerifyStub();
-
-    // Chain .Verifiable() to mark for batch verification
-    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
-
-    IRepoVerify repository = stub;
-    repository.GetById(42);
-
-    // Verify() checks all members marked with .Verifiable()
-    stub.Verify();
-}
-```
-<!-- endSnippet -->
+The `verify-verifiable` example in the Direct Verification section demonstrates this pattern. Chain `.Verifiable()` on the interceptor returned by `OnCall`, then call `stub.Verify()` to check all marked members at once.
 
 ### Verifiable with Times
 
@@ -277,6 +262,40 @@ public void LastArgs_VerifiesMultipleParameters()
 
 ---
 
+## Call Count Inspection
+
+For scenarios where you need to track call counts for custom logic, capture the count in your callback.
+
+<!-- snippet: verify-callcount-tracking -->
+```cs
+[Fact]
+public void TrackCallCount_WithCallback()
+{
+    var stub = new RepoVerifyStub();
+
+    var saveCount = 0;
+    stub.Save.OnCall((user) => { saveCount++; });
+
+    IRepoVerify repository = stub;
+
+    repository.Save(new User { Id = 1 });
+    repository.Save(new User { Id = 2 });
+
+    // Use tracked count for custom assertions
+    Assert.True(saveCount >= 2, "Expected at least 2 saves");
+}
+```
+<!-- endSnippet -->
+
+**When to use tracked counts:**
+- Custom verification logic that doesn't fit `Times` matchers
+- Relative comparisons between multiple methods
+- Debugging to understand call patterns
+
+**Prefer `.Verify(Times)` when possible** - it provides clearer error messages and aligns with the verification pattern.
+
+---
+
 ## Call History Tracking
 
 For complex scenarios requiring inspection of all calls (not just the last), use `OnCall` callbacks to capture a complete history.
@@ -381,21 +400,90 @@ This approach is cleaner than individual assertions and catches missing verifica
 
 ## Property Verification
 
-Properties expose separate interceptors for get and set operations.
+Properties expose separate verification methods for get and set operations.
 
 **Get verification:**
-- `GetCount` - Number of times the property was read
 - `VerifyGet()` / `VerifyGet(Times)` - Verify get access count
 
 **Set verification:**
-- `SetCount` - Number of times the property was written
 - `LastSetValue` - The most recent value assigned to the property
 - `VerifySet()` / `VerifySet(Times)` - Verify set access count
 
 **Combined verification:**
 - `Verify()` / `Verify(Times)` - Verify total access count (get + set)
 
-These follow the same patterns as method verification but distinguish between read and write operations.
+### Property Get Verification
+
+Verify that a property was read the expected number of times.
+
+<!-- snippet: verify-property-get -->
+```cs
+[Fact]
+public void VerifyGet_ChecksPropertyReadCount()
+{
+    var stub = new ConfigVerifyStub();
+    stub.MaxRetries.OnGet(5);
+
+    IConfigVerify config = stub;
+
+    _ = config.MaxRetries;
+    _ = config.MaxRetries;
+
+    // VerifyGet checks how many times property was read
+    stub.MaxRetries.VerifyGet(Times.Exactly(2));
+}
+```
+<!-- endSnippet -->
+
+### Property Set Verification
+
+Verify that a property was written and inspect the assigned value.
+
+<!-- snippet: verify-property-set -->
+```cs
+[Fact]
+public void VerifySet_ChecksPropertyWriteAndValue()
+{
+    var stub = new ConfigVerifyStub();
+
+    IConfigVerify config = stub;
+
+    config.Timeout = 30;
+
+    // VerifySet checks property was written
+    stub.Timeout.VerifySet(Times.Once);
+
+    // LastSetValue contains the assigned value
+    Assert.Equal(30, stub.Timeout.LastSetValue);
+}
+```
+<!-- endSnippet -->
+
+### Property Combined Verification
+
+Verify total property access across both get and set operations.
+
+<!-- snippet: verify-property-combined -->
+```cs
+[Fact]
+public void Verify_ChecksTotalPropertyAccess()
+{
+    var stub = new ConfigVerifyStub();
+    stub.MaxRetries.OnGet(3);
+
+    IConfigVerify config = stub;
+
+    // 2 gets + 2 sets = 4 total accesses
+    _ = config.MaxRetries;
+    _ = config.MaxRetries;
+    config.MaxRetries = 5;
+    config.MaxRetries = 10;
+
+    // Verify checks combined get + set count
+    stub.MaxRetries.Verify(Times.Exactly(4));
+}
+```
+<!-- endSnippet -->
 
 ---
 
@@ -465,6 +553,26 @@ This example shows the modern verification approach: mark what matters with `.Ve
 
 ---
 
+## When Verification Fails
+
+When verification fails, KnockOff throws an exception with a clear message indicating what went wrong.
+
+**Common failure scenarios:**
+
+- **Not called enough times**: "Expected method GetById to be called Times.Once, but was called 0 times"
+- **Called too many times**: "Expected method Save to be called Times.Once, but was called 2 times"
+- **Missing `.Verifiable()` calls**: If you call `stub.Verify()` but nothing was marked `.Verifiable()`, no verification occurs
+- **VerifyAll with uncalled members**: "Expected method Refresh to be called at least once, but was never called"
+
+**Debugging tips:**
+
+1. Check that you're calling the stub through the interface (not directly on the stub class)
+2. Verify callbacks are configured before calling the method under test
+3. Use `.Verifiable()` to explicitly mark what matters
+4. Track call counts in your callbacks for debugging complex scenarios
+
+---
+
 ## Best Practices
 
 **Prefer `.Verifiable()` + `stub.Verify()` over manual assertions.** This prevents forgetting to verify critical calls and makes test intent explicit.
@@ -483,4 +591,6 @@ This example shows the modern verification approach: mark what matters with `.Ve
 
 - [Methods Guide](methods.md) - Configure method behavior and callbacks
 - [Properties Guide](properties.md) - Work with property interceptors
+- [Events Guide](events.md) - Raise and verify events
+- [Delegates Guide](delegates.md) - Configure and verify delegate invocations
 - [Interceptor API Reference](../reference/interceptor-api.md) - Complete API documentation

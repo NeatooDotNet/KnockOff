@@ -90,7 +90,7 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 | `Arg.Any<T>()` | Callback receives all arguments |
 | `Arg.Is<T>(predicate)` | Conditional logic in callback |
 | `.ClearReceivedCalls()` | `stub.Method.Reset()` |
-| `sub.Property.Returns(value)` | `stub.Property.Value = value` |
+| `sub.Property.Returns(value)` | `stub.Property.OnGet(value)` |
 
 ---
 
@@ -298,10 +298,10 @@ public void PropertySetup_KnockOffApproach()
 {
     var stub = new NSubUserRepoStub();
 
-    // KnockOff: Use .Value for read/write properties
-    stub.ConnectionString.Value = "server=localhost";
-    // For read-only properties, also use .Value
-    stub.IsConnected.Value = true;
+    // KnockOff: Use OnGet(value) for all properties
+    stub.ConnectionString.OnGet("server=localhost");
+    // For read-only properties, also use OnGet(value)
+    stub.IsConnected.OnGet(true);
 
     INSubUserRepo repository = stub;
 
@@ -311,7 +311,7 @@ public void PropertySetup_KnockOffApproach()
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `.Returns()` is consistent with methods. KnockOff's `.Value` is more explicit about what you're doing (setting a backing value), but breaks the pattern consistency.
+**Trade-off:** NSubstitute's `.Returns()` is consistent with methods. KnockOff's `.OnGet()` is more explicit about configuring the getter behavior.
 
 ---
 

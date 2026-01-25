@@ -12,27 +12,16 @@ For standard event handler delegates, use the `Raise(sender, args)` method with 
 
 <!-- snippet: events-raise-eventhandler -->
 ```cs
-[Fact]
-public void Raise_EventHandler_NotifiesSubscribers()
+// Subscribe to the event through the interface
+IEventPub publisher = stub;
+publisher.DataReceived += (sender, args) =>
 {
-    var stub = new EventPubStub();
+    receivedArgs = args;
+};
 
-    DataEventArgs? receivedArgs = null;
-
-    // Subscribe to the event through the interface
-    IEventPub publisher = stub;
-    publisher.DataReceived += (sender, args) =>
-    {
-        receivedArgs = args;
-    };
-
-    // Raise the event using the interceptor
-    var eventArgs = new DataEventArgs { Data = "Test Data" };
-    stub.DataReceived.Raise(stub, eventArgs);
-
-    Assert.NotNull(receivedArgs);
-    Assert.Equal("Test Data", receivedArgs.Data);
-}
+// Raise the event using the interceptor
+var eventArgs = new DataEventArgs { Data = "Test Data" };
+stub.DataReceived.Raise(stub, eventArgs);
 ```
 <!-- endSnippet -->
 
@@ -42,21 +31,11 @@ For Action-based events, use the `Raise(arg)` method with a single parameter mat
 
 <!-- snippet: events-raise-action -->
 ```cs
-[Fact]
-public void Raise_Action_NotifiesSubscribers()
-{
-    var stub = new EventPubStub();
+IEventPub publisher = stub;
+publisher.StatusChanged += status => receivedStatus = status;
 
-    string? receivedStatus = null;
-
-    IEventPub publisher = stub;
-    publisher.StatusChanged += status => receivedStatus = status;
-
-    // Raise Action<T> event with single argument
-    stub.StatusChanged.Raise("Connected");
-
-    Assert.Equal("Connected", receivedStatus);
-}
+// Raise Action<T> event with single argument
+stub.StatusChanged.Raise("Connected");
 ```
 <!-- endSnippet -->
 
@@ -70,22 +49,14 @@ Use `HasSubscribers` to verify whether any handlers are currently subscribed to 
 
 <!-- snippet: events-verify-subscribe -->
 ```cs
-[Fact]
-public void HasSubscribers_VerifiesActiveSubscriptions()
-{
-    var stub = new EventSubStub();
+// Initially no subscribers
+Assert.False(stub.OnCompleted.HasSubscribers);
 
-    IEventSub subscriber = stub;
+// Subscribe a handler
+subscriber.OnCompleted += (sender, args) => { };
 
-    // Initially no subscribers
-    Assert.False(stub.OnCompleted.HasSubscribers);
-
-    // Subscribe a handler
-    subscriber.OnCompleted += (sender, args) => { };
-
-    // Now has subscribers
-    Assert.True(stub.OnCompleted.HasSubscribers);
-}
+// Now has subscribers
+Assert.True(stub.OnCompleted.HasSubscribers);
 ```
 <!-- endSnippet -->
 
@@ -95,19 +66,11 @@ Use `AddCount` to track how many times handlers have been added to the event.
 
 <!-- snippet: events-verify-addcount -->
 ```cs
-[Fact]
-public void AddCount_TracksSubscriptionOperations()
-{
-    var stub = new EventSubStub();
+subscriber.OnCompleted += (sender, args) => { };
+subscriber.OnCompleted += (sender, args) => { };
 
-    IEventSub subscriber = stub;
-
-    subscriber.OnCompleted += (sender, args) => { };
-    subscriber.OnCompleted += (sender, args) => { };
-
-    // VerifyAdd tracks subscribe operations
-    stub.OnCompleted.VerifyAdd(Times.Exactly(2));
-}
+// VerifyAdd tracks subscribe operations
+stub.OnCompleted.VerifyAdd(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -119,21 +82,11 @@ Use `RemoveCount` to verify how many times handlers have been unsubscribed from 
 
 <!-- snippet: events-verify-unsubscribe -->
 ```cs
-[Fact]
-public void RemoveCount_TracksUnsubscribeOperations()
-{
-    var stub = new EventSubStub();
+subscriber.OnCompleted += handler;
+subscriber.OnCompleted -= handler;
 
-    IEventSub subscriber = stub;
-
-    EventHandler handler = (sender, args) => { };
-
-    subscriber.OnCompleted += handler;
-    subscriber.OnCompleted -= handler;
-
-    // VerifyRemove tracks unsubscribe operations
-    stub.OnCompleted.VerifyRemove(Times.Once);
-}
+// VerifyRemove tracks unsubscribe operations
+stub.OnCompleted.VerifyRemove(Times.Once);
 ```
 <!-- endSnippet -->
 
@@ -141,36 +94,22 @@ public void RemoveCount_TracksUnsubscribeOperations()
 
 ## Resetting Events
 
-The `Reset()` method clears subscription counts but **does not** remove active subscribers. Use this to reset verification state between test phases while preserving event handlers.
+The `Reset()` method clears subscription counts and removes all active subscribers. Use this to reset both tracking state and event handlers between test phases.
 
 <!-- snippet: events-reset -->
 ```cs
-[Fact]
-public void Reset_ClearsCountsAndSubscribers()
-{
-    var stub = new EventSubStub();
+// Reset clears counts and subscribers
+stub.OnCompleted.Reset();
 
-    IEventSub subscriber = stub;
+// Counts are cleared - verify add was never called after reset
+stub.OnCompleted.VerifyAdd(Times.Never);
 
-    EventHandler handler = (sender, args) => { };
-    subscriber.OnCompleted += handler;
-
-    stub.OnCompleted.VerifyAdd(Times.Once);
-    Assert.True(stub.OnCompleted.HasSubscribers);
-
-    // Reset clears counts and subscribers
-    stub.OnCompleted.Reset();
-
-    // Counts are cleared - verify add was never called after reset
-    stub.OnCompleted.VerifyAdd(Times.Never);
-
-    // Subscribers are also cleared
-    Assert.False(stub.OnCompleted.HasSubscribers);
-}
+// Subscribers are also cleared
+Assert.False(stub.OnCompleted.HasSubscribers);
 ```
 <!-- endSnippet -->
 
-**Important**: `Reset()` only clears tracking counters. If you need to verify subscription state after reset, use `HasSubscribers` to confirm handlers are still attached.
+**Important**: After calling `Reset()`, both the tracking counters and subscribers are cleared, so `HasSubscribers` will return `false`.
 
 ---
 
@@ -180,38 +119,34 @@ This example demonstrates the full event interceptor workflow: subscribing handl
 
 <!-- snippet: events-complete-example -->
 ```cs
-[Fact]
-public void Event_FullWorkflow_SubscribeRaiseUnsubscribe()
+var stub = new EventPubStub();
+
+DataEventArgs? receivedArgs = null;
+int raiseCount = 0;
+
+EventHandler<DataEventArgs> handler = (sender, args) =>
 {
-    var stub = new EventPubStub();
+    receivedArgs = args;
+    raiseCount++;
+};
 
-    DataEventArgs? receivedArgs = null;
-    int raiseCount = 0;
+IEventPub publisher = stub;
 
-    EventHandler<DataEventArgs> handler = (sender, args) =>
-    {
-        receivedArgs = args;
-        raiseCount++;
-    };
+// Subscribe and verify
+publisher.DataReceived += handler;
+stub.DataReceived.VerifyAdd(Times.Once);
+Assert.True(stub.DataReceived.HasSubscribers);
 
-    IEventPub publisher = stub;
+// Raise the event
+var eventArgs = new DataEventArgs { Data = "Test" };
+stub.DataReceived.Raise(stub, eventArgs);
+Assert.Equal(1, raiseCount);
+Assert.Equal("Test", receivedArgs?.Data);
 
-    // Subscribe and verify
-    publisher.DataReceived += handler;
-    stub.DataReceived.VerifyAdd(Times.Once);
-    Assert.True(stub.DataReceived.HasSubscribers);
-
-    // Raise the event
-    var eventArgs = new DataEventArgs { Data = "Test" };
-    stub.DataReceived.Raise(stub, eventArgs);
-    Assert.Equal(1, raiseCount);
-    Assert.Equal("Test", receivedArgs?.Data);
-
-    // Unsubscribe and verify
-    publisher.DataReceived -= handler;
-    stub.DataReceived.VerifyRemove(Times.Once);
-    Assert.False(stub.DataReceived.HasSubscribers);
-}
+// Unsubscribe and verify
+publisher.DataReceived -= handler;
+stub.DataReceived.VerifyRemove(Times.Once);
+Assert.False(stub.DataReceived.HasSubscribers);
 ```
 <!-- endSnippet -->
 

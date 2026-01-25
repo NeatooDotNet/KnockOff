@@ -6,17 +6,19 @@ This document provides a complete API reference for all interceptor types genera
 
 ## Overview
 
-KnockOff generates five types of interceptors, each exposed through properties named after the interface:
+KnockOff generates five types of interceptors, each exposed through properties on your stub class. For a stub implementing `IRepository`, interceptors are accessed via properties named after the interface.
 
-| Interceptor Type | Generated For | Container Property |
-|-----------------|---------------|-------------------|
-| **Method Interceptor** | Interface methods (non-generic) | `{Interface}.{MethodName}` |
-| **Generic Method Interceptor** | Generic interface methods | `{Interface}.{MethodName}` |
-| **Property Interceptor** | Interface properties | `{Interface}.{PropertyName}` |
-| **Indexer Interceptor** | Interface indexers | `{Interface}.Indexer` |
-| **Event Interceptor** | Interface events | `{Interface}.{EventName}` |
+| Interceptor Type | Generated For | Access Pattern | Example |
+|-----------------|---------------|----------------|---------|
+| **Method Interceptor** | Interface methods (non-generic) | `stub.{Interface}.{MethodName}` | `stub.IRepository.Save` |
+| **Generic Method Interceptor** | Generic interface methods | `stub.{Interface}.{MethodName}` | `stub.IRepository.GetById` |
+| **Property Interceptor** | Interface properties | `stub.{Interface}.{PropertyName}` | `stub.IRepository.ConnectionString` |
+| **Indexer Interceptor** | Interface indexers | `stub.{Interface}.Indexer` | `stub.IRepository.Indexer` |
+| **Event Interceptor** | Interface events | `stub.{Interface}.{EventName}` | `stub.IRepository.Changed` |
 
 All interceptors provide a `Reset()` method to clear tracking state and callbacks.
+
+**Pattern Note**: The three KnockOff patterns (Standalone, Inline Interface, Inline Class) all expose the same interceptor API. The only difference is how you declare the stub class.
 
 ---
 
@@ -31,20 +33,16 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 | `WasCalled` | `bool` | True if the method was called at least once |
 | `LastCallArg` | `T` | The argument from the most recent call (single-parameter methods only) |
 | `LastCallArgs` | `(T1, T2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
-| `OnCall` | Delegate | Callback invoked when the method is called |
 
-### Verification Methods
+### Configuration Methods
 
-| Method | Description |
-|--------|-------------|
-| `Verify()` | Verify method was called at least once (throws if not) |
-| `Verify(Times)` | Verify method was called according to Times constraint |
-| `Verifiable()` | Mark interceptor for batch verification with default constraint (AtLeastOnce) |
-| `Verifiable(Times)` | Mark interceptor for batch verification with specific Times constraint |
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `OnCall(delegate)` | `IMethodTracking<...>` | Set callback invoked when method is called. Returns tracking interface for verification. |
 
-### OnCall Signatures
+### OnCall Delegate Signatures
 
-The `OnCall` property type varies based on method signature:
+The delegate type passed to `OnCall()` varies based on method signature:
 
 | Method Signature | OnCall Type |
 |-----------------|-------------|
@@ -55,11 +53,20 @@ The `OnCall` property type varies based on method signature:
 | `R M(T arg)` | `Func<T, R>` |
 | `R M(T1 a, T2 b)` | `Func<T1, T2, R>` |
 
-When `OnCall` is set, the callback is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
+When a callback is configured via `OnCall()`, the callback is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
+
+### Verification Methods
+
+| Method | Description |
+|--------|-------------|
+| `Verify()` | Verify method was called at least once (throws if not) |
+| `Verify(Times)` | Verify method was called according to Times constraint |
+| `Verifiable()` | Mark interceptor for batch verification with default constraint (AtLeastOnce) |
+| `Verifiable(Times)` | Mark interceptor for batch verification with specific Times constraint |
 
 ### Methods
 
-- `void Reset()` - Clears `WasCalled`, `LastCallArg`, `LastCallArgs`, and `OnCall`
+- `void Reset()` - Clears `WasCalled`, `LastCallArg`, `LastCallArgs`, and configured callback
 
 ### Example
 
@@ -117,8 +124,13 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 |----------|------|-------------|
 | `Value` | `T` | Backing value returned by property getter |
 | `LastSetValue` | `T` | The value from the most recent setter call |
-| `OnGet` | `Func<T>` | Callback invoked when the property is read |
-| `OnSet` | `Action<T>` | Callback invoked when the property is written |
+
+### Configuration Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `OnGet(Func<T>)` | `IPropertyGetTracking<T>` | Set callback invoked when property is read. Returns tracking interface for verification. |
+| `OnSet(Action<T>)` | `IPropertySetTracking<T>` | Set callback invoked when property is written. Returns tracking interface for verification. |
 
 ### Verification Methods
 
@@ -135,9 +147,10 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 
 ### Behavior Notes
 
-- **OnGet replaces Value**: When `OnGet` is set, the callback's return value is used instead of `Value`
-- **OnSet doesn't update Value**: Setting `OnSet` does NOT automatically update `Value`. If you want `Value` updated, your callback must do it explicitly
+- **OnGet replaces Value**: When a callback is configured via `OnGet()`, the callback's return value is used instead of `Value`
+- **OnSet doesn't update Value**: Configuring `OnSet()` does NOT automatically update `Value`. If you want `Value` updated, your callback must do it explicitly
 - **Init-only properties**: Setters for `init` properties are tracked like regular setters
+- **Fluent returns**: Both `OnGet()` and `OnSet()` return tracking interfaces, allowing verification on the returned object
 
 ### Methods
 
@@ -152,12 +165,12 @@ public void PropertyInterceptor_CompleteApiDemonstration()
 {
     var stub = new ApiPropertyRepoStub();
 
-    // Set Value directly - returned by getter
-    stub.ConnectionString.Value = "Server=localhost";
+    // Configure getter to return a specific value
+    stub.ConnectionString.OnGet("Server=localhost");
 
     IApiPropertyRepo repository = stub;
 
-    // Read property - uses Value
+    // Read property - returns configured value
     var conn = repository.ConnectionString;
     Assert.Equal("Server=localhost", conn);
 
@@ -173,7 +186,7 @@ public void PropertyInterceptor_CompleteApiDemonstration()
     // LastSetValue captures what was written
     Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
 
-    // OnGet replaces Value with callback return
+    // OnGet can take a callback or direct value
     // OnGet() returns IPropertyGetTracking for verification
     stub.Timeout.OnGet(() => 30);
     var timeout = repository.Timeout;
@@ -181,18 +194,16 @@ public void PropertyInterceptor_CompleteApiDemonstration()
 
     // OnSet provides custom setter behavior
     // OnSet() returns IPropertySetTracking for verification
-    // Note: OnSet takes (value) - does NOT automatically update Value
+    // Note: OnSet callback does NOT automatically update the getter
     var setWasCalled = false;
     stub.Timeout.OnSet((val) =>
     {
         setWasCalled = true;
-        // Manually update Value if needed:
-        // stub.Timeout.Value = val;
+        // Update getter if needed: stub.Timeout.OnGet(val);
     });
     repository.Timeout = 60;
     Assert.True(setWasCalled);
-    // Value is NOT updated because OnSet didn't do it
-    // (OnGet returns 30 from callback, not Value)
+    // Getter still returns 30 (OnSet didn't reconfigure OnGet)
 }
 ```
 <!-- endSnippet -->
@@ -208,10 +219,15 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 | Property | Type | Description |
 |----------|------|-------------|
 | `Backing` | `Dictionary<TKey, TValue>` | Backing dictionary used by default get/set operations |
-| `LastGetKey` | `TKey` | The key from the most recent getter call |
-| `LastSetEntry` | `(TKey, TValue)` | Tuple of key and value from the most recent setter call |
-| `OnGet` | `Func<TKey, TValue>` | Callback invoked when the indexer is read |
-| `OnSet` | `Action<TKey, TValue>` | Callback invoked when the indexer is written |
+| `LastGetKey` | `TKey?` | The key from the most recent getter call (nullable for reference types) |
+| `LastSetEntry` | `(TKey, TValue)?` | Nullable tuple of key and value from the most recent setter call |
+
+### Configuration Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `OnGet(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey, TValue>` | Set callback invoked when indexer is read. Returns tracking interface for verification. |
+| `OnSet(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Set callback invoked when indexer is written. Returns tracking interface for verification. |
 
 ### Verification Methods
 
@@ -225,8 +241,10 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 ### Behavior Notes
 
 - **Backing dictionary**: By default, get returns `Backing[key]` and set stores to `Backing[key]`
-- **OnGet override**: When `OnGet` is set, the callback's return value is used instead of `Backing`
-- **OnSet override**: When `OnSet` is set, the callback is invoked. `Backing` is NOT updated automatically unless your callback does it
+- **OnGet override**: When a callback is configured via `OnGet()`, the callback's return value is used instead of `Backing`
+- **OnSet override**: When a callback is configured via `OnSet()`, the callback is invoked. `Backing` is NOT updated automatically unless your callback does it
+- **Fluent returns**: Both `OnGet()` and `OnSet()` return tracking interfaces, allowing verification on the returned object
+- **Nullable tracking**: `LastGetKey` and `LastSetEntry` are nullable to handle cases where no calls have been made yet
 
 ### Methods
 
@@ -405,9 +423,23 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 | `WasCalled` | `bool` | True if the method was called with these type arguments |
 | `LastCallArg` | `TArg` | The argument from the most recent call with these type arguments (single-parameter methods) |
 | `LastCallArgs` | `(TArg1, TArg2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
-| `OnCall` | Delegate | Callback invoked when the method is called with these type arguments |
 
-The `OnCall` property follows the same signature rules as non-generic method interceptors (see Method Interceptor section).
+#### Typed Configuration Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `OnCall(delegate)` | `IGenericMethodTracking<...>` | Set callback invoked when method is called with these type arguments. Returns tracking interface for verification. |
+
+The callback delegate type follows the same signature rules as non-generic method interceptors (see Method Interceptor section).
+
+#### Typed Verification Methods
+
+| Method | Description |
+|--------|-------------|
+| `Verify()` | Verify method was called with these type arguments at least once (throws if not) |
+| `Verify(Times)` | Verify method was called with these type arguments according to Times constraint |
+| `Verifiable()` | Mark interceptor for batch verification with default constraint (AtLeastOnce) |
+| `Verifiable(Times)` | Mark interceptor for batch verification with specific Times constraint |
 
 ### Methods
 
@@ -481,9 +513,30 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 ---
 
+## Times Constraints
+
+All `Verify()` and `Verifiable()` methods accept an optional `Times` constraint. Common values:
+
+| Constraint | Description |
+|-----------|-------------|
+| `Times.AtLeastOnce` | Called one or more times (default for `Verifiable()`) |
+| `Times.Once` | Called exactly once |
+| `Times.Never` | Never called |
+| `Times.Exactly(n)` | Called exactly n times |
+| `Times.AtLeast(n)` | Called n or more times |
+| `Times.AtMost(n)` | Called n or fewer times |
+| `Times.Between(min, max)` | Called between min and max times (inclusive) |
+
+See the [Verification Guide](../guides/verification.md) for detailed examples.
+
+---
+
 ## See Also
 
 - [Getting Started](../getting-started.md) - Basic usage patterns
 - [Methods Guide](../guides/methods.md) - Configure method behavior and callbacks
 - [Properties Guide](../guides/properties.md) - Work with property interceptors
+- [Indexers Guide](../guides/indexers.md) - Work with indexer interceptors
+- [Events Guide](../guides/events.md) - Work with event interceptors
+- [Generic Methods Guide](../guides/generic-methods.md) - Work with generic method interceptors
 - [Verification Guide](../guides/verification.md) - Assert on stub interactions

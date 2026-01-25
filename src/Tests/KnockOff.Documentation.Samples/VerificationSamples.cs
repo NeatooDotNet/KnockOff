@@ -18,6 +18,12 @@ public interface ISvcVerify
     void Update(int id, string name);
 }
 
+public interface IConfigVerify
+{
+    int MaxRetries { get; set; }
+    int Timeout { get; set; }
+}
+
 // =============================================================================
 // Stubs for Verification Samples
 // =============================================================================
@@ -27,6 +33,9 @@ public partial class RepoVerifyStub : IRepoVerify { }
 
 [KnockOff]
 public partial class SvcVerifyStub : ISvcVerify { }
+
+[KnockOff]
+public partial class ConfigVerifyStub : IConfigVerify { }
 
 // =============================================================================
 // Basic Call Verification
@@ -195,6 +204,32 @@ public class ArgumentVerificationTests
 }
 
 // =============================================================================
+// Call Count Tracking
+// =============================================================================
+
+public class CallCountTests
+{
+    #region verify-callcount-tracking
+    [Fact]
+    public void TrackCallCount_WithCallback()
+    {
+        var stub = new RepoVerifyStub();
+
+        var saveCount = 0;
+        stub.Save.OnCall((user) => { saveCount++; });
+
+        IRepoVerify repository = stub;
+
+        repository.Save(new User { Id = 1 });
+        repository.Save(new User { Id = 2 });
+
+        // Use tracked count for custom assertions
+        Assert.True(saveCount >= 2, "Expected at least 2 saves");
+    }
+    #endregion
+}
+
+// =============================================================================
 // Call History Tracking
 // =============================================================================
 
@@ -283,6 +318,68 @@ public class CrossInterceptorTests
 
         // Single Verify() checks all marked members
         stub.Verify();
+    }
+    #endregion
+}
+
+// =============================================================================
+// Property Verification
+// =============================================================================
+
+public class PropertyVerificationTests
+{
+    #region verify-property-get
+    [Fact]
+    public void VerifyGet_ChecksPropertyReadCount()
+    {
+        var stub = new ConfigVerifyStub();
+        stub.MaxRetries.OnGet(5);
+
+        IConfigVerify config = stub;
+
+        _ = config.MaxRetries;
+        _ = config.MaxRetries;
+
+        // VerifyGet checks how many times property was read
+        stub.MaxRetries.VerifyGet(Times.Exactly(2));
+    }
+    #endregion
+
+    #region verify-property-set
+    [Fact]
+    public void VerifySet_ChecksPropertyWriteAndValue()
+    {
+        var stub = new ConfigVerifyStub();
+
+        IConfigVerify config = stub;
+
+        config.Timeout = 30;
+
+        // VerifySet checks property was written
+        stub.Timeout.VerifySet(Times.Once);
+
+        // LastSetValue contains the assigned value
+        Assert.Equal(30, stub.Timeout.LastSetValue);
+    }
+    #endregion
+
+    #region verify-property-combined
+    [Fact]
+    public void Verify_ChecksTotalPropertyAccess()
+    {
+        var stub = new ConfigVerifyStub();
+        stub.MaxRetries.OnGet(3);
+
+        IConfigVerify config = stub;
+
+        // 2 gets + 2 sets = 4 total accesses
+        _ = config.MaxRetries;
+        _ = config.MaxRetries;
+        config.MaxRetries = 5;
+        config.MaxRetries = 10;
+
+        // Verify checks combined get + set count
+        stub.MaxRetries.Verify(Times.Exactly(4));
     }
     #endregion
 }

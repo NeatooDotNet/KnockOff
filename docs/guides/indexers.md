@@ -2,19 +2,27 @@
 
 Indexers in KnockOff work similarly to properties but with key-based access. Each interface indexer gets a corresponding interceptor that maintains a backing dictionary, tracks access, and supports custom get/set callbacks.
 
+**Quick reference:** For simple test data scenarios, use the `Backing` dictionary. For dynamic or computed values, use `OnGet` callbacks. For write validation or tracking, use `OnSet` callbacks.
+
+<!-- TODO: Add section explaining how indexer configuration works across all three KnockOff patterns: Stand-Alone/Flat ([KnockOff] on class), Inline Interface ([KnockOff<IFoo>]), and Inline Class ([KnockOff<SomeClass>]). Show how to access indexer interceptors in each pattern. -->
+
 ---
 
 ## Configuration Approaches
+
+Choose your configuration approach based on test requirements:
 
 **Backing Dictionary (Recommended for Test Data)**
 - Populate `Indexer.Backing` with test data before running test
 - Use when the indexer should behave like a standard dictionary
 - Simple, readable, and covers most test scenarios
+- Example: Pre-loading a cache stub with known user IDs
 
 **Dynamic Callbacks (For Complex Scenarios)**
 - Set `Indexer.OnGet` to compute values at access time
 - Set `Indexer.OnSet` to intercept and validate writes
 - Use when values depend on state, validation, or need computed behavior
+- Example: Simulating cache misses, validation failures, or retry logic
 
 ---
 
@@ -227,9 +235,7 @@ public void OnSet_Validation()
 
 ## Verifying Indexer Access
 
-Indexer interceptors support verification similar to properties.
-
-### Using Verify() on Indexers
+Indexer interceptors support verification and tracking similar to properties and methods.
 
 <!-- snippet: indexers-verify-access -->
 ```cs
@@ -287,14 +293,14 @@ public void CaptureLastAccess()
 ```
 <!-- endSnippet -->
 
-**Available verification methods:**
-- `VerifyGet(Times)` - Verify indexer getter was called
-- `VerifySet(Times)` - Verify indexer setter was called
+**Verification methods:**
+- `VerifyGet(Times)` - Verify indexer getter was called specified number of times
+- `VerifySet(Times)` - Verify indexer setter was called specified number of times
 
-**Available inspection properties:**
-- `LastGetKey` - The key from the most recent getter call (nullable)
-- `LastSetEntry` - Tuple of (key, value) from the most recent setter call (nullable)
-- `Backing` - The backing dictionary (modifiable)
+**Inspection properties:**
+- `LastGetKey` - The key from the most recent getter call (null if never accessed)
+- `LastSetEntry` - Nullable KeyValuePair of the most recent setter call (null if never set)
+- `Backing` - The backing dictionary (read/write access for test setup)
 
 ---
 
@@ -430,10 +436,11 @@ public void MultipleIndexerOverloads()
 ```
 <!-- endSnippet -->
 
-Overloads are numbered in the order they appear in the interface definition:
-- First indexer: `stub.Indexer`
-- Second indexer: `stub.Indexer_1`
-- Third indexer: `stub.Indexer_2`
+<!-- TODO: Update sample to show actual generated property names - check how multiple indexer overloads are named by the generator (e.g., OfString, OfInt32 vs numeric suffixes) -->
+
+Overloads use type-based naming in the order they appear in the interface definition:
+- String key indexer: `stub.Indexer.OfString`
+- Int32 key indexer: `stub.Indexer.OfInt32`
 
 Each overload maintains its own backing dictionary and configuration.
 
@@ -466,14 +473,40 @@ public void OnGet_TakesPrecedenceOverBacking()
 ```
 <!-- endSnippet -->
 
-**Design principle:** Callbacks override default backing dictionary behavior. If you want both, your callback must explicitly update `Backing`:
+**Design principle:** Callbacks override default backing dictionary behavior. If you need to both execute custom logic AND update the backing dictionary, your callback must explicitly write to `Backing`:
 
-```csharp
-stub.Indexer.OnSet((key, value) => {
-    Validate(key, value);
-    stub.Indexer.Backing[key] = value;  // Manually update Backing
-});
+<!-- snippet: indexers-onset-with-backing -->
+```cs
+[Fact]
+public void OnSet_WithBackingUpdate()
+{
+    var stub = new ConfigStoreStub();
+
+    var validationLog = new List<string>();
+    stub.Indexer.OnSet((key, value) =>
+    {
+        // Custom validation
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("Value cannot be empty");
+
+        validationLog.Add(key);
+
+        // Manually update backing so subsequent reads work
+        stub.Indexer.Backing[key] = value;
+    });
+
+    IConfigStore config = stub;
+
+    config["ApiKey"] = "secret123";
+
+    // Validation was called
+    Assert.Single(validationLog);
+
+    // Backing was updated manually
+    Assert.Equal("secret123", stub.Indexer.Backing["ApiKey"]);
+}
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -519,7 +552,7 @@ public void Reset_ClearsTrackingPreservesBacking()
 ```
 <!-- endSnippet -->
 
-**Note on Reset behavior:** Reset() clears tracking counters, `LastGetKey`, `LastSetEntry`, `OnGet`, and `OnSet`. The `Backing` dictionary is preserved to maintain test data configuration between verification phases.
+**Reset behavior:** Calling `Reset()` clears all tracking counters, `LastGetKey`, `LastSetEntry`, callbacks (`OnGet`, `OnSet`), and sequence configurations. However, the `Backing` dictionary is intentionally preserved so test data remains available across verification phases within the same test.
 
 ---
 

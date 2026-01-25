@@ -1,8 +1,10 @@
 # User Methods
 
-User methods let you define default stub behavior at compile time by writing protected methods in your stub class. They provide reusable defaults across tests while remaining overridable when needed.
+User methods let you define default stub behavior at compile time by writing protected methods in your stub class. They provide reusable defaults across tests while remaining testable through tracking interceptors.
 
 **Availability**: User methods work only with the **Stand-Alone pattern** (`[KnockOff]` on a class implementing an interface). They are not available in Inline Interface or Inline Class patterns.
+
+**Important**: User method interceptors are tracking-only. They do not have `OnCall` for configuring behavior. The protected method implementation is the behavior.
 
 ---
 
@@ -19,7 +21,7 @@ public partial class UserMethodsRepoStub : IUserMethodsRepo { }
 public partial class UserMethodsRepoStub
 {
     // Protected method matches interface method signature
-    // This becomes the default behavior when no OnCall is set
+    // This becomes the behavior (user method interceptors have no OnCall)
     protected User? GetUserById(int id)
     {
         return new User { Id = id, Name = "Default User" };
@@ -46,16 +48,16 @@ public partial class UserMethodsRepoStub
 
 ---
 
-## Priority Order
+## How User Methods Work
 
-When a stub method is called, KnockOff checks for behavior in this order:
+When you define a protected method matching an interface member signature:
 
-1. **OnCall** - Explicitly set callback in test
-2. **User Method** - Protected method defined in stub class
-3. **Source** - Delegated behavior from `Source(T)` if configured
-4. **Smart Default** - Generated default return value
+1. KnockOff generates an explicit interface implementation that calls your protected method
+2. The interceptor tracks calls but does not provide `OnCall` configuration
+3. Your protected method implementation provides the behavior
+4. Tests verify calls through the interceptor using `Verify()` and `LastArg`
 
-User methods act as compile-time defaults. You can override them with `OnCall` for specific tests without changing the user method.
+User methods provide permanent compile-time behavior. To override them, use `Source()` delegation (see the [Source Delegation guide](source-delegation.md)).
 
 <!-- snippet: user-methods-priority -->
 ```cs
@@ -80,9 +82,9 @@ public void UserMethod_ProvidesDefaultBehavior()
 
 ---
 
-## Overriding in Tests
+## Tracking and Verification
 
-Set `OnCall` on the interceptor to override the user method for a specific test scenario.
+User method interceptors provide call tracking without behavior configuration. Use them to verify the user method was called with expected arguments.
 
 <!-- snippet: user-methods-override -->
 ```cs
@@ -104,13 +106,13 @@ public void UserMethod_InterceptorTracksCallsOnly()
 ```
 <!-- endSnippet -->
 
-This lets you keep common "happy path" behavior in the user method while easily testing edge cases.
+User method interceptors have the same verification API as regular interceptors: `Verify()`, `LastArg`, and `Reset()`. They omit `OnCall` because the protected method defines the behavior.
 
 ---
 
-## Resetting to User Method
+## Resetting Call Tracking
 
-Call `Reset()` on the interceptor to clear any `OnCall` override and restore the user method as the active behavior.
+Call `Reset()` on the interceptor to clear call count and argument tracking. The user method behavior remains unchanged since it's defined in your protected method.
 
 <!-- snippet: user-methods-reset -->
 ```cs
@@ -136,7 +138,42 @@ public void Reset_ClearsUserMethodTracking()
 ```
 <!-- endSnippet -->
 
-This is useful when reusing a stub instance across multiple test phases.
+This is useful when reusing a stub instance across multiple test phases or when you need to verify calls made during a specific portion of the test.
+
+---
+
+## Overriding User Method Behavior
+
+User method interceptors do not have `OnCall`. To override user method behavior in specific tests, use `Source()` delegation.
+
+<!-- snippet: user-methods-source-override -->
+```cs
+[Fact]
+public void WhenOverrideNeeded_UseRegularStubWithOnCall()
+{
+    // Use a stub WITHOUT user methods when you need OnCall
+    var stub = new OverridableRepoStub();
+
+    // Configure specific behavior with OnCall
+    stub.GetUserById.OnCall((id) => new User { Id = id, Name = "Overridden" });
+    stub.IsActive.OnCall(true);
+    stub.GetBalance.OnCall(999.99m);
+
+    IUserMethodsRepo repository = stub;
+
+    // OnCall provides the behavior
+    var user = repository.GetUserById(1);
+    Assert.Equal("Overridden", user!.Name);
+    Assert.True(repository.IsActive(1));
+    Assert.Equal(999.99m, repository.GetBalance(1));
+
+    // Still get full verification
+    stub.GetUserById.Verify(Times.Once);
+}
+```
+<!-- endSnippet -->
+
+The `Source()` method allows you to delegate to a different implementation for the entire interface. See the [Source Delegation guide](source-delegation.md) for details.
 
 ---
 
@@ -144,15 +181,15 @@ This is useful when reusing a stub instance across multiple test phases.
 
 ### Shared Test Data Setup
 
-Define user methods that return consistent test data across all tests. Override only when a specific test needs different data.
+Define user methods that return consistent test data across all tests. Tests verify behavior using the tracking interceptors.
 
-**Use case**: Repository stubs that return standard test entities by default. Tests for empty results or edge cases override with `OnCall`.
+**Use case**: Repository stubs that return standard test entities by default. Tests verify the stub was called correctly and check the returned data.
 
 ### Default "Happy Path" Implementations
 
-Implement the most common success scenario in user methods. Tests for error cases or alternate flows override as needed.
+Implement the most common success scenario in user methods. Tests verify the happy path executes correctly.
 
-**Use case**: Service stubs where most tests assume operations succeed. Failure scenarios use `OnCall` to simulate errors.
+**Use case**: Service stubs where most tests assume operations succeed. Tests can verify success paths without configuring callbacks for every method.
 
 ---
 
@@ -207,7 +244,8 @@ public void MultipleCallsTrackedCorrectly()
 
 - User methods only work with the Stand-Alone pattern (`[KnockOff]` on class)
 - Define protected methods matching interface member signatures
-- They provide compile-time defaults that can be overridden with `OnCall`
-- Priority: OnCall > User Method > Source > Smart Default
-- Use `Reset()` to clear OnCall and restore user method behavior
-- Ideal for shared test data and common "happy path" scenarios
+- They provide compile-time behavior that cannot be changed with `OnCall`
+- Interceptors provide tracking only: `Verify()`, `LastArg`, `Reset()`
+- No `OnCall` available on user method interceptors
+- To override behavior, use `Source()` delegation (see [Source Delegation guide](source-delegation.md))
+- Ideal for shared test data and common "happy path" scenarios where behavior is constant

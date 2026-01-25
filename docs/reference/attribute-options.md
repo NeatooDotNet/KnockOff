@@ -48,7 +48,7 @@ Apply `[KnockOff<IService>]` to any test class to generate a stub implementing t
 
 **Behavior:**
 - Generates a stub class in the `Stubs` namespace nested under your test class
-- Stub class name matches the interface name without the "I" prefix (e.g., `IUserRepository` → `UserRepository`)
+- Stub class name matches the interface name (the "I" prefix is preserved: `IUserRepository` → `Stubs.IUserRepository`)
 - Generated class is `partial` and can be extended if needed
 
 **Use when:**
@@ -58,29 +58,24 @@ Apply `[KnockOff<IService>]` to any test class to generate a stub implementing t
 
 <!-- snippet: attr-inline-interface -->
 ```cs
-// Inline interface pattern: [KnockOff<IInterface>] generates Stubs.IInterfaceName
+// Inline interface pattern: [KnockOff<IInterface>] generates stub in Stubs namespace
 [KnockOff<IAttrUserRepository>]
 public partial class InlineInterfacePatternTests
 {
-    [Fact]
-    public void InlineInterface_GeneratesStubInStubsNamespace()
+    private void Example()
     {
-        // Generated stub: Stubs.IAttrUserRepository
+        // Generated stub accessed via Stubs namespace
         var stub = new Stubs.IAttrUserRepository();
 
         stub.GetById.OnCall((id) => new User { Id = id, Name = "Inline User" });
 
         IAttrUserRepository repository = stub;
-        var user = repository.GetById(1);
-
-        Assert.NotNull(user);
-        Assert.Equal("Inline User", user.Name);
     }
 }
 ```
 <!-- endSnippet -->
 
-Access the generated stub through the `Stubs` namespace: `var stub = new Stubs.UserRepository();`
+Access the generated stub through the `Stubs` namespace nested under your test class.
 
 ---
 
@@ -90,8 +85,8 @@ Apply `[KnockOff<MyClass>]` to generate a stub for a concrete class with virtual
 
 **Behavior:**
 - Generates a stub class in the `Stubs` namespace that inherits from the target class
-- Provides an `.Object` property returning the stub cast to the base class type
-- Only virtual members can be intercepted
+- Provides an `.Object` property returning the stub cast to the base class type (use this to pass the stub where the base class type is expected)
+- Only virtual members can be intercepted (non-virtual members call through to the base implementation)
 
 **Use when:**
 - You need to stub a concrete class for legacy code or framework types
@@ -100,31 +95,26 @@ Apply `[KnockOff<MyClass>]` to generate a stub for a concrete class with virtual
 
 <!-- snippet: attr-inline-class -->
 ```cs
-// Inline class pattern: [KnockOff<SomeClass>] generates stub inheriting from class
+// Inline class pattern: [KnockOff<ConcreteClass>] generates stub inheriting from class
 [KnockOff<EmailServiceBase>]
 public partial class InlineClassPatternTests
 {
-    [Fact]
-    public void InlineClass_ProvidesObjectProperty()
+    private void Example()
     {
         // Generated stub inherits from EmailServiceBase
         var stub = new Stubs.EmailServiceBase();
 
-        // .Object property returns the stub as the base class type
+        // Use .Object to get the stub as the base class type
         EmailServiceBase service = stub.Object;
 
-        // Can intercept virtual members and mark verifiable
-        stub.Send.OnCall((to, subject, body) => { }).Verifiable();
-
-        service.Send("test@example.com", "Hello", "World");
-
-        stub.Verify();
+        // Virtual members can be intercepted
+        stub.Send.OnCall((to, subject, body) => { });
     }
 }
 ```
 <!-- endSnippet -->
 
-The `.Object` property lets you pass the stub wherever the base class type is expected: `IEmailSender sender = new Stubs.EmailService().Object;`
+**Note:** The `.Object` property is essential when working with code that requires the base class type. For example, if a constructor expects `EmailServiceBase`, you would pass `stub.Object` rather than `stub` directly.
 
 ---
 
@@ -144,38 +134,23 @@ Apply multiple `[KnockOff<T>]` attributes to generate stubs for several types in
 
 <!-- snippet: attr-multiple -->
 ```cs
-// Multiple inline stubs: Each attribute generates a separate stub
+// Multiple attributes generate independent stubs in the Stubs namespace
 [KnockOff<IAttrUserRepository>]
 [KnockOff<IAttrEmailService>]
 [KnockOff<IAttrLogger>]
 public partial class MultipleStubsPatternTests
 {
-    [Fact]
-    public void MultipleStubs_GeneratesEachInStubsNamespace()
+    private void Example()
     {
-        // Each interface gets its own stub in Stubs namespace
+        // Each interface gets its own stub
         var userRepo = new Stubs.IAttrUserRepository();
         var emailService = new Stubs.IAttrEmailService();
         var logger = new Stubs.IAttrLogger();
 
-        // Configure each stub independently with verifiable
-        userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
-        emailService.Send.OnCall((to, subject, body) => { }).Verifiable();
-        logger.Log.OnCall((message) => { }).Verifiable();
-
-        // Use in tests
-        IAttrUserRepository repo = userRepo;
-        IAttrEmailService email = emailService;
-        IAttrLogger log = logger;
-
-        repo.GetById(1);
-        email.Send("a@b.com", "Subject", "Body");
-        log.Log("Test message");
-
-        // Verify all stubs
-        userRepo.Verify();
-        emailService.Verify();
-        logger.Verify();
+        // Configure each stub independently
+        userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
+        emailService.Send.OnCall((to, subject, body) => { });
+        logger.Log.OnCall((message) => { });
     }
 }
 ```
@@ -187,8 +162,24 @@ public partial class MultipleStubsPatternTests
 
 | Pattern | Best For | Trade-offs |
 |---------|----------|------------|
-| **Stand-Alone** | Full control, custom members | More boilerplate, explicit class declaration |
-| **Inline Interface** | Minimal setup, multiple stubs | Less control over class declaration |
-| **Inline Class** | Legacy code, virtual methods | Only intercepts virtual members, inheritance constraints |
+| **Stand-Alone** | Full control, custom members, traditional OOP style | More boilerplate, explicit class declaration |
+| **Inline Interface** | Minimal setup, multiple stubs, rapid testing | Less control over class declaration |
+| **Inline Class** | Legacy code, framework types, virtual methods | Only intercepts virtual members, inheritance constraints |
+
+**Decision Guide:**
+
+- **Start with Inline Interface** for most scenarios - it provides the fastest setup and least boilerplate
+- **Use Stand-Alone** when you need to add custom properties, methods, or fields to your stub class
+- **Use Inline Class** only when stubbing concrete classes (legacy code or framework types you can't modify)
+- **Mix patterns** freely within a test project based on each stub's specific needs
 
 All patterns support the same interceptor API for configuring behavior, tracking calls, and setting up callbacks.
+
+---
+
+## See Also
+
+- [Getting Started](../getting-started.md) - First steps with KnockOff and basic stub creation
+- [Interceptor API Reference](interceptor-api.md) - Complete reference for configuring stubs
+- [Methods Guide](../guides/methods.md) - Configure method behavior and callbacks
+- [Properties Guide](../guides/properties.md) - Work with property interceptors

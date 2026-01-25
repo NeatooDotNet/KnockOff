@@ -14,11 +14,7 @@ public interface IUserRepoStandalone
 }
 
 [KnockOff]
-public partial class UserRepoStandaloneStub : IUserRepoStandalone
-{
-    // Optionally add user methods for default behavior
-    protected User? GetById(int id) => new User { Id = id, Name = $"User{id}" };
-}
+public partial class UserRepoStandaloneStub : IUserRepoStandalone { }
 #endregion
 
 public class StandalonePatternTests
@@ -30,7 +26,8 @@ public class StandalonePatternTests
         // Arrange - instantiate the reusable stub
         var stub = new UserRepoStandaloneStub();
 
-        // Configure void method via OnCall and mark verifiable
+        // Configure method behavior and mark verifiable
+        stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
         stub.Save.OnCall((user) => { }).Verifiable();
 
         // Act - cast to interface for use
@@ -40,9 +37,8 @@ public class StandalonePatternTests
 
         // Assert - verify via Verify()
         Assert.NotNull(user);
+        Assert.Equal("User42", user.Name);
         stub.Verify();
-        // User method tracks via special interceptor
-        stub.GetById2.Verify(Times.Once);
     }
     #endregion
 }

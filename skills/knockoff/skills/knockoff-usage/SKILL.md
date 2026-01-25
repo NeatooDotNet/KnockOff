@@ -6,7 +6,7 @@ version: 1.0.0
 
 # KnockOff Usage Guide
 
-KnockOff is a Roslyn Source Generator that creates unit test stubs at compile time. Unlike runtime mocking frameworks like Moq, KnockOff generates explicit implementations using partial classes—trading runtime flexibility for readability, debuggability, and performance.
+KnockOff is a Roslyn Source Generator that creates reusable test stubs at compile time. The key benefit: define a stub class once and share it across your entire project, with each test configuring the same stub instance differently. Unlike runtime mocking frameworks that require per-test setup, KnockOff generates explicit implementations using partial classes—enabling stub reusability while providing compile-time safety and zero reflection overhead.
 
 ## Core Concepts
 
@@ -16,6 +16,8 @@ KnockOff is a Roslyn Source Generator that creates unit test stubs at compile ti
 - Properties named after the interface for accessing interceptors
 
 **Three patterns:** KnockOff supports three stub creation patterns. Choose based on reusability needs and target type.
+
+**Shared stubs:** The stand-alone pattern enables defining a stub class once and using it across multiple test files. Each test creates its own instance and configures it differently—no duplicate setup code. Change default behavior in the stub class to affect all tests, or override per-test.
 
 ## The Three Patterns
 
@@ -90,33 +92,46 @@ UserServiceBase service = stub.Object;  // Note: use .Object for class stubs
 
 ### Methods with OnCall
 
-Configure method return values and behavior:
+Configure method return values and behavior using value or callback overloads:
 
 ```csharp
-// Return a value
+// Value overload - fixed return value
+stub.GetUser.OnCall(new User { Id = 42, Name = "Test" });
+
+// Callback overload - compute based on arguments
 stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test" });
 
-// Void methods
+// Void methods - callbacks for side effects
 stub.SaveUser.OnCall((user) => { /* side effects */ });
 
-// Async methods - return Task directly
-stub.GetUserAsync.OnCall((id) => Task.FromResult(new User { Id = id }));
+// Async methods - value auto-wraps in Task
+stub.GetUserAsync.OnCall(new User { Id = 42, Name = "Alice" });
 
-// Conditional logic
+// Async with callback - return unwrapped value
+stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Dynamic" });
+
+// Conditional logic in callbacks
 stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id } : null);
 ```
 
-### Properties with OnGet/OnSet and Value
+### Properties with Value, OnGet, and OnSet
 
 ```csharp
-// Simple value
+// Value property - simple backing value (most common)
 stub.ConnectionString.Value = "server=localhost";
 
-// Dynamic getter
+// OnGet with value - fixed return value
+stub.IsConnected.OnGet(true);
+
+// OnGet with callback - dynamic getter
 stub.IsConnected.OnGet(() => DateTime.Now.Hour < 18);
 
-// Track setter calls
+// OnSet - track or validate setter calls
 stub.CurrentUser.OnSet((value) => { /* handle set */ });
+
+// Combined - both getter and setter
+stub.MaxRetries.OnGet(3);
+stub.MaxRetries.OnSet((value) => { /* validate */ });
 ```
 
 ## Verification
@@ -144,10 +159,13 @@ stub.Verify();
 var tracking = stub.GetUser.OnCall((id) => user).Verifiable();
 
 // After acting...
-tracking.Verify(Times.Once);
-tracking.Verify(Times.AtLeastOnce);
-tracking.Verify(Times.Exactly(3));
-tracking.Verify(Times.Never);
+tracking.Verify(Times.Once);           // Called exactly once
+tracking.Verify(Times.Twice);          // Called exactly twice
+tracking.Verify(Times.Exactly(3));     // Called exactly N times
+tracking.Verify(Times.AtLeastOnce);    // Called one or more times
+tracking.Verify(Times.AtLeast(3));     // Called N or more times
+tracking.Verify(Times.AtMost(5));      // Called N or fewer times
+tracking.Verify(Times.Never);          // Never called
 ```
 
 ### Accessing Call Arguments
@@ -159,6 +177,45 @@ var tracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
 var lastArgs = tracking.LastArgs;
 Assert.Equal("Alice", lastArgs.user.Name);
 ```
+
+## Best Practices
+
+### Choose Value vs Callback Syntax
+
+**Use value overloads when:**
+- Returning a fixed value that never changes
+- No logic needed based on arguments
+- Keeping test setup concise
+
+**Use callback overloads when:**
+- Computing values based on method arguments
+- Implementing conditional logic
+- Tracking calls or performing side effects
+- Need access to all method parameters
+
+### Stub Reusability Strategy
+
+**Stand-alone pattern for:**
+- Stubs used across multiple test classes
+- Default behavior shared by many tests
+- Custom helper methods on the stub (e.g., `ConfigureForHappyPath()`)
+
+**Inline pattern for:**
+- Test-local stubs used only in one test class
+- Quick prototyping or exploratory testing
+- No need for cross-file sharing
+
+### Verification Patterns
+
+**Batch verification with `Verify()`:**
+- Mark multiple members with `.Verifiable()`
+- Call `stub.Verify()` once at the end
+- Best when verifying many calls together
+
+**Individual verification with `Times`:**
+- Store tracking object from `OnCall().Verifiable()`
+- Call `tracking.Verify(Times.X)` for specific constraints
+- Best when different members have different expectations
 
 ## Common Gotchas
 
@@ -200,15 +257,18 @@ var service = new UserService(stub);
 var service = new UserService(stub.Object);
 ```
 
-### Async Methods Need Task.FromResult
+### Using Task.FromResult in Async Callbacks
 
-**Problem:** Returning value directly instead of Task.
+**No longer required:** KnockOff auto-wraps values for async methods.
 
 ```csharp
-// Wrong
+// Value overload - auto-wrapped (preferred)
+stub.GetUserAsync.OnCall(user);
+
+// Callback - auto-wrapped (preferred)
 stub.GetUserAsync.OnCall((id) => user);
 
-// Correct
+// Explicit Task.FromResult - still works but unnecessary
 stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
 ```
 
@@ -218,13 +278,13 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
 |-----|----------|
 | `new Mock<IFoo>()` | `new FooStub()` or `new Stubs.IFoo()` |
 | `mock.Object` | `stub` (direct) or `stub.Object` (class stubs) |
-| `.Setup(x => x.Method()).Returns(val)` | `stub.Method.OnCall(() => val)` |
-| `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.Value = val` |
-| `.ReturnsAsync(val)` | `stub.Method.OnCall(() => Task.FromResult(val))` |
-| `.Callback(x => ...)` | Logic inside OnCall delegate |
+| `.Setup(x => x.Method()).Returns(val)` | `stub.Method.OnCall(val)` or `stub.Method.OnCall(() => val)` |
+| `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.Value = val` or `stub.Prop.OnGet(val)` |
+| `.ReturnsAsync(val)` | `stub.Method.OnCall(val)` (auto-wraps) |
+| `.Callback(x => ...)` | Logic inside OnCall callback |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` |
 | `.Verifiable()` + `mock.Verify()` | `.Verifiable()` + `stub.Verify()` |
-| `It.IsAny<T>()` | Callback receives all args |
+| `It.IsAny<T>()` | Callback receives all args (always) |
 
 ## Reference Documentation
 

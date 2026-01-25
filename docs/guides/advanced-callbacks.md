@@ -11,7 +11,7 @@ Use these patterns when your tests need to simulate:
 - Stateful dependencies where one method affects another
 - Side effects like logging, notifications, or external system calls
 
-The callback receives the stub instance (`ko` parameter), giving you access to all interceptors and their state.
+Most examples use local variables captured by closures—this is C#'s natural way to maintain state between callback invocations. The callback "remembers" variables from its surrounding scope, letting you track counters, queues, or any other state across multiple calls.
 
 ---
 
@@ -340,8 +340,7 @@ public void Cache_SimulatesRealisticBehavior()
 ## Key Takeaways
 
 - **Callbacks have full control**: Any logic you can write in C# works in a callback
-- **Access stub state**: The `ko` parameter gives you access to all interceptors
-- **Closures capture context**: Use local variables and collections to maintain state across calls
+- **Closures capture context**: Use local variables and collections to maintain state across calls—the callback captures these variables from the surrounding scope, allowing you to track state between calls
 - **Think like the dependency**: Model realistic behavior, not just happy paths
 - **Keep tests readable**: Complex callbacks might indicate your test is doing too much—consider splitting it
 

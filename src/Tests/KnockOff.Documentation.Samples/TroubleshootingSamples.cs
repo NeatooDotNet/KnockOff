@@ -114,32 +114,29 @@ public partial class EmailServiceTests
 }
 
 // =============================================================================
-// OnCall Signature - ko Parameter
+// OnCall Signature - Parameter Types
 // =============================================================================
 
 public class OnCallSignatureTests
 {
     #region troubleshoot-oncall-signature
     [Fact]
-    public void OnCallSignature_KoParameterFirst()
+    public void OnCallSignature_MustMatchParameters()
     {
         var stub = new TroubleshootRepoStub();
 
-        // ERROR (won't compile): Missing ko parameter
-        // stub.GetByIdAsync.OnCall((id) => Task.FromResult<User?>(null));
+        // ERROR (won't compile): Wrong parameter type
+        // stub.GetByIdAsync.OnCall((string id) => Task.FromResult<User?>(null));
 
-        // CORRECT: Include ko as first parameter
-        stub.GetByIdAsync.OnCall((id) =>
+        // CORRECT: Match parameter type (int id)
+        stub.GetByIdAsync.OnCall((int id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 
-        // The ko parameter gives access to the stub instance
-        // Useful for accessing other interceptors or state
-        stub.GetByIdAsync.OnCall((id) =>
-        {
-            // Can access other interceptors via ko
-            // ko is the stub instance itself
-            return Task.FromResult<User?>(new User { Id = id });
-        });
+        ITroubleshootRepo repository = stub;
+        var user = repository.GetByIdAsync(42).Result;
+
+        Assert.NotNull(user);
+        Assert.Equal(42, user.Id);
     }
     #endregion
 }
@@ -178,11 +175,11 @@ public class NoCallbackConfiguredTests
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Fix Option 1: Use Value property for properties
+        // Fix Option 1: Use OnGet with a static value
         stub.Host.OnGet("localhost");
         Assert.Equal("localhost", config.Host);
 
-        // Fix Option 2: Use OnGet for dynamic behavior
+        // Fix Option 2: Use OnGet with callback for dynamic behavior
         stub.Port.OnGet(() => 8080);
         Assert.Equal(8080, config.Port);
     }
@@ -279,19 +276,32 @@ public class ResetBehaviorTests
     }
 
     [Fact]
-    public void ManuallyClearing_Value()
+    public void ManuallyClearing_OnGetConfiguration()
     {
         var stub = new ConfigSvcStub();
 
-        // Set Value
+        // Configure with OnGet
         stub.Port.OnGet(8080);
 
-        // To clear Value, set to default
+        // To clear, reconfigure with default value
         stub.Port.OnGet(default(int));
 
-        // Now accessing will use smart defaults
+        // Now returns default value
         IConfigSvc config = stub;
         Assert.Equal(0, config.Port);
     }
     #endregion
 }
+
+// =============================================================================
+// Build Commands
+// =============================================================================
+
+#region troubleshoot-build-commands
+// Rebuild to trigger source generator:
+// dotnet build
+
+// If issues persist, clean first:
+// dotnet clean
+// dotnet build
+#endregion

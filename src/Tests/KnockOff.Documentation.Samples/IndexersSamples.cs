@@ -400,6 +400,37 @@ public class PrioritySamples
         Assert.Equal("from-callback", config["ApiKey"]);
     }
     #endregion
+
+    #region indexers-onset-with-backing
+    [Fact]
+    public void OnSet_WithBackingUpdate()
+    {
+        var stub = new ConfigStoreStub();
+
+        var validationLog = new List<string>();
+        stub.Indexer.OnSet((key, value) =>
+        {
+            // Custom validation
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Value cannot be empty");
+
+            validationLog.Add(key);
+
+            // Manually update backing so subsequent reads work
+            stub.Indexer.Backing[key] = value;
+        });
+
+        IConfigStore config = stub;
+
+        config["ApiKey"] = "secret123";
+
+        // Validation was called
+        Assert.Single(validationLog);
+
+        // Backing was updated manually
+        Assert.Equal("secret123", stub.Indexer.Backing["ApiKey"]);
+    }
+    #endregion
 }
 
 // =============================================================================

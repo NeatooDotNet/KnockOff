@@ -10,13 +10,13 @@
 
 ## The Problem
 
-Creating test doubles is tedious when every test file needs its own configuration. Runtime mocking frameworks require setup code in each test, making it hard to share stubs across your project. When you need the same stub behavior in multiple tests, you end up duplicating setup logic or creating complex test fixtures. Changing shared behavior means updating code in multiple places.
+Testing with mocks means repeating setup code in every test file. When multiple tests need the same stub behavior, you duplicate configuration or build complex test fixtures. Change that behavior? Update every test that uses it. Runtime mocking frameworks make sharing stubs across your project difficult.
 
 ---
 
 ## The Solution
 
-KnockOff uses Roslyn source generation to create reusable stub classes that live in your test project. Define a stub once, then use it across all your tests—each test can configure behavior differently using the same stub instance. Change default behavior in one place, or override it per-test when needed. Share stubs across test files while keeping test-specific customization simple.
+KnockOff generates reusable stub classes you define once and share across your entire project. Each test configures the same stub instance differently—no duplicate setup code. Change default behavior in one place, or override per-test. The same stub class works in every test file that needs it.
 
 **Moq (runtime reflection):**
 
@@ -37,6 +37,40 @@ public void Moq_RuntimeSetup()
 }
 ```
 <!-- endSnippet -->
+
+**KnockOff (source generation):**
+
+<!-- snippet: readme-teaser-knockoff -->
+```cs
+[Fact]
+public void KnockOff_CompileTimeSetup()
+{
+    var stub = new ReadmeUserRepoStub();
+    stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test User" });
+
+    IReadmeUserRepo repository = stub;
+    var user = repository.GetUser(42);
+
+    Assert.NotNull(user);
+    Assert.Equal("Test User", user.Name);
+}
+```
+<!-- endSnippet -->
+
+---
+
+## Key Features
+
+- **Shared stubs** - Define once, use across entire project with per-test customization
+- **Source generation** - Zero reflection overhead, compile-time safety
+- **Explicit configuration** - Clear interceptor API (`OnCall`, `OnGet`, `OnSet`, `Value`)
+- **Verification** - Track call counts, arguments, and validate expected calls
+- **Source delegation** - Delegate stub behavior to real implementations
+- **Three stub patterns** - Stand-alone, inline interface, and inline class
+
+---
+
+## Quick Start
 
 ### Create a Stub
 
@@ -107,14 +141,21 @@ public void VerifyCalls_WithVerifiable()
 
 ---
 
-## Documentation
+## Installation
 
-- **[Getting Started](docs/getting-started.md)** - Installation and your first stub
-- **[Stub Patterns](docs/guides/stub-patterns.md)** - Stand-alone, inline interface, and inline class patterns
-- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete reference for `OnCall`, `OnGet`, `OnSet`, and `Value`
-- **[Source Delegation](docs/guides/source-delegation.md)** - Delegate stub behavior to real implementations
-- **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step guide for migrating existing tests
-- **[Migration from NSubstitute](docs/migration/from-nsubstitute.md)** - Honest comparison and migration guide
+Install via NuGet Package Manager:
+
+```bash
+dotnet add package KnockOff
+```
+
+Or via Package Manager Console:
+
+```powershell
+Install-Package KnockOff
+```
+
+See the [Getting Started Guide](docs/getting-started.md) for detailed setup instructions.
 
 ---
 
@@ -131,15 +172,26 @@ public void VerifyCalls_WithVerifiable()
 | **Generated code** | Visible in project | Hidden | Hidden |
 
 **When to use KnockOff:**
-- You need the same stub in multiple test files with different configurations
-- You want to define default stub behavior once and override it per-test
-- You value explicit, discoverable stub classes over per-test mock setup
-- You want to eliminate duplicate stub configuration across your test suite
+- Multiple test files need the same stub with different configurations per-test
+- You want to eliminate duplicate setup code across your test suite
+- You prefer explicit stub classes you can share and customize
+- Changing shared behavior in one place matters to you
 
 **When to use Moq/NSubstitute:**
-- You prefer fluent setup APIs
-- Your tests rarely share stub implementations
+- You prefer fluent setup APIs and are comfortable with per-test configuration
+- Your tests rarely reuse the same stub across multiple files
 - You're working with a team already invested in those frameworks
+
+---
+
+## Documentation
+
+- **[Getting Started](docs/getting-started.md)** - Installation and your first stub
+- **[Stub Patterns](docs/guides/stub-patterns.md)** - Stand-alone, inline interface, and inline class patterns
+- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete reference for `OnCall`, `OnGet`, `OnSet`, and `Value`
+- **[Source Delegation](docs/guides/source-delegation.md)** - Delegate stub behavior to real implementations
+- **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step guide for migrating existing tests
+- **[Migration from NSubstitute](docs/migration/from-nsubstitute.md)** - Honest comparison and migration guide
 
 ---
 

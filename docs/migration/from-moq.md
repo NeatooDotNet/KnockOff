@@ -31,15 +31,15 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 
 | Moq Pattern | KnockOff Equivalent |
 |-------------|---------------------|
-| `new Mock<IFoo>()` | `new FooStub()` with `[KnockOff<IFoo>] partial class FooStub` |
+| `new Mock<IFoo>()` | `new FooStub()` with `[KnockOff] partial class FooStub : IFoo` |
 | `mock.Object` | `stub` (direct instance) |
 | `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall(() => value)` |
-| `.Setup(x => x.Property).Returns(value)` | `stub.Property.Value = value` |
+| `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
 | `.ReturnsAsync(value)` | `stub.Method.OnCall(() => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
-| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` or `stub.Verify()` |
+| `.Verify(x => x.Method(), Times.Once)` | `var t = stub.Method.OnCall(...); t.Verify(Times.Once)` |
 | `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
-| `mock.Verify()` | `stub.Verify()` |
+| `mock.Verify()` | `stub.Verify()` (checks all `.Verifiable()` calls) |
 | `It.IsAny<T>()` | Callback receives all arguments for inspection |
 
 ---
@@ -93,9 +93,24 @@ public void CreateStub_KnockOffApproach()
 <!-- endSnippet -->
 
 **Key differences:**
-- Moq creates wrapper objects at runtime
-- KnockOff requires a partial class declaration—the generator fills in the implementation
+- Moq wraps test doubles in `Mock<T>` objects
+- KnockOff uses partial class declarations with source generation
 - You use the stub instance directly (no `.Object` property)
+
+**Stub class declaration:**
+
+To enable the above code, declare a partial stub class with the `[KnockOff]` attribute. The source generator creates the implementation.
+
+<!-- snippet: moq-migration-stub-declaration -->
+```cs
+[KnockOff]
+public partial class MoqUserRepoStub : IMoqUserRepo { }
+```
+<!-- endSnippet -->
+
+Place this declaration in your test file. The generator fills in the explicit interface implementations and interceptor properties.
+
+**Alternative:** You can also use the inline pattern `[KnockOff<IFoo>] partial class FooStub` without implementing the interface—both patterns work the same way. This guide uses the standalone pattern for consistency with Moq's explicit interface usage.
 
 ---
 
@@ -184,7 +199,7 @@ public void SetupProperty_KnockOffApproach()
 {
     var stub = new MoqUserRepoStub();
 
-    stub.ConnectionString.Value = "server=localhost";
+    stub.ConnectionString.OnGet("server=localhost");
 
     IMoqUserRepo repository = stub;
     var connStr = repository.ConnectionString;
@@ -196,8 +211,8 @@ public void SetupProperty_KnockOffApproach()
 
 **Key differences:**
 - Moq treats properties like methods in setup
-- KnockOff provides a `.Value` property on the interceptor
-- KnockOff also tracks `GetCount` and `SetCount` for verification
+- KnockOff provides `.OnGet()` and `.OnSet()` methods on the property interceptor
+- KnockOff also provides `.VerifyGet()` and `.VerifySet()` for granular verification
 
 ---
 
@@ -517,10 +532,10 @@ public void SaveUser_CallsRepository()
 <!-- endSnippet -->
 
 **What changed:**
-- Added stub class declaration with `[KnockOff<IUserRepository>]`
+- Added stub class declaration with `[KnockOff]`
 - Replaced `Mock<T>` with stub instance
 - Replaced `.Setup()` with interceptor property assignments
-- Replaced `.Verify()` with direct assertions
+- Replaced `.Verify()` with `stub.Verify()` and tracking object verification
 - Removed `.Object` property accesses
 
 **What stayed the same:**
@@ -538,12 +553,12 @@ public void SaveUser_CallsRepository()
 
 ```csharp
 // Wrong
-[KnockOff<IUserRepository>]
-class UserRepositoryStub { }
+[KnockOff]
+class UserRepositoryStub : IUserRepository { }
 
 // Correct
-[KnockOff<IUserRepository>]
-partial class UserRepositoryStub { }
+[KnockOff]
+partial class UserRepositoryStub : IUserRepository { }
 ```
 
 ### Wrong `OnCall` Signature
@@ -575,8 +590,10 @@ var service = new UserService(stub);
 ## Next Steps
 
 - **[Getting Started Guide](../getting-started.md)** - Learn KnockOff patterns from scratch
-- **[Interceptor API Reference](../api/interceptors.md)** - Deep dive into `OnCall`, `OnGet`, `OnSet`
+- **[Interceptor API Reference](../reference/interceptor-api.md)** - Deep dive into `OnCall`, `OnGet`, `OnSet`
 - **[Verification Guide](../guides/verification.md)** - Advanced call tracking and verification patterns
+- **[Methods Guide](../guides/methods.md)** - Configure method behavior and callbacks
+- **[Properties Guide](../guides/properties.md)** - Work with property interceptors
 
 ---
 

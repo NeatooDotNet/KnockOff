@@ -44,32 +44,19 @@ You can override specific methods while delegating the rest to the source. Set t
 
 <!-- snippet: source-partial-override -->
 ```cs
-[Fact]
-public void Source_PartialOverrideWithOnCall()
-{
-    var stub = new SourceRepoStub();
-    var realRepo = new SimpleRepository();
+// Override GetById for test data
+stub.GetById.OnCall((id) => new User { Id = id, Name = "Test User" });
 
-    // Seed real repo with data
-    realRepo.Save(new User { Id = 1, Name = "Real User" });
+IRepository repository = stub;
 
-    // Delegate to real implementation
-    stub.Source(realRepo);
+// GetById uses OnCall override
+var testUser = repository.GetById(1);
+Assert.NotNull(testUser);
+Assert.Equal("Test User", testUser.Name);
 
-    // Override specific method for testing
-    stub.GetById.OnCall((id) =>
-        id == 999 ? new User { Id = 999, Name = "Test User" } : null);
-
-    IRepository repository = stub;
-
-    // OnCall overrides source for id 999
-    var testUser = repository.GetById(999);
-    Assert.NotNull(testUser);
-    Assert.Equal("Test User", testUser.Name);
-
-    // Source still used when OnCall returns null (fallback)
-    // Note: In this case OnCall handles all ids, so source is bypassed
-}
+// Save delegates to source (no OnCall configured)
+repository.Save(new User { Id = 2, Name = "New User" });
+Assert.NotNull(realRepo.GetById(2));
 ```
 <!-- endSnippet -->
 
@@ -170,28 +157,14 @@ The first match wins. This means you can set a source for baseline behavior, ove
 
 <!-- snippet: source-priority -->
 ```cs
-[Fact]
-public void Priority_OnCallBeatsSourceBeatsSmartDefault()
-{
-    var stub = new SourceRepoStub();
-    var realRepo = new SimpleRepository();
+// Source returns 1 for active user (when no OnCall is set)
+var fromSource = repository.GetPriority(new User { Id = 1, IsActive = true });
+Assert.Equal(1, fromSource);
 
-    realRepo.Save(new User { Id = 1, Name = "Source", IsActive = true });
-
-    // Set source (returns priority 1 for active users)
-    stub.Source(realRepo);
-
-    IRepository repository = stub;
-
-    // Source returns 1 for active user
-    var fromSource = repository.GetPriority(new User { Id = 1, IsActive = true });
-    Assert.Equal(1, fromSource);
-
-    // OnCall overrides source
-    stub.GetPriority.OnCall((user) => 42);
-    var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
-    Assert.Equal(42, fromOnCall);
-}
+// OnCall overrides source
+stub.GetPriority.OnCall((user) => 42);
+var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
+Assert.Equal(42, fromOnCall);
 ```
 <!-- endSnippet -->
 
@@ -201,57 +174,36 @@ Understanding priority order is crucial for predictable stub behavior when mixin
 
 ## Complete Example
 
-Here's a complete scenario testing a caching decorator using source delegation:
+Here's a complete scenario demonstrating source delegation for a decorator pattern test:
 
 <!-- snippet: source-complete-example -->
 ```cs
-[Fact]
-public void CachingDecorator_UsesSourceForBaseline()
-{
-    var stub = new CachingSourceRepoStub();
-    var realRepo = new RealRepository();
+// Override Read for specific test scenario
+stub.Read.OnCall((filename) =>
+    filename == "config.txt" ? "Test Config" : null);
 
-    // Use real repository as baseline
-    stub.Source(realRepo);
+IDataSource dataSource = stub;
 
-    // Track calls to verify caching behavior
-    var callCount = 0;
-    stub.GetUser.OnCall((id) =>
-    {
-        callCount++;
-        // Delegate to source
-        return realRepo.GetUser(id);
-    });
+// OnCall handles config.txt
+var config = dataSource.Read("config.txt");
+Assert.Equal("Test Config", config);
 
-    ICachingRepository repository = stub;
+// OnCall returned null for data.txt, but source is NOT consulted
+// once OnCall is configured - it takes full control
+var data = dataSource.Read("data.txt");
+Assert.Null(data);
 
-    // First call
-    var user1 = repository.GetUser(1);
-    Assert.NotNull(user1);
-    Assert.Equal(1, callCount);
-
-    // Second call with same id
-    var user2 = repository.GetUser(1);
-    Assert.NotNull(user2);
-    Assert.Equal(2, callCount); // Not cached - stub doesn't cache
-
-    // Verify real data came through
-    Assert.Equal("User1", user1.Name);
-    Assert.Equal("User1", user2.Name);
-}
+// Write delegates entirely to source (no OnCall configured)
+dataSource.Write("output.txt", "New Data");
+Assert.Equal("New Data", realDataSource.Read("output.txt"));
 ```
 <!-- endSnippet -->
 
-This example demonstrates source delegation's strength: you get real repository behavior for most operations while controlling specific scenarios (cache miss/hit) needed for decorator testing.
+This example demonstrates source delegation's strength: you get real implementation behavior for most operations while overriding specific members needed for test scenarios.
 
 ---
 
-## Related Guides
-
-- [Callbacks](callbacks.md) - Using `OnCall` to configure stub behavior
-- [User Methods](user-methods.md) - Defining methods in your stub class
-- [Smart Defaults](smart-defaults.md) - Understanding KnockOff's default return values
-
-## See Also
-
-- [API Reference: Source(T)](../api/stub-methods.md#source) - Complete API documentation
+**Next Steps:**
+- [Advanced Callbacks Guide](advanced-callbacks.md) - Using `OnCall` to configure complex stub behavior
+- [User Methods Guide](user-methods.md) - Defining methods in your stub class for custom behavior
+- [Verification Patterns](verification.md) - Assert on stub interactions and call tracking

@@ -104,3 +104,100 @@ public partial class InlineStubTests
     }
     #endregion
 }
+
+// =============================================================================
+// Configuring Return Values - Value Overloads
+// =============================================================================
+
+public class ValueOverloadTests
+{
+    #region getting-started-value-overloads
+    [Fact]
+    public void GetById_ValueOverload_SimplerSyntax()
+    {
+        var stub = new UserRepoStub();
+
+        // Value overload - pass the return value directly
+        stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+
+        // Callback syntax - use when you need argument-based logic
+        stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
+
+        IUserRepo repository = stub;
+        var user = repository.GetById(1);
+
+        Assert.Equal("Dynamic", user!.Name);
+    }
+    #endregion
+}
+
+// =============================================================================
+// Configuring Properties - OnGet/OnSet
+// =============================================================================
+
+public interface IUserConfig
+{
+    User? CurrentUser { get; set; }
+}
+
+[KnockOff]
+public partial class UserConfigStub : IUserConfig { }
+
+public class PropertyConfigurationTests
+{
+    #region getting-started-property-configuration
+    [Fact]
+    public void Property_OnGetAndOnSet()
+    {
+        var stub = new UserConfigStub();
+
+        // OnGet - configure what the getter returns
+        stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+
+        // OnSet - track or validate setter calls
+        User? capturedUser = null;
+        stub.CurrentUser.OnSet((user) => capturedUser = user);
+
+        IUserConfig config = stub;
+
+        // Reading uses OnGet
+        var user = config.CurrentUser;
+        Assert.Equal("Alice", user!.Name);
+
+        // Writing uses OnSet
+        config.CurrentUser = new User { Id = 2, Name = "Bob" };
+        Assert.Equal("Bob", capturedUser!.Name);
+    }
+    #endregion
+}
+
+// =============================================================================
+// Configuring Async Methods - Auto-Wrapping
+// =============================================================================
+
+public interface IAsyncUserRepo
+{
+    Task<User?> GetUserAsync(int id);
+}
+
+[KnockOff]
+public partial class AsyncUserRepoStub : IAsyncUserRepo { }
+
+public class AsyncWrappingTests
+{
+    #region getting-started-async-wrapping
+    [Fact]
+    public async Task AsyncMethod_ValueAutoWrapped()
+    {
+        var stub = new AsyncUserRepoStub();
+
+        // Value overload - KnockOff wraps in Task.FromResult automatically
+        stub.GetUserAsync.OnCall(new User { Id = 1, Name = "Alice" });
+
+        IAsyncUserRepo repository = stub;
+        var user = await repository.GetUserAsync(1);
+
+        Assert.Equal("Alice", user!.Name);
+    }
+    #endregion
+}

@@ -19,8 +19,10 @@ public interface IMoqUserRepo
 // KnockOff Stub (replaces Mock<IMoqUserRepo>)
 // =============================================================================
 
+#region moq-migration-stub-declaration
 [KnockOff]
 public partial class MoqUserRepoStub : IMoqUserRepo { }
+#endregion
 
 // =============================================================================
 // Creating Stubs - Side-by-Side Comparison

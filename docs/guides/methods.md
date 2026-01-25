@@ -2,7 +2,7 @@
 
 Method interceptors track calls, capture arguments, and configure return values for interface methods in your stub. Each method on the stubbed interface gets a corresponding interceptor property that provides verification and configuration capabilities.
 
-**Critical concept**: The `OnCall` callback signature always includes the stub instance as the first parameter, followed by the method's parameters. This gives you access to stub state during callback execution.
+**Key concept**: The `OnCall` callback receives only the method's parameters—you configure behavior based on the inputs to the method being called.
 
 ---
 
@@ -10,7 +10,7 @@ Method interceptors track calls, capture arguments, and configure return values 
 
 ### Void Methods
 
-Configure void methods using `OnCall` with an `Action<TStub>`:
+Configure void methods using `OnCall` with an `Action` that matches the method parameters:
 
 <!-- snippet: methods-oncall-void -->
 ```cs
@@ -19,7 +19,7 @@ public void VoidMethod_ConfiguredWithOnCall()
 {
     var stub = new LogSvcMethodsStub();
 
-    // OnCall for void methods uses Action<TStub, ...params>
+    // OnCall for void methods uses Action<...params>
     var logged = new List<string>();
     var tracking = stub.LogMessage.OnCall((message) =>
     {
@@ -38,7 +38,7 @@ public void VoidMethod_ConfiguredWithOnCall()
 
 ### Methods with Return Values
 
-Configure methods that return values using `OnCall` with a `Func<TStub, T, R>`:
+Configure methods that return values using `OnCall` with a `Func` that matches the method's parameters and return type:
 
 <!-- snippet: methods-oncall-return -->
 ```cs
@@ -47,7 +47,7 @@ public void MethodWithReturn_ConfiguredWithOnCall()
 {
     var stub = new LogSvcMethodsStub();
 
-    // OnCall with return value: first param is stub (ko), then method params
+    // OnCall with return value: Func<...params, TReturn>
     var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
 
     ILogSvcMethods logger = stub;
@@ -59,11 +59,11 @@ public void MethodWithReturn_ConfiguredWithOnCall()
 ```
 <!-- endSnippet -->
 
-Notice the stub instance is the first parameter, followed by the method's `userId` parameter.
+The callback signature matches the method signature: one parameter (`userId`) returning a `string`.
 
 ### Methods with Multiple Parameters
 
-Methods with multiple parameters include all parameters after the stub instance:
+The callback signature includes all method parameters in the same order:
 
 <!-- snippet: methods-oncall-multi-param -->
 ```cs
@@ -72,7 +72,7 @@ public void MethodWithMultipleParams_AllAvailableInOnCall()
 {
     var stub = new AuthSvcMethodsStub();
 
-    // All method parameters follow the stub instance (ko)
+    // All method parameters are passed to the callback in order
     var tracking = stub.ValidateCredentials.OnCall((username, password) =>
         username == "admin" && password == "secret");
 
@@ -91,9 +91,15 @@ public void MethodWithMultipleParams_AllAvailableInOnCall()
 
 ## Verifying Method Calls
 
+KnockOff provides two verification patterns:
+1. **Individual tracking**: Store the object returned by `OnCall` and call `.Verify()` on it
+2. **Batch verification**: Mark interceptors with `.Verifiable()` then call `stub.Verify()` once
+
+The tracking object returned by `OnCall` provides access to `Verify()`, `LastCallArg`/`LastCallArgs`, and call count information.
+
 ### Using Verify()
 
-The recommended approach is to call `.Verify()` on the tracking object returned by `OnCall`:
+Call `.Verify()` on the tracking object returned by `OnCall` to verify that specific method was called:
 
 <!-- snippet: methods-verify-wascalled -->
 ```cs
@@ -114,7 +120,7 @@ public void Verify_VerifiesMethodInvocation()
 
 ### Verifying Call Frequency
 
-Use `Times` to specify exact call count requirements:
+Use `Times` to specify exact call count requirements. Available options include `Once`, `Never`, `AtLeastOnce`, and `Exactly(n)`:
 
 <!-- snippet: methods-verify-callcount -->
 ```cs
@@ -141,7 +147,7 @@ public void Verify_ExactCallCount()
 
 ### Using Verifiable()
 
-For batch verification of multiple methods, use `.Verifiable()` then call `stub.Verify()`:
+For batch verification of multiple methods, mark each with `.Verifiable()` then call `stub.Verify()` once to check all:
 
 <!-- snippet: methods-verify-verifiable -->
 ```cs
@@ -289,7 +295,7 @@ This is useful when reusing a stub instance across multiple test phases or asser
 
 ## Complete Example
 
-This example demonstrates a realistic test using method configuration, execution, and verification:
+This example demonstrates method configuration, argument capturing, and verification in a realistic scenario. The example assumes a `UserService` class that depends on `ICompleteUserRepo`:
 
 <!-- snippet: methods-complete-example -->
 ```cs
@@ -328,10 +334,11 @@ public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
 
 ## Key Takeaways
 
-- **OnCall signature**: Callback receives only the method parameters (no stub instance parameter)
-- **Verification**: Use `tracking.Verify(Times)` or `.Verifiable()` + `stub.Verify()`
-- **Arguments**: `LastCallArg` for single parameters, `LastCallArgs` tuple for multiple
-- **Overloads**: Numbered suffixes (Method1, Method2, ...) in declaration order
-- **Reset**: Clears `WasCalled`, arguments, and callbacks
+- **OnCall signature**: Callback matches method signature—receives only the method parameters
+- **Verification patterns**: Individual tracking with `tracking.Verify(Times)` or batch verification with `.Verifiable()` then `stub.Verify()`
+- **Times options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`
+- **Argument capture**: `LastCallArg` for single parameters, `LastCallArgs` tuple for multiple
+- **Overloads**: Configure using fully-typed lambda to distinguish which overload
+- **Reset**: Clears call count, captured arguments, and removes callbacks
 
 Next: [Property Interceptors](properties.md) for get/set tracking and configuration.

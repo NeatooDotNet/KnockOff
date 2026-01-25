@@ -1,6 +1,8 @@
 # Stub Patterns
 
-KnockOff supports three patterns for creating test stubs. Each pattern solves different testing scenarios with varying trade-offs in reusability, ceremony, and capabilities.
+KnockOff supports three fundamental patterns for creating test stubs: Stand-Alone, Inline Interface, and Inline Class. Each pattern solves different testing scenarios with varying trade-offs in reusability, ceremony, and capabilities.
+
+The Inline Interface pattern also supports **delegate types**, allowing you to stub validation rules, factories, and callbacks. This specialized use case is covered in the Inline Delegate section below.
 
 ## Quick Decision Guide
 
@@ -36,11 +38,7 @@ public interface IUserRepoStandalone
 }
 
 [KnockOff]
-public partial class UserRepoStandaloneStub : IUserRepoStandalone
-{
-    // Optionally add user methods for default behavior
-    protected User? GetById(int id) => new User { Id = id, Name = $"User{id}" };
-}
+public partial class UserRepoStandaloneStub : IUserRepoStandalone { }
 ```
 <!-- endSnippet -->
 
@@ -54,7 +52,8 @@ public void StandaloneStub_CanBeConfiguredAndVerified()
     // Arrange - instantiate the reusable stub
     var stub = new UserRepoStandaloneStub();
 
-    // Configure void method via OnCall and mark verifiable
+    // Configure method behavior and mark verifiable
+    stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
     stub.Save.OnCall((user) => { }).Verifiable();
 
     // Act - cast to interface for use
@@ -64,9 +63,8 @@ public void StandaloneStub_CanBeConfiguredAndVerified()
 
     // Assert - verify via Verify()
     Assert.NotNull(user);
+    Assert.Equal("User42", user.Name);
     stub.Verify();
-    // User method tracks via special interceptor
-    stub.GetById2.Verify(Times.Once);
 }
 ```
 <!-- endSnippet -->
@@ -218,9 +216,9 @@ public void InlineClassStub_UsesObjectProperty()
 
 ---
 
-## Inline Delegate Pattern
+## Inline Delegate Pattern (Specialized Use Case)
 
-The Inline Delegate pattern generates a stub for delegate types. This allows testing code that accepts delegates as parameters, such as validation rules, factories, or callbacks.
+The Inline Delegate pattern is a specialized use of the Inline Interface pattern for delegate types. It generates a stub for delegates, allowing you to test code that accepts delegates as parameters, such as validation rules, factories, or callbacks.
 
 ### When to Use
 
@@ -290,6 +288,8 @@ public void InlineDelegateStub_TracksInvocationsAndConfiguresBehavior()
 
 ## Pattern Comparison
 
+**Note**: Inline Delegate is a specialized use case of the Inline Interface pattern for delegate types.
+
 | Feature | Stand-Alone | Inline Interface | Inline Class | Inline Delegate |
 |---------|-------------|------------------|--------------|-----------------|
 | **Reusable across test files** | Yes | No | No | No |
@@ -306,10 +306,10 @@ public void InlineDelegateStub_TracksInvocationsAndConfiguresBehavior()
 
 ## Choosing a Pattern
 
-Follow this decision tree:
+Follow this decision tree to select the appropriate pattern:
 
 1. **Do you need to stub a delegate type?**
-   - Yes → **Inline Delegate** pattern
+   - Yes → **Inline Delegate** pattern (specialized use of Inline Interface)
    - No → Continue to step 2
 
 2. **Do you need to stub a class (not an interface)?**
@@ -323,6 +323,8 @@ Follow this decision tree:
 4. **Do you need custom methods on the stub?**
    - Yes → **Stand-Alone** pattern
    - No → **Inline Interface** pattern
+
+**The three fundamental patterns** (Stand-Alone, Inline Interface, Inline Class) cover all architectural scenarios. Inline Delegate is a specialized application of Inline Interface for delegate types.
 
 ### Examples by Scenario
 
@@ -341,7 +343,7 @@ Follow this decision tree:
 
 ## Complete Example
 
-This example demonstrates all three patterns in a realistic test scenario.
+This example demonstrates all three fundamental patterns (Stand-Alone, Inline Interface, Inline Class) working together in a realistic test scenario.
 
 <!-- snippet: patterns-complete-example -->
 ```cs
@@ -355,7 +357,7 @@ public partial class PatternComparisonTests
         // Stand-Alone: Reusable email stub
         var emailStub = new EmailSvcPatternStub();
         emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
-        emailStub.IsConfigured.Value = true;
+        emailStub.IsConfigured.OnGet(true);
 
         // Inline Interface: Test-local logger stub
         var loggerStub = new Stubs.ILogSvc();

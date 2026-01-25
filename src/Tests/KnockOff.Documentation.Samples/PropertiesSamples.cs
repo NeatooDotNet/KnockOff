@@ -405,7 +405,7 @@ public class PropertyResetTests
 
         stub.Name.VerifyGet(Times.Never);
         stub.Name.VerifySet(Times.Never);
-        // Note: Reset also clears Value, OnGet, OnSet
+        // Note: Reset clears tracking counters and all configured callbacks
     }
     #endregion
 }
@@ -430,7 +430,7 @@ public class PropertyPriorityTests
 
         IConfigProps config = stub;
 
-        // OnGet wins over Value
+        // Callback syntax takes precedence (last call wins)
         Assert.Equal("dynamic", config.Name);
     }
     #endregion
@@ -462,7 +462,7 @@ public class CompletePropertyExampleTests
         // Track connection state with local variable
         var isConnected = false;
 
-        // Value: Static test data
+        // OnGet with static value: Fixed test data
         stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
         // OnGet: State-dependent behavior using tracked state

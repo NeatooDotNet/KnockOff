@@ -58,12 +58,6 @@ public partial class DataStoreStub : IDataStore { }
 [KnockOff]
 public partial class SourceRepoStub : IRepository { }
 
-// User method to demonstrate priority
-public partial class SourceRepoStub
-{
-    public int GetPriorityImpl(User user) => 99; // User method returns 99
-}
-
 // =============================================================================
 // Basic Source Delegation
 // =============================================================================
@@ -99,7 +93,6 @@ public class BasicSourceDelegationTests
 
 public class PartialOverrideTests
 {
-    #region source-partial-override
     [Fact]
     public void Source_PartialOverrideWithOnCall()
     {
@@ -112,21 +105,22 @@ public class PartialOverrideTests
         // Delegate to real implementation
         stub.Source(realRepo);
 
-        // Override specific method for testing
-        stub.GetById.OnCall((id) =>
-            id == 999 ? new User { Id = 999, Name = "Test User" } : null);
+        #region source-partial-override
+        // Override GetById for test data
+        stub.GetById.OnCall((id) => new User { Id = id, Name = "Test User" });
 
         IRepository repository = stub;
 
-        // OnCall overrides source for id 999
-        var testUser = repository.GetById(999);
+        // GetById uses OnCall override
+        var testUser = repository.GetById(1);
         Assert.NotNull(testUser);
         Assert.Equal("Test User", testUser.Name);
 
-        // Source still used when OnCall returns null (fallback)
-        // Note: In this case OnCall handles all ids, so source is bypassed
+        // Save delegates to source (no OnCall configured)
+        repository.Save(new User { Id = 2, Name = "New User" });
+        Assert.NotNull(realRepo.GetById(2));
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -194,7 +188,6 @@ public class ClearSourceTests
 
 public class PriorityOrderTests
 {
-    #region source-priority
     [Fact]
     public void Priority_OnCallBeatsSourceBeatsSmartDefault()
     {
@@ -208,7 +201,8 @@ public class PriorityOrderTests
 
         IRepository repository = stub;
 
-        // Source returns 1 for active user
+        #region source-priority
+        // Source returns 1 for active user (when no OnCall is set)
         var fromSource = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(1, fromSource);
 
@@ -216,63 +210,65 @@ public class PriorityOrderTests
         stub.GetPriority.OnCall((user) => 42);
         var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(42, fromOnCall);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
-// Complete Example
+// Complete Example - Decorator Pattern Testing
 // =============================================================================
 
-public interface ICachingRepository
+public interface IDataSource
 {
-    User? GetUser(int id);
+    string? Read(string filename);
+    void Write(string filename, string content);
 }
 
-public class RealRepository : ICachingRepository
+public class FileDataSource : IDataSource
 {
-    public User? GetUser(int id) => new User { Id = id, Name = $"User{id}" };
+    private readonly Dictionary<string, string> _data = new();
+
+    public string? Read(string filename) => _data.GetValueOrDefault(filename);
+    public void Write(string filename, string content) => _data[filename] = content;
 }
 
 [KnockOff]
-public partial class CachingSourceRepoStub : ICachingRepository { }
+public partial class DataSourceStub : IDataSource { }
 
 public class CompleteSourceExampleTests
 {
-    #region source-complete-example
     [Fact]
-    public void CachingDecorator_UsesSourceForBaseline()
+    public void Decorator_UsesSourceWithSelectiveOverrides()
     {
-        var stub = new CachingSourceRepoStub();
-        var realRepo = new RealRepository();
+        var stub = new DataSourceStub();
+        var realDataSource = new FileDataSource();
 
-        // Use real repository as baseline
-        stub.Source(realRepo);
+        // Populate real data source
+        realDataSource.Write("config.txt", "Production Config");
+        realDataSource.Write("data.txt", "Production Data");
 
-        // Track calls to verify caching behavior
-        var callCount = 0;
-        stub.GetUser.OnCall((id) =>
-        {
-            callCount++;
-            // Delegate to source
-            return realRepo.GetUser(id);
-        });
+        // Delegate to real implementation
+        stub.Source(realDataSource);
 
-        ICachingRepository repository = stub;
+        #region source-complete-example
+        // Override Read for specific test scenario
+        stub.Read.OnCall((filename) =>
+            filename == "config.txt" ? "Test Config" : null);
 
-        // First call
-        var user1 = repository.GetUser(1);
-        Assert.NotNull(user1);
-        Assert.Equal(1, callCount);
+        IDataSource dataSource = stub;
 
-        // Second call with same id
-        var user2 = repository.GetUser(1);
-        Assert.NotNull(user2);
-        Assert.Equal(2, callCount); // Not cached - stub doesn't cache
+        // OnCall handles config.txt
+        var config = dataSource.Read("config.txt");
+        Assert.Equal("Test Config", config);
 
-        // Verify real data came through
-        Assert.Equal("User1", user1.Name);
-        Assert.Equal("User1", user2.Name);
+        // OnCall returned null for data.txt, but source is NOT consulted
+        // once OnCall is configured - it takes full control
+        var data = dataSource.Read("data.txt");
+        Assert.Null(data);
+
+        // Write delegates entirely to source (no OnCall configured)
+        dataSource.Write("output.txt", "New Data");
+        Assert.Equal("New Data", realDataSource.Read("output.txt"));
+        #endregion
     }
-    #endregion
 }
