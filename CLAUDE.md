@@ -23,6 +23,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `docs/release-notes/` - Release notes
 - `.claude/agents/` - Agent-specific guidance files
 
+**Do NOT load as reference:** `docs/todos/`, `docs/plans/`, `docs/release-notes/` are work artifacts, not reference documentation. Only access these when:
+- Actively working on a specific todo or plan
+- Adding a new release note
+Never load these folders to understand the codebase, research history, or problem-solve.
+
 ## Plan Mode and Project Todos
 
 **When plan mode completes:**

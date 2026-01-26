@@ -37,7 +37,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `mock.Object` | `stub` (direct instance) |
 | `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall(() => value)` |
 | `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
-| `.ReturnsAsync(value)` | `stub.Method.OnCall(() => Task.FromResult(value))` |
+| `.ReturnsAsync(value)` | `stub.Method.OnCall(value)` (value overload auto-wraps) |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` or `stub.Method.Verify(Times.Once)` |
 | `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
@@ -253,7 +253,7 @@ public void VerifyCalls_KnockOffApproach()
 
 ## Step 6: Async Methods
 
-Replace `.ReturnsAsync()` with `Task.FromResult()` in `OnCall`.
+Replace `.ReturnsAsync()` with value overloads (auto-wrapped) or callbacks with `Task.FromResult()`.
 
 **Moq:**
 
@@ -283,7 +283,11 @@ public async Task AsyncMethod_KnockOffApproach()
     var stub = new UserRepositoryStub();
     var testUser = new User { Id = 42, Name = "Alice" };
 
-    stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+    // VALUE overload - auto-wraps in Task.FromResult (recommended)
+    stub.GetUserAsync.OnCall(testUser);
+
+    // CALLBACK overload - manual Task wrapping required
+    // stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 
     IUserRepository repository = stub;
     var user = await repository.GetUserAsync(42);
@@ -295,7 +299,8 @@ public async Task AsyncMethod_KnockOffApproach()
 
 **Key differences:**
 - Moq provides `.ReturnsAsync()` helper
-- KnockOff uses standard `Task.FromResult()` or `Task.CompletedTask`
+- KnockOff value overloads auto-wrap in `Task.FromResult()` (recommended)
+- KnockOff callback overloads require manual `Task.FromResult()` wrapping
 - For exceptions: return `Task.FromException<T>(exception)`
 
 ---
@@ -478,8 +483,8 @@ public class UserServiceTests
     public async Task GetUser_ReturnsUser()
     {
         var user = new User { Id = 1, Name = "Alice" };
-        // Similar to Moq: Setup + Verifiable
-        _stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
+        // Similar to Moq: Setup + Verifiable (value overload auto-wraps for async)
+        _stub.GetUserAsync.OnCall(user).Verifiable();
 
         var result = await _service.GetUserAsync(1);
 
@@ -561,16 +566,19 @@ var service = new UserService(mock.Object);
 var service = new UserService(stub);
 ```
 
-### Async Return Type Mismatch
+### Async Return Type Mismatch (Callback Overloads Only)
 
-**Problem:** Forgetting to wrap return values in `Task.FromResult()` for async methods.
+**Problem:** Forgetting to wrap return values in `Task.FromResult()` when using callback overloads for async methods.
 
 ```csharp
-// Wrong: returns User directly for async method
+// CALLBACK overload: Wrong - returns User directly for async method
 stub.GetUserAsync.OnCall((id) => user);
 
-// Correct: wrap in Task.FromResult
+// CALLBACK overload: Correct - wrap in Task.FromResult
 stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
+
+// VALUE overload: Auto-wraps (recommended for simple cases)
+stub.GetUserAsync.OnCall(user);
 ```
 
 ### Property Configuration
@@ -648,4 +656,4 @@ Use this checklist when migrating a test file from Moq to KnockOff:
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-01-26
