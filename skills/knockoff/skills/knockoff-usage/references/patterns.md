@@ -450,4 +450,4 @@ public partial class PatternComparisonTests
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-01-26

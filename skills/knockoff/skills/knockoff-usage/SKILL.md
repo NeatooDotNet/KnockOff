@@ -1,6 +1,6 @@
 ---
 name: KnockOff Usage
-description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "OnCall", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "migrate from Moq", "KnockOff async", "interceptor API", or needs guidance on creating, configuring, or verifying KnockOff test stubs.
+description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "OnCall", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "OnCallSequence", "ThenCall", ".Of<T>()", "generic method interceptor", "Source() delegation", or needs guidance on creating, configuring, or verifying KnockOff test stubs.
 version: 1.0.0
 ---
 
@@ -17,11 +17,11 @@ KnockOff is a Roslyn Source Generator that creates reusable test stubs at compil
 - Interceptor classes for tracking calls and configuring behavior
 - Public interceptor properties for each interface member (named after the member: `GetById`, `SaveUser`, etc.)
 
-**Three patterns:** KnockOff supports three stub creation patterns. Choose based on reusability needs and target type.
+**Four patterns:** KnockOff supports four stub creation patterns. Choose based on reusability needs and target type.
 
 **Shared stubs:** The stand-alone pattern enables defining a stub class once and using it across multiple test files. Each test creates its own instance and configures it differently—no duplicate setup code. Change default behavior in the stub class to affect all tests, or override per-test.
 
-## The Three Patterns
+## The Four Patterns
 
 ### Stand-Alone Pattern
 
@@ -152,6 +152,26 @@ public void InlineClassStub_UseObjectProperty()
 | Custom methods on stub | Stand-Alone |
 | Quick test-local stub | Inline Interface |
 | Stub a class (not interface) | Inline Class |
+| Stub a delegate type | Inline Delegate |
+
+## Strict Mode
+
+Enable strict mode to catch unexpected method calls. When strict mode is enabled, unconfigured methods throw `StubException` instead of returning default values.
+
+```cs
+// Enable via attribute (class-level default)
+[KnockOff(Strict = true)]
+public partial class StrictUserRepoStub : IUserRepo { }
+
+// Enable via extension method (instance-level)
+var stub = new UserRepoStub().Strict();
+
+// Enable via property
+var stub = new UserRepoStub();
+stub.Strict = true;
+```
+
+In strict mode, calling a method without configuring it first throws immediately, helping catch unintended interactions in tests.
 
 ## Configuring Behavior
 
@@ -207,6 +227,13 @@ logger.LogError("Oops");
 stub.Verify();
 ```
 <!-- endSnippet -->
+
+### Verify() vs VerifyAll()
+
+- **`Verify()`** - Checks only members marked with `.Verifiable()`
+- **`VerifyAll()`** - Checks ALL configured members (any member with `OnCall`, `OnGet`, etc.)
+
+Use `Verify()` when you want explicit control over which members to verify. Use `VerifyAll()` when you want to ensure every configured member was actually called.
 
 ### Using Times Constraints
 
@@ -280,6 +307,25 @@ Assert.Equal("Hello", message);
 - Call `tracking.Verify(Times.X)` for specific constraints
 - Best when different members have different expectations
 
+### Source Delegation
+
+Use `Source()` to delegate unconfigured calls to a real implementation. Configured members (via `OnCall`) take priority over source delegation.
+
+```cs
+var stub = new DataStoreStub();
+var realStore = new InMemoryDataStore();
+
+// Delegate unconfigured members to real implementation
+stub.Source(realStore);
+
+// Override specific members while delegating the rest
+stub.Get.OnCall((id) => "test value");
+
+IDataStore store = stub;
+store.Add("item");     // Delegates to realStore
+store.Get(0);          // Returns "test value" (OnCall configured)
+```
+
 ## Common Gotchas
 
 ### Missing `partial` Keyword
@@ -351,7 +397,7 @@ Assert.Equal("Alice", user!.Name);
 
 For detailed documentation, consult the reference files in `references/`:
 
-- **`references/patterns.md`** - Complete guide to all three stub patterns with examples
+- **`references/patterns.md`** - Complete guide to all four stub patterns with examples
 - **`references/methods.md`** - Method interceptor configuration, verification, and argument capture
 - **`references/properties.md`** - Property interceptors with OnGet, OnSet, and sequences
 - **`references/api-reference.md`** - Complete interceptor API (methods, properties, indexers, events, generics)
@@ -377,4 +423,4 @@ For detailed documentation, consult the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-01-26
