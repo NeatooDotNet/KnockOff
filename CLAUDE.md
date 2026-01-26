@@ -2,19 +2,26 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## Core Principle
 
-**KnockOff** is a Roslyn Source Generator for creating unit test stubs. Unlike Moq's fluent runtime configuration, KnockOff uses partial classes for compile-time setup—trading flexibility for readability and performance.
+**Trust the codebase, not documentation.** Always explore the actual code to understand patterns, conventions, and architecture. Do not rely on descriptions in this file or memory from previous sessions.
 
-Key concept: A class marked with `[KnockOff]` that implements an interface will have:
-1. Explicit interface implementations generated for all members
-2. Interface-named properties for test verification (call counts, args, callbacks)
-3. User-defined methods detected and called from generated interceptors
+## Project Basics
 
-**The solution file** is `src/KnockOff.sln`
-## TODOs and Plans
+**KnockOff** is a Roslyn Source Generator for creating unit test stubs.
 
-**ON CODE-REVIEW** Check that plans in the PR are linked to a single todo in their plan markdown
+**Solution file:** `src/KnockOff.sln`
+
+**Versioning:** Pre-1.0. All changes bump minor version only.
+
+## Folder Structure
+
+- `src/` - Source code
+- `docs/` - Documentation (markdown)
+- `docs/todos/` - Project todos (use `/project-todos` skill)
+- `docs/plans/` - Design documents (use `/project-todos` skill)
+- `docs/release-notes/` - Release notes
+- `.claude/agents/` - Agent-specific guidance files
 
 ## Plan Mode and Project Todos
 
@@ -39,94 +46,16 @@ Key concept: A class marked with `[KnockOff]` that implements an interface will 
 Plan Mode → knockoff-architect → knockoff-developer → Implementation
 ```
 
-This creates a seamless flow: brainstorming → formalization → architectural design → implementation planning → implementation.
+## Code Review Checklist
 
-**Key verification gates:**
-- Architect must complete 7-item verification checklist before handoff
-- Developer must create implementation contract before coding
-- Developer must provide evidence (test output, code snippets) before completion
+- Check that plans in the PR are linked to a single todo in their plan markdown
 
-## Design Principles
+## Agent Files
 
-**CRITICAL: All designs, features, and changes MUST work for all three patterns:**
-1. **Stand-Alone/Flat** - `[KnockOff]` on a class implementing an interface
-2. **Inline Interface** - `[KnockOff<IFoo>]` generating a stub class
-3. **Inline Class** - `[KnockOff<SomeClass>]` generating a stub class
-
-When designing features, architecture, or APIs, you must explicitly consider how each pattern will be supported. Do not design for just one scenario. If a design cannot support all three patterns, stop and ask for guidance.
-
-## API Design
-
-Three patterns: Inline Interface (`[KnockOff<IFoo>]`), Inline Class (`[KnockOff<SomeClass>]`), and Stand-Alone (`[KnockOff]` on a class implementing an interface). See `docs/getting-started.md` or `Documentation.Samples` for examples.
-
-## Source Generator Requirements
-
-- **Must target `netstandard2.0`** (Roslyn requirement)
-- Use `ForAttributeWithMetadataName` for the predicate
-- Transform must return **equatable** types (use `EquatableArray<T>`, records)
-- Reference RemoteFactory for patterns
-
-## Generator Principles
-
-1. **Generated code must compile.** Emit diagnostics instead of broken code.
-2. **Fail fast with clear diagnostics.** Users must understand why and how to fix.
-3. **No silent failures.** Every unsupported scenario needs a diagnostic.
-
-## Naming Conventions
-
-Use **Interceptor** terminology for generated tracking/callback classes:
-- Per-member: `{Interface}_{Member}Interceptor`
-- Container: `{Interface}Interceptors`
-
-**Do NOT use:** `*Intercept`, `*Intercepts`, `*Handler`
-
-## Testing Approach
-
-Use "create objects then test them" pattern:
-1. Define a test interface and `[KnockOff]` stub class
-2. Source generator produces explicit interface implementations
-3. Instantiate the stub and verify behavior through the interface
-
-## Versioning
-
-KnockOff is pre-1.0. All changes, including breaking changes, bump the minor version only.
+Agent files in `.claude/agents/` provide role-specific guidance. They receive CLAUDE.md automatically and should not duplicate its rules.
 
 ## Documentation
 
-### Documentation Pipeline
-
-Documentation uses a two-agent pipeline with MarkdownSnippets for code synchronization:
-
-1. **docs-architect** (Sonnet) - Creates documentation structure with snippet placeholders
-2. **docs-code-samples** (Opus) - Creates compilable sample code in `src/docs/samples/`
-
-### Documentation Structure
-
-```
-README.md                    # Project overview, quick start
-docs/
-├── getting-started.md       # Installation, first usage
-├── guides/                  # Feature guides (methods, properties, etc.)
-├── reference/               # API reference
-├── migration/               # Migration guides
-└── troubleshooting.md       # Troubleshooting guide
-skills/knockoff/
-├── commands/                # Slash command documentation
-└── skills/knockoff-usage/
-    ├── SKILL.md             # Skill overview
-    └── references/          # Plugin reference documentation
-```
-
-**All documentation files** (README.md, docs/, skills/) **use MarkdownSnippets** with compilable sample code.
+Documentation uses MarkdownSnippets for code synchronization. Samples are compiled and tested. Explore the codebase to understand the current structure and patterns.
 
 **Excluded from documentation pipeline:** `docs/todos/`, `docs/plans/`, `docs/release-notes/`, `.claude/`
-
-### Sample Code Location
-
-Documentation samples live in `src/Tests/KnockOff.Documentation.Samples/`.
-
-All code samples are compiled and tested on net8.0, net9.0, and net10.0.
-
-### MarkdownSnippets
-
-Code samples use `#region snippet-name` markers in C# and `<!-- snippet: snippet-name -->` placeholders in markdown. Run `mdsnippets` to sync.
