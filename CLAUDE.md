@@ -59,6 +59,10 @@ Plan Mode → knockoff-architect → knockoff-developer → Implementation
 
 Agent files in `.claude/agents/` provide role-specific guidance. They receive CLAUDE.md automatically and should not duplicate its rules.
 
+## Source-Generated Files
+
+**Roslyn-generated code is excluded from git.** Generated files in `Generated/` folders are not tracked in version control. Tests verify that generator output is correct.
+
 ## Documentation
 
 Documentation uses MarkdownSnippets for code synchronization. Samples are compiled and tested. Explore the codebase to understand the current structure and patterns.
