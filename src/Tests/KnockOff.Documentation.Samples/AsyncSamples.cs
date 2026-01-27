@@ -53,13 +53,32 @@ public class TaskMethodTests
     }
     #endregion
 
+    #region async-task-simplified-callback
+    [Fact]
+    public async Task TaskResult_SimplifiedCallback_AutoWraps()
+    {
+        var stub = new AsyncUserSvcStub();
+
+        // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in Task.FromResult
+        // This combines the simplicity of value overloads with callback flexibility
+        stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+
+        IAsyncUserSvc service = stub;
+        var user = await service.GetUserAsync(42);
+
+        Assert.NotNull(user);
+        Assert.Equal("Alice", user.Name);
+        stub.Verify();
+    }
+    #endregion
+
     #region async-task-result
     [Fact]
     public async Task TaskResult_ReturnedWithFromResult()
     {
         var stub = new AsyncUserSvcStub();
 
-        // CALLBACK: Use Task.FromResult when you need dynamic logic
+        // FULL CALLBACK: Use Task.FromResult when you need async operations in the callback
         stub.GetUserAsync.OnCall((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 
@@ -68,6 +87,25 @@ public class TaskMethodTests
 
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
+        stub.Verify();
+    }
+    #endregion
+
+    #region async-task-simplified-void
+    [Fact]
+    public async Task TaskVoid_SimplifiedCallback_AutoReturnsCompletedTask()
+    {
+        var stub = new AsyncUserSvcStub();
+
+        var updatedUsers = new List<User>();
+
+        // SIMPLIFIED VOID CALLBACK: Just use Action, Task.CompletedTask is auto-returned
+        stub.UpdateUserAsync.OnCall((user) => updatedUsers.Add(user)).Verifiable();
+
+        IAsyncUserSvc service = stub;
+        await service.UpdateUserAsync(new User { Id = 1, Name = "Bob" });
+
+        Assert.Single(updatedUsers);
         stub.Verify();
     }
     #endregion
@@ -120,13 +158,31 @@ public class ValueTaskMethodTests
     }
     #endregion
 
+    #region async-valuetask-simplified-callback
+    [Fact]
+    public async Task ValueTaskResult_SimplifiedCallback_AutoWraps()
+    {
+        var stub = new AsyncUserSvcStub();
+
+        // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in new ValueTask<T>()
+        stub.GetCachedUserAsync.OnCall((id) => new User { Id = id, Name = "Cached" }).Verifiable();
+
+        IAsyncUserSvc service = stub;
+        var user = await service.GetCachedUserAsync(42);
+
+        Assert.NotNull(user);
+        Assert.Equal("Cached", user.Name);
+        stub.Verify();
+    }
+    #endregion
+
     #region async-valuetask
     [Fact]
     public async Task ValueTaskResult_ReturnedDirectly()
     {
         var stub = new AsyncUserSvcStub();
 
-        // Create ValueTask directly with the value
+        // FULL CALLBACK: Create ValueTask directly when you need async operations
         stub.GetCachedUserAsync.OnCall((id) =>
             new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
 
@@ -202,10 +258,9 @@ public class AsyncExceptionTests
         var stub = new AsyncUserSvcStub();
 
         // Throw exception directly in the callback
-        var tracking = stub.GetUserAsync.OnCall((id) =>
-        {
-            throw new NotFoundException($"User {id} not found");
-        });
+        // Note: When only throwing (no return value), use explicit delegate type to disambiguate overloads
+        stub.GetUserAsync.OnCall((AsyncUserSvcStub.GetUserAsyncInterceptor.GetUserAsyncDelegate)(id =>
+            throw new NotFoundException($"User {id} not found")));
 
         IAsyncUserSvc service = stub;
 
