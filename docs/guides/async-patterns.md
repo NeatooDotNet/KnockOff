@@ -47,7 +47,7 @@ public async Task TaskResult_ReturnedWithFromResult()
 {
     var stub = new AsyncUserSvcStub();
 
-    // CALLBACK: Use Task.FromResult when you need dynamic logic
+    // FULL CALLBACK: Use Task.FromResult when you need async operations in the callback
     stub.GetUserAsync.OnCall((id) =>
         Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 
@@ -129,7 +129,7 @@ public async Task ValueTaskResult_ReturnedDirectly()
 {
     var stub = new AsyncUserSvcStub();
 
-    // Create ValueTask directly with the value
+    // FULL CALLBACK: Create ValueTask directly when you need async operations
     stub.GetCachedUserAsync.OnCall((id) =>
         new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
 
@@ -215,10 +215,9 @@ public async Task ThrowDirectly_InOnCallCallback()
     var stub = new AsyncUserSvcStub();
 
     // Throw exception directly in the callback
-    var tracking = stub.GetUserAsync.OnCall((id) =>
-    {
-        throw new NotFoundException($"User {id} not found");
-    });
+    // Note: When only throwing (no return value), use explicit delegate type to disambiguate overloads
+    stub.GetUserAsync.OnCall((AsyncUserSvcStub.GetUserAsyncInterceptor.GetUserAsyncDelegate)(id =>
+        throw new NotFoundException($"User {id} not found")));
 
     IAsyncUserSvc service = stub;
 

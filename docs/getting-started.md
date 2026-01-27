@@ -228,7 +228,9 @@ public void Property_OnGetAndOnSet()
 
 ### Async Methods - Auto-Wrapping
 
-For async methods returning `Task<T>` or `ValueTask<T>`, the value overload automatically wraps your value in the appropriate async type:
+For async methods returning `Task<T>` or `ValueTask<T>`, KnockOff automatically handles the async wrapping - both for value overloads and callbacks.
+
+#### Value Overload (Simplest)
 
 <!-- snippet: getting-started-async-wrapping -->
 ```cs
@@ -248,7 +250,57 @@ public async Task AsyncMethod_ValueAutoWrapped()
 ```
 <!-- endSnippet -->
 
-You don't need to manually wrap values in `Task.FromResult` - KnockOff handles this for you.
+#### Simplified Callbacks
+
+When you need callback logic but don't need actual async operations, return the inner type directly - KnockOff auto-wraps the result:
+
+<!-- snippet: async-task-simplified-callback -->
+```cs
+[Fact]
+public async Task TaskResult_SimplifiedCallback_AutoWraps()
+{
+    var stub = new AsyncUserSvcStub();
+
+    // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in Task.FromResult
+    // This combines the simplicity of value overloads with callback flexibility
+    stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+
+    IAsyncUserSvc service = stub;
+    var user = await service.GetUserAsync(42);
+
+    Assert.NotNull(user);
+    Assert.Equal("Alice", user.Name);
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+#### Void Async Methods
+
+For `Task` or `ValueTask` methods (no return value), use `Action` callbacks - KnockOff auto-returns `Task.CompletedTask`:
+
+<!-- snippet: async-task-simplified-void -->
+```cs
+[Fact]
+public async Task TaskVoid_SimplifiedCallback_AutoReturnsCompletedTask()
+{
+    var stub = new AsyncUserSvcStub();
+
+    var updatedUsers = new List<User>();
+
+    // SIMPLIFIED VOID CALLBACK: Just use Action, Task.CompletedTask is auto-returned
+    stub.UpdateUserAsync.OnCall((user) => updatedUsers.Add(user)).Verifiable();
+
+    IAsyncUserSvc service = stub;
+    await service.UpdateUserAsync(new User { Id = 1, Name = "Bob" });
+
+    Assert.Single(updatedUsers);
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+You don't need to manually wrap values in `Task.FromResult` or return `Task.CompletedTask` - KnockOff handles this for you.
 
 ### Decision Guide: Value vs Callback
 
@@ -294,4 +346,4 @@ Now that you've created your first stubs, explore more features:
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-01-27
