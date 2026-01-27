@@ -88,6 +88,28 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 		}
 
+		// Simplified callback storage for Task<T>/ValueTask<T> methods (accepts Func<..., TInnerType>)
+		var (innerType, isAsyncTaskT, isAsyncValueTaskT) = GetAsyncTypeInfo(model.ReturnType);
+		var isAsyncWithInnerType = isAsyncTaskT || isAsyncValueTaskT;
+		if (isAsyncWithInnerType && !hasRefOrOut)
+		{
+			var simplifiedDelegateType = BuildSimplifiedDelegateType(model.Parameters, innerType);
+			w.Line($"private {simplifiedDelegateType}? _onCallSimplified;");
+			w.Line("private MethodTrackingImpl? _onCallSimplifiedTracking;");
+			w.Line();
+		}
+
+		// Simplified void callback storage for Task/ValueTask methods (accepts Action<...>)
+		var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(model.ReturnType);
+		var isVoidAsync = isVoidTask || isVoidValueTask;
+		if (isVoidAsync && !hasRefOrOut)
+		{
+			var voidDelegateType = BuildSimplifiedVoidDelegateType(model.Parameters);
+			w.Line($"private {voidDelegateType}? _onCallSimplifiedVoid;");
+			w.Line("private MethodTrackingImpl? _onCallSimplifiedVoidTracking;");
+			w.Line();
+		}
+
 		// Sequence storage - list of callbacks that each run once
 		w.Line($"private global::System.Collections.Generic.List<({delegateType} Callback, MethodTrackingImpl Tracking)>? _sequence;");
 		w.Line("private int _sequenceIndex;");
@@ -113,7 +135,9 @@ internal static class MethodInterceptorRenderer
 		w.Line();
 
 		// Backward compatibility: aggregate tracking properties
-		RenderBackwardCompatibleTrackingProperties(w, model.TrackableParameters, model.LastArgType, model.LastArgsType, canHaveValueOverload);
+		RenderBackwardCompatibleTrackingProperties(w, model.TrackableParameters, model.LastArgType, model.LastArgsType, canHaveValueOverload,
+			hasSimplifiedCallback: isAsyncWithInnerType && !hasRefOrOut,
+			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut);
 		w.Line();
 
 		// Verify() methods for direct interceptor verification
@@ -134,6 +158,17 @@ internal static class MethodInterceptorRenderer
 				w.Line("_hasOnCallValue = false;");
 				w.Line("_onCallValue = default!;");
 				w.Line("_onCallValueTracking = null;");
+			}
+			// Clear simplified callback storage (mutual exclusivity)
+			if (isAsyncWithInnerType && !hasRefOrOut)
+			{
+				w.Line("_onCallSimplified = null;");
+				w.Line("_onCallSimplifiedTracking = null;");
+			}
+			if (isVoidAsync && !hasRefOrOut)
+			{
+				w.Line("_onCallSimplifiedVoid = null;");
+				w.Line("_onCallSimplifiedVoidTracking = null;");
 			}
 			w.Line("_onCall = callback;");
 			w.Line("_onCallTracking = new MethodTrackingImpl(this);");
@@ -156,11 +191,70 @@ internal static class MethodInterceptorRenderer
 				// Clear callback storage (mutual exclusivity)
 				w.Line("_onCall = null;");
 				w.Line("_onCallTracking = null;");
+				// Clear simplified callback storage (mutual exclusivity)
+				if (isAsyncWithInnerType && !hasRefOrOut)
+				{
+					w.Line("_onCallSimplified = null;");
+					w.Line("_onCallSimplifiedTracking = null;");
+				}
 				// Set value storage
 				w.Line("_hasOnCallValue = true;");
 				w.Line("_onCallValue = value;");
 				w.Line("_onCallValueTracking = new MethodTrackingImpl(this);");
 				w.Line("return _onCallValueTracking;");
+			}
+			w.Line();
+		}
+
+		// OnCall(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> methods
+		if (isAsyncWithInnerType && !hasRefOrOut)
+		{
+			var simplifiedDelegateType = BuildSimplifiedDelegateType(model.Parameters, innerType);
+			w.Line($"/// <summary>Configures callback returning unwrapped value. Result auto-wrapped in {(isAsyncTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+			w.Line($"public {model.TrackingInterface} OnCall({simplifiedDelegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line("_sequence = null;");
+				w.Line("_sequenceIndex = 0;");
+				w.Line("_isVerifiable = false;");
+				w.Line("_verifiableTimes = null;");
+				// Clear value storage (mutual exclusivity)
+				if (canHaveValueOverload)
+				{
+					w.Line("_hasOnCallValue = false;");
+					w.Line("_onCallValue = default!;");
+					w.Line("_onCallValueTracking = null;");
+				}
+				// Clear async callback storage (mutual exclusivity)
+				w.Line("_onCall = null;");
+				w.Line("_onCallTracking = null;");
+				// Set simplified callback storage
+				w.Line("_onCallSimplified = callback;");
+				w.Line("_onCallSimplifiedTracking = new MethodTrackingImpl(this);");
+				w.Line("return _onCallSimplifiedTracking;");
+			}
+			w.Line();
+		}
+
+		// OnCall(Action<...>) - simplified void callback for Task/ValueTask methods
+		if (isVoidAsync && !hasRefOrOut)
+		{
+			var voidDelegateType = BuildSimplifiedVoidDelegateType(model.Parameters);
+			w.Line($"/// <summary>Configures callback action. {(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.</summary>");
+			w.Line($"public {model.TrackingInterface} OnCall({voidDelegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line("_sequence = null;");
+				w.Line("_sequenceIndex = 0;");
+				w.Line("_isVerifiable = false;");
+				w.Line("_verifiableTimes = null;");
+				// Clear async callback storage (mutual exclusivity)
+				w.Line("_onCall = null;");
+				w.Line("_onCallTracking = null;");
+				// Set simplified void callback storage
+				w.Line("_onCallSimplifiedVoid = callback;");
+				w.Line("_onCallSimplifiedVoidTracking = new MethodTrackingImpl(this);");
+				w.Line("return _onCallSimplifiedVoidTracking;");
 			}
 			w.Line();
 		}
@@ -179,6 +273,17 @@ internal static class MethodInterceptorRenderer
 				w.Line("_onCallValue = default!;");
 				w.Line("_onCallValueTracking = null;");
 			}
+			// Clear simplified callback storage (mutual exclusivity)
+			if (isAsyncWithInnerType && !hasRefOrOut)
+			{
+				w.Line("_onCallSimplified = null;");
+				w.Line("_onCallSimplifiedTracking = null;");
+			}
+			if (isVoidAsync && !hasRefOrOut)
+			{
+				w.Line("_onCallSimplifiedVoid = null;");
+				w.Line("_onCallSimplifiedVoidTracking = null;");
+			}
 			w.Line("_isVerifiable = false;");
 			w.Line("_verifiableTimes = null;");
 			w.Line("_sequence = new global::System.Collections.Generic.List<(" + delegateType + " Callback, MethodTrackingImpl Tracking)>();");
@@ -193,10 +298,16 @@ internal static class MethodInterceptorRenderer
 		RenderInvokeMethod(w, model, options, null);
 
 		// Reset method - clears counts but preserves configuration and verifiable marking
-		RenderResetMethod(w, model.Overloads, model.LastArgType, model.LastArgsType, hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface));
+		RenderResetMethod(w, model.Overloads, model.LastArgType, model.LastArgsType,
+			hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface),
+			hasValueOverload: canHaveValueOverload,
+			hasSimplifiedCallback: isAsyncWithInnerType && !hasRefOrOut,
+			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut);
 
 		// Internal verification support
-		RenderInternalVerificationMembers(w, model.MethodName, model.Overloads, canHaveValueOverload);
+		RenderInternalVerificationMembers(w, model.MethodName, model.Overloads, canHaveValueOverload,
+			hasSimplifiedCallback: isAsyncWithInnerType && !hasRefOrOut,
+			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut);
 
 		// Nested MethodTrackingImpl
 		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
@@ -404,6 +515,43 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
+			// Check simplified callback for Task<T>/ValueTask<T> methods
+			var (invokeInnerType, invokeIsTaskT, invokeIsValueTaskT) = GetAsyncTypeInfo(model.ReturnType);
+			var invokeIsAsyncWithInnerType = invokeIsTaskT || invokeIsValueTaskT;
+			if (invokeIsAsyncWithInnerType && !hasRefOrOut)
+			{
+				w.Line("if (_onCallSimplified != null && _onCallSimplifiedTracking != null)");
+				using (w.Braces())
+				{
+					w.Line($"_onCallSimplifiedTracking.RecordCall({trackingArgs});");
+					var callbackArgs = BuildCallbackArgs(model.Parameters);
+					if (invokeIsTaskT)
+						w.Line($"return global::System.Threading.Tasks.Task.FromResult(_onCallSimplified({callbackArgs}));");
+					else
+						w.Line($"return new global::System.Threading.Tasks.ValueTask<{invokeInnerType}>(_onCallSimplified({callbackArgs}));");
+				}
+				w.Line();
+			}
+
+			// Check simplified void callback for Task/ValueTask methods
+			var (invokeIsVoidTask, invokeIsVoidValueTask) = GetVoidAsyncInfo(model.ReturnType);
+			var invokeIsVoidAsync = invokeIsVoidTask || invokeIsVoidValueTask;
+			if (invokeIsVoidAsync && !hasRefOrOut)
+			{
+				w.Line("if (_onCallSimplifiedVoid != null && _onCallSimplifiedVoidTracking != null)");
+				using (w.Braces())
+				{
+					w.Line($"_onCallSimplifiedVoidTracking.RecordCall({trackingArgs});");
+					var callbackArgs = BuildCallbackArgs(model.Parameters);
+					w.Line($"_onCallSimplifiedVoid({callbackArgs});");
+					if (invokeIsVoidTask)
+						w.Line("return global::System.Threading.Tasks.Task.CompletedTask;");
+					else
+						w.Line("return default;"); // default(ValueTask)
+				}
+				w.Line();
+			}
+
 			// No callback configured - track, check source, then strict/default
 			w.Line("_unconfiguredCallCount++;");
 			if (model.LastArgType != null && model.TrackableParameters.Count > 0)
@@ -570,7 +718,7 @@ internal static class MethodInterceptorRenderer
 
 	#region Reset and Internal Verification Methods
 
-	private static void RenderResetMethod(CodeWriter w, EquatableArray<MethodOverloadSignature> overloads, string? lastArgType = null, string? lastArgsType = null, bool hasSourceField = false)
+	private static void RenderResetMethod(CodeWriter w, EquatableArray<MethodOverloadSignature> overloads, string? lastArgType = null, string? lastArgsType = null, bool hasSourceField = false, bool hasValueOverload = false, bool hasSimplifiedCallback = false, bool hasSimplifiedVoidCallback = false)
 	{
 		w.Line("/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>");
 		using (w.Block("public void Reset()"))
@@ -586,6 +734,14 @@ internal static class MethodInterceptorRenderer
 			{
 				// Single-signature
 				w.Line("_onCallTracking?.Reset();");
+				// Reset value tracking only if value overload exists
+				if (hasValueOverload)
+					w.Line("_onCallValueTracking?.Reset();");
+				// Reset simplified callback tracking
+				if (hasSimplifiedCallback)
+					w.Line("_onCallSimplifiedTracking?.Reset();");
+				if (hasSimplifiedVoidCallback)
+					w.Line("_onCallSimplifiedVoidTracking?.Reset();");
 				w.Line("if (_sequence != null)");
 				using (w.Braces())
 				{
@@ -613,7 +769,7 @@ internal static class MethodInterceptorRenderer
 		w.Line();
 	}
 
-	private static void RenderInternalVerificationMembers(CodeWriter w, string methodName, EquatableArray<MethodOverloadSignature> overloads, bool hasValueOverload)
+	private static void RenderInternalVerificationMembers(CodeWriter w, string methodName, EquatableArray<MethodOverloadSignature> overloads, bool hasValueOverload, bool hasSimplifiedCallback = false, bool hasSimplifiedVoidCallback = false)
 	{
 		if (overloads.Count == 0)
 		{
@@ -622,10 +778,14 @@ internal static class MethodInterceptorRenderer
 			w.Line("internal bool IsVerifiable => _isVerifiable;");
 			w.Line();
 
-			// IsConfigured includes value storage if value overload is supported
+			// IsConfigured includes value storage if value overload is supported, plus simplified callbacks
 			var isConfiguredExpr = hasValueOverload
 				? "_hasOnCallValue || _onCall != null || (_sequence?.Count ?? 0) > 0"
 				: "_onCall != null || (_sequence?.Count ?? 0) > 0";
+			if (hasSimplifiedCallback)
+				isConfiguredExpr += " || _onCallSimplified != null";
+			if (hasSimplifiedVoidCallback)
+				isConfiguredExpr += " || _onCallSimplifiedVoid != null";
 			w.Line("/// <summary>Whether this interceptor has been configured (OnCall, OnCall(value), or OnCallSequence).</summary>");
 			w.Line($"internal bool IsConfigured => {isConfiguredExpr};");
 			w.Line();
@@ -1013,6 +1173,46 @@ internal static class MethodInterceptorRenderer
 	}
 
 	/// <summary>
+	/// Checks if the return type is a void async type (Task or ValueTask without generic argument).
+	/// </summary>
+	/// <param name="returnType">The fully-qualified return type.</param>
+	/// <returns>Tuple of (isTask, isValueTask) indicating which void async type, if any.</returns>
+	private static (bool IsTask, bool IsValueTask) GetVoidAsyncInfo(string returnType)
+	{
+		if (returnType == "global::System.Threading.Tasks.Task")
+			return (true, false);
+		if (returnType == "global::System.Threading.Tasks.ValueTask")
+			return (false, true);
+		return (false, false);
+	}
+
+	/// <summary>
+	/// Builds the simplified callback delegate type for Task&lt;T&gt;/ValueTask&lt;T&gt; methods.
+	/// E.g., Func&lt;int, User?&gt; for a method with int param returning Task&lt;User?&gt;
+	/// </summary>
+	private static string BuildSimplifiedDelegateType(EquatableArray<ParameterModel> parameters, string innerType)
+	{
+		if (parameters.Count == 0)
+			return $"global::System.Func<{innerType}>";
+
+		var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+		return $"global::System.Func<{paramTypes}, {innerType}>";
+	}
+
+	/// <summary>
+	/// Builds the simplified void callback delegate type for Task/ValueTask methods.
+	/// E.g., Action&lt;User&gt; for a method with User param returning Task
+	/// </summary>
+	private static string BuildSimplifiedVoidDelegateType(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0)
+			return "global::System.Action";
+
+		var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+		return $"global::System.Action<{paramTypes}>";
+	}
+
+	/// <summary>
 	/// Makes a type nullable for storage, avoiding double-nullable types.
 	/// </summary>
 	/// <param name="type">The type to make nullable.</param>
@@ -1047,12 +1247,16 @@ internal static class MethodInterceptorRenderer
 		EquatableArray<ParameterModel> trackableParams,
 		string? lastArgType,
 		string? lastArgsType,
-		bool hasValueOverload)
+		bool hasValueOverload,
+		bool hasSimplifiedCallback = false,
+		bool hasSimplifiedVoidCallback = false)
 	{
-		// CallCount - total across OnCall + OnCall(value) + sequence + unconfigured (private - use Verify() API to check call counts)
-		// Include value tracking when value overload exists
+		// CallCount - total across OnCall + OnCall(value) + simplified + sequence + unconfigured (private - use Verify() API to check call counts)
+		// Include value tracking when value overload exists, and simplified callback tracking when present
 		var valueTrackingPart = hasValueOverload ? " + (_onCallValueTracking?.CallCount ?? 0)" : "";
-		w.Line($"private int TotalCallCount {{ get {{ var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0){valueTrackingPart}; if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; }} }}");
+		var simplifiedTrackingPart = hasSimplifiedCallback ? " + (_onCallSimplifiedTracking?.CallCount ?? 0)" : "";
+		var simplifiedVoidTrackingPart = hasSimplifiedVoidCallback ? " + (_onCallSimplifiedVoidTracking?.CallCount ?? 0)" : "";
+		w.Line($"private int TotalCallCount {{ get {{ var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0){valueTrackingPart}{simplifiedTrackingPart}{simplifiedVoidTrackingPart}; if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; }} }}");
 		w.Line();
 
 		// LastCallArg - for single param methods
@@ -1061,15 +1265,20 @@ internal static class MethodInterceptorRenderer
 		{
 			var nullableType = lastArgType.EndsWith("?") ? lastArgType : $"{lastArgType}?";
 			w.Line($"/// <summary>The argument from the last call (from most recently called registration).</summary>");
+
+			// Build the priority chain: value > simplified > simplifiedVoid > onCall > sequence > unconfigured
+			var getterParts = new List<string>();
 			if (hasValueOverload)
-			{
-				// Include value tracking in the priority chain
-				w.Line($"public {nullableType} LastCallArg {{ get {{ if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; }} }}");
-			}
-			else
-			{
-				w.Line($"public {nullableType} LastCallArg {{ get {{ if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg; return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default; }} }}");
-			}
+				getterParts.Add("if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArg;");
+			if (hasSimplifiedCallback)
+				getterParts.Add("if ((_onCallSimplifiedTracking?.CallCount ?? 0) > 0) return _onCallSimplifiedTracking!.LastArg;");
+			if (hasSimplifiedVoidCallback)
+				getterParts.Add("if ((_onCallSimplifiedVoidTracking?.CallCount ?? 0) > 0) return _onCallSimplifiedVoidTracking!.LastArg;");
+			getterParts.Add("if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg;");
+			getterParts.Add("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg;");
+			getterParts.Add("return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default;");
+
+			w.Line($"public {nullableType} LastCallArg {{ get {{ {string.Join(" ", getterParts)} }} }}");
 			w.Line();
 		}
 
@@ -1078,15 +1287,20 @@ internal static class MethodInterceptorRenderer
 		{
 			var nullableType = lastArgsType.EndsWith("?") ? lastArgsType : $"{lastArgsType}?";
 			w.Line($"/// <summary>The arguments from the last call (from most recently called registration).</summary>");
+
+			// Build the priority chain: value > simplified > simplifiedVoid > onCall > sequence > unconfigured
+			var getterParts = new List<string>();
 			if (hasValueOverload)
-			{
-				// Include value tracking in the priority chain
-				w.Line($"public {nullableType} LastCallArgs {{ get {{ if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArgs; if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; }} }}");
-			}
-			else
-			{
-				w.Line($"public {nullableType} LastCallArgs {{ get {{ if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs; if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs; return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default; }} }}");
-			}
+				getterParts.Add("if ((_onCallValueTracking?.CallCount ?? 0) > 0) return _onCallValueTracking!.LastArgs;");
+			if (hasSimplifiedCallback)
+				getterParts.Add("if ((_onCallSimplifiedTracking?.CallCount ?? 0) > 0) return _onCallSimplifiedTracking!.LastArgs;");
+			if (hasSimplifiedVoidCallback)
+				getterParts.Add("if ((_onCallSimplifiedVoidTracking?.CallCount ?? 0) > 0) return _onCallSimplifiedVoidTracking!.LastArgs;");
+			getterParts.Add("if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs;");
+			getterParts.Add("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs;");
+			getterParts.Add("return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default;");
+
+			w.Line($"public {nullableType} LastCallArgs {{ get {{ {string.Join(" ", getterParts)} }} }}");
 			w.Line();
 		}
 	}
