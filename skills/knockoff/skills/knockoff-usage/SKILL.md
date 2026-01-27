@@ -363,21 +363,22 @@ _ = service.GetName();
 ```
 <!-- endSnippet -->
 
-### Using Task.FromResult in Async Callbacks
+### Simplified Async Callbacks
 
-**No longer required:** KnockOff auto-wraps values for async methods.
+**KnockOff auto-wraps async callbacks.** No need for `Task.FromResult()` or `Task.CompletedTask`:
 
-<!-- snippet: skill-gotcha-async-autowrap -->
 ```cs
-// CORRECT: KnockOff auto-wraps - just pass the value directly
+// Value overload - auto-wrapped
 stub.GetUserAsync.OnCall(new User { Id = 1, Name = "Alice" });
 
-// No need for Task.FromResult with value overload
-ISkillAsyncSvc service = stub;
-var user = await service.GetUserAsync(1);
-Assert.Equal("Alice", user!.Name);
+// Simplified callback - return inner type, auto-wrapped in Task.FromResult
+stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" });
+
+// Void async - use Action, Task.CompletedTask auto-returned
+stub.SaveUserAsync.OnCall((user) => ValidateUser(user));
 ```
-<!-- endSnippet -->
+
+See **`references/methods.md`** for complete async method documentation.
 
 ## Moq Migration Quick Reference
 

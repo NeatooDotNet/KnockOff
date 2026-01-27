@@ -353,6 +353,29 @@ internal static class MethodInterceptorRenderer
 			w.Line($"private MethodTrackingImpl_{overload.SignatureSuffix}? _onCallTracking_{overload.SignatureSuffix};");
 			w.Line();
 
+			// Simplified callback storage for Task<T>/ValueTask<T> overloads
+			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+			var isAsyncWithInnerType = isTaskT || isValueTaskT;
+			if (isAsyncWithInnerType && !hasRefOrOut)
+			{
+				var simplifiedDelegateType = BuildSimplifiedDelegateType(overload.Parameters, innerType);
+				w.Line($"private {simplifiedDelegateType}? _onCallSimplified_{overload.SignatureSuffix};");
+				w.Line($"private MethodTrackingImpl_{overload.SignatureSuffix}? _onCallSimplifiedTracking_{overload.SignatureSuffix};");
+				w.Line();
+			}
+
+			// Simplified void callback storage for Task/ValueTask overloads
+			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+			var isVoidAsync = isVoidTask || isVoidValueTask;
+			if (isVoidAsync && !hasRefOrOut)
+			{
+				var voidDelegateType = BuildSimplifiedVoidDelegateType(overload.Parameters);
+				w.Line($"private {voidDelegateType}? _onCallSimplifiedVoid_{overload.SignatureSuffix};");
+				w.Line($"private MethodTrackingImpl_{overload.SignatureSuffix}? _onCallSimplifiedVoidTracking_{overload.SignatureSuffix};");
+				w.Line();
+			}
+
 			// Sequence storage
 			w.Line($"private global::System.Collections.Generic.List<({overload.DelegateName} Callback, MethodTrackingImpl_{overload.SignatureSuffix} Tracking)>? _sequence_{overload.SignatureSuffix};");
 			w.Line($"private int _sequenceIndex_{overload.SignatureSuffix};");
@@ -374,6 +397,13 @@ internal static class MethodInterceptorRenderer
 		// OnCall overloads for each unique signature
 		foreach (var overload in model.Overloads)
 		{
+			// Determine async characteristics for this overload
+			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+			var isAsyncWithInnerType = isTaskT || isValueTaskT;
+			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+			var isVoidAsync = isVoidTask || isVoidValueTask;
+
 			// OnCall - repeating callback
 			w.Line($"/// <summary>Configures callback for {model.MethodName}({GetParamTypeList(overload.Parameters)}). Returns tracking interface.</summary>");
 			w.Line($"public {overload.TrackingInterface} OnCall({overload.DelegateName} callback)");
@@ -383,11 +413,68 @@ internal static class MethodInterceptorRenderer
 				w.Line($"_sequenceIndex_{overload.SignatureSuffix} = 0;");
 				w.Line($"_isVerifiable_{overload.SignatureSuffix} = false;");
 				w.Line($"_verifiableTimes_{overload.SignatureSuffix} = null;");
+				// Clear simplified callback storage (mutual exclusivity)
+				if (isAsyncWithInnerType && !hasRefOrOut)
+				{
+					w.Line($"_onCallSimplified_{overload.SignatureSuffix} = null;");
+					w.Line($"_onCallSimplifiedTracking_{overload.SignatureSuffix} = null;");
+				}
+				if (isVoidAsync && !hasRefOrOut)
+				{
+					w.Line($"_onCallSimplifiedVoid_{overload.SignatureSuffix} = null;");
+					w.Line($"_onCallSimplifiedVoidTracking_{overload.SignatureSuffix} = null;");
+				}
 				w.Line($"_onCall_{overload.SignatureSuffix} = callback;");
 				w.Line($"_onCallTracking_{overload.SignatureSuffix} = new MethodTrackingImpl_{overload.SignatureSuffix}(this);");
 				w.Line($"return _onCallTracking_{overload.SignatureSuffix};");
 			}
 			w.Line();
+
+			// OnCall(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> overloads
+			if (isAsyncWithInnerType && !hasRefOrOut)
+			{
+				var simplifiedDelegateType = BuildSimplifiedDelegateType(overload.Parameters, innerType);
+				w.Line($"/// <summary>Configures callback returning unwrapped value for {model.MethodName}({GetParamTypeList(overload.Parameters)}). Result auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+				w.Line($"public {overload.TrackingInterface} OnCall({simplifiedDelegateType} callback)");
+				using (w.Braces())
+				{
+					w.Line($"_sequence_{overload.SignatureSuffix} = null;");
+					w.Line($"_sequenceIndex_{overload.SignatureSuffix} = 0;");
+					w.Line($"_isVerifiable_{overload.SignatureSuffix} = false;");
+					w.Line($"_verifiableTimes_{overload.SignatureSuffix} = null;");
+					// Clear async callback storage (mutual exclusivity)
+					w.Line($"_onCall_{overload.SignatureSuffix} = null;");
+					w.Line($"_onCallTracking_{overload.SignatureSuffix} = null;");
+					// Set simplified callback storage
+					w.Line($"_onCallSimplified_{overload.SignatureSuffix} = callback;");
+					w.Line($"_onCallSimplifiedTracking_{overload.SignatureSuffix} = new MethodTrackingImpl_{overload.SignatureSuffix}(this);");
+					w.Line($"return _onCallSimplifiedTracking_{overload.SignatureSuffix};");
+				}
+				w.Line();
+			}
+
+			// OnCall(Action<...>) - simplified void callback for Task/ValueTask overloads
+			if (isVoidAsync && !hasRefOrOut)
+			{
+				var voidDelegateType = BuildSimplifiedVoidDelegateType(overload.Parameters);
+				w.Line($"/// <summary>Configures callback action for {model.MethodName}({GetParamTypeList(overload.Parameters)}). {(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.</summary>");
+				w.Line($"public {overload.TrackingInterface} OnCall({voidDelegateType} callback)");
+				using (w.Braces())
+				{
+					w.Line($"_sequence_{overload.SignatureSuffix} = null;");
+					w.Line($"_sequenceIndex_{overload.SignatureSuffix} = 0;");
+					w.Line($"_isVerifiable_{overload.SignatureSuffix} = false;");
+					w.Line($"_verifiableTimes_{overload.SignatureSuffix} = null;");
+					// Clear async callback storage (mutual exclusivity)
+					w.Line($"_onCall_{overload.SignatureSuffix} = null;");
+					w.Line($"_onCallTracking_{overload.SignatureSuffix} = null;");
+					// Set simplified void callback storage
+					w.Line($"_onCallSimplifiedVoid_{overload.SignatureSuffix} = callback;");
+					w.Line($"_onCallSimplifiedVoidTracking_{overload.SignatureSuffix} = new MethodTrackingImpl_{overload.SignatureSuffix}(this);");
+					w.Line($"return _onCallSimplifiedVoidTracking_{overload.SignatureSuffix};");
+				}
+				w.Line();
+			}
 
 			// OnCallSequence - starts a sequence
 			w.Line($"/// <summary>Starts a callback sequence for {model.MethodName}({GetParamTypeList(overload.Parameters)}). Returns sequence for ThenCall chaining.</summary>");
@@ -396,6 +483,17 @@ internal static class MethodInterceptorRenderer
 			{
 				w.Line($"_onCall_{overload.SignatureSuffix} = null;");
 				w.Line($"_onCallTracking_{overload.SignatureSuffix} = null;");
+				// Clear simplified callback storage (mutual exclusivity)
+				if (isAsyncWithInnerType && !hasRefOrOut)
+				{
+					w.Line($"_onCallSimplified_{overload.SignatureSuffix} = null;");
+					w.Line($"_onCallSimplifiedTracking_{overload.SignatureSuffix} = null;");
+				}
+				if (isVoidAsync && !hasRefOrOut)
+				{
+					w.Line($"_onCallSimplifiedVoid_{overload.SignatureSuffix} = null;");
+					w.Line($"_onCallSimplifiedVoidTracking_{overload.SignatureSuffix} = null;");
+				}
 				w.Line($"_isVerifiable_{overload.SignatureSuffix} = false;");
 				w.Line($"_verifiableTimes_{overload.SignatureSuffix} = null;");
 				w.Line($"_sequence_{overload.SignatureSuffix} = new global::System.Collections.Generic.List<({overload.DelegateName} Callback, MethodTrackingImpl_{overload.SignatureSuffix} Tracking)>();");
@@ -664,6 +762,44 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
+			// Check simplified callback for Task<T>/ValueTask<T> overloads
+			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+			var isAsyncWithInnerType = isTaskT || isValueTaskT;
+			if (isAsyncWithInnerType && !hasRefOrOut)
+			{
+				w.Line($"if (_onCallSimplified_{overload.SignatureSuffix} != null && _onCallSimplifiedTracking_{overload.SignatureSuffix} != null)");
+				using (w.Braces())
+				{
+					w.Line($"_onCallSimplifiedTracking_{overload.SignatureSuffix}.RecordCall({trackingArgs});");
+					var callbackArgs = BuildCallbackArgs(overload.Parameters);
+					if (isTaskT)
+						w.Line($"return global::System.Threading.Tasks.Task.FromResult(_onCallSimplified_{overload.SignatureSuffix}({callbackArgs}));");
+					else
+						w.Line($"return new global::System.Threading.Tasks.ValueTask<{innerType}>(_onCallSimplified_{overload.SignatureSuffix}({callbackArgs}));");
+				}
+				w.Line();
+			}
+
+			// Check simplified void callback for Task/ValueTask overloads
+			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+			var isVoidAsync = isVoidTask || isVoidValueTask;
+			if (isVoidAsync && !hasRefOrOut)
+			{
+				w.Line($"if (_onCallSimplifiedVoid_{overload.SignatureSuffix} != null && _onCallSimplifiedVoidTracking_{overload.SignatureSuffix} != null)");
+				using (w.Braces())
+				{
+					w.Line($"_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}.RecordCall({trackingArgs});");
+					var callbackArgs = BuildCallbackArgs(overload.Parameters);
+					w.Line($"_onCallSimplifiedVoid_{overload.SignatureSuffix}({callbackArgs});");
+					if (isVoidTask)
+						w.Line("return global::System.Threading.Tasks.Task.CompletedTask;");
+					else
+						w.Line("return default;"); // default(ValueTask)
+				}
+				w.Line();
+			}
+
 			// No callback configured
 			w.Line("_unconfiguredCallCount++;");
 
@@ -756,6 +892,20 @@ internal static class MethodInterceptorRenderer
 				foreach (var overload in overloads)
 				{
 					w.Line($"_onCallTracking_{overload.SignatureSuffix}?.Reset();");
+					// Reset simplified callback tracking for async overloads
+					var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+					var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+					var isAsyncWithInnerType = isTaskT || isValueTaskT;
+					if (isAsyncWithInnerType && !hasRefOrOut)
+					{
+						w.Line($"_onCallSimplifiedTracking_{overload.SignatureSuffix}?.Reset();");
+					}
+					var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+					var isVoidAsync = isVoidTask || isVoidValueTask;
+					if (isVoidAsync && !hasRefOrOut)
+					{
+						w.Line($"_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?.Reset();");
+					}
 					w.Line($"if (_sequence_{overload.SignatureSuffix} != null)");
 					using (w.Braces())
 					{
@@ -817,8 +967,26 @@ internal static class MethodInterceptorRenderer
 			w.Line($"internal bool IsVerifiable => {isVerifiableExpr};");
 			w.Line();
 
+			// Build IsConfigured including simplified callbacks for each async overload
 			w.Line("/// <summary>Whether any overload has been configured.</summary>");
-			var isConfiguredParts = overloads.Select(o => $"_onCall_{o.SignatureSuffix} != null || (_sequence_{o.SignatureSuffix}?.Count ?? 0) > 0");
+			var isConfiguredParts = new List<string>();
+			foreach (var overload in overloads)
+			{
+				var parts = new List<string>
+				{
+					$"_onCall_{overload.SignatureSuffix} != null",
+					$"(_sequence_{overload.SignatureSuffix}?.Count ?? 0) > 0"
+				};
+				// Add simplified callback checks for async overloads
+				var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+				var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+				if ((isTaskT || isValueTaskT) && !hasRefOrOut)
+					parts.Add($"_onCallSimplified_{overload.SignatureSuffix} != null");
+				var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+				if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
+					parts.Add($"_onCallSimplifiedVoid_{overload.SignatureSuffix} != null");
+				isConfiguredParts.Add(string.Join(" || ", parts));
+			}
 			var isConfiguredExpr = string.Join(" || ", isConfiguredParts);
 			w.Line($"internal bool IsConfigured => {isConfiguredExpr};");
 			w.Line();
@@ -833,7 +1001,21 @@ internal static class MethodInterceptorRenderer
 					using (w.Braces())
 					{
 						w.Line($"var times = _verifiableTimes_{overload.SignatureSuffix} ?? global::KnockOff.Times.AtLeastOnce;");
-						w.Line($"var count = (_onCallTracking_{overload.SignatureSuffix}?.CallCount ?? 0) + (_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0);");
+						// Build count including simplified tracking
+						var countParts = new List<string>
+						{
+							$"(_onCallTracking_{overload.SignatureSuffix}?.CallCount ?? 0)",
+							$"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)"
+						};
+						var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+						var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+						if ((isTaskT || isValueTaskT) && !hasRefOrOut)
+							countParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+						var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+						if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
+							countParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+						var countExpr = string.Join(" + ", countParts);
+						w.Line($"var count = {countExpr};");
 						w.Line($"if (!times.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", times, count);");
 					}
 				}
@@ -847,10 +1029,35 @@ internal static class MethodInterceptorRenderer
 			{
 				foreach (var overload in overloads)
 				{
-					w.Line($"if (_onCall_{overload.SignatureSuffix} != null || (_sequence_{overload.SignatureSuffix}?.Count ?? 0) > 0)");
+					// Build condition including simplified callbacks
+					var condParts = new List<string>
+					{
+						$"_onCall_{overload.SignatureSuffix} != null",
+						$"(_sequence_{overload.SignatureSuffix}?.Count ?? 0) > 0"
+					};
+					var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+					var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+					if ((isTaskT || isValueTaskT) && !hasRefOrOut)
+						condParts.Add($"_onCallSimplified_{overload.SignatureSuffix} != null");
+					var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+					if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
+						condParts.Add($"_onCallSimplifiedVoid_{overload.SignatureSuffix} != null");
+					var condExpr = string.Join(" || ", condParts);
+					w.Line($"if ({condExpr})");
 					using (w.Braces())
 					{
-						w.Line($"var count = (_onCallTracking_{overload.SignatureSuffix}?.CallCount ?? 0) + (_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0);");
+						// Build count including simplified tracking
+						var countParts = new List<string>
+						{
+							$"(_onCallTracking_{overload.SignatureSuffix}?.CallCount ?? 0)",
+							$"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)"
+						};
+						if ((isTaskT || isValueTaskT) && !hasRefOrOut)
+							countParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+						if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
+							countParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+						var countExpr = string.Join(" + ", countParts);
+						w.Line($"var count = {countExpr};");
 						w.Line($"if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, count);");
 					}
 				}
@@ -1314,8 +1521,21 @@ internal static class MethodInterceptorRenderer
 		EquatableArray<MethodOverloadSignature> overloads)
 	{
 		// Build a sum expression across all storage types for each overload, plus unconfigured calls
-		var sumParts = overloads.Select(o =>
-			$"(_onCallTracking_{o.SignatureSuffix}?.CallCount ?? 0) + (_sequence_{o.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)");
+		// Include simplified callback tracking for async overloads
+		var sumParts = new List<string>();
+		foreach (var overload in overloads)
+		{
+			sumParts.Add($"(_onCallTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+			sumParts.Add($"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)");
+			// Add simplified tracking for async overloads
+			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
+			if ((isTaskT || isValueTaskT) && !hasRefOrOut)
+				sumParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
+			if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
+				sumParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+		}
 		var sumExpr = "_unconfiguredCallCount + " + string.Join(" + ", sumParts);
 
 		// Private - use Verify() API to check call counts

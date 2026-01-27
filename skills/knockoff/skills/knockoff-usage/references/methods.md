@@ -217,6 +217,112 @@ Assert.Equal("secret123", password);
 
 ---
 
+## Async Methods
+
+KnockOff provides simplified syntax for async methods, eliminating verbose `Task.FromResult()` and `Task.CompletedTask` wrappers.
+
+### Task<T> and ValueTask<T> Methods
+
+For methods returning `Task<T>` or `ValueTask<T>`, you have three options:
+
+<!-- snippet: async-task-value-overload -->
+```cs
+[Fact]
+public async Task TaskResult_ValueOverload_AutoWraps()
+{
+    var stub = new AsyncUserSvcStub();
+
+    // VALUE OVERLOAD: KnockOff auto-wraps the value in Task.FromResult
+    // This is the simplest syntax for returning async values
+    stub.GetUserAsync.OnCall(new User { Id = 42, Name = "Alice" });
+
+    IAsyncUserSvc service = stub;
+    var user = await service.GetUserAsync(42);
+
+    Assert.NotNull(user);
+    Assert.Equal("Alice", user.Name);
+}
+```
+<!-- endSnippet -->
+
+<!-- snippet: async-task-simplified-callback -->
+```cs
+[Fact]
+public async Task TaskResult_SimplifiedCallback_AutoWraps()
+{
+    var stub = new AsyncUserSvcStub();
+
+    // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in Task.FromResult
+    // This combines the simplicity of value overloads with callback flexibility
+    stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+
+    IAsyncUserSvc service = stub;
+    var user = await service.GetUserAsync(42);
+
+    Assert.NotNull(user);
+    Assert.Equal("Alice", user.Name);
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+<!-- snippet: async-task-result -->
+```cs
+[Fact]
+public async Task TaskResult_ReturnedWithFromResult()
+{
+    var stub = new AsyncUserSvcStub();
+
+    // FULL CALLBACK: Use Task.FromResult when you need async operations in the callback
+    stub.GetUserAsync.OnCall((id) =>
+        Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
+
+    IAsyncUserSvc service = stub;
+    var user = await service.GetUserAsync(42);
+
+    Assert.NotNull(user);
+    Assert.Equal("Alice", user.Name);
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+### Void Async Methods (Task/ValueTask)
+
+For methods returning `Task` or `ValueTask` (no result), use `Action` callbacks - KnockOff auto-returns the completed task:
+
+<!-- snippet: async-task-simplified-void -->
+```cs
+[Fact]
+public async Task TaskVoid_SimplifiedCallback_AutoReturnsCompletedTask()
+{
+    var stub = new AsyncUserSvcStub();
+
+    var updatedUsers = new List<User>();
+
+    // SIMPLIFIED VOID CALLBACK: Just use Action, Task.CompletedTask is auto-returned
+    stub.UpdateUserAsync.OnCall((user) => updatedUsers.Add(user)).Verifiable();
+
+    IAsyncUserSvc service = stub;
+    await service.UpdateUserAsync(new User { Id = 1, Name = "Bob" });
+
+    Assert.Single(updatedUsers);
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
+
+### Async Callback Syntax Decision Guide
+
+| Return Type | Simplest Syntax | When to Use Full Syntax |
+|-------------|-----------------|------------------------|
+| `Task<T>` | `OnCall((args) => value)` | When callback needs actual async operations |
+| `ValueTask<T>` | `OnCall((args) => value)` | When callback needs actual async operations |
+| `Task` | `OnCall((args) => { action(); })` | When callback needs to return a specific Task |
+| `ValueTask` | `OnCall((args) => { action(); })` | When callback needs to return a specific ValueTask |
+
+---
+
 ## Handling Overloaded Methods
 
 When an interface has overloaded methods, KnockOff distinguishes them by the callback signature. The fully-typed lambda tells KnockOff which overload to configure:
@@ -323,6 +429,8 @@ Assert.Equal("new@test.com", savedUser.Email);
 | Configure void method | `stub.Method.OnCall((args) => { })` |
 | Configure method with callback | `stub.Method.OnCall((args) => returnValue)` |
 | Configure method with value | `stub.Method.OnCall(fixedValue)` |
+| Configure async Task<T> (simplified) | `stub.AsyncMethod.OnCall((args) => value)` |
+| Configure async Task (void, simplified) | `stub.AsyncMethod.OnCall((args) => { action(); })` |
 | Verify method was called | `tracking.Verify()` |
 | Verify call count | `tracking.Verify(Times.Exactly(n))` |
 | Mark for batch verify | `stub.Method.OnCall(...).Verifiable()` |
@@ -344,4 +452,4 @@ Assert.Equal("new@test.com", savedUser.Email);
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-01-27
