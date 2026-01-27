@@ -20,6 +20,7 @@ public partial class KnockOffGenerator
 			{
 				"KO0008" => KO0008_TypeParameterArityMismatch,
 				"KO0010" => KO0010_MultipleInterfaces,
+				"KO0100" => KO0100_MethodOverloadsNotSupported,
 				"KO1001" => KO1001_TypeMustBeInterfaceClassOrDelegate,
 				"KO1002" => KO1002_NameCollision,
 				"KO1003" => KO1003_StubsTypeConflict,
@@ -56,7 +57,7 @@ public partial class KnockOffGenerator
 		ReportDiagnostics(context, info.Diagnostics);
 
 		// Check for blocking diagnostics - don't generate code if blocking errors present
-		var hasBlockingDiagnostics = info.Diagnostics.Any(d => d.Id is "KO1002" or "KO1003" or "KO2001" or "KO2002" or "KO2005" or "KO2006");
+		var hasBlockingDiagnostics = info.Diagnostics.Any(d => d.Id is "KO0100" or "KO1002" or "KO1003" or "KO2001" or "KO2002" or "KO2005" or "KO2006");
 
 		if (info.Interfaces.Count == 0 && info.Delegates.Count == 0 && info.Classes.Count == 0)
 			return;

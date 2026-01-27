@@ -170,12 +170,22 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 
 	public void Initialize(IncrementalGeneratorInitializationContext context)
 	{
+		// Extract assembly configuration once per compilation
+		var assemblyConfigProvider = context.CompilationProvider
+			.Select(static (compilation, _) => ExtractAssemblyConfiguration(compilation));
+
 		// Pipeline 1: Explicit [KnockOff] pattern (class implements interfaces) - standalone stubs
 		// Only triggers when [KnockOff] has no constructor arguments (standalone pattern)
 		var classesToGenerate = context.SyntaxProvider.ForAttributeWithMetadataName(
 			"KnockOff.KnockOffAttribute",
 			predicate: static (node, _) => IsCandidateClass(node) && !HasTypeofArgument(node),
-			transform: static (ctx, _) => TransformClass(ctx));
+			transform: static (ctx, _) => ctx)
+			.Combine(assemblyConfigProvider)
+			.Select(static (data, _) =>
+			{
+				var (ctx, assemblyConfig) = data;
+				return TransformClass(ctx, assemblyConfig);
+			});
 
 		context.RegisterSourceOutput(classesToGenerate, static (spc, typeInfo) =>
 		{
@@ -190,7 +200,13 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		var inlineStubsToGenerate = context.SyntaxProvider.ForAttributeWithMetadataName(
 			"KnockOff.KnockOffAttribute`1",
 			predicate: static (node, _) => IsInlineStubCandidate(node),
-			transform: static (ctx, _) => TransformInlineStubClass(ctx));
+			transform: static (ctx, _) => ctx)
+			.Combine(assemblyConfigProvider)
+			.Select(static (data, _) =>
+			{
+				var (ctx, assemblyConfig) = data;
+				return TransformInlineStubClass(ctx, assemblyConfig);
+			});
 
 		context.RegisterSourceOutput(inlineStubsToGenerate, static (spc, info) =>
 		{
@@ -205,7 +221,13 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		var openGenericStubsToGenerate = context.SyntaxProvider.ForAttributeWithMetadataName(
 			"KnockOff.KnockOffAttribute",
 			predicate: static (node, _) => IsInlineStubCandidate(node) && HasTypeofArgument(node),
-			transform: static (ctx, _) => TransformInlineStubClass(ctx));
+			transform: static (ctx, _) => ctx)
+			.Combine(assemblyConfigProvider)
+			.Select(static (data, _) =>
+			{
+				var (ctx, assemblyConfig) = data;
+				return TransformInlineStubClass(ctx, assemblyConfig);
+			});
 
 		context.RegisterSourceOutput(openGenericStubsToGenerate, static (spc, info) =>
 		{
@@ -214,6 +236,22 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 				GenerateInlineStubs(spc, info);
 			}
 		});
+	}
+
+	/// <summary>
+	/// Extracts assembly-wide configuration from assembly-level attributes.
+	/// Called once per compilation via CompilationProvider.
+	/// </summary>
+	private static AssemblyConfiguration ExtractAssemblyConfiguration(Compilation compilation)
+	{
+		var hasStrictAttribute = compilation.Assembly.GetAttributes()
+			.Any(attr =>
+				attr.AttributeClass?.Name == "KnockOffStrictAttribute" &&
+				attr.AttributeClass.ContainingNamespace?.ToDisplayString() == "KnockOff");
+
+		return hasStrictAttribute
+			? new AssemblyConfiguration(DefaultStrict: true)
+			: AssemblyConfiguration.Empty;
 	}
 
 	/// <summary>

@@ -181,17 +181,14 @@ All patterns support the same interceptor API for configuring behavior, tracking
 
 ## Strict Mode
 
-Both attribute patterns support a `Strict` property that controls how stubs handle unconfigured members.
+Strict mode controls how stubs handle unconfigured members. When enabled, unconfigured method calls throw `StubException` instead of returning default values. This helps catch unexpected interactions during tests by failing fast.
 
-**Behavior:**
-- When `Strict = true`, unconfigured method calls throw `StubException` instead of returning default values
-- Helps catch unexpected interactions during tests by failing fast
-- Can be set via attribute property or constructor parameter
+### Per-Stub Strict Mode
 
-**Usage:**
+Set strict mode for individual stubs via attribute property or constructor parameter:
 
 ```csharp
-// Set via attribute property (default for all instances)
+// Set via attribute property (default for all instances of this stub)
 [KnockOff(Strict = true)]
 public partial class UserRepoStub : IUserRepository { }
 
@@ -199,14 +196,73 @@ public partial class UserRepoStub : IUserRepository { }
 [KnockOff<IUserRepository>(Strict = true)]
 public partial class MyTests { }
 
-// Override per instance via constructor
+// Override per instance via constructor (inline stubs only)
 var stub = new Stubs.IUserRepository(strict: true);
+
+// Override at runtime
+stub.Strict = false;  // Disable
+stub.Strict();        // Enable via fluent API
 ```
 
-**When to use strict mode:**
-- During test development to catch missing configurations
-- For critical tests where unexpected calls indicate bugs
-- When you want explicit control over all stub interactions
+### Assembly-Wide Strict Mode
+
+Apply `[assembly: KnockOffStrict]` to make all stubs in an assembly default to strict mode:
+
+```csharp
+// In AssemblyInfo.cs or any file in your test project
+[assembly: KnockOffStrict]
+```
+
+With this attribute, all stubs in the assembly throw `StubException` for unconfigured calls unless explicitly opted out.
+
+### Opting Out of Assembly Strict Mode
+
+Individual stubs can opt out of the assembly default:
+
+```csharp
+[assembly: KnockOffStrict]
+
+// All stubs default to strict mode
+[KnockOff<IUserService>]
+public partial class UserTests { }
+
+// Opt out via attribute property
+[KnockOff<ILegacyService>(Strict = false)]
+public partial class LegacyTests { }
+
+// Opt out via constructor (inline stubs only)
+var stub = new UserTests.Stubs.IUserService(strict: false);
+
+// Opt out at runtime
+stub.Strict = false;
+```
+
+### Precedence
+
+Strict mode settings are resolved in this order (highest to lowest):
+
+1. **Runtime:** `stub.Strict = false` or `stub.Strict()`
+2. **Constructor:** `new Stubs.IService(strict: false)` (inline stubs only)
+3. **Attribute:** `[KnockOff(Strict = false)]` or `[KnockOff<T>(Strict = false)]`
+4. **Assembly:** `[assembly: KnockOffStrict]`
+5. **Default:** `false` (non-strict)
+
+### When to Use Strict Mode
+
+**Use assembly-wide strict mode when:**
+- You want strict behavior as the default for your entire test project
+- You want to enforce explicit stub configuration as a coding standard
+- You prefer opting out of strict mode rather than opting in
+
+**Use per-stub strict mode when:**
+- Only certain tests require strict verification
+- You're migrating an existing test project incrementally
+- Different tests have different strictness requirements
+
+**Benefits of strict mode:**
+- Catches missing configurations during test development
+- Ensures all stub interactions are intentional
+- Prevents tests from passing due to default return values
 
 ---
 
@@ -219,4 +275,4 @@ var stub = new Stubs.IUserRepository(strict: true);
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-01-27

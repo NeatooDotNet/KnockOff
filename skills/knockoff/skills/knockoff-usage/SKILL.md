@@ -1,6 +1,6 @@
 ---
 name: KnockOff Usage
-description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "OnCall", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "OnCallSequence", "ThenCall", ".Of<T>()", "generic method interceptor", "Source() delegation", or needs guidance on creating, configuring, or verifying KnockOff test stubs.
+description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "OnCall", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "assembly-wide strict", "[assembly: KnockOffStrict]", "OnCallSequence", "ThenCall", ".Of<T>()", "generic method interceptor", "Source() delegation", or needs guidance on creating, configuring, or verifying KnockOff test stubs.
 version: 1.0.0
 ---
 
@@ -156,22 +156,21 @@ public void InlineClassStub_UseObjectProperty()
 
 ## Strict Mode
 
-Enable strict mode to catch unexpected method calls. When strict mode is enabled, unconfigured methods throw `StubException` instead of returning default values.
+Enable strict mode to catch unexpected method calls. Unconfigured methods throw `StubException` instead of returning default values.
 
 ```cs
-// Enable via attribute (class-level default)
+// Per-stub via attribute
 [KnockOff(Strict = true)]
 public partial class StrictUserRepoStub : IUserRepo { }
 
-// Enable via extension method (instance-level)
+// Per-stub via fluent API
 var stub = new UserRepoStub().Strict();
 
-// Enable via property
-var stub = new UserRepoStub();
-stub.Strict = true;
+// Assembly-wide default
+[assembly: KnockOffStrict]
 ```
 
-In strict mode, calling a method without configuring it first throws immediately, helping catch unintended interactions in tests.
+See **`references/strict-mode.md`** for precedence rules, opt-out mechanisms, and detailed examples.
 
 ## Configuring Behavior
 
@@ -402,6 +401,7 @@ For detailed documentation, consult the reference files in `references/`:
 - **`references/methods.md`** - Method interceptor configuration, verification, and argument capture
 - **`references/properties.md`** - Property interceptors with OnGet, OnSet, and sequences
 - **`references/api-reference.md`** - Complete interceptor API (methods, properties, indexers, events, generics)
+- **`references/strict-mode.md`** - Strict mode configuration, assembly-wide defaults, and precedence
 - **`references/moq-migration.md`** - Step-by-step Moq to KnockOff migration guide
 
 ## Troubleshooting
@@ -424,4 +424,4 @@ For detailed documentation, consult the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-01-26
+**UPDATED:** 2026-01-27

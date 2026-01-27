@@ -17,7 +17,7 @@ public partial class KnockOffGenerator
 	/// ForAttributeWithMetadataName triggers once per node, with context.Attributes containing
 	/// ALL matching attributes on that node.
 	/// </summary>
-	private static InlineStubClassInfo? TransformInlineStubClass(GeneratorAttributeSyntaxContext context)
+	private static InlineStubClassInfo? TransformInlineStubClass(GeneratorAttributeSyntaxContext context, AssemblyConfiguration assemblyConfig)
 	{
 		var classDeclaration = (ClassDeclarationSyntax)context.TargetNode;
 		var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
@@ -93,16 +93,10 @@ public partial class KnockOffGenerator
 			if (typeArg is null)
 				continue;
 
-			// Extract Strict property from attribute (default false)
-			var strict = false;
-			foreach (var namedArg in attributeData.NamedArguments)
-			{
-				if (namedArg.Key == "Strict" && namedArg.Value.Value is bool strictValue)
-				{
-					strict = strictValue;
-					break;
-				}
-			}
+			// Extract Strict property from attribute (null if not explicitly set)
+			// Precedence: Attribute > Assembly > Default(false)
+			var attributeStrict = ExtractStrictFromAttributeData(attributeData);
+			var strict = attributeStrict ?? assemblyConfig.DefaultStrict;
 
 			// Check if type argument is an interface, class, or delegate (KO1001)
 			if (typeArg.TypeKind != TypeKind.Interface && typeArg.TypeKind != TypeKind.Delegate && typeArg.TypeKind != TypeKind.Class)
@@ -603,7 +597,7 @@ public partial class KnockOffGenerator
 	/// <summary>
 	/// Transform: extract all interface members and user-defined methods
 	/// </summary>
-	private static KnockOffTypeInfo? TransformClass(GeneratorAttributeSyntaxContext context)
+	private static KnockOffTypeInfo? TransformClass(GeneratorAttributeSyntaxContext context, AssemblyConfiguration assemblyConfig)
 	{
 		var classDeclaration = (ClassDeclarationSyntax)context.TargetNode;
 		var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
@@ -611,19 +605,10 @@ public partial class KnockOffGenerator
 		if (classSymbol is null)
 			return null;
 
-		// Extract Strict property from [KnockOff] attribute (default false)
-		var strict = false;
-		foreach (var attributeData in context.Attributes)
-		{
-			foreach (var namedArg in attributeData.NamedArguments)
-			{
-				if (namedArg.Key == "Strict" && namedArg.Value.Value is bool strictValue)
-				{
-					strict = strictValue;
-					break;
-				}
-			}
-		}
+		// Extract Strict property from [KnockOff] attribute (null if not explicitly set)
+		// Precedence: Attribute > Assembly > Default(false)
+		var attributeStrict = ExtractStrictFromAttributes(context.Attributes);
+		var strict = attributeStrict ?? assemblyConfig.DefaultStrict;
 
 		// Get namespace
 		var ns = classSymbol.ContainingNamespace;
@@ -1080,5 +1065,36 @@ public partial class KnockOffGenerator
 
 		// Public and Protected members are accessible
 		return true;
+	}
+
+	/// <summary>
+	/// Extracts the Strict property from a collection of attributes.
+	/// Returns null if not explicitly set (allows assembly default to apply).
+	/// </summary>
+	private static bool? ExtractStrictFromAttributes(ImmutableArray<AttributeData> attributes)
+	{
+		foreach (var attributeData in attributes)
+		{
+			var strict = ExtractStrictFromAttributeData(attributeData);
+			if (strict.HasValue)
+				return strict;
+		}
+		return null;
+	}
+
+	/// <summary>
+	/// Extracts the Strict property from a single attribute.
+	/// Returns null if not explicitly set.
+	/// </summary>
+	private static bool? ExtractStrictFromAttributeData(AttributeData attributeData)
+	{
+		foreach (var namedArg in attributeData.NamedArguments)
+		{
+			if (namedArg.Key == "Strict" && namedArg.Value.Value is bool strictValue)
+			{
+				return strictValue;
+			}
+		}
+		return null;
 	}
 }

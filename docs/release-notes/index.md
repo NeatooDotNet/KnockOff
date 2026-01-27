@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v10.30.0](v10.30.0.md) | 2026-01-27 | Assembly-wide strict mode with `[assembly: KnockOffStrict]` |
 | [v10.27.0](v10.27.0.md) | 2026-01-26 | **Breaking:** Unified callback API to method syntax, removed .Value property, added value-based overloads |
 | [v10.26.0](v10.26.0.md) | 2026-01-22 | **Breaking:** Removed count properties from public API |
 | [v10.25.0](v10.25.0.md) | 2026-01-22 | **Breaking:** Removed WasCalled, added Verify() to method interceptors |
@@ -32,6 +33,9 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.30.0](v10.30.0.md) - 2026-01-27 - Assembly-wide strict mode with `[assembly: KnockOffStrict]`
+- [v10.29.0](v10.29.0.md) - 2026-01-27 - Simplified async callbacks for overload groups
+- [v10.28.0](v10.28.0.md) - 2026-01-27 - Simplified async callbacks
 - [v10.27.0](v10.27.0.md) - 2026-01-26 - **Breaking:** Unified callback API to method syntax, removed .Value property, added value-based overloads
 - [v10.26.0](v10.26.0.md) - 2026-01-22 - **Breaking:** Removed count properties from public API
 - [v10.25.0](v10.25.0.md) - 2026-01-22 - **Breaking:** Removed WasCalled, added Verify() to method interceptors
