@@ -269,6 +269,52 @@ public class StrictModeTests
 	}
 
 	#endregion
+
+	#region User Method Tests
+
+	[Fact]
+	public void StandaloneStub_Strict_UserMethod_DoesNotThrow()
+	{
+		// User methods bypass strict mode - they ARE the configuration
+		var stub = new StrictModeUserMethodStub().Strict();
+		IStrictModeUserMethodTest service = stub;
+
+		// User method executes normally even in strict mode
+		var result = service.GetValue(5);
+
+		Assert.Equal(50, result); // User method multiplies by 10
+		stub.GetValue2.Verify(Times.Once);
+		Assert.Equal(5, stub.GetValue2.LastArg);
+	}
+
+	[Fact]
+	public void StandaloneStub_Strict_UserMethod_NonUserMethodStillThrows()
+	{
+		// User methods work, but non-user-method members still throw
+		var stub = new StrictModeUserMethodStub().Strict();
+		IStrictModeUserMethodTest service = stub;
+
+		// User method works
+		var result = service.GetValue(5);
+		Assert.Equal(50, result);
+
+		// Non-user-method property still throws
+		Assert.Throws<StubException>(() => _ = service.Name);
+	}
+
+	[Fact]
+	public void StandaloneStub_Strict_UserVoidMethod_DoesNotThrow()
+	{
+		var stub = new StrictModeUserMethodStub().Strict();
+		IStrictModeUserMethodTest service = stub;
+
+		// Void user method executes without throwing
+		service.DoSomething();
+
+		stub.DoSomething2.Verify(Times.Once);
+	}
+
+	#endregion
 }
 
 #region Test Interfaces
@@ -307,6 +353,39 @@ public partial class StrictByDefaultStub : IStrictModeTest
 [KnockOff<IStrictByDefault>(Strict = true)]
 public partial class StrictModeInlineTests
 {
+}
+
+#endregion
+
+#region User Method Interface and Stub
+
+public interface IStrictModeUserMethodTest
+{
+	string Name { get; set; }
+	int GetValue(int x);
+	void DoSomething();
+}
+
+[KnockOff]
+public partial class StrictModeUserMethodStub : IStrictModeUserMethodTest
+{
+}
+
+public partial class StrictModeUserMethodStub
+{
+	// User method - bypasses strict mode
+	protected int GetValue(int x)
+	{
+		return x * 10;
+	}
+
+	// User void method - bypasses strict mode
+	protected void DoSomething()
+	{
+		// Intentionally empty - just proves it doesn't throw
+	}
+
+	// Name property has NO user method - will throw in strict mode
 }
 
 #endregion
