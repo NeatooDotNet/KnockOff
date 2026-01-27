@@ -1,6 +1,6 @@
 # Simplified Async Callbacks for Overload Groups
 
-**Status:** Not Started
+**Status:** Complete
 **Priority:** Low
 **Created:** 2026-01-26
 **Last Updated:** 2026-01-26
@@ -50,14 +50,16 @@ stub.SaveAsync.OnCall((User user, CancellationToken ct) => { /* side effect */ }
 
 ## Plans
 
+- [Simplified Async Callbacks for Overload Groups](../plans/overload-group-async-callbacks.md)
+
 ---
 
 ## Tasks
 
-- [ ] Add `Func<..., T>` simplified callbacks for `Task<T>`/`ValueTask<T>` overloads
-- [ ] Add `Action<...>` simplified callbacks for `Task`/`ValueTask` overloads
-- [ ] Add tests for simplified callbacks with overloaded methods (all three patterns)
-- [ ] Update documentation
+- [x] Add `Func<..., T>` simplified callbacks for `Task<T>`/`ValueTask<T>` overloads
+- [x] Add `Action<...>` simplified callbacks for `Task`/`ValueTask` overloads
+- [x] Add tests for simplified callbacks with overloaded methods (all three patterns)
+- [ ] Update documentation (out of scope for this implementation)
 
 ---
 
@@ -65,8 +67,33 @@ stub.SaveAsync.OnCall((User user, CancellationToken ct) => { /* side effect */ }
 
 - 2026-01-26: Created as follow-up from async-callback-simplification feature
 - 2026-01-26: Feasibility analysis with knockoff-architect. Value overloads ruled out - all overloads share same return type making `OnCall(value)` signature ambiguous. Shared-value approach considered but rejected due to Verify complexity (aggregate tracking loses per-signature arg capture). Scoped to simplified async callbacks only, which work because different `Func<>`/`Action<>` arities are distinct types.
+- 2026-01-26: Architecture plan created at `docs/plans/overload-group-async-callbacks.md`. Deep-dive analysis completed. Implementation follows established single-signature pattern - purely renderer changes, no model changes needed.
+- 2026-01-26: Developer review completed. Plan approved with minor implementation details noted.
+- 2026-01-26: Implementation completed. All 4 phases complete. 24 new tests added. All tests pass.
 
 ---
 
 ## Results / Conclusions
+
+**Feature successfully implemented.** Overload groups now support simplified async callbacks:
+
+```csharp
+// Before (verbose)
+stub.GetByIdAsync.OnCall((int id) => Task.FromResult(user));
+
+// After (simplified)
+stub.GetByIdAsync.OnCall((int id) => user);  // Auto-wrapped in Task.FromResult
+```
+
+**Key implementation details:**
+- Per-signature storage: `_onCallSimplified_{suffix}` and `_onCallSimplifiedVoid_{suffix}`
+- Per-signature tracking: Follows same pattern as single-signature methods
+- Mutual exclusivity: Simplified callbacks clear async delegate callbacks and vice versa
+- All three patterns work: Standalone, Inline Interface, Inline Class
+
+**Files modified:**
+- `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Core implementation
+
+**Files added:**
+- `src/Tests/KnockOffTests/OverloadGroupAsyncCallbackTests.cs` - 24 comprehensive tests
 
