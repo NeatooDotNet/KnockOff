@@ -1868,27 +1868,31 @@ internal static class InlineModelBuilder
         var allInterfaces = new List<string> { primaryInterface };
         allInterfaces.AddRange(iface.BaseInterfaces.Select(bi => ToBindGeneric(bi)));
 
+        // Build inheritance lookup from the interface hierarchy
+        // This maps each interface to the set of interfaces it inherits from (including itself)
+        var inheritanceLookup = BuildInheritanceLookup(iface.InterfaceHierarchy, typeParamList);
+
         // Build source providers for each interface in the hierarchy
-        // For the primary interface: all members get source (since primary contains all members)
-        // For base interfaces: only members declared on that exact interface get source
-        // This is conservative but type-safe - we can't determine transitive base relationships
-        // without the full inheritance graph
         var sourceProviders = new List<SourceProviderInfo>();
         var allInterceptorNames = interceptorToDeclaringInterface.Keys.ToList();
 
         foreach (var sourceIfaceFullName in allInterfaces)
         {
             var memberMappings = new List<SourceMemberMapping>();
-            var isPrimaryInterface = sourceIfaceFullName == primaryInterface;
+
+            // Get the set of interfaces that this source interface inherits from (including itself)
+            var inheritedInterfaces = inheritanceLookup.TryGetValue(sourceIfaceFullName, out var inherited)
+                ? inherited
+                : new HashSet<string> { sourceIfaceFullName };
 
             foreach (var interceptorName in allInterceptorNames)
             {
                 var declaringInterface = interceptorToDeclaringInterface[interceptorName];
 
-                // For primary interface: set source on ALL members (safe because primary extends all)
-                // For base interfaces: only set source when declaring interface matches exactly
-                // This avoids type errors - the source type must be assignable to _source field type
-                var setSource = isPrimaryInterface || declaringInterface == sourceIfaceFullName;
+                // Set source if the declaring interface is inherited by the source interface
+                // For Source(IList<T>): includes IList<T>, ICollection<T>, IEnumerable<T>, IEnumerable
+                // For Source(IEnumerable<T>): includes only IEnumerable<T> and IEnumerable
+                var setSource = inheritedInterfaces.Contains(declaringInterface);
 
                 memberMappings.Add(new SourceMemberMapping(
                     InterceptorName: interceptorName,
@@ -1903,6 +1907,37 @@ internal static class InlineModelBuilder
         }
 
         return sourceProviders.ToEquatableArray();
+    }
+
+    /// <summary>
+    /// Builds a lookup table from interface to the set of interfaces it inherits from (including itself).
+    /// </summary>
+    private static Dictionary<string, HashSet<string>> BuildInheritanceLookup(
+        EquatableArray<InterfaceHierarchyEntry> hierarchy,
+        string typeParamList)
+    {
+        var lookup = new Dictionary<string, HashSet<string>>();
+
+        // Helper to convert unbound generic form to bound form
+        string ToBindGeneric(string interfaceName) =>
+            typeParamList.Length > 0
+                ? SymbolHelpers.ReplaceUnboundGeneric(interfaceName, typeParamList)
+                : interfaceName;
+
+        foreach (var entry in hierarchy)
+        {
+            var ifaceName = ToBindGeneric(entry.InterfaceName);
+            var inheritedSet = new HashSet<string> { ifaceName };
+
+            foreach (var baseIface in entry.BaseInterfaces)
+            {
+                inheritedSet.Add(ToBindGeneric(baseIface));
+            }
+
+            lookup[ifaceName] = inheritedSet;
+        }
+
+        return lookup;
     }
 
     #endregion

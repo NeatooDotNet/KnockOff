@@ -40,7 +40,13 @@ internal sealed record InterfaceInfo(
 	/// Fully qualified names of interfaces that this interface directly inherits from.
 	/// Used for building the interface hierarchy for Source(T) methods.
 	/// </summary>
-	EquatableArray<string> BaseInterfaces = default) : IEquatable<InterfaceInfo>
+	EquatableArray<string> BaseInterfaces = default,
+	/// <summary>
+	/// Maps each interface in the hierarchy to the set of interfaces it inherits from.
+	/// Used for Source(T) methods to correctly delegate to members on transitive base interfaces.
+	/// For example, IList&lt;T&gt; inherits from ICollection&lt;T&gt;, IEnumerable&lt;T&gt;, IEnumerable.
+	/// </summary>
+	EquatableArray<InterfaceHierarchyEntry> InterfaceHierarchy = default) : IEquatable<InterfaceInfo>
 {
 	/// <summary>
 	/// Gets the stub class name, including type suffix when needed for collision avoidance.
@@ -265,3 +271,10 @@ internal sealed record ParameterInfo(
 internal sealed record TypeParameterInfo(
 	string Name,
 	EquatableArray<string> Constraints) : IEquatable<TypeParameterInfo>;
+
+/// <summary>
+/// Maps an interface to its base interfaces for Source(T) hierarchy resolution.
+/// </summary>
+internal sealed record InterfaceHierarchyEntry(
+	string InterfaceName,
+	EquatableArray<string> BaseInterfaces) : IEquatable<InterfaceHierarchyEntry>;

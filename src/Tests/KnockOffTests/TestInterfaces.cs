@@ -342,6 +342,37 @@ public partial class SmartDefaultsKnockOff : ISmartDefaultsService
 
 #endregion
 
+#region Custom Collection Interface Test Types (inherits from IList)
+
+/// <summary>
+/// Test interface that inherits from IList&lt;T&gt;.
+/// Used to test that .Source(List&lt;T&gt;) properly delegates GetEnumerator
+/// even when C# overload resolution picks IList&lt;T&gt; over IEnumerable&lt;T&gt;.
+/// </summary>
+public interface ICustomStepList : IList<string>
+{
+	/// <summary>
+	/// Custom method beyond IList members.
+	/// </summary>
+	void AddRange(IEnumerable<string> items);
+}
+
+[KnockOff]
+public partial class CustomStepListKnockOff : ICustomStepList
+{
+}
+
+/// <summary>
+/// Inline stub test class for ICustomStepList.
+/// This tests the InlineModelBuilder path specifically.
+/// </summary>
+[KnockOff<ICustomStepList>]
+public partial class CustomStepListInlineStubTests
+{
+}
+
+#endregion
+
 #region Generic Method Test Types
 
 /// <summary>

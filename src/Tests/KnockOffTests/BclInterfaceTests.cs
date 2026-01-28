@@ -236,6 +236,141 @@ public class BclInterfaceTests
         Assert.Same(user, stub.Add.LastCallArg);
     }
 
+    /// <summary>
+    /// Bug test: When calling .Source(List&lt;T&gt;) on an IList&lt;T&gt; stub,
+    /// GetEnumerator should be delegated to the source.
+    /// C# overload resolution picks IList&lt;T&gt; over IEnumerable&lt;T&gt; when given a List&lt;T&gt;,
+    /// but GetEnumerator is declared on IEnumerable&lt;T&gt;, so it should still be delegated.
+    /// </summary>
+    [Fact]
+    public void IListString_Source_List_GetEnumeratorDelegates()
+    {
+        var stub = new ListStringStubTests.Stubs.IList();
+        var sourceList = new List<string> { "a", "b", "c" };
+
+        // This calls Source(IList<string>) overload due to C# overload resolution
+        stub.Source(sourceList);
+
+        IList<string> list = stub;
+
+        // GetEnumerator is declared on IEnumerable<T>, but should be delegated
+        // because IList<T> inherits from IEnumerable<T>
+        var items = new List<string>();
+        foreach (var item in list)
+        {
+            items.Add(item);
+        }
+
+        Assert.Equal(new[] { "a", "b", "c" }, items);
+    }
+
+    /// <summary>
+    /// Bug test: IList properties like Count should also be delegated via Source(IList&lt;T&gt;).
+    /// Count is declared on ICollection&lt;T&gt;, which IList&lt;T&gt; inherits from.
+    /// </summary>
+    [Fact]
+    public void IListString_Source_List_CountDelegates()
+    {
+        var stub = new ListStringStubTests.Stubs.IList();
+        var sourceList = new List<string> { "a", "b", "c" };
+
+        stub.Source(sourceList);
+
+        IList<string> list = stub;
+
+        Assert.Equal(3, list.Count);
+    }
+
+    /// <summary>
+    /// Bug reproduction test: Custom interface that inherits from IList&lt;T&gt;.
+    /// When calling .Source(List&lt;T&gt;), C# overload resolution picks IList&lt;T&gt; over IEnumerable&lt;T&gt;.
+    /// GetEnumerator (declared on IEnumerable&lt;T&gt;) should still be delegated because
+    /// IList&lt;T&gt; inherits from IEnumerable&lt;T&gt;.
+    /// </summary>
+    [Fact]
+    public void CustomInterface_InheritingIList_Source_GetEnumeratorDelegates()
+    {
+        var stub = new CustomStepListKnockOff();
+        var sourceList = new List<string> { "step1", "step2", "step3" };
+
+        // This calls Source(IList<string>) overload (not Source(ICustomStepList) since List<string> doesn't implement ICustomStepList)
+        stub.Source(sourceList);
+
+        ICustomStepList list = stub;
+
+        // GetEnumerator is declared on IEnumerable<T>, which IList<T> inherits from
+        // This should work even though C# picked the IList<T> overload
+        var items = new List<string>();
+        foreach (var item in list)
+        {
+            items.Add(item);
+        }
+
+        Assert.Equal(new[] { "step1", "step2", "step3" }, items);
+    }
+
+    /// <summary>
+    /// Bug reproduction test: Custom interface that inherits from IList&lt;T&gt;.
+    /// Verify Count delegation works when Source(IList&lt;T&gt;) is called.
+    /// </summary>
+    [Fact]
+    public void CustomInterface_InheritingIList_Source_CountDelegates()
+    {
+        var stub = new CustomStepListKnockOff();
+        var sourceList = new List<string> { "step1", "step2", "step3" };
+
+        stub.Source(sourceList);
+
+        ICustomStepList list = stub;
+
+        Assert.Equal(3, list.Count);
+    }
+
+    /// <summary>
+    /// Bug reproduction test using INLINE STUB pattern ([KnockOff&lt;T&gt;]).
+    /// This tests the InlineModelBuilder code path which has different Source() generation logic.
+    /// When calling .Source(List&lt;T&gt;), C# overload resolution picks IList&lt;T&gt; over IEnumerable&lt;T&gt;.
+    /// GetEnumerator (declared on IEnumerable&lt;T&gt;) should still be delegated.
+    /// </summary>
+    [Fact]
+    public void InlineStub_CustomInterface_InheritingIList_Source_GetEnumeratorDelegates()
+    {
+        var stub = new CustomStepListInlineStubTests.Stubs.ICustomStepList();
+        var sourceList = new List<string> { "step1", "step2", "step3" };
+
+        // This calls Source(IList<string>) overload (not Source(ICustomStepList) since List<string> doesn't implement ICustomStepList)
+        stub.Source(sourceList);
+
+        ICustomStepList list = stub;
+
+        // GetEnumerator is declared on IEnumerable<T>, which IList<T> inherits from
+        // This should work even though C# picked the IList<T> overload
+        var items = new List<string>();
+        foreach (var item in list)
+        {
+            items.Add(item);
+        }
+
+        Assert.Equal(new[] { "step1", "step2", "step3" }, items);
+    }
+
+    /// <summary>
+    /// Bug reproduction test using INLINE STUB pattern ([KnockOff&lt;T&gt;]).
+    /// Verify Count delegation works when Source(IList&lt;T&gt;) is called.
+    /// </summary>
+    [Fact]
+    public void InlineStub_CustomInterface_InheritingIList_Source_CountDelegates()
+    {
+        var stub = new CustomStepListInlineStubTests.Stubs.ICustomStepList();
+        var sourceList = new List<string> { "step1", "step2", "step3" };
+
+        stub.Source(sourceList);
+
+        ICustomStepList list = stub;
+
+        Assert.Equal(3, list.Count);
+    }
+
     #endregion
 
     #region 5. ICollection<T> / ICollection
