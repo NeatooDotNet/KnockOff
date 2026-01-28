@@ -210,8 +210,8 @@ public class OnCallConfigurationTests
     {
         var stub = new DelegateStubTests.Stubs.Formatter();
 
-        // VALUE OVERLOAD: Pass the return value directly (simpler syntax)
-        stub.Interceptor.OnCall("FORMATTED");
+        // RETURNS: Pass the return value directly (simpler syntax)
+        stub.Interceptor.Returns("FORMATTED");
 
         // Invoke through the delegate
         Formatter format = stub;

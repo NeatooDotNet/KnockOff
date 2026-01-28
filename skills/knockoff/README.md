@@ -92,7 +92,7 @@ stub.GetUser.OnCall((id) => new User { Id = id, Name = "Dynamic" });
 
 <!-- snippet: plugin-readme-oncall-value -->
 ```cs
-stub.GetUser.OnCall(new User { Id = 1, Name = "Alice" });
+stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
 ```
 <!-- endSnippet -->
 

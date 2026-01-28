@@ -178,7 +178,7 @@ public class PluginReadmeOnCallTests
         var stub = new ReadmeUserRepoStub();
 
         #region plugin-readme-oncall-value
-        stub.GetUser.OnCall(new User { Id = 1, Name = "Alice" });
+        stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
         #endregion
 
         IReadmeUserRepo repository = stub;

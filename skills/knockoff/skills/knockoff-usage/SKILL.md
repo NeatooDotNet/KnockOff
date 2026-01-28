@@ -181,7 +181,7 @@ Configure method return values and behavior using value or callback overloads:
 <!-- snippet: skill-method-oncall-examples -->
 ```cs
 // VALUE syntax - for fixed return values
-stub.GetValue.OnCall("default-value");
+stub.GetValue.Returns("default-value");
 
 // CALLBACK syntax - for dynamic values based on arguments
 stub.GetValue.OnCall((key) => key == "debug" ? "true" : "false");

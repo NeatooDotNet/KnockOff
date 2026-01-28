@@ -53,9 +53,9 @@ For simple scenarios where the return value does not depend on arguments, use th
 
 <!-- snippet: methods-oncall-value -->
 ```cs
-// Value overload - simpler syntax when you don't need callback logic
+// Returns - simpler syntax when you don't need callback logic
 // Just pass the return value directly
-var tracking = stub.GetUserName.OnCall("StaticUser");
+var tracking = stub.GetUserName.Returns("StaticUser");
 
 ILogSvcMethods logger = stub;
 var name = logger.GetUserName(42);
@@ -70,7 +70,7 @@ tracking.Verify();
 <!-- snippet: methods-oncall-value-vs-callback -->
 ```cs
 // Use VALUE when returning a fixed result:
-stub.GetUserName.OnCall("Alice");
+stub.GetUserName.Returns("Alice");
 
 // Use CALLBACK when you need:
 // - Dynamic values based on arguments
@@ -232,9 +232,9 @@ public async Task TaskResult_ValueOverload_AutoWraps()
 {
     var stub = new AsyncUserSvcStub();
 
-    // VALUE OVERLOAD: KnockOff auto-wraps the value in Task.FromResult
+    // RETURNS: KnockOff auto-wraps the value in Task.FromResult
     // This is the simplest syntax for returning async values
-    stub.GetUserAsync.OnCall(new User { Id = 42, Name = "Alice" });
+    stub.GetUserAsync.Returns(new User { Id = 42, Name = "Alice" });
 
     IAsyncUserSvc service = stub;
     var user = await service.GetUserAsync(42);
@@ -253,7 +253,7 @@ public async Task TaskResult_SimplifiedCallback_AutoWraps()
     var stub = new AsyncUserSvcStub();
 
     // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in Task.FromResult
-    // This combines the simplicity of value overloads with callback flexibility
+    // This combines the simplicity of Returns() with callback flexibility
     stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
 
     IAsyncUserSvc service = stub;

@@ -158,8 +158,8 @@ public void WhenOverrideNeeded_UseRegularStubWithOnCall()
 
     // Configure specific behavior with OnCall
     stub.GetUserById.OnCall((id) => new User { Id = id, Name = "Overridden" });
-    stub.IsActive.OnCall(true);
-    stub.GetBalance.OnCall(999.99m);
+    stub.IsActive.Returns(true);
+    stub.GetBalance.Returns(999.99m);
 
     IUserMethodsRepo repository = stub;
 

@@ -55,9 +55,9 @@ tracking.Verify();
 
 <!-- snippet: methods-oncall-value -->
 ```cs
-// Value overload - simpler syntax when you don't need callback logic
+// Returns - simpler syntax when you don't need callback logic
 // Just pass the return value directly
-var tracking = stub.GetUserName.OnCall("StaticUser");
+var tracking = stub.GetUserName.Returns("StaticUser");
 
 ILogSvcMethods logger = stub;
 var name = logger.GetUserName(42);
@@ -295,7 +295,7 @@ Assert.Equal("new@test.com", savedUser.Email);
 
 ## Key Takeaways
 
-- **OnCall options**: Use `OnCall(callback)` for dynamic values or `OnCall(value)` for fixed return values
+- **Configuration options**: Use `OnCall(callback)` for dynamic values or `Returns(value)` for fixed return values
 - **OnCall signature**: Callback matches method signature—receives only the method parameters
 - **Verification patterns**: Individual tracking with `tracking.Verify(Times)` or batch verification with `.Verifiable()` then `stub.Verify()`
 - **Times options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`

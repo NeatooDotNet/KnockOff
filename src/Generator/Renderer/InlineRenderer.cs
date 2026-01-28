@@ -1283,7 +1283,7 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic void OnCall({del.OnCallType} callback) {{ _onCall = callback; }}");
         w.Line();
 
-        // OnCall value overload - wraps value in lambda (non-void delegates only)
+        // Returns value overload - wraps value in lambda (non-void delegates only)
         if (!del.IsVoid)
         {
             // Generate underscore parameters to ignore arguments: () => value, (_) => value, (_, _) => value, etc.
@@ -1291,7 +1291,7 @@ internal static class InlineRenderer
                 ? ""
                 : string.Join(", ", Enumerable.Range(0, del.Parameters.Count).Select(_ => "_"));
             w.Line($"\t\t\t/// <summary>Configures return value for delegate. Always returns the specified value.</summary>");
-            w.Line($"\t\t\tpublic void OnCall({del.ReturnType} value) {{ _onCall = ({ignoredParams}) => value; }}");
+            w.Line($"\t\t\tpublic void Returns({del.ReturnType} value) {{ _onCall = ({ignoredParams}) => value; }}");
             w.Line();
         }
 

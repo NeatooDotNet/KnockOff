@@ -121,9 +121,9 @@ public class MethodConfigurationTests
         var stub = new LogSvcMethodsStub();
 
         #region methods-oncall-value
-        // Value overload - simpler syntax when you don't need callback logic
+        // Returns - simpler syntax when you don't need callback logic
         // Just pass the return value directly
-        var tracking = stub.GetUserName.OnCall("StaticUser");
+        var tracking = stub.GetUserName.Returns("StaticUser");
 
         ILogSvcMethods logger = stub;
         var name = logger.GetUserName(42);
@@ -140,7 +140,7 @@ public class MethodConfigurationTests
 
         #region methods-oncall-value-vs-callback
         // Use VALUE when returning a fixed result:
-        stub.GetUserName.OnCall("Alice");
+        stub.GetUserName.Returns("Alice");
 
         // Use CALLBACK when you need:
         // - Dynamic values based on arguments

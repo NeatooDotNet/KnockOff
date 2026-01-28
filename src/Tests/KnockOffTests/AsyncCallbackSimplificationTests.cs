@@ -433,7 +433,7 @@ public partial class AsyncCallbackSimplificationTests
 		Assert.Equal("simplified", await service.GetStringAsync(1));
 
 		// Configure with value - should clear simplified callback
-		stub.GetStringAsync.OnCall("value");
+		stub.GetStringAsync.Returns("value");
 		Assert.Equal("value", await service.GetStringAsync(2));
 	}
 
@@ -444,7 +444,7 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		// Configure with value first
-		stub.GetStringAsync.OnCall("value");
+		stub.GetStringAsync.Returns("value");
 		Assert.Equal("value", await service.GetStringAsync(1));
 
 		// Configure with simplified callback - should clear value

@@ -22,7 +22,7 @@ public partial class ThreePatternValueOverloadTests
 		var knockOff = new StandaloneServiceKnockOff();
 		IThreePatternService service = knockOff;
 
-		knockOff.GetName.OnCall("standalone result");
+		knockOff.GetName.Returns("standalone result");
 
 		Assert.Equal("standalone result", service.GetName());
 	}
@@ -45,7 +45,7 @@ public partial class ThreePatternValueOverloadTests
 		IThreePatternService service = knockOff;
 
 		// Value auto-wrapped in Task
-		knockOff.GetNameAsync.OnCall("async standalone");
+		knockOff.GetNameAsync.Returns("async standalone");
 
 		Assert.Equal("async standalone", await service.GetNameAsync());
 	}
@@ -56,7 +56,7 @@ public partial class ThreePatternValueOverloadTests
 		var knockOff = new StandaloneServiceKnockOff();
 		IThreePatternService service = knockOff;
 
-		var tracking = knockOff.GetName.OnCall("tracked value");
+		var tracking = knockOff.GetName.Returns("tracked value");
 
 		service.GetName();
 		service.GetName();
@@ -75,7 +75,7 @@ public partial class ThreePatternValueOverloadTests
 		var serviceStub = new InlineInterfaceStubs.Stubs.IThreePatternService();
 		IThreePatternService service = serviceStub;
 
-		serviceStub.GetName.OnCall("inline interface result");
+		serviceStub.GetName.Returns("inline interface result");
 
 		Assert.Equal("inline interface result", service.GetName());
 	}
@@ -97,7 +97,7 @@ public partial class ThreePatternValueOverloadTests
 		var serviceStub = new InlineInterfaceStubs.Stubs.IThreePatternService();
 		IThreePatternService service = serviceStub;
 
-		serviceStub.GetNameAsync.OnCall("async inline interface");
+		serviceStub.GetNameAsync.Returns("async inline interface");
 
 		Assert.Equal("async inline interface", await service.GetNameAsync());
 	}
@@ -108,7 +108,7 @@ public partial class ThreePatternValueOverloadTests
 		var serviceStub = new InlineInterfaceStubs.Stubs.IThreePatternService();
 		IThreePatternService service = serviceStub;
 
-		var tracking = serviceStub.GetName.OnCall("tracked value");
+		var tracking = serviceStub.GetName.Returns("tracked value");
 
 		service.GetName();
 
@@ -178,12 +178,12 @@ public partial class ThreePatternValueOverloadTests
 	{
 		// Standalone - supports OnCall(null)
 		var standalone = new StandaloneServiceKnockOff();
-		standalone.GetNullable.OnCall((string?)null);
+		standalone.GetNullable.Returns((string?)null);
 		Assert.Null(((IThreePatternService)standalone).GetNullable());
 
 		// Inline Interface - supports OnCall(null)
 		var inlineInterface = new InlineInterfaceStubs.Stubs.IThreePatternService();
-		inlineInterface.GetNullable.OnCall((string?)null);
+		inlineInterface.GetNullable.Returns((string?)null);
 		Assert.Null(((IThreePatternService)inlineInterface).GetNullable());
 	}
 
@@ -192,12 +192,12 @@ public partial class ThreePatternValueOverloadTests
 	{
 		// Standalone - supports OnCall(int)
 		var standalone = new StandaloneServiceKnockOff();
-		standalone.GetCount.OnCall(42);
+		standalone.GetCount.Returns(42);
 		Assert.Equal(42, ((IThreePatternService)standalone).GetCount());
 
 		// Inline Interface - supports OnCall(int)
 		var inlineInterface = new InlineInterfaceStubs.Stubs.IThreePatternService();
-		inlineInterface.GetCount.OnCall(99);
+		inlineInterface.GetCount.Returns(99);
 		Assert.Equal(99, ((IThreePatternService)inlineInterface).GetCount());
 	}
 
@@ -206,14 +206,14 @@ public partial class ThreePatternValueOverloadTests
 	{
 		// Standalone
 		var standalone = new StandaloneServiceKnockOff();
-		standalone.GetName.OnCall("first");
-		standalone.GetName.OnCall("second");
+		standalone.GetName.Returns("first");
+		standalone.GetName.Returns("second");
 		Assert.Equal("second", ((IThreePatternService)standalone).GetName());
 
 		// Inline Interface
 		var inlineInterface = new InlineInterfaceStubs.Stubs.IThreePatternService();
-		inlineInterface.GetName.OnCall("third");
-		inlineInterface.GetName.OnCall("fourth");
+		inlineInterface.GetName.Returns("third");
+		inlineInterface.GetName.Returns("fourth");
 		Assert.Equal("fourth", ((IThreePatternService)inlineInterface).GetName());
 	}
 

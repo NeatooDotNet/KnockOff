@@ -134,8 +134,8 @@ public class OnCallValueTests
         var stub = new TroubleshootRepoStub();
 
         // Instead of: stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
-        // Use OnCall(value) when the return value doesn't depend on parameters:
-        stub.GetById.OnCall(new User { Id = 999, Name = "Static User" });
+        // Use Returns(value) when the return value doesn't depend on parameters:
+        stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
 
         ITroubleshootRepo repository = stub;
         var user1 = repository.GetById(1);

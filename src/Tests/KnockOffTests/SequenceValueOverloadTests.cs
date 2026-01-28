@@ -165,7 +165,7 @@ public partial class SequenceValueOverloadTests
 		Assert.Equal("seq2", service.GetOptional());
 
 		// Now configure with value - clears sequence
-		knockOff.GetOptional.OnCall("after sequence");
+		knockOff.GetOptional.Returns("after sequence");
 
 		Assert.Equal("after sequence", service.GetOptional());
 		Assert.Equal("after sequence", service.GetOptional());

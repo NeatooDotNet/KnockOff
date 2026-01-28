@@ -138,13 +138,13 @@ public void Send_WhenCalled_TracksMessage()
 ```
 <!-- endSnippet -->
 
-## Understanding OnCall
+## Understanding Method Configuration
 
-The `OnCall` method is the core API for configuring stub behavior. It provides two syntaxes: value-based for simple cases and callback-based for dynamic behavior.
+KnockOff provides two methods for configuring stub behavior: `Returns(value)` for simple cases and `OnCall(callback)` for dynamic behavior.
 
-### OnCall with Values - Simple Return Values
+### Returns - Simple Return Values
 
-When your method needs to return a fixed value, use the value overload. KnockOff generates an `OnCall(TReturn value)` overload for all methods that return values:
+When your method needs to return a fixed value, use `Returns()`. KnockOff generates a `Returns(TReturn value)` method for all methods that return values:
 
 <!-- snippet: getting-started-value-overloads -->
 ```cs
@@ -153,8 +153,8 @@ public void GetById_ValueOverload_SimplerSyntax()
 {
     var stub = new UserRepoStub();
 
-    // Value overload - pass the return value directly
-    stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+    // Returns - pass the return value directly
+    stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
 
     // Callback syntax - use when you need argument-based logic
     stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
@@ -167,12 +167,12 @@ public void GetById_ValueOverload_SimplerSyntax()
 ```
 <!-- endSnippet -->
 
-**Key benefits of OnCall(value)**:
+**Key benefits of Returns(value)**:
 - Simpler syntax when you don't need dynamic logic
 - Still returns a tracking object for verification
 - Works with async methods (auto-wraps in Task.FromResult)
 
-### OnCall with Callbacks - Dynamic Behavior
+### OnCall - Dynamic Behavior
 
 When you need to compute values based on arguments, perform side effects, or implement conditional logic, use the callback overload:
 
@@ -239,8 +239,8 @@ public async Task AsyncMethod_ValueAutoWrapped()
 {
     var stub = new AsyncUserRepoStub();
 
-    // Value overload - KnockOff wraps in Task.FromResult automatically
-    stub.GetUserAsync.OnCall(new User { Id = 1, Name = "Alice" });
+    // Returns - KnockOff wraps in Task.FromResult automatically
+    stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
 
     IAsyncUserRepo repository = stub;
     var user = await repository.GetUserAsync(1);
@@ -262,7 +262,7 @@ public async Task TaskResult_SimplifiedCallback_AutoWraps()
     var stub = new AsyncUserSvcStub();
 
     // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in Task.FromResult
-    // This combines the simplicity of value overloads with callback flexibility
+    // This combines the simplicity of Returns() with callback flexibility
     stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
 
     IAsyncUserSvc service = stub;
@@ -302,11 +302,11 @@ public async Task TaskVoid_SimplifiedCallback_AutoReturnsCompletedTask()
 
 You don't need to manually wrap values in `Task.FromResult` or return `Task.CompletedTask` - KnockOff handles this for you.
 
-### Decision Guide: Value vs Callback
+### Decision Guide: Returns vs OnCall
 
 | Syntax | Use When | Example |
 |--------|----------|---------|
-| `.OnCall(value)` | Returning a fixed value | `stub.GetStatus.OnCall("OK")` |
+| `.Returns(value)` | Returning a fixed value | `stub.GetStatus.Returns("OK")` |
 | `.OnCall(callback)` | Computing values from arguments | `stub.GetUser.OnCall((id) => users[id])` |
 | `.OnCall(callback)` | Conditional logic | `stub.IsValid.OnCall((x) => x > 0)` |
 | `.OnCall(callback)` | Side effects or tracking | `stub.Save.OnCall((u) => saved.Add(u))` |

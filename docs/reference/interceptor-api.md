@@ -38,7 +38,7 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 | Method | Return Type | Description |
 |--------|-------------|-------------|
 | `OnCall(delegate)` | `IMethodTracking<T>` or `IMethodTrackingArgs<(T1?, T2?, ...)>` | Configure callback invoked when method is called. Returns tracking interface for verification. |
-| `OnCall(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value. Returns tracking interface. Available only for methods with return values. |
+| `Returns(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value. Returns tracking interface. Available only for methods with return values. |
 | `OnCallSequence(delegate)` | `IMethodSequence<TDelegate>` | Start a callback sequence. Each callback runs exactly once. Chain with `ThenCall()`. |
 
 **Return type details**:
@@ -46,7 +46,7 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 - Multi-parameter methods return `IMethodTrackingArgs<(T1?, T2?, ...)>` with `LastArgs` property
 - Void methods and return methods both support callbacks
 
-**Value overload benefits**:
+**Returns() benefits**:
 - Simpler syntax when returning a fixed value
 - Still returns tracking object for verification
 - Not available for void methods (no return value to configure)
@@ -64,9 +64,9 @@ The delegate type for the callback overload varies based on method signature:
 | `R M(T arg)` | `Func<T, R>` |
 | `R M(T1 a, T2 b)` | `Func<T1, T2, R>` |
 
-**When to use each overload**:
-- **Value overload** (`OnCall(value)`): Returning a fixed value
-- **Callback overload** (`OnCall(callback)`): Dynamic values based on arguments, conditional logic, or side effects
+**When to use each method**:
+- **Returns** (`Returns(value)`): Returning a fixed value
+- **OnCall** (`OnCall(callback)`): Dynamic values based on arguments, conditional logic, or side effects
 
 When a callback is configured, it is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
 
@@ -419,7 +419,7 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 | Method | Return Type | Description |
 |--------|-------------|-------------|
 | `OnCall(delegate)` | `IMethodTracking<T>` or `IMethodTrackingArgs<(...)>` | Configure callback invoked when method is called with these type arguments. Returns tracking interface for verification. |
-| `OnCall(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value for these type arguments. Returns tracking interface. Available only for methods with return values. |
+| `Returns(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value for these type arguments. Returns tracking interface. Available only for methods with return values. |
 | `OnCallSequence(delegate)` | `IMethodSequence<TDelegate>` | Start a callback sequence for these type arguments. Each callback runs exactly once. Chain with `ThenCall()`. |
 
 The callback delegate type follows the same signature rules as non-generic method interceptors (see Method Interceptor section).

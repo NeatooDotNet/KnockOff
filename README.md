@@ -1,6 +1,6 @@
 # KnockOff
 
-**Reusable test stubs that work across your entire project**
+**No more `Arg.Any<>()`. No more `It.IsAny<>()`. Just write C#.**
 
 [![NuGet](https://img.shields.io/nuget/v/KnockOff.svg)](https://www.nuget.org/packages/KnockOff/)
 [![Build Status](https://github.com/NeatooDotNet/KnockOff/workflows/Build,%20Test%20&%20Publish/badge.svg)](https://github.com/NeatooDotNet/KnockOff/actions)
@@ -8,69 +8,159 @@
 
 ---
 
-## The Problem
+## The Difference
 
-Testing with mocks means repeating setup code in every test file. When multiple tests need the same stub behavior, you duplicate configuration or build complex test fixtures. Change that behavior? Update every test that uses it. Runtime mocking frameworks make sharing stubs across your project difficult.
+**NSubstitute:**
+```csharp
+var repo = Substitute.For<IUserRepo>();
+repo.GetUser(Arg.Is<int>(id => id > 0)).Returns(x => new User { Id = x.Arg<int>() });
+```
+
+**KnockOff:**
+```csharp
+var stub = new UserRepoStub();
+stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id } : null);
+```
+
+No `Arg.Is<>()`. No `x.Arg<int>()`. The parameter is just `id`.
 
 ---
 
-## The Solution
+## Unique Feature: Source Delegation
 
-KnockOff generates reusable stub classes you define once and share across your entire project. Each test configures the same stub instance differently—no duplicate setup code. Change default behavior in one place, or override per-test. The same stub class works in every test file that needs it.
+Delegate to a real implementation, override only what you need:
 
-**Moq (runtime reflection):**
+```csharp
+var realRepo = new SqlUserRepository(connectionString);
+var stub = new UserRepoStub();
 
-<!-- snippet: readme-teaser-moq -->
-```cs
-[Fact]
-public void Moq_RuntimeSetup()
-{
-    var mock = new Mock<IReadmeUserRepo>();
-    mock.Setup(x => x.GetUser(It.IsAny<int>()))
-        .Returns(new User { Id = 42, Name = "Test User" });
+stub.Source(realRepo);  // ALL methods delegate to real implementation
 
-    IReadmeUserRepo repository = mock.Object;
-    var user = repository.GetUser(42);
+// Override just the method you're testing
+stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test User" });
 
-    Assert.NotNull(user);
-    Assert.Equal("Test User", user.Name);
-}
+IUserRepo repo = stub;
+repo.Save(user);     // Calls real SqlUserRepository.Save()
+repo.GetUser(1);     // Returns test data
 ```
-<!-- endSnippet -->
 
-**KnockOff (source generation):**
-
-<!-- snippet: readme-teaser-knockoff -->
-```cs
-[Fact]
-public void KnockOff_CompileTimeSetup()
-{
-    var stub = new ReadmeUserRepoStub();
-    stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test User" });
-
-    IReadmeUserRepo repository = stub;
-    var user = repository.GetUser(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Test User", user.Name);
-}
-```
-<!-- endSnippet -->
+No other mocking framework has this. Perfect for integration tests, decorator patterns, and partial mocking without complexity.
 
 ---
 
-## Key Features
+## Side-by-Side Comparisons
 
-- **Shared stubs** - Define once, use across entire project with per-test customization
-- **Source generation** - Zero reflection overhead, compile-time safety
-- **Flexible configuration** - Configure methods with `OnCall(callback)` or `OnCall(value)`, properties with `OnGet`/`OnSet`
-- **Verification** - Track call counts, capture arguments, validate with `Times` constraints
-- **Source delegation** - Delegate stub behavior to real implementations
-- **Three stub patterns** - Stand-alone, inline interface, and inline class
+### Methods
+
+| Task | NSubstitute | KnockOff |
+|------|-------------|----------|
+| **Return value** | `calc.Add(1, 2).Returns(3);` | `stub.Add.Returns(3);` |
+| **Any argument** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(10);` | `stub.Add.Returns(10);` |
+| **Conditional** | `calc.Add(Arg.Is<int>(x => x > 0), Arg.Any<int>()).Returns(x => ...);` | `stub.Add.OnCall((a, b) => a > 0 ? a + b : 0);` |
+| **Throw** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Throws<InvalidOperationException>();` | `stub.Add.OnCall((a, b) => throw new InvalidOperationException());` |
+| **Callback** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(3).AndDoes(x => ...);` | `stub.Add.OnCall((a, b) => { log.Add(a); return 3; });` |
+| **Async** | `repo.GetUserAsync(1).Returns(user);` | `stub.GetUserAsync.Returns(user);` |
+| **Verify called** | `calc.Received().Add(1, 2);` | `stub.Add.Verify();` |
+| **Verify count** | `calc.Received(3).Add(Arg.Any<int>(), Arg.Any<int>());` | `stub.Add.Verify(Times.Exactly(3));` |
+
+### Argument Capture
+
+```csharp
+// NSubstitute - requires Arg.Do in setup
+int capturedA = 0, capturedB = 0;
+calc.Add(Arg.Do<int>(x => capturedA = x), Arg.Do<int>(x => capturedB = x));
+calc.Add(1, 2);
+
+// KnockOff - built-in, no pre-setup
+var tracking = stub.Add.OnCall((a, b) => a + b);
+calc.Add(1, 2);
+var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
+```
+
+### Properties
+
+| Task | NSubstitute | KnockOff |
+|------|-------------|----------|
+| **Setup getter** | `calc.Mode.Returns("Scientific");` | `stub.Mode.OnGet("Scientific");` |
+| **Setup setter** | `calc.When(x => x.Mode = Arg.Any<string>()).Do(x => ...);` | `stub.Mode.OnSet((v) => captured = v);` |
+| **Verify getter** | `_ = calc.Received().Mode;` | `stub.Mode.VerifyGet();` |
+| **Verify setter** | `calc.Received().Mode = "Scientific";` | `stub.Mode.VerifySet();` |
+| **Verify count** | `_ = calc.Received(3).Mode;` | `stub.Mode.VerifyGet(Times.Exactly(3));` |
+| **Capture value** | `calc.When(x => x.Mode = Arg.Do<string>(v => ...)).Do(...);` | `stub.Mode.LastSetValue` (built-in) |
+
+### Events
+
+| Task | NSubstitute | KnockOff |
+|------|-------------|----------|
+| **Raise event** | `calc.PoweringUp += Raise.Event();` | `stub.PoweringUp.Raise(stub, EventArgs.Empty);` |
+| **Raise with args** | `calc.PoweringUp += Raise.EventWith(sender, args);` | `stub.PoweringUp.Raise(sender, args);` |
+| **Verify subscription** | *(not available)* | `stub.PoweringUp.VerifyAdd(Times.Once);` |
+| **Verify unsubscription** | *(not available)* | `stub.PoweringUp.VerifyRemove(Times.Once);` |
+| **Check subscribers** | *(not available)* | `stub.PoweringUp.HasSubscribers` |
+
+### Delegates
+
+| Task | NSubstitute | KnockOff |
+|------|-------------|----------|
+| **Setup** | `factory(Arg.Any<int>()).Returns("result");` | `stub.Interceptor.Returns("result");` |
+| **With logic** | `factory(Arg.Is<int>(x => x > 0)).Returns(x => $"val: {x.Arg<int>()}");` | `stub.Interceptor.OnCall((x) => $"val: {x}");` |
+| **Verify** | `factory.Received()(42);` | `stub.Interceptor.Verify();` |
+| **Capture** | *(manual with Arg.Do)* | `stub.Interceptor.LastCallArg` (built-in) |
+
+### Indexers
+
+| Task | NSubstitute | KnockOff |
+|------|-------------|----------|
+| **Setup getter** | `dict["key"].Returns(42);` | `stub.Indexer.Backing["key"] = 42;` |
+| **Dynamic getter** | `dict[Arg.Any<string>()].Returns(0);` | `stub.Indexer.OnGet((key) => 0);` |
+| **Verify getter** | `_ = dict.Received()["key"];` | `stub.Indexer.VerifyGet();` |
+| **Verify setter** | `dict.Received()["key"] = 42;` | `stub.Indexer.VerifySet();` |
+| **Capture** | *(manual with When/Do)* | `stub.Indexer.LastSetEntry` |
+
+---
+
+## Feature Parity
+
+KnockOff covers the features NSubstitute users expect:
+
+| Feature | KnockOff | NSubstitute |
+|---------|----------|-------------|
+| **Returns** | `Returns(value)` | `.Returns(value)` |
+| **Returns with logic** | `OnCall((args) => value)` | `.Returns(x => value)` |
+| **Callbacks** | Built into `OnCall` | `.AndDoes(callback)` |
+| **Throws** | `OnCall(() => throw ...)` | `.Throws<T>()` |
+| **Async methods** | Auto-wrapped | Auto-wrapped |
+| **Properties** | `OnGet` / `OnSet` | `.Returns` / assignment |
+| **Indexers** | `Indexer.OnGet` / `OnSet` / `Backing` | Assignment |
+| **Events** | `Raise()` / `VerifyAdd` / `VerifyRemove` | `Raise.Event()` |
+| **Delegates** | `Interceptor.OnCall` | Setup on substitute |
+| **Verification** | `.Verify(Times)` | `.Received(n)` |
+| **Batch verification** | `.Verifiable()` + `stub.Verify()` | Individual `.Received()` calls |
+| **Strict mode** | `[KnockOff(Strict=true)]` | Configure substitute |
+
+---
+
+## What KnockOff Does Better
+
+| Feature | Why It's Better |
+|---------|-----------------|
+| **No matcher DSL** | `Arg.Any<>`, `Arg.Is<>` replaced with plain C# conditionals |
+| **Named tuple capture** | `var (a, b) = tracking.LastArgs` vs manual `Arg.Do<>` setup |
+| **Source delegation** | Delegate to real implementation, override specific methods |
+| **Event verification** | `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` |
+| **Explicit Get/Set verify** | `VerifyGet(Times)` / `VerifySet(Times)` |
+| **Built-in capture** | `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` |
+| **Reusable stub classes** | Define once, customize per-test |
 
 ---
 
 ## Quick Start
+
+### Install
+
+```bash
+dotnet add package KnockOff
+```
 
 ### Create a Stub
 
@@ -98,11 +188,7 @@ public class QuickStartCreateStubTests
 ```
 <!-- endSnippet -->
 
-### Configure Behavior
-
-Configure methods with `OnCall` using either a callback or a value:
-
-**Callback syntax** - Use when you need parameter-based logic:
+### Configure and Verify
 
 <!-- snippet: readme-quickstart-configure -->
 ```cs
@@ -122,78 +208,6 @@ public void ConfigureStub_WithOnCall()
 }
 ```
 <!-- endSnippet -->
-
-**Value syntax** - Simpler when returning a fixed value:
-
-<!-- snippet: getting-started-value-overloads -->
-```cs
-[Fact]
-public void GetById_ValueOverload_SimplerSyntax()
-{
-    var stub = new UserRepoStub();
-
-    // Value overload - pass the return value directly
-    stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
-
-    // Callback syntax - use when you need argument-based logic
-    stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
-
-    IUserRepo repository = stub;
-    var user = repository.GetById(1);
-
-    Assert.Equal("Dynamic", user!.Name);
-}
-```
-<!-- endSnippet -->
-
-Both forms return a tracking object for verification and argument capture.
-
-**OnCall API Summary:**
-
-| Method Type           | Callback Form                | Value Form       | Returns                  |
-|-----------------------|------------------------------|------------------|--------------------------|
-| With return value     | `OnCall((args) => value)`    | `OnCall(value)`  | `IMethodTracking<TArg>` |
-| Void method           | `OnCall((args) => { })`      | N/A              | `IMethodTracking<TArg>` |
-
-Both forms return a tracking object that provides:
-- `.Verifiable()` and `.Verifiable(Times)` - Mark for batch verification
-- `.Verify()` and `.Verify(Times)` - Verify call count immediately
-- `.LastArg` or `.LastArgs` - Capture arguments from most recent call
-
-### Configure Properties
-
-Properties use `OnGet` and `OnSet` for configuration:
-
-<!-- snippet: getting-started-property-configuration -->
-```cs
-[Fact]
-public void Property_OnGetAndOnSet()
-{
-    var stub = new UserConfigStub();
-
-    // OnGet - configure what the getter returns
-    stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
-
-    // OnSet - track or validate setter calls
-    User? capturedUser = null;
-    stub.CurrentUser.OnSet((user) => capturedUser = user);
-
-    IUserConfig config = stub;
-
-    // Reading uses OnGet
-    var user = config.CurrentUser;
-    Assert.Equal("Alice", user!.Name);
-
-    // Writing uses OnSet
-    config.CurrentUser = new User { Id = 2, Name = "Bob" };
-    Assert.Equal("Bob", capturedUser!.Name);
-}
-```
-<!-- endSnippet -->
-
-### Verify Calls
-
-Mark methods with `.Verifiable()` and batch verify with `stub.Verify()`:
 
 <!-- snippet: readme-quickstart-verify -->
 ```cs
@@ -215,74 +229,64 @@ public void VerifyCalls_WithVerifiable()
 
 ---
 
-## Installation
+## Three Stub Patterns
 
-Install via NuGet Package Manager:
-
-```bash
-dotnet add package KnockOff
+**Standalone** - Reusable across your project:
+```csharp
+[KnockOff]
+public partial class UserRepoStub : IUserRepo { }
 ```
 
-Or via Package Manager Console:
-
-```powershell
-Install-Package KnockOff
+**Inline Interface** - Test-local stubs:
+```csharp
+[KnockOff<IUserRepo>]
+public partial class MyTests
+{
+    [Fact]
+    public void Test()
+    {
+        var stub = new Stubs.IUserRepo();
+    }
+}
 ```
 
-See the [Getting Started Guide](docs/getting-started.md) for detailed setup instructions.
-
----
-
-## Why KnockOff?
-
-| Feature | KnockOff | Moq | NSubstitute |
-|---------|----------|-----|-------------|
-| **Stub reusability** | Define once, share across project | Per-test setup required | Per-test setup required |
-| **Default behavior** | Configured in stub class | Repeated in each test | Repeated in each test |
-| **Per-test override** | Simple interceptor assignment | Full re-setup needed | Full re-setup needed |
-| **Setup method** | Source generation | Runtime reflection | Runtime dynamic proxy |
-| **Performance** | Zero reflection overhead | Expression compilation | Dynamic proxy overhead |
-| **Learning curve** | Explicit interceptor API | Fluent expression API | Fluent API |
-| **Generated code** | Visible in project | Hidden | Hidden |
-
-**When to use KnockOff:**
-- Multiple test files need the same stub with different configurations per-test
-- You want to eliminate duplicate setup code across your test suite
-- You prefer explicit stub classes you can share and customize
-- Changing shared behavior in one place matters to you
-
-**When to use Moq/NSubstitute:**
-- You prefer fluent setup APIs and are comfortable with per-test configuration
-- Your tests rarely reuse the same stub across multiple files
-- You're working with a team already invested in those frameworks
+**Inline Class** - Stub virtual members:
+```csharp
+[KnockOff<MyService>]
+public partial class MyTests
+{
+    [Fact]
+    public void Test()
+    {
+        var stub = new Stubs.MyService();
+        IMyService service = stub.Object;
+    }
+}
+```
 
 ---
 
 ## Documentation
 
-- **[Getting Started](docs/getting-started.md)** - Installation and your first stub
-- **[Stub Patterns](docs/guides/stub-patterns.md)** - Stand-alone, inline interface, and inline class patterns
-- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete reference for `OnCall`, `OnGet`, and `OnSet`
-- **[Source Delegation](docs/guides/source-delegation.md)** - Delegate stub behavior to real implementations
-- **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step guide for migrating existing tests
-- **[Migration from NSubstitute](docs/migration/from-nsubstitute.md)** - Honest comparison and migration guide
+- **[Getting Started](docs/getting-started.md)** - Installation and first stub
+- **[Stub Patterns](docs/guides/stub-patterns.md)** - Standalone, inline interface, inline class
+- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete `OnCall`, `OnGet`, `OnSet` reference
+- **[Source Delegation](docs/guides/source-delegation.md)** - Delegate to real implementations
+- **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step migration guide
+- **[Migration from NSubstitute](docs/migration/from-nsubstitute.md)** - Comparison and migration guide
 
 ---
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/NeatooDotNet/KnockOff/issues)
-- **Pull Requests**: Submit PRs for bug fixes, features, or documentation improvements
-- **Discussions**: Join the conversation in [GitHub Discussions](https://github.com/NeatooDotNet/KnockOff/discussions)
-
----
-
-**UPDATED:** 2026-01-25
+- **Issues**: [GitHub Issues](https://github.com/NeatooDotNet/KnockOff/issues)
+- **Pull Requests**: Bug fixes, features, documentation
+- **Discussions**: [GitHub Discussions](https://github.com/NeatooDotNet/KnockOff/discussions)
