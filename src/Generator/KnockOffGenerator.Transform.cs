@@ -364,6 +364,27 @@ public partial class KnockOffGenerator
 			.Select(bi => bi.ToDisplayString(FullyQualifiedWithNullability))
 			.ToArray();
 
+		// Build full interface hierarchy - map each interface to its base interfaces
+		// This enables Source(IList<T>) to correctly delegate to IEnumerable<T>.GetEnumerator
+		var hierarchyEntries = new List<InterfaceHierarchyEntry>();
+
+		// Add entry for primary interface
+		hierarchyEntries.Add(new InterfaceHierarchyEntry(
+			iface.ToDisplayString(FullyQualifiedWithNullability),
+			new EquatableArray<string>(baseInterfaceNames)));
+
+		// Add entries for each base interface
+		foreach (var baseInterface in iface.AllInterfaces)
+		{
+			var baseIfaceFullName = baseInterface.ToDisplayString(FullyQualifiedWithNullability);
+			var baseOfBaseNames = baseInterface.AllInterfaces
+				.Select(bi => bi.ToDisplayString(FullyQualifiedWithNullability))
+				.ToArray();
+			hierarchyEntries.Add(new InterfaceHierarchyEntry(
+				baseIfaceFullName,
+				new EquatableArray<string>(baseOfBaseNames)));
+		}
+
 		return new InterfaceInfo(
 			iface.ToDisplayString(FullyQualifiedWithNullability),
 			iface.Name,
@@ -374,7 +395,8 @@ public partial class KnockOffGenerator
 			Strict: strict,
 			IsOpenGeneric: isOpenGeneric,
 			TypeParameters: typeParameters,
-			BaseInterfaces: new EquatableArray<string>(baseInterfaceNames));
+			BaseInterfaces: new EquatableArray<string>(baseInterfaceNames),
+			InterfaceHierarchy: new EquatableArray<InterfaceHierarchyEntry>(hierarchyEntries.ToArray()));
 	}
 
 	/// <summary>
