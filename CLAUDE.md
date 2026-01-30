@@ -14,6 +14,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Versioning:** Pre-1.0. All changes bump minor version only.
 
+## KnockOff Patterns and Members
+
+**ALWAYS consider all patterns and members when creating todos or plans.** Missing a pattern or member type leads to incomplete implementations.
+
+### Four Patterns
+
+1. **Stand-alone** - `[KnockOff]` on partial class that implements interface/extends class
+2. **Inline interface** - `[KnockOff<IInterface>]` generates nested stub class
+3. **Inline class** - `[KnockOff<ConcreteClass>]` generates nested stub for virtual/abstract members
+4. **Inline delegate** - `[KnockOff<DelegateType>]` generates stub for delegate invocation
+
+### Four Member Types
+
+1. **Methods** - Instance methods with various signatures
+2. **Properties** - Get-only, set-only, get/set properties
+3. **Indexers** - `this[...]` accessors (get/set with key parameters)
+4. **Events** - Event add/remove handlers
+
+### Scope Checklist for Todos/Plans
+
+When defining scope, explicitly state which patterns and members are affected:
+- [ ] Which patterns? (all 4, or specific subset)
+- [ ] Which member types? (all 4, or specific subset)
+- [ ] Are there pattern+member combinations that need special handling?
+
 ## Folder Structure
 
 - `src/` - Source code
