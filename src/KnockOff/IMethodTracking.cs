@@ -3,16 +3,16 @@ namespace KnockOff;
 /// <summary>
 /// Tracks invocations of a method callback registration.
 /// </summary>
-public interface IMethodTracking
+public interface IMethodTracking : ITracking
 {
     /// <summary>Clears tracking state for this registration (LastArg/LastArgs = default, call count = 0).</summary>
-    void Reset();
+    new void Reset();
 
     /// <summary>
     /// Verifies the callback was invoked at least once.
     /// Throws VerificationException if not satisfied.
     /// </summary>
-    void Verify();
+    new void Verify();
 
     /// <summary>
     /// Verifies the callback was invoked according to the Times constraint.

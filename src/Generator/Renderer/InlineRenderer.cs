@@ -1253,6 +1253,13 @@ internal static class InlineRenderer
 
     private static void RenderDelegateStub(CodeWriter w, InlineDelegateStubModel del)
     {
+        // Determine if When chain is supported for this delegate
+        // Non-void: requires parameters (uses IWhenBuilder + IWhenChain)
+        // Void: requires parameters (uses IVoidWhenChain directly)
+        var canHaveWhenChain = !del.IsVoid && del.Parameters.Count > 0;
+        var canHaveVoidWhenChain = del.IsVoid && del.Parameters.Count > 0;
+        var interceptorClassName = del.InterceptorClassName + del.TypeParameterList;
+
         // Generate handler class first (generic if delegate is open generic)
         w.Line($"\t\t/// <summary>Interceptor for {del.StubClassName} delegate.</summary>");
         w.Line($"\t\tpublic sealed class {del.InterceptorClassName}{del.TypeParameterList}{del.ConstraintClauses}");
@@ -1295,6 +1302,25 @@ internal static class InlineRenderer
             w.Line();
         }
 
+        // When chain storage fields (for delegates with parameters)
+        // Fields are internal so the stub's Invoke method can access them
+        if (canHaveWhenChain)
+        {
+            w.Line("\t\t\t// When chain storage");
+            w.Line("\t\t\tinternal global::System.Collections.Generic.List<WhenMatcher>? _whenChain;");
+            w.Line("\t\t\tinternal int _whenChainHead;");
+            w.Line("\t\t\tinternal bool _whenVerifiable;");
+            w.Line();
+        }
+        if (canHaveVoidWhenChain)
+        {
+            w.Line("\t\t\t// When chain storage for void delegate");
+            w.Line("\t\t\tinternal global::System.Collections.Generic.List<VoidWhenMatcher>? _whenChain;");
+            w.Line("\t\t\tinternal int _whenChainHead;");
+            w.Line("\t\t\tinternal bool _whenVerifiable;");
+            w.Line();
+        }
+
         // RecordCall method
         if (del.Parameters.Count == 0)
         {
@@ -1320,6 +1346,11 @@ internal static class InlineRenderer
             w.Append("LastCallArg = default; ");
         else if (del.LastCallArgsType != null)
             w.Append("LastCallArgs = default; ");
+        if (canHaveWhenChain || canHaveVoidWhenChain)
+        {
+            w.Append("_whenChainHead = 0; ");
+            w.Append("if (_whenChain != null) foreach (var m in _whenChain) m.CallCount = 0; ");
+        }
         w.Line("}");
         w.Line();
 
@@ -1334,6 +1365,30 @@ internal static class InlineRenderer
         w.Line("\t\t\t\tif (!times.Validate(_callCount))");
         w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"delegate\", times, _callCount));");
         w.Line("\t\t\t}");
+        w.Line();
+
+        // When() entry points (for delegates with parameters)
+        if (canHaveWhenChain)
+        {
+            RenderDelegateWhenEntryPoints(w, del);
+        }
+        if (canHaveVoidWhenChain)
+        {
+            RenderVoidDelegateWhenEntryPoints(w, del);
+        }
+
+        // When matcher/builder/chain nested classes (for delegates with parameters)
+        if (canHaveWhenChain)
+        {
+            RenderDelegateWhenMatcherClasses(w, del);
+            RenderDelegateWhenBuilderImpl(w, del);
+            RenderDelegateWhenChainImpl(w, del);
+        }
+        if (canHaveVoidWhenChain)
+        {
+            RenderVoidDelegateWhenMatcherClasses(w, del);
+            RenderVoidDelegateWhenChainImpl(w, del);
+        }
 
         w.Line("\t\t}");
         w.Line();
@@ -1353,7 +1408,7 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic {del.InterceptorClassName}{del.TypeParameterList} Interceptor {{ get; }} = new();");
         w.Line();
 
-        // Private Invoke method
+        // Private Invoke method with When chain support
         w.Line($"\t\t\tprivate {del.ReturnType} Invoke({del.InvokeParameterDeclarations})");
         w.Line("\t\t\t{");
         if (del.Parameters.Count > 0)
@@ -1364,6 +1419,56 @@ internal static class InlineRenderer
         {
             w.Line("\t\t\t\tInterceptor.RecordCall();");
         }
+
+        // When chain check (for non-void delegates with parameters)
+        if (canHaveWhenChain)
+        {
+            w.Line();
+            w.Line("\t\t\t\t// When chain - check HEAD matcher first (highest priority)");
+            w.Line("\t\t\t\tif (Interceptor._whenChain != null && Interceptor._whenChainHead < Interceptor._whenChain.Count)");
+            w.Line("\t\t\t\t{");
+            w.Line("\t\t\t\t\tvar matcher = Interceptor._whenChain[Interceptor._whenChainHead];");
+            w.Line($"\t\t\t\t\tif (matcher.Matches({del.InvokeArgumentList}))");
+            w.Line("\t\t\t\t\t{");
+            w.Line("\t\t\t\t\t\tmatcher.CallCount++;");
+            w.Line("\t\t\t\t\t\t// Advance HEAD unless at last matcher (which repeats)");
+            w.Line("\t\t\t\t\t\tif (Interceptor._whenChainHead < Interceptor._whenChain.Count - 1)");
+            w.Line("\t\t\t\t\t\t\tInterceptor._whenChainHead++;");
+            w.Line($"\t\t\t\t\t\treturn matcher.Execute({del.InvokeArgumentList});");
+            w.Line("\t\t\t\t\t}");
+            w.Line("\t\t\t\t\telse if (matcher.IsTerminal)");
+            w.Line("\t\t\t\t\t{");
+            w.Line("\t\t\t\t\t\t// ThenNone: didn't match (always false), exhaust by advancing");
+            w.Line("\t\t\t\t\t\tInterceptor._whenChainHead++;");
+            w.Line("\t\t\t\t\t}");
+            w.Line("\t\t\t\t}");
+        }
+
+        // When chain check (for void delegates with parameters)
+        if (canHaveVoidWhenChain)
+        {
+            w.Line();
+            w.Line("\t\t\t\t// When chain - check HEAD matcher first (highest priority)");
+            w.Line("\t\t\t\tif (Interceptor._whenChain != null && Interceptor._whenChainHead < Interceptor._whenChain.Count)");
+            w.Line("\t\t\t\t{");
+            w.Line("\t\t\t\t\tvar matcher = Interceptor._whenChain[Interceptor._whenChainHead];");
+            w.Line($"\t\t\t\t\tif (matcher.Matches({del.InvokeArgumentList}))");
+            w.Line("\t\t\t\t\t{");
+            w.Line("\t\t\t\t\t\tmatcher.CallCount++;");
+            w.Line("\t\t\t\t\t\t// Advance HEAD unless at last matcher (which repeats)");
+            w.Line("\t\t\t\t\t\tif (Interceptor._whenChainHead < Interceptor._whenChain.Count - 1)");
+            w.Line("\t\t\t\t\t\t\tInterceptor._whenChainHead++;");
+            w.Line($"\t\t\t\t\t\tmatcher.Execute({del.InvokeArgumentList});");
+            w.Line("\t\t\t\t\t\treturn;");
+            w.Line("\t\t\t\t\t}");
+            w.Line("\t\t\t\t\telse if (matcher.IsTerminal)");
+            w.Line("\t\t\t\t\t{");
+            w.Line("\t\t\t\t\t\t// ThenNone: didn't match (always false), exhaust by advancing");
+            w.Line("\t\t\t\t\t\tInterceptor._whenChainHead++;");
+            w.Line("\t\t\t\t\t}");
+            w.Line("\t\t\t\t}");
+        }
+
         if (del.IsVoid)
         {
             var onCallArgs = del.InvokeArgumentList;
@@ -1383,6 +1488,485 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic static implicit operator {del.DelegateType}({del.StubClassName}{del.TypeParameterList} stub) => stub.Invoke;");
 
         w.Line("\t\t}");
+        w.Line();
+    }
+
+    private static void RenderDelegateWhenEntryPoints(CodeWriter w, InlineDelegateStubModel del)
+    {
+        var predicateType = BuildDelegatePredicateType(del.Parameters);
+        var paramTypeList = BuildDelegateParamTypeList(del.Parameters);
+        var interceptorClassName = del.InterceptorClassName + del.TypeParameterList;
+
+        // When() value overload - returns concrete type for fluent chaining
+        w.Line($"\t\t\t/// <summary>Configures parameter-specific matching with exact values. Returns builder for Returns().</summary>");
+        w.Line($"\t\t\tpublic WhenBuilder When({paramTypeList})");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\t_whenChain ??= new global::System.Collections.Generic.List<WhenMatcher>();");
+        var lambdaParams = BuildDelegateLambdaParams(del.Parameters);
+        var predicateBody = BuildDelegatePredicateBody(del.Parameters);
+        w.Line($"\t\t\t\treturn new WhenBuilder(this, ({lambdaParams}) => {predicateBody});");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // When() predicate overload - returns concrete type for fluent chaining
+        w.Line($"\t\t\t/// <summary>Configures parameter-specific matching with predicate. Returns builder for Returns().</summary>");
+        w.Line($"\t\t\tpublic WhenBuilder When({predicateType} predicate)");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\t_whenChain ??= new global::System.Collections.Generic.List<WhenMatcher>();");
+        w.Line("\t\t\t\treturn new WhenBuilder(this, predicate);");
+        w.Line("\t\t\t}");
+        w.Line();
+    }
+
+    private static void RenderDelegateWhenMatcherClasses(CodeWriter w, InlineDelegateStubModel del)
+    {
+        var matchParams = BuildDelegateMatchParams(del.Parameters);
+        var callbackArgs = BuildDelegateCallbackArgs(del.Parameters);
+        var predicateType = BuildDelegatePredicateType(del.Parameters);
+
+        // WhenMatcher abstract base (internal for access from stub class)
+        w.Line($"\t\t\t/// <summary>Abstract base for When chain matchers.</summary>");
+        w.Line($"\t\t\tinternal abstract class WhenMatcher");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tpublic abstract bool Matches({matchParams});");
+        w.Line($"\t\t\t\tpublic abstract {del.ReturnType} Execute({matchParams});");
+        w.Line("\t\t\t\tpublic abstract bool IsTerminal { get; }");
+        w.Line("\t\t\t\tpublic int CallCount { get; set; }");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // WhenMatcherValue
+        w.Line($"\t\t\t/// <summary>Matcher with predicate and value.</summary>");
+        w.Line($"\t\t\tinternal sealed class WhenMatcherValue : WhenMatcher");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tprivate readonly {predicateType} _predicate;");
+        w.Line($"\t\t\t\tprivate readonly {del.ReturnType} _value;");
+        w.Line($"\t\t\t\tpublic WhenMatcherValue({predicateType} predicate, {del.ReturnType} value) {{ _predicate = predicate; _value = value; }}");
+        w.Line($"\t\t\t\tpublic override bool Matches({matchParams}) => _predicate({callbackArgs});");
+        w.Line($"\t\t\t\tpublic override {del.ReturnType} Execute({matchParams}) => _value;");
+        w.Line("\t\t\t\tpublic override bool IsTerminal => false;");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // WhenMatcherCall
+        w.Line($"\t\t\t/// <summary>Matcher that always matches and invokes callback. Terminal.</summary>");
+        w.Line($"\t\t\tinternal sealed class WhenMatcherCall : WhenMatcher");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tprivate readonly {del.OnCallType} _callback;");
+        w.Line($"\t\t\t\tpublic WhenMatcherCall({del.OnCallType} callback) => _callback = callback;");
+        w.Line($"\t\t\t\tpublic override bool Matches({matchParams}) => true;");
+        w.Line($"\t\t\t\tpublic override {del.ReturnType} Execute({matchParams}) => _callback({callbackArgs});");
+        w.Line("\t\t\t\tpublic override bool IsTerminal => true;");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // WhenMatcherNone
+        w.Line($"\t\t\t/// <summary>Matcher that never matches. Terminal.</summary>");
+        w.Line($"\t\t\tinternal sealed class WhenMatcherNone : WhenMatcher");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tpublic override bool Matches({matchParams}) => false;");
+        w.Line($"\t\t\t\tpublic override {del.ReturnType} Execute({matchParams}) => default!;");
+        w.Line("\t\t\t\tpublic override bool IsTerminal => true;");
+        w.Line("\t\t\t}");
+        w.Line();
+    }
+
+    private static void RenderDelegateWhenBuilderImpl(CodeWriter w, InlineDelegateStubModel del)
+    {
+        var predicateType = BuildDelegatePredicateType(del.Parameters);
+        var interceptorClassName = del.InterceptorClassName + del.TypeParameterList;
+
+        // Check if this is an async delegate (Task<T> or ValueTask<T>)
+        var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(del.ReturnType);
+        var isAsync = isTaskT || isValueTaskT;
+
+        w.Line($"\t\t\t/// <summary>Builder for When matchers.</summary>");
+        w.Line($"\t\t\tpublic sealed class WhenBuilder : global::KnockOff.IWhenBuilder<{del.OnCallType}, {del.ReturnType}>");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tprivate readonly {interceptorClassName} _interceptor;");
+        w.Line($"\t\t\t\tprivate readonly {predicateType} _predicate;");
+        w.Line($"\t\t\t\tpublic WhenBuilder({interceptorClassName} interceptor, {predicateType} predicate) {{ _interceptor = interceptor; _predicate = predicate; }}");
+
+        // For async delegates, generate Returns(TInner) that auto-wraps
+        if (isAsync)
+        {
+            w.Line($"\t\t\t\t/// <summary>Configures the return value. Auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+            w.Line($"\t\t\t\tpublic WhenChain Returns({innerType} value)");
+            w.Line("\t\t\t\t{");
+            w.Line("\t\t\t\t\t_interceptor._whenChain ??= new global::System.Collections.Generic.List<WhenMatcher>();");
+            if (isTaskT)
+                w.Line("\t\t\t\t\t_interceptor._whenChain.Add(new WhenMatcherValue(_predicate, global::System.Threading.Tasks.Task.FromResult(value)));");
+            else
+                w.Line($"\t\t\t\t\t_interceptor._whenChain.Add(new WhenMatcherValue(_predicate, new global::System.Threading.Tasks.ValueTask<{innerType}>(value)));");
+            w.Line("\t\t\t\t\treturn new WhenChain(_interceptor);");
+            w.Line("\t\t\t\t}");
+            w.Line();
+            // Explicit interface implementation wraps too
+            if (isTaskT)
+                w.Line($"\t\t\t\tglobal::KnockOff.IWhenChain<{del.OnCallType}, {del.ReturnType}> global::KnockOff.IWhenBuilder<{del.OnCallType}, {del.ReturnType}>.Returns({del.ReturnType} value) => Returns(value.Result);");
+            else
+                w.Line($"\t\t\t\tglobal::KnockOff.IWhenChain<{del.OnCallType}, {del.ReturnType}> global::KnockOff.IWhenBuilder<{del.OnCallType}, {del.ReturnType}>.Returns({del.ReturnType} value) => Returns(value.Result);");
+        }
+        else
+        {
+            w.Line($"\t\t\t\tpublic WhenChain Returns({del.ReturnType} value)");
+            w.Line("\t\t\t\t{");
+            w.Line("\t\t\t\t\t_interceptor._whenChain ??= new global::System.Collections.Generic.List<WhenMatcher>();");
+            w.Line("\t\t\t\t\t_interceptor._whenChain.Add(new WhenMatcherValue(_predicate, value));");
+            w.Line("\t\t\t\t\treturn new WhenChain(_interceptor);");
+            w.Line("\t\t\t\t}");
+            w.Line();
+            // Explicit interface implementation for IWhenBuilder.Returns
+            w.Line($"\t\t\t\tglobal::KnockOff.IWhenChain<{del.OnCallType}, {del.ReturnType}> global::KnockOff.IWhenBuilder<{del.OnCallType}, {del.ReturnType}>.Returns({del.ReturnType} value) => Returns(value);");
+        }
+        w.Line("\t\t\t}");
+        w.Line();
+    }
+
+    private static void RenderDelegateWhenChainImpl(CodeWriter w, InlineDelegateStubModel del)
+    {
+        var predicateType = BuildDelegatePredicateType(del.Parameters);
+        var paramTypeList = BuildDelegateParamTypeList(del.Parameters);
+        var interceptorClassName = del.InterceptorClassName + del.TypeParameterList;
+
+        w.Line($"\t\t\t/// <summary>When chain implementation.</summary>");
+        w.Line($"\t\t\tpublic sealed class WhenChain : global::KnockOff.IWhenChain<{del.OnCallType}, {del.ReturnType}>");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tprivate readonly {interceptorClassName} _interceptor;");
+        w.Line($"\t\t\t\tpublic WhenChain({interceptorClassName} interceptor) => _interceptor = interceptor;");
+        w.Line();
+
+        // ThenWhen value overload
+        w.Line($"\t\t\t\tpublic WhenBuilder ThenWhen({paramTypeList})");
+        w.Line("\t\t\t\t{");
+        var lambdaParams = BuildDelegateLambdaParams(del.Parameters);
+        var predicateBody = BuildDelegatePredicateBody(del.Parameters);
+        w.Line($"\t\t\t\t\treturn new WhenBuilder(_interceptor, ({lambdaParams}) => {predicateBody});");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // ThenWhen predicate overload
+        w.Line($"\t\t\t\tpublic WhenBuilder ThenWhen({predicateType} predicate)");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\treturn new WhenBuilder(_interceptor, predicate);");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // ThenCall
+        w.Line($"\t\t\t\tpublic global::KnockOff.IWhenTracking ThenCall({del.OnCallType} callback)");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenChain ??= new global::System.Collections.Generic.List<WhenMatcher>();");
+        w.Line("\t\t\t\t\t_interceptor._whenChain.Add(new WhenMatcherCall(callback));");
+        w.Line("\t\t\t\t\treturn this;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // ThenNone
+        w.Line("\t\t\t\tpublic global::KnockOff.IWhenTracking ThenNone()");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenChain ??= new global::System.Collections.Generic.List<WhenMatcher>();");
+        w.Line("\t\t\t\t\t_interceptor._whenChain.Add(new WhenMatcherNone());");
+        w.Line("\t\t\t\t\treturn this;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Verify
+        w.Line("\t\t\t\tpublic void Verify()");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\tif (_interceptor._whenChain == null || _interceptor._whenChain.Count == 0) return;");
+        w.Line("\t\t\t\t\tvar head = _interceptor._whenChainHead;");
+        w.Line("\t\t\t\t\tvar count = _interceptor._whenChain.Count;");
+        w.Line("\t\t\t\t\tif (head < count && !_interceptor._whenChain[head].IsTerminal)");
+        w.Line("\t\t\t\t\t\tthrow new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Reset
+        w.Line("\t\t\t\tpublic void Reset()");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenChainHead = 0;");
+        w.Line("\t\t\t\t\tif (_interceptor._whenChain != null)");
+        w.Line("\t\t\t\t\t\tforeach (var m in _interceptor._whenChain)");
+        w.Line("\t\t\t\t\t\t\tm.CallCount = 0;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Verifiable
+        w.Line($"\t\t\t\tpublic WhenChain Verifiable()");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenVerifiable = true;");
+        w.Line("\t\t\t\t\treturn this;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Explicit interface implementations
+        w.Line($"\t\t\t\tglobal::KnockOff.IWhenChain<{del.OnCallType}, {del.ReturnType}> global::KnockOff.IWhenChain<{del.OnCallType}, {del.ReturnType}>.Verifiable() => Verifiable();");
+        w.Line("\t\t\t\tglobal::KnockOff.IWhenTracking global::KnockOff.IWhenTracking.Verifiable() => Verifiable();");
+
+        w.Line("\t\t\t}");
+        w.Line();
+    }
+
+    private static string BuildDelegatePredicateType(EquatableArray<ParameterModel> parameters)
+    {
+        if (parameters.Count == 0)
+            return "global::System.Func<bool>";
+        var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+        return $"global::System.Func<{paramTypes}, bool>";
+    }
+
+    private static string BuildDelegateParamTypeList(EquatableArray<ParameterModel> parameters)
+    {
+        if (parameters.Count == 0) return "";
+        return string.Join(", ", parameters.Select(p => $"{p.Type} {p.Name}"));
+    }
+
+    private static string BuildDelegateMatchParams(EquatableArray<ParameterModel> parameters)
+    {
+        if (parameters.Count == 0) return "";
+        return string.Join(", ", parameters.Select(p => $"{p.Type} {p.Name}"));
+    }
+
+    private static string BuildDelegateCallbackArgs(EquatableArray<ParameterModel> parameters)
+    {
+        if (parameters.Count == 0) return "";
+        return string.Join(", ", parameters.Select(p => p.Name));
+    }
+
+    private static string BuildDelegateLambdaParams(EquatableArray<ParameterModel> parameters)
+    {
+        if (parameters.Count == 0) return "";
+        return string.Join(", ", Enumerable.Range(0, parameters.Count).Select(i => $"_arg{i}"));
+    }
+
+    private static string BuildDelegatePredicateBody(EquatableArray<ParameterModel> parameters)
+    {
+        if (parameters.Count == 0) return "true";
+        var parts = new List<string>();
+        for (int i = 0; i < parameters.Count; i++)
+        {
+            parts.Add($"global::System.Object.Equals(_arg{i}, {parameters.GetArray()![i].Name})");
+        }
+        return string.Join(" && ", parts);
+    }
+
+    /// <summary>
+    /// Analyzes a return type for async patterns and extracts the inner type.
+    /// </summary>
+    private static (string InnerType, bool IsTaskT, bool IsValueTaskT) GetAsyncTypeInfo(string returnType)
+    {
+        const string TaskPrefix = "global::System.Threading.Tasks.Task<";
+        const string ValueTaskPrefix = "global::System.Threading.Tasks.ValueTask<";
+
+        if (returnType.StartsWith(TaskPrefix) && returnType.EndsWith(">"))
+        {
+            var innerType = returnType.Substring(TaskPrefix.Length, returnType.Length - TaskPrefix.Length - 1);
+            return (innerType, true, false);
+        }
+
+        if (returnType.StartsWith(ValueTaskPrefix) && returnType.EndsWith(">"))
+        {
+            var innerType = returnType.Substring(ValueTaskPrefix.Length, returnType.Length - ValueTaskPrefix.Length - 1);
+            return (innerType, false, true);
+        }
+
+        return (returnType, false, false);
+    }
+
+    // Void delegate When chain methods
+
+    private static void RenderVoidDelegateWhenEntryPoints(CodeWriter w, InlineDelegateStubModel del)
+    {
+        var predicateType = BuildDelegatePredicateType(del.Parameters);
+        var paramTypeList = BuildDelegateParamTypeList(del.Parameters);
+        var interceptorClassName = del.InterceptorClassName + del.TypeParameterList;
+
+        // When() value overload - returns concrete type to enable fluent ThenWhen chaining
+        w.Line($"\t\t\t/// <summary>Configures parameter-specific matching with exact values for void delegate. Returns chain directly.</summary>");
+        w.Line("\t\t\tpublic VoidWhenChain When(" + paramTypeList + ")");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\t_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcher>();");
+        var lambdaParams = BuildDelegateLambdaParams(del.Parameters);
+        var predicateBody = BuildDelegatePredicateBody(del.Parameters);
+        w.Line($"\t\t\t\tvar matcher = new VoidWhenMatcherPredicate(({lambdaParams}) => {predicateBody});");
+        w.Line("\t\t\t\t_whenChain.Add(matcher);");
+        w.Line("\t\t\t\treturn new VoidWhenChain(this, matcher);");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // When() predicate overload - returns concrete type to enable fluent ThenWhen chaining
+        w.Line($"\t\t\t/// <summary>Configures parameter-specific matching with predicate for void delegate. Returns chain directly.</summary>");
+        w.Line("\t\t\tpublic VoidWhenChain When(" + predicateType + " predicate)");
+        w.Line("\t\t\t{");
+        w.Line("\t\t\t\t_whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcher>();");
+        w.Line("\t\t\t\tvar matcher = new VoidWhenMatcherPredicate(predicate);");
+        w.Line("\t\t\t\t_whenChain.Add(matcher);");
+        w.Line("\t\t\t\treturn new VoidWhenChain(this, matcher);");
+        w.Line("\t\t\t}");
+        w.Line();
+    }
+
+    private static void RenderVoidDelegateWhenMatcherClasses(CodeWriter w, InlineDelegateStubModel del)
+    {
+        var matchParams = BuildDelegateMatchParams(del.Parameters);
+        var callbackArgs = BuildDelegateCallbackArgs(del.Parameters);
+        var predicateType = BuildDelegatePredicateType(del.Parameters);
+
+        // VoidWhenMatcher abstract base (internal for access from stub class)
+        w.Line($"\t\t\t/// <summary>Abstract base for void When chain matchers.</summary>");
+        w.Line($"\t\t\tinternal abstract class VoidWhenMatcher");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tpublic abstract bool Matches({matchParams});");
+        w.Line($"\t\t\t\tpublic abstract void Execute({matchParams});");
+        w.Line("\t\t\t\tpublic abstract bool IsTerminal { get; }");
+        w.Line("\t\t\t\tpublic int CallCount { get; set; }");
+        w.Line($"\t\t\t\tpublic {del.OnCallType}? Callback {{ get; set; }}");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // VoidWhenMatcherPredicate
+        w.Line($"\t\t\t/// <summary>Matcher with predicate and optional callback.</summary>");
+        w.Line($"\t\t\tinternal sealed class VoidWhenMatcherPredicate : VoidWhenMatcher");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tprivate readonly {predicateType} _predicate;");
+        w.Line($"\t\t\t\tpublic VoidWhenMatcherPredicate({predicateType} predicate) => _predicate = predicate;");
+        w.Line($"\t\t\t\tpublic override bool Matches({matchParams}) => _predicate({callbackArgs});");
+        w.Line($"\t\t\t\tpublic override void Execute({matchParams}) {{ Callback?.Invoke({callbackArgs}); }}");
+        w.Line("\t\t\t\tpublic override bool IsTerminal => false;");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // VoidWhenMatcherCall
+        w.Line($"\t\t\t/// <summary>Matcher that always matches and invokes callback. Terminal.</summary>");
+        w.Line($"\t\t\tinternal sealed class VoidWhenMatcherCall : VoidWhenMatcher");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tprivate readonly {del.OnCallType} _callback;");
+        w.Line($"\t\t\t\tpublic VoidWhenMatcherCall({del.OnCallType} callback) => _callback = callback;");
+        w.Line($"\t\t\t\tpublic override bool Matches({matchParams}) => true;");
+        w.Line($"\t\t\t\tpublic override void Execute({matchParams}) => _callback({callbackArgs});");
+        w.Line("\t\t\t\tpublic override bool IsTerminal => true;");
+        w.Line("\t\t\t}");
+        w.Line();
+
+        // VoidWhenMatcherNone
+        w.Line($"\t\t\t/// <summary>Matcher that never matches. Terminal.</summary>");
+        w.Line($"\t\t\tinternal sealed class VoidWhenMatcherNone : VoidWhenMatcher");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tpublic override bool Matches({matchParams}) => false;");
+        w.Line($"\t\t\t\tpublic override void Execute({matchParams}) {{ }}");
+        w.Line("\t\t\t\tpublic override bool IsTerminal => true;");
+        w.Line("\t\t\t}");
+        w.Line();
+    }
+
+    private static void RenderVoidDelegateWhenChainImpl(CodeWriter w, InlineDelegateStubModel del)
+    {
+        var predicateType = BuildDelegatePredicateType(del.Parameters);
+        var paramTypeList = BuildDelegateParamTypeList(del.Parameters);
+        var interceptorClassName = del.InterceptorClassName + del.TypeParameterList;
+
+        w.Line($"\t\t\t/// <summary>Void When chain implementation.</summary>");
+        w.Line($"\t\t\tpublic sealed class VoidWhenChain : global::KnockOff.IVoidWhenChain<{del.OnCallType}>");
+        w.Line("\t\t\t{");
+        w.Line($"\t\t\t\tprivate readonly {interceptorClassName} _interceptor;");
+        w.Line("\t\t\t\tprivate readonly VoidWhenMatcher _currentMatcher;");
+        w.Line($"\t\t\t\tinternal VoidWhenChain({interceptorClassName} interceptor, VoidWhenMatcher currentMatcher) {{ _interceptor = interceptor; _currentMatcher = currentMatcher; }}");
+        w.Line();
+
+        // Call - sets optional callback on current matcher
+        // Returns concrete type to enable fluent ThenWhen chaining
+        w.Line("\t\t\t\tpublic VoidWhenChain Call(" + del.OnCallType + " callback)");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_currentMatcher.Callback = callback;");
+        w.Line("\t\t\t\t\treturn this;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+        // Explicit interface implementation for IVoidWhenChain.Call
+        w.Line($"\t\t\t\tglobal::KnockOff.IVoidWhenChain<{del.OnCallType}> global::KnockOff.IVoidWhenChain<{del.OnCallType}>.Call({del.OnCallType} callback) => Call(callback);");
+        w.Line();
+
+        // ThenWhen value overload - returns concrete type for chaining
+        w.Line("\t\t\t\tpublic VoidWhenChain ThenWhen(" + paramTypeList + ")");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcher>();");
+        var lambdaParams = BuildDelegateLambdaParams(del.Parameters);
+        var predicateBody = BuildDelegatePredicateBody(del.Parameters);
+        w.Line($"\t\t\t\t\tvar matcher = new VoidWhenMatcherPredicate(({lambdaParams}) => {predicateBody});");
+        w.Line("\t\t\t\t\t_interceptor._whenChain.Add(matcher);");
+        w.Line("\t\t\t\t\treturn new VoidWhenChain(_interceptor, matcher);");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // ThenWhen predicate overload - returns concrete type for chaining
+        w.Line("\t\t\t\tpublic VoidWhenChain ThenWhen(" + predicateType + " predicate)");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcher>();");
+        w.Line("\t\t\t\t\tvar matcher = new VoidWhenMatcherPredicate(predicate);");
+        w.Line("\t\t\t\t\t_interceptor._whenChain.Add(matcher);");
+        w.Line("\t\t\t\t\treturn new VoidWhenChain(_interceptor, matcher);");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // ThenCall
+        w.Line($"\t\t\t\tpublic global::KnockOff.IWhenTracking ThenCall({del.OnCallType} callback)");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcher>();");
+        w.Line("\t\t\t\t\t_interceptor._whenChain.Add(new VoidWhenMatcherCall(callback));");
+        w.Line("\t\t\t\t\treturn this;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // ThenNone
+        w.Line("\t\t\t\tpublic global::KnockOff.IWhenTracking ThenNone()");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenChain ??= new global::System.Collections.Generic.List<VoidWhenMatcher>();");
+        w.Line("\t\t\t\t\t_interceptor._whenChain.Add(new VoidWhenMatcherNone());");
+        w.Line("\t\t\t\t\treturn this;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Verify() - from ITracking
+        w.Line("\t\t\t\tpublic void Verify()");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\tif (_interceptor._whenChain == null || _interceptor._whenChain.Count == 0) return;");
+        w.Line("\t\t\t\t\tvar head = _interceptor._whenChainHead;");
+        w.Line("\t\t\t\t\tvar count = _interceptor._whenChain.Count;");
+        w.Line("\t\t\t\t\tif (head < count && !_interceptor._whenChain[head].IsTerminal)");
+        w.Line("\t\t\t\t\t\tthrow new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Verify(Times) - parameter-specific verification
+        w.Line("\t\t\t\tpublic void Verify(global::KnockOff.Times times)");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\tif (!times.Validate(_currentMatcher.CallCount))");
+        w.Line("\t\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"When matcher\", times, _currentMatcher.CallCount));");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Reset
+        w.Line("\t\t\t\tpublic void Reset()");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenChainHead = 0;");
+        w.Line("\t\t\t\t\tif (_interceptor._whenChain != null)");
+        w.Line("\t\t\t\t\t\tforeach (var m in _interceptor._whenChain)");
+        w.Line("\t\t\t\t\t\t\tm.CallCount = 0;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Verifiable - returns concrete type for chaining
+        w.Line("\t\t\t\tpublic VoidWhenChain Verifiable()");
+        w.Line("\t\t\t\t{");
+        w.Line("\t\t\t\t\t_interceptor._whenVerifiable = true;");
+        w.Line("\t\t\t\t\treturn this;");
+        w.Line("\t\t\t\t}");
+        w.Line();
+
+        // Explicit interface implementations
+        w.Line($"\t\t\t\tglobal::KnockOff.IVoidWhenChain<{del.OnCallType}> global::KnockOff.IVoidWhenChain<{del.OnCallType}>.Verifiable() => Verifiable();");
+        w.Line("\t\t\t\tglobal::KnockOff.IWhenTracking global::KnockOff.IWhenTracking.Verifiable() => Verifiable();");
+
+        w.Line("\t\t\t}");
         w.Line();
     }
 

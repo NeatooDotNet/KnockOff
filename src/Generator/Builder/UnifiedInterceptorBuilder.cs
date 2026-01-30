@@ -393,6 +393,23 @@ internal static class UnifiedInterceptorBuilder
 	}
 
 	#endregion
+
+	#region When Chain Support
+
+	/// <summary>
+	/// Builds the predicate Func type for When matching (e.g., "Func&lt;int, string, bool&gt;").
+	/// Used by When() entry point generation.
+	/// </summary>
+	public static string BuildWhenPredicateType(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0)
+			return "global::System.Func<bool>";
+
+		var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+		return $"global::System.Func<{paramTypes}, bool>";
+	}
+
+	#endregion
 }
 
 /// <summary>

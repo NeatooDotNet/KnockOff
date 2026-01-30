@@ -115,6 +115,25 @@ internal static class MethodInterceptorRenderer
 		w.Line("private int _sequenceIndex;");
 		w.Line();
 
+		// When chain storage - parameter-specific matching (for methods with parameters and no ref/out)
+		// Non-void methods use WhenMatcher, void methods use VoidWhenMatcher
+		var canHaveWhenChain = !model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
+		var canHaveVoidWhenChain = model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
+		if (canHaveWhenChain)
+		{
+			w.Line("private global::System.Collections.Generic.List<WhenMatcher>? _whenChain;");
+			w.Line("private int _whenChainHead;");
+			w.Line("private bool _whenVerifiable;");
+			w.Line();
+		}
+		if (canHaveVoidWhenChain)
+		{
+			w.Line("private global::System.Collections.Generic.List<VoidWhenMatcher>? _whenChain;");
+			w.Line("private int _whenChainHead;");
+			w.Line("private bool _whenVerifiable;");
+			w.Line();
+		}
+
 		// Verifiable state
 		w.Line("private bool _isVerifiable;");
 		w.Line("private global::KnockOff.Times? _verifiableTimes;");
@@ -294,6 +313,19 @@ internal static class MethodInterceptorRenderer
 		}
 		w.Line();
 
+		// Full interceptor class name for nested class constructors
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+
+		// When() entry points for parameter-specific matching
+		if (canHaveWhenChain)
+		{
+			RenderWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, model.ReturnType, delegateType, null);
+		}
+		if (canHaveVoidWhenChain)
+		{
+			RenderVoidWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, delegateType, null);
+		}
+
 		// Invoke method
 		RenderInvokeMethod(w, model, options, null);
 
@@ -302,19 +334,33 @@ internal static class MethodInterceptorRenderer
 			hasSourceField: !string.IsNullOrEmpty(model.DeclaringInterface),
 			hasValueOverload: canHaveValueOverload,
 			hasSimplifiedCallback: isAsyncWithInnerType && !hasRefOrOut,
-			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut);
+			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut,
+			hasWhenChain: canHaveWhenChain || canHaveVoidWhenChain);
 
 		// Internal verification support
 		RenderInternalVerificationMembers(w, model.MethodName, model.Overloads, canHaveValueOverload,
 			hasSimplifiedCallback: isAsyncWithInnerType && !hasRefOrOut,
-			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut);
+			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut,
+			hasWhenChain: canHaveWhenChain || canHaveVoidWhenChain);
 
 		// Nested MethodTrackingImpl
-		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
 		RenderMethodTrackingImpl(w, model.TrackableParameters, model.LastArgType, model.LastArgsType, model.TrackingInterface, fullInterceptorClassName, null);
 
 		// Nested MethodSequenceImpl
 		RenderMethodSequenceImpl(w, fullInterceptorClassName, delegateType, null);
+
+		// Nested When chain classes (for parameter-specific matching)
+		if (canHaveWhenChain)
+		{
+			RenderWhenMatcherClasses(w, model.Parameters, model.ReturnType, delegateType, null);
+			RenderWhenBuilderImpl(w, fullInterceptorClassName, model.Parameters, model.ReturnType, delegateType, null);
+			RenderWhenChainImpl(w, fullInterceptorClassName, model.Parameters, model.ReturnType, delegateType, null);
+		}
+		if (canHaveVoidWhenChain)
+		{
+			RenderVoidWhenMatcherClasses(w, model.Parameters, delegateType, null);
+			RenderVoidWhenChainImpl(w, fullInterceptorClassName, model.Parameters, delegateType, null);
+		}
 	}
 
 	#endregion
@@ -380,6 +426,24 @@ internal static class MethodInterceptorRenderer
 			w.Line($"private global::System.Collections.Generic.List<({overload.DelegateName} Callback, MethodTrackingImpl_{overload.SignatureSuffix} Tracking)>? _sequence_{overload.SignatureSuffix};");
 			w.Line($"private int _sequenceIndex_{overload.SignatureSuffix};");
 			w.Line();
+
+			// When chain storage - parameter-specific matching (for overloads with parameters and no ref/out)
+			var canHaveWhenChain = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+			var canHaveVoidWhenChain = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+			if (canHaveWhenChain)
+			{
+				w.Line($"private global::System.Collections.Generic.List<WhenMatcher_{overload.SignatureSuffix}>? _whenChain_{overload.SignatureSuffix};");
+				w.Line($"private int _whenChainHead_{overload.SignatureSuffix};");
+				w.Line($"private bool _whenVerifiable_{overload.SignatureSuffix};");
+				w.Line();
+			}
+			if (canHaveVoidWhenChain)
+			{
+				w.Line($"private global::System.Collections.Generic.List<VoidWhenMatcher_{overload.SignatureSuffix}>? _whenChain_{overload.SignatureSuffix};");
+				w.Line($"private int _whenChainHead_{overload.SignatureSuffix};");
+				w.Line($"private bool _whenVerifiable_{overload.SignatureSuffix};");
+				w.Line();
+			}
 
 			// Verifiable state per overload
 			w.Line($"private bool _isVerifiable_{overload.SignatureSuffix};");
@@ -505,6 +569,29 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 		}
 
+		// Full interceptor class name for nested class constructors
+		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
+
+		// When() entry points for each unique signature (for parameter-specific matching)
+		// Check if we need return-type disambiguation (multiple overloads with same params but different returns)
+		var needsReturnTypeDisambiguation = HasReturnTypeOnlyOverloads(model.Overloads);
+		foreach (var overload in model.Overloads)
+		{
+			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			var canHaveWhenChain = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+			var canHaveVoidWhenChain = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+			// Use return type suffix to disambiguate When methods when needed
+			var returnTypeSuffix = needsReturnTypeDisambiguation ? UnifiedInterceptorBuilder.GetTypeSuffix(overload.ReturnType) : null;
+			if (canHaveWhenChain)
+			{
+				RenderWhenEntryPoints(w, fullInterceptorClassName, overload.Parameters, overload.ReturnType, overload.DelegateName, overload.SignatureSuffix, returnTypeSuffix);
+			}
+			if (canHaveVoidWhenChain)
+			{
+				RenderVoidWhenEntryPoints(w, fullInterceptorClassName, overload.Parameters, overload.DelegateName, overload.SignatureSuffix, returnTypeSuffix);
+			}
+		}
+
 		// Invoke methods for each unique signature
 		foreach (var overload in model.Overloads)
 		{
@@ -520,7 +607,6 @@ internal static class MethodInterceptorRenderer
 		RenderInternalVerificationMembers(w, model.MethodName, model.Overloads, hasValueOverload: false);
 
 		// Nested tracking classes for each unique signature
-		var fullInterceptorClassName = model.InterceptorClassName + options.InterceptorTypeParameters;
 		foreach (var overload in model.Overloads)
 		{
 			RenderMethodTrackingImpl(w, overload.TrackableParameters, overload.LastArgType, overload.LastArgsType, overload.TrackingInterface, fullInterceptorClassName, overload.SignatureSuffix);
@@ -530,6 +616,25 @@ internal static class MethodInterceptorRenderer
 		foreach (var overload in model.Overloads)
 		{
 			RenderMethodSequenceImpl(w, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix);
+		}
+
+		// Nested When chain classes for each unique signature (for parameter-specific matching)
+		foreach (var overload in model.Overloads)
+		{
+			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
+			var canHaveWhenChain = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+			var canHaveVoidWhenChain = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+			if (canHaveWhenChain)
+			{
+				RenderWhenMatcherClasses(w, overload.Parameters, overload.ReturnType, overload.DelegateName, overload.SignatureSuffix);
+				RenderWhenBuilderImpl(w, fullInterceptorClassName, overload.Parameters, overload.ReturnType, overload.DelegateName, overload.SignatureSuffix);
+				RenderWhenChainImpl(w, fullInterceptorClassName, overload.Parameters, overload.ReturnType, overload.DelegateName, overload.SignatureSuffix);
+			}
+			if (canHaveVoidWhenChain)
+			{
+				RenderVoidWhenMatcherClasses(w, overload.Parameters, overload.DelegateName, overload.SignatureSuffix);
+				RenderVoidWhenChainImpl(w, fullInterceptorClassName, overload.Parameters, overload.DelegateName, overload.SignatureSuffix);
+			}
 		}
 	}
 
@@ -562,7 +667,20 @@ internal static class MethodInterceptorRenderer
 
 			var trackingArgs = UnifiedInterceptorBuilder.BuildTrackingArgs(model.TrackableParameters);
 
-			// Check sequence first (takes priority if present and not exhausted)
+			// When chain - check HEAD matcher first (highest priority)
+			// For non-void methods with parameters and no ref/out
+			var canHaveWhenChain = !model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
+			var canHaveVoidWhenChain = model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
+			if (canHaveWhenChain)
+			{
+				RenderWhenChainInvokeCheck(w, model.Parameters, model.ReturnType, null);
+			}
+			if (canHaveVoidWhenChain)
+			{
+				RenderVoidWhenChainInvokeCheck(w, model.Parameters, null);
+			}
+
+			// Check sequence (takes priority if When chain didn't match)
 			w.Line("if (_sequence != null && _sequenceIndex < _sequence.Count)");
 			using (w.Braces())
 			{
@@ -730,7 +848,21 @@ internal static class MethodInterceptorRenderer
 
 			var trackingArgs = UnifiedInterceptorBuilder.BuildTrackingArgs(overload.TrackableParameters);
 
-			// Check sequence first
+			// When chain - check HEAD matcher first (highest priority)
+			// For overloads with parameters and no ref/out
+			var hasRefOrOutForWhen = HasRefOrOutParameters(overload.Parameters);
+			var canHaveWhenChain = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+			var canHaveVoidWhenChain = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+			if (canHaveWhenChain)
+			{
+				RenderWhenChainInvokeCheck(w, overload.Parameters, overload.ReturnType, overload.SignatureSuffix);
+			}
+			if (canHaveVoidWhenChain)
+			{
+				RenderVoidWhenChainInvokeCheck(w, overload.Parameters, overload.SignatureSuffix);
+			}
+
+			// Check sequence (takes priority if When chain didn't match)
 			w.Line($"if (_sequence_{overload.SignatureSuffix} != null && _sequenceIndex_{overload.SignatureSuffix} < _sequence_{overload.SignatureSuffix}.Count)");
 			using (w.Braces())
 			{
@@ -850,11 +982,63 @@ internal static class MethodInterceptorRenderer
 		w.Line();
 	}
 
+	/// <summary>
+	/// Renders the When chain invoke check logic.
+	/// This should be called at the TOP of the Invoke method, before sequence check.
+	/// </summary>
+	/// <param name="w">Code writer.</param>
+	/// <param name="parameters">Method parameters.</param>
+	/// <param name="returnType">Method return type.</param>
+	/// <param name="signatureSuffix">Suffix for overload groups, null for single-signature.</param>
+	private static void RenderWhenChainInvokeCheck(
+		CodeWriter w,
+		EquatableArray<ParameterModel> parameters,
+		string returnType,
+		string? signatureSuffix)
+	{
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var whenChainField = signatureSuffix == null ? "_whenChain" : $"_whenChain_{signatureSuffix}";
+		var whenChainHeadField = signatureSuffix == null ? "_whenChainHead" : $"_whenChainHead_{signatureSuffix}";
+		var callbackArgs = BuildCallbackArgs(parameters);
+
+		w.Line($"// When chain - check HEAD matcher first (highest priority)");
+		w.Line($"if ({whenChainField} != null && {whenChainHeadField} < {whenChainField}.Count)");
+		using (w.Braces())
+		{
+			w.Line($"var matcher = {whenChainField}[{whenChainHeadField}];");
+			w.Line($"if (matcher.Matches({callbackArgs}))");
+			using (w.Braces())
+			{
+				w.Line("matcher.CallCount++;");
+				w.Line();
+				w.Line("// Advance HEAD unless at last matcher (which repeats)");
+				w.Line($"if ({whenChainHeadField} < {whenChainField}.Count - 1)");
+				using (w.Braces())
+				{
+					w.Line($"{whenChainHeadField}++;");
+				}
+				w.Line("// At last matcher: never advance (repeat behavior for both ThenWhen and ThenCall)");
+				w.Line();
+
+				// Return value directly - Execute() returns the full return type (async wrapping done at config time)
+				w.Line($"return matcher.Execute({callbackArgs});");
+			}
+			w.Line("else if (matcher.IsTerminal)");
+			using (w.Braces())
+			{
+				w.Line("// ThenNone: didn't match (always false), exhaust by advancing past it");
+				w.Line($"{whenChainHeadField}++;");
+			}
+			w.Line("// Non-terminal didn't match: fall through to rest of priority chain");
+		}
+		w.Line();
+	}
+
 	#endregion
 
 	#region Reset and Internal Verification Methods
 
-	private static void RenderResetMethod(CodeWriter w, EquatableArray<MethodOverloadSignature> overloads, string? lastArgType = null, string? lastArgsType = null, bool hasSourceField = false, bool hasValueOverload = false, bool hasSimplifiedCallback = false, bool hasSimplifiedVoidCallback = false)
+	private static void RenderResetMethod(CodeWriter w, EquatableArray<MethodOverloadSignature> overloads, string? lastArgType = null, string? lastArgsType = null, bool hasSourceField = false, bool hasValueOverload = false, bool hasSimplifiedCallback = false, bool hasSimplifiedVoidCallback = false, bool hasWhenChain = false)
 	{
 		w.Line("/// <summary>Resets tracking state but preserves configuration and verifiable marking.</summary>");
 		using (w.Block("public void Reset()"))
@@ -885,6 +1069,17 @@ internal static class MethodInterceptorRenderer
 					w.Line("\ttracking.Reset();");
 				}
 				w.Line("_sequenceIndex = 0;");
+				// Reset When chain (only if When chain is supported)
+				if (hasWhenChain)
+				{
+					w.Line("_whenChainHead = 0;");
+					w.Line("if (_whenChain != null)");
+					using (w.Braces())
+					{
+						w.Line("foreach (var matcher in _whenChain)");
+						w.Line("\tmatcher.CallCount = 0;");
+					}
+				}
 			}
 			else
 			{
@@ -913,13 +1108,26 @@ internal static class MethodInterceptorRenderer
 						w.Line("\ttracking.Reset();");
 					}
 					w.Line($"_sequenceIndex_{overload.SignatureSuffix} = 0;");
+					// Reset When chain for this overload (only if When chain is supported)
+					var canHaveWhenChain = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+					var canHaveVoidWhenChain = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+					if (canHaveWhenChain || canHaveVoidWhenChain)
+					{
+						w.Line($"_whenChainHead_{overload.SignatureSuffix} = 0;");
+						w.Line($"if (_whenChain_{overload.SignatureSuffix} != null)");
+						using (w.Braces())
+						{
+							w.Line($"foreach (var matcher in _whenChain_{overload.SignatureSuffix})");
+							w.Line("\tmatcher.CallCount = 0;");
+						}
+					}
 				}
 			}
 		}
 		w.Line();
 	}
 
-	private static void RenderInternalVerificationMembers(CodeWriter w, string methodName, EquatableArray<MethodOverloadSignature> overloads, bool hasValueOverload, bool hasSimplifiedCallback = false, bool hasSimplifiedVoidCallback = false)
+	private static void RenderInternalVerificationMembers(CodeWriter w, string methodName, EquatableArray<MethodOverloadSignature> overloads, bool hasValueOverload, bool hasSimplifiedCallback = false, bool hasSimplifiedVoidCallback = false, bool hasWhenChain = false)
 	{
 		if (overloads.Count == 0)
 		{
@@ -928,7 +1136,7 @@ internal static class MethodInterceptorRenderer
 			w.Line("internal bool IsVerifiable => _isVerifiable;");
 			w.Line();
 
-			// IsConfigured includes value storage if value overload is supported, plus simplified callbacks
+			// IsConfigured includes value storage if value overload is supported, plus simplified callbacks and When chain
 			var isConfiguredExpr = hasValueOverload
 				? "_hasReturnsValue || _onCall != null || (_sequence?.Count ?? 0) > 0"
 				: "_onCall != null || (_sequence?.Count ?? 0) > 0";
@@ -936,7 +1144,9 @@ internal static class MethodInterceptorRenderer
 				isConfiguredExpr += " || _onCallSimplified != null";
 			if (hasSimplifiedVoidCallback)
 				isConfiguredExpr += " || _onCallSimplifiedVoid != null";
-			w.Line("/// <summary>Whether this interceptor has been configured (OnCall, Returns(value), or OnCallSequence).</summary>");
+			if (hasWhenChain)
+				isConfiguredExpr += " || (_whenChain?.Count ?? 0) > 0";
+			w.Line("/// <summary>Whether this interceptor has been configured (OnCall, Returns(value), OnCallSequence, or When).</summary>");
 			w.Line($"internal bool IsConfigured => {isConfiguredExpr};");
 			w.Line();
 
@@ -944,9 +1154,30 @@ internal static class MethodInterceptorRenderer
 			w.Line($"internal global::KnockOff.VerificationFailure? CheckVerification()");
 			using (w.Braces())
 			{
-				w.Line("if (!_isVerifiable) return null;");
-				w.Line("var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
-				w.Line($"return times.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure(\"{methodName}\", times, TotalCallCount);");
+				// Early return if nothing is verifiable (include When chain check only if When chain is supported)
+				var verifiableCheck = hasWhenChain ? "if (!_isVerifiable && !_whenVerifiable) return null;" : "if (!_isVerifiable) return null;";
+				w.Line(verifiableCheck);
+				// Check regular verifiable first
+				w.Line("if (_isVerifiable)");
+				using (w.Braces())
+				{
+					w.Line("var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+					w.Line($"if (!times.Validate(TotalCallCount)) return new global::KnockOff.VerificationFailure(\"{methodName}\", times, TotalCallCount);");
+				}
+				// Check When chain verifiable (only if When chain is supported)
+				if (hasWhenChain)
+				{
+					w.Line("if (_whenVerifiable && _whenChain != null && _whenChain.Count > 0)");
+					using (w.Braces())
+					{
+						w.Line("var head = _whenChainHead;");
+						w.Line("var count = _whenChain.Count;");
+						w.Line("// Chain must be fully consumed (HEAD at end or at terminal matcher)");
+						w.Line("if (head < count && !_whenChain[head].IsTerminal)");
+						w.Line($"\treturn global::KnockOff.VerificationFailure.SequenceIncomplete(\"{methodName} When chain\", count, head);");
+					}
+				}
+				w.Line("return null;");
 			}
 			w.Line();
 
@@ -955,7 +1186,23 @@ internal static class MethodInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line("if (!IsConfigured) return null;");
-				w.Line($"return global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount) ? null : new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, TotalCallCount);");
+				// Check regular configuration
+				w.Line("if (!global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount))");
+				w.Line($"\treturn new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, TotalCallCount);");
+				// Check When chain if configured
+				if (hasWhenChain)
+				{
+					w.Line("if (_whenChain != null && _whenChain.Count > 0)");
+					using (w.Braces())
+					{
+						w.Line("var head = _whenChainHead;");
+						w.Line("var count = _whenChain.Count;");
+						w.Line("// Chain must be fully consumed (HEAD at end or at terminal matcher)");
+						w.Line("if (head < count && !_whenChain[head].IsTerminal)");
+						w.Line($"\treturn global::KnockOff.VerificationFailure.SequenceIncomplete(\"{methodName} When chain\", count, head);");
+					}
+				}
+				w.Line("return null;");
 			}
 			w.Line();
 		}
@@ -967,7 +1214,7 @@ internal static class MethodInterceptorRenderer
 			w.Line($"internal bool IsVerifiable => {isVerifiableExpr};");
 			w.Line();
 
-			// Build IsConfigured including simplified callbacks for each async overload
+			// Build IsConfigured including simplified callbacks and When chains for each overload
 			w.Line("/// <summary>Whether any overload has been configured.</summary>");
 			var isConfiguredParts = new List<string>();
 			foreach (var overload in overloads)
@@ -985,6 +1232,11 @@ internal static class MethodInterceptorRenderer
 				var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 				if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
 					parts.Add($"_onCallSimplifiedVoid_{overload.SignatureSuffix} != null");
+				// Add When chain check for overloads with parameters and no ref/out
+				var canHaveWhenChainForOverload = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+				var canHaveVoidWhenChainForOverload = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+				if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+					parts.Add($"(_whenChain_{overload.SignatureSuffix}?.Count ?? 0) > 0");
 				isConfiguredParts.Add(string.Join(" || ", parts));
 			}
 			var isConfiguredExpr = string.Join(" || ", isConfiguredParts);
@@ -1017,6 +1269,22 @@ internal static class MethodInterceptorRenderer
 						var countExpr = string.Join(" + ", countParts);
 						w.Line($"var count = {countExpr};");
 						w.Line($"if (!times.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", times, count);");
+					}
+					// Check When chain verification for this overload
+					var hasRefOrOutForWhen = HasRefOrOutParameters(overload.Parameters);
+					var canHaveWhenChainForOverload = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+					var canHaveVoidWhenChainForOverload = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+					if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+					{
+						w.Line($"if (_whenVerifiable_{overload.SignatureSuffix} && _whenChain_{overload.SignatureSuffix} != null && _whenChain_{overload.SignatureSuffix}.Count > 0)");
+						using (w.Braces())
+						{
+							w.Line($"var head = _whenChainHead_{overload.SignatureSuffix};");
+							w.Line($"var chainCount = _whenChain_{overload.SignatureSuffix}.Count;");
+							w.Line("// Chain must be fully consumed (HEAD at end or at terminal matcher)");
+							w.Line($"if (head < chainCount && !_whenChain_{overload.SignatureSuffix}[head].IsTerminal)");
+							w.Line($"\treturn global::KnockOff.VerificationFailure.SequenceIncomplete(\"{methodName} When chain\", chainCount, head);");
+						}
 					}
 				}
 				w.Line("return null;");
@@ -1059,6 +1327,22 @@ internal static class MethodInterceptorRenderer
 						var countExpr = string.Join(" + ", countParts);
 						w.Line($"var count = {countExpr};");
 						w.Line($"if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, count);");
+					}
+					// Check When chain for this overload if configured
+					var hasRefOrOutForWhen = HasRefOrOutParameters(overload.Parameters);
+					var canHaveWhenChainForOverload = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+					var canHaveVoidWhenChainForOverload = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+					if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+					{
+						w.Line($"if (_whenChain_{overload.SignatureSuffix} != null && _whenChain_{overload.SignatureSuffix}.Count > 0)");
+						using (w.Braces())
+						{
+							w.Line($"var head = _whenChainHead_{overload.SignatureSuffix};");
+							w.Line($"var chainCount = _whenChain_{overload.SignatureSuffix}.Count;");
+							w.Line("// Chain must be fully consumed (HEAD at end or at terminal matcher)");
+							w.Line($"if (head < chainCount && !_whenChain_{overload.SignatureSuffix}[head].IsTerminal)");
+							w.Line($"\treturn global::KnockOff.VerificationFailure.SequenceIncomplete(\"{methodName} When chain\", chainCount, head);");
+						}
 					}
 				}
 				w.Line("return null;");
@@ -1318,6 +1602,762 @@ internal static class MethodInterceptorRenderer
 
 	#endregion
 
+	#region When Chain Classes
+
+	/// <summary>
+	/// Renders the WhenMatcher abstract base class and its implementations.
+	/// These classes are parameterized by the method's parameters and return type.
+	/// </summary>
+	/// <param name="w">The code writer.</param>
+	/// <param name="parameters">Method parameters for Matches/Execute signatures.</param>
+	/// <param name="returnType">Return type for Execute method.</param>
+	/// <param name="delegateType">Delegate type for callbacks.</param>
+	/// <param name="signatureSuffix">Suffix for overload groups, null for single-signature.</param>
+	private static void RenderWhenMatcherClasses(
+		CodeWriter w,
+		EquatableArray<ParameterModel> parameters,
+		string returnType,
+		string delegateType,
+		string? signatureSuffix)
+	{
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var matchParams = BuildMatchParams(parameters);
+		var executeParams = BuildMatchParams(parameters);
+		var callbackArgs = BuildCallbackArgs(parameters);
+		var predicateType = BuildPredicateType(parameters);
+
+		// WhenMatcher abstract base
+		w.Line($"/// <summary>Abstract base for When chain matchers.</summary>");
+		w.Line($"private abstract class WhenMatcher{suffix}");
+		using (w.Braces())
+		{
+			w.Line($"public abstract bool Matches({matchParams});");
+			w.Line($"public abstract {returnType} Execute({executeParams});");
+			w.Line("public abstract bool IsTerminal { get; }");
+			w.Line("public int CallCount { get; set; }");
+		}
+		w.Line();
+
+		// WhenMatcherValue - predicate + value
+		w.Line($"/// <summary>Matcher that uses a predicate and returns a stored value.</summary>");
+		w.Line($"private sealed class WhenMatcherValue{suffix} : WhenMatcher{suffix}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {predicateType} _predicate;");
+			w.Line($"private readonly {returnType} _value;");
+			w.Line();
+			w.Line($"public WhenMatcherValue{suffix}({predicateType} predicate, {returnType} value)");
+			using (w.Braces())
+			{
+				w.Line("_predicate = predicate;");
+				w.Line("_value = value;");
+			}
+			w.Line();
+			w.Line($"public override bool Matches({matchParams}) => _predicate({callbackArgs});");
+			w.Line($"public override {returnType} Execute({executeParams}) => _value;");
+			w.Line("public override bool IsTerminal => false;");
+		}
+		w.Line();
+
+		// WhenMatcherCall - callback, always matches, terminal
+		w.Line($"/// <summary>Matcher that always matches and invokes a callback. Terminal.</summary>");
+		w.Line($"private sealed class WhenMatcherCall{suffix} : WhenMatcher{suffix}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {delegateType} _callback;");
+			w.Line();
+			w.Line($"public WhenMatcherCall{suffix}({delegateType} callback) => _callback = callback;");
+			w.Line();
+			w.Line($"public override bool Matches({matchParams}) => true;");
+			w.Line($"public override {returnType} Execute({executeParams}) => _callback({callbackArgs});");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+
+		// WhenMatcherNone - never matches, terminal
+		w.Line($"/// <summary>Matcher that never matches. Used to close chain without fallback. Terminal.</summary>");
+		w.Line($"private sealed class WhenMatcherNone{suffix} : WhenMatcher{suffix}");
+		using (w.Braces())
+		{
+			w.Line($"public override bool Matches({matchParams}) => false;");
+			w.Line($"public override {returnType} Execute({executeParams}) => default!;");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the WhenBuilderImpl nested class.
+	/// Holds a pending predicate and exposes Returns(value) to complete the matcher.
+	/// </summary>
+	private static void RenderWhenBuilderImpl(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string returnType,
+		string delegateType,
+		string? signatureSuffix)
+	{
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var predicateType = BuildPredicateType(parameters);
+		var whenChainField = signatureSuffix == null ? "_whenChain" : $"_whenChain_{signatureSuffix}";
+
+		// Check if this is an async method (Task<T> or ValueTask<T>)
+		var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(returnType);
+		var isAsync = isTaskT || isValueTaskT;
+
+		w.Line($"/// <summary>Builder for When matchers. Captures predicate, awaits Returns(value).</summary>");
+		w.Line($"public sealed class WhenBuilder{suffix} : global::KnockOff.IWhenBuilder<{delegateType}, {returnType}>");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _interceptor;");
+			w.Line($"private readonly {predicateType} _predicate;");
+			w.Line();
+
+			w.Line($"public WhenBuilder{suffix}({interceptorClassName} interceptor, {predicateType} predicate)");
+			using (w.Braces())
+			{
+				w.Line("_interceptor = interceptor;");
+				w.Line("_predicate = predicate;");
+			}
+			w.Line();
+
+			// For async methods (Task<T>/ValueTask<T>), generate Returns(TInner) that auto-wraps
+			if (isAsync)
+			{
+				// Returns accepts the unwrapped type and wraps internally
+				w.Line($"/// <summary>Configures the return value. Auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+				w.Line($"public WhenChain{suffix} Returns({innerType} value)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<WhenMatcher{suffix}>();");
+					// Wrap with Task.FromResult or new ValueTask<T>
+					if (isTaskT)
+						w.Line($"_interceptor.{whenChainField}.Add(new WhenMatcherValue{suffix}(_predicate, global::System.Threading.Tasks.Task.FromResult(value)));");
+					else
+						w.Line($"_interceptor.{whenChainField}.Add(new WhenMatcherValue{suffix}(_predicate, new global::System.Threading.Tasks.ValueTask<{innerType}>(value)));");
+					w.Line($"return new WhenChain{suffix}(_interceptor);");
+				}
+				w.Line();
+				// Explicit interface implementation wraps too
+				if (isTaskT)
+					w.Line($"global::KnockOff.IWhenChain<{delegateType}, {returnType}> global::KnockOff.IWhenBuilder<{delegateType}, {returnType}>.Returns({returnType} value) => Returns(value.Result);");
+				else
+					w.Line($"global::KnockOff.IWhenChain<{delegateType}, {returnType}> global::KnockOff.IWhenBuilder<{delegateType}, {returnType}>.Returns({returnType} value) => Returns(value.Result);");
+			}
+			else
+			{
+				// Non-async: Returns accepts the full return type directly
+				w.Line($"public WhenChain{suffix} Returns({returnType} value)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<WhenMatcher{suffix}>();");
+					w.Line($"_interceptor.{whenChainField}.Add(new WhenMatcherValue{suffix}(_predicate, value));");
+					w.Line($"return new WhenChain{suffix}(_interceptor);");
+				}
+				w.Line();
+				// Explicit interface implementation for IWhenBuilder.Returns
+				w.Line($"global::KnockOff.IWhenChain<{delegateType}, {returnType}> global::KnockOff.IWhenBuilder<{delegateType}, {returnType}>.Returns({returnType} value) => Returns(value);");
+			}
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the WhenChainImpl nested class.
+	/// Implements IWhenChain with ThenCall, ThenNone, Verify, Reset, Verifiable.
+	/// ThenWhen overloads are generated separately (they require parameter types).
+	/// </summary>
+	private static void RenderWhenChainImpl(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string returnType,
+		string delegateType,
+		string? signatureSuffix)
+	{
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var whenChainField = signatureSuffix == null ? "_whenChain" : $"_whenChain_{signatureSuffix}";
+		var whenChainHeadField = signatureSuffix == null ? "_whenChainHead" : $"_whenChainHead_{signatureSuffix}";
+		var whenVerifiableField = signatureSuffix == null ? "_whenVerifiable" : $"_whenVerifiable_{signatureSuffix}";
+		var predicateType = BuildPredicateType(parameters);
+		var paramTypeList = BuildParamTypeList(parameters);
+
+		w.Line($"/// <summary>When chain implementation with ThenCall, ThenNone, verification support.</summary>");
+		w.Line($"public sealed class WhenChain{suffix} : global::KnockOff.IWhenChain<{delegateType}, {returnType}>");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _interceptor;");
+			w.Line();
+
+			w.Line($"public WhenChain{suffix}({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line();
+
+			// ThenWhen with values and predicate
+			if (parameters.Count > 0)
+			{
+				w.Line($"/// <summary>Adds another matcher with exact value matching.</summary>");
+				w.Line($"public WhenBuilder{suffix} ThenWhen({paramTypeList})");
+				using (w.Braces())
+				{
+					// Build equality predicate - lambda params are prefixed with _ to avoid shadowing method params
+					var lambdaParams = BuildLambdaParamsForEquality(parameters);
+					var predicateBody = BuildEqualityPredicateBody(parameters);
+					w.Line($"return new WhenBuilder{suffix}(_interceptor, ({lambdaParams}) => {predicateBody});");
+				}
+				w.Line();
+
+				// ThenWhen with predicate
+				w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
+				w.Line($"public WhenBuilder{suffix} ThenWhen({predicateType} predicate)");
+				using (w.Braces())
+				{
+					w.Line($"return new WhenBuilder{suffix}(_interceptor, predicate);");
+				}
+				w.Line();
+			}
+
+			// ThenCall - terminal with callback
+			w.Line($"/// <summary>Adds an unconditional callback as terminal matcher.</summary>");
+			w.Line($"public global::KnockOff.IWhenTracking ThenCall({delegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<WhenMatcher{suffix}>();");
+				w.Line($"_interceptor.{whenChainField}.Add(new WhenMatcherCall{suffix}(callback));");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// ThenNone - terminal that never matches
+			w.Line($"/// <summary>Closes chain with no matcher. Falls through when exhausted.</summary>");
+			w.Line($"public global::KnockOff.IWhenTracking ThenNone()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<WhenMatcher{suffix}>();");
+				w.Line($"_interceptor.{whenChainField}.Add(new WhenMatcherNone{suffix}());");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// Verify - checks if chain reached terminal state
+			w.Line($"/// <summary>Verifies the When chain was fully consumed (reached terminal state).</summary>");
+			w.Line("public void Verify()");
+			using (w.Braces())
+			{
+				w.Line($"if (_interceptor.{whenChainField} == null || _interceptor.{whenChainField}.Count == 0) return;");
+				w.Line($"var head = _interceptor.{whenChainHeadField};");
+				w.Line($"var count = _interceptor.{whenChainField}.Count;");
+				w.Line("// Chain is complete if HEAD reached a terminal matcher or exhausted");
+				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal)");
+				using (w.Braces())
+				{
+					w.Line("throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
+				}
+			}
+			w.Line();
+
+			// Reset - resets HEAD and all matcher CallCounts
+			w.Line($"/// <summary>Resets When chain HEAD and all matcher call counts.</summary>");
+			w.Line("public void Reset()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{whenChainHeadField} = 0;");
+				w.Line($"if (_interceptor.{whenChainField} != null)");
+				using (w.Braces())
+				{
+					w.Line($"foreach (var matcher in _interceptor.{whenChainField})");
+					w.Line("\tmatcher.CallCount = 0;");
+				}
+			}
+			w.Line();
+
+			// Verifiable - marks for Stub.Verify()
+			w.Line($"/// <summary>Marks this When chain for verification by Stub.Verify().</summary>");
+			w.Line($"public WhenChain{suffix} Verifiable()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{whenVerifiableField} = true;");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// Explicit interface implementations for IWhenChain.Verifiable and IWhenTracking.Verifiable
+			w.Line($"global::KnockOff.IWhenChain<{delegateType}, {returnType}> global::KnockOff.IWhenChain<{delegateType}, {returnType}>.Verifiable() => Verifiable();");
+			w.Line("global::KnockOff.IWhenTracking global::KnockOff.IWhenTracking.Verifiable() => Verifiable();");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the When() entry point methods for parameter-specific matching.
+	/// Generates both value overload (exact matching) and predicate overload (Func&lt;T1, T2, bool&gt;).
+	/// </summary>
+	/// <param name="w">The code writer.</param>
+	/// <param name="interceptorClassName">The full interceptor class name including type parameters.</param>
+	/// <param name="parameters">Method parameters for When() signature.</param>
+	/// <param name="returnType">Return type for IWhenBuilder.</param>
+	/// <param name="delegateType">Delegate type for IWhenBuilder.</param>
+	/// <param name="signatureSuffix">Suffix for overload groups, null for single-signature.</param>
+	/// <param name="methodNameSuffix">Suffix for method name to disambiguate return-type-only overloads.</param>
+	private static void RenderWhenEntryPoints(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string returnType,
+		string delegateType,
+		string? signatureSuffix,
+		string? methodNameSuffix = null)
+	{
+		// When() requires parameters - parameterless methods cannot use When()
+		if (parameters.Count == 0) return;
+
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var whenChainField = signatureSuffix == null ? "_whenChain" : $"_whenChain_{signatureSuffix}";
+		var predicateType = UnifiedInterceptorBuilder.BuildWhenPredicateType(parameters);
+		var paramTypeList = BuildParamTypeList(parameters);
+		var whenMethodName = methodNameSuffix == null ? "When" : $"When_{methodNameSuffix}";
+
+		// When() value overload - exact value matching via Object.Equals
+		// Returns concrete type to enable fluent ThenWhen chaining
+		w.Line($"/// <summary>Configures parameter-specific matching with exact values. Returns builder for Returns().</summary>");
+		w.Line($"public WhenBuilder{suffix} {whenMethodName}({paramTypeList})");
+		using (w.Braces())
+		{
+			// Initialize When chain if null
+			w.Line($"{whenChainField} ??= new global::System.Collections.Generic.List<WhenMatcher{suffix}>();");
+
+			// Build equality predicate - use indexed lambda params to avoid keyword conflicts
+			var lambdaParams = BuildLambdaParamsForEquality(parameters);
+			var predicateBody = BuildEqualityPredicateBody(parameters);
+			w.Line($"return new WhenBuilder{suffix}(this, ({lambdaParams}) => {predicateBody});");
+		}
+		w.Line();
+
+		// When() predicate overload - Func<T1, T2, bool>
+		// Returns concrete type to enable fluent ThenWhen chaining
+		w.Line($"/// <summary>Configures parameter-specific matching with predicate. Returns builder for Returns().</summary>");
+		w.Line($"public WhenBuilder{suffix} {whenMethodName}({predicateType} predicate)");
+		using (w.Braces())
+		{
+			// Initialize When chain if null
+			w.Line($"{whenChainField} ??= new global::System.Collections.Generic.List<WhenMatcher{suffix}>();");
+			w.Line($"return new WhenBuilder{suffix}(this, predicate);");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Builds a parameter list for Matches/Execute methods (e.g., "int a, string b").
+	/// </summary>
+	private static string BuildMatchParams(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "";
+		return string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}"));
+	}
+
+	/// <summary>
+	/// Builds the predicate Func type for When matching (e.g., "Func&lt;int, string, bool&gt;").
+	/// </summary>
+	private static string BuildPredicateType(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0)
+			return "global::System.Func<bool>";
+
+		var paramTypes = string.Join(", ", parameters.Select(p => p.Type));
+		return $"global::System.Func<{paramTypes}, bool>";
+	}
+
+	/// <summary>
+	/// Builds a comma-separated list of parameter types (e.g., "int a, string b").
+	/// </summary>
+	private static string BuildParamTypeList(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "";
+		return string.Join(", ", parameters.Select(p => $"{p.Type} {p.EscapedName}"));
+	}
+
+	/// <summary>
+	/// Builds lambda parameter names (e.g., "a, b" for use in "(a, b) => ...").
+	/// </summary>
+	private static string BuildLambdaParams(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "";
+		return string.Join(", ", parameters.Select(p => p.EscapedName));
+	}
+
+	/// <summary>
+	/// Builds lambda parameter names for equality comparisons using indexed names to avoid keyword conflicts.
+	/// E.g., "_arg0, _arg1" for use in "(_arg0, _arg1) => Equals(_arg0, a) &amp;&amp; Equals(_arg1, b)".
+	/// </summary>
+	private static string BuildLambdaParamsForEquality(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "";
+		// Use indexed names to avoid conflicts with C# keywords and the method parameters
+		return string.Join(", ", Enumerable.Range(0, parameters.Count).Select(i => $"_arg{i}"));
+	}
+
+	/// <summary>
+	/// Builds an equality predicate body comparing lambda params (indexed) to method params.
+	/// E.g., "Equals(_arg0, a) &amp;&amp; Equals(_arg1, b)".
+	/// Uses Object.Equals for null-safety.
+	/// </summary>
+	private static string BuildEqualityPredicateBody(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0) return "true";
+
+		var parts = new List<string>();
+		for (int i = 0; i < parameters.Count; i++)
+		{
+			// Lambda param is indexed (_arg0, _arg1, etc.), method param is the expected value
+			parts.Add($"global::System.Object.Equals(_arg{i}, {parameters.GetArray()![i].EscapedName})");
+		}
+		return string.Join(" && ", parts);
+	}
+
+	#endregion
+
+	#region Void When Chain Classes
+
+	/// <summary>
+	/// Renders the When() entry point methods for void methods.
+	/// For void methods, When() returns IVoidWhenChain directly (no builder needed).
+	/// </summary>
+	/// <param name="methodNameSuffix">Suffix for method name to disambiguate return-type-only overloads.</param>
+	private static void RenderVoidWhenEntryPoints(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string delegateType,
+		string? signatureSuffix,
+		string? methodNameSuffix = null)
+	{
+		// When() requires parameters - parameterless methods cannot use When()
+		if (parameters.Count == 0) return;
+
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var whenChainField = signatureSuffix == null ? "_whenChain" : $"_whenChain_{signatureSuffix}";
+		var predicateType = UnifiedInterceptorBuilder.BuildWhenPredicateType(parameters);
+		var paramTypeList = BuildParamTypeList(parameters);
+		var whenMethodName = methodNameSuffix == null ? "When" : $"When_{methodNameSuffix}";
+		var chainType = $"VoidWhenChain{suffix}";
+
+		// When() value overload - exact value matching via Object.Equals
+		// Returns concrete type to enable fluent ThenWhen chaining
+		w.Line($"/// <summary>Configures parameter-specific matching with exact values for void method. Returns chain directly.</summary>");
+		w.Line($"public {chainType} {whenMethodName}({paramTypeList})");
+		using (w.Braces())
+		{
+			// Initialize When chain if null
+			w.Line($"{whenChainField} ??= new global::System.Collections.Generic.List<VoidWhenMatcher{suffix}>();");
+
+			// Build equality predicate - use indexed lambda params to avoid keyword conflicts
+			var lambdaParams = BuildLambdaParamsForEquality(parameters);
+			var predicateBody = BuildEqualityPredicateBody(parameters);
+
+			// Add matcher immediately (no builder needed for void)
+			w.Line($"var matcher = new VoidWhenMatcherPredicate{suffix}(({lambdaParams}) => {predicateBody});");
+			w.Line($"{whenChainField}.Add(matcher);");
+			w.Line($"return new {chainType}(this, matcher);");
+		}
+		w.Line();
+
+		// When() predicate overload - Func<T1, T2, bool>
+		// Returns concrete type to enable fluent ThenWhen chaining
+		w.Line($"/// <summary>Configures parameter-specific matching with predicate for void method. Returns chain directly.</summary>");
+		w.Line($"public {chainType} {whenMethodName}({predicateType} predicate)");
+		using (w.Braces())
+		{
+			// Initialize When chain if null
+			w.Line($"{whenChainField} ??= new global::System.Collections.Generic.List<VoidWhenMatcher{suffix}>();");
+			w.Line($"var matcher = new VoidWhenMatcherPredicate{suffix}(predicate);");
+			w.Line($"{whenChainField}.Add(matcher);");
+			w.Line($"return new {chainType}(this, matcher);");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the void When chain invoke check logic.
+	/// For void methods - executes callback if configured, no return value.
+	/// </summary>
+	private static void RenderVoidWhenChainInvokeCheck(
+		CodeWriter w,
+		EquatableArray<ParameterModel> parameters,
+		string? signatureSuffix)
+	{
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var whenChainField = signatureSuffix == null ? "_whenChain" : $"_whenChain_{signatureSuffix}";
+		var whenChainHeadField = signatureSuffix == null ? "_whenChainHead" : $"_whenChainHead_{signatureSuffix}";
+		var callbackArgs = BuildCallbackArgs(parameters);
+
+		w.Line($"// When chain - check HEAD matcher first (highest priority)");
+		w.Line($"if ({whenChainField} != null && {whenChainHeadField} < {whenChainField}.Count)");
+		using (w.Braces())
+		{
+			w.Line($"var matcher = {whenChainField}[{whenChainHeadField}];");
+			w.Line($"if (matcher.Matches({callbackArgs}))");
+			using (w.Braces())
+			{
+				w.Line("matcher.CallCount++;");
+				w.Line();
+				w.Line("// Advance HEAD unless at last matcher (which repeats)");
+				w.Line($"if ({whenChainHeadField} < {whenChainField}.Count - 1)");
+				using (w.Braces())
+				{
+					w.Line($"{whenChainHeadField}++;");
+				}
+				w.Line("// At last matcher: never advance (repeat behavior for both ThenWhen and ThenCall)");
+				w.Line();
+
+				// Execute (void) and return - no return value
+				w.Line($"matcher.Execute({callbackArgs});");
+				w.Line("return;");
+			}
+			w.Line("else if (matcher.IsTerminal)");
+			using (w.Braces())
+			{
+				w.Line("// ThenNone: didn't match (always false), exhaust by advancing past it");
+				w.Line($"{whenChainHeadField}++;");
+			}
+			w.Line("// Non-terminal didn't match: fall through to rest of priority chain");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the VoidWhenMatcher abstract base class and its implementations.
+	/// </summary>
+	private static void RenderVoidWhenMatcherClasses(
+		CodeWriter w,
+		EquatableArray<ParameterModel> parameters,
+		string delegateType,
+		string? signatureSuffix)
+	{
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var matchParams = BuildMatchParams(parameters);
+		var callbackArgs = BuildCallbackArgs(parameters);
+		var predicateType = BuildPredicateType(parameters);
+
+		// VoidWhenMatcher abstract base
+		w.Line($"/// <summary>Abstract base for void When chain matchers.</summary>");
+		w.Line($"internal abstract class VoidWhenMatcher{suffix}");
+		using (w.Braces())
+		{
+			w.Line($"public abstract bool Matches({matchParams});");
+			w.Line($"public abstract void Execute({matchParams});");
+			w.Line("public abstract bool IsTerminal { get; }");
+			w.Line("public int CallCount { get; set; }");
+			w.Line($"public {delegateType}? Callback {{ get; set; }}");
+		}
+		w.Line();
+
+		// VoidWhenMatcherPredicate - predicate with optional callback
+		w.Line($"/// <summary>Matcher that uses a predicate and optionally invokes a callback.</summary>");
+		w.Line($"private sealed class VoidWhenMatcherPredicate{suffix} : VoidWhenMatcher{suffix}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {predicateType} _predicate;");
+			w.Line();
+			w.Line($"public VoidWhenMatcherPredicate{suffix}({predicateType} predicate) => _predicate = predicate;");
+			w.Line();
+			w.Line($"public override bool Matches({matchParams}) => _predicate({callbackArgs});");
+			w.Line($"public override void Execute({matchParams}) {{ Callback?.Invoke({callbackArgs}); }}");
+			w.Line("public override bool IsTerminal => false;");
+		}
+		w.Line();
+
+		// VoidWhenMatcherCall - callback, always matches, terminal
+		w.Line($"/// <summary>Matcher that always matches and invokes a callback. Terminal.</summary>");
+		w.Line($"private sealed class VoidWhenMatcherCall{suffix} : VoidWhenMatcher{suffix}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {delegateType} _callback;");
+			w.Line();
+			w.Line($"public VoidWhenMatcherCall{suffix}({delegateType} callback) => _callback = callback;");
+			w.Line();
+			w.Line($"public override bool Matches({matchParams}) => true;");
+			w.Line($"public override void Execute({matchParams}) => _callback({callbackArgs});");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+
+		// VoidWhenMatcherNone - never matches, terminal
+		w.Line($"/// <summary>Matcher that never matches. Used to close chain without fallback. Terminal.</summary>");
+		w.Line($"private sealed class VoidWhenMatcherNone{suffix} : VoidWhenMatcher{suffix}");
+		using (w.Braces())
+		{
+			w.Line($"public override bool Matches({matchParams}) => false;");
+			w.Line($"public override void Execute({matchParams}) {{ }}");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the VoidWhenChainImpl nested class.
+	/// </summary>
+	private static void RenderVoidWhenChainImpl(
+		CodeWriter w,
+		string interceptorClassName,
+		EquatableArray<ParameterModel> parameters,
+		string delegateType,
+		string? signatureSuffix)
+	{
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var whenChainField = signatureSuffix == null ? "_whenChain" : $"_whenChain_{signatureSuffix}";
+		var whenChainHeadField = signatureSuffix == null ? "_whenChainHead" : $"_whenChainHead_{signatureSuffix}";
+		var whenVerifiableField = signatureSuffix == null ? "_whenVerifiable" : $"_whenVerifiable_{signatureSuffix}";
+		var predicateType = BuildPredicateType(parameters);
+		var paramTypeList = BuildParamTypeList(parameters);
+
+		w.Line($"/// <summary>Void When chain implementation with Call, ThenWhen, ThenCall, ThenNone, verification support.</summary>");
+		w.Line($"public sealed class VoidWhenChain{suffix} : global::KnockOff.IVoidWhenChain<{delegateType}>");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _interceptor;");
+			w.Line($"private readonly VoidWhenMatcher{suffix} _currentMatcher;");
+			w.Line();
+
+			w.Line($"internal VoidWhenChain{suffix}({interceptorClassName} interceptor, VoidWhenMatcher{suffix} currentMatcher)");
+			using (w.Braces())
+			{
+				w.Line("_interceptor = interceptor;");
+				w.Line("_currentMatcher = currentMatcher;");
+			}
+			w.Line();
+
+			var chainType = $"VoidWhenChain{suffix}";
+
+			// Call - sets optional callback on current matcher
+			// Returns concrete type to enable fluent ThenWhen chaining
+			w.Line($"/// <summary>Sets an optional callback to invoke when this matcher matches.</summary>");
+			w.Line($"public {chainType} Call({delegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line("_currentMatcher.Callback = callback;");
+				w.Line("return this;");
+			}
+			w.Line();
+			// Explicit interface implementation for IVoidWhenChain.Call
+			w.Line($"global::KnockOff.IVoidWhenChain<{delegateType}> global::KnockOff.IVoidWhenChain<{delegateType}>.Call({delegateType} callback) => Call(callback);");
+			w.Line();
+
+			// ThenWhen with values and predicate
+			if (parameters.Count > 0)
+			{
+				w.Line($"/// <summary>Adds another matcher with exact value matching.</summary>");
+				w.Line($"public {chainType} ThenWhen({paramTypeList})");
+				using (w.Braces())
+				{
+					// Build equality predicate - lambda params are prefixed with _ to avoid shadowing method params
+					var lambdaParams = BuildLambdaParamsForEquality(parameters);
+					var predicateBody = BuildEqualityPredicateBody(parameters);
+					w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<VoidWhenMatcher{suffix}>();");
+					w.Line($"var matcher = new VoidWhenMatcherPredicate{suffix}(({lambdaParams}) => {predicateBody});");
+					w.Line($"_interceptor.{whenChainField}.Add(matcher);");
+					w.Line($"return new {chainType}(_interceptor, matcher);");
+				}
+				w.Line();
+
+				// ThenWhen with predicate
+				w.Line($"/// <summary>Adds another matcher with predicate matching.</summary>");
+				w.Line($"public {chainType} ThenWhen({predicateType} predicate)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<VoidWhenMatcher{suffix}>();");
+					w.Line($"var matcher = new VoidWhenMatcherPredicate{suffix}(predicate);");
+					w.Line($"_interceptor.{whenChainField}.Add(matcher);");
+					w.Line($"return new {chainType}(_interceptor, matcher);");
+				}
+				w.Line();
+			}
+
+			// ThenCall - terminal with callback
+			w.Line($"/// <summary>Adds an unconditional callback as terminal matcher.</summary>");
+			w.Line($"public global::KnockOff.IWhenTracking ThenCall({delegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<VoidWhenMatcher{suffix}>();");
+				w.Line($"_interceptor.{whenChainField}.Add(new VoidWhenMatcherCall{suffix}(callback));");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// ThenNone - terminal that never matches
+			w.Line($"/// <summary>Closes chain with no matcher. Falls through when exhausted.</summary>");
+			w.Line($"public global::KnockOff.IWhenTracking ThenNone()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<VoidWhenMatcher{suffix}>();");
+				w.Line($"_interceptor.{whenChainField}.Add(new VoidWhenMatcherNone{suffix}());");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// Verify() - checks if chain reached terminal state (from ITracking)
+			w.Line($"/// <summary>Verifies the When chain was fully consumed (reached terminal state).</summary>");
+			w.Line("public void Verify()");
+			using (w.Braces())
+			{
+				w.Line($"if (_interceptor.{whenChainField} == null || _interceptor.{whenChainField}.Count == 0) return;");
+				w.Line($"var head = _interceptor.{whenChainHeadField};");
+				w.Line($"var count = _interceptor.{whenChainField}.Count;");
+				w.Line("// Chain is complete if HEAD reached a terminal matcher or exhausted");
+				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal)");
+				using (w.Braces())
+				{
+					w.Line("throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
+				}
+			}
+			w.Line();
+
+			// Verify(Times) - parameter-specific verification for current matcher
+			w.Line($"/// <summary>Verifies this specific matcher was called the expected number of times.</summary>");
+			w.Line("public void Verify(global::KnockOff.Times times)");
+			using (w.Braces())
+			{
+				w.Line("if (!times.Validate(_currentMatcher.CallCount))");
+				using (w.Braces())
+				{
+					w.Line("throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"When matcher\", times, _currentMatcher.CallCount));");
+				}
+			}
+			w.Line();
+
+			// Reset - resets HEAD and all matcher CallCounts
+			w.Line($"/// <summary>Resets When chain HEAD and all matcher call counts.</summary>");
+			w.Line("public void Reset()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{whenChainHeadField} = 0;");
+				w.Line($"if (_interceptor.{whenChainField} != null)");
+				using (w.Braces())
+				{
+					w.Line($"foreach (var matcher in _interceptor.{whenChainField})");
+					w.Line("\tmatcher.CallCount = 0;");
+				}
+			}
+			w.Line();
+
+			// Verifiable - marks for Stub.Verify() - returns concrete type for chaining
+			w.Line($"/// <summary>Marks this When chain for verification by Stub.Verify().</summary>");
+			w.Line($"public {chainType} Verifiable()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{whenVerifiableField} = true;");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// Explicit interface implementations
+			w.Line($"global::KnockOff.IVoidWhenChain<{delegateType}> global::KnockOff.IVoidWhenChain<{delegateType}>.Verifiable() => Verifiable();");
+			w.Line("global::KnockOff.IWhenTracking global::KnockOff.IWhenTracking.Verifiable() => Verifiable();");
+		}
+		w.Line();
+	}
+
+	#endregion
+
 	#region Helpers
 
 	private static string GetOwnerWithParams(UnifiedMethodInterceptorModel model)
@@ -1439,6 +2479,35 @@ internal static class MethodInterceptorRenderer
 	private static bool HasRefOrOutParameters(EquatableArray<ParameterModel> parameters)
 	{
 		return parameters.Any(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Ref || p.RefKind == Microsoft.CodeAnalysis.RefKind.Out);
+	}
+
+	/// <summary>
+	/// Checks if overloads contain return-type-only differences (same params, different returns).
+	/// When true, When() methods need return type suffix to avoid conflicts.
+	/// </summary>
+	private static bool HasReturnTypeOnlyOverloads(EquatableArray<MethodOverloadSignature> overloads)
+	{
+		// Group by parameter types only (excluding return type from the signature suffix)
+		// If any group has more than one entry, we have return-type-only differences
+		var paramGroups = new Dictionary<string, int>();
+		foreach (var overload in overloads)
+		{
+			// Build a key from parameter types only
+			var paramKey = overload.Parameters.Count == 0
+				? "NoParams"
+				: string.Join("_", overload.Parameters.Select(p => UnifiedInterceptorBuilder.GetTypeSuffix(p.Type)));
+
+			if (paramGroups.TryGetValue(paramKey, out var count))
+			{
+				paramGroups[paramKey] = count + 1;
+			}
+			else
+			{
+				paramGroups[paramKey] = 1;
+			}
+		}
+
+		return paramGroups.Values.Any(count => count > 1);
 	}
 
 	#endregion
