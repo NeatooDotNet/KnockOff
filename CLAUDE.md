@@ -42,6 +42,7 @@ When defining scope, explicitly state which patterns and members are affected:
 ## Folder Structure
 
 - `src/` - Source code
+- `src/Design/` - **API design source of truth** (see below)
 - `docs/` - Documentation (markdown)
 - `docs/todos/` - Project todos (use `/project-todos` skill)
 - `docs/plans/` - Design documents (use `/project-todos` skill)
@@ -52,6 +53,25 @@ When defining scope, explicitly state which patterns and members are affected:
 - Actively working on a specific todo or plan
 - Adding a new release note
 Never load these folders to understand the codebase, research history, or problem-solve.
+
+## Design Projects (Source of Truth)
+
+**The `src/Design/` directory is the authoritative source of truth for KnockOff's API.**
+
+When answering questions about how KnockOff works:
+1. Read the relevant file in `src/Design/Design.Stubs/`
+2. Trust the code and comments as ground truth
+3. Never guess - verify against these files
+
+Key files by topic:
+- **Stub patterns**: `StubPatterns/AllPatterns.cs`
+- **Methods**: `Methods/BasicMethods.cs`, `Methods/WhenMatching.cs`
+- **Properties**: `Properties/PropertyBasics.cs`
+- **Indexers**: `Indexers/IndexerBasics.cs`
+- **Events**: `Events/EventPatterns.cs`
+- **Advanced**: `Advanced/` (Source delegation, Strict mode, Verification)
+
+See `src/Design/CLAUDE-DESIGN.md` for Claude-specific guidance.
 
 ## Plan Mode and Project Todos
 

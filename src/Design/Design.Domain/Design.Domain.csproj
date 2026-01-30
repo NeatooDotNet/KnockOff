@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>Design.Domain</RootNamespace>
+		<AssemblyName>Design.Domain</AssemblyName>
+		<IsPackable>false</IsPackable>
+		<!-- Suppress code analysis rules that conflict with demo purposes:
+		     - CA1003: We intentionally use Action-based events to demonstrate KnockOff handles them
+		     - CA1711: We use names ending in 'Collection' for clarity in demos
+		     - CA1716: We use 'Stop' method for clarity in demos -->
+		<NoWarn>$(NoWarn);CA1003;CA1711;CA1716</NoWarn>
+	</PropertyGroup>
+
+</Project>
