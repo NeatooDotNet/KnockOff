@@ -56,12 +56,36 @@ No other mocking framework has this. Perfect for integration tests, decorator pa
 |------|-------------|----------|
 | **Return value** | `calc.Add(1, 2).Returns(3);` | `stub.Add.Returns(3);` |
 | **Any argument** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(10);` | `stub.Add.Returns(10);` |
-| **Conditional** | `calc.Add(Arg.Is<int>(x => x > 0), Arg.Any<int>()).Returns(x => ...);` | `stub.Add.OnCall((a, b) => a > 0 ? a + b : 0);` |
-| **Throw** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Throws<InvalidOperationException>();` | `stub.Add.OnCall((a, b) => throw new InvalidOperationException());` |
+| **Match values** | `calc.Add(1, 2).Returns(100);` | `stub.Add.When(1, 2).Returns(100);` |
+| **Conditional** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(x => ...);` | `stub.Add.OnCall((a, b) => a > 0 ? a + b : 0);` |
+| **Throw** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Throws<Exception>();` | `stub.Add.OnCall((a, b) => throw new Exception());` |
 | **Callback** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(3).AndDoes(x => ...);` | `stub.Add.OnCall((a, b) => { log.Add(a); return 3; });` |
+| **Sequence** | `calc.Add(1, 2).Returns(1, 2, 3);` | `stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2).ThenCall((a, b) => 3);` |
 | **Async** | `repo.GetUserAsync(1).Returns(user);` | `stub.GetUserAsync.Returns(user);` |
 | **Verify called** | `calc.Received().Add(1, 2);` | `stub.Add.Verify();` |
 | **Verify count** | `calc.Received(3).Add(Arg.Any<int>(), Arg.Any<int>());` | `stub.Add.Verify(Times.Exactly(3));` |
+
+### Argument Matching
+
+```csharp
+// NSubstitute - Arg.Is<T> per parameter (permanent matchers)
+calc.Add(Arg.Is<int>(a => a > 0), Arg.Any<int>()).Returns(100);
+
+// KnockOff - OnCall with conditional (permanent, matches all calls)
+stub.Add.OnCall((a, b) => a > 0 ? 100 : 0);
+
+// KnockOff - When() for sequential matching (first match returns 100, then falls through)
+stub.Add.When((a, b) => a > 0).Returns(100).ThenCall((a, b) => a + b);
+
+// Multiple specific values
+calc.Add(1, 2).Returns(100);
+calc.Add(3, 4).Returns(200);
+
+stub.Add.When(1, 2).Returns(100);
+stub.Add.When(3, 4).Returns(200);
+```
+
+**Note:** NSubstitute's matchers are permanent—they match all qualifying calls. KnockOff's `When()` is sequential—matchers are consumed in order. Use `OnCall()` with conditionals for permanent matching behavior.
 
 ### Argument Capture
 
@@ -127,6 +151,8 @@ KnockOff covers the features NSubstitute users expect:
 |---------|----------|-------------|
 | **Returns** | `Returns(value)` | `.Returns(value)` |
 | **Returns with logic** | `OnCall((args) => value)` | `.Returns(x => value)` |
+| **Argument matching** | `When(args).Returns(value)` | `Arg.Is<T>()` per parameter |
+| **Sequences** | `OnCall().ThenCall()` | `.Returns(v1, v2, v3)` |
 | **Callbacks** | Built into `OnCall` | `.AndDoes(callback)` |
 | **Throws** | `OnCall(() => throw ...)` | `.Throws<T>()` |
 | **Async methods** | Auto-wrapped | Auto-wrapped |
@@ -144,7 +170,7 @@ KnockOff covers the features NSubstitute users expect:
 
 | Feature | Why It's Better |
 |---------|-----------------|
-| **No matcher DSL** | `Arg.Any<>`, `Arg.Is<>` replaced with plain C# conditionals |
+| **Parameter matching** | `When((a, b) => a > 0)` matches all params at once vs `Arg.Is<>` per param |
 | **Named tuple capture** | `var (a, b) = tracking.LastArgs` vs manual `Arg.Do<>` setup |
 | **Source delegation** | Delegate to real implementation, override specific methods |
 | **Event verification** | `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` |

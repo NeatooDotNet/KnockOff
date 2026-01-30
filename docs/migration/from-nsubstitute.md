@@ -36,10 +36,10 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 
 **KnockOff's approach:**
 - Compile-time source generation with partial classes
-- `OnCall` delegates for behavior configuration
+- `Returns()` or `OnCall()` delegates for behavior configuration
 - `Verifiable()` + `Verify()` for batch verification
-- Conditional logic in callbacks for argument matching
-- Explicit `Task.FromResult()` for async methods
+- `When()` API for declarative argument matching (similar to `Arg.Is<T>()`)
+- Auto-wrapped `Task.FromResult()` for async methods with `Returns()`
 - No recursive mocking support
 
 **What stays the same:**
@@ -55,10 +55,9 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 
 | Feature | NSubstitute | KnockOff | Verdict |
 |---------|-------------|----------|---------|
-| **API elegance** | `.Returns(42)` | `OnCall(() => 42)` | NSub is cleaner |
+| **API elegance** | `.Returns(42)` | `.Returns(42)` or `OnCall(() => 42)` | Comparable |
 | **Verification readability** | `sub.Received().Method()` | `tracking.Verify(Times.Once)` | NSub is more intuitive |
-| **Async setup** | `.Returns(user)` auto-wraps | `Task.FromResult(user)` required | NSub is simpler |
-| **Argument matchers** | `Arg.Is<T>(x => ...)` | Conditional in callback | NSub is more declarative |
+| **Async setup** | `.Returns(user)` auto-wraps | `.Returns(user)` auto-wraps | Comparable |
 | **Learning curve** | Familiar to most C# devs | New patterns to learn | NSub wins |
 | **Recursive mocks** | Built-in support | Not supported | NSub only |
 
@@ -71,6 +70,9 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 | **Generated code** | Visible, debuggable | Hidden proxy magic | KnockOff wins |
 | **Performance** | Zero reflection overhead | Dynamic proxy cost | KnockOff wins |
 | **Default behavior** | Configure in stub class | Repeat in each test | KnockOff wins |
+| **Argument access** | `(a, b) => a + b` typed params | `callInfo.Arg<int>()` or `ArgAt<>()` | KnockOff wins |
+| **Parameter matching** | `When((a, b) => a > 0)` | `Arg.Is<T>(x => ...)` per param | Comparable |
+| **Source delegation** | `stub.Source(realImpl)` | Not supported | KnockOff only |
 
 ---
 
@@ -79,16 +81,17 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 | NSubstitute Pattern | KnockOff Equivalent |
 |---------------------|---------------------|
 | `Substitute.For<IFoo>()` | `new FooStub()` with `[KnockOff] partial class FooStub : IFoo` |
-| `.Returns(value)` | `stub.Method.OnCall(() => value)` |
+| `.Returns(value)` | `stub.Method.Returns(value)` or `stub.Method.OnCall(() => value)` |
 | `.Returns(callInfo => ...)` | `stub.Method.OnCall((args) => ...)` |
-| `.ReturnsForAnyArgs(value)` | `stub.Method.OnCall((args) => value)` (inherently matches any) |
+| `.ReturnsForAnyArgs(value)` | `stub.Method.Returns(value)` (inherently matches any) |
 | `.When(x => x.Method()).Do(...)` | Logic in `OnCall` delegate |
 | `.Returns(...).AndDoes(...)` | Combine in single `OnCall` delegate |
 | `.Received()` | `stub.Method.Verify(Times.AtLeastOnce)` or `.Verifiable()` |
 | `.Received(n)` | `stub.Method.Verify(Times.Exactly(n))` |
 | `.DidNotReceive()` | `tracking.Verify(Times.Never)` |
-| `Arg.Any<T>()` | Callback receives all arguments |
-| `Arg.Is<T>(predicate)` | Conditional logic in callback |
+| `Arg.Any<T>()` | Callback receives all arguments (default behavior) |
+| `Arg.Is<T>(predicate)` | `stub.Method.When((args) => predicate).Returns(value)` |
+| `.Returns(v1, v2, v3)` | `stub.Method.OnCall(() => v1).ThenCall(() => v2).ThenCall(() => v3)` |
 | `.ClearReceivedCalls()` | `stub.Method.Reset()` |
 | `sub.Property.Returns(value)` | `stub.Property.OnGet(value)` |
 
@@ -705,7 +708,7 @@ public void ReturnsAndDoes_KnockOffApproach()
 
 ---
 
-## Step 13: Argument Matchers
+## Step 13: Argument Matchers (Callback Approach)
 
 Replace `Arg.Is<T>()` with conditional logic in callbacks.
 
@@ -761,7 +764,121 @@ public void ArgMatchers_KnockOffApproach()
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `Arg.Is<T>()` is declarative and can be combined with multiple matchers per method. KnockOff's approach puts the logic inside the callback, which is less elegant but more flexible. NSubstitute's matchers work at setup-time; KnockOff's logic runs at call-time, meaning you can change behavior without reconfiguring.
+**Trade-off:** NSubstitute's `Arg.Is<T>()` is declarative and can be combined with multiple matchers per method. KnockOff's callback approach puts the logic inside the callback, which is less elegant but more flexible.
+
+---
+
+## Step 13b: Argument Matchers (Predicate Matching)
+
+For permanent predicate matching that applies to multiple calls, both frameworks take different approaches.
+
+**NSubstitute:**
+
+<!-- snippet: nsub-migration-when-predicate-nsub -->
+```cs
+[Fact]
+public void WhenPredicate_NSubstituteApproach()
+{
+    var substitute = Substitute.For<INSubUserRepo>();
+
+    // Arg.Is<T>() with predicate per parameter
+    substitute.GetUser(Arg.Is<int>(id => id > 0))
+        .Returns(callInfo => new User
+        {
+            Id = callInfo.Arg<int>(),
+            Name = "Valid User"
+        });
+
+    substitute.GetUser(Arg.Is<int>(id => id <= 0))
+        .Returns((User?)null);
+
+    INSubUserRepo repository = substitute;
+
+    Assert.NotNull(repository.GetUser(1));
+    Assert.NotNull(repository.GetUser(100));
+    Assert.Null(repository.GetUser(0));
+    Assert.Null(repository.GetUser(-5));
+}
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+
+<!-- snippet: nsub-migration-when-predicate-knockoff -->
+```cs
+[Fact]
+public void WhenPredicate_KnockOffApproach()
+{
+    var stub = new NSubUserRepoStub();
+
+    // For permanent predicate matching, use OnCall with conditionals
+    // (When() is for sequential/consumable matching)
+    stub.GetUser.OnCall((id) =>
+        id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+
+    INSubUserRepo repository = stub;
+
+    Assert.NotNull(repository.GetUser(1));
+    Assert.NotNull(repository.GetUser(100));
+    Assert.Null(repository.GetUser(0));
+    Assert.Null(repository.GetUser(-5));
+}
+```
+<!-- endSnippet -->
+
+**Trade-off:** NSubstitute's `Arg.Is<T>()` matchers are permanent—they apply to all matching calls. KnockOff's `OnCall()` with conditionals achieves the same result. KnockOff's `When()` API is designed for sequential/consumable matching (first call matches X, second matches Y), which is a different use case.
+
+---
+
+## Step 13c: Exact Value Matching
+
+Both frameworks support exact value matching.
+
+**NSubstitute:**
+
+<!-- snippet: nsub-migration-when-values-nsub -->
+```cs
+[Fact]
+public void WhenValues_NSubstituteApproach()
+{
+    var substitute = Substitute.For<INSubUserRepo>();
+
+    // Exact value matching
+    substitute.GetUser(42).Returns(new User { Id = 42, Name = "Alice" });
+    substitute.GetUser(99).Returns(new User { Id = 99, Name = "Bob" });
+
+    INSubUserRepo repository = substitute;
+
+    Assert.Equal("Alice", repository.GetUser(42)?.Name);
+    Assert.Equal("Bob", repository.GetUser(99)?.Name);
+    Assert.Null(repository.GetUser(1)); // No match
+}
+```
+<!-- endSnippet -->
+
+**KnockOff (When API):**
+
+<!-- snippet: nsub-migration-when-values-knockoff -->
+```cs
+[Fact]
+public void WhenValues_KnockOffApproach()
+{
+    var stub = new NSubUserRepoStub();
+
+    // When() with exact values
+    stub.GetUser.When(42).Returns(new User { Id = 42, Name = "Alice" });
+    stub.GetUser.When(99).Returns(new User { Id = 99, Name = "Bob" });
+
+    INSubUserRepo repository = stub;
+
+    Assert.Equal("Alice", repository.GetUser(42)?.Name);
+    Assert.Equal("Bob", repository.GetUser(99)?.Name);
+    Assert.Null(repository.GetUser(1)); // No match
+}
+```
+<!-- endSnippet -->
+
+**Trade-off:** Both approaches are clean and declarative for exact value matching. KnockOff's `When(value).Returns(result)` reads similarly to NSubstitute's `Method(value).Returns(result)`.
 
 ---
 
@@ -1180,7 +1297,7 @@ User? captured = null;
 stub.SaveUser.OnCall((user) => { captured = user; });
 ```
 
-### Multiple Return Values
+### Multiple Return Values (Sequences)
 
 NSubstitute can return different values for sequential calls:
 
@@ -1189,14 +1306,17 @@ NSubstitute can return different values for sequential calls:
 sub.GetUser(1).Returns(user1, user2, user3);
 ```
 
-KnockOff requires manual counting:
+KnockOff uses `ThenCall()` chaining:
 
 ```csharp
-// KnockOff
-var callCount = 0;
-var users = new[] { user1, user2, user3 };
-stub.GetUser.OnCall((id) => users[callCount++ % users.Length]);
+// KnockOff - ThenCall sequence
+stub.GetUser
+    .OnCall((id) => user1)
+    .ThenCall((id) => user2)
+    .ThenCall((id) => user3);
 ```
+
+**Key difference:** NSubstitute's sequence repeats the last value forever. KnockOff's sequence exhausts and returns `default(T)` in non-strict mode (or throws in strict mode).
 
 ---
 
@@ -1231,4 +1351,4 @@ KnockOff earns its place when:
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-01-30
