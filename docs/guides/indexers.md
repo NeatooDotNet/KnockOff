@@ -306,20 +306,20 @@ public void CaptureLastAccess()
 
 Use sequences when an indexer should return different values for the same key across multiple reads, or react differently to multiple writes.
 
-### Get Sequences (OnGetSequence)
+### Get Sequences
 
-When you need an indexer to return different values on successive reads of the same key:
+When you need an indexer to return different values on successive reads of the same key, use `OnGet().ThenGet()`:
 
 <!-- snippet: indexers-ongetsequence-basic -->
 ```cs
 [Fact]
-public void OnGetSequence_DifferentValuesPerAccess()
+public void OnGet_ThenGet_DifferentValuesPerAccess()
 {
     var stub = new ConfigStoreStub();
 
     // Configure sequence: first access returns "cached", second returns "fresh"
     stub.Indexer
-        .OnGetSequence((key) => "cached")
+        .OnGet((key) => "cached")
         .ThenGet((key) => "fresh");
 
     IConfigStore config = stub;
@@ -333,19 +333,19 @@ public void OnGetSequence_DifferentValuesPerAccess()
 ```
 <!-- endSnippet -->
 
-**When to use OnGetSequence:**
+**When to use get sequences:**
 - Testing cache invalidation (first hit returns cached, second returns fresh)
 - Simulating retry logic with changing data
 - Testing eventual consistency scenarios
 
-### Set Sequences (OnSetSequence)
+### Set Sequences
 
-When you need different behavior for successive indexer writes:
+When you need different behavior for successive indexer writes, use `OnSet().ThenSet()`:
 
-<!-- snippet: indexers-onsetsequence-basic -->
+<!-- snippet: indexers-onset-then-sequence -->
 ```cs
 [Fact]
-public void OnSetSequence_DifferentBehaviorPerWrite()
+public void OnSet_ThenSet_DifferentBehaviorPerWrite()
 {
     var stub = new ProductInventoryStub();
 
@@ -353,7 +353,7 @@ public void OnSetSequence_DifferentBehaviorPerWrite()
 
     // First write fails validation, second write succeeds
     stub.Indexer
-        .OnSetSequence((sku, qty) =>
+        .OnSet((sku, qty) =>
         {
             attemptCount++;
             throw new InvalidOperationException("Service unavailable");
@@ -377,7 +377,7 @@ public void OnSetSequence_DifferentBehaviorPerWrite()
 ```
 <!-- endSnippet -->
 
-**When to use OnSetSequence:**
+**When to use set sequences:**
 - Testing validation that changes over time
 - Simulating connection failures then recovery
 - Testing retry logic with different outcomes
@@ -388,9 +388,9 @@ public void OnSetSequence_DifferentBehaviorPerWrite()
 |----------|----------|-----|
 | Indexer uses backing dictionary | `Backing[key] = value` | Simple, standard dictionary behavior |
 | Indexer computes values from keys | `OnGet((key) => computed)` | Key-based computation |
-| Indexer returns different values per access | `OnGetSequence((k) => v1).ThenGet((k) => v2)` | Different values on successive reads |
+| Indexer returns different values per access | `OnGet((k) => v1).ThenGet((k) => v2)` | Different values on successive reads |
 | Indexer validates writes | `OnSet((k, v) => Validate(k, v))` | Custom validation logic |
-| Indexer validation changes per write | `OnSetSequence((k, v) => check1).ThenSet((k, v) => check2)` | Different behavior per write |
+| Indexer validation changes per write | `OnSet((k, v) => check1).ThenSet((k, v) => check2)` | Different behavior per write |
 
 ---
 
@@ -560,10 +560,10 @@ Choose your configuration approach based on the test scenario:
 |----------|----------|---------|
 | Indexer should return fixed test data | `Backing` | `stub.Indexer.Backing[1] = user1;` |
 | Indexer computes values from keys | `OnGet` | `stub.Cache.OnGet((id) => LoadById(id));` |
-| Indexer returns different values per access | `OnGetSequence` | `stub.Data.OnGetSequence((k) => v1).ThenGet((k) => v2);` |
+| Indexer returns different values per access | `OnGet().ThenGet()` | `stub.Data.OnGet((k) => v1).ThenGet((k) => v2);` |
 | Track all writes to indexer | `OnSet` | `stub.Store.OnSet((k, v) => log.Add((k, v)));` |
 | Simulate validation in indexer | `OnSet` | `stub.Config.OnSet((k, v) => Validate(k));` |
-| Indexer validation changes per write | `OnSetSequence` | `stub.Db.OnSetSequence((k, v) => Fail()).ThenSet((k, v) => Ok());` |
+| Indexer validation changes per write | `OnSet().ThenSet()` | `stub.Db.OnSet((k, v) => Fail()).ThenSet((k, v) => Ok());` |
 | Verify indexer was accessed | Verification | `stub.Indexer.VerifyGet(Times.Once);` |
 | Verify last key written | Verification | `Assert.Equal(42, stub.Indexer.LastGetKey);` |
 
@@ -642,7 +642,7 @@ public void CompleteIndexerExample_AllPatterns()
 1. **Start with Backing** - It covers most scenarios and behaves like a standard dictionary
 2. **Use OnGet for computed values** - Key-dependent or state-dependent returns
 3. **Use OnSet for tracking** - When you need to verify writes or simulate validation
-4. **Use sequences for changing behavior** - OnGetSequence/OnSetSequence when values or behavior differ across calls
+4. **Use sequences for changing behavior** - `OnGet().ThenGet()` / `OnSet().ThenSet()` when values or behavior differ across calls
 5. **OnGet/OnSet override Backing** - Callbacks take precedence over dictionary lookups
 6. **Reset() preserves Backing and callbacks** - Clears tracking state but not configuration
 7. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like property verification

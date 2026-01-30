@@ -195,7 +195,7 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCallSequence_ClearsValueConfiguration()
+	public void OnCall_ThenCall_ClearsValueConfiguration()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
@@ -204,8 +204,8 @@ public class MethodValueOverloadTests
 		knockOff.GetOptional.Returns("value");
 		Assert.Equal("value", service.GetOptional());
 
-		// Then configure with sequence - should clear value
-		knockOff.GetOptional.OnCallSequence(() => "seq1").ThenCall(() => "seq2");
+		// Then configure with OnCall().ThenCall() sequence - should clear value
+		knockOff.GetOptional.OnCall(() => "seq1").ThenCall(() => "seq2");
 		Assert.Equal("seq1", service.GetOptional());
 		Assert.Equal("seq2", service.GetOptional());
 	}

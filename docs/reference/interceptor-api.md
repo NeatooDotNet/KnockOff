@@ -37,9 +37,10 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnCall(delegate)` | `IMethodTracking<T>` or `IMethodTrackingArgs<(T1?, T2?, ...)>` | Configure callback invoked when method is called. Returns tracking interface for verification. |
+| `OnCall(delegate)` | `IMethodTracking<T>` or `IMethodTrackingArgs<(T1?, T2?, ...)>` | Configure callback invoked when method is called. Returns tracking interface for verification. Use `.ThenCall()` on the returned object to chain sequences. |
 | `Returns(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value. Returns tracking interface. Available only for methods with return values. |
-| `OnCallSequence(delegate)` | `IMethodSequence<TDelegate>` | Start a callback sequence. Each callback runs exactly once. Chain with `ThenCall()`. |
+| `When(T1 arg1, T2 arg2, ...)` | `IWhenBuilder<TDelegate, TReturn>` (return methods) or `IVoidWhenChain<TDelegate>` (void methods) | Match specific argument values. Chain `.Returns(value)` for return methods or `.Call(callback)` for void methods. See [Parameter Matching Guide](../guides/parameter-matching.md). |
+| `When(Func<T1, T2, ..., bool> predicate)` | `IWhenBuilder<TDelegate, TReturn>` (return methods) or `IVoidWhenChain<TDelegate>` (void methods) | Match arguments via predicate. Chain `.Returns(value)` for return methods or `.Call(callback)` for void methods. See [Parameter Matching Guide](../guides/parameter-matching.md). |
 
 **Return type details**:
 - Single-parameter methods return `IMethodTracking<T>` with `LastArg` property
@@ -133,11 +134,9 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnGet(Func<T>)` | `IPropertyGetTracking` | Configure callback invoked when property is read. Returns tracking interface for verification. |
+| `OnGet(Func<T>)` | `IPropertyGetTracking` | Configure callback invoked when property is read. Returns tracking interface for verification. Use `.ThenGet()` on the returned object to chain sequences. |
 | `OnGet(T value)` | `IPropertyGetTracking` | Configure getter to return the specified value. Convenience overload for `OnGet(() => value)`. |
-| `OnGetSequence(Func<T>)` | `IPropertyGetSequence<T>` | Start a getter callback sequence. Each callback runs exactly once. Chain with `ThenGet()`. |
-| `OnSet(Action<T>)` | `IPropertySetTracking<T>` | Configure callback invoked when property is written. Returns tracking interface for verification. |
-| `OnSetSequence(Action<T>)` | `IPropertySetSequence<T>` | Start a setter callback sequence. Each callback runs exactly once. Chain with `ThenSet()`. |
+| `OnSet(Action<T>)` | `IPropertySetTracking<T>` | Configure callback invoked when property is written. Returns tracking interface for verification. Use `.ThenSet()` on the returned object to chain sequences. |
 
 ### Verification Methods
 
@@ -225,10 +224,8 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnGet(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey, TValue>` | Configure callback invoked when indexer is read. Returns tracking interface for verification. |
-| `OnGetSequence(Func<TKey, TValue>)` | `IIndexerGetSequence<TKey, TValue>` | Start a getter callback sequence. Each callback runs exactly once. Chain with `ThenGet()`. |
-| `OnSet(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configure callback invoked when indexer is written. Returns tracking interface for verification. |
-| `OnSetSequence(Action<TKey, TValue>)` | `IIndexerSetSequence<TKey, TValue>` | Start a setter callback sequence. Each callback runs exactly once. Chain with `ThenSet()`. |
+| `OnGet(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey, TValue>` | Configure callback invoked when indexer is read. Returns tracking interface for verification. Use `.ThenGet()` on the returned object to chain sequences. |
+| `OnSet(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configure callback invoked when indexer is written. Returns tracking interface for verification. Use `.ThenSet()` on the returned object to chain sequences. |
 
 ### Verification Methods
 
@@ -418,9 +415,8 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnCall(delegate)` | `IMethodTracking<T>` or `IMethodTrackingArgs<(...)>` | Configure callback invoked when method is called with these type arguments. Returns tracking interface for verification. |
+| `OnCall(delegate)` | `IMethodTracking<T>` or `IMethodTrackingArgs<(...)>` | Configure callback invoked when method is called with these type arguments. Returns tracking interface for verification. Use `.ThenCall()` on the returned object to chain sequences. |
 | `Returns(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value for these type arguments. Returns tracking interface. Available only for methods with return values. |
-| `OnCallSequence(delegate)` | `IMethodSequence<TDelegate>` | Start a callback sequence for these type arguments. Each callback runs exactly once. Chain with `ThenCall()`. |
 
 The callback delegate type follows the same signature rules as non-generic method interceptors (see Method Interceptor section).
 
@@ -483,18 +479,111 @@ stub.GetById.Of<Product>().Verify(Times.Never);
 
 ---
 
+## When Chain API
+
+The When() API provides parameter-specific matching. It returns different interfaces depending on whether the method returns a value or is void.
+
+### For Return Methods
+
+When() returns `IWhenBuilder<TDelegate, TReturn>` which requires calling `.Returns()` to complete the configuration:
+
+<!-- snippet: when-chain-return-method-api -->
+```cs
+// When() returns IWhenBuilder, which requires .Returns() to complete
+var chain = stub.Calculate.When(5, 10).Returns(50);
+
+// chain is IWhenChain - can continue chaining or verify
+chain.ThenWhen(1, 2).Returns(100);
+
+IWhenCalculator calc = stub;
+Assert.Equal(50, calc.Calculate(5, 10));
+Assert.Equal(100, calc.Calculate(1, 2));
+```
+<!-- endSnippet -->
+
+**IWhenBuilder Methods:**
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `Returns(TReturn value)` | `IWhenChain<TDelegate, TReturn>` | Specifies the return value when matcher matches. For async methods, automatically wraps with `Task.FromResult()`. |
+
+**IWhenChain Methods:**
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `ThenWhen(T1 arg1, ...)` | `IWhenBuilder<TDelegate, TReturn>` | Add another value matcher. Must chain `.Returns()` to complete. |
+| `ThenWhen(Func<T1, ..., bool>)` | `IWhenBuilder<TDelegate, TReturn>` | Add another predicate matcher. Must chain `.Returns()` to complete. |
+| `ThenCall(TDelegate callback)` | `IWhenTracking` | Add unconditional terminal matcher that repeats forever. |
+| `ThenNone()` | `IWhenTracking` | Close chain - subsequent calls fall through to next configured behavior. |
+| `Verify()` | `void` | Verify chain reached terminal state. |
+| `Verify(Times)` | `void` | Verify chain reached terminal state according to Times constraint. |
+| `Verifiable()` | `IWhenChain<TDelegate, TReturn>` | Mark for batch verification. Returns this for fluent chaining. |
+| `Reset()` | `void` | Reset chain to beginning, clear all matcher call counts. |
+
+### For Void Methods
+
+When() returns `IVoidWhenChain<TDelegate>` directly - no builder step needed since there's nothing to return:
+
+<!-- snippet: when-chain-void-method-api -->
+```cs
+// Void methods: When() returns IVoidWhenChain directly
+var chain = stub.Process.When(1, 2);
+
+// .Call() is optional - adds callback for side effects
+var called = false;
+chain.Call((a, b) => called = true);
+
+IWhenProcessor processor = stub;
+processor.Process(1, 2);
+
+Assert.True(called);
+
+// Verify this matcher was called once (parameter-specific count)
+chain.Verify(Times.Once);
+```
+<!-- endSnippet -->
+
+**IVoidWhenChain Methods:**
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `Call(TDelegate callback)` | `IVoidWhenChain<TDelegate>` | Optional: Configure callback when matcher matches. Returns this for fluent chaining. |
+| `ThenWhen(T1 arg1, ...)` | `IVoidWhenChain<TDelegate>` | Add another value matcher. Can optionally chain `.Call()`. |
+| `ThenWhen(Func<T1, ..., bool>)` | `IVoidWhenChain<TDelegate>` | Add another predicate matcher. Can optionally chain `.Call()`. |
+| `ThenCall(TDelegate callback)` | `IWhenTracking` | Add unconditional terminal matcher that repeats forever. |
+| `ThenNone()` | `IWhenTracking` | Close chain - subsequent calls fall through to next configured behavior. |
+| `Verify()` | `void` | Verify chain reached terminal state. |
+| `Verify(Times)` | `void` | Verify specific matcher was called according to Times constraint (parameter-specific count). |
+| `Verifiable()` | `IVoidWhenChain<TDelegate>` | Mark for batch verification. Returns this for fluent chaining. |
+| `Reset()` | `void` | Reset chain to beginning, clear all matcher call counts. |
+
+### When Chain Priority
+
+When a method is called, KnockOff checks configurations in this priority order:
+
+1. **When() chain** - Checked first. If current matcher matches, its callback/value is used and chain advances.
+2. **Sequence (OnCall().ThenCall())** - If When() doesn't match or chain is exhausted.
+3. **Returns(value)** - If no sequence configured.
+4. **OnCall(callback)** - If no Returns configured.
+5. **Default behavior** - `default(T)` in non-strict mode, exception in strict mode.
+
+See the [Parameter Matching Guide](../guides/parameter-matching.md) for detailed examples and usage patterns.
+
+---
+
 ## Reset Behavior Summary
 
 All interceptors provide a `Reset()` method. This table summarizes what each reset clears and preserves:
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | Tracking state, `LastCallArg`, `LastCallArgs`, callbacks, sequences | Verifiable marking |
+| **Method** | Tracking state, `LastCallArg`, `LastCallArgs`, callbacks, sequences, When chains | Verifiable marking |
 | **Property** | Tracking state, `LastSetValue`, `OnGet`, `OnSet`, sequences | Verifiable marking |
 | **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet`, sequences | `Backing` dictionary, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
-| **Generic Method (Base)** | All tracking, callbacks, sequences across all type arguments | Verifiable marking |
-| **Generic Method (Typed)** | Tracking, callbacks, sequences for specific type argument(s) only | Tracking for other type arguments, verifiable marking |
+| **Generic Method (Base)** | All tracking, callbacks, sequences, When chains across all type arguments | Verifiable marking |
+| **Generic Method (Typed)** | Tracking, callbacks, sequences, When chains for specific type argument(s) only | Tracking for other type arguments, verifiable marking |
+| **When Chain** | Chain position (HEAD), all matcher call counts | Chain structure (matchers and callbacks) |
 
 **Key Principles**:
 - `Reset()` clears tracking (counts, arguments) and runtime state (callbacks, sequences, subscribers)

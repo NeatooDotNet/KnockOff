@@ -277,13 +277,13 @@ public class PropertySequenceTests
 {
     #region properties-ongetsequence-value
     [Fact]
-    public void OnGetSequence_ValueSyntax()
+    public void OnGet_ValueSyntax_ThenGet()
     {
         var stub = new ConfigPropsStub();
 
-        // OnGetSequence with value - simpler syntax for static values
-        // Note: First value uses OnGetSequence(value), chain uses callback syntax
-        stub.Name.OnGetSequence("First")
+        // OnGet with value - simpler syntax for static values
+        // ThenGet elevates to sequence mode
+        stub.Name.OnGet("First")
             .ThenGet(() => "Second")
             .ThenGet(() => "Third");
 
@@ -295,15 +295,15 @@ public class PropertySequenceTests
     }
     #endregion
 
-    #region properties-ongetsequence-basic
+    #region properties-onget-then-sequence
     [Fact]
-    public void OnGetSequence_ReturnsDifferentValuesOnSuccessiveReads()
+    public void OnGet_ThenGet_ReturnsDifferentValuesOnSuccessiveReads()
     {
         var stub = new ConfigPropsStub();
 
-        // OnGetSequence configures different return values for each read
+        // OnGet().ThenGet() configures different return values for each read
         stub.Name
-            .OnGetSequence(() => "First")
+            .OnGet(() => "First")
             .ThenGet(() => "Second")
             .ThenGet(() => "Third");
 
@@ -316,18 +316,18 @@ public class PropertySequenceTests
     }
     #endregion
 
-    #region properties-onsetsequence-basic
+    #region properties-onset-then-sequence
     [Fact]
-    public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
+    public void OnSet_ThenSet_ReactsDifferentlyToSuccessiveWrites()
     {
         var stub = new ConfigPropsStub();
 
         var firstWriteValue = "";
         var secondWriteValue = "";
 
-        // OnSetSequence configures different callbacks for each write
+        // OnSet().ThenSet() configures different callbacks for each write
         stub.Name
-            .OnSetSequence((value) => { firstWriteValue = $"First: {value}"; })
+            .OnSet((value) => { firstWriteValue = $"First: {value}"; })
             .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
 
         IConfigProps config = stub;
@@ -351,11 +351,11 @@ public class PropertySequenceTests
 
         // Configure sequences
         var getSequence = stub.Name
-            .OnGetSequence(() => "A")
+            .OnGet(() => "A")
             .ThenGet(() => "B");
 
         var setSequence = stub.Age
-            .OnSetSequence((v) => { })
+            .OnSet((v) => { })
             .ThenSet((v) => { });
 
         IConfigProps config = stub;

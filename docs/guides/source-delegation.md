@@ -148,7 +148,7 @@ This is useful when you need source delegation for test setup but want to verify
 
 KnockOff's interceptors evaluate member calls in this priority order:
 
-1. **Sequence (OnCallSequence)** - Active sequence steps run first
+1. **Sequence callbacks** - Active sequence steps run first (configured via `OnCall().ThenCall()`)
 2. **OnCall value** - Direct return value, set via `stub.Method.OnCall(value)`
 3. **OnCall callback** - Callback, set via `stub.Method.OnCall((args) => result)`
 4. **Source delegation** - Set via `stub.Source(realImplementation)`

@@ -6,10 +6,9 @@ namespace KnockOff.Renderer.Shared;
 
 /// <summary>
 /// Renders property interceptor classes for both inline and flat stubs.
-/// Generates OnGet() returning IPropertyGetTracking (repeating callback),
-/// OnGetSequence() returning IPropertyGetSequence (for ThenGet chaining),
-/// OnSet()/OnSetSequence() similarly for setters,
-/// nested tracking and sequence implementation classes, InvokeGet/InvokeSet methods, and verification.
+/// Generates OnGet() returning IPropertyGetBuilder (repeating callback, elevatable to sequence via ThenGet),
+/// OnSet() returning IPropertySetBuilder similarly for setters,
+/// nested builder and sequence implementation classes, InvokeGet/InvokeSet methods, and verification.
 /// </summary>
 internal static class PropertyInterceptorRenderer
 {
@@ -59,8 +58,8 @@ internal static class PropertyInterceptorRenderer
 
 		// Getter tracking and sequence storage
 		w.Line($"private global::System.Func<{model.ValueType}>? _onGet;");
-		w.Line("private PropertyGetTrackingImpl? _onGetTracking;");
-		w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;");
+		w.Line("private PropertyGetBuilderImpl? _onGetTracking;");
+		w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetBuilderImpl Tracking)>? _getSequence;");
 		w.Line("private int _getSequenceIndex;");
 		w.Line();
 
@@ -83,9 +82,9 @@ internal static class PropertyInterceptorRenderer
 		w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }");
 		w.Line();
 
-		// OnGet() - repeating callback, returns IPropertyGetTracking
-		w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>");
-		w.Line($"public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<{model.ValueType}> callback)");
+		// OnGet() - repeating callback, returns IPropertyGetBuilder
+		w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+		w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> OnGet(global::System.Func<{model.ValueType}> callback)");
 		using (w.Braces())
 		{
 			w.Line("_getSequence = null;");
@@ -93,36 +92,14 @@ internal static class PropertyInterceptorRenderer
 			w.Line("_isGetVerifiable = false;");
 			w.Line("_getVerifiableTimes = null;");
 			w.Line("_onGet = callback;");
-			w.Line("_onGetTracking = new PropertyGetTrackingImpl(this);");
+			w.Line("_onGetTracking = new PropertyGetBuilderImpl(this);");
 			w.Line("return _onGetTracking;");
 		}
 		w.Line();
 
-		// OnGetSequence() - starts a sequence, returns IPropertyGetSequence
-		w.Line($"/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>");
-		w.Line($"public global::KnockOff.IPropertyGetSequence<{model.ValueType}> OnGetSequence(global::System.Func<{model.ValueType}> callback)");
-		using (w.Braces())
-		{
-			w.Line("_onGet = null;");
-			w.Line("_onGetTracking = null;");
-			w.Line("_isGetVerifiable = false;");
-			w.Line("_getVerifiableTimes = null;");
-			w.Line($"_getSequence = new global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetTrackingImpl Tracking)>();");
-			w.Line("var tracking = new PropertyGetTrackingImpl(this);");
-			w.Line("_getSequence.Add((callback, tracking));");
-			w.Line("_getSequenceIndex = 0;");
-			w.Line("return new PropertyGetSequenceImpl(this);");
-		}
-		w.Line();
-
 		// OnGet(value) - wrapper method for value-based configuration
-		w.Line($"/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>");
-		w.Line($"public global::KnockOff.IPropertyGetTracking OnGet({model.ValueType} value) => OnGet(() => value);");
-		w.Line();
-
-		// OnGetSequence(value) - wrapper method for value-based sequence start
-		w.Line($"/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>");
-		w.Line($"public global::KnockOff.IPropertyGetSequence<{model.ValueType}> OnGetSequence({model.ValueType} value) => OnGetSequence(() => value);");
+		w.Line($"/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>");
+		w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> OnGet({model.ValueType} value) => OnGet(() => value);");
 		w.Line();
 
 		// RecordSet - tracks init setter invocation (for verification)
@@ -159,7 +136,7 @@ internal static class PropertyInterceptorRenderer
 		RenderInitOnlyInternalVerification(w, model);
 
 		// Nested classes
-		RenderPropertyGetTrackingImpl(w, fullInterceptorClassName, isInitOnly: true);
+		RenderPropertyGetBuilderImpl(w, model.ValueType, fullInterceptorClassName, isInitOnly: true);
 		RenderPropertyGetSequenceImpl(w, model.ValueType, fullInterceptorClassName, isInitOnly: true);
 	}
 
@@ -195,8 +172,8 @@ internal static class PropertyInterceptorRenderer
 		if (model.HasGetter)
 		{
 			w.Line($"private global::System.Func<{model.ValueType}>? _onGet;");
-			w.Line("private PropertyGetTrackingImpl? _onGetTracking;");
-			w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetTrackingImpl Tracking)>? _getSequence;");
+			w.Line("private PropertyGetBuilderImpl? _onGetTracking;");
+			w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetBuilderImpl Tracking)>? _getSequence;");
 			w.Line("private int _getSequenceIndex;");
 			w.Line("private bool _isGetVerifiable;");
 			w.Line("private global::KnockOff.Times? _getVerifiableTimes;");
@@ -208,8 +185,8 @@ internal static class PropertyInterceptorRenderer
 		if (model.HasSetter)
 		{
 			w.Line($"private global::System.Action<{model.ValueType}>? _onSet;");
-			w.Line("private PropertySetTrackingImpl? _onSetTracking;");
-			w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ValueType}> Callback, PropertySetTrackingImpl Tracking)>? _setSequence;");
+			w.Line("private PropertySetBuilderImpl? _onSetTracking;");
+			w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ValueType}> Callback, PropertySetBuilderImpl Tracking)>? _setSequence;");
 			w.Line("private int _setSequenceIndex;");
 			w.Line("private bool _isSetVerifiable;");
 			w.Line("private global::KnockOff.Times? _setVerifiableTimes;");
@@ -243,8 +220,8 @@ internal static class PropertyInterceptorRenderer
 		// OnGet() method (if has getter)
 		if (model.HasGetter)
 		{
-			w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>");
-			w.Line($"public global::KnockOff.IPropertyGetTracking OnGet(global::System.Func<{model.ValueType}> callback)");
+			w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> OnGet(global::System.Func<{model.ValueType}> callback)");
 			using (w.Braces())
 			{
 				w.Line("_getSequence = null;");
@@ -252,43 +229,22 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_isGetVerifiable = false;");
 				w.Line("_getVerifiableTimes = null;");
 				w.Line("_onGet = callback;");
-				w.Line("_onGetTracking = new PropertyGetTrackingImpl(this);");
+				w.Line("_onGetTracking = new PropertyGetBuilderImpl(this);");
 				w.Line("return _onGetTracking;");
 			}
 			w.Line();
 
-			w.Line($"/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>");
-			w.Line($"public global::KnockOff.IPropertyGetSequence<{model.ValueType}> OnGetSequence(global::System.Func<{model.ValueType}> callback)");
-			using (w.Braces())
-			{
-				w.Line("_onGet = null;");
-				w.Line("_onGetTracking = null;");
-				w.Line("_isGetVerifiable = false;");
-				w.Line("_getVerifiableTimes = null;");
-				w.Line($"_getSequence = new global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetTrackingImpl Tracking)>();");
-				w.Line("var tracking = new PropertyGetTrackingImpl(this);");
-				w.Line("_getSequence.Add((callback, tracking));");
-				w.Line("_getSequenceIndex = 0;");
-				w.Line("return new PropertyGetSequenceImpl(this);");
-			}
-			w.Line();
-
 			// OnGet(value) - wrapper method for value-based configuration
-			w.Line($"/// <summary>Configures getter to return the specified value. Returns tracking interface.</summary>");
-			w.Line($"public global::KnockOff.IPropertyGetTracking OnGet({model.ValueType} value) => OnGet(() => value);");
-			w.Line();
-
-			// OnGetSequence(value) - wrapper method for value-based sequence start
-			w.Line($"/// <summary>Starts a getter value sequence. Returns sequence for ThenGet chaining.</summary>");
-			w.Line($"public global::KnockOff.IPropertyGetSequence<{model.ValueType}> OnGetSequence({model.ValueType} value) => OnGetSequence(() => value);");
+			w.Line($"/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> OnGet({model.ValueType} value) => OnGet(() => value);");
 			w.Line();
 		}
 
 		// OnSet() method (if has setter)
 		if (model.HasSetter)
 		{
-			w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>");
-			w.Line($"public global::KnockOff.IPropertySetTracking<{model.ValueType}> OnSet(global::System.Action<{model.ValueType}> callback)");
+			w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+			w.Line($"public global::KnockOff.IPropertySetBuilder<{model.ValueType}> OnSet(global::System.Action<{model.ValueType}> callback)");
 			using (w.Braces())
 			{
 				w.Line("_setSequence = null;");
@@ -296,26 +252,11 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_isSetVerifiable = false;");
 				w.Line("_setVerifiableTimes = null;");
 				w.Line("_onSet = callback;");
-				w.Line("_onSetTracking = new PropertySetTrackingImpl(this);");
+				w.Line("_onSetTracking = new PropertySetBuilderImpl(this);");
 				w.Line("return _onSetTracking;");
 			}
 			w.Line();
 
-			w.Line($"/// <summary>Starts a setter callback sequence. Returns sequence for ThenSet chaining. Each callback runs exactly once.</summary>");
-			w.Line($"public global::KnockOff.IPropertySetSequence<{model.ValueType}> OnSetSequence(global::System.Action<{model.ValueType}> callback)");
-			using (w.Braces())
-			{
-				w.Line("_onSet = null;");
-				w.Line("_onSetTracking = null;");
-				w.Line("_isSetVerifiable = false;");
-				w.Line("_setVerifiableTimes = null;");
-				w.Line($"_setSequence = new global::System.Collections.Generic.List<(global::System.Action<{model.ValueType}> Callback, PropertySetTrackingImpl Tracking)>();");
-				w.Line("var tracking = new PropertySetTrackingImpl(this);");
-				w.Line("_setSequence.Add((callback, tracking));");
-				w.Line("_setSequenceIndex = 0;");
-				w.Line("return new PropertySetSequenceImpl(this);");
-			}
-			w.Line();
 		}
 
 		// InvokeGet/InvokeSet methods
@@ -340,12 +281,12 @@ internal static class PropertyInterceptorRenderer
 		// Nested classes
 		if (model.HasGetter)
 		{
-			RenderPropertyGetTrackingImpl(w, fullInterceptorClassName, isInitOnly: false);
+			RenderPropertyGetBuilderImpl(w, model.ValueType, fullInterceptorClassName, isInitOnly: false);
 			RenderPropertyGetSequenceImpl(w, model.ValueType, fullInterceptorClassName, isInitOnly: false);
 		}
 		if (model.HasSetter)
 		{
-			RenderPropertySetTrackingImpl(w, model.ValueType, fullInterceptorClassName);
+			RenderPropertySetBuilderImpl(w, model.ValueType, fullInterceptorClassName);
 			RenderPropertySetSequenceImpl(w, model.ValueType, fullInterceptorClassName);
 		}
 	}
@@ -806,21 +747,22 @@ internal static class PropertyInterceptorRenderer
 
 	#endregion
 
-	#region Nested PropertyGetTrackingImpl
+	#region Nested PropertyGetBuilderImpl
 
-	private static void RenderPropertyGetTrackingImpl(
+	private static void RenderPropertyGetBuilderImpl(
 		CodeWriter w,
+		string valueType,
 		string interceptorClassName,
 		bool isInitOnly)
 	{
-		w.Line($"/// <summary>Tracks invocations for getter callback registration.</summary>");
-		w.Line($"private sealed class PropertyGetTrackingImpl : global::KnockOff.IPropertyGetTracking");
+		w.Line($"/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
+		w.Line($"private sealed class PropertyGetBuilderImpl : global::KnockOff.IPropertyGetBuilder<{valueType}>");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
 			w.Line();
 
-			w.Line($"public PropertyGetTrackingImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line($"public PropertyGetBuilderImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
 			w.Line("internal int CallCount { get; private set; }");
@@ -847,8 +789,33 @@ internal static class PropertyInterceptorRenderer
 			}
 			w.Line();
 
+			// ThenGet(callback) - lazy elevation from repeating to sequence mode
+			w.Line($"/// <summary>Elevates to sequence mode and adds another getter callback. Returns sequence for further chaining.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(global::System.Func<{valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("if (_interceptor._getSequence == null)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor._getSequence = new global::System.Collections.Generic.List<(global::System.Func<{valueType}> Callback, PropertyGetBuilderImpl Tracking)>();");
+					w.Line("_interceptor._getSequence.Add((_interceptor._onGet!, this));");
+					w.Line("_interceptor._onGet = null;");
+					w.Line("_interceptor._onGetTracking = null;");  // Clear to prevent double-counting in TotalGetCount
+					w.Line("_interceptor._getSequenceIndex = 0;");
+				}
+				w.Line("var nextBuilder = new PropertyGetBuilderImpl(_interceptor);");
+				w.Line("_interceptor._getSequence.Add((callback, nextBuilder));");
+				w.Line("return new PropertyGetSequenceImpl(_interceptor);");
+			}
+			w.Line();
+
+			// ThenGet(value) - wrapper for value-based sequence chaining
+			w.Line($"/// <summary>Elevates to sequence mode and adds a value to return. Returns sequence for further chaining.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet({valueType} value) => ThenGet(() => value);");
+			w.Line();
+
 			w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-			w.Line("public global::KnockOff.IPropertyGetTracking Verifiable()");
+			w.Line($"public global::KnockOff.IPropertyGetBuilder<{valueType}> Verifiable()");
 			using (w.Braces())
 			{
 				w.Line("_interceptor._isGetVerifiable = true;");
@@ -857,35 +824,30 @@ internal static class PropertyInterceptorRenderer
 			}
 			w.Line();
 
-			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-			w.Line("public global::KnockOff.IPropertyGetTracking Verifiable(global::KnockOff.Times times)");
-			using (w.Braces())
-			{
-				w.Line("_interceptor._isGetVerifiable = true;");
-				w.Line("_interceptor._getVerifiableTimes = times;");
-				w.Line("return this;");
-			}
+			// Explicit interface implementation for base IPropertyGetTracking.Verifiable()
+			w.Line("global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();");
+			w.Line("global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Times times) => Verifiable();");
 		}
 		w.Line();
 	}
 
 	#endregion
 
-	#region Nested PropertySetTrackingImpl
+	#region Nested PropertySetBuilderImpl
 
-	private static void RenderPropertySetTrackingImpl(
+	private static void RenderPropertySetBuilderImpl(
 		CodeWriter w,
 		string valueType,
 		string interceptorClassName)
 	{
-		w.Line($"/// <summary>Tracks invocations for setter callback registration.</summary>");
-		w.Line($"private sealed class PropertySetTrackingImpl : global::KnockOff.IPropertySetTracking<{valueType}>");
+		w.Line($"/// <summary>Builder for setter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
+		w.Line($"private sealed class PropertySetBuilderImpl : global::KnockOff.IPropertySetBuilder<{valueType}>");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
 			w.Line();
 
-			w.Line($"public PropertySetTrackingImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line($"public PropertySetBuilderImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
 			w.Line($"private {valueType} _lastValue = default!;");
@@ -919,8 +881,28 @@ internal static class PropertyInterceptorRenderer
 			}
 			w.Line();
 
+			// ThenSet(callback) - lazy elevation from repeating to sequence mode
+			w.Line($"/// <summary>Elevates to sequence mode and adds another setter callback. Returns sequence for further chaining.</summary>");
+			w.Line($"public global::KnockOff.IPropertySetSequence<{valueType}> ThenSet(global::System.Action<{valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("if (_interceptor._setSequence == null)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor._setSequence = new global::System.Collections.Generic.List<(global::System.Action<{valueType}> Callback, PropertySetBuilderImpl Tracking)>();");
+					w.Line("_interceptor._setSequence.Add((_interceptor._onSet!, this));");
+					w.Line("_interceptor._onSet = null;");
+					w.Line("_interceptor._onSetTracking = null;");  // Clear to prevent double-counting in TotalSetCount
+					w.Line("_interceptor._setSequenceIndex = 0;");
+				}
+				w.Line("var nextBuilder = new PropertySetBuilderImpl(_interceptor);");
+				w.Line("_interceptor._setSequence.Add((callback, nextBuilder));");
+				w.Line("return new PropertySetSequenceImpl(_interceptor);");
+			}
+			w.Line();
+
 			w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-			w.Line($"public global::KnockOff.IPropertySetTracking<{valueType}> Verifiable()");
+			w.Line($"public global::KnockOff.IPropertySetBuilder<{valueType}> Verifiable()");
 			using (w.Braces())
 			{
 				w.Line("_interceptor._isSetVerifiable = true;");
@@ -929,14 +911,9 @@ internal static class PropertyInterceptorRenderer
 			}
 			w.Line();
 
-			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-			w.Line($"public global::KnockOff.IPropertySetTracking<{valueType}> Verifiable(global::KnockOff.Times times)");
-			using (w.Braces())
-			{
-				w.Line("_interceptor._isSetVerifiable = true;");
-				w.Line("_interceptor._setVerifiableTimes = times;");
-				w.Line("return this;");
-			}
+			// Explicit interface implementation for base IPropertySetTracking<T>.Verifiable()
+			w.Line($"global::KnockOff.IPropertySetTracking<{valueType}> global::KnockOff.IPropertySetTracking<{valueType}>.Verifiable() => Verifiable();");
+			w.Line($"global::KnockOff.IPropertySetTracking<{valueType}> global::KnockOff.IPropertySetTracking<{valueType}>.Verifiable(global::KnockOff.Times times) => Verifiable();");
 		}
 		w.Line();
 	}
@@ -965,7 +942,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(global::System.Func<{valueType}> callback)");
 			using (w.Braces())
 			{
-				w.Line("var tracking = new PropertyGetTrackingImpl(_interceptor);");
+				w.Line("var tracking = new PropertyGetBuilderImpl(_interceptor);");
 				w.Line("_interceptor._getSequence!.Add((callback, tracking));");
 				w.Line("return this;");
 			}
@@ -1027,7 +1004,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line($"public global::KnockOff.IPropertySetSequence<{valueType}> ThenSet(global::System.Action<{valueType}> callback)");
 			using (w.Braces())
 			{
-				w.Line("var tracking = new PropertySetTrackingImpl(_interceptor);");
+				w.Line("var tracking = new PropertySetBuilderImpl(_interceptor);");
 				w.Line("_interceptor._setSequence!.Add((callback, tracking));");
 				w.Line("return this;");
 			}

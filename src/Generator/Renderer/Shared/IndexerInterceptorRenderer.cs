@@ -6,10 +6,9 @@ namespace KnockOff.Renderer.Shared;
 
 /// <summary>
 /// Renders indexer interceptor classes for both inline and flat stubs.
-/// Generates OnGet() returning IIndexerGetTracking (repeating callback),
-/// OnGetSequence() returning IIndexerGetSequence (for ThenGet chaining),
-/// OnSet()/OnSetSequence() similarly for setters,
-/// nested tracking and sequence implementation classes, InvokeGet/InvokeSet methods,
+/// Generates OnGet() returning IIndexerGetBuilder (repeating callback, elevatable to sequence via ThenGet),
+/// OnSet() returning IIndexerSetBuilder similarly for setters,
+/// nested builder and sequence implementation classes, InvokeGet/InvokeSet methods,
 /// Backing dictionary, and verification.
 /// </summary>
 internal static class IndexerInterceptorRenderer
@@ -47,8 +46,8 @@ internal static class IndexerInterceptorRenderer
 			if (model.HasGetter)
 			{
 				w.Line($"private global::System.Func<{model.ParameterTypes}, {model.ValueType}>? _onGet;");
-				w.Line("private IndexerGetTrackingImpl? _onGetTracking;");
-				w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerGetTrackingImpl Tracking)>? _getSequence;");
+				w.Line("private IndexerGetBuilderImpl? _onGetTracking;");
+				w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerGetBuilderImpl Tracking)>? _getSequence;");
 				w.Line("private int _getSequenceIndex;");
 				w.Line("private bool _isGetVerifiable;");
 				w.Line("private global::KnockOff.Times? _getVerifiableTimes;");
@@ -61,8 +60,8 @@ internal static class IndexerInterceptorRenderer
 			if (model.HasSetter)
 			{
 				w.Line($"private global::System.Action<{model.ParameterTypes}, {model.ValueType}>? _onSet;");
-				w.Line("private IndexerSetTrackingImpl? _onSetTracking;");
-				w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerSetTrackingImpl Tracking)>? _setSequence;");
+				w.Line("private IndexerSetBuilderImpl? _onSetTracking;");
+				w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerSetBuilderImpl Tracking)>? _setSequence;");
 				w.Line("private int _setSequenceIndex;");
 				w.Line("private bool _isSetVerifiable;");
 				w.Line("private global::KnockOff.Times? _setVerifiableTimes;");
@@ -104,8 +103,8 @@ internal static class IndexerInterceptorRenderer
 			// OnGet() method (if has getter)
 			if (model.HasGetter)
 			{
-				w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns tracking interface.</summary>");
-				w.Line($"public global::KnockOff.IIndexerGetTracking<{model.KeyType}> OnGet(global::System.Func<{model.ParameterTypes}, {model.ValueType}> callback)");
+				w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+				w.Line($"public global::KnockOff.IIndexerGetBuilder<{model.KeyType}, {model.ValueType}> OnGet(global::System.Func<{model.ParameterTypes}, {model.ValueType}> callback)");
 				using (w.Braces())
 				{
 					w.Line("_getSequence = null;");
@@ -113,33 +112,18 @@ internal static class IndexerInterceptorRenderer
 					w.Line("_isGetVerifiable = false;");
 					w.Line("_getVerifiableTimes = null;");
 					w.Line("_onGet = callback;");
-					w.Line("_onGetTracking = new IndexerGetTrackingImpl(this);");
+					w.Line("_onGetTracking = new IndexerGetBuilderImpl(this);");
 					w.Line("return _onGetTracking;");
 				}
 				w.Line();
 
-				w.Line($"/// <summary>Starts a getter callback sequence. Returns sequence for ThenGet chaining. Each callback runs exactly once.</summary>");
-				w.Line($"public global::KnockOff.IIndexerGetSequence<{model.KeyType}, {model.ValueType}> OnGetSequence(global::System.Func<{model.ParameterTypes}, {model.ValueType}> callback)");
-				using (w.Braces())
-				{
-					w.Line("_onGet = null;");
-					w.Line("_onGetTracking = null;");
-					w.Line("_isGetVerifiable = false;");
-					w.Line("_getVerifiableTimes = null;");
-					w.Line($"_getSequence = new global::System.Collections.Generic.List<(global::System.Func<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerGetTrackingImpl Tracking)>();");
-					w.Line("var tracking = new IndexerGetTrackingImpl(this);");
-					w.Line("_getSequence.Add((callback, tracking));");
-					w.Line("_getSequenceIndex = 0;");
-					w.Line("return new IndexerGetSequenceImpl(this);");
-				}
-				w.Line();
 			}
 
 			// OnSet() method (if has setter)
 			if (model.HasSetter)
 			{
-				w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns tracking interface.</summary>");
-				w.Line($"public global::KnockOff.IIndexerSetTracking<{model.KeyType}, {model.ValueType}> OnSet(global::System.Action<{model.ParameterTypes}, {model.ValueType}> callback)");
+				w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
+				w.Line($"public global::KnockOff.IIndexerSetBuilder<{model.KeyType}, {model.ValueType}> OnSet(global::System.Action<{model.ParameterTypes}, {model.ValueType}> callback)");
 				using (w.Braces())
 				{
 					w.Line("_setSequence = null;");
@@ -147,26 +131,11 @@ internal static class IndexerInterceptorRenderer
 					w.Line("_isSetVerifiable = false;");
 					w.Line("_setVerifiableTimes = null;");
 					w.Line("_onSet = callback;");
-					w.Line("_onSetTracking = new IndexerSetTrackingImpl(this);");
+					w.Line("_onSetTracking = new IndexerSetBuilderImpl(this);");
 					w.Line("return _onSetTracking;");
 				}
 				w.Line();
 
-				w.Line($"/// <summary>Starts a setter callback sequence. Returns sequence for ThenSet chaining. Each callback runs exactly once.</summary>");
-				w.Line($"public global::KnockOff.IIndexerSetSequence<{model.KeyType}, {model.ValueType}> OnSetSequence(global::System.Action<{model.ParameterTypes}, {model.ValueType}> callback)");
-				using (w.Braces())
-				{
-					w.Line("_onSet = null;");
-					w.Line("_onSetTracking = null;");
-					w.Line("_isSetVerifiable = false;");
-					w.Line("_setVerifiableTimes = null;");
-					w.Line($"_setSequence = new global::System.Collections.Generic.List<(global::System.Action<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerSetTrackingImpl Tracking)>();");
-					w.Line("var tracking = new IndexerSetTrackingImpl(this);");
-					w.Line("_setSequence.Add((callback, tracking));");
-					w.Line("_setSequenceIndex = 0;");
-					w.Line("return new IndexerSetSequenceImpl(this);");
-				}
-				w.Line();
 			}
 
 			// InvokeGet/InvokeSet methods
@@ -191,12 +160,12 @@ internal static class IndexerInterceptorRenderer
 			// Nested classes
 			if (model.HasGetter)
 			{
-				RenderIndexerGetTrackingImpl(w, model.KeyType, fullInterceptorClassName);
+				RenderIndexerGetBuilderImpl(w, model.KeyType, model.ValueType, model.ParameterTypes, fullInterceptorClassName);
 				RenderIndexerGetSequenceImpl(w, model.KeyType, model.ValueType, model.ParameterTypes, fullInterceptorClassName);
 			}
 			if (model.HasSetter)
 			{
-				RenderIndexerSetTrackingImpl(w, model.KeyType, model.ValueType, fullInterceptorClassName);
+				RenderIndexerSetBuilderImpl(w, model.KeyType, model.ValueType, model.ParameterTypes, fullInterceptorClassName);
 				RenderIndexerSetSequenceImpl(w, model.KeyType, model.ValueType, model.ParameterTypes, fullInterceptorClassName);
 			}
 		}
@@ -543,21 +512,23 @@ internal static class IndexerInterceptorRenderer
 
 	#endregion
 
-	#region Nested IndexerGetTrackingImpl
+	#region Nested IndexerGetBuilderImpl
 
-	private static void RenderIndexerGetTrackingImpl(
+	private static void RenderIndexerGetBuilderImpl(
 		CodeWriter w,
 		string keyType,
+		string valueType,
+		string parameterTypes,
 		string interceptorClassName)
 	{
-		w.Line($"/// <summary>Tracks invocations for getter callback registration.</summary>");
-		w.Line($"private sealed class IndexerGetTrackingImpl : global::KnockOff.IIndexerGetTracking<{keyType}>");
+		w.Line($"/// <summary>Builder for getter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
+		w.Line($"private sealed class IndexerGetBuilderImpl : global::KnockOff.IIndexerGetBuilder<{keyType}, {valueType}>");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
 			w.Line();
 
-			w.Line($"public IndexerGetTrackingImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line($"public IndexerGetBuilderImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
 			w.Line($"private {keyType} _lastKey = default!;");
@@ -591,8 +562,28 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
+			// ThenGet(callback) - lazy elevation from repeating to sequence mode
+			w.Line($"/// <summary>Elevates to sequence mode and adds another getter callback. Returns sequence for further chaining.</summary>");
+			w.Line($"public global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}> ThenGet(global::System.Func<{parameterTypes}, {valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("if (_interceptor._getSequence == null)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor._getSequence = new global::System.Collections.Generic.List<(global::System.Func<{parameterTypes}, {valueType}> Callback, IndexerGetBuilderImpl Tracking)>();");
+					w.Line("_interceptor._getSequence.Add((_interceptor._onGet!, this));");
+					w.Line("_interceptor._onGet = null;");
+					w.Line("_interceptor._onGetTracking = null;");  // Clear to prevent double-counting in TotalGetCount
+					w.Line("_interceptor._getSequenceIndex = 0;");
+				}
+				w.Line("var nextBuilder = new IndexerGetBuilderImpl(_interceptor);");
+				w.Line("_interceptor._getSequence.Add((callback, nextBuilder));");
+				w.Line("return new IndexerGetSequenceImpl(_interceptor);");
+			}
+			w.Line();
+
 			w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-			w.Line($"public global::KnockOff.IIndexerGetTracking<{keyType}> Verifiable()");
+			w.Line($"public global::KnockOff.IIndexerGetBuilder<{keyType}, {valueType}> Verifiable()");
 			using (w.Braces())
 			{
 				w.Line("_interceptor._isGetVerifiable = true;");
@@ -601,36 +592,32 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-			w.Line($"public global::KnockOff.IIndexerGetTracking<{keyType}> Verifiable(global::KnockOff.Times times)");
-			using (w.Braces())
-			{
-				w.Line("_interceptor._isGetVerifiable = true;");
-				w.Line("_interceptor._getVerifiableTimes = times;");
-				w.Line("return this;");
-			}
+			// Explicit interface implementation for base IIndexerGetTracking<TKey>.Verifiable()
+			w.Line($"global::KnockOff.IIndexerGetTracking<{keyType}> global::KnockOff.IIndexerGetTracking<{keyType}>.Verifiable() => Verifiable();");
+			w.Line($"global::KnockOff.IIndexerGetTracking<{keyType}> global::KnockOff.IIndexerGetTracking<{keyType}>.Verifiable(global::KnockOff.Times times) => Verifiable();");
 		}
 		w.Line();
 	}
 
 	#endregion
 
-	#region Nested IndexerSetTrackingImpl
+	#region Nested IndexerSetBuilderImpl
 
-	private static void RenderIndexerSetTrackingImpl(
+	private static void RenderIndexerSetBuilderImpl(
 		CodeWriter w,
 		string keyType,
 		string valueType,
+		string parameterTypes,
 		string interceptorClassName)
 	{
-		w.Line($"/// <summary>Tracks invocations for setter callback registration.</summary>");
-		w.Line($"private sealed class IndexerSetTrackingImpl : global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}>");
+		w.Line($"/// <summary>Builder for setter callback registration. Supports tracking and lazy elevation to sequence.</summary>");
+		w.Line($"private sealed class IndexerSetBuilderImpl : global::KnockOff.IIndexerSetBuilder<{keyType}, {valueType}>");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
 			w.Line();
 
-			w.Line($"public IndexerSetTrackingImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line($"public IndexerSetBuilderImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
 			w.Line($"private ({keyType} Key, {valueType} Value)? _lastEntry;");
@@ -664,8 +651,28 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
+			// ThenSet(callback) - lazy elevation from repeating to sequence mode
+			w.Line($"/// <summary>Elevates to sequence mode and adds another setter callback. Returns sequence for further chaining.</summary>");
+			w.Line($"public global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}> ThenSet(global::System.Action<{parameterTypes}, {valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("if (_interceptor._setSequence == null)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor._setSequence = new global::System.Collections.Generic.List<(global::System.Action<{parameterTypes}, {valueType}> Callback, IndexerSetBuilderImpl Tracking)>();");
+					w.Line("_interceptor._setSequence.Add((_interceptor._onSet!, this));");
+					w.Line("_interceptor._onSet = null;");
+					w.Line("_interceptor._onSetTracking = null;");  // Clear to prevent double-counting in TotalSetCount
+					w.Line("_interceptor._setSequenceIndex = 0;");
+				}
+				w.Line("var nextBuilder = new IndexerSetBuilderImpl(_interceptor);");
+				w.Line("_interceptor._setSequence.Add((callback, nextBuilder));");
+				w.Line("return new IndexerSetSequenceImpl(_interceptor);");
+			}
+			w.Line();
+
 			w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-			w.Line($"public global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}> Verifiable()");
+			w.Line($"public global::KnockOff.IIndexerSetBuilder<{keyType}, {valueType}> Verifiable()");
 			using (w.Braces())
 			{
 				w.Line("_interceptor._isSetVerifiable = true;");
@@ -674,14 +681,9 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-			w.Line($"public global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}> Verifiable(global::KnockOff.Times times)");
-			using (w.Braces())
-			{
-				w.Line("_interceptor._isSetVerifiable = true;");
-				w.Line("_interceptor._setVerifiableTimes = times;");
-				w.Line("return this;");
-			}
+			// Explicit interface implementation for base IIndexerSetTracking<TKey, TValue>.Verifiable()
+			w.Line($"global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}> global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}>.Verifiable() => Verifiable();");
+			w.Line($"global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}> global::KnockOff.IIndexerSetTracking<{keyType}, {valueType}>.Verifiable(global::KnockOff.Times times) => Verifiable();");
 		}
 		w.Line();
 	}
@@ -711,7 +713,7 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"public global::KnockOff.IIndexerGetSequence<{keyType}, {valueType}> ThenGet(global::System.Func<{parameterTypes}, {valueType}> callback)");
 			using (w.Braces())
 			{
-				w.Line("var tracking = new IndexerGetTrackingImpl(_interceptor);");
+				w.Line("var tracking = new IndexerGetBuilderImpl(_interceptor);");
 				w.Line("_interceptor._getSequence!.Add((callback, tracking));");
 				w.Line("return this;");
 			}
@@ -770,7 +772,7 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"public global::KnockOff.IIndexerSetSequence<{keyType}, {valueType}> ThenSet(global::System.Action<{parameterTypes}, {valueType}> callback)");
 			using (w.Braces())
 			{
-				w.Line("var tracking = new IndexerSetTrackingImpl(_interceptor);");
+				w.Line("var tracking = new IndexerSetBuilderImpl(_interceptor);");
 				w.Line("_interceptor._setSequence!.Add((callback, tracking));");
 				w.Line("return this;");
 			}

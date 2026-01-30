@@ -167,18 +167,16 @@ public partial class PropertyValueOverloadTests
 	#region Sequence Tests
 
 	[Fact]
-	public void OnGetSequence_WithValue_StartsSequence()
+	public void OnGet_WithValue_ThenGet_CreatesSequence()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGetSequence("first");
+		knockOff.Name.OnGet("first").ThenGet("second");
 
 		Assert.Equal("first", service.Name);
+		Assert.Equal("second", service.Name);
 	}
-
-	// Note: ThenGet(value) chaining requires interface changes (Phase 5)
-	// For now, use lambda syntax for chaining: .ThenGet(() => "value")
 
 	#endregion
 

@@ -146,7 +146,7 @@ public void OnCall_WithStaticValue()
 **Available on:**
 - **Methods**: `stub.MethodName.Returns(value)` - Returns the same value for every call
 - **Properties**: `stub.PropertyName.OnGet(value)` - Returns the same value for every get
-- **Sequences**: `stub.MethodName.OnCallSequence(callback).ThenCall(callback)` - Each callback in sequence
+- **Sequences**: `stub.MethodName.OnCall(callback).ThenCall(callback)` - Each callback in sequence
 
 **Key difference from callbacks:**
 - **Returns(value)**: Simple, concise for constant returns
@@ -248,7 +248,7 @@ public void Understanding_Property_Priority()
     IConfigSvc config = stub;
 
     // Priority order (from highest to lowest):
-    // 1. OnGetSequence (if configured and not exhausted)
+    // 1. Sequence (if elevated via ThenGet() and not exhausted)
     // 2. OnGet callback/value (most recent takes precedence)
     // 3. Source delegation (if configured)
     // 4. Strict mode check (throws if enabled and nothing configured)

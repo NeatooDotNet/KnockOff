@@ -462,8 +462,8 @@ public partial class AsyncCallbackSimplificationTests
 		stub.GetStringAsync.OnCall((id) => "simplified");
 		Assert.Equal("simplified", await service.GetStringAsync(1));
 
-		// Configure with sequence - should clear simplified callback
-		stub.GetStringAsync.OnCallSequence((id) => Task.FromResult("seq1"))
+		// Configure with OnCall().ThenCall() sequence - should clear simplified callback
+		stub.GetStringAsync.OnCall((id) => Task.FromResult("seq1"))
 			.ThenCall((id) => Task.FromResult("seq2"));
 		Assert.Equal("seq1", await service.GetStringAsync(2));
 		Assert.Equal("seq2", await service.GetStringAsync(3));

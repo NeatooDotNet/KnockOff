@@ -38,6 +38,9 @@ internal static class UnifiedInterceptorBuilder
 		{
 			// Single-signature case
 			var sig = uniqueSignatures[0];
+			var onCallDelegateType = BuildOnCallDelegateType(methodName, sig, ownerClassName, ownerTypeParameters);
+			// Get the delegate type without nullable marker for builder interface
+			var delegateTypeForBuilder = onCallDelegateType.TrimEnd('?');
 			return new UnifiedMethodInterceptorModel(
 				InterceptorClassName: interceptorClassName,
 				MethodName: methodName,
@@ -49,12 +52,12 @@ internal static class UnifiedInterceptorBuilder
 				ParameterDeclarations: sig.ParameterDeclarations,
 				ReturnType: sig.ReturnType,
 				IsVoid: sig.IsVoid,
-				OnCallDelegateType: BuildOnCallDelegateType(methodName, sig, ownerClassName, ownerTypeParameters),
+				OnCallDelegateType: onCallDelegateType,
 				NeedsCustomDelegate: NeedsCustomDelegate(sig),
 				CustomDelegateSignature: BuildCustomDelegateSignature(methodName, sig, ownerClassName, ownerTypeParameters),
 				LastArgType: GetLastArgType(sig.TrackableParameters),
 				LastArgsType: GetLastArgsType(sig.TrackableParameters),
-				TrackingInterface: GetTrackingInterface(sig.TrackableParameters),
+				BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateTypeForBuilder),
 				DefaultExpression: sig.DefaultExpression,
 				ThrowsOnDefault: sig.ThrowsOnDefault,
 				Overloads: EquatableArray<MethodOverloadSignature>.Empty);
@@ -80,7 +83,8 @@ internal static class UnifiedInterceptorBuilder
 				CustomDelegateSignature: null,
 				LastArgType: null,
 				LastArgsType: null,
-				TrackingInterface: "global::KnockOff.IMethodTracking",
+				// For multi-overload, the builder interface is per-signature, not at the model level
+				BuilderInterface: "global::KnockOff.IMethodTracking",
 				DefaultExpression: first.DefaultExpression,
 				ThrowsOnDefault: first.ThrowsOnDefault,
 				Overloads: new EquatableArray<MethodOverloadSignature>(
@@ -134,7 +138,7 @@ internal static class UnifiedInterceptorBuilder
 			DelegateSignature: delegateSignature,
 			LastArgType: GetLastArgType(sig.TrackableParameters),
 			LastArgsType: GetLastArgsType(sig.TrackableParameters),
-			TrackingInterface: GetTrackingInterface(sig.TrackableParameters),
+			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateName),
 			DefaultExpression: sig.DefaultExpression,
 			ThrowsOnDefault: sig.ThrowsOnDefault);
 	}
@@ -190,7 +194,26 @@ internal static class UnifiedInterceptorBuilder
 	#region Tracking Type Determination
 
 	/// <summary>
+	/// Determines the IMethodCallBuilder interface type based on trackable parameter count.
+	/// Builder interfaces extend the tracking interfaces and add ThenCall() for sequence elevation.
+	/// </summary>
+	public static string GetBuilderInterface(EquatableArray<ParameterModel> trackableParams, string delegateType)
+	{
+		if (trackableParams.Count == 0)
+			return $"global::KnockOff.IMethodCallBuilder<{delegateType}>";
+		if (trackableParams.Count == 1)
+		{
+			var param = trackableParams.GetArray()![0];
+			return $"global::KnockOff.IMethodCallBuilder<{delegateType}, {param.Type}>";
+		}
+		// Multiple params use tuple
+		var tupleType = GetLastArgsType(trackableParams);
+		return $"global::KnockOff.IMethodCallBuilderArgs<{delegateType}, {tupleType}>";
+	}
+
+	/// <summary>
 	/// Determines the IMethodTracking interface type based on trackable parameter count.
+	/// Used internally by the builder implementation class.
 	/// </summary>
 	public static string GetTrackingInterface(EquatableArray<ParameterModel> trackableParams)
 	{

@@ -306,7 +306,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.OnCallSequence((a, b) => 1).ThenCall((a, b) => 2);
+		stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2);
 		stub.Add.When(1, 2).Returns(100);
 
 		// When takes priority when matching

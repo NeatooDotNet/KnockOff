@@ -193,16 +193,15 @@ public class PluginReadmeOnCallTests
 public class PluginReadmeSequentialTests
 {
     [Fact]
-    public void OnCallSequence_ThenCall()
+    public void OnCall_ThenCall()
     {
         var stub = new PluginReadmeValueRepoStub();
 
         #region plugin-readme-sequential
         stub.GetValue
-            .OnCallSequence(() => 10)
+            .OnCall(() => 10)
             .ThenCall(() => 20)
-            .ThenCall(() => 30)
-            .Verifiable();
+            .ThenCall(() => 30);
         #endregion
 
         IPluginReadmeValueRepo service = stub;
@@ -210,8 +209,6 @@ public class PluginReadmeSequentialTests
         Assert.Equal(10, service.GetValue());
         Assert.Equal(20, service.GetValue());
         Assert.Equal(30, service.GetValue());
-
-        stub.Verify();
     }
 }
 

@@ -435,3 +435,219 @@ public class OverloadedMethodTests
         #endregion
     }
 }
+
+// =============================================================================
+// Interfaces for Sequence Samples
+// =============================================================================
+
+public interface IStatusSvc
+{
+    string GetStatus();
+}
+
+public interface INotifierSvc
+{
+    void Notify(string message);
+}
+
+public interface ICalculatorSvc
+{
+    int Calculate(int x, int y);
+}
+
+public interface IValueSvc
+{
+    int GetValue();
+}
+
+public interface IProcessSvc
+{
+    void Process();
+}
+
+// =============================================================================
+// Stubs for Sequence Samples
+// =============================================================================
+
+[KnockOff]
+public partial class StatusSvcStub : IStatusSvc { }
+
+[KnockOff]
+public partial class NotifierSvcStub : INotifierSvc { }
+
+[KnockOff]
+public partial class CalculatorSvcStub : ICalculatorSvc { }
+
+[KnockOff]
+public partial class ValueSvcStub : IValueSvc { }
+
+[KnockOff]
+public partial class ProcessSvcStub : IProcessSvc { }
+
+// =============================================================================
+// Sequence Samples
+// =============================================================================
+
+public class SequenceTests
+{
+    [Fact]
+    public void Sequence_BasicStatusProgression()
+    {
+        var stub = new StatusSvcStub();
+
+        #region methods-sequence-basic
+        // Configure different returns for successive calls
+        stub.GetStatus
+            .OnCall(() => "Pending")
+            .ThenCall(() => "Processing")
+            .ThenCall(() => "Complete");
+
+        IStatusSvc service = stub;
+
+        // Each call returns the next value in sequence
+        Assert.Equal("Pending", service.GetStatus());
+        Assert.Equal("Processing", service.GetStatus());
+        Assert.Equal("Complete", service.GetStatus());
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_VoidMethods()
+    {
+        var stub = new NotifierSvcStub();
+
+        #region methods-sequence-void
+        // Void method sequences use Action callbacks
+        var calls = new List<string>();
+        stub.Notify
+            .OnCall((msg) => calls.Add("first"))
+            .ThenCall((msg) => calls.Add("second"))
+            .ThenCall((msg) => calls.Add("third"));
+
+        INotifierSvc notifier = stub;
+
+        notifier.Notify("a");
+        notifier.Notify("b");
+        notifier.Notify("c");
+
+        Assert.Equal(new[] { "first", "second", "third" }, calls);
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_ReturnMethods()
+    {
+        var stub = new CalculatorSvcStub();
+
+        #region methods-sequence-return
+        // Return method sequences use Func callbacks
+        stub.Calculate
+            .OnCall((x, y) => x + y)
+            .ThenCall((x, y) => x * y)
+            .ThenCall((x, y) => x - y);
+
+        ICalculatorSvc calc = stub;
+
+        // 5 + 3 = 8
+        Assert.Equal(8, calc.Calculate(5, 3));
+
+        // 5 * 3 = 15
+        Assert.Equal(15, calc.Calculate(5, 3));
+
+        // 5 - 3 = 2
+        Assert.Equal(2, calc.Calculate(5, 3));
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_Exhaustion_ReturnsDefault()
+    {
+        var stub = new ValueSvcStub();
+
+        #region methods-sequence-exhaustion
+        // Sequence callbacks run once each in order
+        stub.GetValue
+            .OnCall(() => 1)
+            .ThenCall(() => 2)
+            .ThenCall(() => 3);
+
+        IValueSvc service = stub;
+
+        Assert.Equal(1, service.GetValue());
+        Assert.Equal(2, service.GetValue());
+        Assert.Equal(3, service.GetValue());
+
+        // After exhaustion: default(int) = 0 in non-strict mode
+        Assert.Equal(0, service.GetValue());
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_MixedValuesAndCallbacks()
+    {
+        var stub = new StatusSvcStub();
+
+        #region methods-sequence-mixed
+        // Mix fixed values with dynamic callbacks using OnCall
+        stub.GetStatus
+            .OnCall(() => "Initial")
+            .ThenCall(() => DateTime.Now.ToString("HH:mm:ss"))
+            .ThenCall(() => "Final");
+
+        IStatusSvc service = stub;
+
+        // First call: fixed value
+        Assert.Equal("Initial", service.GetStatus());
+
+        // Second call: dynamic value (time)
+        var timeResult = service.GetStatus();
+        Assert.Matches(@"\d{2}:\d{2}:\d{2}", timeResult);
+
+        // Third call: fixed value
+        Assert.Equal("Final", service.GetStatus());
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_Verification()
+    {
+        var stub = new ProcessSvcStub();
+
+        #region methods-sequence-verification
+        // Sequence can be verified like any callback
+        var sequence = stub.Process
+            .OnCall(() => { })
+            .ThenCall(() => { })
+            .ThenCall(() => { });
+
+        IProcessSvc processor = stub;
+        processor.Process();
+        processor.Process();
+        processor.Process();
+
+        // Verify sequence was exhausted
+        sequence.Verify();
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_WithBatchVerification()
+    {
+        var stub = new ProcessSvcStub();
+
+        #region methods-sequence-with-times
+        // Mark sequence for batch verification via stub.Verify()
+        stub.Process
+            .OnCall(() => { })
+            .ThenCall(() => { })
+            .Verifiable();
+
+        IProcessSvc processor = stub;
+        processor.Process();
+        processor.Process();
+
+        // stub.Verify() checks all Verifiable() sequences completed
+        stub.Verify();
+        #endregion
+    }
+}

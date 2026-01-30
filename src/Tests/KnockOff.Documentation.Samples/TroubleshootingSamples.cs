@@ -231,7 +231,7 @@ public class OnGetPriorityTests
         IConfigSvc config = stub;
 
         // Priority order (from highest to lowest):
-        // 1. OnGetSequence (if configured and not exhausted)
+        // 1. Sequence (if elevated via ThenGet() and not exhausted)
         // 2. OnGet callback/value (most recent takes precedence)
         // 3. Source delegation (if configured)
         // 4. Strict mode check (throws if enabled and nothing configured)

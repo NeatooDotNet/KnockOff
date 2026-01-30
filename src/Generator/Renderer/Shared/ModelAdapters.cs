@@ -62,6 +62,9 @@ internal static class ModelAdapters
 			? className
 			: $"{className}{typeParameters}";
 
+		// Get delegate type without nullable marker for builder interface
+		var delegateTypeForBuilder = first.OnCallDelegateType.TrimEnd('?');
+
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
 			MethodName: first.MethodName,
@@ -78,7 +81,7 @@ internal static class ModelAdapters
 			CustomDelegateSignature: first.CustomDelegateSignature,
 			LastArgType: GetLastArgType(first.TrackableParameters),
 			LastArgsType: GetLastArgsType(first.TrackableParameters, first.LastCallType),
-			TrackingInterface: GetTrackingInterface(first.TrackableParameters, first.LastCallType),
+			BuilderInterface: GetBuilderInterface(first.TrackableParameters, first.LastCallType, delegateTypeForBuilder),
 			DefaultExpression: first.DefaultExpression,
 			ThrowsOnDefault: first.ThrowsOnDefault,
 			Overloads: EquatableArray<MethodOverloadSignature>.Empty);
@@ -123,7 +126,7 @@ internal static class ModelAdapters
 				DelegateSignature: delegateSignature,
 				LastArgType: GetLastArgType(method.TrackableParameters),
 				LastArgsType: GetLastArgsType(method.TrackableParameters, method.LastCallType),
-				TrackingInterface: GetTrackingInterface(method.TrackableParameters, method.LastCallType),
+				BuilderInterface: GetBuilderInterface(method.TrackableParameters, method.LastCallType, delegateName),
 				DefaultExpression: method.DefaultExpression,
 				ThrowsOnDefault: method.ThrowsOnDefault));
 		}
@@ -144,7 +147,8 @@ internal static class ModelAdapters
 			CustomDelegateSignature: null,
 			LastArgType: null,
 			LastArgsType: null,
-			TrackingInterface: "global::KnockOff.IMethodTracking",
+			// For multi-overload, the builder interface is per-signature, not at the model level
+			BuilderInterface: "global::KnockOff.IMethodTracking",
 			DefaultExpression: first.DefaultExpression,
 			ThrowsOnDefault: first.ThrowsOnDefault,
 			Overloads: new EquatableArray<MethodOverloadSignature>(overloads.ToArray()));
@@ -182,17 +186,17 @@ internal static class ModelAdapters
 		return lastCallType ?? $"({string.Join(", ", trackableParams.Select(p => $"{p.Type} {p.EscapedName}"))})";
 	}
 
-	private static string GetTrackingInterface(EquatableArray<ParameterModel> trackableParams, string? lastCallType)
+	private static string GetBuilderInterface(EquatableArray<ParameterModel> trackableParams, string? lastCallType, string delegateType)
 	{
 		if (trackableParams.Count == 0)
-			return "global::KnockOff.IMethodTracking";
+			return $"global::KnockOff.IMethodCallBuilder<{delegateType}>";
 		if (trackableParams.Count == 1)
 		{
 			var param = trackableParams.GetArray()![0];
-			return $"global::KnockOff.IMethodTracking<{param.Type}>";
+			return $"global::KnockOff.IMethodCallBuilder<{delegateType}, {param.Type}>";
 		}
 		var tupleType = lastCallType ?? $"({string.Join(", ", trackableParams.Select(p => $"{p.Type} {p.EscapedName}"))})";
-		return $"global::KnockOff.IMethodTrackingArgs<{tupleType}>";
+		return $"global::KnockOff.IMethodCallBuilderArgs<{delegateType}, {tupleType}>";
 	}
 
 	private static string BuildDelegateParamList(EquatableArray<ParameterModel> parameters)

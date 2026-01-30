@@ -4,39 +4,34 @@ namespace KnockOff.Tests;
 /// Tests for value-based sequence overloads.
 /// Phase 5 of value-based overloads feature.
 ///
-/// Note: Method sequence value overloads (OnCallSequence(value), ThenCall(value))
-/// are not yet implemented - those are callback-only.
-///
-/// Property sequences have value overloads:
-/// - OnGetSequence(value) - implemented and works
-/// - ThenGet(value) - generated on concrete class but interface returns IPropertyGetSequence
-///   which doesn't include the value overload, so chaining must use lambda syntax
+/// Property OnGet/OnCall support both values and callbacks, with ThenGet/ThenCall for sequencing:
+/// - OnGet(value) - configures repeating value return
+/// - OnGet(callback) - configures repeating callback
+/// - OnGet(...).ThenGet(...) - elevates to sequence mode
 /// </summary>
 public partial class SequenceValueOverloadTests
 {
 	#region Property Sequence Value Tests
 
 	[Fact]
-	public void OnGetSequence_WithValue_ReturnsSingleValue()
+	public void OnGet_WithValue_ReturnsSingleValue()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGetSequence("first");
+		knockOff.Name.OnGet("first");
 
 		Assert.Equal("first", service.Name);
 	}
 
 	[Fact]
-	public void OnGetSequence_WithValue_ThenGet_WithCallback_ReturnsSequence()
+	public void OnGet_WithValue_ThenGet_WithCallback_ReturnsSequence()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		// Note: ThenGet(value) is on the concrete class but OnGetSequence returns
-		// IPropertyGetSequence which doesn't have the value overload.
-		// Use lambda syntax for chaining.
-		knockOff.Name.OnGetSequence("first")
+		// OnGet returns builder interface, ThenGet elevates to sequence mode
+		knockOff.Name.OnGet("first")
 			.ThenGet(() => "second")
 			.ThenGet(() => "third");
 
@@ -46,12 +41,12 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void OnGetSequence_WithCallback_ThenGet_ReturnsSequence()
+	public void OnGet_WithCallback_ThenGet_ReturnsSequence()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGetSequence(() => "callback first")
+		knockOff.Name.OnGet(() => "callback first")
 			.ThenGet(() => "callback second")
 			.ThenGet(() => "callback third");
 
@@ -61,12 +56,12 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void OnGetSequence_WithValue_TracksCorrectly()
+	public void OnGet_WithValue_TracksCorrectly()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		var sequence = knockOff.Name.OnGetSequence("a")
+		var sequence = knockOff.Name.OnGet("a")
 			.ThenGet(() => "b")
 			.ThenGet(() => "c");
 
@@ -80,34 +75,34 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void OnGetSequence_WithValue_SupportsNullValue()
+	public void OnGet_WithValue_SupportsNullValue()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGetSequence((string?)null);
+		knockOff.Name.OnGet((string?)null);
 
 		Assert.Null(service.Name);
 	}
 
 	[Fact]
-	public void OnGetSequence_WithIntValue_WorksWithValueTypes()
+	public void OnGet_WithIntValue_WorksWithValueTypes()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Count.OnGetSequence(42);
+		knockOff.Count.OnGet(42);
 
 		Assert.Equal(42, service.Count);
 	}
 
 	[Fact]
-	public void OnGetSequence_WithBoolValue_WorksWithBooleans()
+	public void OnGet_WithBoolValue_WorksWithBooleans()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.IsEnabled.OnGetSequence(true);
+		knockOff.IsEnabled.OnGet(true);
 
 		Assert.True(service.IsEnabled);
 	}
@@ -120,12 +115,12 @@ public partial class SequenceValueOverloadTests
 	// These tests demonstrate the existing callback-based sequences work correctly.
 
 	[Fact]
-	public void OnCallSequence_WithCallbacks_ReturnsSequenceValues()
+	public void OnCall_WithCallbacks_ReturnsSequenceValues()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.OnCallSequence(() => "first")
+		knockOff.GetOptional.OnCall(() => "first")
 			.ThenCall(() => "second")
 			.ThenCall(() => "third");
 
@@ -135,12 +130,12 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCallSequence_WithCallbacks_TracksCorrectly()
+	public void OnCall_WithCallbacks_TracksCorrectly()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var sequence = knockOff.GetOptional.OnCallSequence(() => "a")
+		var sequence = knockOff.GetOptional.OnCall(() => "a")
 			.ThenCall(() => "b")
 			.ThenCall(() => "c");
 
@@ -152,13 +147,13 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCallSequence_CanMixWithOnCallValue_AfterSequenceExhausted()
+	public void OnCall_CanMixWithOnCallValue_AfterSequenceExhausted()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
 		// Set up sequence that will be exhausted
-		knockOff.GetOptional.OnCallSequence(() => "seq1").ThenCall(() => "seq2");
+		knockOff.GetOptional.OnCall(() => "seq1").ThenCall(() => "seq2");
 
 		// Consume the sequence
 		Assert.Equal("seq1", service.GetOptional());
@@ -176,12 +171,12 @@ public partial class SequenceValueOverloadTests
 	#region Async Method Sequence Tests
 
 	[Fact]
-	public async Task AsyncMethod_OnCallSequence_ReturnsSequenceValues()
+	public async Task AsyncMethod_OnCall_ReturnsSequenceValues()
 	{
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		knockOff.GetRequiredAsync.OnCallSequence(() => Task.FromResult("first"))
+		knockOff.GetRequiredAsync.OnCall(() => Task.FromResult("first"))
 			.ThenCall(() => Task.FromResult("second"))
 			.ThenCall(() => Task.FromResult("third"));
 
@@ -195,39 +190,57 @@ public partial class SequenceValueOverloadTests
 	#region Edge Cases
 
 	[Fact]
-	public void OnGetSequence_Exhausted_ReturnsDefaultInNonStrictMode()
+	public void OnGet_WithoutThenGet_RepeatsForever()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGetSequence("only one");
+		knockOff.Name.OnGet("repeating");
 
-		Assert.Equal("only one", service.Name);
-		// Second access - sequence exhausted, returns default in non-strict mode
+		// OnGet without ThenGet repeats the same value forever
+		Assert.Equal("repeating", service.Name);
+		Assert.Equal("repeating", service.Name);
+		Assert.Equal("repeating", service.Name);
+	}
+
+	[Fact]
+	public void OnGet_ThenGet_Exhausted_ReturnsDefaultInNonStrictMode()
+	{
+		var knockOff = new PropertyTestKnockOff();
+		IPropertyTest service = knockOff;
+
+		// Create sequence with ThenGet to enable exhaustion
+		knockOff.Name.OnGet("first").ThenGet("second");
+
+		Assert.Equal("first", service.Name);
+		Assert.Equal("second", service.Name);
+		// Third access - sequence exhausted, returns default in non-strict mode
 		Assert.Null(service.Name);
 	}
 
 	[Fact]
-	public void OnGetSequence_Exhausted_ThrowsInStrictMode()
+	public void OnGet_ThenGet_Exhausted_ThrowsInStrictMode()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		knockOff.Strict = true;
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGetSequence("only one");
+		// Create sequence with ThenGet to enable exhaustion
+		knockOff.Name.OnGet("first").ThenGet("second");
 
-		Assert.Equal("only one", service.Name);
-		// Second access - sequence exhausted, throws in strict mode
+		Assert.Equal("first", service.Name);
+		Assert.Equal("second", service.Name);
+		// Third access - sequence exhausted, throws in strict mode
 		Assert.Throws<StubException>(() => service.Name);
 	}
 
 	[Fact]
-	public void OnGetSequence_VerifyIncomplete_Throws()
+	public void OnGet_VerifyIncomplete_Throws()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		var sequence = knockOff.Name.OnGetSequence("a")
+		var sequence = knockOff.Name.OnGet("a")
 			.ThenGet(() => "b")
 			.ThenGet(() => "c");
 
@@ -240,12 +253,12 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void OnGetSequence_Reset_AllowsReplay()
+	public void OnGet_Reset_AllowsReplay()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGetSequence("a").ThenGet(() => "b");
+		knockOff.Name.OnGet("a").ThenGet(() => "b");
 
 		Assert.Equal("a", service.Name);
 		Assert.Equal("b", service.Name);
@@ -258,29 +271,47 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void MethodOnCallSequence_Exhausted_ReturnsDefaultInNonStrictMode()
+	public void MethodOnCall_WithoutThenCall_RepeatsForever()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.OnCallSequence(() => "only one");
+		knockOff.GetOptional.OnCall(() => "repeating");
 
-		Assert.Equal("only one", service.GetOptional());
-		// Second access - sequence exhausted, returns default in non-strict mode
+		// OnCall without ThenCall repeats the same callback forever
+		Assert.Equal("repeating", service.GetOptional());
+		Assert.Equal("repeating", service.GetOptional());
+		Assert.Equal("repeating", service.GetOptional());
+	}
+
+	[Fact]
+	public void MethodOnCall_ThenCall_Exhausted_ReturnsDefaultInNonStrictMode()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Create sequence with ThenCall to enable exhaustion
+		knockOff.GetOptional.OnCall(() => "first").ThenCall(() => "second");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Third access - sequence exhausted, returns default in non-strict mode
 		Assert.Null(service.GetOptional());
 	}
 
 	[Fact]
-	public void MethodOnCallSequence_Exhausted_ThrowsInStrictMode()
+	public void MethodOnCall_ThenCall_Exhausted_ThrowsInStrictMode()
 	{
 		var knockOff = new SampleKnockOff();
 		knockOff.Strict = true;
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.OnCallSequence(() => "only one");
+		// Create sequence with ThenCall to enable exhaustion
+		knockOff.GetOptional.OnCall(() => "first").ThenCall(() => "second");
 
-		Assert.Equal("only one", service.GetOptional());
-		// Second access - sequence exhausted, throws in strict mode
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Third access - sequence exhausted, throws in strict mode
 		Assert.Throws<StubException>(() => service.GetOptional());
 	}
 

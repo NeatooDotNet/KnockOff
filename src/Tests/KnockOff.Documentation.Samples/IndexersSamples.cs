@@ -282,13 +282,13 @@ public class SequenceSamples
 {
     #region indexers-ongetsequence-basic
     [Fact]
-    public void OnGetSequence_DifferentValuesPerAccess()
+    public void OnGet_ThenGet_DifferentValuesPerAccess()
     {
         var stub = new ConfigStoreStub();
 
         // Configure sequence: first access returns "cached", second returns "fresh"
         stub.Indexer
-            .OnGetSequence((key) => "cached")
+            .OnGet((key) => "cached")
             .ThenGet((key) => "fresh");
 
         IConfigStore config = stub;
@@ -301,9 +301,9 @@ public class SequenceSamples
     }
     #endregion
 
-    #region indexers-onsetsequence-basic
+    #region indexers-onset-then-sequence
     [Fact]
-    public void OnSetSequence_DifferentBehaviorPerWrite()
+    public void OnSet_ThenSet_DifferentBehaviorPerWrite()
     {
         var stub = new ProductInventoryStub();
 
@@ -311,7 +311,7 @@ public class SequenceSamples
 
         // First write fails validation, second write succeeds
         stub.Indexer
-            .OnSetSequence((sku, qty) =>
+            .OnSet((sku, qty) =>
             {
                 attemptCount++;
                 throw new InvalidOperationException("Service unavailable");
