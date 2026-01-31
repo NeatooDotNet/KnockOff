@@ -87,16 +87,16 @@ Use `stub.Interceptor.OnCall(...)` to configure custom behavior when the delegat
 
 **Important:** Each call to `OnCall` replaces the previous configuration. The most recent `OnCall` wins.
 
-### OnCall Overloads
+### Configuration Methods
 
-Delegates with return values support two OnCall overloads:
+Delegates with return values support two configuration methods:
 
-| Overload | Signature | Use Case | Example |
-|----------|-----------|----------|---------|
-| **Value** | `OnCall(TReturn value)` | Return fixed value regardless of input | `stub.Interceptor.OnCall("SUCCESS")` |
-| **Callback** | `OnCall(Func<...> callback)` | Compute return value from input | `stub.Interceptor.OnCall((x) => x * 2)` |
+| Method | Signature | Use Case | Example |
+|--------|-----------|----------|---------|
+| **Returns** | `Returns(TReturn value)` | Return fixed value regardless of input | `stub.Interceptor.Returns("SUCCESS")` |
+| **OnCall** | `OnCall(Func<...> callback)` | Compute return value from input | `stub.Interceptor.OnCall((x) => x * 2)` |
 
-Void delegates (`Action`, `Action<T>`) support only the callback overload:
+Void delegates (`Action`, `Action<T>`) support only the callback method:
 
 | Overload | Signature | Use Case | Example |
 |----------|-----------|----------|---------|
@@ -125,9 +125,9 @@ public void OnCallVoid_ExecutesCustomLogic()
 ```
 <!-- endSnippet -->
 
-### OnCall with Fixed Return Value
+### Returns with Fixed Return Value
 
-For delegates that return values, configure a fixed return value using the value overload. The value is returned regardless of input arguments.
+For delegates that return values, configure a fixed return value using `Returns()`. The value is returned regardless of input arguments.
 
 <!-- snippet: delegate-stub-oncall-value -->
 ```cs
@@ -136,8 +136,8 @@ public void OnCallValue_ReturnsFixedValue()
 {
     var stub = new DelegateStubTests.Stubs.Formatter();
 
-    // VALUE OVERLOAD: Pass the return value directly (simpler syntax)
-    stub.Interceptor.OnCall("FORMATTED");
+    // RETURNS: Pass the return value directly (simpler syntax)
+    stub.Interceptor.Returns("FORMATTED");
 
     // Invoke through the delegate
     Formatter format = stub;
@@ -149,12 +149,12 @@ public void OnCallValue_ReturnsFixedValue()
 ```
 <!-- endSnippet -->
 
-**Use the value overload when:**
+**Use `Returns(value)` when:**
 - Return value is constant across all invocations
 - You need simpler test setup
 - Input arguments don't affect the result
 
-**Signature:** `OnCall(TReturn value)` where `TReturn` is the delegate's return type.
+**Signature:** `Returns(TReturn value)` where `TReturn` is the delegate's return type.
 
 ### OnCall with Computed Return Value
 

@@ -55,9 +55,9 @@ tracking.Verify();
 
 <!-- snippet: methods-oncall-value -->
 ```cs
-// Value overload - simpler syntax when you don't need callback logic
+// Returns - simpler syntax when you don't need callback logic
 // Just pass the return value directly
-var tracking = stub.GetUserName.OnCall("StaticUser");
+var tracking = stub.GetUserName.Returns("StaticUser");
 
 ILogSvcMethods logger = stub;
 var name = logger.GetUserName(42);
@@ -258,6 +258,177 @@ This is useful when reusing a stub instance across multiple test phases or asser
 
 ---
 
+## Sequences
+
+Use sequences when a method should behave differently across multiple calls. Sequences are created by chaining `ThenCall()` after the initial `OnCall()` configuration.
+
+### Basic Method Sequences
+
+Configure different behavior for successive calls:
+
+<!-- snippet: methods-sequence-basic -->
+```cs
+// Configure different returns for successive calls
+stub.GetStatus
+    .OnCall(() => "Pending")
+    .ThenCall(() => "Processing")
+    .ThenCall(() => "Complete");
+
+IStatusSvc service = stub;
+
+// Each call returns the next value in sequence
+Assert.Equal("Pending", service.GetStatus());
+Assert.Equal("Processing", service.GetStatus());
+Assert.Equal("Complete", service.GetStatus());
+```
+<!-- endSnippet -->
+
+Each callback in the sequence is invoked exactly once in order.
+
+### Void Method Sequences
+
+Sequences work with void methods using `Action` callbacks:
+
+<!-- snippet: methods-sequence-void -->
+```cs
+// Void method sequences use Action callbacks
+var calls = new List<string>();
+stub.Notify
+    .OnCall((msg) => calls.Add("first"))
+    .ThenCall((msg) => calls.Add("second"))
+    .ThenCall((msg) => calls.Add("third"));
+
+INotifierSvc notifier = stub;
+
+notifier.Notify("a");
+notifier.Notify("b");
+notifier.Notify("c");
+
+Assert.Equal(new[] { "first", "second", "third" }, calls);
+```
+<!-- endSnippet -->
+
+### Return Method Sequences
+
+Sequences with return values use `Func` callbacks:
+
+<!-- snippet: methods-sequence-return -->
+```cs
+// Return method sequences use Func callbacks
+stub.Calculate
+    .OnCall((x, y) => x + y)
+    .ThenCall((x, y) => x * y)
+    .ThenCall((x, y) => x - y);
+
+ICalculatorSvc calc = stub;
+
+// 5 + 3 = 8
+Assert.Equal(8, calc.Calculate(5, 3));
+
+// 5 * 3 = 15
+Assert.Equal(15, calc.Calculate(5, 3));
+
+// 5 - 3 = 2
+Assert.Equal(2, calc.Calculate(5, 3));
+```
+<!-- endSnippet -->
+
+The callback signature matches the method signature, just like `OnCall()`.
+
+### Sequence Exhaustion
+
+After the sequence is exhausted (all callbacks consumed), subsequent calls return `default(T)` in non-strict mode or throw in strict mode:
+
+<!-- snippet: methods-sequence-exhaustion -->
+```cs
+// Sequence callbacks run once each in order
+stub.GetValue
+    .OnCall(() => 1)
+    .ThenCall(() => 2)
+    .ThenCall(() => 3);
+
+IValueSvc service = stub;
+
+Assert.Equal(1, service.GetValue());
+Assert.Equal(2, service.GetValue());
+Assert.Equal(3, service.GetValue());
+
+// After exhaustion: default(int) = 0 in non-strict mode
+Assert.Equal(0, service.GetValue());
+```
+<!-- endSnippet -->
+
+### Mixing Fixed Values and Dynamic Callbacks
+
+You can mix fixed values and dynamic callbacks in the same sequence using `OnCall()`:
+
+<!-- snippet: methods-sequence-mixed -->
+```cs
+// Mix fixed values with dynamic callbacks using OnCall
+stub.GetStatus
+    .OnCall(() => "Initial")
+    .ThenCall(() => DateTime.Now.ToString("HH:mm:ss"))
+    .ThenCall(() => "Final");
+
+IStatusSvc service = stub;
+
+// First call: fixed value
+Assert.Equal("Initial", service.GetStatus());
+
+// Second call: dynamic value (time)
+var timeResult = service.GetStatus();
+Assert.Matches(@"\d{2}:\d{2}:\d{2}", timeResult);
+
+// Third call: fixed value
+Assert.Equal("Final", service.GetStatus());
+```
+<!-- endSnippet -->
+
+**Note:** Use `OnCall(() => value)` to include fixed values in a sequence chain.
+
+### Sequence Verification
+
+Sequences can be verified like any other callback configuration:
+
+<!-- snippet: methods-sequence-verification -->
+```cs
+// Sequence can be verified like any callback
+var sequence = stub.Process
+    .OnCall(() => { })
+    .ThenCall(() => { })
+    .ThenCall(() => { });
+
+IProcessSvc processor = stub;
+processor.Process();
+processor.Process();
+processor.Process();
+
+// Verify sequence was exhausted
+sequence.Verify();
+```
+<!-- endSnippet -->
+
+### Combining Sequences With Verification
+
+<!-- snippet: methods-sequence-with-times -->
+```cs
+// Mark sequence for batch verification via stub.Verify()
+stub.Process
+    .OnCall(() => { })
+    .ThenCall(() => { })
+    .Verifiable();
+
+IProcessSvc processor = stub;
+processor.Process();
+processor.Process();
+
+// stub.Verify() checks all Verifiable() sequences completed
+stub.Verify();
+```
+<!-- endSnippet -->
+
+---
+
 ## Complete Example
 
 This example demonstrates method configuration, argument capturing, and verification in a realistic scenario. The example assumes a `UserService` class that depends on `ICompleteUserRepo`:
@@ -295,15 +466,19 @@ Assert.Equal("new@test.com", savedUser.Email);
 
 ## Key Takeaways
 
-- **OnCall options**: Use `OnCall(callback)` for dynamic values or `OnCall(value)` for fixed return values
+- **Configuration options**: Use `OnCall(callback)` for dynamic values or `Returns(value)` for fixed return values
 - **OnCall signature**: Callback matches method signature—receives only the method parameters
 - **Verification patterns**: Individual tracking with `tracking.Verify(Times)` or batch verification with `.Verifiable()` then `stub.Verify()`
 - **Times options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`
 - **Argument capture**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Configure using fully-typed lambda to distinguish which overload
+- **Sequences**: Chain `ThenCall()` for different behavior across successive calls
 - **Reset**: Clears call count, captured arguments, and removes callbacks
 
 Next: [Property Interceptors](properties.md) for get/set tracking and configuration.
+
+**See also:**
+- [Parameter Matching Guide](parameter-matching.md) - Use `When()` to match specific argument values
 
 ---
 

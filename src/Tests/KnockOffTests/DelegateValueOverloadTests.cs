@@ -3,7 +3,7 @@ using KnockOff;
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for delegate stub OnCall(value) overloads.
+/// Tests for delegate stub Returns(value) overloads.
 /// Phase 4 of value-based overloads feature.
 /// </summary>
 public class DelegateValueOverloadTests
@@ -11,12 +11,12 @@ public class DelegateValueOverloadTests
 	#region Basic Value Return Tests
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsConfiguredString()
+	public void Returns_WithValue_ReturnsConfiguredString()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.OnCall("configured value");
+		stub.Interceptor.Returns("configured value");
 
 		var result = factory();
 
@@ -25,12 +25,12 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsConfiguredInt()
+	public void Returns_WithValue_ReturnsConfiguredInt()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.IntFactory();
 		IntFactory factory = stub;
 
-		stub.Interceptor.OnCall(42);
+		stub.Interceptor.Returns(42);
 
 		var result = factory();
 
@@ -39,12 +39,12 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsConfiguredBool()
+	public void Returns_WithValue_ReturnsConfiguredBool()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.BoolFactory();
 		BoolFactory factory = stub;
 
-		stub.Interceptor.OnCall(true);
+		stub.Interceptor.Returns(true);
 
 		var result = factory();
 
@@ -52,13 +52,13 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsNullWhenDelegateReturnsNullable()
+	public void Returns_WithValue_ReturnsNullWhenDelegateReturnsNullable()
 	{
 		// Test with NullableStringFactory which returns string?
 		var stub = new DelegateValueOverloadTestClass.Stubs.NullableStringFactory();
 		NullableStringFactory factory = stub;
 
-		stub.Interceptor.OnCall((string?)null);
+		stub.Interceptor.Returns((string?)null);
 
 		var result = factory();
 
@@ -66,12 +66,12 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_RepeatsIndefinitely()
+	public void Returns_WithValue_RepeatsIndefinitely()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.OnCall("repeated");
+		stub.Interceptor.Returns("repeated");
 
 		Assert.Equal("repeated", factory());
 		Assert.Equal("repeated", factory());
@@ -85,13 +85,13 @@ public class DelegateValueOverloadTests
 	#region Single Parameter Tests
 
 	[Fact]
-	public void OnCall_WithValue_SingleParam_IgnoresArgument()
+	public void Returns_WithValue_SingleParam_IgnoresArgument()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringTransformer();
 		StringTransformer transformer = stub;
 
 		// Value overload ignores the argument and always returns configured value
-		stub.Interceptor.OnCall("constant");
+		stub.Interceptor.Returns("constant");
 
 		var result1 = transformer("input1");
 		var result2 = transformer("input2");
@@ -101,12 +101,12 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_SingleParam_TracksLastCallArg()
+	public void Returns_WithValue_SingleParam_TracksLastCallArg()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringTransformer();
 		StringTransformer transformer = stub;
 
-		stub.Interceptor.OnCall("result");
+		stub.Interceptor.Returns("result");
 
 		transformer("first");
 		transformer("second");
@@ -120,12 +120,12 @@ public class DelegateValueOverloadTests
 	#region Multiple Parameter Tests
 
 	[Fact]
-	public void OnCall_WithValue_MultiParam_IgnoresAllArguments()
+	public void Returns_WithValue_MultiParam_IgnoresAllArguments()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.MessageBuilder();
 		MessageBuilder builder = stub;
 
-		stub.Interceptor.OnCall("constant message");
+		stub.Interceptor.Returns("constant message");
 
 		var result = builder("Alice", 30);
 
@@ -133,12 +133,12 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_MultiParam_TracksLastCallArgs()
+	public void Returns_WithValue_MultiParam_TracksLastCallArgs()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.MessageBuilder();
 		MessageBuilder builder = stub;
 
-		stub.Interceptor.OnCall("result");
+		stub.Interceptor.Returns("result");
 
 		builder("Alice", 30);
 		builder("Bob", 25);
@@ -154,13 +154,13 @@ public class DelegateValueOverloadTests
 	#region Complex Object Tests
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsComplexObject()
+	public void Returns_WithValue_ReturnsComplexObject()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.PersonFactory();
 		PersonFactory factory = stub;
 
 		var testPerson = new Person { Name = "Test", Age = 42 };
-		stub.Interceptor.OnCall(testPerson);
+		stub.Interceptor.Returns(testPerson);
 
 		var result = factory();
 
@@ -168,13 +168,13 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsList()
+	public void Returns_WithValue_ReturnsList()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.ListFactory();
 		ListFactory factory = stub;
 
 		var testList = new List<string> { "a", "b", "c" };
-		stub.Interceptor.OnCall(testList);
+		stub.Interceptor.Returns(testList);
 
 		var result = factory();
 
@@ -186,13 +186,13 @@ public class DelegateValueOverloadTests
 	#region Mutual Exclusivity Tests
 
 	[Fact]
-	public void OnCall_Callback_ClearsValueConfiguration()
+	public void OnCall_Callback_ClearsReturnsConfiguration()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
 		// First configure with value
-		stub.Interceptor.OnCall("value");
+		stub.Interceptor.Returns("value");
 		Assert.Equal("value", factory());
 
 		// Then configure with callback - should override
@@ -201,7 +201,7 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_Value_ClearsCallbackConfiguration()
+	public void Returns_ClearsCallbackConfiguration()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
@@ -211,7 +211,7 @@ public class DelegateValueOverloadTests
 		Assert.Equal("callback", factory());
 
 		// Then configure with value - should override
-		stub.Interceptor.OnCall("value");
+		stub.Interceptor.Returns("value");
 		Assert.Equal("value", factory());
 	}
 
@@ -257,12 +257,12 @@ public class DelegateValueOverloadTests
 	#region Verification Tests
 
 	[Fact]
-	public void OnCall_WithValue_Verify_Works()
+	public void Returns_WithValue_Verify_Works()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.OnCall("test");
+		stub.Interceptor.Returns("test");
 
 		factory();
 
@@ -270,12 +270,12 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_VerifyWithTimes_Works()
+	public void Returns_WithValue_VerifyWithTimes_Works()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.OnCall("test");
+		stub.Interceptor.Returns("test");
 
 		factory();
 		factory();
@@ -294,7 +294,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.OnCall("configured");
+		stub.Interceptor.Returns("configured");
 		factory();
 		factory();
 

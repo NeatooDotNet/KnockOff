@@ -106,7 +106,7 @@ public partial class InlineStubTests
 }
 
 // =============================================================================
-// Configuring Return Values - Value Overloads
+// Configuring Return Values - Returns()
 // =============================================================================
 
 public class ValueOverloadTests
@@ -117,8 +117,8 @@ public class ValueOverloadTests
     {
         var stub = new UserRepoStub();
 
-        // Value overload - pass the return value directly
-        stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+        // Returns - pass the return value directly
+        stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
 
         // Callback syntax - use when you need argument-based logic
         stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
@@ -191,8 +191,8 @@ public class AsyncWrappingTests
     {
         var stub = new AsyncUserRepoStub();
 
-        // Value overload - KnockOff wraps in Task.FromResult automatically
-        stub.GetUserAsync.OnCall(new User { Id = 1, Name = "Alice" });
+        // Returns - KnockOff wraps in Task.FromResult automatically
+        stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
 
         IAsyncUserRepo repository = stub;
         var user = await repository.GetUserAsync(1);

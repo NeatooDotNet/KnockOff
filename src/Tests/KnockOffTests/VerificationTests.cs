@@ -98,7 +98,7 @@ public class VerificationTests
         // Arrange
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCallSequence((a, b) => 100)
+            .OnCall((a, b) => 100)
             .ThenCall((a, b) => 200);
 
         // Act
@@ -116,7 +116,7 @@ public class VerificationTests
         // Arrange
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCallSequence((a, b) => 100)
+            .OnCall((a, b) => 100)
             .ThenCall((a, b) => 200);
 
         // Act
@@ -133,7 +133,7 @@ public class VerificationTests
         // Arrange
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCallSequence((a, b) => 100)
+            .OnCall((a, b) => 100)
             .ThenCall((a, b) => 200);
 
         // Act - Don't call anything

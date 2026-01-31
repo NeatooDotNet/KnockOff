@@ -144,7 +144,7 @@ public class MethodOnCallTests
 
         #region skill-method-oncall-examples
         // VALUE syntax - for fixed return values
-        stub.GetValue.OnCall("default-value");
+        stub.GetValue.Returns("default-value");
 
         // CALLBACK syntax - for dynamic values based on arguments
         stub.GetValue.OnCall((key) => key == "debug" ? "true" : "false");
@@ -354,9 +354,9 @@ public class AsyncGotchaTests
 
         #region skill-gotcha-async-autowrap
         // CORRECT: KnockOff auto-wraps - just pass the value directly
-        stub.GetUserAsync.OnCall(new User { Id = 1, Name = "Alice" });
+        stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
 
-        // No need for Task.FromResult with value overload
+        // No need for Task.FromResult with Returns()
         ISkillAsyncSvc service = stub;
         var user = await service.GetUserAsync(1);
         Assert.Equal("Alice", user!.Name);

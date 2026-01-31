@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>Design.Stubs</RootNamespace>
+		<AssemblyName>Design.Stubs</AssemblyName>
+		<IsPackable>false</IsPackable>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+		<!-- Allow underscores in example method names for clarity -->
+		<!-- CA2007: ConfigureAwait not needed for library demos -->
+		<!-- CA1030: Method names with "Raise" are fine for event demo code -->
+		<!-- CS0219: Variables showing result values are assigned but intentionally not asserted in demo code -->
+		<NoWarn>$(NoWarn);CA1707;CA2007;CA1030;CS0219</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Design.Domain\Design.Domain.csproj" />
+		<ProjectReference Include="..\..\KnockOff\KnockOff.csproj" />
+		<ProjectReference Include="..\..\Generator\Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+	</ItemGroup>
+
+</Project>

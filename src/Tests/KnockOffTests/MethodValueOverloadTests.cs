@@ -1,7 +1,7 @@
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for OnCall(value) method value overloads.
+/// Tests for Returns(value) method value overloads.
 /// Phase 1 of value-based overloads feature.
 /// </summary>
 public class MethodValueOverloadTests
@@ -9,12 +9,12 @@ public class MethodValueOverloadTests
 	#region Basic Value Return Tests
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsConfiguredValue()
+	public void Returns_WithValue_ReturnsConfiguredValue()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.OnCall("configured value");
+		var tracking = knockOff.GetOptional.Returns("configured value");
 
 		var result = service.GetOptional();
 
@@ -23,12 +23,12 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsNullWhenConfiguredNull()
+	public void Returns_WithValue_ReturnsNullWhenConfiguredNull()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.OnCall((string?)null);
+		var tracking = knockOff.GetOptional.Returns((string?)null);
 
 		var result = service.GetOptional();
 
@@ -37,12 +37,12 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_RepeatsIndefinitely()
+	public void Returns_WithValue_RepeatsIndefinitely()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.OnCall("repeated");
+		knockOff.GetOptional.Returns("repeated");
 
 		Assert.Equal("repeated", service.GetOptional());
 		Assert.Equal("repeated", service.GetOptional());
@@ -50,12 +50,12 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_TracksCallCount()
+	public void Returns_WithValue_TracksCallCount()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.OnCall("test");
+		var tracking = knockOff.GetOptional.Returns("test");
 
 		service.GetOptional();
 		service.GetOptional();
@@ -65,13 +65,13 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsValueType()
+	public void Returns_WithValue_ReturnsValueType()
 	{
 		// Use generic interface with value type return
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		var tracking = knockOff.GetInt.OnCall(42);
+		var tracking = knockOff.GetInt.Returns(42);
 
 		var result = service.GetInt();
 
@@ -80,12 +80,12 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsZeroForValueType()
+	public void Returns_WithValue_ReturnsZeroForValueType()
 	{
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		var tracking = knockOff.GetInt.OnCall(0);
+		var tracking = knockOff.GetInt.Returns(0);
 
 		var result = service.GetInt();
 
@@ -94,23 +94,23 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsBoolTrue()
+	public void Returns_WithValue_ReturnsBoolTrue()
 	{
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		knockOff.GetBool.OnCall(true);
+		knockOff.GetBool.Returns(true);
 
 		Assert.True(service.GetBool());
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsBoolFalse()
+	public void Returns_WithValue_ReturnsBoolFalse()
 	{
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		knockOff.GetBool.OnCall(false);
+		knockOff.GetBool.Returns(false);
 
 		Assert.False(service.GetBool());
 	}
@@ -120,13 +120,13 @@ public class MethodValueOverloadTests
 	#region Async Auto-Wrapping Tests
 
 	[Fact]
-	public async Task OnCall_WithValue_AsyncTaskOfT_AutoWraps()
+	public async Task Returns_WithValue_AsyncTaskOfT_AutoWraps()
 	{
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
 		// GetRequiredAsync returns Task<string> - no user method, so we can test value overload
-		knockOff.GetRequiredAsync.OnCall("async result");
+		knockOff.GetRequiredAsync.Returns("async result");
 
 		var result = await service.GetRequiredAsync();
 
@@ -134,12 +134,12 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public async Task OnCall_WithValue_AsyncTaskOfNullableT_AutoWrapsNull()
+	public async Task Returns_WithValue_AsyncTaskOfNullableT_AutoWrapsNull()
 	{
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		knockOff.GetOptionalAsync.OnCall((string?)null);
+		knockOff.GetOptionalAsync.Returns((string?)null);
 
 		var result = await service.GetOptionalAsync();
 
@@ -147,12 +147,12 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public async Task OnCall_WithValue_AsyncTaskOfT_TracksInvocations()
+	public async Task Returns_WithValue_AsyncTaskOfT_TracksInvocations()
 	{
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		var tracking = knockOff.GetRequiredAsync.OnCall("test");
+		var tracking = knockOff.GetRequiredAsync.Returns("test");
 
 		await service.GetRequiredAsync();
 		await service.GetRequiredAsync();
@@ -171,7 +171,7 @@ public class MethodValueOverloadTests
 		ISampleService service = knockOff;
 
 		// First configure with value
-		knockOff.GetOptional.OnCall("value");
+		knockOff.GetOptional.Returns("value");
 		Assert.Equal("value", service.GetOptional());
 
 		// Then configure with callback - should clear value
@@ -180,7 +180,7 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_Value_ClearsCallbackConfiguration()
+	public void Returns_Value_ClearsCallbackConfiguration()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
@@ -190,22 +190,22 @@ public class MethodValueOverloadTests
 		Assert.Equal("callback", service.GetOptional());
 
 		// Then configure with value - should clear callback
-		knockOff.GetOptional.OnCall("value");
+		knockOff.GetOptional.Returns("value");
 		Assert.Equal("value", service.GetOptional());
 	}
 
 	[Fact]
-	public void OnCallSequence_ClearsValueConfiguration()
+	public void OnCall_ThenCall_ClearsValueConfiguration()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
 		// First configure with value
-		knockOff.GetOptional.OnCall("value");
+		knockOff.GetOptional.Returns("value");
 		Assert.Equal("value", service.GetOptional());
 
-		// Then configure with sequence - should clear value
-		knockOff.GetOptional.OnCallSequence(() => "seq1").ThenCall(() => "seq2");
+		// Then configure with OnCall().ThenCall() sequence - should clear value
+		knockOff.GetOptional.OnCall(() => "seq1").ThenCall(() => "seq2");
 		Assert.Equal("seq1", service.GetOptional());
 		Assert.Equal("seq2", service.GetOptional());
 	}
@@ -215,12 +215,12 @@ public class MethodValueOverloadTests
 	#region Tracking and Verification Tests
 
 	[Fact]
-	public void OnCall_WithValue_Verifiable_Works()
+	public void Returns_WithValue_Verifiable_Works()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.OnCall("test").Verifiable();
+		knockOff.GetOptional.Returns("test").Verifiable();
 
 		service.GetOptional();
 
@@ -228,12 +228,12 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_VerifiableWithTimes_Works()
+	public void Returns_WithValue_VerifiableWithTimes_Works()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.OnCall("test").Verifiable(Times.Exactly(2));
+		knockOff.GetOptional.Returns("test").Verifiable(Times.Exactly(2));
 
 		service.GetOptional();
 		service.GetOptional();
@@ -242,11 +242,11 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_IsConfigured_ReturnsTrue()
+	public void Returns_WithValue_IsConfigured_ReturnsTrue()
 	{
 		var knockOff = new SampleKnockOff();
 
-		knockOff.GetOptional.OnCall("test");
+		knockOff.GetOptional.Returns("test");
 
 		// VerifyAll should not fail because IsConfigured is true
 		Assert.Throws<VerificationException>(() => knockOff.VerifyAll());
@@ -262,13 +262,13 @@ public class MethodValueOverloadTests
 	#region Generic Interface Tests
 
 	[Fact]
-	public void OnCall_WithValue_GenericInterface_Works()
+	public void Returns_WithValue_GenericInterface_Works()
 	{
 		var knockOff = new UserRepositoryKnockOff();
 		IRepository<User> repo = knockOff;
 
 		var mockUser = new User { Id = 1, Name = "Test" };
-		var tracking = knockOff.GetById.OnCall(mockUser);
+		var tracking = knockOff.GetById.Returns(mockUser);
 
 		var result = repo.GetById(42);
 
@@ -277,12 +277,12 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_GenericInterface_ReturnsNull()
+	public void Returns_WithValue_GenericInterface_ReturnsNull()
 	{
 		var knockOff = new UserRepositoryKnockOff();
 		IRepository<User> repo = knockOff;
 
-		knockOff.GetById.OnCall((User?)null);
+		knockOff.GetById.Returns((User?)null);
 
 		var result = repo.GetById(42);
 
@@ -294,13 +294,13 @@ public class MethodValueOverloadTests
 	#region Complex Object Tests
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsComplexObject()
+	public void Returns_WithValue_ReturnsComplexObject()
 	{
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
 		var entity = new TestEntity { Id = 99, Name = "TestName" };
-		knockOff.GetEntity.OnCall(entity);
+		knockOff.GetEntity.Returns(entity);
 
 		var result = service.GetEntity();
 
@@ -308,13 +308,13 @@ public class MethodValueOverloadTests
 	}
 
 	[Fact]
-	public void OnCall_WithValue_ReturnsCollection()
+	public void Returns_WithValue_ReturnsCollection()
 	{
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
 		var list = new List<string> { "a", "b", "c" };
-		knockOff.GetList.OnCall(list);
+		knockOff.GetList.Returns(list);
 
 		var result = service.GetList();
 

@@ -41,9 +41,9 @@ public class TaskMethodTests
     {
         var stub = new AsyncUserSvcStub();
 
-        // VALUE OVERLOAD: KnockOff auto-wraps the value in Task.FromResult
+        // RETURNS: KnockOff auto-wraps the value in Task.FromResult
         // This is the simplest syntax for returning async values
-        stub.GetUserAsync.OnCall(new User { Id = 42, Name = "Alice" });
+        stub.GetUserAsync.Returns(new User { Id = 42, Name = "Alice" });
 
         IAsyncUserSvc service = stub;
         var user = await service.GetUserAsync(42);
@@ -60,7 +60,7 @@ public class TaskMethodTests
         var stub = new AsyncUserSvcStub();
 
         // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in Task.FromResult
-        // This combines the simplicity of value overloads with callback flexibility
+        // This combines the simplicity of Returns() with callback flexibility
         stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
 
         IAsyncUserSvc service = stub;
@@ -146,9 +146,9 @@ public class ValueTaskMethodTests
     {
         var stub = new AsyncUserSvcStub();
 
-        // VALUE OVERLOAD: KnockOff auto-wraps the value in new ValueTask<T>(value)
+        // RETURNS: KnockOff auto-wraps the value in new ValueTask<T>(value)
         // This is the simplest syntax for returning async values
-        stub.GetCachedUserAsync.OnCall(new User { Id = 42, Name = "Cached" });
+        stub.GetCachedUserAsync.Returns(new User { Id = 42, Name = "Cached" });
 
         IAsyncUserSvc service = stub;
         var user = await service.GetCachedUserAsync(42);

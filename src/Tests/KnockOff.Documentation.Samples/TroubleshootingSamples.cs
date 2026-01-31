@@ -134,8 +134,8 @@ public class OnCallValueTests
         var stub = new TroubleshootRepoStub();
 
         // Instead of: stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
-        // Use OnCall(value) when the return value doesn't depend on parameters:
-        stub.GetById.OnCall(new User { Id = 999, Name = "Static User" });
+        // Use Returns(value) when the return value doesn't depend on parameters:
+        stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
 
         ITroubleshootRepo repository = stub;
         var user1 = repository.GetById(1);
@@ -231,7 +231,7 @@ public class OnGetPriorityTests
         IConfigSvc config = stub;
 
         // Priority order (from highest to lowest):
-        // 1. OnGetSequence (if configured and not exhausted)
+        // 1. Sequence (if elevated via ThenGet() and not exhausted)
         // 2. OnGet callback/value (most recent takes precedence)
         // 3. Source delegation (if configured)
         // 4. Strict mode check (throws if enabled and nothing configured)

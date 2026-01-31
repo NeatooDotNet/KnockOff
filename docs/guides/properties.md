@@ -280,24 +280,24 @@ public void Verifiable_MarksPropertyForVerification()
 
 ## Sequence Behavior
 
-Use sequences when a property should return different values across multiple reads or react differently to multiple writes. Sequences are configured with `OnGetSequence` and `OnSetSequence`, which return tracking objects that support `ThenGet` and `ThenSet` chaining.
+Use sequences when a property should return different values across multiple reads or react differently to multiple writes. Sequences are created by chaining `ThenGet()` or `ThenSet()` after the initial `OnGet()` or `OnSet()` call.
 
-### Return Value Sequences (OnGetSequence)
+### Return Value Sequences
 
-When you need a property to return different values on successive reads, use `OnGetSequence`.
+When you need a property to return different values on successive reads, use `OnGet().ThenGet()`.
 
-**Value overloads:** Both `OnGetSequence(value)` and `ThenGet(value)` accept static values as shorthand for callback syntax. Use whichever reads better for your scenario.
+**Value overloads:** Both `OnGet(value)` and `ThenGet(value)` accept static values as shorthand for callback syntax. Use whichever reads better for your scenario.
 
 <!-- snippet: properties-ongetsequence-value -->
 ```cs
 [Fact]
-public void OnGetSequence_ValueSyntax()
+public void OnGet_ValueSyntax_ThenGet()
 {
     var stub = new ConfigPropsStub();
 
-    // OnGetSequence with value - simpler syntax for static values
-    // Note: First value uses OnGetSequence(value), chain uses callback syntax
-    stub.Name.OnGetSequence("First")
+    // OnGet with value - simpler syntax for static values
+    // ThenGet elevates to sequence mode
+    stub.Name.OnGet("First")
         .ThenGet(() => "Second")
         .ThenGet(() => "Third");
 
@@ -312,16 +312,16 @@ public void OnGetSequence_ValueSyntax()
 
 You can also mix value and callback syntax in the same sequence:
 
-<!-- snippet: properties-ongetsequence-basic -->
+<!-- snippet: properties-onget-then-sequence -->
 ```cs
 [Fact]
-public void OnGetSequence_ReturnsDifferentValuesOnSuccessiveReads()
+public void OnGet_ThenGet_ReturnsDifferentValuesOnSuccessiveReads()
 {
     var stub = new ConfigPropsStub();
 
-    // OnGetSequence configures different return values for each read
+    // OnGet().ThenGet() configures different return values for each read
     stub.Name
-        .OnGetSequence(() => "First")
+        .OnGet(() => "First")
         .ThenGet(() => "Second")
         .ThenGet(() => "Third");
 
@@ -335,29 +335,29 @@ public void OnGetSequence_ReturnsDifferentValuesOnSuccessiveReads()
 ```
 <!-- endSnippet -->
 
-**When to use OnGetSequence:**
+**When to use get sequences:**
 - Testing pagination where page numbers change
 - Simulating changing state over time
 - Testing retry logic that checks status repeatedly
 - Verifying behavior with different data on successive calls
 
-### Setter Sequences (OnSetSequence)
+### Setter Sequences
 
-When you need different behavior for successive property writes, use `OnSetSequence`:
+When you need different behavior for successive property writes, use `OnSet().ThenSet()`:
 
-<!-- snippet: properties-onsetsequence-basic -->
+<!-- snippet: properties-onset-then-sequence -->
 ```cs
 [Fact]
-public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
+public void OnSet_ThenSet_ReactsDifferentlyToSuccessiveWrites()
 {
     var stub = new ConfigPropsStub();
 
     var firstWriteValue = "";
     var secondWriteValue = "";
 
-    // OnSetSequence configures different callbacks for each write
+    // OnSet().ThenSet() configures different callbacks for each write
     stub.Name
-        .OnSetSequence((value) => { firstWriteValue = $"First: {value}"; })
+        .OnSet((value) => { firstWriteValue = $"First: {value}"; })
         .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
 
     IConfigProps config = stub;
@@ -374,7 +374,7 @@ public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
 ```
 <!-- endSnippet -->
 
-**When to use OnSetSequence:**
+**When to use set sequences:**
 - Testing validation that changes over time
 - Simulating connection state changes
 - Testing error recovery (first write fails, second succeeds)
@@ -384,20 +384,20 @@ public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
 | Use Case | Use This | Why |
 |----------|----------|-----|
 | Property always returns same value | `OnGet(value)` or `OnGet(() => value)` | Simple, no sequence needed |
-| Property returns different values per read | `OnGetSequence(() => first).ThenGet(() => second)` | Different values on successive reads |
-| Property setter should validate differently | `OnSetSequence((v) => validate1(v)).ThenSet((v) => validate2(v))` | Different behavior per write |
+| Property returns different values per read | `OnGet(() => first).ThenGet(() => second)` | Different values on successive reads |
+| Property setter should validate differently | `OnSet((v) => validate1(v)).ThenSet((v) => validate2(v))` | Different behavior per write |
 | Property behavior changes based on test state | `OnGet(() => computedValue)` | Callback computes on each access |
 
 ### Sequence Tracking
 
-Both `OnGetSequence` and `OnSetSequence` return sequence-specific interfaces that support chaining and verification:
+Both `OnGet().ThenGet()` and `OnSet().ThenSet()` return sequence-specific interfaces that support chaining and verification:
 
-**OnGetSequence returns IPropertyGetSequence\<T\>:**
+**OnGet returns IPropertyGetSequence\<T\>:**
 - Use `.ThenGet(() => value)` to chain additional get behaviors
 - Each callback in the sequence is called once in order
 - After exhausting the sequence, behavior depends on strict mode (see Troubleshooting)
 
-**OnSetSequence returns IPropertySetSequence\<T\>:**
+**OnSet returns IPropertySetSequence\<T\>:**
 - Use `.ThenSet((value) => { })` to chain additional set behaviors
 - Each callback in the sequence is called once in order
 - After exhausting the sequence, subsequent writes do nothing (non-strict) or throw (strict mode)
@@ -411,11 +411,11 @@ public void Sequence_VerifiesLikeRegularCallbacks()
 
     // Configure sequences
     var getSequence = stub.Name
-        .OnGetSequence(() => "A")
+        .OnGet(() => "A")
         .ThenGet(() => "B");
 
     var setSequence = stub.Age
-        .OnSetSequence((v) => { })
+        .OnSet((v) => { })
         .ThenSet((v) => { });
 
     IConfigProps config = stub;
@@ -513,10 +513,10 @@ Choose your configuration approach based on the test scenario:
 | Property should return fixed test data | `OnGet(value)` | `stub.UserId.OnGet(42);` |
 | Property should return current time/random value | `OnGet(callback)` | `stub.Now.OnGet(() => DateTime.UtcNow);` |
 | Property depends on other stub state | `OnGet(callback)` | `stub.IsReady.OnGet(() => isInitialized);` |
-| Property returns different values per read | `OnGetSequence` | `stub.Status.OnGetSequence(() => "Pending").ThenGet(() => "Complete");` |
+| Property returns different values per read | `OnGet().ThenGet()` | `stub.Status.OnGet("Pending").ThenGet("Complete");` |
 | Track all values written to property | `OnSet` | `stub.Name.OnSet((v) => list.Add(v));` |
 | Simulate validation in dependency | `OnSet` | `stub.Age.OnSet((v) => Validate(v));` |
-| Setter behavior changes across writes | `OnSetSequence` | `stub.Config.OnSetSequence((v) => Reject(v)).ThenSet((v) => Accept(v));` |
+| Setter behavior changes across writes | `OnSet().ThenSet()` | `stub.Config.OnSet((v) => Reject(v)).ThenSet((v) => Accept(v));` |
 | Verify property was accessed N times | Verification | `stub.UserId.VerifyGet(Times.Exactly(2));` |
 | Verify last value written | Verification | `Assert.Equal("x", stub.Name.LastSetValue);` |
 
@@ -576,7 +576,7 @@ public void CompletePropertyExample_AllConfigurationApproaches()
 1. **Start with OnGet(value)** - Static value syntax covers most scenarios and keeps tests simple
 2. **Use OnGet(callback) for computed values** - Time-dependent or state-dependent returns
 3. **Use OnSet for tracking** - When you need to verify writes or simulate validation
-4. **Use sequences for changing behavior** - OnGetSequence/OnSetSequence when values or behavior differ across calls
+4. **Use sequences for changing behavior** - `OnGet().ThenGet()` / `OnSet().ThenSet()` when values or behavior differ across calls
 5. **Last OnGet wins** - You can upgrade from static values to dynamic callbacks by calling OnGet again
 6. **Reset() preserves configuration** - Clears call counts and sequence position, but preserves OnGet/OnSet callbacks
 7. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like method verification

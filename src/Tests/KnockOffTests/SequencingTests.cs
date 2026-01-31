@@ -63,11 +63,11 @@ public class SequencingTests
     }
 
     [Fact]
-    public void OnCallSequence_AdvancesAfterEachCall()
+    public void OnCall_ThenCall_AdvancesAfterEachCall()
     {
         var stub = new SequenceTestKnockOff();
         stub.Add
-            .OnCallSequence((a, b) => 100)
+            .OnCall((a, b) => 100)
             .ThenCall((a, b) => 200)
             .ThenCall((a, b) => 300);
 
@@ -78,11 +78,11 @@ public class SequencingTests
     }
 
     [Fact]
-    public void OnCallSequence_TwoCallbacks_BothExecute()
+    public void OnCall_ThenCall_TwoCallbacks_BothExecute()
     {
         var stub = new SequenceTestKnockOff();
         stub.Add
-            .OnCallSequence((a, b) => 100)
+            .OnCall((a, b) => 100)
             .ThenCall((a, b) => 200);
 
         ISequenceTestService svc = stub;
@@ -96,7 +96,7 @@ public class SequencingTests
         var stub = new SequenceTestKnockOff();
         stub.Strict = true;
         stub.Add
-            .OnCallSequence((a, b) => 100)
+            .OnCall((a, b) => 100)
             .ThenCall((a, b) => 200);
 
         ISequenceTestService svc = stub;
@@ -112,7 +112,7 @@ public class SequencingTests
         var stub = new SequenceTestKnockOff();
         stub.Strict = false;
         stub.Add
-            .OnCallSequence((a, b) => 100)
+            .OnCall((a, b) => 100)
             .ThenCall((a, b) => 200);
 
         ISequenceTestService svc = stub;
@@ -156,7 +156,7 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCallSequence((a, b) => 1)
+            .OnCall((a, b) => 1)
             .ThenCall((a, b) => 2);
 
         ISequenceTestService svc = stub;
@@ -172,7 +172,7 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCallSequence((a, b) => 1)
+            .OnCall((a, b) => 1)
             .ThenCall((a, b) => 2);
 
         ISequenceTestService svc = stub;
@@ -186,7 +186,7 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCallSequence((a, b) => 1)
+            .OnCall((a, b) => 1)
             .ThenCall((a, b) => 2)
             .ThenCall((a, b) => 3);
 
@@ -204,7 +204,7 @@ public class SequencingTests
     {
         var stub = new SequenceTestKnockOff();
         var sequence = stub.Add
-            .OnCallSequence((a, b) => 1)
+            .OnCall((a, b) => 1)
             .ThenCall((a, b) => 2);
 
         ISequenceTestService svc = stub;

@@ -92,7 +92,7 @@ stub.GetUser.OnCall((id) => new User { Id = id, Name = "Dynamic" });
 
 <!-- snippet: plugin-readme-oncall-value -->
 ```cs
-stub.GetUser.OnCall(new User { Id = 1, Name = "Alice" });
+stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
@@ -102,13 +102,13 @@ Both overloads return an `IMethodTracking<T>` for verification and argument capt
 
 Configure different return values for successive calls:
 
+<!-- TODO: Update sample to use OnCall().ThenCall() instead of OnCallSequence() -->
 <!-- snippet: plugin-readme-sequential -->
 ```cs
 stub.GetValue
-    .OnCallSequence(() => 10)
+    .OnCall(() => 10)
     .ThenCall(() => 20)
-    .ThenCall(() => 30)
-    .Verifiable();
+    .ThenCall(() => 30);
 ```
 <!-- endSnippet -->
 

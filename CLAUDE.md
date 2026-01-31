@@ -14,9 +14,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Versioning:** Pre-1.0. All changes bump minor version only.
 
+## KnockOff Patterns and Members
+
+**ALWAYS consider all patterns and members when creating todos or plans.** Missing a pattern or member type leads to incomplete implementations.
+
+### Four Patterns
+
+1. **Stand-alone** - `[KnockOff]` on partial class that implements interface/extends class
+2. **Inline interface** - `[KnockOff<IInterface>]` generates nested stub class
+3. **Inline class** - `[KnockOff<ConcreteClass>]` generates nested stub for virtual/abstract members
+4. **Inline delegate** - `[KnockOff<DelegateType>]` generates stub for delegate invocation
+
+### Four Member Types
+
+1. **Methods** - Instance methods with various signatures
+2. **Properties** - Get-only, set-only, get/set properties
+3. **Indexers** - `this[...]` accessors (get/set with key parameters)
+4. **Events** - Event add/remove handlers
+
+### Scope Checklist for Todos/Plans
+
+When defining scope, explicitly state which patterns and members are affected:
+- [ ] Which patterns? (all 4, or specific subset)
+- [ ] Which member types? (all 4, or specific subset)
+- [ ] Are there pattern+member combinations that need special handling?
+
 ## Folder Structure
 
 - `src/` - Source code
+- `src/Design/` - **API design source of truth** (see below)
 - `docs/` - Documentation (markdown)
 - `docs/todos/` - Project todos (use `/project-todos` skill)
 - `docs/plans/` - Design documents (use `/project-todos` skill)
@@ -27,6 +53,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Actively working on a specific todo or plan
 - Adding a new release note
 Never load these folders to understand the codebase, research history, or problem-solve.
+
+## Design Projects (Source of Truth)
+
+**The `src/Design/` directory is the authoritative source of truth for KnockOff's API.**
+
+When answering questions about how KnockOff works:
+1. Read the relevant file in `src/Design/Design.Stubs/`
+2. Trust the code and comments as ground truth
+3. Never guess - verify against these files
+
+Key files by topic:
+- **Stub patterns**: `StubPatterns/AllPatterns.cs`
+- **Methods**: `Methods/BasicMethods.cs`, `Methods/WhenMatching.cs`
+- **Properties**: `Properties/PropertyBasics.cs`
+- **Indexers**: `Indexers/IndexerBasics.cs`
+- **Events**: `Events/EventPatterns.cs`
+- **Advanced**: `Advanced/` (Source delegation, Strict mode, Verification)
+
+See `src/Design/CLAUDE-DESIGN.md` for Claude-specific guidance.
 
 ## Plan Mode and Project Todos
 

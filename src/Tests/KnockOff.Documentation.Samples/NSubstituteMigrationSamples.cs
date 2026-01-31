@@ -908,3 +908,105 @@ public class CompleteKnockOffNSubTests
     }
     #endregion
 }
+
+// =============================================================================
+// When() API - Predicate Matching (Step 13b)
+// =============================================================================
+
+public class WhenPredicateNSubTests
+{
+    #region nsub-migration-when-predicate-nsub
+    [Fact]
+    public void WhenPredicate_NSubstituteApproach()
+    {
+        var substitute = Substitute.For<INSubUserRepo>();
+
+        // Arg.Is<T>() with predicate per parameter
+        substitute.GetUser(Arg.Is<int>(id => id > 0))
+            .Returns(callInfo => new User
+            {
+                Id = callInfo.Arg<int>(),
+                Name = "Valid User"
+            });
+
+        substitute.GetUser(Arg.Is<int>(id => id <= 0))
+            .Returns((User?)null);
+
+        INSubUserRepo repository = substitute;
+
+        Assert.NotNull(repository.GetUser(1));
+        Assert.NotNull(repository.GetUser(100));
+        Assert.Null(repository.GetUser(0));
+        Assert.Null(repository.GetUser(-5));
+    }
+    #endregion
+}
+
+public class WhenPredicateKnockOffTests
+{
+    #region nsub-migration-when-predicate-knockoff
+    [Fact]
+    public void WhenPredicate_KnockOffApproach()
+    {
+        var stub = new NSubUserRepoStub();
+
+        // For permanent predicate matching, use OnCall with conditionals
+        // (When() is for sequential/consumable matching)
+        stub.GetUser.OnCall((id) =>
+            id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+
+        INSubUserRepo repository = stub;
+
+        Assert.NotNull(repository.GetUser(1));
+        Assert.NotNull(repository.GetUser(100));
+        Assert.Null(repository.GetUser(0));
+        Assert.Null(repository.GetUser(-5));
+    }
+    #endregion
+}
+
+// =============================================================================
+// When() API - Value Matching (Step 13c)
+// =============================================================================
+
+public class WhenValuesNSubTests
+{
+    #region nsub-migration-when-values-nsub
+    [Fact]
+    public void WhenValues_NSubstituteApproach()
+    {
+        var substitute = Substitute.For<INSubUserRepo>();
+
+        // Exact value matching
+        substitute.GetUser(42).Returns(new User { Id = 42, Name = "Alice" });
+        substitute.GetUser(99).Returns(new User { Id = 99, Name = "Bob" });
+
+        INSubUserRepo repository = substitute;
+
+        Assert.Equal("Alice", repository.GetUser(42)?.Name);
+        Assert.Equal("Bob", repository.GetUser(99)?.Name);
+        Assert.Null(repository.GetUser(1)); // No match
+    }
+    #endregion
+}
+
+public class WhenValuesKnockOffTests
+{
+    #region nsub-migration-when-values-knockoff
+    [Fact]
+    public void WhenValues_KnockOffApproach()
+    {
+        var stub = new NSubUserRepoStub();
+
+        // When() with exact values
+        stub.GetUser.When(42).Returns(new User { Id = 42, Name = "Alice" });
+        stub.GetUser.When(99).Returns(new User { Id = 99, Name = "Bob" });
+
+        INSubUserRepo repository = stub;
+
+        Assert.Equal("Alice", repository.GetUser(42)?.Name);
+        Assert.Equal("Bob", repository.GetUser(99)?.Name);
+        Assert.Null(repository.GetUser(1)); // No match
+    }
+    #endregion
+}

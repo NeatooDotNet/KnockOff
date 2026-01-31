@@ -14,6 +14,12 @@ public interface IPropertyGetSequence<TValue>
     IPropertyGetSequence<TValue> ThenGet(Func<TValue> callback);
 
     /// <summary>
+    /// Adds another value to return in the sequence.
+    /// Each value in the sequence is returned exactly once.
+    /// </summary>
+    IPropertyGetSequence<TValue> ThenGet(TValue value);
+
+    /// <summary>
     /// Verifies the entire sequence was executed (all callbacks invoked).
     /// Throws VerificationException if sequence incomplete.
     /// </summary>

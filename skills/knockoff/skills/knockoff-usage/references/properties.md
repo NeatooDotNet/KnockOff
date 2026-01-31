@@ -11,7 +11,7 @@ Property interceptors are generated for every property in an interface. Each int
 - **OnGet(value)** - Set a static value to return from the getter
 - **OnGet(callback)** - Dynamic callback for computed values
 - **OnSet(callback)** - Callback for intercepting setter calls
-- **OnGetSequence/OnSetSequence** - Different behavior for successive accesses
+- **OnGet().ThenGet() / OnSet().ThenSet()** - Different behavior for successive accesses (sequences)
 - **Verification methods** - For asserting on property access patterns
 - **LastSetValue** - For capturing the most recent value written to a setter
 
@@ -322,20 +322,20 @@ public void Verifiable_MarksPropertyForVerification()
 
 ## Property Sequences
 
-### OnGetSequence for Successive Reads
+### OnGet().ThenGet() for Successive Reads
 
-Use `OnGetSequence` when a property should return different values on successive reads.
+Use `OnGet().ThenGet()` when a property should return different values on successive reads.
 
-<!-- snippet: properties-ongetsequence-basic -->
+<!-- snippet: properties-onget-then-sequence -->
 ```cs
 [Fact]
-public void OnGetSequence_ReturnsDifferentValuesOnSuccessiveReads()
+public void OnGet_ThenGet_ReturnsDifferentValuesOnSuccessiveReads()
 {
     var stub = new ConfigPropsStub();
 
-    // OnGetSequence configures different return values for each read
+    // OnGet().ThenGet() configures different return values for each read
     stub.Name
-        .OnGetSequence(() => "First")
+        .OnGet(() => "First")
         .ThenGet(() => "Second")
         .ThenGet(() => "Third");
 
@@ -354,13 +354,13 @@ The value overload simplifies static sequences:
 <!-- snippet: properties-ongetsequence-value -->
 ```cs
 [Fact]
-public void OnGetSequence_ValueSyntax()
+public void OnGet_ValueSyntax_ThenGet()
 {
     var stub = new ConfigPropsStub();
 
-    // OnGetSequence with value - simpler syntax for static values
-    // Note: First value uses OnGetSequence(value), chain uses callback syntax
-    stub.Name.OnGetSequence("First")
+    // OnGet with value - simpler syntax for static values
+    // ThenGet elevates to sequence mode
+    stub.Name.OnGet("First")
         .ThenGet(() => "Second")
         .ThenGet(() => "Third");
 
@@ -373,23 +373,23 @@ public void OnGetSequence_ValueSyntax()
 ```
 <!-- endSnippet -->
 
-### OnSetSequence for Successive Writes
+### OnSet().ThenSet() for Successive Writes
 
-Use `OnSetSequence` when a property should react differently to successive writes.
+Use `OnSet().ThenSet()` when a property should react differently to successive writes.
 
-<!-- snippet: properties-onsetsequence-basic -->
+<!-- snippet: properties-onset-then-sequence -->
 ```cs
 [Fact]
-public void OnSetSequence_ReactsDifferentlyToSuccessiveWrites()
+public void OnSet_ThenSet_ReactsDifferentlyToSuccessiveWrites()
 {
     var stub = new ConfigPropsStub();
 
     var firstWriteValue = "";
     var secondWriteValue = "";
 
-    // OnSetSequence configures different callbacks for each write
+    // OnSet().ThenSet() configures different callbacks for each write
     stub.Name
-        .OnSetSequence((value) => { firstWriteValue = $"First: {value}"; })
+        .OnSet((value) => { firstWriteValue = $"First: {value}"; })
         .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
 
     IConfigProps config = stub;
@@ -419,11 +419,11 @@ public void Sequence_VerifiesLikeRegularCallbacks()
 
     // Configure sequences
     var getSequence = stub.Name
-        .OnGetSequence(() => "A")
+        .OnGet(() => "A")
         .ThenGet(() => "B");
 
     var setSequence = stub.Age
-        .OnSetSequence((v) => { })
+        .OnSet((v) => { })
         .ThenSet((v) => { });
 
     IConfigProps config = stub;
@@ -580,10 +580,10 @@ Choose your configuration approach based on the test scenario:
 | Property should return fixed test data | `OnGet(value)` | `stub.UserId.OnGet(42);` |
 | Property should return current time/random value | `OnGet(callback)` | `stub.Now.OnGet(() => DateTime.UtcNow);` |
 | Property depends on other stub state | `OnGet(callback)` | `stub.IsReady.OnGet(() => isInitialized);` |
-| Property should return different values on successive reads | `OnGetSequence` | `stub.Name.OnGetSequence("A").ThenGet("B");` |
+| Property should return different values on successive reads | `OnGet().ThenGet()` | `stub.Name.OnGet("A").ThenGet("B");` |
 | Track all values written to property | `OnSet` | `stub.Name.OnSet((v) => list.Add(v));` |
 | Simulate validation in dependency | `OnSet` | `stub.Age.OnSet((v) => Validate(v));` |
-| Property should react differently to successive writes | `OnSetSequence` | `stub.Name.OnSetSequence(cb1).ThenSet(cb2);` |
+| Property should react differently to successive writes | `OnSet().ThenSet()` | `stub.Name.OnSet(cb1).ThenSet(cb2);` |
 | Verify property was accessed N times | `VerifyGet` | `stub.UserId.VerifyGet(Times.Exactly(2));` |
 | Verify last value written | `LastSetValue` | `Assert.Equal("x", stub.Name.LastSetValue);` |
 
@@ -595,12 +595,9 @@ Choose your configuration approach based on the test scenario:
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `OnGet(T value)` | `IPropertyGetTracking` | Configure getter to return static value |
-| `OnGet(Func<T> callback)` | `IPropertyGetTracking` | Configure getter with dynamic callback |
-| `OnGetSequence(T value)` | `IPropertyGetSequence<T>` | Start getter sequence with static value |
-| `OnGetSequence(Func<T> callback)` | `IPropertyGetSequence<T>` | Start getter sequence with callback |
-| `OnSet(Action<T> callback)` | `IPropertySetTracking<T>` | Configure setter callback |
-| `OnSetSequence(Action<T> callback)` | `IPropertySetSequence<T>` | Start setter sequence with callback |
+| `OnGet(T value)` | `IPropertyGetSequence<T>` | Configure getter to return static value. Chain with `.ThenGet()` for sequences. |
+| `OnGet(Func<T> callback)` | `IPropertyGetSequence<T>` | Configure getter with dynamic callback. Chain with `.ThenGet()` for sequences. |
+| `OnSet(Action<T> callback)` | `IPropertySetSequence<T>` | Configure setter callback. Chain with `.ThenSet()` for sequences. |
 
 ### Verification Methods
 
