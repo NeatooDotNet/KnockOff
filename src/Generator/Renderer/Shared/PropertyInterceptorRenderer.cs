@@ -79,7 +79,7 @@ internal static class PropertyInterceptorRenderer
 		w.Line();
 
 		// Aggregate get count (private - use VerifyGet() to check)
-		w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }");
+		w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
 		w.Line();
 
 		// OnGet() - repeating callback, returns IPropertyGetBuilder
@@ -198,11 +198,11 @@ internal static class PropertyInterceptorRenderer
 		// Aggregate counts (private - use VerifyGet/VerifySet to check)
 		if (model.HasGetter)
 		{
-			w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }");
+			w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
 		}
 		if (model.HasSetter)
 		{
-			w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?.CallCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking.CallCount; return sum; } }");
+			w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?._callCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking._callCount; return sum; } }");
 		}
 		if (model.HasGetter || model.HasSetter)
 		{
@@ -213,7 +213,7 @@ internal static class PropertyInterceptorRenderer
 		if (model.HasSetter)
 		{
 			w.Line($"/// <summary>The value from the last setter call (from most recently called registration).</summary>");
-			w.Line($"public {model.NullableValueType} LastSetValue {{ get {{ if ((_onSetTracking?.CallCount ?? 0) > 0) return _onSetTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking.CallCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; }} }}");
+			w.Line($"public {model.NullableValueType} LastSetValue {{ get {{ if ((_onSetTracking?._callCount ?? 0) > 0) return _onSetTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking._callCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; }} }}");
 			w.Line();
 		}
 
@@ -765,15 +765,15 @@ internal static class PropertyInterceptorRenderer
 			w.Line($"public PropertyGetBuilderImpl({interceptorClassName} interceptor) => _interceptor = interceptor;");
 			w.Line();
 
-			w.Line("internal int CallCount { get; private set; }");
+			w.Line("internal int _callCount;");
 			w.Line();
 
 			w.Line("/// <summary>Records a call to this callback.</summary>");
-			w.Line("public void RecordCall() => CallCount++;");
+			w.Line("public void RecordCall() => _callCount++;");
 			w.Line();
 
 			w.Line("/// <summary>Resets tracking state.</summary>");
-			w.Line("public void Reset() => CallCount = 0;");
+			w.Line("public void Reset() => _callCount = 0;");
 			w.Line();
 
 			w.Line("/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>");
@@ -784,8 +784,8 @@ internal static class PropertyInterceptorRenderer
 			w.Line("public void Verify(global::KnockOff.Times times)");
 			using (w.Braces())
 			{
-				w.Line("if (!times.Validate(CallCount))");
-				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"property getter\", times, CallCount));");
+				w.Line("if (!times.Validate(_callCount))");
+				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"property getter\", times, _callCount));");
 			}
 			w.Line();
 
@@ -853,7 +853,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line($"private {valueType} _lastValue = default!;");
 			w.Line();
 
-			w.Line("internal int CallCount { get; private set; }");
+			w.Line("internal int _callCount;");
 			w.Line();
 
 			w.Line($"/// <summary>Last value passed to this setter callback. Default if never called.</summary>");
@@ -861,11 +861,11 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 
 			w.Line("/// <summary>Records a call to this callback.</summary>");
-			w.Line($"public void RecordCall({valueType} value) {{ CallCount++; _lastValue = value; }}");
+			w.Line($"public void RecordCall({valueType} value) {{ _callCount++; _lastValue = value; }}");
 			w.Line();
 
 			w.Line("/// <summary>Resets tracking state.</summary>");
-			w.Line("public void Reset() { CallCount = 0; _lastValue = default!; }");
+			w.Line("public void Reset() { _callCount = 0; _lastValue = default!; }");
 			w.Line();
 
 			w.Line("/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>");
@@ -876,8 +876,8 @@ internal static class PropertyInterceptorRenderer
 			w.Line("public void Verify(global::KnockOff.Times times)");
 			using (w.Braces())
 			{
-				w.Line("if (!times.Validate(CallCount))");
-				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"property setter\", times, CallCount));");
+				w.Line("if (!times.Validate(_callCount))");
+				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"property setter\", times, _callCount));");
 			}
 			w.Line();
 

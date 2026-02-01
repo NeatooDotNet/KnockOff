@@ -1193,16 +1193,16 @@ internal static class MethodInterceptorRenderer
 						// Build count including simplified tracking
 						var countParts = new List<string>
 						{
-							$"(_onCallTracking_{overload.SignatureSuffix}?.CallCount ?? 0)",
-							$"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)"
+							$"(_onCallTracking_{overload.SignatureSuffix}?._callCount ?? 0)",
+							$"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking._callCount) ?? 0)"
 						};
 						var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
 						var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 						if ((isTaskT || isValueTaskT) && !hasRefOrOut)
-							countParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+							countParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 						var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 						if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
-							countParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+							countParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 						var countExpr = string.Join(" + ", countParts);
 						w.Line($"var count = {countExpr};");
 						w.Line($"if (!times.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", times, count);");
@@ -1254,13 +1254,13 @@ internal static class MethodInterceptorRenderer
 						// Build count including simplified tracking
 						var countParts = new List<string>
 						{
-							$"(_onCallTracking_{overload.SignatureSuffix}?.CallCount ?? 0)",
-							$"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)"
+							$"(_onCallTracking_{overload.SignatureSuffix}?._callCount ?? 0)",
+							$"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking._callCount) ?? 0)"
 						};
 						if ((isTaskT || isValueTaskT) && !hasRefOrOut)
-							countParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+							countParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 						if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
-							countParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+							countParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 						var countExpr = string.Join(" + ", countParts);
 						w.Line($"var count = {countExpr};");
 						w.Line($"if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, count);");
@@ -1334,8 +1334,8 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// CallCount property (internal to nested class - parent accesses for aggregate)
-			w.Line("internal int CallCount { get; private set; }");
+			// CallCount field (private - parent interceptor can access since this is a nested class)
+			w.Line("internal int _callCount;");
 			w.Line();
 
 			// LastArg/LastArgs property
@@ -1357,27 +1357,27 @@ internal static class MethodInterceptorRenderer
 			w.Line("/// <summary>Records a call to this callback.</summary>");
 			if (trackableParams.Count == 0)
 			{
-				w.Line("public void RecordCall() => CallCount++;");
+				w.Line("public void RecordCall() => _callCount++;");
 			}
 			else if (trackableParams.Count == 1)
 			{
 				var param = trackableParams.GetArray()![0];
-				w.Line($"public void RecordCall({param.Type} {param.EscapedName}) {{ CallCount++; _lastArg = {param.EscapedName}; }}");
+				w.Line($"public void RecordCall({param.Type} {param.EscapedName}) {{ _callCount++; _lastArg = {param.EscapedName}; }}");
 			}
 			else
 			{
-				w.Line($"public void RecordCall({lastArgsType} args) {{ CallCount++; _lastArgs = args; }}");
+				w.Line($"public void RecordCall({lastArgsType} args) {{ _callCount++; _lastArgs = args; }}");
 			}
 			w.Line();
 
 			// Reset method
 			w.Line("/// <summary>Resets tracking state.</summary>");
 			if (trackableParams.Count == 0)
-				w.Line("public void Reset() => CallCount = 0;");
+				w.Line("public void Reset() => _callCount = 0;");
 			else if (trackableParams.Count == 1)
-				w.Line("public void Reset() { CallCount = 0; _lastArg = default!; }");
+				w.Line("public void Reset() { _callCount = 0; _lastArg = default!; }");
 			else
-				w.Line("public void Reset() { CallCount = 0; _lastArgs = default; }");
+				w.Line("public void Reset() { _callCount = 0; _lastArgs = default; }");
 			w.Line();
 
 			// Verify() - no params, defaults to AtLeastOnce
@@ -1390,8 +1390,8 @@ internal static class MethodInterceptorRenderer
 			w.Line("public void Verify(global::KnockOff.Times times)");
 			using (w.Braces())
 			{
-				w.Line("if (!times.Validate(CallCount))");
-				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, CallCount));");
+				w.Line("if (!times.Validate(_callCount))");
+				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, _callCount));");
 			}
 			w.Line();
 
@@ -1496,7 +1496,7 @@ internal static class MethodInterceptorRenderer
 					w.Line($"if (_interceptor.{sequenceField} == null) return 0;");
 					w.Line("var total = 0;");
 					w.Line($"foreach (var (_, tracking) in _interceptor.{sequenceField})");
-					w.Line("\ttotal += tracking.CallCount;");
+					w.Line("\ttotal += tracking._callCount;");
 					w.Line("return total;");
 				}
 			}
@@ -2478,10 +2478,10 @@ internal static class MethodInterceptorRenderer
 	{
 		// CallCount - total across OnCall + Returns(value) + simplified + sequence + unconfigured (private - use Verify() API to check call counts)
 		// Include value tracking when value overload exists, and simplified callback tracking when present
-		var valueTrackingPart = hasValueOverload ? " + (_returnsValueTracking?.CallCount ?? 0)" : "";
-		var simplifiedTrackingPart = hasSimplifiedCallback ? " + (_onCallSimplifiedTracking?.CallCount ?? 0)" : "";
-		var simplifiedVoidTrackingPart = hasSimplifiedVoidCallback ? " + (_onCallSimplifiedVoidTracking?.CallCount ?? 0)" : "";
-		w.Line($"private int TotalCallCount {{ get {{ var sum = _unconfiguredCallCount + (_onCallTracking?.CallCount ?? 0){valueTrackingPart}{simplifiedTrackingPart}{simplifiedVoidTrackingPart}; if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking.CallCount; return sum; }} }}");
+		var valueTrackingPart = hasValueOverload ? " + (_returnsValueTracking?._callCount ?? 0)" : "";
+		var simplifiedTrackingPart = hasSimplifiedCallback ? " + (_onCallSimplifiedTracking?._callCount ?? 0)" : "";
+		var simplifiedVoidTrackingPart = hasSimplifiedVoidCallback ? " + (_onCallSimplifiedVoidTracking?._callCount ?? 0)" : "";
+		w.Line($"private int TotalCallCount {{ get {{ var sum = _unconfiguredCallCount + (_onCallTracking?._callCount ?? 0){valueTrackingPart}{simplifiedTrackingPart}{simplifiedVoidTrackingPart}; if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking._callCount; return sum; }} }}");
 		w.Line();
 
 		// LastCallArg - for single param methods
@@ -2494,13 +2494,13 @@ internal static class MethodInterceptorRenderer
 			// Build the priority chain: value > simplified > simplifiedVoid > onCall > sequence > unconfigured
 			var getterParts = new List<string>();
 			if (hasValueOverload)
-				getterParts.Add("if ((_returnsValueTracking?.CallCount ?? 0) > 0) return _returnsValueTracking!.LastArg;");
+				getterParts.Add("if ((_returnsValueTracking?._callCount ?? 0) > 0) return _returnsValueTracking!.LastArg;");
 			if (hasSimplifiedCallback)
-				getterParts.Add("if ((_onCallSimplifiedTracking?.CallCount ?? 0) > 0) return _onCallSimplifiedTracking!.LastArg;");
+				getterParts.Add("if ((_onCallSimplifiedTracking?._callCount ?? 0) > 0) return _onCallSimplifiedTracking!.LastArg;");
 			if (hasSimplifiedVoidCallback)
-				getterParts.Add("if ((_onCallSimplifiedVoidTracking?.CallCount ?? 0) > 0) return _onCallSimplifiedVoidTracking!.LastArg;");
-			getterParts.Add("if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArg;");
-			getterParts.Add("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArg;");
+				getterParts.Add("if ((_onCallSimplifiedVoidTracking?._callCount ?? 0) > 0) return _onCallSimplifiedVoidTracking!.LastArg;");
+			getterParts.Add("if ((_onCallTracking?._callCount ?? 0) > 0) return _onCallTracking!.LastArg;");
+			getterParts.Add("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking._callCount > 0) return _sequence[i].Tracking.LastArg;");
 			getterParts.Add("return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default;");
 
 			w.Line($"public {nullableType} LastCallArg {{ get {{ {string.Join(" ", getterParts)} }} }}");
@@ -2516,13 +2516,13 @@ internal static class MethodInterceptorRenderer
 			// Build the priority chain: value > simplified > simplifiedVoid > onCall > sequence > unconfigured
 			var getterParts = new List<string>();
 			if (hasValueOverload)
-				getterParts.Add("if ((_returnsValueTracking?.CallCount ?? 0) > 0) return _returnsValueTracking!.LastArgs;");
+				getterParts.Add("if ((_returnsValueTracking?._callCount ?? 0) > 0) return _returnsValueTracking!.LastArgs;");
 			if (hasSimplifiedCallback)
-				getterParts.Add("if ((_onCallSimplifiedTracking?.CallCount ?? 0) > 0) return _onCallSimplifiedTracking!.LastArgs;");
+				getterParts.Add("if ((_onCallSimplifiedTracking?._callCount ?? 0) > 0) return _onCallSimplifiedTracking!.LastArgs;");
 			if (hasSimplifiedVoidCallback)
-				getterParts.Add("if ((_onCallSimplifiedVoidTracking?.CallCount ?? 0) > 0) return _onCallSimplifiedVoidTracking!.LastArgs;");
-			getterParts.Add("if ((_onCallTracking?.CallCount ?? 0) > 0) return _onCallTracking!.LastArgs;");
-			getterParts.Add("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking.CallCount > 0) return _sequence[i].Tracking.LastArgs;");
+				getterParts.Add("if ((_onCallSimplifiedVoidTracking?._callCount ?? 0) > 0) return _onCallSimplifiedVoidTracking!.LastArgs;");
+			getterParts.Add("if ((_onCallTracking?._callCount ?? 0) > 0) return _onCallTracking!.LastArgs;");
+			getterParts.Add("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking._callCount > 0) return _sequence[i].Tracking.LastArgs;");
 			getterParts.Add("return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default;");
 
 			w.Line($"public {nullableType} LastCallArgs {{ get {{ {string.Join(" ", getterParts)} }} }}");
@@ -2543,16 +2543,16 @@ internal static class MethodInterceptorRenderer
 		var sumParts = new List<string>();
 		foreach (var overload in overloads)
 		{
-			sumParts.Add($"(_onCallTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
-			sumParts.Add($"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking.CallCount) ?? 0)");
+			sumParts.Add($"(_onCallTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
+			sumParts.Add($"(_sequence_{overload.SignatureSuffix}?.Sum(s => s.Tracking._callCount) ?? 0)");
 			// Add simplified tracking for async overloads
 			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
 			var (_, isTaskT, isValueTaskT) = GetAsyncTypeInfo(overload.ReturnType);
 			if ((isTaskT || isValueTaskT) && !hasRefOrOut)
-				sumParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+				sumParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 			if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
-				sumParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?.CallCount ?? 0)");
+				sumParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 		}
 		var sumExpr = "_unconfiguredCallCount + " + string.Join(" + ", sumParts);
 
