@@ -1,6 +1,6 @@
 # Create Design Source of Truth Projects
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** High
 **Created:** 2026-01-30
 **Last Updated:** 2026-01-30 (Developer review complete - approved)
@@ -58,44 +58,44 @@ Design Code → Design Plan → Updated Codebase + Design Code → Skills/Sample
 ## Tasks
 
 ### Phase 1: Foundation
-- [ ] Create `src/Design/` directory structure
-- [ ] Create `Design.sln` solution with project reference to KnockOff
-- [ ] Create `Design.Domain` project with basic stub definitions
+- [x] Create `src/Design/` directory structure
+- [x] Create `Design.sln` solution with project reference to KnockOff
+- [x] Create `Design.Domain` project with basic stub definitions
 
 ### Phase 2: Pattern Documentation
-- [ ] Create `StubPatterns/AllPatterns.cs` showing all four stub patterns side-by-side
-- [ ] Add extensive comments explaining when to use each pattern
-- [ ] Document what the generator produces for each pattern
+- [x] Create `StubPatterns/AllPatterns.cs` showing all four stub patterns side-by-side
+- [x] Add extensive comments explaining when to use each pattern
+- [x] Document what the generator produces for each pattern
 
 ### Phase 3: Member Type Coverage
-- [ ] Methods documentation (OnCall, Returns, When, ThenCall, Verify)
-- [ ] Properties documentation (OnGet, OnSet, Value, sequences)
-- [ ] Indexers documentation (OnGet, OnSet, Backing, sequences)
-- [ ] Events documentation (Raise, VerifyAdd, VerifyRemove)
-- [ ] Delegates documentation (Interceptor pattern)
+- [x] Methods documentation (OnCall, Returns, When, ThenCall, Verify)
+- [x] Properties documentation (OnGet, OnSet, Value, sequences)
+- [x] Indexers documentation (OnGet, OnSet, Backing, sequences)
+- [x] Events documentation (Raise, VerifyAdd, VerifyRemove)
+- [x] Delegates documentation (Interceptor pattern)
 
 ### Phase 4: Advanced Features
-- [ ] When() API comprehensive documentation
-- [ ] Sequence API (OnCall().ThenCall()) documentation
-- [ ] Verification patterns (Verifiable, Verify, Times)
-- [ ] Source delegation pattern
-- [ ] Strict mode behavior
+- [x] When() API comprehensive documentation
+- [x] Sequence API (OnCall().ThenCall()) documentation
+- [x] Verification patterns (Verifiable, Verify, Times)
+- [x] Source delegation pattern
+- [x] Strict mode behavior
 
 ### Phase 5: Testing Patterns
-- [ ] Create `Design.Tests` project
-- [ ] Demonstrate stub usage patterns
-- [ ] Show common testing scenarios
+- [x] Create `Design.Tests` project
+- [x] Demonstrate stub usage patterns
+- [x] Show common testing scenarios
 
 ### Phase 6: Documentation & Finalization
-- [ ] Create `README.md` and `CLAUDE-DESIGN.md`
-- [ ] Update main `CLAUDE.md` to reference design projects
-- [ ] Re-evaluate relationship with skills/knockoff/ after completion
+- [x] Create `README.md` and `CLAUDE-DESIGN.md`
+- [x] Update main `CLAUDE.md` to reference design projects
+- [x] Re-evaluate relationship with skills/knockoff/ after completion
 
 ### Comment Requirements
-- [ ] At least 10 "DID NOT DO THIS BECAUSE" comments
-- [ ] At least 10 "DESIGN DECISION" comments
-- [ ] At least 5 "GENERATOR BEHAVIOR" comments
-- [ ] At least 5 "COMMON MISTAKE" comments
+- [x] At least 10 "DID NOT DO THIS BECAUSE" comments (23 found)
+- [x] At least 10 "DESIGN DECISION" comments (80+ found)
+- [x] At least 5 "GENERATOR BEHAVIOR" comments (44 found)
+- [x] At least 5 "COMMON MISTAKE" comments (21 found)
 
 ---
 
@@ -117,7 +117,23 @@ Design Code → Design Plan → Updated Codebase + Design Code → Skills/Sample
 3. IMatrix - Already properly documented as KNOWN LIMITATION in IndexerBasics.cs. Added clarifying comment to IMatrix interface definition in Design.Domain.
 All 115 tests pass across net8.0, net9.0, and net10.0.
 
+**2026-02-01**: Re-evaluated and updated skills/knockoff/ based on Design projects:
+1. Rewrote SKILL.md to be Claude-action-focused with critical behavioral gotchas section
+2. Added all key gotchas from CLAUDE-DESIGN.md (sequences exhaust, Handler property, Times.Between doesn't exist, etc.)
+3. Fixed Times.Between() error in moq-migration.md (was incorrectly listed as supported)
+4. Updated async documentation to correctly describe auto-wrapping behavior
+5. Updated README.md with quick reference and gotchas summary
+6. Skills remain self-contained for use in other projects (no Design project dependencies)
+
+**Decision**: Skills stay as self-contained documentation for external projects. Design projects are the source of truth for KnockOff development. Skills were updated to incorporate all critical insights from Design projects.
+
 ---
 
 ## Results / Conclusions
+
+Design projects successfully established as authoritative source of truth:
+- 115 tests verify documented behavior
+- All critical gotchas captured in CLAUDE-DESIGN.md
+- Skills updated to be consistent with Design projects
+- Skills remain portable and self-contained for use in other codebases
 

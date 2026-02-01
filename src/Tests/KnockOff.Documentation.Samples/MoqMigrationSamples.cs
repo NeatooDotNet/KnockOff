@@ -732,3 +732,188 @@ public class CompleteMigrationCombinedExample
         Assert.Equal("Alice", knockoffResult?.Name);
     }
 }
+
+// =============================================================================
+// Common Gotchas - Forgetting Partial Keyword
+// =============================================================================
+
+#region moq-migration-gotcha-partial-wrong
+// Wrong
+[KnockOff<IMoqUserRepo>]
+class MoqUserRepoStubWrong { }
+#endregion
+
+#region moq-migration-gotcha-partial-correct
+// Correct
+[KnockOff<IMoqUserRepo>]
+partial class MoqUserRepoStubCorrect { }
+#endregion
+
+// =============================================================================
+// Common Gotchas - Wrong OnCall Signature
+// =============================================================================
+
+public class GotchaSignatureTests
+{
+    [Fact]
+    public void WrongSignature_Examples()
+    {
+        var stub = new MoqUserRepoStub();
+        var user = new User { Id = 1, Name = "Alice" };
+
+        #region moq-migration-gotcha-signature-wrong
+        // Wrong: GetUser(int id) expects (int) callback
+        // stub.GetUser.OnCall(() => user);  // Compile error
+        #endregion
+
+        #region moq-migration-gotcha-signature-correct
+        // Correct
+        stub.GetUser.OnCall((id) => user);
+        #endregion
+    }
+}
+
+// =============================================================================
+// Common Gotchas - Forgetting .Object Equivalence
+// =============================================================================
+
+public class GotchaObjectTests
+{
+    [Fact]
+    public void ObjectEquivalence_Examples()
+    {
+        #region moq-migration-gotcha-object-moq
+        // Moq: needed .Object
+        var mock = new Mock<IMoqUserRepo>();
+        var moqService = new UserServiceMigration(mock.Object);
+        #endregion
+
+        #region moq-migration-gotcha-object-knockoff
+        // KnockOff: use stub directly
+        var stub = new MoqUserRepoStub();
+        var knockoffService = new UserServiceMigration(stub);
+        #endregion
+
+        Assert.NotNull(moqService);
+        Assert.NotNull(knockoffService);
+    }
+}
+
+// =============================================================================
+// Common Gotchas - Async Auto-Wrap
+// =============================================================================
+
+public class GotchaAsyncAutoWrapTests
+{
+    [Fact]
+    public async Task AsyncAutoWrap_Examples()
+    {
+        var stub = new MoqUserRepoStub();
+        var user = new User { Id = 1, Name = "Alice" };
+
+        #region moq-migration-gotcha-async-autowrap
+        // Returns - auto-wraps in Task.FromResult
+        stub.GetUserAsync.Returns(user);
+
+        // Simplified callback - also auto-wraps (return unwrapped type)
+        stub.GetUserAsync.OnCall((id) => user);
+
+        // Only use Task.FromResult when callback needs actual async operations
+        stub.GetUserAsync.OnCall(async (id) =>
+        {
+            await Task.Delay(1); // Some actual async work
+            return user;
+        });
+        #endregion
+
+        var result = await ((IMoqUserRepo)stub).GetUserAsync(1);
+        Assert.Equal("Alice", result?.Name);
+    }
+}
+
+// =============================================================================
+// Common Gotchas - Property Configuration
+// =============================================================================
+
+public class GotchaPropertyTests
+{
+    [Fact]
+    public void PropertyConfiguration_Examples()
+    {
+        var stub = new MoqUserRepoStub();
+
+        #region moq-migration-gotcha-property-wrong
+        // Wrong: OnCall is for methods
+        // stub.ConnectionString.OnCall(() => "connection");  // Compile error
+        #endregion
+
+        #region moq-migration-gotcha-property-correct
+        // Correct: use OnGet for property getters
+        stub.ConnectionString.OnGet("connection");
+
+        // For setters, use OnSet
+        stub.ConnectionString.OnSet((value) => { /* handle set */ });
+        #endregion
+
+        Assert.Equal("connection", ((IMoqUserRepo)stub).ConnectionString);
+    }
+}
+
+// =============================================================================
+// Common Gotchas - Void Methods Need Delegate Body
+// =============================================================================
+
+public class GotchaVoidMethodTests
+{
+    [Fact]
+    public void VoidMethod_Examples()
+    {
+        var stub = new MoqUserRepoStub();
+
+        #region moq-migration-gotcha-void-wrong
+        // Wrong: no delegate body
+        // stub.SaveUser.OnCall();  // Compile error
+        #endregion
+
+        #region moq-migration-gotcha-void-correct
+        // Correct
+        stub.SaveUser.OnCall((user) => { });
+        #endregion
+    }
+}
+
+// =============================================================================
+// Times Matcher Reference
+// =============================================================================
+
+public class TimesMatcherTests
+{
+    [Fact]
+    public void TimesMatchers_Examples()
+    {
+        var mock = new Mock<IMoqUserRepo>();
+        var stub = new MoqUserRepoStub();
+        stub.SaveUser.OnCall((user) => { });
+
+        // Call 3 times
+        ((IMoqUserRepo)stub).SaveUser(new User { Name = "A" });
+        ((IMoqUserRepo)stub).SaveUser(new User { Name = "B" });
+        ((IMoqUserRepo)stub).SaveUser(new User { Name = "C" });
+
+        mock.Object.SaveUser(new User { Name = "A" });
+        mock.Object.SaveUser(new User { Name = "B" });
+        mock.Object.SaveUser(new User { Name = "C" });
+
+        #region moq-migration-times-example
+        // Moq
+        mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Exactly(3));
+
+        // KnockOff
+        stub.SaveUser.Verify(Times.Exactly(3));
+
+        // For range verification (no Times.Between in KnockOff):
+        stub.SaveUser.Verify(Times.AtLeast(1));
+        stub.SaveUser.Verify(Times.AtMost(5));
+        #endregion
+    }
+}
