@@ -10,13 +10,16 @@ This plugin provides comprehensive assistance for using the KnockOff stub librar
 
 Automatically activates when you ask about:
 - Creating stubs with `[KnockOff]` or `[KnockOff<T>]` attributes
-- The three stub patterns (Stand-Alone, Inline Interface, Inline Class)
-- Configuring behavior with `OnCall` (callback or value), `OnGet`, `OnSet`
-- Sequential callbacks with `OnCallSequence`, `ThenCall`
-- Verification with `Verify()`, `Verifiable()`, and `Times` constraints
-- Async method handling
+- The four stub patterns (Stand-Alone, Inline Interface, Inline Class, Inline Delegate)
+- Configuring behavior with `Returns`, `OnCall`, `OnGet`, `OnSet`
+- Argument matching with `When()` API
+- Sequential callbacks with `ThenCall`, `ThenGet`, `ThenSet`
+- Verification with `Verify()`, `Verifiable()`, `VerifyAll()`, and `Times` constraints
+- Async method handling (auto-wrapping)
 - Generic method stubbing with `.Of<T>()`
-- Event subscription tracking and raising
+- Event subscription tracking (Handler property)
+- Source delegation with `Source()`
+- Strict mode configuration
 - Common issues and best practices
 
 ### Commands
@@ -38,134 +41,67 @@ To use this plugin in other projects:
 1. Copy the `skills/knockoff/` directory to your project
 2. Claude Code will auto-discover it in your `.claude/` or `skills/` directories
 
-## Usage Examples
+## Quick API Reference
 
-### Create a New Stub
+### Four Patterns
 
-```
-/knockoff:create-stub
-```
+| Pattern | Attribute | Access |
+|---------|-----------|--------|
+| Stand-Alone | `[KnockOff]` on partial class | `new MyStub()` |
+| Inline Interface | `[KnockOff<IInterface>]` | `new Stubs.IInterface()` |
+| Inline Class | `[KnockOff<MyClass>]` | `new Stubs.MyClass()` then `.Object` |
+| Inline Delegate | `[KnockOff<MyDelegate>]` | `new Stubs.MyDelegate()` |
 
-Claude guides you through:
-1. Choosing a stub pattern (Stand-Alone, Inline Interface, Inline Class)
-2. Selecting the target interface or class
-3. Generating the stub class and basic test scaffolding
+### Method Configuration
 
-### Migrate from Moq
-
-```
-/knockoff:migrate-from-moq path/to/tests/MyTests.cs
-```
-
-Analyzes your Moq tests and transforms them to KnockOff:
-- Converts `Mock<T>` to stub classes
-- Transforms `.Setup()` calls to `.OnCall()` configuration
-- Migrates `.Verify()` calls to KnockOff verification
-
-### Troubleshoot Issues
-
-```
-/knockoff:troubleshoot
-```
-
-Diagnose and fix common problems:
-- Stub not generating
-- Compilation errors in generated code
-- Interceptor configuration issues
-- Verification failures
-
-## Key API Quick Reference
-
-This is a quick reference of KnockOff's core APIs. For complete documentation with examples, see the [API Reference](skills/knockoff-usage/references/api-reference.md).
-
-### OnCall - Two Convenient Overloads
-
-**Callback overload** - Full control with argument-based logic:
-
-<!-- snippet: plugin-readme-oncall-callback -->
 ```cs
-stub.GetUser.OnCall((id) => new User { Id = id, Name = "Dynamic" });
-```
-<!-- endSnippet -->
-
-**Value overload** - Simpler syntax for fixed return values:
-
-<!-- snippet: plugin-readme-oncall-value -->
-```cs
+// Fixed value
 stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
+
+// Dynamic callback
+stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+
+// Argument matching
+stub.GetUser.When(42).Returns(adminUser);
+stub.GetUser.When(id => id < 0).Returns(null);
+
+// Sequences (exhaust after all consumed - don't repeat!)
+stub.GetNext.OnCall(() => 1).ThenCall(() => 2).ThenCall(() => 3);
 ```
-<!-- endSnippet -->
-
-Both overloads return an `IMethodTracking<T>` for verification and argument capture.
-
-### Sequential Callbacks
-
-Configure different return values for successive calls:
-
-<!-- TODO: Update sample to use OnCall().ThenCall() instead of OnCallSequence() -->
-<!-- snippet: plugin-readme-sequential -->
-```cs
-stub.GetValue
-    .OnCall(() => 10)
-    .ThenCall(() => 20)
-    .ThenCall(() => 30);
-```
-<!-- endSnippet -->
 
 ### Verification
 
-**Immediate verification** - Verify a specific member:
-
-<!-- snippet: plugin-readme-verify-immediate -->
 ```cs
+// Mark for batch verification
+stub.Save.OnCall((user) => { }).Verifiable();
+stub.Verify();  // Checks all Verifiable() members
+
+// Or verify individually
 var tracking = stub.Save.OnCall((user) => { });
-
-// ... exercise stub ...
+tracking.Verify(Times.Once);
 ```
-<!-- endSnippet -->
 
-**Batch verification** - Mark with `Verifiable()`, then verify all at once:
+### Critical Gotchas
 
-<!-- snippet: plugin-readme-verify-batch -->
-```cs
-stub.GetUser.OnCall((id) => new User { Id = id }).Verifiable();
-stub.Save.OnCall((user) => { }).Verifiable(Times.Exactly(2));
-
-// ... exercise stub ...
-```
-<!-- endSnippet -->
-
-### Generic Methods
-
-Use `.Of<T>()` to configure and verify type-specific behavior:
-
-<!-- snippet: plugin-readme-generic-methods -->
-```cs
-stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-```
-<!-- endSnippet -->
+1. **Sequences exhaust** - They return `default` after all callbacks consumed, NOT repeat last value
+2. **Events use Handler property** - `stub.EventInterceptor.Handler?.Invoke(...)` (no Raise method)
+3. **Class stubs use .Object** - `stub.Object` to get the class instance
+4. **Times.Between() doesn't exist** - Use `AtLeast` + `AtMost` instead
 
 ## Plugin Documentation
 
 ### Skill Reference
 
-The **knockoff-usage** skill provides comprehensive documentation on KnockOff APIs and patterns:
+The **knockoff-usage** skill provides comprehensive documentation:
 
-- [Stub Patterns](skills/knockoff-usage/references/patterns.md) - All three patterns with complete examples
-- [Methods Guide](skills/knockoff-usage/references/methods.md) - Method interceptor configuration and verification
-- [Properties Guide](skills/knockoff-usage/references/properties.md) - Property interceptors (OnGet, OnSet)
+- [Main Skill Guide](skills/knockoff-usage/SKILL.md) - Complete guide with gotchas
+- [Stub Patterns](skills/knockoff-usage/references/patterns.md) - All four patterns with examples
+- [Methods Guide](skills/knockoff-usage/references/methods.md) - Method configuration and verification
+- [Properties Guide](skills/knockoff-usage/references/properties.md) - Property interceptors
 - [API Reference](skills/knockoff-usage/references/api-reference.md) - Complete interceptor API
-- [Moq Migration](skills/knockoff-usage/references/moq-migration.md) - Step-by-step migration guide
-
-### Project Documentation
-
-For library documentation and guides, see:
-
-- [Project README](../../README.md) - Library overview and quick start
-- [Getting Started Guide](../../docs/getting-started.md) - Installation and first usage
-- [Interceptor API Reference](../../docs/reference/interceptor-api.md) - Complete API documentation
-- [Migration Guides](../../docs/migration/) - Migrating from Moq and NSubstitute
+- [Strict Mode](skills/knockoff-usage/references/strict-mode.md) - Strict mode configuration
+- [Moq Migration](skills/knockoff-usage/references/moq-migration.md) - Migration guide
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-01

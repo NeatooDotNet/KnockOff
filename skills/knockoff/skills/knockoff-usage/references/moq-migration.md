@@ -34,15 +34,17 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | Moq Pattern | KnockOff Equivalent |
 |-------------|---------------------|
 | `new Mock<IFoo>()` | `new FooStub()` with `[KnockOff<IFoo>] partial class FooStub` |
-| `mock.Object` | `stub` (direct instance) |
-| `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall(() => value)` |
+| `mock.Object` | `stub` (direct) or `stub.Object` (class stubs only) |
+| `.Setup(x => x.Method()).Returns(value)` | `stub.Method.Returns(value)` |
+| `.Setup(x => x.Method(arg)).Returns(val)` | `stub.Method.When(arg).Returns(val)` |
 | `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
-| `.ReturnsAsync(value)` | `stub.Method.OnCall(value)` (value overload auto-wraps) |
+| `.ReturnsAsync(value)` | `stub.Method.Returns(value)` (auto-wraps) |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
-| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` or `stub.Method.Verify(Times.Once)` |
-| `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
+| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` |
+| `.Verifiable()` | `.Verifiable()` then `stub.Verify()` |
 | `mock.Verify()` | `stub.Verify()` |
-| `It.IsAny<T>()` | Callback receives all arguments for inspection |
+| `It.IsAny<T>()` | Callback receives all args |
+| `It.Is<T>(pred)` | `stub.Method.When(pred).Returns(val)` |
 
 ---
 
@@ -283,10 +285,13 @@ public async Task AsyncMethod_KnockOffApproach()
     var stub = new UserRepositoryStub();
     var testUser = new User { Id = 42, Name = "Alice" };
 
-    // VALUE overload - auto-wraps in Task.FromResult (recommended)
-    stub.GetUserAsync.OnCall(testUser);
+    // RETURNS - auto-wraps in Task.FromResult
+    stub.GetUserAsync.Returns(testUser);
 
-    // CALLBACK overload - manual Task wrapping required
+    // SIMPLIFIED CALLBACK - return unwrapped type, auto-wraps (recommended)
+    stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" });
+
+    // FULL CALLBACK - manual Task wrapping (when you need async in callback)
     // stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 
     IUserRepository repository = stub;
@@ -299,8 +304,9 @@ public async Task AsyncMethod_KnockOffApproach()
 
 **Key differences:**
 - Moq provides `.ReturnsAsync()` helper
-- KnockOff value overloads auto-wrap in `Task.FromResult()` (recommended)
-- KnockOff callback overloads require manual `Task.FromResult()` wrapping
+- KnockOff `Returns()` and simplified callbacks auto-wrap in `Task.FromResult()`
+- Return the unwrapped type from callbacks - KnockOff handles the Task wrapping
+- Only use explicit `Task.FromResult()` when your callback needs actual async operations
 - For exceptions: return `Task.FromException<T>(exception)`
 
 ---
@@ -566,19 +572,22 @@ var service = new UserService(mock.Object);
 var service = new UserService(stub);
 ```
 
-### Async Return Type Mismatch (Callback Overloads Only)
+### Async Methods - Both Overloads Auto-Wrap
 
-**Problem:** Forgetting to wrap return values in `Task.FromResult()` when using callback overloads for async methods.
+**Note:** KnockOff auto-wraps both Returns and simplified callbacks for async methods:
 
 ```csharp
-// CALLBACK overload: Wrong - returns User directly for async method
+// Returns - auto-wraps in Task.FromResult
+stub.GetUserAsync.Returns(user);
+
+// Simplified callback - also auto-wraps (return unwrapped type)
 stub.GetUserAsync.OnCall((id) => user);
 
-// CALLBACK overload: Correct - wrap in Task.FromResult
-stub.GetUserAsync.OnCall((id) => Task.FromResult(user));
-
-// VALUE overload: Auto-wraps (recommended for simple cases)
-stub.GetUserAsync.OnCall(user);
+// Only use Task.FromResult when callback needs actual async operations
+stub.GetUserAsync.OnCall(async (id) => {
+    await SomeAsyncOperation();
+    return user;
+});
 ```
 
 ### Property Configuration
@@ -612,7 +621,7 @@ stub.DeleteUser.OnCall((id) => { });
 
 ## Times Matcher Reference
 
-KnockOff supports the same `Times` matchers as Moq:
+KnockOff supports these `Times` matchers:
 
 | Matcher | Description |
 |---------|-------------|
@@ -622,7 +631,8 @@ KnockOff supports the same `Times` matchers as Moq:
 | `Times.AtLeast(n)` | Method was called at least n times |
 | `Times.AtMost(n)` | Method was called at most n times |
 | `Times.Exactly(n)` | Method was called exactly n times |
-| `Times.Between(min, max)` | Method was called between min and max times |
+
+**Note:** Unlike Moq, KnockOff does NOT have `Times.Between()`. Use separate `AtLeast` and `AtMost` checks instead.
 
 **Example:**
 
@@ -632,6 +642,10 @@ mock.Verify(x => x.SaveUser(It.IsAny<User>()), Times.Exactly(3));
 
 // KnockOff
 stub.SaveUser.Verify(Times.Exactly(3));
+
+// For range verification (no Times.Between in KnockOff):
+stub.SaveUser.Verify(Times.AtLeast(1));
+stub.SaveUser.Verify(Times.AtMost(5));
 ```
 
 ---
@@ -656,4 +670,4 @@ Use this checklist when migrating a test file from Moq to KnockOff:
 
 ---
 
-**UPDATED:** 2026-01-26
+**UPDATED:** 2026-02-01

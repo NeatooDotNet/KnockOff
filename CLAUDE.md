@@ -73,6 +73,10 @@ Key files by topic:
 
 See `src/Design/CLAUDE-DESIGN.md` for Claude-specific guidance.
 
+## KnockOff Skill (`skills/knockoff/`)
+
+**The skill must remain stand-alone.** It is distributed to other projects where Design projects don't exist. When updating the skill, incorporate insights from Design projects but never add dependencies on Design files.
+
 ## Plan Mode and Project Todos
 
 **When plan mode completes:**
