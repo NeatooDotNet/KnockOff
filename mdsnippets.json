@@ -14,7 +14,7 @@
   "ExcludeMarkdownDirectories": [
     "todos",
     "release-notes",
-    "design",
+    "Design",
     ".claude",
     "plans"
   ],
