@@ -1569,6 +1569,11 @@ internal static class FlatRenderer
 			w.Line("internal int CallCount { get; private set; }");
 			w.Line();
 
+			// Verifiable state
+			w.Line("private bool _isVerifiable;");
+			w.Line("private global::KnockOff.Times? _verifiableTimes;");
+			w.Line();
+
 			// LastArg/LastArgs property (non-nullable to match interface)
 			if (method.TrackableParameters.Count == 1)
 			{
@@ -1617,6 +1622,18 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
+			// CheckVerification method - for Stub.Verify() aggregation
+			w.Line("/// <summary>Checks verification for Stub.Verify().</summary>");
+			w.Line($"internal global::KnockOff.VerificationFailure? CheckVerification()");
+			using (w.Braces())
+			{
+				w.Line("if (!_isVerifiable) return null;");
+				w.Line("var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+				w.Line($"if (!times.Validate(CallCount)) return new global::KnockOff.VerificationFailure(\"{method.MethodName}\", times, CallCount);");
+				w.Line("return null;");
+			}
+			w.Line();
+
 			// Verify methods - new API throws VerificationException
 			w.Line("/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>");
 			w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
@@ -1635,21 +1652,45 @@ internal static class FlatRenderer
 			var isBaseInterface = trackingInterface == "global::KnockOff.IMethodTracking";
 			if (isBaseInterface)
 			{
-				w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-				w.Line("public global::KnockOff.IMethodTracking Verifiable() => this;");
+				w.Line("/// <summary>Marks for verification by Stub.Verify().</summary>");
+				w.Line("public global::KnockOff.IMethodTracking Verifiable()");
+				using (w.Braces())
+				{
+					w.Line("_isVerifiable = true;");
+					w.Line("_verifiableTimes = null;");
+					w.Line("return this;");
+				}
 				w.Line();
 
-				w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-				w.Line("public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;");
+				w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint.</summary>");
+				w.Line("public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times)");
+				using (w.Braces())
+				{
+					w.Line("_isVerifiable = true;");
+					w.Line("_verifiableTimes = times;");
+					w.Line("return this;");
+				}
 			}
 			else
 			{
-				w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-				w.Line($"public {trackingInterface} Verifiable() => this;");
+				w.Line("/// <summary>Marks for verification by Stub.Verify().</summary>");
+				w.Line($"public {trackingInterface} Verifiable()");
+				using (w.Braces())
+				{
+					w.Line("_isVerifiable = true;");
+					w.Line("_verifiableTimes = null;");
+					w.Line("return this;");
+				}
 				w.Line();
 
-				w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-				w.Line($"public {trackingInterface} Verifiable(global::KnockOff.Times times) => this;");
+				w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint.</summary>");
+				w.Line($"public {trackingInterface} Verifiable(global::KnockOff.Times times)");
+				using (w.Braces())
+				{
+					w.Line("_isVerifiable = true;");
+					w.Line("_verifiableTimes = times;");
+					w.Line("return this;");
+				}
 				w.Line();
 
 				// Explicit interface implementations for base IMethodTracking
@@ -2110,8 +2151,15 @@ internal static class FlatRenderer
 		w.Line($"public {primaryInterface} Object => this;");
 		w.Line();
 
-		// Verify and VerifyAll methods (only if there are method interceptors)
-		if (unit.MethodGroups.Count > 0)
+		// Verify and VerifyAll methods (if there are any verifiable members)
+		// Must check all member types: methods, user methods, properties, events
+		// NOTE: Indexers excluded - there's a separate bug where indexer container accessor paths are wrong
+		// TODO: Fix indexer verification accessor paths (see IndexerGroups vs individual Indexers)
+		var hasUserMethods = unit.Methods.Any(m => !m.IsGenericMethod && m.UserMethodCall != null);
+		if (unit.MethodGroups.Count > 0
+			|| hasUserMethods
+			|| unit.Properties.Count > 0
+			|| unit.Events.Count > 0)
 		{
 			RenderVerifyMethods(w, unit);
 		}
@@ -2187,6 +2235,12 @@ internal static class FlatRenderer
 				w.Line($"if ({name}.CheckVerification() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
 			}
 
+			// Check verifiable user-defined method interceptors
+			foreach (var name in userMethodInterceptorNames)
+			{
+				w.Line($"if ({name}.CheckVerification() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
+			}
+
 			w.Line();
 			w.Line("if (failures.Count > 0)");
 			w.Line("\tthrow new global::KnockOff.VerificationException(failures);");
@@ -2194,6 +2248,7 @@ internal static class FlatRenderer
 		w.Line();
 
 		// VerifyAll method - checks ALL configured members, throws if any fail
+		// NOTE: User-defined methods are NOT included in VerifyAll because they are always "configured"
 		w.Line("/// <summary>Verifies ALL configured members were invoked at least once. Throws VerificationException with all failures if any fail.</summary>");
 		using (w.Block("public void VerifyAll()"))
 		{
