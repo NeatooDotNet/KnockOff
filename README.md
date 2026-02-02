@@ -40,90 +40,62 @@ public interface IFormatter
 ```
 <!-- endSnippet -->
 
-**NSubstitute** - Must use `Arg.Any<T>()` to match any value:
+### Any-Value Matching
 
-<!-- snippet: readme-method-overload-nsubstitute -->
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-any-value -->
 ```cs
-[Fact]
-public void NSubstitute_OverloadResolution()
-{
-    var formatter = Substitute.For<IFormatter>();
-
-    // Arg.Any<T>() required - compiler needs the types to resolve overload
-    formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
-    formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
-
-    // Specific value matching - literals work when all args are specific
-    formatter.Format("test", true).Returns("UPPERCASE");
-    formatter.Format("test", 10).Returns("truncated");
-
-    // To use argument values, extract from CallInfo:
-    formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
-        .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
-
-    // Verify it works
-    Assert.Equal("HELLO", formatter.Format("hello", true));
-    Assert.Equal("hello", formatter.Format("hello", false));
-}
+// Arg.Any<T>() required - compiler needs the types to resolve overload
+formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
+formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
 ```
 <!-- endSnippet -->
 
-**KnockOff** - Just write C# with typed parameters:
-
-<!-- snippet: readme-method-overload-knockoff -->
+**KnockOff:**
+<!-- snippet: readme-knockoff-any-value -->
 ```cs
-[Fact]
-public void OnCall_WithExplicitParameterTypes_ResolvesOverload()
-{
-    var stub = new FormatterStub();
-
-    // Explicit parameter types resolve the overload - standard C# syntax
-    stub.Format.OnCall((string input, bool uppercase) => "bool overload");
-    stub.Format.OnCall((string input, int maxLength) => "int overload");
-
-    IFormatter formatter = stub;
-
-    // Each overload is correctly configured
-    Assert.Equal("bool overload", formatter.Format("test", true));
-    Assert.Equal("int overload", formatter.Format("test", 10));
-}
+// Explicit parameter types resolve the overload - standard C# syntax
+stub.Format.OnCall((string input, bool uppercase) => "bool overload");
+stub.Format.OnCall((string input, int maxLength) => "int overload");
 ```
 <!-- endSnippet -->
 
-<!-- snippet: readme-method-overload-when -->
+### Specific-Value Matching
+
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-specific-value -->
 ```cs
-[Fact]
-public void When_WithLiteralValues_ResolvesOverload()
-{
-    var stub = new FormatterStub();
-
-    // Specific value matching - parameter types resolve the overload
-    stub.Format.When("test", true).Returns("UPPERCASE");
-    stub.Format.When("test", 10).Returns("truncated");
-
-    IFormatter formatter = stub;
-
-    Assert.Equal("UPPERCASE", formatter.Format("test", true));
-    Assert.Equal("truncated", formatter.Format("test", 10));
-}
+// Specific value matching - literals work when all args are specific
+formatter.Format("test", true).Returns("UPPERCASE");
+formatter.Format("test", 10).Returns("truncated");
 ```
 <!-- endSnippet -->
 
-<!-- snippet: readme-method-overload-argument-access -->
+**KnockOff:**
+<!-- snippet: readme-knockoff-specific-value -->
 ```cs
-[Fact]
-public void OnCall_ArgumentsDirectlyAvailable_WithNamesAndTypes()
-{
-    var stub = new FormatterStub();
+// Specific value matching - parameter types resolve the overload
+stub.Format.When("test", true).Returns("UPPERCASE");
+stub.Format.When("test", 10).Returns("truncated");
+```
+<!-- endSnippet -->
 
-    // Arguments are directly available with names and types:
-    stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+### Argument Access
 
-    IFormatter formatter = stub;
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-argument-access -->
+```cs
+// To use argument values, extract from CallInfo:
+formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
+    .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
+```
+<!-- endSnippet -->
 
-    Assert.Equal("HELLO", formatter.Format("hello", true));
-    Assert.Equal("hello", formatter.Format("hello", false));
-}
+**KnockOff:**
+<!-- snippet: readme-knockoff-argument-access -->
+```cs
+// Arguments are directly available with names and types:
+stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
 ```
 <!-- endSnippet -->
 

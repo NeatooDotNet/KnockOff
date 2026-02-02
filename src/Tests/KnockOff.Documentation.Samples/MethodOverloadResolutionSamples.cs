@@ -23,62 +23,120 @@ public interface IFormatter
 public partial class FormatterStub : IFormatter { }
 
 // =============================================================================
-// Method Overload Resolution Samples
+// NSubstitute Comparison Samples (focused snippets)
 // =============================================================================
 
-public class MethodOverloadResolutionTests
+public class NSubstituteOverloadResolutionTests
 {
-    #region readme-method-overload-knockoff
     [Fact]
-    public void OnCall_WithExplicitParameterTypes_ResolvesOverload()
+    public void NSubstitute_AnyValueMatching()
     {
-        var stub = new FormatterStub();
+        var formatter = Substitute.For<IFormatter>();
 
-        // Explicit parameter types resolve the overload - standard C# syntax
-        stub.Format.OnCall((string input, bool uppercase) => "bool overload");
-        stub.Format.OnCall((string input, int maxLength) => "int overload");
+        #region readme-nsubstitute-any-value
+        // Arg.Any<T>() required - compiler needs the types to resolve overload
+        formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
+        formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
+        #endregion
 
-        IFormatter formatter = stub;
-
-        // Each overload is correctly configured
         Assert.Equal("bool overload", formatter.Format("test", true));
         Assert.Equal("int overload", formatter.Format("test", 10));
     }
-    #endregion
 
-    #region readme-method-overload-when
     [Fact]
-    public void When_WithLiteralValues_ResolvesOverload()
+    public void NSubstitute_SpecificValueMatching()
+    {
+        var formatter = Substitute.For<IFormatter>();
+
+        #region readme-nsubstitute-specific-value
+        // Specific value matching - literals work when all args are specific
+        formatter.Format("test", true).Returns("UPPERCASE");
+        formatter.Format("test", 10).Returns("truncated");
+        #endregion
+
+        Assert.Equal("UPPERCASE", formatter.Format("test", true));
+        Assert.Equal("truncated", formatter.Format("test", 10));
+    }
+
+    [Fact]
+    public void NSubstitute_ArgumentAccess()
+    {
+        var formatter = Substitute.For<IFormatter>();
+
+        #region readme-nsubstitute-argument-access
+        // To use argument values, extract from CallInfo:
+        formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
+            .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
+        #endregion
+
+        Assert.Equal("HELLO", formatter.Format("hello", true));
+        Assert.Equal("hello", formatter.Format("hello", false));
+    }
+}
+
+// =============================================================================
+// KnockOff Samples (focused snippets)
+// =============================================================================
+
+public class KnockOffOverloadResolutionTests
+{
+    [Fact]
+    public void KnockOff_AnyValueMatching()
     {
         var stub = new FormatterStub();
 
+        #region readme-knockoff-any-value
+        // Explicit parameter types resolve the overload - standard C# syntax
+        stub.Format.OnCall((string input, bool uppercase) => "bool overload");
+        stub.Format.OnCall((string input, int maxLength) => "int overload");
+        #endregion
+
+        IFormatter formatter = stub;
+
+        Assert.Equal("bool overload", formatter.Format("test", true));
+        Assert.Equal("int overload", formatter.Format("test", 10));
+    }
+
+    [Fact]
+    public void KnockOff_SpecificValueMatching()
+    {
+        var stub = new FormatterStub();
+
+        #region readme-knockoff-specific-value
         // Specific value matching - parameter types resolve the overload
         stub.Format.When("test", true).Returns("UPPERCASE");
         stub.Format.When("test", 10).Returns("truncated");
+        #endregion
 
         IFormatter formatter = stub;
 
         Assert.Equal("UPPERCASE", formatter.Format("test", true));
         Assert.Equal("truncated", formatter.Format("test", 10));
     }
-    #endregion
 
-    #region readme-method-overload-argument-access
     [Fact]
-    public void OnCall_ArgumentsDirectlyAvailable_WithNamesAndTypes()
+    public void KnockOff_ArgumentAccess()
     {
         var stub = new FormatterStub();
 
+        #region readme-knockoff-argument-access
         // Arguments are directly available with names and types:
         stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+        #endregion
 
         IFormatter formatter = stub;
 
         Assert.Equal("HELLO", formatter.Format("hello", true));
         Assert.Equal("hello", formatter.Format("hello", false));
     }
-    #endregion
+}
 
+// =============================================================================
+// Additional KnockOff Tests
+// =============================================================================
+
+public class MethodOverloadResolutionTests
+{
     [Fact]
     public void CompleteExample_AllOverloadPatterns()
     {
@@ -148,35 +206,4 @@ public class MethodOverloadResolutionTests
         // Int overload uses its OnCall
         Assert.Equal("hello", formatter.Format("hello world", 5));
     }
-}
-
-// =============================================================================
-// NSubstitute Comparison Samples
-// =============================================================================
-
-public class NSubstituteOverloadResolutionTests
-{
-    #region readme-method-overload-nsubstitute
-    [Fact]
-    public void NSubstitute_OverloadResolution()
-    {
-        var formatter = Substitute.For<IFormatter>();
-
-        // Arg.Any<T>() required - compiler needs the types to resolve overload
-        formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
-        formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
-
-        // Specific value matching - literals work when all args are specific
-        formatter.Format("test", true).Returns("UPPERCASE");
-        formatter.Format("test", 10).Returns("truncated");
-
-        // To use argument values, extract from CallInfo:
-        formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
-            .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
-
-        // Verify it works
-        Assert.Equal("HELLO", formatter.Format("hello", true));
-        Assert.Equal("hello", formatter.Format("hello", false));
-    }
-    #endregion
 }
