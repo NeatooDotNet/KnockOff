@@ -122,10 +122,10 @@ public class MigrationValueReadTests
         #region migration-value-read-after
         // AFTER: Configure with OnGet, verify through interface
         stub.Name.OnGet("Expected");
+        #endregion
 
         IMigrationUserService service = stub;
         Assert.Equal("Expected", service.Name);
-        #endregion
     }
 }
 

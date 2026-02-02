@@ -25,26 +25,9 @@ Value types return `default(T)`:
 
 <!-- snippet: smart-defaults-value-types -->
 ```cs
-[Fact]
-public void ValueTypes_ReturnDefault()
-{
-    var stub = new ValueTypeServiceStub();
-    IValueTypeService service = stub;
-
-    // No configuration - smart defaults apply
-
-    // int defaults to 0
-    Assert.Equal(0, service.GetCount());
-
-    // bool defaults to false
-    Assert.False(service.IsEnabled());
-
-    // decimal defaults to 0.0m
-    Assert.Equal(0.0m, service.GetRate());
-
-    // DateTime defaults to default(DateTime)
-    Assert.Equal(default(DateTime), service.GetTimestamp());
-}
+// No configuration needed - value types return default(T)
+int count = service.GetCount();      // returns 0
+bool enabled = service.IsEnabled();  // returns false
 ```
 <!-- endSnippet -->
 
@@ -58,26 +41,9 @@ Nullable types (both reference and value types) return `null`:
 
 <!-- snippet: smart-defaults-nullable -->
 ```cs
-[Fact]
-public void NullableTypes_ReturnNull()
-{
-    var stub = new NullableServiceStub();
-    INullableService service = stub;
-
-    // No configuration - smart defaults apply
-
-    // string? returns null
-    Assert.Null(service.GetOptionalName());
-
-    // User? returns null
-    Assert.Null(service.FindUserById(42));
-
-    // int? returns null
-    Assert.Null(service.GetOptionalCount());
-
-    // bool? returns null
-    Assert.Null(service.GetOptionalFlag());
-}
+// Nullable types return null (both reference and value types)
+string? name = service.GetOptionalName();  // returns null
+int? count = service.GetOptionalCount();   // returns null
 ```
 <!-- endSnippet -->
 
@@ -91,23 +57,8 @@ Types with a public parameterless constructor return `new T()`:
 
 <!-- snippet: smart-defaults-ctor -->
 ```cs
-[Fact]
-public void TypesWithCtor_ReturnNewInstance()
-{
-    var stub = new ConfigServiceStub();
-    IConfigService service = stub;
-
-    // No configuration - smart defaults apply
-
-    // Types with parameterless constructor return new T()
-    var config = service.GetConfig();
-    Assert.NotNull(config);
-    Assert.Equal("default", config.Environment); // Default property value
-
-    var options = service.GetOptions();
-    Assert.NotNull(options);
-    Assert.False(options.FeatureA); // Default property value
-}
+// Types with parameterless constructor return new T()
+AppConfig config = service.GetConfig();  // returns new AppConfig()
 ```
 <!-- endSnippet -->
 
@@ -132,39 +83,9 @@ Common collection interfaces return new, empty collections:
 
 <!-- snippet: smart-defaults-collections -->
 ```cs
-[Fact]
-public void Collections_ReturnEmptyInstances()
-{
-    var stub = new CollectionServiceStub();
-    ICollectionService service = stub;
-
-    // No configuration - smart defaults apply
-
-    // IEnumerable<T> returns empty List<T>
-    var users = service.GetUsers();
-    Assert.NotNull(users);
-    Assert.Empty(users);
-
-    // IList<T> returns empty List<T>
-    var tags = service.GetTags();
-    Assert.NotNull(tags);
-    Assert.Empty(tags);
-
-    // IReadOnlyList<T> returns empty List<T>
-    var ids = service.GetIds();
-    Assert.NotNull(ids);
-    Assert.Empty(ids);
-
-    // IDictionary<K,V> returns empty Dictionary<K,V>
-    var metadata = service.GetMetadata();
-    Assert.NotNull(metadata);
-    Assert.Empty(metadata);
-
-    // ISet<T> returns empty HashSet<T>
-    var keys = service.GetUniqueKeys();
-    Assert.NotNull(keys);
-    Assert.Empty(keys);
-}
+// Collection interfaces return empty, non-null collections
+IEnumerable<User> users = service.GetUsers();       // returns new List<User>()
+IDictionary<string, string> meta = service.GetMetadata();  // returns new Dictionary<>()
 ```
 <!-- endSnippet -->
 
@@ -180,32 +101,11 @@ This fail-fast behavior prevents subtle bugs from returning null where the type 
 
 <!-- snippet: smart-defaults-throw -->
 ```cs
-[Fact]
-public void TypeWithoutCtor_ThrowsWithoutConfiguration()
-{
-    var stub = new UserFactoryStub();
-    IUserFactory factory = stub;
+// Types without parameterless constructor throw if not configured
+// factory.GetUser(); // throws InvalidOperationException
 
-    // UserWithRequiredCtor has no parameterless constructor, so smart defaults can't create one
-    // Without OnCall, user method, or Source, calling this method throws
-
-    var exception = Assert.Throws<InvalidOperationException>(() => factory.GetUser());
-    Assert.Contains("No implementation provided", exception.Message);
-}
-
-[Fact]
-public void TypeWithoutCtor_WorksWithConfiguration()
-{
-    var stub = new UserFactoryStub();
-    IUserFactory factory = stub;
-
-    // Configure OnCall to provide value
-    stub.GetUser.OnCall(() => new UserWithRequiredCtor(1, "Configured"));
-
-    var user = factory.GetUser();
-    Assert.NotNull(user);
-    Assert.Equal("Configured", user.Name);
-}
+// Fix: configure OnCall to provide the value
+stub.GetUser.OnCall(() => new UserWithRequiredCtor(1, "Configured"));
 ```
 <!-- endSnippet -->
 
@@ -259,29 +159,9 @@ Async return types use smart defaults for their inner type:
 
 <!-- snippet: smart-defaults-async -->
 ```cs
-[Fact]
-public async Task AsyncTypes_ReturnCompletedTasks()
-{
-    var stub = new AsyncDefaultsServiceStub();
-    IAsyncDefaultsService service = stub;
-
-    // No configuration - smart defaults apply
-
-    // Task<User?> returns completed task with null
-    var user = await service.GetUserAsync(1);
-    Assert.Null(user);
-
-    // Task<int> returns completed task with 0
-    var count = await service.GetCountAsync();
-    Assert.Equal(0, count);
-
-    // Task returns completed task
-    await service.CompleteAsync(); // Should not throw
-
-    // ValueTask<bool> returns completed with false
-    var isValid = await service.IsValidAsync();
-    Assert.False(isValid);
-}
+// Async methods return completed tasks with smart defaults for inner type
+int count = await service.GetCountAsync();  // returns Task.FromResult(0)
+await service.CompleteAsync();              // returns Task.CompletedTask
 ```
 <!-- endSnippet -->
 

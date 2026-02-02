@@ -23,20 +23,8 @@ The `OnGet(value)` method is the simplest way to configure a property. Call it b
 
 <!-- snippet: properties-value-basic -->
 ```cs
-[Fact]
-public void Value_SetsPropertyReturnValue()
-{
-    var stub = new UserConfigPropsStub();
-
-    // Set a static value for the property via the interceptor
-    stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
-
-    IUserConfigProps config = stub;
-    var user = config.CurrentUser;
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// Set a static value for the property via the interceptor
+stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
@@ -44,22 +32,10 @@ Configure multiple properties at once for test fixtures:
 
 <!-- snippet: properties-value-multiple -->
 ```cs
-[Fact]
-public void Value_ConfigureMultipleProperties()
-{
-    var stub = new UserConfigPropsStub();
-
-    // Configure several properties before test execution
-    stub.UserId.OnGet(42);
-    stub.Email.OnGet("test@example.com");
-    stub.CurrentUser.OnGet(new User { Id = 42, Name = "Test User" });
-
-    IUserConfigProps config = stub;
-
-    Assert.Equal(42, config.UserId);
-    Assert.Equal("test@example.com", config.Email);
-    Assert.NotNull(config.CurrentUser);
-}
+// Configure several properties before test execution
+stub.UserId.OnGet(42);
+stub.Email.OnGet("test@example.com");
+stub.CurrentUser.OnGet(new User { Id = 42, Name = "Test User" });
 ```
 <!-- endSnippet -->
 
@@ -77,23 +53,8 @@ Use `OnGet(() => value)` when a property's value should be computed at access ti
 
 <!-- snippet: properties-onget-dynamic -->
 ```cs
-[Fact]
-public void OnGet_ReturnsComputedValue()
-{
-    var stub = new TimeProviderPropsStub();
-
-    // OnGet callback returns dynamic value on each access
-    stub.Timestamp.OnGet(() => DateTime.UtcNow);
-
-    ITimeProviderProps timeProvider = stub;
-
-    var time1 = timeProvider.Timestamp;
-    Thread.Sleep(10);
-    var time2 = timeProvider.Timestamp;
-
-    // Each access returns current time
-    Assert.True(time2 >= time1);
-}
+// OnGet callback returns dynamic value on each access
+stub.Timestamp.OnGet(() => DateTime.UtcNow);
 ```
 <!-- endSnippet -->
 
@@ -101,27 +62,10 @@ OnGet callbacks can create state-dependent behavior:
 
 <!-- snippet: properties-onget-stateful -->
 ```cs
-[Fact]
-public void OnGet_DependsOnOtherInterceptorState()
-{
-    var stub = new ServiceWithInitPropsStub();
-
-    // Track initialization state with local variable
-    var isInitialized = false;
-
-    // OnGet checks the tracked state
-    stub.IsReady.OnGet(() => isInitialized);
-    var initTracking = stub.Initialize.OnCall(() => { isInitialized = true; });
-
-    IServiceWithInitProps service = stub;
-
-    // Initially false (Initialize not called)
-    Assert.False(service.IsReady);
-
-    // After Initialize, becomes true
-    service.Initialize();
-    Assert.True(service.IsReady);
-}
+// OnGet checks the tracked state
+stub.IsReady.OnGet(() => isInitialized);
+// Initialize method updates the tracked state
+stub.Initialize.OnCall(() => { isInitialized = true; });
 ```
 <!-- endSnippet -->
 
@@ -129,22 +73,11 @@ public void OnGet_DependsOnOtherInterceptorState()
 
 <!-- snippet: properties-onget-value-vs-callback -->
 ```cs
-[Fact]
-public void OnGet_ValueVsCallback()
-{
-    var stub = new ConfigPropsStub();
+// VALUE: Simple syntax for static values
+stub.Name.OnGet("StaticName");
 
-    // VALUE: Simple syntax for static values
-    stub.Name.OnGet("StaticName");
-
-    // CALLBACK: For computed or dynamic values
-    stub.Age.OnGet(() => DateTime.Now.Year - 2000);
-
-    IConfigProps config = stub;
-
-    Assert.Equal("StaticName", config.Name);
-    Assert.True(config.Age >= 0); // Dynamic value
-}
+// CALLBACK: For computed or dynamic values
+stub.Age.OnGet(() => DateTime.Now.Year - 2000);
 ```
 <!-- endSnippet -->
 
@@ -162,23 +95,9 @@ Use `OnSet(callback)` to intercept property writes. This allows tracking values 
 
 <!-- snippet: properties-onset-tracking -->
 ```cs
-[Fact]
-public void OnSet_TracksAllWrittenValues()
-{
-    var stub = new ConfigPropsStub();
-
-    var setValues = new List<string>();
-    stub.Name.OnSet((value) => setValues.Add(value));
-
-    IConfigProps config = stub;
-
-    config.Name = "First";
-    config.Name = "Second";
-    config.Name = "Third";
-
-    Assert.Equal(3, setValues.Count);
-    Assert.Equal(new[] { "First", "Second", "Third" }, setValues);
-}
+// OnSet captures every value written to the property
+var setValues = new List<string>();
+stub.Name.OnSet((value) => setValues.Add(value));
 ```
 <!-- endSnippet -->
 
@@ -186,26 +105,12 @@ Use `OnSet` to simulate validation logic in dependencies:
 
 <!-- snippet: properties-onset-validation -->
 ```cs
-[Fact]
-public void OnSet_SimulatesValidation()
+// OnSet throws for invalid values
+stub.Age.OnSet((value) =>
 {
-    var stub = new ConfigPropsStub();
-
-    // OnSet throws for invalid values
-    stub.Age.OnSet((value) =>
-    {
-        if (value < 0)
-            throw new ArgumentException("Age cannot be negative");
-    });
-
-    IConfigProps config = stub;
-
-    // Valid value works
-    config.Age = 25;
-
-    // Invalid value throws
-    Assert.Throws<ArgumentException>(() => config.Age = -1);
-}
+    if (value < 0)
+        throw new ArgumentException("Age cannot be negative");
+});
 ```
 <!-- endSnippet -->
 
@@ -225,20 +130,8 @@ Property interceptors support verification similar to method interceptors.
 
 <!-- snippet: properties-verify-getcount -->
 ```cs
-[Fact]
-public void VerifyGet_TracksPropertyReads()
-{
-    var stub = new ConfigPropsStub();
-    stub.Age.OnGet(42);
-
-    IConfigProps service = stub;
-
-    _ = service.Age;
-    _ = service.Age;
-
-    // VerifyGet checks how many times property was read
-    stub.Age.VerifyGet(Times.Exactly(2));
-}
+// VerifyGet checks how many times property was read
+stub.Age.VerifyGet(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -248,20 +141,8 @@ public void VerifyGet_TracksPropertyReads()
 
 <!-- snippet: properties-verify-lastsetvalue -->
 ```cs
-[Fact]
-public void LastSetValue_CapturesLastWrittenValue()
-{
-    var stub = new ConfigPropsStub();
-
-    IConfigProps service = stub;
-
-    service.Name = "First";
-    service.Name = "Second";
-    service.Name = "Expected";
-
-    // LastSetValue contains the most recent value
-    Assert.Equal("Expected", stub.Name.LastSetValue);
-}
+// LastSetValue contains the most recent value
+Assert.Equal("Expected", stub.Name.LastSetValue);
 ```
 <!-- endSnippet -->
 
@@ -290,24 +171,10 @@ Mark properties for batch verification using `Verifiable()`:
 
 <!-- snippet: properties-verifiable -->
 ```cs
-[Fact]
-public void Verifiable_MarksPropertyForVerification()
-{
-    var stub = new ConfigPropsStub();
-
-    // Mark property as verifiable
-    stub.Name.OnGet("test");
-    stub.Name.Verifiable();
-    stub.Age.Verifiable();
-
-    IConfigProps service = stub;
-    _ = service.Name;
-    service.Age = 42;
-
-    // Verify individually (standalone stubs verify at interceptor level)
-    stub.Name.Verify();
-    stub.Age.Verify();
-}
+// Mark property as verifiable - requires access before Verify()
+stub.Name.OnGet("test");
+stub.Name.Verifiable();
+stub.Age.Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -328,24 +195,11 @@ Use `OnGet().ThenGet()` when a property should return different values on succes
 
 <!-- snippet: properties-onget-then-sequence -->
 ```cs
-[Fact]
-public void OnGet_ThenGet_ReturnsDifferentValuesOnSuccessiveReads()
-{
-    var stub = new ConfigPropsStub();
-
-    // OnGet().ThenGet() configures different return values for each read
-    stub.Name
-        .OnGet(() => "First")
-        .ThenGet(() => "Second")
-        .ThenGet(() => "Third");
-
-    IConfigProps config = stub;
-
-    // Each read returns the next value in the sequence
-    Assert.Equal("First", config.Name);
-    Assert.Equal("Second", config.Name);
-    Assert.Equal("Third", config.Name);
-}
+// OnGet().ThenGet() configures different return values for each read
+stub.Name
+    .OnGet(() => "First")
+    .ThenGet(() => "Second")
+    .ThenGet(() => "Third");
 ```
 <!-- endSnippet -->
 
@@ -353,23 +207,10 @@ The value overload simplifies static sequences:
 
 <!-- snippet: properties-ongetsequence-value -->
 ```cs
-[Fact]
-public void OnGet_ValueSyntax_ThenGet()
-{
-    var stub = new ConfigPropsStub();
-
-    // OnGet with value - simpler syntax for static values
-    // ThenGet elevates to sequence mode
-    stub.Name.OnGet("First")
-        .ThenGet(() => "Second")
-        .ThenGet(() => "Third");
-
-    IConfigProps config = stub;
-
-    Assert.Equal("First", config.Name);
-    Assert.Equal("Second", config.Name);
-    Assert.Equal("Third", config.Name);
-}
+// OnGet with value, ThenGet elevates to sequence mode
+stub.Name.OnGet("First")
+    .ThenGet(() => "Second")
+    .ThenGet(() => "Third");
 ```
 <!-- endSnippet -->
 
@@ -379,30 +220,10 @@ Use `OnSet().ThenSet()` when a property should react differently to successive w
 
 <!-- snippet: properties-onset-then-sequence -->
 ```cs
-[Fact]
-public void OnSet_ThenSet_ReactsDifferentlyToSuccessiveWrites()
-{
-    var stub = new ConfigPropsStub();
-
-    var firstWriteValue = "";
-    var secondWriteValue = "";
-
-    // OnSet().ThenSet() configures different callbacks for each write
-    stub.Name
-        .OnSet((value) => { firstWriteValue = $"First: {value}"; })
-        .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
-
-    IConfigProps config = stub;
-
-    // First write triggers first callback
-    config.Name = "Alpha";
-    Assert.Equal("First: Alpha", firstWriteValue);
-    Assert.Equal("", secondWriteValue);
-
-    // Second write triggers second callback
-    config.Name = "Beta";
-    Assert.Equal("Second: Beta", secondWriteValue);
-}
+// OnSet().ThenSet() configures different callbacks for each write
+stub.Name
+    .OnSet((value) => { firstWriteValue = $"First: {value}"; })
+    .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
 ```
 <!-- endSnippet -->
 
@@ -412,36 +233,14 @@ Sequences support the same verification as regular callbacks:
 
 <!-- snippet: properties-sequence-verification -->
 ```cs
-[Fact]
-public void Sequence_VerifiesLikeRegularCallbacks()
-{
-    var stub = new ConfigPropsStub();
+// Sequences support verification like regular callbacks
+var getSequence = stub.Name
+    .OnGet(() => "A")
+    .ThenGet(() => "B");
 
-    // Configure sequences
-    var getSequence = stub.Name
-        .OnGet(() => "A")
-        .ThenGet(() => "B");
-
-    var setSequence = stub.Age
-        .OnSet((v) => { })
-        .ThenSet((v) => { });
-
-    IConfigProps config = stub;
-
-    // Access properties
-    _ = config.Name;
-    _ = config.Name;
-    config.Age = 1;
-    config.Age = 2;
-
-    // Verify sequence was fully consumed
-    getSequence.Verify();
-    setSequence.Verify();
-
-    // VerifyGet/VerifySet work the same with sequences
-    stub.Name.VerifyGet(Times.Exactly(2));
-    stub.Age.VerifySet(Times.Exactly(2));
-}
+var setSequence = stub.Age
+    .OnSet((v) => { })
+    .ThenSet((v) => { });
 ```
 <!-- endSnippet -->
 
@@ -451,27 +250,10 @@ After a sequence returns all configured values, subsequent reads **repeat the la
 
 <!-- snippet: properties-sequence-exhaustion -->
 ```cs
-[Fact]
-public void Sequence_ExhaustionRepeatsLastValue()
-{
-    var stub = new ConfigPropsStub();
-
-    // Configure a sequence of three values
-    stub.Name.OnGet("first")
-        .ThenGet("second")
-        .ThenGet("third");
-
-    IConfigProps config = stub;
-
-    // Each read advances through the sequence
-    Assert.Equal("first", config.Name);
-    Assert.Equal("second", config.Name);
-    Assert.Equal("third", config.Name);
-
-    // After exhaustion, repeats the last value
-    Assert.Equal("third", config.Name);
-    Assert.Equal("third", config.Name);
-}
+// Configure a sequence - after exhaustion, repeats last value
+stub.Name.OnGet("first")
+    .ThenGet("second")
+    .ThenGet("third");
 ```
 <!-- endSnippet -->
 
@@ -479,25 +261,10 @@ To return `default(T)` after exhaustion instead, chain `.ThenDefault()`:
 
 <!-- snippet: properties-sequence-thendefault -->
 ```cs
-[Fact]
-public void Sequence_ThenDefault_ReturnsDefaultAfterExhaustion()
-{
-    var stub = new ConfigPropsStub();
-
-    // ThenDefault() changes exhaustion behavior
-    stub.Name.OnGet("first")
-        .ThenGet("second")
-        .ThenDefault();
-
-    IConfigProps config = stub;
-
-    Assert.Equal("first", config.Name);
-    Assert.Equal("second", config.Name);
-
-    // After exhaustion, returns default (null for string)
-    Assert.Null(config.Name);
-    Assert.Null(config.Name);
-}
+// ThenDefault() returns default(T) after exhaustion instead of repeating
+stub.Name.OnGet("first")
+    .ThenGet("second")
+    .ThenDefault();
 ```
 <!-- endSnippet -->
 
@@ -511,22 +278,9 @@ When you call `OnGet` multiple times, the last call wins. This applies to both v
 
 <!-- snippet: properties-priority -->
 ```cs
-[Fact]
-public void OnGet_TakesPrecedenceOverValue()
-{
-    var stub = new ConfigPropsStub();
-
-    // Set a static value
-    stub.Name.OnGet("initial");
-
-    // Then set OnGet - it takes precedence
-    stub.Name.OnGet(() => "dynamic");
-
-    IConfigProps config = stub;
-
-    // Callback syntax takes precedence (last call wins)
-    Assert.Equal("dynamic", config.Name);
-}
+// Last OnGet call wins - can upgrade from value to callback
+stub.Name.OnGet("initial");
+stub.Name.OnGet(() => "dynamic");
 ```
 <!-- endSnippet -->
 
@@ -540,29 +294,11 @@ Calling `Reset()` on a property interceptor clears all tracking state and config
 
 <!-- snippet: properties-reset -->
 ```cs
-[Fact]
-public void Reset_ClearsCountsButPreservesValue()
-{
-    var stub = new ConfigPropsStub();
+// Reset clears counts but preserves callbacks
+stub.Name.Reset();
 
-    stub.Name.OnGet("test");
-
-    IConfigProps config = stub;
-
-    // Access property to increment counts
-    _ = config.Name;
-    config.Name = "updated";
-
-    stub.Name.VerifyGet(Times.AtLeastOnce);
-    stub.Name.VerifySet(Times.AtLeastOnce);
-
-    // Reset clears counts and callbacks
-    stub.Name.Reset();
-
-    stub.Name.VerifyGet(Times.Never);
-    stub.Name.VerifySet(Times.Never);
-    // Note: Reset clears tracking counters and all configured callbacks
-}
+stub.Name.VerifyGet(Times.Never);
+stub.Name.VerifySet(Times.Never);
 ```
 <!-- endSnippet -->
 
@@ -586,44 +322,18 @@ This example demonstrates all property configuration approaches in a realistic t
 
 <!-- snippet: properties-complete-example -->
 ```cs
-[Fact]
-public void CompletePropertyExample_AllConfigurationApproaches()
-{
-    var stub = new UserConfigCompleteStub();
+// OnGet with static value: Fixed test data
+stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
-    // Track connection state with local variable
-    var isConnected = false;
+// OnGet with callback: State-dependent behavior
+stub.IsConnected.OnGet(() => isConnected);
 
-    // OnGet with static value: Fixed test data
-    stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+// OnSet: Track all values written
+var connectionStrings = new List<string>();
+stub.ConnectionString.OnSet((value) => connectionStrings.Add(value));
 
-    // OnGet: State-dependent behavior using tracked state
-    stub.IsConnected.OnGet(() => isConnected);
-
-    // OnSet: Track all values written
-    var connectionStrings = new List<string>();
-    stub.ConnectionString.OnSet((value) => connectionStrings.Add(value));
-
-    // Configure the Connect method to update state
-    var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });
-
-    IUserConfigComplete service = stub;
-
-    // Test execution
-    var user = service.CurrentUser;            // Read CurrentUser
-    Assert.False(service.IsConnected);         // Not connected yet
-
-    service.Connect();                          // Call Connect
-    Assert.True(service.IsConnected);          // Now connected
-
-    service.ConnectionString = "Server=test";  // Write ConnectionString
-
-    // Verification
-    stub.CurrentUser.VerifyGet(Times.Once);
-    Assert.True(service.IsConnected);
-    Assert.Single(connectionStrings);
-    Assert.Equal("Server=test", stub.ConnectionString.LastSetValue);
-}
+// Method callback updates the tracked state
+stub.Connect.OnCall(() => { isConnected = true; });
 ```
 <!-- endSnippet -->
 

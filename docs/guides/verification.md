@@ -38,20 +38,13 @@ The simplest verification checks whether a method was invoked at least once.
 
 <!-- snippet: verify-verifiable -->
 ```cs
-[Fact]
-public void Verifiable_MarksForBatchVerification()
-{
-    var stub = new RepoVerifyStub();
+// Mark for batch verification, then verify all marked members
+stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 
-    // Chain .Verifiable() to mark for batch verification
-    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+IRepoVerify repository = stub;
+repository.GetById(42);
 
-    IRepoVerify repository = stub;
-    repository.GetById(42);
-
-    // Verify() checks all members marked with .Verifiable()
-    stub.Verify();
-}
+stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -61,18 +54,8 @@ Verify a method was called exactly once.
 
 <!-- snippet: verify-times-once -->
 ```cs
-[Fact]
-public void Verify_WithTimesOnce()
-{
-    var stub = new RepoVerifyStub();
-    var tracking = stub.Save.OnCall((user) => { });
-
-    IRepoVerify repository = stub;
-    repository.Save(new User { Id = 1 });
-
-    // Verify exactly one call using Times.Once
-    tracking.Verify(Times.Once);
-}
+// Verify exactly one call
+tracking.Verify(Times.Once);
 ```
 <!-- endSnippet -->
 
@@ -82,22 +65,8 @@ Verify a method was called a minimum number of times.
 
 <!-- snippet: verify-times-atleast -->
 ```cs
-[Fact]
-public void Verify_WithTimesAtLeast()
-{
-    var stub = new RepoVerifyStub();
-    var tracking = stub.Refresh.OnCall(() => { });
-
-    IRepoVerify repository = stub;
-
-    // Simulate multiple refreshes
-    repository.Refresh();
-    repository.Refresh();
-    repository.Refresh();
-
-    // Verify at least 2 calls
-    tracking.Verify(Times.AtLeast(2));
-}
+// Verify at least N calls
+tracking.Verify(Times.AtLeast(2));
 ```
 <!-- endSnippet -->
 
@@ -107,18 +76,8 @@ Verify a method was never invoked.
 
 <!-- snippet: verify-times-never -->
 ```cs
-[Fact]
-public void Verify_WithTimesNever()
-{
-    var stub = new RepoVerifyStub();
-    var tracking = stub.Refresh.OnCall(() => { });
-
-    IRepoVerify repository = stub;
-    // Don't call Refresh
-
-    // Verify method was never called via tracking
-    tracking.Verify(Times.Never);
-}
+// Verify method was never called
+tracking.Verify(Times.Never);
 ```
 <!-- endSnippet -->
 
@@ -152,21 +111,8 @@ You can specify `Times` constraints when marking with `.Verifiable()`.
 
 <!-- snippet: verify-verifiable-times -->
 ```cs
-[Fact]
-public void Verifiable_WithTimesConstraint()
-{
-    var stub = new RepoVerifyStub();
-
-    // Mark with Times constraint for batch verification
-    stub.Refresh.OnCall(() => { }).Verifiable(Times.Exactly(2));
-
-    IRepoVerify repository = stub;
-    repository.Refresh();
-    repository.Refresh();
-
-    // Verify() respects the Times constraint
-    stub.Verify();
-}
+// Mark with Times constraint for batch verification
+stub.Refresh.OnCall(() => { }).Verifiable(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -189,22 +135,8 @@ Call `stub.VerifyAll()` to check every interceptor that has `OnCall` or `Value` 
 
 <!-- snippet: verify-verifyall -->
 ```cs
-[Fact]
-public void VerifyAll_ChecksAllConfiguredMembers()
-{
-    var stub = new RepoVerifyStub();
-
-    // Configure multiple members (no need to mark Verifiable)
-    stub.GetById.OnCall((id) => new User { Id = id });
-    stub.Save.OnCall((user) => { });
-
-    IRepoVerify repository = stub;
-    repository.GetById(1);
-    repository.Save(new User { Id = 1 });
-
-    // VerifyAll() checks all configured members were called at least once
-    stub.VerifyAll();
-}
+// VerifyAll checks all configured members were called at least once
+stub.VerifyAll();
 ```
 <!-- endSnippet -->
 
@@ -224,18 +156,8 @@ For argument inspection, use `LastCallArg` or `LastCallArgs` from the tracking o
 
 <!-- snippet: verify-lastcallarg -->
 ```cs
-[Fact]
-public void LastArg_VerifiesSingleParameter()
-{
-    var stub = new RepoVerifyStub();
-    var tracking = stub.GetById.OnCall((id) => new User { Id = id });
-
-    IRepoVerify repository = stub;
-    repository.GetById(42);
-
-    // Verify the parameter value via tracking
-    Assert.Equal(42, tracking.LastArg);
-}
+// LastArg contains the most recent argument value
+Assert.Equal(42, tracking.LastArg);
 ```
 <!-- endSnippet -->
 
@@ -243,20 +165,10 @@ public void LastArg_VerifiesSingleParameter()
 
 <!-- snippet: verify-lastcallargs-tuple -->
 ```cs
-[Fact]
-public void LastArgs_VerifiesMultipleParameters()
-{
-    var stub = new SvcVerifyStub();
-    var tracking = stub.Update.OnCall((id, name) => { });
-
-    ISvcVerify service = stub;
-    service.Update(42, "Alice");
-
-    // Destructure the named tuple for verification
-    var (id, name) = tracking.LastArgs;
-    Assert.Equal(42, id);
-    Assert.Equal("Alice", name);
-}
+// LastArgs is a named tuple for multi-parameter methods
+var (id, name) = tracking.LastArgs;
+Assert.Equal(42, id);
+Assert.Equal("Alice", name);
 ```
 <!-- endSnippet -->
 
@@ -268,22 +180,9 @@ For scenarios where you need to track call counts for custom logic, capture the 
 
 <!-- snippet: verify-callcount-tracking -->
 ```cs
-[Fact]
-public void TrackCallCount_WithCallback()
-{
-    var stub = new RepoVerifyStub();
-
-    var saveCount = 0;
-    stub.Save.OnCall((user) => { saveCount++; });
-
-    IRepoVerify repository = stub;
-
-    repository.Save(new User { Id = 1 });
-    repository.Save(new User { Id = 2 });
-
-    // Use tracked count for custom assertions
-    Assert.True(saveCount >= 2, "Expected at least 2 saves");
-}
+// Track call count in the callback for custom assertions
+var saveCount = 0;
+stub.Save.OnCall((user) => { saveCount++; });
 ```
 <!-- endSnippet -->
 
@@ -302,28 +201,13 @@ For complex scenarios requiring inspection of all calls (not just the last), use
 
 <!-- snippet: verify-call-history -->
 ```cs
-[Fact]
-public void OnCall_CapturesAllCallsToList()
+// Capture all calls to a list for history inspection
+var calls = new List<int>();
+stub.GetById.OnCall((id) =>
 {
-    var stub = new RepoVerifyStub();
-
-    // Capture all calls to a list within the callback
-    var calls = new List<int>();
-    var tracking = stub.GetById.OnCall((id) =>
-    {
-        calls.Add(id);
-        return new User { Id = id };
-    });
-
-    IRepoVerify repository = stub;
-
-    repository.GetById(1);
-    repository.GetById(2);
-    repository.GetById(3);
-
-    // Verify the complete call history
-    Assert.Equal(new[] { 1, 2, 3 }, calls);
-}
+    calls.Add(id);
+    return new User { Id = id };
+});
 ```
 <!-- endSnippet -->
 
@@ -337,27 +221,13 @@ To verify that methods were called in a specific sequence, track call order usin
 
 <!-- snippet: verify-call-order -->
 ```cs
-[Fact]
-public void CallOrder_VerifiedWithCounter()
-{
-    var stub = new RepoVerifyStub();
+// Track call order with a shared counter
+var order = 0;
+var saveOrder = 0;
+var refreshOrder = 0;
 
-    var order = 0;
-    var saveOrder = 0;
-    var refreshOrder = 0;
-
-    var saveTracking = stub.Save.OnCall((user) => saveOrder = ++order);
-    var refreshTracking = stub.Refresh.OnCall(() => refreshOrder = ++order);
-
-    IRepoVerify repository = stub;
-
-    // Execute operations
-    repository.Save(new User { Id = 1 });
-    repository.Refresh();
-
-    // Verify Save was called before Refresh
-    Assert.True(saveOrder < refreshOrder, "Save should be called before Refresh");
-}
+stub.Save.OnCall((user) => saveOrder = ++order);
+stub.Refresh.OnCall(() => refreshOrder = ++order);
 ```
 <!-- endSnippet -->
 
@@ -371,26 +241,10 @@ Verify multiple methods were called using `.Verifiable()` and `stub.Verify()`.
 
 <!-- snippet: verify-cross-interceptor -->
 ```cs
-[Fact]
-public void CrossInterceptor_VerifyMultipleMethodsCalled()
-{
-    var stub = new RepoVerifyStub();
-
-    // Mark all methods as verifiable
-    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
-    stub.Save.OnCall((user) => { }).Verifiable();
-    stub.Refresh.OnCall(() => { }).Verifiable();
-
-    IRepoVerify repository = stub;
-
-    // Execute operations
-    repository.GetById(1);
-    repository.Save(new User { Id = 1 });
-    repository.Refresh();
-
-    // Single Verify() checks all marked members
-    stub.Verify();
-}
+// Mark multiple methods as verifiable
+stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+stub.Save.OnCall((user) => { }).Verifiable();
+stub.Refresh.OnCall(() => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -418,20 +272,8 @@ Verify that a property was read the expected number of times.
 
 <!-- snippet: verify-property-get -->
 ```cs
-[Fact]
-public void VerifyGet_ChecksPropertyReadCount()
-{
-    var stub = new ConfigVerifyStub();
-    stub.MaxRetries.OnGet(5);
-
-    IConfigVerify config = stub;
-
-    _ = config.MaxRetries;
-    _ = config.MaxRetries;
-
-    // VerifyGet checks how many times property was read
-    stub.MaxRetries.VerifyGet(Times.Exactly(2));
-}
+// VerifyGet checks how many times property was read
+stub.MaxRetries.VerifyGet(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -441,21 +283,11 @@ Verify that a property was written and inspect the assigned value.
 
 <!-- snippet: verify-property-set -->
 ```cs
-[Fact]
-public void VerifySet_ChecksPropertyWriteAndValue()
-{
-    var stub = new ConfigVerifyStub();
+// VerifySet checks property was written
+stub.Timeout.VerifySet(Times.Once);
 
-    IConfigVerify config = stub;
-
-    config.Timeout = 30;
-
-    // VerifySet checks property was written
-    stub.Timeout.VerifySet(Times.Once);
-
-    // LastSetValue contains the assigned value
-    Assert.Equal(30, stub.Timeout.LastSetValue);
-}
+// LastSetValue contains the assigned value
+Assert.Equal(30, stub.Timeout.LastSetValue);
 ```
 <!-- endSnippet -->
 
@@ -465,23 +297,8 @@ Verify total property access across both get and set operations.
 
 <!-- snippet: verify-property-combined -->
 ```cs
-[Fact]
-public void Verify_ChecksTotalPropertyAccess()
-{
-    var stub = new ConfigVerifyStub();
-    stub.MaxRetries.OnGet(3);
-
-    IConfigVerify config = stub;
-
-    // 2 gets + 2 sets = 4 total accesses
-    _ = config.MaxRetries;
-    _ = config.MaxRetries;
-    config.MaxRetries = 5;
-    config.MaxRetries = 10;
-
-    // Verify checks combined get + set count
-    stub.MaxRetries.Verify(Times.Exactly(4));
-}
+// Verify checks combined get + set count (2 gets + 2 sets = 4)
+stub.MaxRetries.Verify(Times.Exactly(4));
 ```
 <!-- endSnippet -->
 
@@ -493,59 +310,17 @@ Here's a comprehensive verification scenario demonstrating the recommended patte
 
 <!-- snippet: verify-complete-example -->
 ```cs
-[Fact]
-public void CompleteVerification_AllTechniques()
-{
-    var stub = new RepoVerifyStub();
+// 1. Batch verification - checks all Times constraints
+stub.Verify();
 
-    // Track call order
-    var order = 0;
-    var getOrder = 0;
-    var saveOrder = 0;
-    var refreshOrder = 0;
+// 2. Argument verification via tracking
+Assert.Equal(2, getTracking.LastArg);
 
-    // Track call history
-    var getIdHistory = new List<int>();
+// 3. Call history verification
+Assert.Equal(new[] { 1, 2 }, getIdHistory);
 
-    // Mark all methods as verifiable with specific constraints
-    var getTracking = stub.GetById.OnCall((id) =>
-    {
-        getIdHistory.Add(id);
-        getOrder = ++order;
-        return new User { Id = id, Name = $"User{id}" };
-    }).Verifiable(Times.Exactly(2));
-
-    var saveTracking = stub.Save.OnCall((user) =>
-    {
-        saveOrder = ++order;
-    }).Verifiable(Times.Once);
-
-    var refreshTracking = stub.Refresh.OnCall(() =>
-    {
-        refreshOrder = ++order;
-    }).Verifiable(Times.Once);
-
-    IRepoVerify repository = stub;
-
-    // Execute operations
-    repository.GetById(1);
-    repository.GetById(2);
-    repository.Save(new User { Id = 1, Name = "Updated" });
-    repository.Refresh();
-
-    // 1. Batch verification - checks all Times constraints
-    stub.Verify();
-
-    // 2. Argument verification
-    Assert.Equal(2, getTracking.LastArg); // Last call was GetById(2)
-
-    // 3. Call history verification
-    Assert.Equal(new[] { 1, 2 }, getIdHistory);
-
-    // 4. Call order verification
-    Assert.True(getOrder < saveOrder, "Get before Save");
-    Assert.True(saveOrder < refreshOrder, "Save before Refresh");
-}
+// 4. Call order verification
+Assert.True(getOrder < saveOrder, "Get before Save");
 ```
 <!-- endSnippet -->
 

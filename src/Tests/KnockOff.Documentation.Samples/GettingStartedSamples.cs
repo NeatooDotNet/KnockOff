@@ -38,26 +38,26 @@ public partial class UserRepoStub : IUserRepo
 
 public class StandaloneUsageTests
 {
-    #region getting-started-standalone-use
     [Fact]
     public void SaveUser_WhenCalled_TracksInvocation()
     {
-        // Arrange - create the stub
         var stub = new UserRepoStub();
 
-        // Configure method behavior using OnCall
-        // Chain .Verifiable() to mark for batch verification
+        #region getting-started-standalone-use
+        // Configure behavior and mark for verification
         stub.SaveUser.OnCall((user) => true).Verifiable();
 
-        // Act - use through the interface
+        // Call the method through the interface
         IUserRepo repository = stub;
-        var result = repository.SaveUser(new User { Id = 1, Name = "Alice" });
+        repository.SaveUser(new User { Id = 1, Name = "Alice" });
 
-        // Assert - Verify() checks all members marked with .Verifiable()
-        Assert.True(result);
+        // Verify() checks all .Verifiable() members were called
         stub.Verify();
+        #endregion
+
+        // Additional assertion for test completeness
+        Assert.True(((IUserRepo)stub).SaveUser(new User { Id = 1, Name = "Test" }));
     }
-    #endregion
 }
 
 // =============================================================================
@@ -81,28 +81,25 @@ public partial class InlineStubTests
 
 public partial class InlineStubTests
 {
-    #region getting-started-inline-use
     [Fact]
     public void Send_WhenCalled_TracksMessage()
     {
-        // Arrange - instantiate the generated stub
         var stub = new Stubs.IEmailSvc();
 
-        // Configure behavior and mark as verifiable
+        #region getting-started-inline-use
         // OnCall returns a tracking object for argument access
         var tracking = stub.Send.OnCall((to, subject, body) => { }).Verifiable();
 
-        // Act - use through the interface
         IEmailSvc emailService = stub;
         emailService.Send("user@example.com", "Welcome", "Hello!");
 
-        // Assert - Verify() checks method was called
-        stub.Verify();
-        // Access last arguments from tracking
+        // Access captured arguments from the tracking object
         var args = tracking.LastArgs;
+        #endregion
+
+        stub.Verify();
         Assert.Equal("user@example.com", args.to);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -111,24 +108,24 @@ public partial class InlineStubTests
 
 public class ValueOverloadTests
 {
-    #region getting-started-value-overloads
     [Fact]
     public void GetById_ValueOverload_SimplerSyntax()
     {
         var stub = new UserRepoStub();
 
-        // Returns - pass the return value directly
+        #region getting-started-value-overloads
+        // Returns() - simple fixed value
         stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
 
-        // Callback syntax - use when you need argument-based logic
+        // OnCall() - dynamic value based on arguments
         stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
+        #endregion
 
         IUserRepo repository = stub;
         var user = repository.GetById(1);
 
         Assert.Equal("Dynamic", user!.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -145,30 +142,28 @@ public partial class UserConfigStub : IUserConfig { }
 
 public class PropertyConfigurationTests
 {
-    #region getting-started-property-configuration
     [Fact]
     public void Property_OnGetAndOnSet()
     {
         var stub = new UserConfigStub();
+        User? capturedUser = null;
 
-        // OnGet - configure what the getter returns
+        #region getting-started-property-configuration
+        // OnGet - configure the getter return value
         stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
-        // OnSet - track or validate setter calls
-        User? capturedUser = null;
+        // OnSet - capture or validate setter calls
         stub.CurrentUser.OnSet((user) => capturedUser = user);
+        #endregion
 
         IUserConfig config = stub;
 
-        // Reading uses OnGet
         var user = config.CurrentUser;
         Assert.Equal("Alice", user!.Name);
 
-        // Writing uses OnSet
         config.CurrentUser = new User { Id = 2, Name = "Bob" };
         Assert.Equal("Bob", capturedUser!.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -185,19 +180,19 @@ public partial class AsyncUserRepoStub : IAsyncUserRepo { }
 
 public class AsyncWrappingTests
 {
-    #region getting-started-async-wrapping
     [Fact]
     public async Task AsyncMethod_ValueAutoWrapped()
     {
         var stub = new AsyncUserRepoStub();
 
-        // Returns - KnockOff wraps in Task.FromResult automatically
+        #region getting-started-async-wrapping
+        // Returns() auto-wraps in Task.FromResult - no manual wrapping needed
         stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
+        #endregion
 
         IAsyncUserRepo repository = stub;
         var user = await repository.GetUserAsync(1);
 
         Assert.Equal("Alice", user!.Name);
     }
-    #endregion
 }

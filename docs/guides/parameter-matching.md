@@ -25,12 +25,6 @@ stub.Calculate.OnCall((a, b) =>
     else
         return a + b;
 });
-
-IWhenCalculator calc = stub;
-Assert.Equal(50, calc.Calculate(5, 10));
-Assert.Equal(100, calc.Calculate(1, 2));
-Assert.Equal(999, calc.Calculate(200, 1));
-Assert.Equal(7, calc.Calculate(3, 4));
 ```
 <!-- endSnippet -->
 
@@ -46,9 +40,6 @@ The callback must inspect parameters and branch on logic. When() solves this by 
 ```cs
 // With When(): match arguments, then configure response
 stub.Calculate.When(5, 10).Returns(50);
-
-IWhenCalculator calc = stub;
-Assert.Equal(50, calc.Calculate(5, 10));
 ```
 <!-- endSnippet -->
 
@@ -67,15 +58,6 @@ Match exact parameter values with `When()`:
 // Configure different returns for different argument values
 stub.Add.When(1, 2).Returns(100);
 stub.Add.When(3, 4).Returns(200);
-
-IWhenCalculator calc = stub;
-
-// Matching arguments use configured returns
-Assert.Equal(100, calc.Add(1, 2));
-Assert.Equal(200, calc.Add(3, 4));
-
-// Non-matching arguments fall through to default (0)
-Assert.Equal(0, calc.Add(9, 9));
 ```
 <!-- endSnippet -->
 
@@ -89,15 +71,6 @@ Match based on conditions using a predicate:
 ```cs
 // Match based on condition
 stub.Add.When((a, b) => a > 10).Returns(999);
-
-IWhenCalculator calc = stub;
-
-// First param > 10: predicate matches
-Assert.Equal(999, calc.Add(15, 5));
-Assert.Equal(999, calc.Add(100, 1));
-
-// First param <= 10: predicate doesn't match, falls through
-Assert.Equal(0, calc.Add(5, 20));
 ```
 <!-- endSnippet -->
 
@@ -111,9 +84,6 @@ When() works with any parameter count:
 ```cs
 // When() works with any parameter count
 stub.Transform.When("hello").Returns("HELLO");
-
-IWhenTransformer transformer = stub;
-Assert.Equal("HELLO", transformer.Transform("hello"));
 ```
 <!-- endSnippet -->
 
@@ -131,13 +101,6 @@ Use `When()` alone to track parameter-specific calls:
 ```cs
 // When() alone tracks parameter-specific calls
 var chain = stub.Process.When(1, 2);
-
-IWhenProcessor processor = stub;
-processor.Process(1, 2);
-processor.Process(1, 2);
-
-// Verify this specific parameter combination was called twice
-chain.Verify(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -150,14 +113,7 @@ Add a callback with `.Call()` if you need side effects:
 <!-- snippet: when-void-with-callback -->
 ```cs
 // Call() adds callback for side effects
-var calls = new List<(int, int)>();
 stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
-
-IWhenProcessor processor = stub;
-processor.Process(1, 2);
-
-Assert.Single(calls);
-Assert.Equal((1, 2), calls[0]);
 ```
 <!-- endSnippet -->
 
@@ -170,15 +126,7 @@ Predicates work the same as return methods:
 <!-- snippet: when-void-predicate -->
 ```cs
 // Predicate matching works the same for void methods
-var matched = new List<(int, int)>();
 stub.Process.When((a, b) => a > 10).Call((a, b) => matched.Add((a, b)));
-
-IWhenProcessor processor = stub;
-processor.Process(1, 2);   // a <= 10, doesn't match
-processor.Process(15, 20); // a > 10, matches
-
-Assert.Single(matched);
-Assert.Equal((15, 20), matched[0]);
 ```
 <!-- endSnippet -->
 
@@ -197,20 +145,6 @@ stub.Add
     .When(1, 2).Returns(100)
     .ThenWhen(3, 4).Returns(200)
     .ThenWhen((a, b) => a > 100).Returns(999);
-
-IWhenCalculator calc = stub;
-
-// First matching call consumes first matcher
-Assert.Equal(100, calc.Add(1, 2));
-
-// Second matching call consumes second matcher
-Assert.Equal(200, calc.Add(3, 4));
-
-// Third matching call consumes third matcher
-Assert.Equal(999, calc.Add(150, 1));
-
-// Subsequent calls repeat the last matcher
-Assert.Equal(999, calc.Add(200, 5));
 ```
 <!-- endSnippet -->
 
@@ -232,13 +166,6 @@ Calling `When()` multiple times adds to the same chain:
 stub.Add.When(1, 2).Returns(100);
 stub.Add.When(2, 3).Returns(200);
 stub.Add.When(3, 4).Returns(300);
-
-IWhenCalculator calc = stub;
-
-// Each consumed in order
-Assert.Equal(100, calc.Add(1, 2));
-Assert.Equal(200, calc.Add(2, 3));
-Assert.Equal(300, calc.Add(3, 4));
 ```
 <!-- endSnippet -->
 
@@ -258,15 +185,6 @@ Use `ThenCall()` to add an unconditional matcher that repeats forever:
 stub.Add
     .When(1, 2).Returns(100)
     .ThenCall((a, b) => a + b);
-
-IWhenCalculator calc = stub;
-
-// First call matches When(1, 2)
-Assert.Equal(100, calc.Add(1, 2));
-
-// Subsequent calls use ThenCall callback
-Assert.Equal(15, calc.Add(5, 10));
-Assert.Equal(30, calc.Add(10, 20));
 ```
 <!-- endSnippet -->
 
@@ -285,15 +203,6 @@ Use `ThenNone()` to close the chain and fall through:
 // ThenNone() closes the chain and falls through
 stub.Add.When(1, 2).Returns(100).ThenNone();
 stub.Add.Returns(999);
-
-IWhenCalculator calc = stub;
-
-// First call uses When matcher
-Assert.Equal(100, calc.Add(1, 2));
-
-// After ThenNone(), falls through to Returns()
-Assert.Equal(999, calc.Add(9, 9));
-Assert.Equal(999, calc.Add(5, 5));
 ```
 <!-- endSnippet -->
 
@@ -324,11 +233,6 @@ When no When() matcher matches, the call falls through to other configured behav
 // When() falls through to Returns() when no match
 stub.Add.When(1, 2).Returns(100);
 stub.Add.Returns(999);
-
-IWhenCalculator calc = stub;
-
-Assert.Equal(100, calc.Add(1, 2));  // When() matches
-Assert.Equal(999, calc.Add(9, 9));  // Falls through to Returns()
 ```
 <!-- endSnippet -->
 
@@ -339,11 +243,6 @@ Assert.Equal(999, calc.Add(9, 9));  // Falls through to Returns()
 // When() falls through to OnCall() when no match
 stub.Add.When(1, 2).Returns(100);
 stub.Add.OnCall((a, b) => a * b);
-
-IWhenCalculator calc = stub;
-
-Assert.Equal(100, calc.Add(1, 2));  // When() matches
-Assert.Equal(27, calc.Add(9, 3));   // Falls through to OnCall()
 ```
 <!-- endSnippet -->
 
@@ -354,11 +253,6 @@ Assert.Equal(27, calc.Add(9, 3));   // Falls through to OnCall()
 // Non-strict mode: unmatched calls return default
 stub.Strict = false;
 stub.Add.When(1, 2).Returns(100);
-
-IWhenCalculator calc = stub;
-
-Assert.Equal(100, calc.Add(1, 2));
-Assert.Equal(0, calc.Add(9, 9));  // default(int) = 0
 ```
 <!-- endSnippet -->
 
@@ -369,11 +263,6 @@ In strict mode, unmatched calls throw:
 // Strict mode: unmatched calls throw
 stub.Strict = true;
 stub.Add.When(1, 2).Returns(100);
-
-IWhenCalculator calc = stub;
-
-Assert.Equal(100, calc.Add(1, 2));
-Assert.Throws<StubException>(() => calc.Add(9, 9));
 ```
 <!-- endSnippet -->
 
@@ -390,15 +279,6 @@ stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2);
 
 // When() has higher priority
 stub.Add.When(1, 2).Returns(100);
-
-IWhenCalculator calc = stub;
-
-// When() matches for (1, 2), sequence not consulted
-Assert.Equal(100, calc.Add(1, 2));
-
-// Non-matching calls use sequence
-Assert.Equal(1, calc.Add(5, 5));  // First in sequence
-Assert.Equal(2, calc.Add(6, 6));  // Second in sequence
 ```
 <!-- endSnippet -->
 
@@ -418,17 +298,6 @@ Call `.Verify()` on the returned chain to verify it reached a terminal state:
 var chain = stub.Add
     .When(1, 2).Returns(100)
     .ThenCall((a, b) => 999);
-
-IWhenCalculator calc = stub;
-
-// Consume When matcher
-calc.Add(1, 2);
-
-// Use ThenCall terminal
-calc.Add(9, 9);
-
-// Verify succeeds - chain reached terminal state
-chain.Verify();
 ```
 <!-- endSnippet -->
 
@@ -445,14 +314,6 @@ Verification passes if the chain reaches:
 var chain = stub.Add
     .When(1, 2).Returns(100)
     .ThenWhen(2, 3).Returns(200);
-
-IWhenCalculator calc = stub;
-
-// Only consume first matcher
-calc.Add(1, 2);
-
-// Verify fails - second matcher not consumed
-Assert.Throws<VerificationException>(() => chain.Verify());
 ```
 <!-- endSnippet -->
 
@@ -467,13 +328,6 @@ stub.Add
     .When(1, 2).Returns(100)
     .ThenCall((a, b) => 999)
     .Verifiable();
-
-IWhenCalculator calc = stub;
-calc.Add(1, 2);
-calc.Add(9, 9);
-
-// stub.Verify() checks all Verifiable() chains
-stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -485,14 +339,6 @@ For void methods, verify specific parameter calls with `Times`:
 ```cs
 // Track specific parameter combination
 var chain = stub.Process.When(1, 2);
-
-IWhenProcessor processor = stub;
-processor.Process(1, 2);  // Matches
-processor.Process(1, 2);  // Matches
-processor.Process(3, 4);  // Doesn't match
-
-// Verify specific combination was called exactly twice
-chain.Verify(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -508,21 +354,10 @@ Call `Reset()` on the returned chain to restart from the beginning:
 
 <!-- snippet: when-reset-chain -->
 ```cs
+// Chain tracks position - Reset() restarts from beginning
 var chain = stub.Add
     .When(1, 2).Returns(100)
     .ThenCall((a, b) => 999);
-
-IWhenCalculator calc = stub;
-
-// Consume When matcher and use ThenCall
-calc.Add(1, 2);
-calc.Add(9, 9);
-
-// Reset restarts chain from beginning
-chain.Reset();
-
-// When matcher is available again
-Assert.Equal(100, calc.Add(1, 2));
 ```
 <!-- endSnippet -->
 
@@ -536,18 +371,10 @@ Calling `Reset()` on the interceptor also resets the When chain:
 
 <!-- snippet: when-reset-interceptor -->
 ```cs
+// Interceptor Reset() also resets When chain
 stub.Add
     .When(1, 2).Returns(100)
     .ThenCall((a, b) => 999);
-
-IWhenCalculator calc = stub;
-calc.Add(1, 2);  // Consume When matcher
-
-// Interceptor Reset() also resets When chain
-stub.Add.Reset();
-
-// When matcher is available again
-Assert.Equal(100, calc.Add(1, 2));
 ```
 <!-- endSnippet -->
 
@@ -561,12 +388,6 @@ For async methods, `Returns()` automatically wraps the value with `Task.FromResu
 ```cs
 // Returns() auto-wraps with Task.FromResult()
 stub.GetAsync.When("hello").Returns("HELLO");
-
-IWhenAsyncDataService service = stub;
-
-// No Task.FromResult needed in configuration
-var result = await service.GetAsync("hello");
-Assert.Equal("HELLO", result);
 ```
 <!-- endSnippet -->
 
@@ -578,11 +399,6 @@ Assert.Equal("HELLO", result);
 stub.GetAsync
     .When("first").Returns("FIRST")
     .ThenCall(s => Task.FromResult(s.ToUpper()));
-
-IWhenAsyncDataService service = stub;
-
-Assert.Equal("FIRST", await service.GetAsync("first"));
-Assert.Equal("SECOND", await service.GetAsync("second"));
 ```
 <!-- endSnippet -->
 
@@ -604,20 +420,9 @@ Choose `When()` over `OnCall()` when you have these scenarios:
 <!-- snippet: when-usecase-retry -->
 ```cs
 // Simulate a service that fails once then succeeds
-var userData = "{ \"name\": \"Alice\" }";
 stub.FetchData
     .When("user:123").Returns((string?)null)
-    .ThenWhen("user:123").Returns(userData);
-
-IWhenDataFetcher fetcher = stub;
-
-// First attempt fails
-var firstAttempt = fetcher.FetchData("user:123");
-Assert.Null(firstAttempt);
-
-// Retry succeeds
-var retry = fetcher.FetchData("user:123");
-Assert.Equal(userData, retry);
+    .ThenWhen("user:123").Returns("{ \"name\": \"Alice\" }");
 ```
 <!-- endSnippet -->
 
@@ -628,21 +433,10 @@ For parameterless methods, use `OnCall().ThenCall()` sequences instead of When()
 <!-- snippet: when-usecase-state-transitions -->
 ```cs
 // For parameterless methods, use OnCall().ThenCall() sequences
-// (When() requires parameters for matching)
 stub.GetStatus
     .OnCall(() => "Pending")
     .ThenCall(() => "Processing")
     .ThenCall(() => "Complete");
-
-IWhenStatusService service = stub;
-
-// Status progresses with each call
-Assert.Equal("Pending", service.GetStatus());
-Assert.Equal("Processing", service.GetStatus());
-Assert.Equal("Complete", service.GetStatus());
-
-// After sequence exhausted: repeats last value in non-strict mode (NSubstitute behavior)
-Assert.Equal("Complete", service.GetStatus());
 ```
 <!-- endSnippet -->
 
@@ -656,52 +450,11 @@ This example demonstrates When() in a realistic test scenario:
 ```cs
 // Payment gateway with different responses for specific amounts
 stub.ProcessPayment
-    // Specific amount: success
-    .When(100m).Returns(new WhenPaymentResult
-    {
-        Success = true,
-        Message = "Payment processed"
-    })
-    // Zero amount: validation error
-    .ThenWhen(0m).Returns(new WhenPaymentResult
-    {
-        Success = false,
-        Message = "Invalid amount"
-    })
-    // Large amounts: requires approval
-    .ThenWhen((amt) => amt > 1000m).Returns(new WhenPaymentResult
-    {
-        Success = false,
-        RequiresApproval = true,
-        Message = "Amount exceeds limit"
-    })
-    // All other amounts: general processing
-    .ThenCall((amt) => new WhenPaymentResult
-    {
-        Success = true,
-        Message = $"Processed ${amt}"
-    })
+    .When(100m).Returns(new WhenPaymentResult { Success = true, Message = "Payment processed" })
+    .ThenWhen(0m).Returns(new WhenPaymentResult { Success = false, Message = "Invalid amount" })
+    .ThenWhen((amt) => amt > 1000m).Returns(new WhenPaymentResult { RequiresApproval = true })
+    .ThenCall((amt) => new WhenPaymentResult { Success = true, Message = $"Processed ${amt}" })
     .Verifiable();
-
-IWhenPaymentGateway gateway = stub;
-
-// Test specific scenarios
-var result100 = gateway.ProcessPayment(100m);
-Assert.True(result100.Success);
-
-var resultZero = gateway.ProcessPayment(0m);
-Assert.False(resultZero.Success);
-Assert.Equal("Invalid amount", resultZero.Message);
-
-var resultLarge = gateway.ProcessPayment(5000m);
-Assert.True(resultLarge.RequiresApproval);
-
-var resultGeneral = gateway.ProcessPayment(250m);
-Assert.True(resultGeneral.Success);
-Assert.Equal("Processed $250", resultGeneral.Message);
-
-// Verify the chain was fully exercised
-stub.Verify();
 ```
 <!-- endSnippet -->
 

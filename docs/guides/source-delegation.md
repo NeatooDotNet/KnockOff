@@ -12,25 +12,8 @@ Configure a stub to delegate to a real implementation by calling `Source(realImp
 
 <!-- snippet: source-basic -->
 ```cs
-[Fact]
-public void Source_DelegatesToRealImplementation()
-{
-    var stub = new DataStoreStub();
-    var realStore = new InMemoryDataStore();
-
-    // Configure stub to delegate to real implementation
-    stub.Source(realStore);
-
-    IDataStore store = stub;
-
-    // All calls delegate to the real implementation
-    store.Add("first");
-    store.Add("second");
-
-    Assert.Equal(2, store.Count);
-    Assert.Equal("first", store.Get(0));
-    Assert.Equal("second", store.Get(1));
-}
+// Configure stub to delegate to real implementation
+stub.Source(realStore);
 ```
 <!-- endSnippet -->
 
@@ -44,19 +27,8 @@ You can override specific methods while delegating the rest to the source. Set t
 
 <!-- snippet: source-partial-override -->
 ```cs
-// Override GetById for test data
+// Override specific member while source handles the rest
 stub.GetById.OnCall((id) => new User { Id = id, Name = "Test User" });
-
-IRepository repository = stub;
-
-// GetById uses OnCall override
-var testUser = repository.GetById(1);
-Assert.NotNull(testUser);
-Assert.Equal("Test User", testUser.Name);
-
-// Save delegates to source (no OnCall configured)
-repository.Save(new User { Id = 2, Name = "New User" });
-Assert.NotNull(realRepo.GetById(2));
 ```
 <!-- endSnippet -->
 
@@ -70,25 +42,8 @@ When delegating to an implementation of a derived interface (like `IList<T>` whi
 
 <!-- snippet: source-hierarchy -->
 ```cs
-[Fact]
-public void Source_AppliesAcrossInterfaceHierarchy()
-{
-    var stub = new DataStoreStub();
-    var realStore = new InMemoryDataStore();
-
-    // Add items to real store
-    realStore.Add("item1");
-    realStore.Add("item2");
-
-    // Delegate to real implementation
-    stub.Source(realStore);
-
-    IDataStore store = stub;
-
-    // All interface methods delegate to source
-    Assert.Equal(2, store.Count);
-    Assert.Equal("item1", store.Get(0));
-}
+// Source applies to all interface hierarchy levels
+stub.Source(realStore);
 ```
 <!-- endSnippet -->
 
@@ -102,26 +57,8 @@ Remove source delegation by setting it to `null`:
 
 <!-- snippet: source-clear -->
 ```cs
-[Fact]
-public void Source_CanBeClearedWithNull()
-{
-    var stub = new DataStoreStub();
-    var realStore = new InMemoryDataStore();
-
-    realStore.Add("item");
-    stub.Source(realStore);
-
-    IDataStore store = stub;
-
-    // Source is active
-    Assert.Equal(1, store.Count);
-
-    // Clear source
-    stub.Source(null);
-
-    // Now smart defaults are used (Count returns 0)
-    Assert.Equal(0, store.Count);
-}
+// Clear source to revert to smart defaults
+stub.Source(null);
 ```
 <!-- endSnippet -->
 
@@ -162,14 +99,8 @@ The first match wins. This means you can set a source for baseline behavior and 
 
 <!-- snippet: source-priority -->
 ```cs
-// Source returns 1 for active user (when no OnCall is set)
-var fromSource = repository.GetPriority(new User { Id = 1, IsActive = true });
-Assert.Equal(1, fromSource);
-
-// OnCall overrides source
+// OnCall takes precedence over source
 stub.GetPriority.OnCall((user) => 42);
-var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
-Assert.Equal(42, fromOnCall);
 ```
 <!-- endSnippet -->
 
@@ -193,24 +124,9 @@ Here's a complete scenario demonstrating source delegation for a decorator patte
 
 <!-- snippet: source-complete-example -->
 ```cs
-// Override Read for specific test scenario
+// OnCall takes full control - source not consulted even for non-matches
 stub.Read.OnCall((filename) =>
     filename == "config.txt" ? "Test Config" : null);
-
-IDataSource dataSource = stub;
-
-// OnCall handles config.txt
-var config = dataSource.Read("config.txt");
-Assert.Equal("Test Config", config);
-
-// OnCall returned null for data.txt, but source is NOT consulted
-// once OnCall is configured - it takes full control
-var data = dataSource.Read("data.txt");
-Assert.Null(data);
-
-// Write delegates entirely to source (no OnCall configured)
-dataSource.Write("output.txt", "New Data");
-Assert.Equal("New Data", realDataSource.Read("output.txt"));
 ```
 <!-- endSnippet -->
 

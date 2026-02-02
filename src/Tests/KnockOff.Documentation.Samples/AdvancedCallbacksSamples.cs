@@ -98,23 +98,22 @@ public partial class CacheStub : ICache { }
 
 public class SequentialQueueTests
 {
-    #region advanced-sequential-queue
     [Fact]
     public void QueuePattern_ReturnsDifferentValuesOnSuccessiveCalls()
     {
         var stub = new EmailServiceStub();
 
+        #region advanced-sequential-queue
         // Queue of results: first succeeds, second fails
         var results = new Queue<bool>(new[] { true, false });
-
-        var tracking = stub.Send.OnCall((to, message) => results.Dequeue());
+        stub.Send.OnCall((to, message) => results.Dequeue());
+        #endregion
 
         IEmailService service = stub;
 
         Assert.True(service.Send("user@test.com", "Welcome"));   // First call: success
         Assert.False(service.Send("user@test.com", "Reminder")); // Second call: failure
     }
-    #endregion
 }
 
 // =============================================================================
@@ -123,19 +122,20 @@ public class SequentialQueueTests
 
 public class SequentialCounterTests
 {
-    #region advanced-sequential-counter
     [Fact]
     public void CounterPattern_SucceedsAfterMultipleFailures()
     {
         var stub = new RetryServiceStub();
 
+        #region advanced-sequential-counter
+        // Counter tracks call count for conditional behavior
         var attempts = 0;
-
-        var tracking = stub.Attempt.OnCall(() =>
+        stub.Attempt.OnCall(() =>
         {
             attempts++;
             return attempts > 3; // Succeed on 4th attempt
         });
+        #endregion
 
         IRetryService service = stub;
 
@@ -144,7 +144,6 @@ public class SequentialCounterTests
         Assert.False(service.Attempt()); // Attempt 3: fail
         Assert.True(service.Attempt());  // Attempt 4: success
     }
-    #endregion
 }
 
 // =============================================================================
@@ -153,18 +152,20 @@ public class SequentialCounterTests
 
 public class ConditionalReturnsTests
 {
-    #region advanced-conditional-switch
     [Fact]
     public void SwitchExpression_ReturnsDifferentUsersById()
     {
         var stub = new UserRepositoryStub();
 
-        var tracking = stub.FindById.OnCall((id) => id switch
+        #region advanced-conditional-switch
+        // Pattern matching for argument-based return values
+        stub.FindById.OnCall((id) => id switch
         {
             1 => new User { Id = 1, Name = "Admin", Email = "admin@test.com" },
             2 => new User { Id = 2, Name = "User", Email = "user@test.com" },
             _ => null
         });
+        #endregion
 
         IUserRepository repository = stub;
 
@@ -179,7 +180,6 @@ public class ConditionalReturnsTests
         var unknown = repository.FindById(999);
         Assert.Null(unknown);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -188,17 +188,19 @@ public class ConditionalReturnsTests
 
 public class ExceptionTests
 {
-    #region advanced-exception
     [Fact]
     public void ThrowException_WhenAmountExceedsLimit()
     {
         var stub = new PaymentGatewayStub();
 
-        var tracking = stub.Charge.OnCall((amount) =>
+        #region advanced-exception
+        // Throw exceptions based on argument conditions
+        stub.Charge.OnCall((amount) =>
         {
             if (amount > 1000)
                 throw new PaymentException("Insufficient funds");
         });
+        #endregion
 
         IPaymentGateway gateway = stub;
 
@@ -208,7 +210,6 @@ public class ExceptionTests
         // Amount exceeding limit throws
         Assert.Throws<PaymentException>(() => gateway.Charge(1500));
     }
-    #endregion
 }
 
 // =============================================================================
@@ -217,20 +218,17 @@ public class ExceptionTests
 
 public class StateDependentPropertyTests
 {
-    #region advanced-state-property
     [Fact]
     public void Property_ReflectsMethodCallState()
     {
         var stub = new ConnectionStub();
 
-        // Track connection state with local variable
+        #region advanced-state-property
+        // Shared state between property and method
         var isConnected = false;
-
-        // IsConnected returns the tracked state
         stub.IsConnected.OnGet(() => isConnected);
-
-        // Connect() updates the tracked state
-        var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });
+        stub.Connect.OnCall(() => { isConnected = true; });
+        #endregion
 
         IConnection connection = stub;
 
@@ -241,7 +239,6 @@ public class StateDependentPropertyTests
         connection.Connect();
         Assert.True(connection.IsConnected);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -250,23 +247,22 @@ public class StateDependentPropertyTests
 
 public class StateDependentMethodTests
 {
-    #region advanced-state-method
     [Fact]
     public void Method_ThrowsIfNotInitialized()
     {
         var stub = new DatabaseStub();
 
-        // Track initialization state with local variable
+        #region advanced-state-method
+        // Enforce method ordering with shared state
         var isInitialized = false;
-
-        var initTracking = stub.Initialize.OnCall(() => { isInitialized = true; });
-
-        var queryTracking = stub.Query.OnCall((sql) =>
+        stub.Initialize.OnCall(() => { isInitialized = true; });
+        stub.Query.OnCall((sql) =>
         {
             if (!isInitialized)
                 throw new InvalidOperationException("Must call Initialize() first");
             return "result";
         });
+        #endregion
 
         IDatabase database = stub;
 
@@ -278,7 +274,6 @@ public class StateDependentMethodTests
         var result = database.Query("SELECT * FROM users");
         Assert.Equal("result", result);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -287,7 +282,6 @@ public class StateDependentMethodTests
 
 public class SideEffectsTests
 {
-    #region advanced-side-effects
     [Fact]
     public void Callback_PerformsMultipleActions()
     {
@@ -297,17 +291,15 @@ public class SideEffectsTests
         var notifications = new List<string>();
         var nextOrderId = 100;
 
-        var tracking = stub.PlaceOrder.OnCall((order) =>
+        #region advanced-side-effects
+        // Callbacks can track state and perform side effects
+        stub.PlaceOrder.OnCall((order) =>
         {
-            // Track the order
             placedOrders.Add(order);
-
-            // Simulate notification
             notifications.Add($"Order {nextOrderId} placed for user {order.UserId}");
-
-            // Return generated ID
             return nextOrderId++;
         });
+        #endregion
 
         IOrderService service = stub;
 
@@ -318,7 +310,6 @@ public class SideEffectsTests
         Assert.Single(notifications);
         Assert.Contains("Order 100 placed for user 42", notifications);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -327,7 +318,6 @@ public class SideEffectsTests
 
 public class CacheSimulationTests
 {
-    #region advanced-complete-example
     [Fact]
     public void Cache_SimulatesRealisticBehavior()
     {
@@ -340,6 +330,7 @@ public class CacheSimulationTests
         var hits = 0;
         var misses = 0;
 
+        #region advanced-complete-example
         // Get: Check expiration, track hits/misses
         stub.Get.OnCall((key) =>
         {
@@ -361,7 +352,6 @@ public class CacheSimulationTests
         {
             if (cache.Count >= maxCapacity && !cache.ContainsKey(key))
             {
-                // Evict oldest entry
                 var oldest = cache.OrderBy(kvp => kvp.Value.Added).First();
                 cache.Remove(oldest.Key);
             }
@@ -378,6 +368,7 @@ public class CacheSimulationTests
 
         // Stats: Return current counts
         stub.Stats.OnGet(() => new CacheStats { Hits = hits, Misses = misses });
+        #endregion
 
         ICache cacheService = stub;
 
@@ -403,5 +394,4 @@ public class CacheSimulationTests
         Assert.Equal(0, cacheService.Stats.Hits);
         Assert.Equal(0, cacheService.Stats.Misses);
     }
-    #endregion
 }

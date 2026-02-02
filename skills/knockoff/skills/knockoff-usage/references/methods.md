@@ -13,18 +13,7 @@ Configure void methods using `OnCall` with an `Action`:
 <!-- snippet: methods-oncall-void -->
 ```cs
 // OnCall for void methods uses Action<...params>
-var logged = new List<string>();
-var tracking = stub.LogMessage.OnCall((message) =>
-{
-    logged.Add(message);
-});
-
-ILogSvcMethods logger = stub;
-logger.LogMessage("Hello, World!");
-
-Assert.Single(logged);
-Assert.Equal("Hello, World!", logged[0]);
-tracking.Verify();
+stub.LogMessage.OnCall((message) => logged.Add(message));
 ```
 <!-- endSnippet -->
 
@@ -37,13 +26,7 @@ Configure methods that return values using `OnCall` with a `Func`:
 <!-- snippet: methods-oncall-return -->
 ```cs
 // OnCall with return value: Func<...params, TReturn>
-var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
-
-ILogSvcMethods logger = stub;
-var name = logger.GetUserName(42);
-
-Assert.Equal("TestUser", name);
-tracking.Verify();
+stub.GetUserName.OnCall((userId) => "TestUser");
 ```
 <!-- endSnippet -->
 
@@ -54,14 +37,7 @@ For simple scenarios where the return value does not depend on arguments, use th
 <!-- snippet: methods-oncall-value -->
 ```cs
 // Returns - simpler syntax when you don't need callback logic
-// Just pass the return value directly
-var tracking = stub.GetUserName.Returns("StaticUser");
-
-ILogSvcMethods logger = stub;
-var name = logger.GetUserName(42);
-
-Assert.Equal("StaticUser", name);
-tracking.Verify();
+stub.GetUserName.Returns("StaticUser");
 ```
 <!-- endSnippet -->
 
@@ -108,16 +84,8 @@ Methods with multiple parameters include all parameters in the callback:
 <!-- snippet: methods-oncall-multi-param -->
 ```cs
 // All method parameters are passed to the callback in order
-var tracking = stub.ValidateCredentials.OnCall((username, password) =>
+stub.ValidateCredentials.OnCall((username, password) =>
     username == "admin" && password == "secret");
-
-IAuthSvcMethods auth = stub;
-
-Assert.True(auth.ValidateCredentials("admin", "secret"));
-Assert.False(auth.ValidateCredentials("user", "wrong"));
-
-// Verify exactly 2 calls were made
-tracking.Verify(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -131,13 +99,8 @@ Call `.Verify()` on the tracking object returned by `OnCall`:
 
 <!-- snippet: methods-verify-wascalled -->
 ```cs
+// Mark with Verifiable(), then stub.Verify() checks all marked members
 stub.Save.OnCall((entity) => { }).Verifiable();
-
-ISaveRepoMethods repository = stub;
-repository.Save(new User { Id = 1 });
-
-// Verify() checks all members marked with .Verifiable()
-stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -147,18 +110,7 @@ Use `Times` to specify exact call count requirements:
 
 <!-- snippet: methods-verify-callcount -->
 ```cs
-var tracking = stub.Notify.OnCall((message) => { });
-
-INotifierMethods notifier = stub;
-
-// Simulate processing a 2-item collection
-var items = new[] { "item1", "item2" };
-foreach (var item in items)
-{
-    notifier.Notify($"Processing {item}");
-}
-
-// Verify exactly 2 calls (throws if different)
+// Verify exact call count (throws if different)
 tracking.Verify(Times.Exactly(2));
 ```
 <!-- endSnippet -->
@@ -178,16 +130,9 @@ For batch verification of multiple methods, use `.Verifiable()` then call `stub.
 
 <!-- snippet: methods-verify-verifiable -->
 ```cs
-// Mark expected calls
+// Mark expected calls with Verifiable(), then stub.Verify() checks all
 stub.Save.OnCall((entity) => { }).Verifiable(Times.Once);
 stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
-
-ISaveRepoMethods repository = stub;
-repository.Save(new User { Id = 1 });
-repository.GetById(1);
-
-// Verify all marked methods (throws if any not called correctly)
-stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -205,14 +150,8 @@ Access the last call's argument using `LastArg`:
 
 <!-- snippet: methods-capture-single -->
 ```cs
-var tracking = stub.GetUser.OnCall((userId) => new User { Id = userId });
-
-IUserRepoMethods repository = stub;
-repository.GetUser(42);
-
-// LastArg captures the most recent call's argument (from tracking)
+// LastArg captures the most recent call's argument
 int capturedId = tracking.LastArg;
-Assert.Equal(42, capturedId);
 ```
 <!-- endSnippet -->
 
@@ -222,15 +161,8 @@ Access arguments using the `LastArgs` named tuple:
 
 <!-- snippet: methods-capture-multiple -->
 ```cs
-var tracking = stub.ValidateCredentials.OnCall((username, password) => true);
-
-IAuthSvcMethods auth = stub;
-auth.ValidateCredentials("admin", "secret123");
-
-// LastArgs is a named tuple with all parameters (from tracking)
+// LastArgs is a named tuple with all parameters
 var (username, password) = tracking.LastArgs;
-Assert.Equal("admin", username);
-Assert.Equal("secret123", password);
 ```
 <!-- endSnippet -->
 
@@ -246,63 +178,23 @@ For methods returning `Task<T>` or `ValueTask<T>`, you have three options:
 
 <!-- snippet: async-task-value-overload -->
 ```cs
-[Fact]
-public async Task TaskResult_ValueOverload_AutoWraps()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // RETURNS: KnockOff auto-wraps the value in Task.FromResult
-    // This is the simplest syntax for returning async values
-    stub.GetUserAsync.Returns(new User { Id = 42, Name = "Alice" });
-
-    IAsyncUserSvc service = stub;
-    var user = await service.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// KnockOff auto-wraps the value in Task.FromResult
+stub.GetUserAsync.Returns(new User { Id = 42, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
 <!-- snippet: async-task-simplified-callback -->
 ```cs
-[Fact]
-public async Task TaskResult_SimplifiedCallback_AutoWraps()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in Task.FromResult
-    // This combines the simplicity of Returns() with callback flexibility
-    stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
-
-    IAsyncUserSvc service = stub;
-    var user = await service.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-    stub.Verify();
-}
+// OnCall() with unwrapped return type - auto-wrapped in Task.FromResult
+stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
 ```
 <!-- endSnippet -->
 
 <!-- snippet: async-task-result -->
 ```cs
-[Fact]
-public async Task TaskResult_ReturnedWithFromResult()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // FULL CALLBACK: Use Task.FromResult when you need async operations in the callback
-    stub.GetUserAsync.OnCall((id) =>
-        Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
-
-    IAsyncUserSvc service = stub;
-    var user = await service.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-    stub.Verify();
-}
+// Use Task.FromResult when you need parameter-based return values
+stub.GetUserAsync.OnCall((id) =>
+    Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -312,22 +204,8 @@ For methods returning `Task` or `ValueTask` (no result), use `Action` callbacks 
 
 <!-- snippet: async-task-simplified-void -->
 ```cs
-[Fact]
-public async Task TaskVoid_SimplifiedCallback_AutoReturnsCompletedTask()
-{
-    var stub = new AsyncUserSvcStub();
-
-    var updatedUsers = new List<User>();
-
-    // SIMPLIFIED VOID CALLBACK: Just use Action, Task.CompletedTask is auto-returned
-    stub.UpdateUserAsync.OnCall((user) => updatedUsers.Add(user)).Verifiable();
-
-    IAsyncUserSvc service = stub;
-    await service.UpdateUserAsync(new User { Id = 1, Name = "Bob" });
-
-    Assert.Single(updatedUsers);
-    stub.Verify();
-}
+// Action callback for void async - Task.CompletedTask auto-returned
+stub.UpdateUserAsync.OnCall((user) => updatedUsers.Add(user)).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -453,28 +331,10 @@ When an interface has overloaded methods, KnockOff distinguishes them by the cal
 
 <!-- snippet: methods-overloads -->
 ```cs
-// Overloads are distinguished by the callback parameter types
-// The fully-typed lambda tells KnockOff which overload to configure
-var findAllTracking = stub.Find.OnCall(() =>
-    new List<User>()).Verifiable();
-var findByIdTracking = stub.Find.OnCall((int id) =>
-    new User { Id = id, Name = "ById" }).Verifiable();
-var findByNameTracking = stub.Find.OnCall((string name) =>
-    new User { Id = 1, Name = name }).Verifiable();
-
-ISearchRepo repo = stub;
-
-// Call each overload
-repo.Find();
-repo.Find(42);
-repo.Find("Alice");
-
-// Verify all overloads were called
-stub.Verify();
-
-// Access last arguments via tracking objects
-Assert.Equal(42, findByIdTracking.LastArg);
-Assert.Equal("Alice", findByNameTracking.LastArg);
+// Fully-typed lambda tells KnockOff which overload to configure
+stub.Find.OnCall(() => new List<User>());
+stub.Find.OnCall((int id) => new User { Id = id, Name = "ById" });
+stub.Find.OnCall((string name) => new User { Id = 1, Name = name });
 ```
 <!-- endSnippet -->
 
@@ -488,19 +348,8 @@ Clear tracking state and remove callbacks using `Reset()`:
 
 <!-- snippet: methods-reset -->
 ```cs
-var tracking = stub.ProcessData.OnCall((data) => { });
-
-IProcessorMethods processor = stub;
-processor.ProcessData("initial");
-
-// Verify one call was made
-tracking.Verify(Times.Once);
-
-// Reset clears tracking state on the interceptor
+// Reset clears call count, captured arguments, and callbacks
 stub.ProcessData.Reset();
-
-// After reset, Verify(Times.Never) passes via tracking
-tracking.Verify(Times.Never);
 ```
 <!-- endSnippet -->
 
@@ -517,30 +366,9 @@ This example demonstrates a realistic test using method configuration, execution
 
 <!-- snippet: methods-complete-example -->
 ```cs
-// Arrange
-var stub = new CompleteUserRepoStub();
-
-var testUser = new User { Id = 1, Name = "Alice", Email = "old@test.com" };
+// Configure stub with tracking
 var getTracking = stub.GetUser.OnCall((id) => id == 1 ? testUser : null).Verifiable();
 var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
-
-var service = new UserService(stub);
-
-// Act
-var result = service.UpdateUserEmail(1, "new@test.com");
-
-// Assert
-Assert.True(result);
-
-// Verify both methods were called
-stub.Verify();
-
-// Verify GetUser was called with correct ID
-Assert.Equal(1, getTracking.LastArg);
-
-// Verify saved user has new email via the tracking args
-var savedUser = saveTracking.LastArg;
-Assert.Equal("new@test.com", savedUser.Email);
 ```
 <!-- endSnippet -->
 

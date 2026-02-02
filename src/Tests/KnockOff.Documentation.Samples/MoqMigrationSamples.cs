@@ -30,30 +30,32 @@ public partial class MoqUserRepoStub : IMoqUserRepo { }
 
 public class CreateStubMoqTests
 {
-    #region moq-migration-create-stub-moq
     [Fact]
     public void CreateStub_MoqApproach()
     {
+        #region moq-migration-create-stub-moq
+        // Create mock wrapper, access instance via .Object
         var mock = new Mock<IMoqUserRepo>();
         IMoqUserRepo repository = mock.Object;
+        #endregion
 
         Assert.NotNull(repository);
     }
-    #endregion
 }
 
 public class CreateStubKnockOffTests
 {
-    #region moq-migration-create-stub-knockoff
     [Fact]
     public void CreateStub_KnockOffApproach()
     {
+        #region moq-migration-create-stub-knockoff
+        // Stub IS the instance - no wrapper needed
         var stub = new MoqUserRepoStub();
         IMoqUserRepo repository = stub;
+        #endregion
 
         Assert.NotNull(repository);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -86,14 +88,16 @@ public class MockCreationCombinedSamples
 
 public class SetupMethodMoqTests
 {
-    #region moq-migration-setup-method-moq
     [Fact]
     public void SetupMethod_MoqApproach()
     {
         var mock = new Mock<IMoqUserRepo>();
         var testUser = new User { Id = 42, Name = "Alice" };
 
+        #region moq-migration-setup-method-moq
+        // Setup with expression tree and It.IsAny<T>() matcher
         mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(testUser);
+        #endregion
 
         IMoqUserRepo repository = mock.Object;
         var user = repository.GetUser(42);
@@ -101,19 +105,20 @@ public class SetupMethodMoqTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 }
 
 public class SetupMethodKnockOffTests
 {
-    #region moq-migration-setup-method-knockoff
     [Fact]
     public void SetupMethod_KnockOffApproach()
     {
         var stub = new MoqUserRepoStub();
         var testUser = new User { Id = 42, Name = "Alice" };
 
+        #region moq-migration-setup-method-knockoff
+        // OnCall with typed delegate - arguments available directly
         stub.GetUser.OnCall((id) => testUser);
+        #endregion
 
         IMoqUserRepo repository = stub;
         var user = repository.GetUser(42);
@@ -121,7 +126,6 @@ public class SetupMethodKnockOffTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -156,38 +160,40 @@ public class MethodReturnsCombinedSamples
 
 public class SetupPropertyMoqTests
 {
-    #region moq-migration-setup-property-moq
     [Fact]
     public void SetupProperty_MoqApproach()
     {
         var mock = new Mock<IMoqUserRepo>();
 
+        #region moq-migration-setup-property-moq
+        // Properties use same Setup/Returns pattern as methods
         mock.Setup(x => x.ConnectionString).Returns("server=localhost");
+        #endregion
 
         IMoqUserRepo repository = mock.Object;
         var connStr = repository.ConnectionString;
 
         Assert.Equal("server=localhost", connStr);
     }
-    #endregion
 }
 
 public class SetupPropertyKnockOffTests
 {
-    #region moq-migration-setup-property-knockoff
     [Fact]
     public void SetupProperty_KnockOffApproach()
     {
         var stub = new MoqUserRepoStub();
 
+        #region moq-migration-setup-property-knockoff
+        // OnGet configures property getter return value
         stub.ConnectionString.OnGet("server=localhost");
+        #endregion
 
         IMoqUserRepo repository = stub;
         var connStr = repository.ConnectionString;
 
         Assert.Equal("server=localhost", connStr);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -220,7 +226,6 @@ public class PropertySetupCombinedSamples
 
 public class VerifyCallsMoqTests
 {
-    #region moq-migration-verify-moq
     [Fact]
     public void VerifyCalls_MoqApproach()
     {
@@ -229,32 +234,31 @@ public class VerifyCallsMoqTests
         IMoqUserRepo repository = mock.Object;
         repository.SaveUser(new User { Id = 1, Name = "Bob" });
 
+        #region moq-migration-verify-moq
+        // Verify with expression tree and Times constraint
         mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Once());
+        #endregion
     }
-    #endregion
 }
 
 public class VerifyCallsKnockOffTests
 {
-    #region moq-migration-verify-knockoff
     [Fact]
     public void VerifyCalls_KnockOffApproach()
     {
         var stub = new MoqUserRepoStub();
 
-        // Mark method as verifiable during setup
+        #region moq-migration-verify-knockoff
+        // Mark as verifiable during setup, then verify all at once
         stub.SaveUser.OnCall((user) => { }).Verifiable();
+        #endregion
 
         IMoqUserRepo repository = stub;
         repository.SaveUser(new User { Id = 1, Name = "Bob" });
 
         // Verify() checks all members marked with .Verifiable()
         stub.Verify();
-
-        // Or verify with Times constraint directly on tracking
-        // stub.SaveUser.Verify(Times.Once);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -293,14 +297,16 @@ public class VerificationCombinedSamples
 
 public class AsyncMethodMoqTests
 {
-    #region moq-migration-async-moq
     [Fact]
     public async Task AsyncMethod_MoqApproach()
     {
         var mock = new Mock<IMoqUserRepo>();
         var testUser = new User { Id = 42, Name = "Alice" };
 
+        #region moq-migration-async-moq
+        // ReturnsAsync helper wraps value in Task
         mock.Setup(x => x.GetUserAsync(It.IsAny<int>())).ReturnsAsync(testUser);
+        #endregion
 
         IMoqUserRepo repository = mock.Object;
         var user = await repository.GetUserAsync(42);
@@ -308,19 +314,20 @@ public class AsyncMethodMoqTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 }
 
 public class AsyncMethodKnockOffTests
 {
-    #region moq-migration-async-knockoff
     [Fact]
     public async Task AsyncMethod_KnockOffApproach()
     {
         var stub = new MoqUserRepoStub();
         var testUser = new User { Id = 42, Name = "Alice" };
 
+        #region moq-migration-async-knockoff
+        // Use Task.FromResult to wrap the return value
         stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+        #endregion
 
         IMoqUserRepo repository = stub;
         var user = await repository.GetUserAsync(42);
@@ -328,7 +335,6 @@ public class AsyncMethodKnockOffTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -366,15 +372,17 @@ public class AsyncMethodsCombinedSamples
 
 public class CallbackMoqTests
 {
-    #region moq-migration-callback-moq
     [Fact]
     public void Callback_MoqApproach()
     {
         var mock = new Mock<IMoqUserRepo>();
         var savedUsers = new List<User>();
 
+        #region moq-migration-callback-moq
+        // Callback is separate from Returns
         mock.Setup(x => x.SaveUser(It.IsAny<User>()))
             .Callback<User>(u => savedUsers.Add(u));
+        #endregion
 
         IMoqUserRepo repository = mock.Object;
         repository.SaveUser(new User { Id = 1, Name = "Alice" });
@@ -384,22 +392,20 @@ public class CallbackMoqTests
         Assert.Equal("Alice", savedUsers[0].Name);
         Assert.Equal("Bob", savedUsers[1].Name);
     }
-    #endregion
 }
 
 public class CallbackKnockOffTests
 {
-    #region moq-migration-callback-knockoff
     [Fact]
     public void Callback_KnockOffApproach()
     {
         var stub = new MoqUserRepoStub();
         var savedUsers = new List<User>();
 
-        stub.SaveUser.OnCall((user) =>
-        {
-            savedUsers.Add(user);
-        });
+        #region moq-migration-callback-knockoff
+        // Logic goes directly in OnCall delegate
+        stub.SaveUser.OnCall((user) => savedUsers.Add(user));
+        #endregion
 
         IMoqUserRepo repository = stub;
         repository.SaveUser(new User { Id = 1, Name = "Alice" });
@@ -409,7 +415,6 @@ public class CallbackKnockOffTests
         Assert.Equal("Alice", savedUsers[0].Name);
         Assert.Equal("Bob", savedUsers[1].Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -449,14 +454,16 @@ public class CallbacksCombinedSamples
 
 public class ArgumentMatchingMoqTests
 {
-    #region moq-migration-arguments-moq
     [Fact]
     public void ArgumentMatching_MoqApproach()
     {
         var mock = new Mock<IMoqUserRepo>();
 
+        #region moq-migration-arguments-moq
+        // It.Is<T>() for conditional matching, Returns<T> to access args
         mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
             .Returns<int>(id => new User { Id = id, Name = "Valid User" });
+        #endregion
 
         IMoqUserRepo repository = mock.Object;
 
@@ -466,19 +473,20 @@ public class ArgumentMatchingMoqTests
         Assert.NotNull(validUser);
         Assert.Null(invalidUser);
     }
-    #endregion
 }
 
 public class ArgumentMatchingKnockOffTests
 {
-    #region moq-migration-arguments-knockoff
     [Fact]
     public void ArgumentMatching_KnockOffApproach()
     {
         var stub = new MoqUserRepoStub();
 
+        #region moq-migration-arguments-knockoff
+        // Arguments available directly - use standard C# conditionals
         stub.GetUser.OnCall((id) =>
             id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+        #endregion
 
         IMoqUserRepo repository = stub;
 
@@ -488,7 +496,6 @@ public class ArgumentMatchingKnockOffTests
         Assert.NotNull(validUser);
         Assert.Null(invalidUser);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -611,7 +618,6 @@ public class UserServiceMigration
 
 public class CompleteMoqTests
 {
-    #region moq-migration-complete-moq
     private readonly Mock<IMoqUserRepo> _mockRepo;
     private readonly UserServiceMigration _service;
 
@@ -625,12 +631,18 @@ public class CompleteMoqTests
     public async Task GetUser_ReturnsUser()
     {
         var user = new User { Id = 1, Name = "Alice" };
+
+        #region moq-migration-complete-moq
+        // Setup with expression tree
         _mockRepo.Setup(x => x.GetUserAsync(1)).ReturnsAsync(user);
 
         var result = await _service.GetUserAsync(1);
 
-        Assert.Equal("Alice", result?.Name);
+        // Verify with expression tree and Times
         _mockRepo.Verify(x => x.GetUserAsync(1), Moq.Times.Once());
+        #endregion
+
+        Assert.Equal("Alice", result?.Name);
     }
 
     [Fact]
@@ -646,7 +658,6 @@ public class CompleteMoqTests
         Assert.Equal("Bob", savedUser?.Name);
         _mockRepo.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Once());
     }
-    #endregion
 }
 
 // =============================================================================
@@ -655,7 +666,6 @@ public class CompleteMoqTests
 
 public class CompleteKnockOffTests
 {
-    #region moq-migration-complete-knockoff
     private readonly MoqUserRepoStub _stub;
     private readonly UserServiceMigration _service;
 
@@ -669,14 +679,18 @@ public class CompleteKnockOffTests
     public async Task GetUser_ReturnsUser()
     {
         var user = new User { Id = 1, Name = "Alice" };
-        // Similar to Moq: Setup + Verifiable
+
+        #region moq-migration-complete-knockoff
+        // OnCall with Verifiable marks for batch verification
         _stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
 
         var result = await _service.GetUserAsync(1);
 
-        Assert.Equal("Alice", result?.Name);
-        // Similar to Moq: mock.Verify() -> stub.Verify()
+        // stub.Verify() checks all .Verifiable() members
         _stub.Verify();
+        #endregion
+
+        Assert.Equal("Alice", result?.Name);
     }
 
     [Fact]
@@ -692,10 +706,9 @@ public class CompleteKnockOffTests
 
         Assert.NotNull(savedUser);
         Assert.Equal("Bob", savedUser?.Name);
-        // Similar to Moq: mock.Verify(x => x.SaveUser(...), Times.Once())
+        // Or verify with Times constraint on tracking object
         tracking.Verify(Times.Once);
     }
-    #endregion
 }
 
 // =============================================================================

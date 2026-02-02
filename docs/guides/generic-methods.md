@@ -45,18 +45,9 @@ The `OnCall` method accepts a callback matching the method signature and returns
 
 <!-- snippet: generic-configure-single -->
 ```cs
-var stub = new RepositoryStub();
-
 // Configure behavior for User type
 stub.GetById.Of<User>().OnCall((id) =>
     new User { Id = id, Name = "Test User" });
-
-IRepository repository = stub;
-var user = repository.GetById<User>(42);
-
-Assert.NotNull(user);
-Assert.Equal(42, user.Id);
-Assert.Equal("Test User", user.Name);
 ```
 <!-- endSnippet -->
 
@@ -64,22 +55,12 @@ You can configure multiple types independently. Each `OnCall` is specific to its
 
 <!-- snippet: generic-configure-multiple -->
 ```cs
-var stub = new RepositoryStub();
-
 // Configure different behavior for each type
 stub.GetById.Of<User>().OnCall((id) =>
     new User { Id = id, Name = "User" });
 
 stub.GetById.Of<Order>().OnCall((id) =>
     new Order { Id = id, Amount = 99.99m });
-
-IRepository repository = stub;
-
-var user = repository.GetById<User>(1);
-var order = repository.GetById<Order>(2);
-
-Assert.Equal("User", user?.Name);
-Assert.Equal(99.99m, order?.Amount);
 ```
 <!-- endSnippet -->
 
@@ -91,18 +72,8 @@ After execution, verify calls per type using the same `.Of<T>()` accessor. The `
 
 <!-- snippet: generic-verify-typed -->
 ```cs
-var stub = new RepositoryStub();
-
-var tracking = stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-
-IRepository repository = stub;
-
-repository.GetById<User>(1);
-repository.GetById<User>(2);
-
 // Verify calls for specific type using Times
 tracking.Verify(Times.Exactly(2));
-Assert.Equal(2, stub.GetById.Of<User>().LastCallArg);
 ```
 <!-- endSnippet -->
 
@@ -110,18 +81,7 @@ You can verify calls for multiple types independently:
 
 <!-- snippet: generic-verify-aggregate -->
 ```cs
-var stub = new RepositoryStub();
-
-var userTracking = stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-var orderTracking = stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
-
-IRepository repository = stub;
-
-repository.GetById<User>(1);
-repository.GetById<User>(2);
-repository.GetById<Order>(3);
-
-// Verify each type was called using tracking
+// Verify each type was called independently
 userTracking.Verify(Times.Exactly(2));
 orderTracking.Verify(Times.Once);
 ```
@@ -135,8 +95,6 @@ For methods with multiple type parameters, use `.Of<T1, T2, ...>()`:
 
 <!-- snippet: generic-multi-param -->
 ```cs
-var stub = new ConverterStub();
-
 // Configure for string -> int conversion
 stub.Convert.Of<string, int>().OnCall((source) =>
     int.Parse(source));
@@ -144,14 +102,6 @@ stub.Convert.Of<string, int>().OnCall((source) =>
 // Configure for int -> string conversion
 stub.Convert.Of<int, string>().OnCall((source) =>
     source.ToString());
-
-IConverter converter = stub;
-
-var intResult = converter.Convert<string, int>("42");
-var strResult = converter.Convert<int, string>(100);
-
-Assert.Equal(42, intResult);
-Assert.Equal("100", strResult);
 ```
 <!-- endSnippet -->
 
@@ -163,21 +113,8 @@ Use `CalledTypeArguments` to see which type combinations were actually invoked:
 
 <!-- snippet: generic-called-types -->
 ```cs
-var stub = new RepositoryStub();
-
-stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
-
-IRepository repository = stub;
-
-repository.GetById<User>(1);
-repository.GetById<Order>(2);
-
 // CalledTypeArguments contains all types used
 var types = stub.GetById.CalledTypeArguments;
-Assert.Equal(2, types.Count);
-Assert.Contains(typeof(User), types);
-Assert.Contains(typeof(Order), types);
 ```
 <!-- endSnippet -->
 
@@ -191,16 +128,6 @@ Reset type-specific state using `.Of<T>().Reset()`:
 
 <!-- snippet: generic-reset-typed -->
 ```cs
-var stub = new RepositoryStub();
-
-stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
-
-IRepository repository = stub;
-
-repository.GetById<User>(1);
-repository.GetById<Order>(2);
-
 // Reset only User-specific state
 stub.GetById.Of<User>().Reset();
 
@@ -213,23 +140,11 @@ To reset all type arguments at once, call `Reset()` on the base interceptor:
 
 <!-- snippet: generic-reset-all -->
 ```cs
-var stub = new RepositoryStub();
-
-stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
-
-IRepository repository = stub;
-
-repository.GetById<User>(1);
-repository.GetById<Order>(2);
-
 // Reset all type-specific state
 stub.GetById.Reset();
 
-// Verify no calls after reset using Times.Never
 stub.GetById.Of<User>().Verify(Times.Never);
 stub.GetById.Of<Order>().Verify(Times.Never);
-Assert.Empty(stub.GetById.CalledTypeArguments);
 ```
 <!-- endSnippet -->
 
@@ -241,8 +156,6 @@ Here's a full test demonstrating generic method stubbing for a serializer/deseri
 
 <!-- snippet: generic-complete-example -->
 ```cs
-var stub = new SerializerStub();
-
 // Configure Serialize for different types
 var serializeUserTracking = stub.Serialize.Of<User>().OnCall((obj) =>
     $"{{\"Id\":{obj.Id},\"Name\":\"{obj.Name}\"}}");
@@ -256,26 +169,6 @@ var deserializeUserTracking = stub.Deserialize.Of<User>().OnCall((data) =>
 
 var deserializeOrderTracking = stub.Deserialize.Of<Order>().OnCall((data) =>
     new Order { Id = 2, Amount = 50.00m });
-
-ISerializer serializer = stub;
-
-// Execute serialization
-var userJson = serializer.Serialize(new User { Id = 1, Name = "Alice" });
-var orderJson = serializer.Serialize(new Order { Id = 2, Amount = 99.99m });
-
-// Execute deserialization
-var user = serializer.Deserialize<User>(userJson);
-var order = serializer.Deserialize<Order>(orderJson);
-
-// Verify per-type calls with Times
-serializeUserTracking.Verify(Times.Once);
-serializeOrderTracking.Verify(Times.Once);
-deserializeUserTracking.Verify(Times.Once);
-deserializeOrderTracking.Verify(Times.Once);
-
-// Verify called type arguments
-Assert.Contains(typeof(User), stub.Serialize.CalledTypeArguments);
-Assert.Contains(typeof(Order), stub.Serialize.CalledTypeArguments);
 ```
 <!-- endSnippet -->
 

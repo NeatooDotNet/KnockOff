@@ -67,18 +67,10 @@ public class StandAlonePatternTests
 #region attr-inline-interface
 // Inline interface pattern: [KnockOff<IInterface>] generates stub in Stubs namespace
 [KnockOff<IAttrUserRepository>]
-public partial class InlineInterfacePatternTests
-{
-    private void Example()
-    {
-        // Generated stub accessed via Stubs namespace
-        var stub = new Stubs.IAttrUserRepository();
+public partial class InlineInterfacePatternTests { }
 
-        stub.GetById.OnCall((id) => new User { Id = id, Name = "Inline User" });
-
-        IAttrUserRepository repository = stub;
-    }
-}
+// Generated stub accessed via Stubs namespace
+// var stub = new InlineInterfacePatternTests.Stubs.IAttrUserRepository();
 #endregion
 
 public partial class InlineInterfacePatternTests
@@ -105,20 +97,11 @@ public partial class InlineInterfacePatternTests
 #region attr-inline-class
 // Inline class pattern: [KnockOff<ConcreteClass>] generates stub inheriting from class
 [KnockOff<EmailServiceBase>]
-public partial class InlineClassPatternTests
-{
-    private void Example()
-    {
-        // Generated stub inherits from EmailServiceBase
-        var stub = new Stubs.EmailServiceBase();
+public partial class InlineClassPatternTests { }
 
-        // Use .Object to get the stub as the base class type
-        EmailServiceBase service = stub.Object;
-
-        // Virtual members can be intercepted
-        stub.Send.OnCall((to, subject, body) => { });
-    }
-}
+// Generated stub inherits from EmailServiceBase
+// var stub = new InlineClassPatternTests.Stubs.EmailServiceBase();
+// EmailServiceBase service = stub.Object;  // Cast to base class type
 #endregion
 
 public partial class InlineClassPatternTests
@@ -147,21 +130,12 @@ public partial class InlineClassPatternTests
 [KnockOff<IAttrUserRepository>]
 [KnockOff<IAttrEmailService>]
 [KnockOff<IAttrLogger>]
-public partial class MultipleStubsPatternTests
-{
-    private void Example()
-    {
-        // Each interface gets its own stub
-        var userRepo = new Stubs.IAttrUserRepository();
-        var emailService = new Stubs.IAttrEmailService();
-        var logger = new Stubs.IAttrLogger();
+public partial class MultipleStubsPatternTests { }
 
-        // Configure each stub independently
-        userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
-        emailService.Send.OnCall((to, subject, body) => { });
-        logger.Log.OnCall((message) => { });
-    }
-}
+// Each interface gets its own stub in the Stubs namespace
+// var userRepo = new MultipleStubsPatternTests.Stubs.IAttrUserRepository();
+// var emailService = new MultipleStubsPatternTests.Stubs.IAttrEmailService();
+// var logger = new MultipleStubsPatternTests.Stubs.IAttrLogger();
 #endregion
 
 public partial class MultipleStubsPatternTests
