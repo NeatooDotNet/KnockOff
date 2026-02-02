@@ -49,6 +49,7 @@ internal static class IndexerInterceptorRenderer
 				w.Line("private IndexerGetBuilderImpl? _onGetTracking;");
 				w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerGetBuilderImpl Tracking)>? _getSequence;");
 				w.Line("private int _getSequenceIndex;");
+				w.Line("private bool _getRepeatLastValue = true;");
 				w.Line("private bool _isGetVerifiable;");
 				w.Line("private global::KnockOff.Times? _getVerifiableTimes;");
 				w.Line("private int _unconfiguredGetCount;");
@@ -63,6 +64,7 @@ internal static class IndexerInterceptorRenderer
 				w.Line("private IndexerSetBuilderImpl? _onSetTracking;");
 				w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerSetBuilderImpl Tracking)>? _setSequence;");
 				w.Line("private int _setSequenceIndex;");
+				w.Line("private bool _setRepeatLastValue = true;");
 				w.Line("private bool _isSetVerifiable;");
 				w.Line("private global::KnockOff.Times? _setVerifiableTimes;");
 				w.Line("private int _unconfiguredSetCount;");
@@ -196,6 +198,23 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
+			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then default
+			w.Line("if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)");
+			using (w.Braces())
+			{
+				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.IndexerName} (get)\");");
+				// Repeat last value if enabled (default behavior in non-strict mode)
+				w.Line("if (_getRepeatLastValue && _getSequence.Count > 0)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _getSequence[_getSequence.Count - 1];");
+					w.Line($"tracking.RecordCall({model.KeyExpression});");
+					w.Line($"return callback({model.KeyExpression});");
+				}
+			}
+			w.Line();
+
 			// Priority 2: Repeating OnGet callback
 			w.Line("if (_onGet != null && _onGetTracking != null)");
 			using (w.Braces())
@@ -208,14 +227,6 @@ internal static class IndexerInterceptorRenderer
 			// No callback configured - track unconfigured call
 			w.Line("_unconfiguredGetCount++;");
 			w.Line($"_unconfiguredLastGetKey = {model.KeyExpression};");
-			w.Line();
-
-			// Sequence exhausted in strict mode
-			w.Line("if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)");
-			using (w.Braces())
-			{
-				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.IndexerName} (get)\");");
-			}
 			w.Line();
 
 			// Priority 3: Backing dictionary
@@ -261,6 +272,27 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
+			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then do nothing
+			w.Line("if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)");
+			using (w.Braces())
+			{
+				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.IndexerName} (set)\");");
+				// Repeat last value if enabled (default behavior in non-strict mode)
+				w.Line("if (_setRepeatLastValue && _setSequence.Count > 0)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _setSequence[_setSequence.Count - 1];");
+					w.Line($"tracking.RecordCall({model.KeyExpression}, value);");
+					w.Line($"callback({model.KeyExpression}, value);");
+					w.Line("return;");
+				}
+				// Store in Backing (only reached when _repeatLastValue is false via ThenDefault())
+				w.Line($"Backing[{model.KeyExpression}] = value;");
+				w.Line("return;");
+			}
+			w.Line();
+
 			// Priority 2: Repeating OnSet callback
 			w.Line("if (_onSet != null && _onSetTracking != null)");
 			using (w.Braces())
@@ -274,16 +306,6 @@ internal static class IndexerInterceptorRenderer
 			// No callback configured - track unconfigured call
 			w.Line("_unconfiguredSetCount++;");
 			w.Line($"_unconfiguredLastSetEntry = ({model.KeyExpression}, value);");
-			w.Line();
-
-			// Sequence exhausted in strict mode
-			w.Line("if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)");
-			using (w.Braces())
-			{
-				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.IndexerName} (set)\");");
-				w.Line($"Backing[{model.KeyExpression}] = value;");
-				w.Line("return;");
-			}
 			w.Line();
 
 			// Priority 3: Source (if available)
@@ -743,6 +765,15 @@ internal static class IndexerInterceptorRenderer
 				w.Line("_interceptor._getVerifiableTimes = null;");
 				w.Line("return this;");
 			}
+			w.Line();
+
+			// ThenDefault() - terminates sequence with default(T) after exhaustion
+			w.Line("/// <summary>Terminates sequence with default(T) after exhaustion instead of repeating last value.</summary>");
+			w.Line("public void ThenDefault()");
+			using (w.Braces())
+			{
+				w.Line("_interceptor._getRepeatLastValue = false;");
+			}
 		}
 		w.Line();
 	}
@@ -801,6 +832,15 @@ internal static class IndexerInterceptorRenderer
 				w.Line("_interceptor._isSetVerifiable = true;");
 				w.Line("_interceptor._setVerifiableTimes = null;");
 				w.Line("return this;");
+			}
+			w.Line();
+
+			// ThenDefault() - terminates sequence with default after exhaustion (do nothing for setters)
+			w.Line("/// <summary>Terminates sequence after exhaustion instead of repeating last callback (do nothing after exhaustion).</summary>");
+			w.Line("public void ThenDefault()");
+			using (w.Braces())
+			{
+				w.Line("_interceptor._setRepeatLastValue = false;");
 			}
 		}
 		w.Line();

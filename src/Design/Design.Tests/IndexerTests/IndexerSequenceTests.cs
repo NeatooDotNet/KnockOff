@@ -28,14 +28,32 @@ public class IndexerSequenceTests
     }
 
     [Fact]
-    public void ThenGet_ExhaustsAfterAllCallbacks()
+    public void ThenGet_RepeatsLastValueAfterExhaustion()
     {
-        // ACTUAL BEHAVIOR: Sequences do NOT repeat the last callback.
-        // After all callbacks are consumed, unconfigured gets return default.
+        // ACTUAL BEHAVIOR: Sequences repeat the last callback (NSubstitute-like).
+        // Use ThenDefault() to return default(T) after exhaustion instead.
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
 
         stub.Indexer.OnGet(k => 1)
             .ThenGet(k => 999);
+
+        Design.Domain.Entities.ICollection<string, int> collection = stub;
+
+        Assert.Equal(1, collection["x"]); // First callback
+        Assert.Equal(999, collection["x"]); // Second callback
+        Assert.Equal(999, collection["x"]); // Repeats last value
+        Assert.Equal(999, collection["x"]); // Still repeats
+    }
+
+    [Fact]
+    public void ThenDefault_ReturnsDefaultAfterExhaustion()
+    {
+        // ThenDefault() causes sequence to return default(T) after exhaustion
+        var stub = new IndexerSequencesDemo.Stubs.ICollection();
+
+        stub.Indexer.OnGet(k => 1)
+            .ThenGet(k => 999)
+            .ThenDefault();
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
 
@@ -79,15 +97,35 @@ public class IndexerSequenceTests
     }
 
     [Fact]
-    public void ThenSet_ExhaustsAfterAllCallbacks()
+    public void ThenSet_RepeatsLastCallbackAfterExhaustion()
     {
-        // ACTUAL BEHAVIOR: Sequences do NOT repeat the last callback.
-        // After all callbacks are consumed, sets are not tracked.
+        // ACTUAL BEHAVIOR: Sequences repeat the last callback (NSubstitute-like).
+        // Use ThenDefault() to skip callbacks after exhaustion instead.
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
         var log = new List<string>();
 
         stub.Indexer.OnSet((k, v) => log.Add($"First: {k}={v}"))
             .ThenSet((k, v) => log.Add($"Final: {k}={v}"));
+
+        Design.Domain.Entities.ICollection<string, int> collection = stub;
+
+        collection["a"] = 1;
+        collection["b"] = 2;
+        collection["c"] = 3; // Repeats last callback
+
+        Assert.Equal(["First: a=1", "Final: b=2", "Final: c=3"], log);
+    }
+
+    [Fact]
+    public void ThenSet_ThenDefault_SkipsAfterExhaustion()
+    {
+        // ThenDefault() causes sequence to skip callbacks after exhaustion
+        var stub = new IndexerSequencesDemo.Stubs.ICollection();
+        var log = new List<string>();
+
+        stub.Indexer.OnSet((k, v) => log.Add($"First: {k}={v}"))
+            .ThenSet((k, v) => log.Add($"Final: {k}={v}"))
+            .ThenDefault();
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
 

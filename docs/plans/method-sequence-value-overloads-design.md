@@ -2,7 +2,7 @@
 
 **Date:** 2026-02-01
 **Related Todo:** [Method Sequence Value Overloads](../todos/method-sequence-value-overloads.md)
-**Status:** Under Review (Developer)
+**Status:** Complete
 **Last Updated:** 2026-02-01
 
 ---
@@ -280,37 +280,275 @@ No new diagnostics needed. Invalid cases (void, ref/out) simply don't get `ThenR
 
 ## Developer Review
 
-[Developer adds concerns/questions here during review phase]
+**Status:** Approved
+**Reviewed:** 2026-02-01
 
-**Status:** Not Started
+### My Understanding of This Plan
 
-**Concerns:** [List any issues found, or "None - ready for implementation"]
+**Core Change:** Add `ThenReturns(TValue value)` method to generated `MethodSequenceImpl` and `MethodCallBuilderImpl` classes to enable value-based method sequence chaining.
+
+**User-Facing API:** `stub.Method.Returns(v1).ThenReturns(v2)` and `stub.Method.OnCall(cb).ThenReturns(v)`
+
+**Internal Changes:** Modify `RenderMethodSequenceImpl` and `RenderMethodCallBuilderImpl` in `MethodInterceptorRenderer.cs`
+
+**Patterns Affected:** All four (Standalone, Inline Interface, Inline Class, Delegate) - same renderer
+
+### Codebase Investigation
+
+**Files Examined:**
+- `/home/keithvoels/neatoodotnet/KnockOff/src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Confirmed `RenderMethodSequenceImpl` (lines 1466-1550) and `RenderMethodCallBuilderImpl` (lines 1295-1460) are the target functions. Helper methods `GetAsyncTypeInfo` and `GetVoidAsyncInfo` exist and can be reused.
+- `/home/keithvoels/neatoodotnet/KnockOff/src/Generator/Renderer/Shared/PropertyInterceptorRenderer.cs` - Confirmed reference pattern at lines 951-953: `ThenGet({valueType} value) => ThenGet(() => value);`
+- `/home/keithvoels/neatoodotnet/KnockOff/src/KnockOff/IMethodSequence.cs` - Confirmed interface has only `ThenCall`, no value overload (by design)
+- `/home/keithvoels/neatoodotnet/KnockOff/src/KnockOff/IMethodCallBuilder.cs` - Confirmed builder interfaces have `ThenCall` returning `IMethodSequence<TCallback>`
+- `/home/keithvoels/neatoodotnet/KnockOff/src/Tests/KnockOffTests/SequenceValueOverloadTests.cs` - Existing test file for property sequence values; good place to add method sequence value tests
+- `/home/keithvoels/neatoodotnet/KnockOff/src/Design/Design.Stubs/Methods/MethodSequences.cs` - Contains "REJECTED PATTERN" at lines 101-106 that will be updated
+
+**Searches Performed:**
+- Searched for `ThenReturns|ThenCall` - found 29 files using these patterns, confirmed no existing `ThenReturns` on method sequences
+- Searched for `RenderMethodCallBuilderImpl` - found it's called for both single-signature (line 311) and overloads (line 549)
+- Searched for `HasRefOrOutParameters` - confirmed it's used throughout to exclude ref/out methods from value overloads
+
+**Discrepancies Found:** None - plan accurately reflects codebase structure
+
+### Structured Question Checklist
+
+**Completeness Questions:**
+- [x] All four patterns addressed (Standalone, Inline Interface, Inline Class, Delegate) - Yes, all use same `MethodInterceptorRenderer`
+- [x] What happens with null/empty/default values - Plan mentions null case in Risks section
+- [x] What happens with generic type parameters - Plan addresses generic methods in Edge Cases
+- [x] What happens with nested types or inherited members - N/A, method interceptors handle this
+- [x] Interaction with existing features - Sequences integrate with existing OnCall/ThenCall, verification, When chains
+
+**Correctness Questions:**
+- [x] Do generated code examples compile - Yes, follows existing pattern from property sequences
+- [x] Is implementation consistent with existing patterns - Yes, mirrors `PropertyGetSequenceImpl.ThenGet(value)`
+- [x] Are model/builder/renderer responsibilities correct - Yes, renderer generates, no model changes needed
+- [x] Breaking changes migration path - N/A, purely additive
+
+**Clarity Questions:**
+- [x] Can I implement without clarifying questions - Yes
+- [x] Ambiguous requirements - None found
+- [x] Edge cases explicitly handled - Yes, void/ref/out exclusions documented
+- [x] Test strategy specific enough - Yes, test names provided
+
+**Risk Questions:**
+- [x] What could go wrong - Overload resolution with null (documented in plan)
+- [x] Which existing tests might fail - None, purely additive
+- [x] Performance implications - None, trivial wrapper method
+- [x] Backward compatibility concerns - None, additive change
+
+### Devil's Advocate Analysis
+
+**Edge cases NOT explicitly covered:**
+1. **Methods returning `IAsyncEnumerable<T>`** - Not covered but acceptable; this is a separate async pattern from Task/ValueTask and likely out of scope
+2. **Nullable value types** - `int?` return type should work but not explicitly tested in plan
+
+**Ways this could break existing functionality:**
+1. No concerns - purely additive, existing `ThenCall` unchanged
+
+**Ways users could misunderstand the API:**
+1. Already addressed in plan - `ThenReturns` vs `ThenCall` naming makes intent clear
+
+### Why This Plan Is Exceptionally Clear
+
+This plan is well-structured and complete because:
+1. The design directly mirrors an existing proven pattern (`PropertyGetSequenceImpl.ThenGet(value)`)
+2. All helper methods needed already exist (`GetAsyncTypeInfo`, `GetVoidAsyncInfo`, `HasRefOrOutParameters`)
+3. The exclusion criteria (void, ref/out, void-async) match existing `Returns(value)` logic
+4. The two target functions are clearly identified with exact line numbers
+5. Test cases are enumerated with descriptive names
+6. Edge cases are explicitly documented
+
+### Review Summary
+
+- Files examined: 6
+- Questions checked: 16 of 16
+- Devil's advocate items: 3 generated, 1 already addressed in plan, 2 acceptable as out-of-scope
+
+### Concerns
+
+None - ready for implementation
 
 ---
 
 ## Implementation Contract
 
-[Developer fills before starting implementation]
+**Created:** 2026-02-01
+**Approved by:** knockoff-developer
 
-**In Scope:**
-- [ ] File changes listed
-- [ ] Test cases listed
+### In Scope
 
-**Out of Scope:**
-[Explicitly list what will NOT be changed]
+**Phase 1: Generator Changes** - COMPLETE
+- [x] `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs`:
+  - [x] Modify `RenderMethodSequenceImpl` to add `ThenReturns(TValue value)` method
+  - [x] Add check: only generate if `!isVoid && !hasRefOrOut`
+  - [x] Handle sync case: `ThenReturns({valueType} value) => ThenCall({discards} => value);`
+  - [x] Handle Task<T> case: `ThenReturns({innerType} value) => ThenCall({discards} => Task.FromResult(value));`
+  - [x] Handle ValueTask<T> case: `ThenReturns({innerType} value) => ThenCall({discards} => new ValueTask<{innerType}>(value));`
+  - [x] Modify `RenderMethodCallBuilderImpl` to add `ThenReturns(TValue value)` method
+  - [x] Same async wrapping logic as above
+  - [x] **Checkpoint: Build solution, verify no compile errors** - All 12 test projects built successfully
+
+**Phase 2: Tests** - COMPLETE
+- [x] `src/Tests/KnockOffTests/SequenceValueOverloadTests.cs`:
+  - [x] Add `OnCall_ThenReturns_ReturnsSequence` test
+  - [x] Add `OnCall_ThenReturns_MixedSequence` test
+  - [x] Add `AsyncMethod_ThenReturns_AutoWraps` test
+  - [x] Add `ValueTaskMethod_ThenReturns_AutoWraps` test
+  - [x] Add `ThenReturns_TracksCorrectly` test (verify sequence.Verify() works)
+  - [x] Add `ThenReturns_SequenceExhaustion_ReturnsDefaultInNonStrictMode` test
+  - [x] Add `ThenReturns_SequenceExhaustion_ThrowsInStrictMode` test
+  - [x] Add `ThenReturns_NullValue_WorksCorrectly` test
+  - [x] **Checkpoint: Run all tests, all pass** - 27 sequence tests pass
+
+**Phase 3: Documentation** - COMPLETE
+- [x] `src/Design/Design.Stubs/Methods/MethodSequences.cs`:
+  - [x] Remove "REJECTED PATTERN" notes
+  - [x] Add `ThenReturns_CreatesSequenceOfValues()` example showing value sequences
+  - [x] Add `MixedSequence_CallbacksAndValues()` example showing mixed sequences
+- [x] `src/Design/Design.Tests/MethodTests/MethodSequenceTests.cs`:
+  - [x] Add `ThenReturns_CreatesValueSequence` test
+  - [x] Add `ThenReturns_MixedWithThenCall` test
+  - [x] Add `ThenReturns_Verify_Works` test
+  - [x] **Checkpoint: Build Design projects, run Design tests** - 118 Design tests pass
+
+### Explicitly Out of Scope
+
+- **IAsyncEnumerable<T> support** - Different async pattern, future enhancement
+- **Interface changes** - `IMethodSequence<TCallback>` unchanged; value overload is generated only
+- **IMethodCallBuilder interface changes** - Same reasoning; generated method only
+- **Indexer sequences** - Indexers don't have method sequences (different API)
+- **Event sequences** - Events don't have method sequences
+
+### Verification Gates
+
+1. **After Phase 1:** Solution builds without errors. Generated code for a test stub shows `ThenReturns` method on `MethodSequenceImpl` and `MethodCallBuilderImpl`.
+
+2. **After Phase 2:** All existing tests pass. New tests pass. Test coverage includes sync, Task<T>, ValueTask<T>, null values, mixed sequences, and sequence exhaustion.
+
+3. **Final:** All tests pass. Design project builds and tests pass. No regressions.
+
+### Stop Conditions
+
+If any of these occur, STOP and report:
+- Out-of-scope test fails unexpectedly
+- Architectural contradiction discovered (e.g., delegate type structure prevents implementation)
+- Generated code does not compile for any pattern
 
 ---
 
 ## Implementation Progress
 
-[Track progress through phases]
+**Started:** 2026-02-01
+**Developer:** knockoff-developer
+
+### Phase 1: Generator Changes - COMPLETE
+
+**Changes made to `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs`:**
+
+1. Added `parameterCount` parameter to `RenderMethodSequenceImpl` and `RenderMethodCallBuilderImpl` functions
+2. Added `BuildDiscardLambdaPrefix` helper method to generate correct discard patterns:
+   - 0 params: `()`
+   - 1 param: `(_)`
+   - 2 params: `(_, _)`
+3. Added `ThenReturns(TValue value)` method generation in both:
+   - `RenderMethodSequenceImpl` (after ThenCall)
+   - `RenderMethodCallBuilderImpl` (after ThenCall)
+4. Correctly handles sync, Task<T>, and ValueTask<T> return types
+5. Correctly excludes void methods and methods with ref/out parameters
+
+**Verification:**
+- Solution builds without errors (0 warnings, 0 errors)
+- All 956 tests pass on net10.0, 956 on net9.0, 955 on net8.0
+- Generated code verified to show correct `ThenReturns` methods with proper discard patterns
+
+### Phase 2: Tests - COMPLETE
+
+**Changes made to `src/Tests/KnockOffTests/SequenceValueOverloadTests.cs`:**
+
+1. Added 8 new tests for `ThenReturns` functionality:
+   - `OnCall_ThenReturns_ReturnsSequence` - Basic value sequence
+   - `OnCall_ThenReturns_MixedSequence` - Mix callbacks and values
+   - `AsyncMethod_ThenReturns_AutoWraps` - Task<T> auto-wrapping
+   - `ValueTaskMethod_ThenReturns_AutoWraps` - ValueTask<T> auto-wrapping
+   - `ThenReturns_TracksCorrectly` - Verification works
+   - `ThenReturns_SequenceExhaustion_ReturnsDefaultInNonStrictMode` - Exhaustion behavior
+   - `ThenReturns_SequenceExhaustion_ThrowsInStrictMode` - Strict mode exhaustion
+   - `ThenReturns_NullValue_WorksCorrectly` - Null value handling
+
+2. Added `IValueTaskMethodService` interface and `ValueTaskMethodKnockOff` stub for ValueTask testing
+
+**Bug Fix During Phase 2:**
+
+Fixed double-counting bug in `TotalCallCount` when elevating to sequence mode:
+- Added `_onCallTracking = null` in `ThenCall` elevation logic
+- Without this fix, the same tracking object was counted twice (once via `_onCallTracking` field, once in sequence)
+
+### Phase 3: Documentation - COMPLETE
+
+**Changes made to `src/Design/Design.Stubs/Methods/MethodSequences.cs`:**
+
+1. Removed "REJECTED PATTERN" documentation for `Returns().ThenReturns()`
+2. Added `ThenReturns_CreatesSequenceOfValues()` example
+3. Added `MixedSequence_CallbacksAndValues()` example
+4. Updated header to mention `OnCall().ThenReturns()` pattern
+
+**Changes made to `src/Design/Design.Tests/MethodTests/MethodSequenceTests.cs`:**
+
+1. Added `ThenReturns_CreatesValueSequence` test
+2. Added `ThenReturns_MixedWithThenCall` test
+3. Added `ThenReturns_Verify_Works` test
 
 ---
 
 ## Completion Evidence
 
-[Required before marking complete]
+**Completed:** 2026-02-01
 
-- **Tests Passing:** [Output or screenshot]
-- **Generated Code Sample:** [Snippet showing feature works]
-- **All Checklist Items:** [Confirmed 100% complete]
+### Test Results
+
+All tests pass across all target frameworks:
+
+```
+KnockOffTests.dll:
+- net8.0:  963 passed
+- net9.0:  964 passed
+- net10.0: 964 passed
+
+Design.Tests.dll:
+- net8.0:  118 passed
+- net9.0:  118 passed
+- net10.0: 118 passed
+
+SequenceValueOverloadTests: 27 tests pass (including 8 new ThenReturns tests)
+```
+
+### Generated Code Sample
+
+From `SampleKnockOff.g.cs` - GetOptional interceptor:
+
+```csharp
+public sealed class MethodSequenceImpl : global::KnockOff.IMethodSequence<GetOptionalDelegate>
+{
+    // Adds a value to the sequence. The value is returned exactly once.
+    public MethodSequenceImpl ThenReturns(string? value) => ThenCall(() => value);
+
+    // ... other methods
+}
+
+public sealed class MethodCallBuilderImpl : global::KnockOff.IMethodCallBuilder<GetOptionalDelegate>
+{
+    // Elevates to sequence mode and adds a value. Returns sequence for further chaining.
+    public MethodSequenceImpl ThenReturns(string? value) => ThenCall(() => value);
+
+    // ... other methods
+}
+```
+
+### All Checklist Items
+
+- [x] Phase 1: Generator Changes - COMPLETE
+- [x] Phase 2: Tests - COMPLETE
+- [x] Phase 3: Documentation - COMPLETE
+- [x] All verification gates passed
+- [x] No stop conditions triggered

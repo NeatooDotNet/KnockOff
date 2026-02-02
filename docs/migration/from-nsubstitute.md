@@ -91,7 +91,7 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 | `.DidNotReceive()` | `tracking.Verify(Times.Never)` |
 | `Arg.Any<T>()` | Callback receives all arguments (default behavior) |
 | `Arg.Is<T>(predicate)` | `stub.Method.When((args) => predicate).Returns(value)` |
-| `.Returns(v1, v2, v3)` | `stub.Method.OnCall(() => v1).ThenCall(() => v2).ThenCall(() => v3)` |
+| `.Returns(v1, v2, v3)` | `stub.Method.Returns(v1, v2, v3)` (identical syntax) |
 | `.ClearReceivedCalls()` | `stub.Method.Reset()` |
 | `sub.Property.Returns(value)` | `stub.Property.OnGet(value)` |
 
@@ -1299,24 +1299,40 @@ stub.SaveUser.OnCall((user) => { captured = user; });
 
 ### Multiple Return Values (Sequences)
 
-NSubstitute can return different values for sequential calls:
+KnockOff now supports identical syntax to NSubstitute for sequences:
+
+**NSubstitute:**
 
 ```csharp
-// NSubstitute
-sub.GetUser(1).Returns(user1, user2, user3);
+substitute.GetUser(1).Returns(user1, user2, user3);
+substitute.GetUser(1); // user1
+substitute.GetUser(1); // user2
+substitute.GetUser(1); // user3
+substitute.GetUser(1); // user3 (repeats last)
 ```
 
-KnockOff uses `ThenCall()` chaining:
+**KnockOff (identical syntax):**
 
 ```csharp
-// KnockOff - ThenCall sequence
-stub.GetUser
-    .OnCall((id) => user1)
-    .ThenCall((id) => user2)
-    .ThenCall((id) => user3);
+stub.GetUser.Returns(user1, user2, user3);
+stub.GetUser(1); // user1
+stub.GetUser(1); // user2
+stub.GetUser(1); // user3
+stub.GetUser(1); // user3 (repeats last)
 ```
 
-**Key difference:** NSubstitute's sequence repeats the last value forever. KnockOff's sequence exhausts and returns `default(T)` in non-strict mode (or throws in strict mode).
+**Key difference:** Drop the `()` after the method name. Otherwise identical.
+
+Both frameworks repeat the last value after sequence exhaustion.
+
+**Advanced capability:** KnockOff also supports adding to sequences with computed values:
+
+```csharp
+// Start with computed values, then add fixed values
+stub.GetUser.OnCall((id) => ComputeUser(id)).ThenReturns(user2, user3);
+```
+
+**KnockOff extension:** Use `ThenDefault()` to explicitly return `default(T)` after exhaustion instead of repeating (NSubstitute has no equivalent). In strict mode, sequences throw `StubException.SequenceExhausted` on exhaustion.
 
 ---
 
@@ -1351,4 +1367,4 @@ KnockOff earns its place when:
 
 ---
 
-**UPDATED:** 2026-01-30
+**UPDATED:** 2026-02-02

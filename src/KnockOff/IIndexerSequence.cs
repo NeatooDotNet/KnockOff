@@ -28,6 +28,11 @@ public interface IIndexerGetSequence<TKey, TValue>
     /// Returns this for fluent chaining.
     /// </summary>
     IIndexerGetSequence<TKey, TValue> Verifiable();
+
+    /// <summary>
+    /// Terminates sequence with default(T) after exhaustion instead of repeating last value.
+    /// </summary>
+    void ThenDefault();
 }
 
 /// <summary>
@@ -58,4 +63,9 @@ public interface IIndexerSetSequence<TKey, TValue>
     /// Returns this for fluent chaining.
     /// </summary>
     IIndexerSetSequence<TKey, TValue> Verifiable();
+
+    /// <summary>
+    /// Terminates sequence with default(T) after exhaustion instead of repeating last value.
+    /// </summary>
+    void ThenDefault();
 }

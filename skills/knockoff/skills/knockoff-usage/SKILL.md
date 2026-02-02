@@ -12,15 +12,21 @@ KnockOff is a Roslyn Source Generator that creates test stubs at compile time. S
 
 **Read this section first to avoid common mistakes.**
 
-### 1. Sequences EXHAUST - They Do NOT Repeat
+### 1. Sequences REPEAT Last Value After Exhaustion
 
-Sequences return `default` after all callbacks are consumed:
+Sequences repeat the last value after exhaustion (matching NSubstitute):
 
 ```cs
-stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 999);
+stub.Add.Returns(1, 999);
 calc.Add(0, 0); // Returns 1
 calc.Add(0, 0); // Returns 999
-calc.Add(0, 0); // Returns 0 (default - EXHAUSTED, not 999!)
+calc.Add(0, 0); // Returns 999 (repeats last value!)
+
+// Use ThenDefault() to return default(T) instead of repeating
+stub.Add.Returns(1, 999).ThenDefault();
+calc.Add(0, 0); // Returns 1
+calc.Add(0, 0); // Returns 999
+calc.Add(0, 0); // Returns 0 (default - ThenDefault() terminates with default)
 ```
 
 ### 2. Events Use Handler Property - No Raise() Method
@@ -190,14 +196,19 @@ stub.GetUserAsync.OnCall((id) => new User { Id = id });  // Returns Task<User>
 stub.SaveAsync.OnCall((user) => { });  // Returns Task.CompletedTask
 ```
 
-### Sequences with ThenCall()
+### Sequences (NSubstitute-style)
 
 ```cs
-stub.GetNext
-    .OnCall(() => "first")
-    .ThenCall(() => "second")
-    .ThenCall(() => "third");
-// After third call, returns default (exhausts)
+// Concise value sequences (preferred)
+stub.GetNext.Returns("first", "second", "third");
+// After third call, repeats "third" (NSubstitute-like behavior)
+
+// Mix callbacks with value sequences
+stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
+// First: computed, then 100, 200, 200...
+
+// Use ThenDefault() to return default(T) instead of repeating:
+stub.GetNext.Returns("first", "second").ThenDefault();
 ```
 
 ### When() - Argument Matching
@@ -436,16 +447,21 @@ public delegate string MyOperation(int value);
 [KnockOff<MyOperation>]
 ```
 
-### Expecting Sequences to Repeat
+### Expecting Sequences to Return Default After Exhaustion
 
 ```cs
-// WRONG assumption: Last value repeats
-stub.GetNext.OnCall(() => 1).ThenCall(() => 2);
-// After 2 calls, returns 0 (default), NOT 2
+// Sequences repeat last value by default (NSubstitute-like behavior)
+stub.GetNext.Returns(1, 2);
+// After 2 calls, returns 2 (repeats last value)
 
-// RIGHT: If you need infinite, use OnCall with state
-var counter = 0;
-stub.GetNext.OnCall(() => ++counter);
+// Use ThenDefault() to return default(T) instead of repeating
+stub.GetNext.Returns(1, 2).ThenDefault();
+// After 2 calls, returns 0 (default)
+
+// Use Strict mode to throw when sequence exhausted
+stub.Strict = true;
+stub.GetNext.Returns(1, 2);
+// Third call throws StubException.SequenceExhausted
 ```
 
 ---
@@ -463,4 +479,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-01
+**UPDATED:** 2026-02-02

@@ -22,6 +22,11 @@ public interface IMethodSequence
     /// Returns this for fluent chaining.
     /// </summary>
     IMethodSequence Verifiable();
+
+    /// <summary>
+    /// Terminates sequence with default(T) after exhaustion instead of repeating last value.
+    /// </summary>
+    void ThenDefault();
 }
 
 /// <summary>

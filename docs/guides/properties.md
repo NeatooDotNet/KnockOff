@@ -288,6 +288,8 @@ When you need a property to return different values on successive reads, use `On
 
 **Value overloads:** Both `OnGet(value)` and `ThenGet(value)` accept static values as shorthand for callback syntax. Use whichever reads better for your scenario.
 
+**Sequence exhaustion:** After returning all values in the sequence, subsequent reads repeat the last value. Use `ThenDefault()` to return `default(T)` after exhaustion instead.
+
 <!-- snippet: properties-ongetsequence-value -->
 ```cs
 [Fact]
@@ -340,6 +342,64 @@ public void OnGet_ThenGet_ReturnsDifferentValuesOnSuccessiveReads()
 - Simulating changing state over time
 - Testing retry logic that checks status repeatedly
 - Verifying behavior with different data on successive calls
+
+### Sequence Exhaustion Behavior
+
+After a sequence returns all configured values, subsequent reads **repeat the last value** by default. This matches NSubstitute's behavior and works well for most test scenarios.
+
+<!-- snippet: properties-sequence-exhaustion -->
+```cs
+[Fact]
+public void Sequence_ExhaustionRepeatsLastValue()
+{
+    var stub = new ConfigPropsStub();
+
+    // Configure a sequence of three values
+    stub.Name.OnGet("first")
+        .ThenGet("second")
+        .ThenGet("third");
+
+    IConfigProps config = stub;
+
+    // Each read advances through the sequence
+    Assert.Equal("first", config.Name);
+    Assert.Equal("second", config.Name);
+    Assert.Equal("third", config.Name);
+
+    // After exhaustion, repeats the last value
+    Assert.Equal("third", config.Name);
+    Assert.Equal("third", config.Name);
+}
+```
+<!-- endSnippet -->
+
+To return `default(T)` after exhaustion instead of repeating the last value, chain `.ThenDefault()` at the end of the sequence:
+
+<!-- snippet: properties-sequence-thendefault -->
+```cs
+[Fact]
+public void Sequence_ThenDefault_ReturnsDefaultAfterExhaustion()
+{
+    var stub = new ConfigPropsStub();
+
+    // ThenDefault() changes exhaustion behavior
+    stub.Name.OnGet("first")
+        .ThenGet("second")
+        .ThenDefault();
+
+    IConfigProps config = stub;
+
+    Assert.Equal("first", config.Name);
+    Assert.Equal("second", config.Name);
+
+    // After exhaustion, returns default (null for string)
+    Assert.Null(config.Name);
+    Assert.Null(config.Name);
+}
+```
+<!-- endSnippet -->
+
+**Note:** In strict mode (`stub.Strict = true`), accessing an exhausted sequence throws `StubException` instead of repeating the last value.
 
 ### Setter Sequences
 
@@ -590,4 +650,4 @@ public void CompletePropertyExample_AllConfigurationApproaches()
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-02

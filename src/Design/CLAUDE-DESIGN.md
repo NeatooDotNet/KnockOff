@@ -60,13 +60,22 @@ src/Design/Design.Stubs/
 
 ## Key Behavioral Gotchas
 
-### 1. Sequences Exhaust
+### 1. Sequences Repeat Last Value
 
-Sequences do NOT repeat the last callback. They exhaust:
+Sequences REPEAT the last callback after exhaustion (NSubstitute-like):
 
 ```csharp
-// After 2 calls, returns default (not 999 forever)
+// After 2 calls, repeats 999 forever
 stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 999);
+// Call 1: 1, Call 2: 999, Call 3+: 999
+
+// Use ThenDefault() to return default(T) instead of repeating
+stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 999).ThenDefault();
+// Call 1: 1, Call 2: 999, Call 3+: 0 (default)
+
+// Strict mode always throws on exhaustion
+stub.Strict = true;
+// Call 3 throws StubException.SequenceExhausted
 ```
 
 ### 2. Events Use Handler Property

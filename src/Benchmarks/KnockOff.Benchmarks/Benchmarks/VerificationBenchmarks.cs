@@ -21,8 +21,10 @@ public class VerificationBenchmarks
     private Mock<ICalculator> _moqCalculator = null!;
     private CalculatorStub _knockOffCalculator = null!;
     private ICalculatorCreateExpectations _rocksCalculator = null!;
+    #pragma warning disable CA1859 // Use concrete types when possible for improved performance
     private IMethodTracking _knockOffSimpleTracking = null!;
     private IMethodTrackingArgs<(int? a, int? b)> _knockOffCalculatorTracking = null!;
+#pragma warning restore CA1859
 
     [GlobalSetup]
     public void Setup()

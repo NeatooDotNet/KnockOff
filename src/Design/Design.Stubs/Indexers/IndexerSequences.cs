@@ -46,7 +46,7 @@ public partial class IndexerSequencesDemo
         var r1 = collection["hello"]; // 5 (first callback: length)
         var r2 = collection["world"]; // 100 (second callback)
         var r3 = collection["foo"];   // 999 (third callback)
-        var r4 = collection["bar"];   // 0 (sequence exhausted, returns default)
+        var r4 = collection["bar"];   // 999 (repeats last value)
     }
 
     // =========================================================================
@@ -70,7 +70,32 @@ public partial class IndexerSequencesDemo
         collection["a"] = 1; // log: ["First: a=1"]
         collection["b"] = 2; // log: [..., "Second: b=2"]
         collection["c"] = 3; // log: [..., "Final: c=3"]
-        collection["d"] = 4; // No callback - sequence exhausted
+        collection["d"] = 4; // log: [..., "Final: d=4"] (repeats last callback)
+    }
+
+    // =========================================================================
+    // ThenDefault() - Explicit Default Termination
+    // =========================================================================
+    // DESIGN DECISION: ThenDefault() configures the sequence to return default(T)
+    // after exhaustion instead of repeating the last value.
+    //
+    // This is useful when tests need to detect or handle exhaustion explicitly.
+    // =========================================================================
+
+    public void ThenDefault_ReturnsDefaultAfterExhaustion()
+    {
+        var stub = new Stubs.ICollection();
+
+        stub.Indexer.OnGet((k) => k.Length)
+            .ThenGet((k) => 100)
+            .ThenDefault();  // Return default after exhaustion
+
+        ICollection<string, int> collection = stub;
+
+        var r1 = collection["hello"]; // 5 (first callback: length)
+        var r2 = collection["world"]; // 100 (second callback)
+        var r3 = collection["foo"];   // 0 (default - sequence exhausted)
+        var r4 = collection["bar"];   // 0 (still default)
     }
 
     // =========================================================================

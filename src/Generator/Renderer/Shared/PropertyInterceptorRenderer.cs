@@ -61,6 +61,7 @@ internal static class PropertyInterceptorRenderer
 		w.Line("private PropertyGetBuilderImpl? _onGetTracking;");
 		w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetBuilderImpl Tracking)>? _getSequence;");
 		w.Line("private int _getSequenceIndex;");
+		w.Line("private bool _getRepeatLastValue = true;");
 		w.Line();
 
 		// Verifiable state (for getter)
@@ -175,6 +176,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line("private PropertyGetBuilderImpl? _onGetTracking;");
 			w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetBuilderImpl Tracking)>? _getSequence;");
 			w.Line("private int _getSequenceIndex;");
+			w.Line("private bool _getRepeatLastValue = true;");
 			w.Line("private bool _isGetVerifiable;");
 			w.Line("private global::KnockOff.Times? _getVerifiableTimes;");
 			w.Line("private int _unconfiguredGetCount;");
@@ -188,6 +190,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line("private PropertySetBuilderImpl? _onSetTracking;");
 			w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ValueType}> Callback, PropertySetBuilderImpl Tracking)>? _setSequence;");
 			w.Line("private int _setSequenceIndex;");
+			w.Line("private bool _setRepeatLastValue = true;");
 			w.Line("private bool _isSetVerifiable;");
 			w.Line("private global::KnockOff.Times? _setVerifiableTimes;");
 			w.Line("private int _unconfiguredSetCount;");
@@ -330,11 +333,21 @@ internal static class PropertyInterceptorRenderer
 			w.Line("_unconfiguredGetCount++;");
 			w.Line();
 
-			// Sequence exhausted in strict mode
+			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then default
 			w.Line("if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)");
 			using (w.Braces())
 			{
+				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.PropertyName} (get)\");");
+				// Repeat last value if enabled (default behavior in non-strict mode)
+				w.Line("if (_getRepeatLastValue && _getSequence.Count > 0)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _getSequence[_getSequence.Count - 1];");
+					w.Line("tracking.RecordCall();");
+					w.Line("return callback();");
+				}
+				// Return fallback value (only reached when _repeatLastValue is false via ThenDefault())
 				// Init-only: return _value (set by init setter)
 				// Regular with setter: return backing value if set, otherwise default
 				// Getter-only: use smart default (from DefaultExpression)
@@ -423,11 +436,22 @@ internal static class PropertyInterceptorRenderer
 			w.Line("_unconfiguredLastSetValue = value;");
 			w.Line();
 
-			// Sequence exhausted in strict mode
+			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then do nothing
 			w.Line("if (_setSequence != null && _setSequenceIndex >= _setSequence.Count)");
 			using (w.Braces())
 			{
+				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
 				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.PropertyName} (set)\");");
+				// Repeat last callback if enabled (default behavior in non-strict mode)
+				w.Line("if (_setRepeatLastValue && _setSequence.Count > 0)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _setSequence[_setSequence.Count - 1];");
+					w.Line("tracking.RecordCall(value);");
+					w.Line("callback(value);");
+					w.Line("return;");
+				}
+				// Do nothing (only reached when _repeatLastValue is false via ThenDefault())
 				w.Line("return;");
 			}
 			w.Line();
@@ -814,6 +838,36 @@ internal static class PropertyInterceptorRenderer
 			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet({valueType} value) => ThenGet(() => value);");
 			w.Line();
 
+			// ThenGet(params values) - adds multiple values to sequence
+			w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(params {valueType}[] values)");
+			using (w.Braces())
+			{
+				w.Line("if (values.Length == 0)");
+				using (w.Braces())
+				{
+					// Elevate to sequence mode without adding any new values (same as ThenGet elevation)
+					w.Line("if (_interceptor._getSequence == null)");
+					using (w.Braces())
+					{
+						w.Line($"_interceptor._getSequence = new global::System.Collections.Generic.List<(global::System.Func<{valueType}> Callback, PropertyGetBuilderImpl Tracking)>();");
+						w.Line("_interceptor._getSequence.Add((_interceptor._onGet!, this));");
+						w.Line("_interceptor._onGet = null;");
+						w.Line("_interceptor._onGetTracking = null;");
+						w.Line("_interceptor._getSequenceIndex = 0;");
+					}
+					w.Line("return new PropertyGetSequenceImpl(_interceptor);");
+				}
+				w.Line("var seq = ThenGet(values[0]);");
+				w.Line("for (int i = 1; i < values.Length; i++)");
+				using (w.Braces())
+				{
+					w.Line("seq = seq.ThenGet(values[i]);");
+				}
+				w.Line("return seq;");
+			}
+			w.Line();
+
 			w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
 			w.Line($"public global::KnockOff.IPropertyGetBuilder<{valueType}> Verifiable()");
 			using (w.Braces())
@@ -953,6 +1007,20 @@ internal static class PropertyInterceptorRenderer
 			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet({valueType} value) => ThenGet(() => value);");
 			w.Line();
 
+			// ThenGet(params values) - adds multiple values to sequence
+			w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(params {valueType}[] values)");
+			using (w.Braces())
+			{
+				w.Line("foreach (var value in values)");
+				using (w.Braces())
+				{
+					w.Line("ThenGet(value);");
+				}
+				w.Line("return this;");
+			}
+			w.Line();
+
 			w.Line("/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>");
 			w.Line("public void Verify()");
 			using (w.Braces())
@@ -976,6 +1044,15 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_interceptor._isGetVerifiable = true;");
 				w.Line("_interceptor._getVerifiableTimes = null;");
 				w.Line("return this;");
+			}
+			w.Line();
+
+			// ThenDefault() - terminates sequence with default(T) after exhaustion
+			w.Line("/// <summary>Terminates sequence with default(T) after exhaustion instead of repeating last value.</summary>");
+			w.Line("public void ThenDefault()");
+			using (w.Braces())
+			{
+				w.Line("_interceptor._getRepeatLastValue = false;");
 			}
 		}
 		w.Line();
@@ -1033,6 +1110,15 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_interceptor._isSetVerifiable = true;");
 				w.Line("_interceptor._setVerifiableTimes = null;");
 				w.Line("return this;");
+			}
+			w.Line();
+
+			// ThenDefault() - terminates sequence (do nothing) after exhaustion
+			w.Line("/// <summary>Terminates sequence after exhaustion instead of repeating last callback.</summary>");
+			w.Line("public void ThenDefault()");
+			using (w.Braces())
+			{
+				w.Line("_interceptor._setRepeatLastValue = false;");
 			}
 		}
 		w.Line();
