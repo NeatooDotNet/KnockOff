@@ -50,14 +50,15 @@ public partial class ConfigPropsStub : IConfigProps { }
 
 public class StaticValueTests
 {
-    #region properties-value-basic
     [Fact]
     public void Value_SetsPropertyReturnValue()
     {
         var stub = new UserConfigPropsStub();
 
+        #region properties-value-basic
         // Set a static value for the property via the interceptor
         stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+        #endregion
 
         IUserConfigProps config = stub;
         var user = config.CurrentUser;
@@ -65,18 +66,18 @@ public class StaticValueTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 
-    #region properties-value-multiple
     [Fact]
     public void Value_ConfigureMultipleProperties()
     {
         var stub = new UserConfigPropsStub();
 
+        #region properties-value-multiple
         // Configure several properties before test execution
         stub.UserId.OnGet(42);
         stub.Email.OnGet("test@example.com");
         stub.CurrentUser.OnGet(new User { Id = 42, Name = "Test User" });
+        #endregion
 
         IUserConfigProps config = stub;
 
@@ -84,7 +85,6 @@ public class StaticValueTests
         Assert.Equal("test@example.com", config.Email);
         Assert.NotNull(config.CurrentUser);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -93,33 +93,34 @@ public class StaticValueTests
 
 public class DynamicGetterTests
 {
-    #region properties-onget-value-vs-callback
     [Fact]
     public void OnGet_ValueVsCallback()
     {
         var stub = new ConfigPropsStub();
 
+        #region properties-onget-value-vs-callback
         // VALUE: Simple syntax for static values
         stub.Name.OnGet("StaticName");
 
         // CALLBACK: For computed or dynamic values
         stub.Age.OnGet(() => DateTime.Now.Year - 2000);
+        #endregion
 
         IConfigProps config = stub;
 
         Assert.Equal("StaticName", config.Name);
         Assert.True(config.Age >= 0); // Dynamic value
     }
-    #endregion
 
-    #region properties-onget-dynamic
     [Fact]
     public void OnGet_ReturnsComputedValue()
     {
         var stub = new TimeProviderPropsStub();
 
+        #region properties-onget-dynamic
         // OnGet callback returns dynamic value on each access
         stub.Timestamp.OnGet(() => DateTime.UtcNow);
+        #endregion
 
         ITimeProviderProps timeProvider = stub;
 
@@ -130,9 +131,7 @@ public class DynamicGetterTests
         // Each access returns current time
         Assert.True(time2 >= time1);
     }
-    #endregion
 
-    #region properties-onget-stateful
     [Fact]
     public void OnGet_DependsOnOtherInterceptorState()
     {
@@ -141,9 +140,12 @@ public class DynamicGetterTests
         // Track initialization state with local variable
         var isInitialized = false;
 
+        #region properties-onget-stateful
         // OnGet checks the tracked state
         stub.IsReady.OnGet(() => isInitialized);
-        var initTracking = stub.Initialize.OnCall(() => { isInitialized = true; });
+        // Initialize method updates the tracked state
+        stub.Initialize.OnCall(() => { isInitialized = true; });
+        #endregion
 
         IServiceWithInitProps service = stub;
 
@@ -154,7 +156,6 @@ public class DynamicGetterTests
         service.Initialize();
         Assert.True(service.IsReady);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -163,14 +164,16 @@ public class DynamicGetterTests
 
 public class SetterInterceptionTests
 {
-    #region properties-onset-tracking
     [Fact]
     public void OnSet_TracksAllWrittenValues()
     {
         var stub = new ConfigPropsStub();
 
+        #region properties-onset-tracking
+        // OnSet captures every value written to the property
         var setValues = new List<string>();
         stub.Name.OnSet((value) => setValues.Add(value));
+        #endregion
 
         IConfigProps config = stub;
 
@@ -181,20 +184,20 @@ public class SetterInterceptionTests
         Assert.Equal(3, setValues.Count);
         Assert.Equal(new[] { "First", "Second", "Third" }, setValues);
     }
-    #endregion
 
-    #region properties-onset-validation
     [Fact]
     public void OnSet_SimulatesValidation()
     {
         var stub = new ConfigPropsStub();
 
+        #region properties-onset-validation
         // OnSet throws for invalid values
         stub.Age.OnSet((value) =>
         {
             if (value < 0)
                 throw new ArgumentException("Age cannot be negative");
         });
+        #endregion
 
         IConfigProps config = stub;
 
@@ -204,7 +207,6 @@ public class SetterInterceptionTests
         // Invalid value throws
         Assert.Throws<ArgumentException>(() => config.Age = -1);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -213,7 +215,6 @@ public class SetterInterceptionTests
 
 public class PropertyVerificationTests
 {
-    #region properties-verify-getcount
     [Fact]
     public void VerifyGet_TracksPropertyReads()
     {
@@ -225,12 +226,12 @@ public class PropertyVerificationTests
         _ = service.Age;
         _ = service.Age;
 
+        #region properties-verify-getcount
         // VerifyGet checks how many times property was read
         stub.Age.VerifyGet(Times.Exactly(2));
+        #endregion
     }
-    #endregion
 
-    #region properties-verify-lastsetvalue
     [Fact]
     public void LastSetValue_CapturesLastWrittenValue()
     {
@@ -242,21 +243,23 @@ public class PropertyVerificationTests
         service.Name = "Second";
         service.Name = "Expected";
 
+        #region properties-verify-lastsetvalue
         // LastSetValue contains the most recent value
         Assert.Equal("Expected", stub.Name.LastSetValue);
+        #endregion
     }
-    #endregion
 
-    #region properties-verifiable
     [Fact]
     public void Verifiable_MarksPropertyForVerification()
     {
         var stub = new ConfigPropsStub();
 
-        // Mark property as verifiable
+        #region properties-verifiable
+        // Mark property as verifiable - requires access before Verify()
         stub.Name.OnGet("test");
         stub.Name.Verifiable();
         stub.Age.Verifiable();
+        #endregion
 
         IConfigProps service = stub;
         _ = service.Name;
@@ -266,7 +269,6 @@ public class PropertyVerificationTests
         stub.Name.Verify();
         stub.Age.Verify();
     }
-    #endregion
 }
 
 // =============================================================================
@@ -275,17 +277,17 @@ public class PropertyVerificationTests
 
 public class PropertySequenceTests
 {
-    #region properties-ongetsequence-value
     [Fact]
     public void OnGet_ValueSyntax_ThenGet()
     {
         var stub = new ConfigPropsStub();
 
-        // OnGet with value - simpler syntax for static values
-        // ThenGet elevates to sequence mode
+        #region properties-ongetsequence-value
+        // OnGet with value, ThenGet elevates to sequence mode
         stub.Name.OnGet("First")
             .ThenGet(() => "Second")
             .ThenGet(() => "Third");
+        #endregion
 
         IConfigProps config = stub;
 
@@ -293,19 +295,19 @@ public class PropertySequenceTests
         Assert.Equal("Second", config.Name);
         Assert.Equal("Third", config.Name);
     }
-    #endregion
 
-    #region properties-onget-then-sequence
     [Fact]
     public void OnGet_ThenGet_ReturnsDifferentValuesOnSuccessiveReads()
     {
         var stub = new ConfigPropsStub();
 
+        #region properties-onget-then-sequence
         // OnGet().ThenGet() configures different return values for each read
         stub.Name
             .OnGet(() => "First")
             .ThenGet(() => "Second")
             .ThenGet(() => "Third");
+        #endregion
 
         IConfigProps config = stub;
 
@@ -314,18 +316,18 @@ public class PropertySequenceTests
         Assert.Equal("Second", config.Name);
         Assert.Equal("Third", config.Name);
     }
-    #endregion
 
-    #region properties-sequence-exhaustion
     [Fact]
     public void Sequence_ExhaustionRepeatsLastValue()
     {
         var stub = new ConfigPropsStub();
 
-        // Configure a sequence of three values
+        #region properties-sequence-exhaustion
+        // Configure a sequence - after exhaustion, repeats last value
         stub.Name.OnGet("first")
             .ThenGet("second")
             .ThenGet("third");
+        #endregion
 
         IConfigProps config = stub;
 
@@ -338,18 +340,18 @@ public class PropertySequenceTests
         Assert.Equal("third", config.Name);
         Assert.Equal("third", config.Name);
     }
-    #endregion
 
-    #region properties-sequence-thendefault
     [Fact]
     public void Sequence_ThenDefault_ReturnsDefaultAfterExhaustion()
     {
         var stub = new ConfigPropsStub();
 
-        // ThenDefault() changes exhaustion behavior
+        #region properties-sequence-thendefault
+        // ThenDefault() returns default(T) after exhaustion instead of repeating
         stub.Name.OnGet("first")
             .ThenGet("second")
             .ThenDefault();
+        #endregion
 
         IConfigProps config = stub;
 
@@ -360,9 +362,7 @@ public class PropertySequenceTests
         Assert.Null(config.Name);
         Assert.Null(config.Name);
     }
-    #endregion
 
-    #region properties-onset-then-sequence
     [Fact]
     public void OnSet_ThenSet_ReactsDifferentlyToSuccessiveWrites()
     {
@@ -371,10 +371,12 @@ public class PropertySequenceTests
         var firstWriteValue = "";
         var secondWriteValue = "";
 
+        #region properties-onset-then-sequence
         // OnSet().ThenSet() configures different callbacks for each write
         stub.Name
             .OnSet((value) => { firstWriteValue = $"First: {value}"; })
             .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
+        #endregion
 
         IConfigProps config = stub;
 
@@ -387,15 +389,14 @@ public class PropertySequenceTests
         config.Name = "Beta";
         Assert.Equal("Second: Beta", secondWriteValue);
     }
-    #endregion
 
-    #region properties-sequence-verification
     [Fact]
     public void Sequence_VerifiesLikeRegularCallbacks()
     {
         var stub = new ConfigPropsStub();
 
-        // Configure sequences
+        #region properties-sequence-verification
+        // Sequences support verification like regular callbacks
         var getSequence = stub.Name
             .OnGet(() => "A")
             .ThenGet(() => "B");
@@ -403,6 +404,7 @@ public class PropertySequenceTests
         var setSequence = stub.Age
             .OnSet((v) => { })
             .ThenSet((v) => { });
+        #endregion
 
         IConfigProps config = stub;
 
@@ -420,7 +422,6 @@ public class PropertySequenceTests
         stub.Name.VerifyGet(Times.Exactly(2));
         stub.Age.VerifySet(Times.Exactly(2));
     }
-    #endregion
 }
 
 // =============================================================================
@@ -429,7 +430,6 @@ public class PropertySequenceTests
 
 public class PropertyResetTests
 {
-    #region properties-reset
     [Fact]
     public void Reset_ClearsCountsButPreservesValue()
     {
@@ -446,14 +446,14 @@ public class PropertyResetTests
         stub.Name.VerifyGet(Times.AtLeastOnce);
         stub.Name.VerifySet(Times.AtLeastOnce);
 
-        // Reset clears counts and callbacks
+        #region properties-reset
+        // Reset clears counts but preserves callbacks
         stub.Name.Reset();
 
         stub.Name.VerifyGet(Times.Never);
         stub.Name.VerifySet(Times.Never);
-        // Note: Reset clears tracking counters and all configured callbacks
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -462,24 +462,22 @@ public class PropertyResetTests
 
 public class PropertyPriorityTests
 {
-    #region properties-priority
     [Fact]
     public void OnGet_TakesPrecedenceOverValue()
     {
         var stub = new ConfigPropsStub();
 
-        // Set a static value
+        #region properties-priority
+        // Last OnGet call wins - can upgrade from value to callback
         stub.Name.OnGet("initial");
-
-        // Then set OnGet - it takes precedence
         stub.Name.OnGet(() => "dynamic");
+        #endregion
 
         IConfigProps config = stub;
 
         // Callback syntax takes precedence (last call wins)
         Assert.Equal("dynamic", config.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -499,7 +497,6 @@ public partial class UserConfigCompleteStub : IUserConfigComplete { }
 
 public class CompletePropertyExampleTests
 {
-    #region properties-complete-example
     [Fact]
     public void CompletePropertyExample_AllConfigurationApproaches()
     {
@@ -508,18 +505,20 @@ public class CompletePropertyExampleTests
         // Track connection state with local variable
         var isConnected = false;
 
+        #region properties-complete-example
         // OnGet with static value: Fixed test data
         stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
-        // OnGet: State-dependent behavior using tracked state
+        // OnGet with callback: State-dependent behavior
         stub.IsConnected.OnGet(() => isConnected);
 
         // OnSet: Track all values written
         var connectionStrings = new List<string>();
         stub.ConnectionString.OnSet((value) => connectionStrings.Add(value));
 
-        // Configure the Connect method to update state
-        var connectTracking = stub.Connect.OnCall(() => { isConnected = true; });
+        // Method callback updates the tracked state
+        stub.Connect.OnCall(() => { isConnected = true; });
+        #endregion
 
         IUserConfigComplete service = stub;
 
@@ -538,5 +537,4 @@ public class CompletePropertyExampleTests
         Assert.Single(connectionStrings);
         Assert.Equal("Server=test", stub.ConnectionString.LastSetValue);
     }
-    #endregion
 }

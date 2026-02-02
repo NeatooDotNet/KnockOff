@@ -67,24 +67,15 @@ Configure and verify stub behavior through the generated interceptors:
 
 <!-- snippet: getting-started-standalone-use -->
 ```cs
-[Fact]
-public void SaveUser_WhenCalled_TracksInvocation()
-{
-    // Arrange - create the stub
-    var stub = new UserRepoStub();
+// Configure behavior and mark for verification
+stub.SaveUser.OnCall((user) => true).Verifiable();
 
-    // Configure method behavior using OnCall
-    // Chain .Verifiable() to mark for batch verification
-    stub.SaveUser.OnCall((user) => true).Verifiable();
+// Call the method through the interface
+IUserRepo repository = stub;
+repository.SaveUser(new User { Id = 1, Name = "Alice" });
 
-    // Act - use through the interface
-    IUserRepo repository = stub;
-    var result = repository.SaveUser(new User { Id = 1, Name = "Alice" });
-
-    // Assert - Verify() checks all members marked with .Verifiable()
-    Assert.True(result);
-    stub.Verify();
-}
+// Verify() checks all .Verifiable() members were called
+stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -115,26 +106,14 @@ Instantiate and configure the generated stub:
 
 <!-- snippet: getting-started-inline-use -->
 ```cs
-[Fact]
-public void Send_WhenCalled_TracksMessage()
-{
-    // Arrange - instantiate the generated stub
-    var stub = new Stubs.IEmailSvc();
+// OnCall returns a tracking object for argument access
+var tracking = stub.Send.OnCall((to, subject, body) => { }).Verifiable();
 
-    // Configure behavior and mark as verifiable
-    // OnCall returns a tracking object for argument access
-    var tracking = stub.Send.OnCall((to, subject, body) => { }).Verifiable();
+IEmailSvc emailService = stub;
+emailService.Send("user@example.com", "Welcome", "Hello!");
 
-    // Act - use through the interface
-    IEmailSvc emailService = stub;
-    emailService.Send("user@example.com", "Welcome", "Hello!");
-
-    // Assert - Verify() checks method was called
-    stub.Verify();
-    // Access last arguments from tracking
-    var args = tracking.LastArgs;
-    Assert.Equal("user@example.com", args.to);
-}
+// Access captured arguments from the tracking object
+var args = tracking.LastArgs;
 ```
 <!-- endSnippet -->
 
@@ -148,22 +127,11 @@ When your method needs to return a fixed value, use `Returns()`. KnockOff genera
 
 <!-- snippet: getting-started-value-overloads -->
 ```cs
-[Fact]
-public void GetById_ValueOverload_SimplerSyntax()
-{
-    var stub = new UserRepoStub();
+// Returns() - simple fixed value
+stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
 
-    // Returns - pass the return value directly
-    stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
-
-    // Callback syntax - use when you need argument-based logic
-    stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
-
-    IUserRepo repository = stub;
-    var user = repository.GetById(1);
-
-    Assert.Equal("Dynamic", user!.Name);
-}
+// OnCall() - dynamic value based on arguments
+stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
 ```
 <!-- endSnippet -->
 
@@ -201,28 +169,11 @@ Properties use `OnGet` for getters and `OnSet` for setters. Both support value a
 
 <!-- snippet: getting-started-property-configuration -->
 ```cs
-[Fact]
-public void Property_OnGetAndOnSet()
-{
-    var stub = new UserConfigStub();
+// OnGet - configure the getter return value
+stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
 
-    // OnGet - configure what the getter returns
-    stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
-
-    // OnSet - track or validate setter calls
-    User? capturedUser = null;
-    stub.CurrentUser.OnSet((user) => capturedUser = user);
-
-    IUserConfig config = stub;
-
-    // Reading uses OnGet
-    var user = config.CurrentUser;
-    Assert.Equal("Alice", user!.Name);
-
-    // Writing uses OnSet
-    config.CurrentUser = new User { Id = 2, Name = "Bob" };
-    Assert.Equal("Bob", capturedUser!.Name);
-}
+// OnSet - capture or validate setter calls
+stub.CurrentUser.OnSet((user) => capturedUser = user);
 ```
 <!-- endSnippet -->
 
@@ -234,19 +185,8 @@ For async methods returning `Task<T>` or `ValueTask<T>`, KnockOff automatically 
 
 <!-- snippet: getting-started-async-wrapping -->
 ```cs
-[Fact]
-public async Task AsyncMethod_ValueAutoWrapped()
-{
-    var stub = new AsyncUserRepoStub();
-
-    // Returns - KnockOff wraps in Task.FromResult automatically
-    stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
-
-    IAsyncUserRepo repository = stub;
-    var user = await repository.GetUserAsync(1);
-
-    Assert.Equal("Alice", user!.Name);
-}
+// Returns() auto-wraps in Task.FromResult - no manual wrapping needed
+stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
@@ -256,22 +196,8 @@ When you need callback logic but don't need actual async operations, return the 
 
 <!-- snippet: async-task-simplified-callback -->
 ```cs
-[Fact]
-public async Task TaskResult_SimplifiedCallback_AutoWraps()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // SIMPLIFIED CALLBACK: Return the unwrapped type, auto-wrapped in Task.FromResult
-    // This combines the simplicity of Returns() with callback flexibility
-    stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
-
-    IAsyncUserSvc service = stub;
-    var user = await service.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-    stub.Verify();
-}
+// OnCall() with unwrapped return type - auto-wrapped in Task.FromResult
+stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -281,22 +207,8 @@ For `Task` or `ValueTask` methods (no return value), use `Action` callbacks - Kn
 
 <!-- snippet: async-task-simplified-void -->
 ```cs
-[Fact]
-public async Task TaskVoid_SimplifiedCallback_AutoReturnsCompletedTask()
-{
-    var stub = new AsyncUserSvcStub();
-
-    var updatedUsers = new List<User>();
-
-    // SIMPLIFIED VOID CALLBACK: Just use Action, Task.CompletedTask is auto-returned
-    stub.UpdateUserAsync.OnCall((user) => updatedUsers.Add(user)).Verifiable();
-
-    IAsyncUserSvc service = stub;
-    await service.UpdateUserAsync(new User { Id = 1, Name = "Bob" });
-
-    Assert.Single(updatedUsers);
-    stub.Verify();
-}
+// Action callback for void async - Task.CompletedTask auto-returned
+stub.UpdateUserAsync.OnCall((user) => updatedUsers.Add(user)).Verifiable();
 ```
 <!-- endSnippet -->
 

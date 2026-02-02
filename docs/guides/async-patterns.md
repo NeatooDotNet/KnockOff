@@ -16,21 +16,8 @@ For simple async values, KnockOff auto-wraps values in `Task.FromResult`:
 
 <!-- snippet: async-task-value-overload -->
 ```cs
-[Fact]
-public async Task TaskResult_ValueOverload_AutoWraps()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // RETURNS: KnockOff auto-wraps the value in Task.FromResult
-    // This is the simplest syntax for returning async values
-    stub.GetUserAsync.Returns(new User { Id = 42, Name = "Alice" });
-
-    IAsyncUserSvc service = stub;
-    var user = await service.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// KnockOff auto-wraps the value in Task.FromResult
+stub.GetUserAsync.Returns(new User { Id = 42, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
@@ -42,22 +29,9 @@ For async methods where you need dynamic logic or parameter-based values, use `T
 
 <!-- snippet: async-task-result -->
 ```cs
-[Fact]
-public async Task TaskResult_ReturnedWithFromResult()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // FULL CALLBACK: Use Task.FromResult when you need async operations in the callback
-    stub.GetUserAsync.OnCall((id) =>
-        Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
-
-    IAsyncUserSvc service = stub;
-    var user = await service.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-    stub.Verify();
-}
+// Use Task.FromResult when you need parameter-based return values
+stub.GetUserAsync.OnCall((id) =>
+    Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -65,26 +39,12 @@ For async methods with no return value (`Task` instead of `Task<T>`), use `Task.
 
 <!-- snippet: async-task-void -->
 ```cs
-[Fact]
-public async Task TaskVoid_ReturnedWithCompletedTask()
+// Return Task.CompletedTask for async void methods
+stub.UpdateUserAsync.OnCall((user) =>
 {
-    var stub = new AsyncUserSvcStub();
-
-    var updatedUsers = new List<User>();
-
-    // Use Task.CompletedTask for async void methods
-    stub.UpdateUserAsync.OnCall((user) =>
-    {
-        updatedUsers.Add(user);
-        return Task.CompletedTask;
-    }).Verifiable();
-
-    IAsyncUserSvc service = stub;
-    await service.UpdateUserAsync(new User { Id = 1, Name = "Bob" });
-
-    Assert.Single(updatedUsers);
-    stub.Verify();
-}
+    updatedUsers.Add(user);
+    return Task.CompletedTask;
+}).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -98,21 +58,8 @@ For simple ValueTask values, KnockOff auto-wraps values in `ValueTask<T>`:
 
 <!-- snippet: async-valuetask-value-overload -->
 ```cs
-[Fact]
-public async Task ValueTaskResult_ValueOverload_AutoWraps()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // RETURNS: KnockOff auto-wraps the value in new ValueTask<T>(value)
-    // This is the simplest syntax for returning async values
-    stub.GetCachedUserAsync.Returns(new User { Id = 42, Name = "Cached" });
-
-    IAsyncUserSvc service = stub;
-    var user = await service.GetCachedUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Cached", user.Name);
-}
+// KnockOff auto-wraps the value in new ValueTask<T>(value)
+stub.GetCachedUserAsync.Returns(new User { Id = 42, Name = "Cached" });
 ```
 <!-- endSnippet -->
 
@@ -124,22 +71,9 @@ For ValueTask methods where you need dynamic logic, construct the value task in 
 
 <!-- snippet: async-valuetask -->
 ```cs
-[Fact]
-public async Task ValueTaskResult_ReturnedDirectly()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // FULL CALLBACK: Create ValueTask directly when you need async operations
-    stub.GetCachedUserAsync.OnCall((id) =>
-        new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
-
-    IAsyncUserSvc service = stub;
-    var user = await service.GetCachedUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Cached", user.Name);
-    stub.Verify();
-}
+// Create ValueTask directly when you need parameter-based return values
+stub.GetCachedUserAsync.OnCall((id) =>
+    new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -151,27 +85,12 @@ Use async lambdas in `OnCall` to simulate asynchronous delays:
 
 <!-- snippet: async-delay -->
 ```cs
-[Fact]
-public async Task AsyncDelay_SimulatesLatency()
+// Use async lambda to simulate network latency
+stub.GetUserAsync.OnCall(async (id) =>
 {
-    var stub = new AsyncUserSvcStub();
-
-    // Use async lambda to simulate delay
-    var tracking = stub.GetUserAsync.OnCall(async (id) =>
-    {
-        await Task.Delay(50); // Simulate network latency
-        return new User { Id = id, Name = "Delayed" };
-    });
-
-    IAsyncUserSvc service = stub;
-
-    var sw = System.Diagnostics.Stopwatch.StartNew();
-    var user = await service.GetUserAsync(1);
-    sw.Stop();
-
-    Assert.NotNull(user);
-    Assert.True(sw.ElapsedMilliseconds >= 40); // Account for timing variance
-}
+    await Task.Delay(50);
+    return new User { Id = id, Name = "Delayed" };
+});
 ```
 <!-- endSnippet -->
 
@@ -185,21 +104,9 @@ Return a faulted task using `Task.FromException<T>`:
 
 <!-- snippet: async-exception -->
 ```cs
-[Fact]
-public async Task TaskFromException_ReturnsFaultedTask()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // Return a faulted task using Task.FromException
-    var tracking = stub.GetUserAsync.OnCall((id) =>
-        Task.FromException<User?>(new NotFoundException($"User {id} not found")));
-
-    IAsyncUserSvc service = stub;
-
-    // Awaiting throws the configured exception
-    await Assert.ThrowsAsync<NotFoundException>(() =>
-        service.GetUserAsync(999));
-}
+// Return a faulted task using Task.FromException
+stub.GetUserAsync.OnCall((id) =>
+    Task.FromException<User?>(new NotFoundException($"User {id} not found")));
 ```
 <!-- endSnippet -->
 
@@ -209,22 +116,9 @@ Alternatively, throw exceptions directly in the `OnCall` callback. Both approach
 
 <!-- snippet: async-throw -->
 ```cs
-[Fact]
-public async Task ThrowDirectly_InOnCallCallback()
-{
-    var stub = new AsyncUserSvcStub();
-
-    // Throw exception directly in the callback
-    // Note: When only throwing (no return value), use explicit delegate type to disambiguate overloads
-    stub.GetUserAsync.OnCall((AsyncUserSvcStub.GetUserAsyncInterceptor.GetUserAsyncDelegate)(id =>
-        throw new NotFoundException($"User {id} not found")));
-
-    IAsyncUserSvc service = stub;
-
-    // Exception is thrown when the method is called
-    await Assert.ThrowsAsync<NotFoundException>(() =>
-        service.GetUserAsync(999));
-}
+// Throw directly - use explicit delegate type to disambiguate overloads
+stub.GetUserAsync.OnCall((AsyncUserSvcStub.GetUserAsyncInterceptor.GetUserAsyncDelegate)(id =>
+    throw new NotFoundException($"User {id} not found")));
 ```
 <!-- endSnippet -->
 
@@ -236,26 +130,10 @@ This example demonstrates stubbing an async repository for testing a service lay
 
 <!-- snippet: async-complete-example -->
 ```cs
-[Fact]
-public async Task AsyncService_SuccessScenario()
-{
-    var stub = new AsyncRepoStub();
-
-    // Configure success case with Verifiable markers
-    stub.FindAsync.OnCall((id) =>
-        Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
-
-    stub.SaveAsync.OnCall((user) => Task.CompletedTask).Verifiable();
-
-    var manager = new UserManager(stub);
-
-    // Act
-    var result = await manager.UpdateUserNameAsync(42, "Updated");
-
-    // Assert
-    Assert.True(result);
-    stub.Verify(); // Verifies both FindAsync and SaveAsync were called
-}
+// Configure multiple async methods with verification
+stub.FindAsync.OnCall((id) =>
+    Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
+stub.SaveAsync.OnCall((user) => Task.CompletedTask).Verifiable();
 ```
 <!-- endSnippet -->
 

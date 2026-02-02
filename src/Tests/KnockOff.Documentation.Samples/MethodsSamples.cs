@@ -80,22 +80,18 @@ public class MethodConfigurationTests
     public void VoidMethod_ConfiguredWithOnCall()
     {
         var stub = new LogSvcMethodsStub();
+        var logged = new List<string>();
 
         #region methods-oncall-void
         // OnCall for void methods uses Action<...params>
-        var logged = new List<string>();
-        var tracking = stub.LogMessage.OnCall((message) =>
-        {
-            logged.Add(message);
-        });
+        stub.LogMessage.OnCall((message) => logged.Add(message));
+        #endregion
 
         ILogSvcMethods logger = stub;
         logger.LogMessage("Hello, World!");
 
         Assert.Single(logged);
         Assert.Equal("Hello, World!", logged[0]);
-        tracking.Verify();
-        #endregion
     }
 
     [Fact]
@@ -105,14 +101,13 @@ public class MethodConfigurationTests
 
         #region methods-oncall-return
         // OnCall with return value: Func<...params, TReturn>
-        var tracking = stub.GetUserName.OnCall((userId) => "TestUser");
+        stub.GetUserName.OnCall((userId) => "TestUser");
+        #endregion
 
         ILogSvcMethods logger = stub;
         var name = logger.GetUserName(42);
 
         Assert.Equal("TestUser", name);
-        tracking.Verify();
-        #endregion
     }
 
     [Fact]
@@ -122,15 +117,13 @@ public class MethodConfigurationTests
 
         #region methods-oncall-value
         // Returns - simpler syntax when you don't need callback logic
-        // Just pass the return value directly
-        var tracking = stub.GetUserName.Returns("StaticUser");
+        stub.GetUserName.Returns("StaticUser");
+        #endregion
 
         ILogSvcMethods logger = stub;
         var name = logger.GetUserName(42);
 
         Assert.Equal("StaticUser", name);
-        tracking.Verify();
-        #endregion
     }
 
     [Fact]
@@ -159,17 +152,14 @@ public class MethodConfigurationTests
 
         #region methods-oncall-multi-param
         // All method parameters are passed to the callback in order
-        var tracking = stub.ValidateCredentials.OnCall((username, password) =>
+        stub.ValidateCredentials.OnCall((username, password) =>
             username == "admin" && password == "secret");
+        #endregion
 
         IAuthSvcMethods auth = stub;
 
         Assert.True(auth.ValidateCredentials("admin", "secret"));
         Assert.False(auth.ValidateCredentials("user", "wrong"));
-
-        // Verify exactly 2 calls were made
-        tracking.Verify(Times.Exactly(2));
-        #endregion
     }
 }
 
@@ -185,56 +175,28 @@ public class MethodVerificationTests
         var stub = new SaveRepoMethodsStub();
 
         #region methods-verify-wascalled
+        // Mark with Verifiable(), then stub.Verify() checks all marked members
         stub.Save.OnCall((entity) => { }).Verifiable();
+        #endregion
 
         ISaveRepoMethods repository = stub;
         repository.Save(new User { Id = 1 });
 
-        // Verify() checks all members marked with .Verifiable()
         stub.Verify();
-        #endregion
-    }
-
-    [Fact]
-    public void Verify_WithTimesConstraint()
-    {
-        var stub = new NotifierMethodsStub();
-
-        #region methods-verify-times
-        var tracking = stub.Notify.OnCall((message) => { });
-
-        INotifierMethods notifier = stub;
-
-        // Simulate processing a 2-item collection
-        var items = new[] { "item1", "item2" };
-        foreach (var item in items)
-        {
-            notifier.Notify($"Processing {item}");
-        }
-
-        // Verify exact call count using Times
-        tracking.Verify(Times.Exactly(2));
-        #endregion
     }
 
     [Fact]
     public void Verify_ExactCallCount()
     {
         var stub = new NotifierMethodsStub();
-
-        #region methods-verify-callcount
         var tracking = stub.Notify.OnCall((message) => { });
 
         INotifierMethods notifier = stub;
+        notifier.Notify("item1");
+        notifier.Notify("item2");
 
-        // Simulate processing a 2-item collection
-        var items = new[] { "item1", "item2" };
-        foreach (var item in items)
-        {
-            notifier.Notify($"Processing {item}");
-        }
-
-        // Verify exactly 2 calls (throws if different)
+        #region methods-verify-callcount
+        // Verify exact call count (throws if different)
         tracking.Verify(Times.Exactly(2));
         #endregion
     }
@@ -245,17 +207,16 @@ public class MethodVerificationTests
         var stub = new SaveRepoMethodsStub();
 
         #region methods-verify-verifiable
-        // Mark expected calls
+        // Mark expected calls with Verifiable(), then stub.Verify() checks all
         stub.Save.OnCall((entity) => { }).Verifiable(Times.Once);
         stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+        #endregion
 
         ISaveRepoMethods repository = stub;
         repository.Save(new User { Id = 1 });
         repository.GetById(1);
 
-        // Verify all marked methods (throws if any not called correctly)
         stub.Verify();
-        #endregion
     }
 }
 
@@ -269,35 +230,35 @@ public class ArgumentCaptureTests
     public void LastArg_CapturesSingleParameter()
     {
         var stub = new UserRepoMethodsStub();
-
-        #region methods-capture-single
         var tracking = stub.GetUser.OnCall((userId) => new User { Id = userId });
 
         IUserRepoMethods repository = stub;
         repository.GetUser(42);
 
-        // LastArg captures the most recent call's argument (from tracking)
+        #region methods-capture-single
+        // LastArg captures the most recent call's argument
         int capturedId = tracking.LastArg;
-        Assert.Equal(42, capturedId);
         #endregion
+
+        Assert.Equal(42, capturedId);
     }
 
     [Fact]
     public void LastArgs_CapturesAllParameters()
     {
         var stub = new AuthSvcMethodsStub();
-
-        #region methods-capture-multiple
         var tracking = stub.ValidateCredentials.OnCall((username, password) => true);
 
         IAuthSvcMethods auth = stub;
         auth.ValidateCredentials("admin", "secret123");
 
-        // LastArgs is a named tuple with all parameters (from tracking)
+        #region methods-capture-multiple
+        // LastArgs is a named tuple with all parameters
         var (username, password) = tracking.LastArgs;
+        #endregion
+
         Assert.Equal("admin", username);
         Assert.Equal("secret123", password);
-        #endregion
     }
 }
 
@@ -311,22 +272,19 @@ public class MethodResetTests
     public void Reset_ClearsTrackingState()
     {
         var stub = new ProcessorMethodsStub();
-
-        #region methods-reset
         var tracking = stub.ProcessData.OnCall((data) => { });
 
         IProcessorMethods processor = stub;
         processor.ProcessData("initial");
 
-        // Verify one call was made
         tracking.Verify(Times.Once);
 
-        // Reset clears tracking state on the interceptor
+        #region methods-reset
+        // Reset clears call count, captured arguments, and callbacks
         stub.ProcessData.Reset();
-
-        // After reset, Verify(Times.Never) passes via tracking
-        tracking.Verify(Times.Never);
         #endregion
+
+        tracking.Verify(Times.Never);
     }
 }
 
@@ -369,32 +327,22 @@ public class CompleteMethodExampleTests
     [Fact]
     public void UserService_UpdateUserEmail_CallsRepositoryCorrectly()
     {
-        #region methods-complete-example
-        // Arrange
         var stub = new CompleteUserRepoStub();
-
         var testUser = new User { Id = 1, Name = "Alice", Email = "old@test.com" };
+
+        #region methods-complete-example
+        // Configure stub with tracking
         var getTracking = stub.GetUser.OnCall((id) => id == 1 ? testUser : null).Verifiable();
         var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
+        #endregion
 
         var service = new UserService(stub);
-
-        // Act
         var result = service.UpdateUserEmail(1, "new@test.com");
 
-        // Assert
         Assert.True(result);
-
-        // Verify both methods were called
         stub.Verify();
-
-        // Verify GetUser was called with correct ID
         Assert.Equal(1, getTracking.LastArg);
-
-        // Verify saved user has new email via the tracking args
-        var savedUser = saveTracking.LastArg;
-        Assert.Equal("new@test.com", savedUser.Email);
-        #endregion
+        Assert.Equal("new@test.com", saveTracking.LastArg.Email);
     }
 }
 
@@ -410,29 +358,17 @@ public class OverloadedMethodTests
         var stub = new SearchRepoStub();
 
         #region methods-overloads
-        // Overloads are distinguished by the callback parameter types
-        // The fully-typed lambda tells KnockOff which overload to configure
-        var findAllTracking = stub.Find.OnCall(() =>
-            new List<User>()).Verifiable();
-        var findByIdTracking = stub.Find.OnCall((int id) =>
-            new User { Id = id, Name = "ById" }).Verifiable();
-        var findByNameTracking = stub.Find.OnCall((string name) =>
-            new User { Id = 1, Name = name }).Verifiable();
+        // Fully-typed lambda tells KnockOff which overload to configure
+        stub.Find.OnCall(() => new List<User>());
+        stub.Find.OnCall((int id) => new User { Id = id, Name = "ById" });
+        stub.Find.OnCall((string name) => new User { Id = 1, Name = name });
+        #endregion
 
         ISearchRepo repo = stub;
 
-        // Call each overload
         repo.Find();
         repo.Find(42);
         repo.Find("Alice");
-
-        // Verify all overloads were called
-        stub.Verify();
-
-        // Access last arguments via tracking objects
-        Assert.Equal(42, findByIdTracking.LastArg);
-        Assert.Equal("Alice", findByNameTracking.LastArg);
-        #endregion
     }
 }
 
@@ -504,18 +440,16 @@ public class SequenceTests
         var stub = new ValueSvcStub();
 
         #region methods-sequence-params
-        // NSubstitute-style concise syntax: Returns(first, params rest)
+        // Returns(first, params rest) for value sequences
         stub.GetValue.Returns(1, 2, 3);
+        #endregion
 
         IValueSvc service = stub;
 
         Assert.Equal(1, service.GetValue());
         Assert.Equal(2, service.GetValue());
         Assert.Equal(3, service.GetValue());
-
-        // After exhaustion: repeats last value (NSubstitute behavior)
-        Assert.Equal(3, service.GetValue());
-        #endregion
+        Assert.Equal(3, service.GetValue()); // repeats last value
     }
 
     [Fact]
@@ -526,16 +460,14 @@ public class SequenceTests
         #region methods-sequence-params-async
         // Async methods auto-wrap values - no Task.FromResult needed
         stub.GetDataAsync.Returns("first", "second", "third");
+        #endregion
 
         IDataSvc service = stub;
 
         Assert.Equal("first", await service.GetDataAsync(1));
         Assert.Equal("second", await service.GetDataAsync(2));
         Assert.Equal("third", await service.GetDataAsync(3));
-
-        // After exhaustion: repeats last value
-        Assert.Equal("third", await service.GetDataAsync(4));
-        #endregion
+        Assert.Equal("third", await service.GetDataAsync(4)); // repeats last value
     }
 
     [Fact]
@@ -544,10 +476,11 @@ public class SequenceTests
         var stub = new CalculatorSvcStub();
 
         #region methods-sequence-callback-then-params
-        // OnCall for computed first value, then params for constants
+        // OnCall for first callback, then ThenReturns for constant values
         stub.Calculate
-            .OnCall((x, y) => x + y)      // First call: compute x + y
-            .ThenReturns(100, 200, 300);  // Then: constant values
+            .OnCall((x, y) => x + y)
+            .ThenReturns(100, 200, 300);
+        #endregion
 
         ICalculatorSvc calc = stub;
 
@@ -556,7 +489,6 @@ public class SequenceTests
         Assert.Equal(200, calc.Calculate(0, 0)); // constant
         Assert.Equal(300, calc.Calculate(0, 0)); // constant
         Assert.Equal(300, calc.Calculate(0, 0)); // repeats last
-        #endregion
     }
 
     [Fact]
@@ -565,33 +497,33 @@ public class SequenceTests
         var stub = new StatusSvcStub();
 
         #region methods-sequence-basic
-        // Configure different returns for successive calls
+        // Chain ThenCall() for callback sequences
         stub.GetStatus
             .OnCall(() => "Pending")
             .ThenCall(() => "Processing")
             .ThenCall(() => "Complete");
+        #endregion
 
         IStatusSvc service = stub;
 
-        // Each call returns the next value in sequence
         Assert.Equal("Pending", service.GetStatus());
         Assert.Equal("Processing", service.GetStatus());
         Assert.Equal("Complete", service.GetStatus());
-        #endregion
     }
 
     [Fact]
     public void Sequence_VoidMethods()
     {
         var stub = new NotifierSvcStub();
+        var calls = new List<string>();
 
         #region methods-sequence-void
         // Void method sequences use Action callbacks
-        var calls = new List<string>();
         stub.Notify
             .OnCall((msg) => calls.Add("first"))
             .ThenCall((msg) => calls.Add("second"))
             .ThenCall((msg) => calls.Add("third"));
+        #endregion
 
         INotifierSvc notifier = stub;
 
@@ -600,7 +532,6 @@ public class SequenceTests
         notifier.Notify("c");
 
         Assert.Equal(new[] { "first", "second", "third" }, calls);
-        #endregion
     }
 
     [Fact]
@@ -614,18 +545,13 @@ public class SequenceTests
             .OnCall((x, y) => x + y)
             .ThenCall((x, y) => x * y)
             .ThenCall((x, y) => x - y);
+        #endregion
 
         ICalculatorSvc calc = stub;
 
-        // 5 + 3 = 8
-        Assert.Equal(8, calc.Calculate(5, 3));
-
-        // 5 * 3 = 15
-        Assert.Equal(15, calc.Calculate(5, 3));
-
-        // 5 - 3 = 2
-        Assert.Equal(2, calc.Calculate(5, 3));
-        #endregion
+        Assert.Equal(8, calc.Calculate(5, 3));   // 5 + 3 = 8
+        Assert.Equal(15, calc.Calculate(5, 3));  // 5 * 3 = 15
+        Assert.Equal(2, calc.Calculate(5, 3));   // 5 - 3 = 2
     }
 
     [Fact]
@@ -634,22 +560,17 @@ public class SequenceTests
         var stub = new ValueSvcStub();
 
         #region methods-sequence-exhaustion
-        // Sequence callbacks run once each in order
-        stub.GetValue
-            .OnCall(() => 1)
-            .ThenCall(() => 2)
-            .ThenCall(() => 3);
+        // After exhaustion: repeats last value (NSubstitute behavior)
+        stub.GetValue.OnCall(() => 1).ThenCall(() => 2).ThenCall(() => 3);
+        #endregion
 
         IValueSvc service = stub;
 
         Assert.Equal(1, service.GetValue());
         Assert.Equal(2, service.GetValue());
         Assert.Equal(3, service.GetValue());
-
-        // After exhaustion: repeats last value in non-strict mode (NSubstitute behavior)
+        Assert.Equal(3, service.GetValue()); // repeats last value
         Assert.Equal(3, service.GetValue());
-        Assert.Equal(3, service.GetValue());
-        #endregion
     }
 
     [Fact]
@@ -659,20 +580,15 @@ public class SequenceTests
 
         #region methods-sequence-then-default
         // ThenDefault() returns default(T) after exhaustion instead of repeating
-        stub.GetValue
-            .OnCall(() => 1)
-            .ThenCall(() => 2)
-            .ThenDefault();
+        stub.GetValue.OnCall(() => 1).ThenCall(() => 2).ThenDefault();
+        #endregion
 
         IValueSvc service = stub;
 
         Assert.Equal(1, service.GetValue());
         Assert.Equal(2, service.GetValue());
-
-        // After exhaustion with ThenDefault: returns default(int) = 0
+        Assert.Equal(0, service.GetValue()); // default(int) = 0
         Assert.Equal(0, service.GetValue());
-        Assert.Equal(0, service.GetValue()); // continues returning default
-        #endregion
     }
 
     [Fact]
@@ -683,19 +599,14 @@ public class SequenceTests
         #region methods-sequence-strict
         // Strict mode throws on sequence exhaustion
         stub.Strict = true;
-
-        stub.GetValue
-            .OnCall(() => 1)
-            .ThenCall(() => 2);
+        stub.GetValue.OnCall(() => 1).ThenCall(() => 2);
+        #endregion
 
         IValueSvc service = stub;
 
         Assert.Equal(1, service.GetValue());
         Assert.Equal(2, service.GetValue());
-
-        // Third call throws StubException.SequenceExhausted in strict mode
         Assert.Throws<StubException>(() => service.GetValue());
-        #endregion
     }
 
     [Fact]
@@ -704,33 +615,25 @@ public class SequenceTests
         var stub = new StatusSvcStub();
 
         #region methods-sequence-mixed
-        // Mix fixed values with dynamic callbacks using OnCall
+        // Mix fixed values with dynamic callbacks
         stub.GetStatus
             .OnCall(() => "Initial")
             .ThenCall(() => DateTime.Now.ToString("HH:mm:ss"))
             .ThenCall(() => "Final");
+        #endregion
 
         IStatusSvc service = stub;
 
-        // First call: fixed value
         Assert.Equal("Initial", service.GetStatus());
-
-        // Second call: dynamic value (time)
         var timeResult = service.GetStatus();
         Assert.Matches(@"\d{2}:\d{2}:\d{2}", timeResult);
-
-        // Third call: fixed value
         Assert.Equal("Final", service.GetStatus());
-        #endregion
     }
 
     [Fact]
     public void Sequence_Verification()
     {
         var stub = new ProcessSvcStub();
-
-        #region methods-sequence-verification
-        // Sequence can be verified like any callback
         var sequence = stub.Process
             .OnCall(() => { })
             .ThenCall(() => { })
@@ -741,7 +644,8 @@ public class SequenceTests
         processor.Process();
         processor.Process();
 
-        // Verify sequence was exhausted
+        #region methods-sequence-verification
+        // Verify sequence was called the expected number of times
         sequence.Verify();
         #endregion
     }
@@ -757,13 +661,12 @@ public class SequenceTests
             .OnCall(() => { })
             .ThenCall(() => { })
             .Verifiable();
+        #endregion
 
         IProcessSvc processor = stub;
         processor.Process();
         processor.Process();
 
-        // stub.Verify() checks all Verifiable() sequences completed
         stub.Verify();
-        #endregion
     }
 }

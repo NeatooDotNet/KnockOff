@@ -14,16 +14,8 @@ For standard event handler delegates, use the `Raise(sender, args)` method with 
 
 <!-- snippet: events-raise-eventhandler -->
 ```cs
-// Subscribe to the event through the interface
-IEventPub publisher = stub;
-publisher.DataReceived += (sender, args) =>
-{
-    receivedArgs = args;
-};
-
-// Raise the event using the interceptor
-var eventArgs = new DataEventArgs { Data = "Test Data" };
-stub.DataReceived.Raise(stub, eventArgs);
+// Raise EventHandler<T> event with sender and args
+stub.DataReceived.Raise(stub, new DataEventArgs { Data = "Test Data" });
 ```
 <!-- endSnippet -->
 
@@ -33,9 +25,6 @@ For Action-based events, use the `Raise(arg)` method with a single parameter mat
 
 <!-- snippet: events-raise-action -->
 ```cs
-IEventPub publisher = stub;
-publisher.StatusChanged += status => receivedStatus = status;
-
 // Raise Action<T> event with single argument
 stub.StatusChanged.Raise("Connected");
 ```
@@ -51,14 +40,8 @@ Use `HasSubscribers` to verify whether any handlers are currently subscribed to 
 
 <!-- snippet: events-verify-subscribe -->
 ```cs
-// Initially no subscribers
-Assert.False(stub.OnCompleted.HasSubscribers);
-
-// Subscribe a handler
-subscriber.OnCompleted += (sender, args) => { };
-
-// Now has subscribers
-Assert.True(stub.OnCompleted.HasSubscribers);
+// Check if any handlers are subscribed
+var hasHandlers = stub.OnCompleted.HasSubscribers;
 ```
 <!-- endSnippet -->
 
@@ -68,10 +51,7 @@ Use `VerifyAdd` to verify how many times handlers have been subscribed to the ev
 
 <!-- snippet: events-verify-addcount -->
 ```cs
-subscriber.OnCompleted += (sender, args) => { };
-subscriber.OnCompleted += (sender, args) => { };
-
-// VerifyAdd tracks subscribe operations
+// Verify how many times handlers were subscribed
 stub.OnCompleted.VerifyAdd(Times.Exactly(2));
 ```
 <!-- endSnippet -->
@@ -84,10 +64,7 @@ Use `VerifyRemove` to verify how many times handlers have been unsubscribed from
 
 <!-- snippet: events-verify-unsubscribe -->
 ```cs
-subscriber.OnCompleted += handler;
-subscriber.OnCompleted -= handler;
-
-// VerifyRemove tracks unsubscribe operations
+// Verify how many times handlers were unsubscribed
 stub.OnCompleted.VerifyRemove(Times.Once);
 ```
 <!-- endSnippet -->
@@ -100,14 +77,8 @@ Mark event interceptors with `Verifiable()` to include them in batch verificatio
 
 <!-- snippet: events-verifiable -->
 ```cs
-// Mark event for batch verification
+// Mark event for batch verification (expects at least one add/remove)
 stub.OnCompleted.Verifiable();
-
-// Subscribe to the event (satisfies Verifiable)
-subscriber.OnCompleted += (sender, args) => { };
-
-// Verify() checks all members marked with .Verifiable()
-stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -123,14 +94,8 @@ The `Reset()` method clears subscription counts and removes all active subscribe
 
 <!-- snippet: events-reset -->
 ```cs
-// Reset clears counts and subscribers
+// Clear all tracking counts and remove all subscribers
 stub.OnCompleted.Reset();
-
-// Counts are cleared - verify add was never called after reset
-stub.OnCompleted.VerifyAdd(Times.Never);
-
-// Subscribers are also cleared
-Assert.False(stub.OnCompleted.HasSubscribers);
 ```
 <!-- endSnippet -->
 
@@ -144,34 +109,16 @@ This example demonstrates the full event interceptor workflow: subscribing handl
 
 <!-- snippet: events-complete-example -->
 ```cs
-var stub = new EventPubStub();
-
-DataEventArgs? receivedArgs = null;
-int raiseCount = 0;
-
-EventHandler<DataEventArgs> handler = (sender, args) =>
-{
-    receivedArgs = args;
-    raiseCount++;
-};
-
-IEventPub publisher = stub;
-
-// Subscribe and verify
+// Subscribe through the interface
 publisher.DataReceived += handler;
 stub.DataReceived.VerifyAdd(Times.Once);
-Assert.True(stub.DataReceived.HasSubscribers);
 
-// Raise the event
-var eventArgs = new DataEventArgs { Data = "Test" };
-stub.DataReceived.Raise(stub, eventArgs);
-Assert.Equal(1, raiseCount);
-Assert.Equal("Test", receivedArgs?.Data);
+// Raise the event from the stub
+stub.DataReceived.Raise(stub, new DataEventArgs { Data = "Test" });
 
 // Unsubscribe and verify
 publisher.DataReceived -= handler;
 stub.DataReceived.VerifyRemove(Times.Once);
-Assert.False(stub.DataReceived.HasSubscribers);
 ```
 <!-- endSnippet -->
 

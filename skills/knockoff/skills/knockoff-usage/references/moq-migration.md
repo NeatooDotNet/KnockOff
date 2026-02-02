@@ -70,14 +70,9 @@ Replace `Mock<T>` instances with KnockOff stub classes.
 
 <!-- snippet: moq-migration-create-stub-moq -->
 ```cs
-[Fact]
-public void CreateStub_MoqApproach()
-{
-    var mock = new Mock<IMoqUserRepo>();
-    IMoqUserRepo repository = mock.Object;
-
-    Assert.NotNull(repository);
-}
+// Create mock wrapper, access instance via .Object
+var mock = new Mock<IMoqUserRepo>();
+IMoqUserRepo repository = mock.Object;
 ```
 <!-- endSnippet -->
 
@@ -92,14 +87,9 @@ public partial class MoqUserRepoStub : IMoqUserRepo { }
 
 <!-- snippet: moq-migration-create-stub-knockoff -->
 ```cs
-[Fact]
-public void CreateStub_KnockOffApproach()
-{
-    var stub = new MoqUserRepoStub();
-    IMoqUserRepo repository = stub;
-
-    Assert.NotNull(repository);
-}
+// Stub IS the instance - no wrapper needed
+var stub = new MoqUserRepoStub();
+IMoqUserRepo repository = stub;
 ```
 <!-- endSnippet -->
 
@@ -118,20 +108,8 @@ Replace `.Setup().Returns()` with `OnCall` property assignments.
 
 <!-- snippet: moq-migration-setup-method-moq -->
 ```cs
-[Fact]
-public void SetupMethod_MoqApproach()
-{
-    var mock = new Mock<IMoqUserRepo>();
-    var testUser = new User { Id = 42, Name = "Alice" };
-
-    mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(testUser);
-
-    IMoqUserRepo repository = mock.Object;
-    var user = repository.GetUser(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// Setup with expression tree and It.IsAny<T>() matcher
+mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(testUser);
 ```
 <!-- endSnippet -->
 
@@ -139,20 +117,8 @@ public void SetupMethod_MoqApproach()
 
 <!-- snippet: moq-migration-setup-method-knockoff -->
 ```cs
-[Fact]
-public void SetupMethod_KnockOffApproach()
-{
-    var stub = new MoqUserRepoStub();
-    var testUser = new User { Id = 42, Name = "Alice" };
-
-    stub.GetUser.OnCall((id) => testUser);
-
-    IMoqUserRepo repository = stub;
-    var user = repository.GetUser(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// OnCall with typed delegate - arguments available directly
+stub.GetUser.OnCall((id) => testUser);
 ```
 <!-- endSnippet -->
 
@@ -171,18 +137,8 @@ Replace property `.Setup().Returns()` with `OnGet()` calls.
 
 <!-- snippet: moq-migration-setup-property-moq -->
 ```cs
-[Fact]
-public void SetupProperty_MoqApproach()
-{
-    var mock = new Mock<IMoqUserRepo>();
-
-    mock.Setup(x => x.ConnectionString).Returns("server=localhost");
-
-    IMoqUserRepo repository = mock.Object;
-    var connStr = repository.ConnectionString;
-
-    Assert.Equal("server=localhost", connStr);
-}
+// Properties use same Setup/Returns pattern as methods
+mock.Setup(x => x.ConnectionString).Returns("server=localhost");
 ```
 <!-- endSnippet -->
 
@@ -190,18 +146,8 @@ public void SetupProperty_MoqApproach()
 
 <!-- snippet: moq-migration-setup-property-knockoff -->
 ```cs
-[Fact]
-public void SetupProperty_KnockOffApproach()
-{
-    var stub = new MoqUserRepoStub();
-
-    stub.ConnectionString.OnGet("server=localhost");
-
-    IMoqUserRepo repository = stub;
-    var connStr = repository.ConnectionString;
-
-    Assert.Equal("server=localhost", connStr);
-}
+// OnGet configures property getter return value
+stub.ConnectionString.OnGet("server=localhost");
 ```
 <!-- endSnippet -->
 
@@ -220,16 +166,8 @@ Replace Moq's `.Verify()` calls with KnockOff's `.Verify()` or `.Verifiable()` A
 
 <!-- snippet: moq-migration-verify-moq -->
 ```cs
-[Fact]
-public void VerifyCalls_MoqApproach()
-{
-    var mock = new Mock<IMoqUserRepo>();
-
-    IMoqUserRepo repository = mock.Object;
-    repository.SaveUser(new User { Id = 1, Name = "Bob" });
-
-    mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Once());
-}
+// Verify with expression tree and Times constraint
+mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Once());
 ```
 <!-- endSnippet -->
 
@@ -237,23 +175,8 @@ public void VerifyCalls_MoqApproach()
 
 <!-- snippet: moq-migration-verify-knockoff -->
 ```cs
-[Fact]
-public void VerifyCalls_KnockOffApproach()
-{
-    var stub = new MoqUserRepoStub();
-
-    // Mark method as verifiable during setup
-    stub.SaveUser.OnCall((user) => { }).Verifiable();
-
-    IMoqUserRepo repository = stub;
-    repository.SaveUser(new User { Id = 1, Name = "Bob" });
-
-    // Verify() checks all members marked with .Verifiable()
-    stub.Verify();
-
-    // Or verify with Times constraint directly on tracking
-    // stub.SaveUser.Verify(Times.Once);
-}
+// Mark as verifiable during setup, then verify all at once
+stub.SaveUser.OnCall((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -275,20 +198,8 @@ Replace `.ReturnsAsync()` with value overloads (auto-wrapped) or callbacks with 
 
 <!-- snippet: moq-migration-async-moq -->
 ```cs
-[Fact]
-public async Task AsyncMethod_MoqApproach()
-{
-    var mock = new Mock<IMoqUserRepo>();
-    var testUser = new User { Id = 42, Name = "Alice" };
-
-    mock.Setup(x => x.GetUserAsync(It.IsAny<int>())).ReturnsAsync(testUser);
-
-    IMoqUserRepo repository = mock.Object;
-    var user = await repository.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// ReturnsAsync helper wraps value in Task
+mock.Setup(x => x.GetUserAsync(It.IsAny<int>())).ReturnsAsync(testUser);
 ```
 <!-- endSnippet -->
 
@@ -296,20 +207,8 @@ public async Task AsyncMethod_MoqApproach()
 
 <!-- snippet: moq-migration-async-knockoff -->
 ```cs
-[Fact]
-public async Task AsyncMethod_KnockOffApproach()
-{
-    var stub = new MoqUserRepoStub();
-    var testUser = new User { Id = 42, Name = "Alice" };
-
-    stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
-
-    IMoqUserRepo repository = stub;
-    var user = await repository.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// Use Task.FromResult to wrap the return value
+stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
@@ -330,23 +229,9 @@ Replace `.Callback()` with logic directly in `OnCall` delegates.
 
 <!-- snippet: moq-migration-callback-moq -->
 ```cs
-[Fact]
-public void Callback_MoqApproach()
-{
-    var mock = new Mock<IMoqUserRepo>();
-    var savedUsers = new List<User>();
-
-    mock.Setup(x => x.SaveUser(It.IsAny<User>()))
-        .Callback<User>(u => savedUsers.Add(u));
-
-    IMoqUserRepo repository = mock.Object;
-    repository.SaveUser(new User { Id = 1, Name = "Alice" });
-    repository.SaveUser(new User { Id = 2, Name = "Bob" });
-
-    Assert.Equal(2, savedUsers.Count);
-    Assert.Equal("Alice", savedUsers[0].Name);
-    Assert.Equal("Bob", savedUsers[1].Name);
-}
+// Callback is separate from Returns
+mock.Setup(x => x.SaveUser(It.IsAny<User>()))
+    .Callback<User>(u => savedUsers.Add(u));
 ```
 <!-- endSnippet -->
 
@@ -354,25 +239,8 @@ public void Callback_MoqApproach()
 
 <!-- snippet: moq-migration-callback-knockoff -->
 ```cs
-[Fact]
-public void Callback_KnockOffApproach()
-{
-    var stub = new MoqUserRepoStub();
-    var savedUsers = new List<User>();
-
-    stub.SaveUser.OnCall((user) =>
-    {
-        savedUsers.Add(user);
-    });
-
-    IMoqUserRepo repository = stub;
-    repository.SaveUser(new User { Id = 1, Name = "Alice" });
-    repository.SaveUser(new User { Id = 2, Name = "Bob" });
-
-    Assert.Equal(2, savedUsers.Count);
-    Assert.Equal("Alice", savedUsers[0].Name);
-    Assert.Equal("Bob", savedUsers[1].Name);
-}
+// Logic goes directly in OnCall delegate
+stub.SaveUser.OnCall((user) => savedUsers.Add(user));
 ```
 <!-- endSnippet -->
 
@@ -391,22 +259,9 @@ Replace `It.IsAny<T>()` matchers with callback logic.
 
 <!-- snippet: moq-migration-arguments-moq -->
 ```cs
-[Fact]
-public void ArgumentMatching_MoqApproach()
-{
-    var mock = new Mock<IMoqUserRepo>();
-
-    mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
-        .Returns<int>(id => new User { Id = id, Name = "Valid User" });
-
-    IMoqUserRepo repository = mock.Object;
-
-    var validUser = repository.GetUser(1);
-    var invalidUser = repository.GetUser(-1);
-
-    Assert.NotNull(validUser);
-    Assert.Null(invalidUser);
-}
+// It.Is<T>() for conditional matching, Returns<T> to access args
+mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
+    .Returns<int>(id => new User { Id = id, Name = "Valid User" });
 ```
 <!-- endSnippet -->
 
@@ -414,22 +269,9 @@ public void ArgumentMatching_MoqApproach()
 
 <!-- snippet: moq-migration-arguments-knockoff -->
 ```cs
-[Fact]
-public void ArgumentMatching_KnockOffApproach()
-{
-    var stub = new MoqUserRepoStub();
-
-    stub.GetUser.OnCall((id) =>
-        id > 0 ? new User { Id = id, Name = "Valid User" } : null);
-
-    IMoqUserRepo repository = stub;
-
-    var validUser = repository.GetUser(1);
-    var invalidUser = repository.GetUser(-1);
-
-    Assert.NotNull(validUser);
-    Assert.Null(invalidUser);
-}
+// Arguments available directly - use standard C# conditionals
+stub.GetUser.OnCall((id) =>
+    id > 0 ? new User { Id = id, Name = "Valid User" } : null);
 ```
 <!-- endSnippet -->
 
@@ -448,40 +290,13 @@ This example shows a full test class migrated from Moq to KnockOff.
 
 <!-- snippet: moq-migration-complete-moq -->
 ```cs
-private readonly Mock<IMoqUserRepo> _mockRepo;
-private readonly UserServiceMigration _service;
+// Setup with expression tree
+_mockRepo.Setup(x => x.GetUserAsync(1)).ReturnsAsync(user);
 
-public CompleteMoqTests()
-{
-    _mockRepo = new Mock<IMoqUserRepo>();
-    _service = new UserServiceMigration(_mockRepo.Object);
-}
+var result = await _service.GetUserAsync(1);
 
-[Fact]
-public async Task GetUser_ReturnsUser()
-{
-    var user = new User { Id = 1, Name = "Alice" };
-    _mockRepo.Setup(x => x.GetUserAsync(1)).ReturnsAsync(user);
-
-    var result = await _service.GetUserAsync(1);
-
-    Assert.Equal("Alice", result?.Name);
-    _mockRepo.Verify(x => x.GetUserAsync(1), Moq.Times.Once());
-}
-
-[Fact]
-public void SaveUser_CallsRepository()
-{
-    User? savedUser = null;
-    _mockRepo.Setup(x => x.SaveUser(It.IsAny<User>()))
-        .Callback<User>(u => savedUser = u);
-
-    _service.SaveUser(new User { Id = 1, Name = "Bob" });
-
-    Assert.NotNull(savedUser);
-    Assert.Equal("Bob", savedUser?.Name);
-    _mockRepo.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Once());
-}
+// Verify with expression tree and Times
+_mockRepo.Verify(x => x.GetUserAsync(1), Moq.Times.Once());
 ```
 <!-- endSnippet -->
 
@@ -489,45 +304,13 @@ public void SaveUser_CallsRepository()
 
 <!-- snippet: moq-migration-complete-knockoff -->
 ```cs
-private readonly MoqUserRepoStub _stub;
-private readonly UserServiceMigration _service;
+// OnCall with Verifiable marks for batch verification
+_stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
 
-public CompleteKnockOffTests()
-{
-    _stub = new MoqUserRepoStub();
-    _service = new UserServiceMigration(_stub);
-}
+var result = await _service.GetUserAsync(1);
 
-[Fact]
-public async Task GetUser_ReturnsUser()
-{
-    var user = new User { Id = 1, Name = "Alice" };
-    // Similar to Moq: Setup + Verifiable
-    _stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
-
-    var result = await _service.GetUserAsync(1);
-
-    Assert.Equal("Alice", result?.Name);
-    // Similar to Moq: mock.Verify() -> stub.Verify()
-    _stub.Verify();
-}
-
-[Fact]
-public void SaveUser_CallsRepository()
-{
-    User? savedUser = null;
-    var tracking = _stub.SaveUser.OnCall((user) =>
-    {
-        savedUser = user;
-    }).Verifiable();
-
-    _service.SaveUser(new User { Id = 1, Name = "Bob" });
-
-    Assert.NotNull(savedUser);
-    Assert.Equal("Bob", savedUser?.Name);
-    // Similar to Moq: mock.Verify(x => x.SaveUser(...), Times.Once())
-    tracking.Verify(Times.Once);
-}
+// stub.Verify() checks all .Verifiable() members
+_stub.Verify();
 ```
 <!-- endSnippet -->
 

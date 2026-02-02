@@ -231,6 +231,7 @@ public class MethodInterceptorApiTests
 
         // Configure multi-parameter method
         var updateTracking = stub.Update.OnCall((id, name) => { }).Verifiable();
+        #endregion
 
         // Exercise the stub
         repository.Save(new User { Id = 1, Name = "Alice" });
@@ -247,7 +248,6 @@ public class MethodInterceptorApiTests
         var (id, name) = updateTracking.LastArgs;
         Assert.Equal(1, id);
         Assert.Equal("UpdatedName", name);
-        #endregion
 
         // Additional assertions outside snippet
         Assert.NotNull(user);
@@ -268,11 +268,15 @@ public class PropertyInterceptorApiTests
         IApiPropertyRepo repository = stub;
 
         #region property-interceptor-complete-api-demo
-        // Value: Direct value for getter
+        // OnGet with value: configure getter return value
         stub.ConnectionString.OnGet("Server=localhost");
 
-        // OnGet callback: Dynamic value
+        // OnGet with callback: dynamic value
         stub.Timeout.OnGet(() => 30);
+
+        // OnSet: configure setter callback
+        stub.Timeout.OnSet((val) => { /* handle set */ });
+        #endregion
 
         // Exercise getter
         var conn = repository.ConnectionString;
@@ -292,18 +296,6 @@ public class PropertyInterceptorApiTests
         // LastSetValue: Captured value from setter
         Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
 
-        // IMPORTANT: OnSet does NOT auto-update getter value
-        var setWasCalled = false;
-        stub.Timeout.OnSet((val) =>
-        {
-            setWasCalled = true;
-            // To update getter: stub.Timeout.OnGet(val);
-        });
-        repository.Timeout = 90;
-        Assert.True(setWasCalled);
-        // Getter still returns 30 - OnSet didn't change it
-        #endregion
-
         Assert.Equal("Server=localhost", conn);
         Assert.Equal(30, timeout);
     }
@@ -322,13 +314,19 @@ public class IndexerInterceptorApiTests
         IApiIndexerRepo repository = stub;
 
         #region indexer-interceptor-complete-api-demo
-        // Backing dictionary: Default storage for indexer
+        // Backing: default dictionary storage for indexer
         stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
-        stub.Indexer.Backing[2] = new User { Id = 2, Name = "Bob" };
 
-        // Read uses Backing by default
-        var user1 = repository[1];
-        Assert.Equal("Alice", user1?.Name);
+        // OnGet: override backing lookup with callback
+        stub.Indexer.OnGet((key) => new User { Id = key, Name = "FromCallback" });
+
+        // OnSet: configure setter callback
+        stub.Indexer.OnSet((key, value) => { /* handle set */ });
+        #endregion
+
+        // OnGet configured above, so it returns FromCallback
+        var fromCallback = repository[1];
+        Assert.Equal("FromCallback", fromCallback?.Name);
 
         // VerifyGet: Check read count
         stub.Indexer.VerifyGet(Times.Once);
@@ -336,7 +334,7 @@ public class IndexerInterceptorApiTests
         // LastGetKey: Key from most recent get
         Assert.Equal(1, stub.Indexer.LastGetKey);
 
-        // Write uses Backing by default
+        // OnSet configured above, callback fires (but doesn't update Backing)
         repository[3] = new User { Id = 3, Name = "Charlie" };
 
         // VerifySet: Check write count
@@ -347,22 +345,8 @@ public class IndexerInterceptorApiTests
         Assert.Equal(3, lastEntry?.Key);
         Assert.Equal("Charlie", lastEntry?.Value?.Name);
 
-        // OnGet: Override Backing lookup
-        stub.Indexer.OnGet((key) => new User { Id = key, Name = "FromCallback" });
-        var fromCallback = repository[999];
-        Assert.Equal("FromCallback", fromCallback?.Name);
-
-        // IMPORTANT: OnSet does NOT auto-update Backing
-        var onSetCalled = false;
-        stub.Indexer.OnSet((key, value) =>
-        {
-            onSetCalled = true;
-            // To update Backing: stub.Indexer.Backing[key] = value;
-        });
-        repository[4] = new User { Id = 4 };
-        Assert.True(onSetCalled);
-        Assert.False(stub.Indexer.Backing.ContainsKey(4)); // Not in Backing
-        #endregion
+        // Backing wasn't updated by OnSet (unless callback explicitly does it)
+        Assert.False(stub.Indexer.Backing.ContainsKey(3));
     }
 }
 
@@ -378,19 +362,22 @@ public class EventInterceptorApiTests
         var stub = new ApiEventRepoStub();
         IApiEventRepo repository = stub;
 
-        #region event-interceptor-complete-api-demo
-        // Subscribe to EventHandler event
+        // Subscribe to event
         var changedInvoked = false;
         repository.Changed += (sender, e) => changedInvoked = true;
 
-        // VerifyAdd: Check subscription occurred
-        stub.Changed.VerifyAdd(Times.Once);
+        #region event-interceptor-complete-api-demo
+        // HasSubscribers: check for active subscriptions
+        var hasSubscribers = stub.Changed.HasSubscribers;
 
-        // HasSubscribers: Active subscription check
-        Assert.True(stub.Changed.HasSubscribers);
-
-        // Raise: Fire event to all subscribers
+        // Raise: fire event to all subscribers
         stub.Changed.Raise(repository, EventArgs.Empty);
+
+        // VerifyAdd/VerifyRemove: check subscription counts
+        stub.Changed.VerifyAdd(Times.Once);
+        #endregion
+
+        Assert.True(hasSubscribers);
         Assert.True(changedInvoked);
 
         // Unsubscribe tracking
@@ -409,7 +396,6 @@ public class EventInterceptorApiTests
         stub.UserAdded.Raise(new User { Id = 1, Name = "Alice" });
         Assert.NotNull(addedUser);
         Assert.Equal("Alice", addedUser.Name);
-        #endregion
     }
 }
 
@@ -426,12 +412,16 @@ public class GenericMethodInterceptorApiTests
         IApiGenericRepo repository = stub;
 
         #region generic-method-interceptor-complete-api-demo
-        // .Of<T>(): Access typed interceptor for specific type argument
+        // Of<T>(): access typed interceptor for specific type argument
         stub.GetById.Of<User>().OnCall((id) =>
             new User { Id = id, Name = $"User{id}" });
 
         stub.GetById.Of<Product>().OnCall((id) =>
             new Product { Id = id, Name = $"Product{id}" });
+
+        // CalledTypeArguments: list of all type arguments used
+        var typeArgs = stub.GetById.CalledTypeArguments;
+        #endregion
 
         // Call with different type arguments
         var user1 = repository.GetById<User>(1);
@@ -458,7 +448,6 @@ public class GenericMethodInterceptorApiTests
         // Base Reset: Clears all type arguments
         stub.GetById.Reset();
         stub.GetById.Of<Product>().Verify(Times.Never);
-        #endregion
     }
 }
 

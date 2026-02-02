@@ -52,28 +52,21 @@ public partial class TroubleshootGoodStub : ITroubleshootRepo { }
 
 public partial class TroubleshootEmailServiceTests
 {
-    #region troubleshoot-object
     [Fact]
     public void ClassStub_RequiresObjectProperty()
     {
         var stub = new Stubs.EmailService();
-
-        // Configure the stub
         stub.Send.OnCall((to, subject) => true);
 
-        // ERROR (commented out): Cannot pass stub directly
-        // Method expects EmailService, not Stubs.EmailService
-        // SomeMethodExpectingEmailService(stub);
-
-        // CORRECT: Use .Object to get the EmailService instance
+        #region troubleshoot-object
+        // Use .Object to get the typed instance for class stubs
         EmailService service = stub.Object;
+        #endregion
 
-        // Now it can be used wherever EmailService is expected
         var result = service.Send("test@example.com", "Hello");
         Assert.True(result);
     }
 
-    // Example method expecting the base class type
     private void UseEmailService(EmailService service)
     {
         service.Send("a@b.com", "Test");
@@ -84,13 +77,9 @@ public partial class TroubleshootEmailServiceTests
     {
         var stub = new Stubs.EmailService();
         stub.Send.OnCall((to, subject) => true);
-
-        // Pass stub.Object to method expecting EmailService
         UseEmailService(stub.Object);
-
         stub.Send.Verify();
     }
-    #endregion
 }
 
 // =============================================================================
@@ -99,18 +88,16 @@ public partial class TroubleshootEmailServiceTests
 
 public class OnCallSignatureTests
 {
-    #region troubleshoot-oncall-signature
     [Fact]
     public void OnCallSignature_MustMatchParameters()
     {
         var stub = new TroubleshootRepoStub();
 
-        // ERROR (won't compile): Wrong parameter type
-        // stub.GetByIdAsync.OnCall((string id) => Task.FromResult<User?>(null));
-
-        // CORRECT: Match parameter type (int id)
+        #region troubleshoot-oncall-signature
+        // OnCall signature must match method parameters exactly
         stub.GetByIdAsync.OnCall((int id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
+        #endregion
 
         ITroubleshootRepo repository = stub;
         var user = repository.GetByIdAsync(42).Result;
@@ -118,7 +105,6 @@ public class OnCallSignatureTests
         Assert.NotNull(user);
         Assert.Equal(42, user.Id);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -127,26 +113,24 @@ public class OnCallSignatureTests
 
 public class OnCallValueTests
 {
-    #region troubleshoot-oncall-value
     [Fact]
     public void OnCall_WithStaticValue()
     {
         var stub = new TroubleshootRepoStub();
 
-        // Instead of: stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
-        // Use Returns(value) when the return value doesn't depend on parameters:
+        #region troubleshoot-oncall-value
+        // Use Returns(value) when the return doesn't depend on parameters
         stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
+        #endregion
 
         ITroubleshootRepo repository = stub;
         var user1 = repository.GetById(1);
         var user2 = repository.GetById(2);
 
-        // Both calls return the same value
         Assert.Equal(999, user1?.Id);
         Assert.Equal(999, user2?.Id);
         Assert.Equal("Static User", user1?.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -155,24 +139,21 @@ public class OnCallValueTests
 
 public class NoCallbackTests
 {
-    #region troubleshoot-no-callback
     [Fact]
     public void MethodWithoutCallback_UsesSmartDefaults()
     {
         var stub = new TroubleshootRepoStub();
         ITroubleshootRepo repository = stub;
 
-        // Without configuration, smart defaults apply:
-        // - Nullable returns null
-        // - Non-nullable with ctor returns new instance
-        // - Value types return default
-
         // Nullable User? returns null by default
         var user = repository.GetById(1);
         Assert.Null(user);
 
-        // For non-nullable string, configure explicitly:
+        #region troubleshoot-no-callback
+        // Configure required (non-nullable) return values explicitly
         stub.GetName.OnCall(() => "Configured Name");
+        #endregion
+
         var name = repository.GetName();
         Assert.Equal("Configured Name", name);
     }
@@ -183,15 +164,12 @@ public class NoCallbackTests
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Fix Option 1: Use OnGet with a static value
         stub.Host.OnGet("localhost");
         Assert.Equal("localhost", config.Host);
 
-        // Fix Option 2: Use OnGet with callback for dynamic behavior
         stub.Port.OnGet(() => 8080);
         Assert.Equal(8080, config.Port);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -200,26 +178,22 @@ public class NoCallbackTests
 
 public class OnGetPriorityTests
 {
-    #region troubleshoot-onget-priority
     [Fact]
     public void OnGet_MostRecentTakesPrecedence()
     {
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Configure OnGet with callback
         stub.Host.OnGet(() => "from-callback");
-
-        // Access uses OnGet
         Assert.Equal("from-callback", config.Host);
 
-        // OnGet with value overrides previous callback
-        stub.Host.OnGet("from-value");
-
+        #region troubleshoot-onget-priority
         // Most recent OnGet configuration wins
+        stub.Host.OnGet("from-value");
+        #endregion
+
         Assert.Equal("from-value", config.Host);
 
-        // OnGet with callback can override again
         stub.Host.OnGet(() => "back-to-callback");
         Assert.Equal("back-to-callback", config.Host);
     }
@@ -230,26 +204,15 @@ public class OnGetPriorityTests
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Priority order (from highest to lowest):
-        // 1. Sequence (if elevated via ThenGet() and not exhausted)
-        // 2. OnGet callback/value (most recent takes precedence)
-        // 3. Source delegation (if configured)
-        // 4. Strict mode check (throws if enabled and nothing configured)
-        // 5. Default (fallback)
-
-        // OnGet with value
         stub.Port.OnGet(80);
         Assert.Equal(80, config.Port);
 
-        // OnGet with callback overrides previous value
         stub.Port.OnGet(() => 443);
         Assert.Equal(443, config.Port);
 
-        // OnGet with value overrides previous callback
         stub.Port.OnGet(8080);
         Assert.Equal(8080, config.Port);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -258,29 +221,24 @@ public class OnGetPriorityTests
 
 public class ResetBehaviorTests
 {
-    #region troubleshoot-reset-value
     [Fact]
     public void Reset_ClearsTracking_ButPreservesConfiguration()
     {
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        // Configure value via OnGet
         stub.Host.OnGet("configured-host");
 
-        // Access property to verify reads
         _ = config.Host;
         _ = config.Host;
         stub.Host.VerifyGet(Times.Exactly(2));
 
-        // Reset clears tracking
+        #region troubleshoot-reset-value
+        // Reset() clears tracking but preserves OnGet configuration
         stub.Host.Reset();
-
-        // Verify tracking was cleared
-        stub.Host.VerifyGet(Times.Never);
-
-        // OnGet configuration is preserved after Reset
-        Assert.Equal("configured-host", config.Host);
+        stub.Host.VerifyGet(Times.Never);  // Tracking cleared
+        Assert.Equal("configured-host", config.Host);  // Config preserved
+        #endregion
     }
 
     [Fact]
@@ -288,17 +246,13 @@ public class ResetBehaviorTests
     {
         var stub = new ConfigSvcStub();
 
-        // Configure with OnGet
         stub.Port.OnGet(8080);
 
-        // To clear, reconfigure with default value
         stub.Port.OnGet(default(int));
 
-        // Now returns default value
         IConfigSvc config = stub;
         Assert.Equal(0, config.Port);
     }
-    #endregion
 }
 
 // =============================================================================

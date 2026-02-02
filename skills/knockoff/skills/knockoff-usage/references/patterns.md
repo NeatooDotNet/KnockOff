@@ -55,26 +55,10 @@ The source generator produces:
 
 <!-- snippet: patterns-standalone-usage -->
 ```cs
-[Fact]
-public void StandaloneStub_CanBeConfiguredAndVerified()
-{
-    // Arrange - instantiate the reusable stub
-    var stub = new UserRepoStandaloneStub();
-
-    // Configure method behavior and mark verifiable
-    stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
-    stub.Save.OnCall((user) => { }).Verifiable();
-
-    // Act - cast to interface for use
-    IUserRepoStandalone repository = stub;
-    var user = repository.GetById(42);
-    repository.Save(user!);
-
-    // Assert - verify via Verify()
-    Assert.NotNull(user);
-    Assert.Equal("User42", user.Name);
-    stub.Verify();
-}
+// Stand-Alone: instantiate like any class, configure via Verify()
+var stub = new UserRepoStandaloneStub();
+stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
+stub.Save.OnCall((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -131,26 +115,10 @@ The source generator produces a nested `Stubs` class containing the stub impleme
 
 <!-- snippet: patterns-inline-interface-usage -->
 ```cs
-[Fact]
-public void InlineInterfaceStub_GeneratedInStubsNamespace()
-{
-    // Arrange - use generated Stubs.InterfaceName class
-    var stub = new Stubs.IUserRepoInline();
-
-    // Configure behavior and mark verifiable
-    stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
-    stub.Save.OnCall((user) => { }).Verifiable();
-
-    // Act
-    IUserRepoInline repository = stub;
-    var user = repository.GetById(1);
-    repository.Save(user!);
-
-    // Assert
-    Assert.NotNull(user);
-    Assert.Equal("Test", user.Name);
-    stub.Verify();
-}
+// Inline Interface: access via Stubs namespace
+var stub = new Stubs.IUserRepoInline();
+stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
+stub.Save.OnCall((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -216,24 +184,10 @@ The source generator produces:
 
 <!-- snippet: patterns-inline-class-usage -->
 ```cs
-[Fact]
-public void InlineClassStub_UsesObjectProperty()
-{
-    // Arrange - create wrapper stub
-    var stub = new Stubs.UserServiceClass();
-
-    // Configure virtual member behavior and mark verifiable
-    stub.GetUser.OnCall((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
-
-    // Act - use .Object to get the actual class instance
-    UserServiceClass service = stub.Object;
-    var user = service.GetUser(42);
-
-    // Assert
-    Assert.NotNull(user);
-    Assert.Equal("FromStub", user.Name);
-    stub.Verify();
-}
+// Inline Class: configure stub, use .Object for the class instance
+var stub = new Stubs.UserServiceClass();
+stub.GetUser.OnCall((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+UserServiceClass service = stub.Object;
 ```
 <!-- endSnippet -->
 
@@ -296,26 +250,10 @@ The source generator produces:
 
 <!-- snippet: patterns-inline-delegate-usage -->
 ```cs
-[Fact]
-public void InlineDelegateStub_TracksInvocationsAndConfiguresBehavior()
-{
-    // Arrange - create delegate stub
-    var ruleStub = new Stubs.ValidationRule();
-
-    // Configure behavior via Interceptor.OnCall
-    ruleStub.Interceptor.OnCall((value) => value != "invalid");
-
-    // Act - implicit conversion to delegate type
-    ValidationRule rule = ruleStub;
-    bool result1 = rule("valid");
-    bool result2 = rule("invalid");
-
-    // Assert - verify calls and behavior
-    Assert.True(result1);
-    Assert.False(result2);
-    ruleStub.Interceptor.Verify(Times.Exactly(2));
-    Assert.Equal("invalid", ruleStub.Interceptor.LastCallArg);
-}
+// Inline Delegate: configure via Interceptor, implicit conversion to delegate
+var ruleStub = new Stubs.ValidationRule();
+ruleStub.Interceptor.OnCall((value) => value != "invalid");
+ValidationRule rule = ruleStub;
 ```
 <!-- endSnippet -->
 
@@ -398,45 +336,18 @@ This example demonstrates using all patterns in a realistic test scenario:
 
 <!-- snippet: patterns-complete-example -->
 ```cs
-[KnockOff<ILogSvc>]
-[KnockOff<AuditSvcBase>]
-public partial class PatternComparisonTests
-{
-    [Fact]
-    public void AllThreePatterns_WorkTogether()
-    {
-        // Stand-Alone: Reusable email stub
-        var emailStub = new EmailSvcPatternStub();
-        emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
-        emailStub.IsConfigured.OnGet(true);
+// Stand-Alone: direct instantiation
+var emailStub = new EmailSvcPatternStub();
+emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
 
-        // Inline Interface: Test-local logger stub
-        var loggerStub = new Stubs.ILogSvc();
-        var logMessages = new List<string>();
-        var logTracking = loggerStub.Log.OnCall((msg) => logMessages.Add(msg)).Verifiable(Times.Exactly(2));
+// Inline Interface: via Stubs namespace
+var loggerStub = new Stubs.ILogSvc();
+loggerStub.Log.OnCall((msg) => { }).Verifiable();
 
-        // Inline Class: Stub for abstract base class
-        var auditStub = new Stubs.AuditSvcBase();
-        auditStub.Audit.OnCall((action) => { }).Verifiable();
-
-        // Act - simulate integration scenario
-        IEmailSvcPattern email = emailStub;
-        ILogSvc logger = loggerStub;
-        AuditSvcBase audit = auditStub.Object;
-
-        logger.Log("Starting operation");
-        var sent = email.Send("user@test.com", "Hello", "World");
-        audit.Audit("email_sent");
-        logger.Log("Operation complete");
-
-        // Assert - each pattern provides Verify()
-        Assert.True(sent);
-        emailStub.Verify();
-        loggerStub.Verify();
-        auditStub.Verify();
-        Assert.Contains("Starting operation", logMessages);
-    }
-}
+// Inline Class: use .Object for class instance
+var auditStub = new Stubs.AuditSvcBase();
+auditStub.Audit.OnCall((action) => { }).Verifiable();
+AuditSvcBase audit = auditStub.Object;
 ```
 <!-- endSnippet -->
 

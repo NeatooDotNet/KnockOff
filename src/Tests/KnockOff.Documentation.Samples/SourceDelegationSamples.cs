@@ -64,15 +64,16 @@ public partial class SourceRepoStub : IRepository { }
 
 public class BasicSourceDelegationTests
 {
-    #region source-basic
     [Fact]
     public void Source_DelegatesToRealImplementation()
     {
         var stub = new DataStoreStub();
         var realStore = new InMemoryDataStore();
 
+        #region source-basic
         // Configure stub to delegate to real implementation
         stub.Source(realStore);
+        #endregion
 
         IDataStore store = stub;
 
@@ -84,7 +85,6 @@ public class BasicSourceDelegationTests
         Assert.Equal("first", store.Get(0));
         Assert.Equal("second", store.Get(1));
     }
-    #endregion
 }
 
 // =============================================================================
@@ -106,8 +106,9 @@ public class PartialOverrideTests
         stub.Source(realRepo);
 
         #region source-partial-override
-        // Override GetById for test data
+        // Override specific member while source handles the rest
         stub.GetById.OnCall((id) => new User { Id = id, Name = "Test User" });
+        #endregion
 
         IRepository repository = stub;
 
@@ -119,7 +120,6 @@ public class PartialOverrideTests
         // Save delegates to source (no OnCall configured)
         repository.Save(new User { Id = 2, Name = "New User" });
         Assert.NotNull(realRepo.GetById(2));
-        #endregion
     }
 }
 
@@ -129,7 +129,6 @@ public class PartialOverrideTests
 
 public class HierarchyTests
 {
-    #region source-hierarchy
     [Fact]
     public void Source_AppliesAcrossInterfaceHierarchy()
     {
@@ -140,8 +139,10 @@ public class HierarchyTests
         realStore.Add("item1");
         realStore.Add("item2");
 
-        // Delegate to real implementation
+        #region source-hierarchy
+        // Source applies to all interface hierarchy levels
         stub.Source(realStore);
+        #endregion
 
         IDataStore store = stub;
 
@@ -149,7 +150,6 @@ public class HierarchyTests
         Assert.Equal(2, store.Count);
         Assert.Equal("item1", store.Get(0));
     }
-    #endregion
 }
 
 // =============================================================================
@@ -158,7 +158,6 @@ public class HierarchyTests
 
 public class ClearSourceTests
 {
-    #region source-clear
     [Fact]
     public void Source_CanBeClearedWithNull()
     {
@@ -173,13 +172,14 @@ public class ClearSourceTests
         // Source is active
         Assert.Equal(1, store.Count);
 
-        // Clear source
+        #region source-clear
+        // Clear source to revert to smart defaults
         stub.Source(null);
+        #endregion
 
         // Now smart defaults are used (Count returns 0)
         Assert.Equal(0, store.Count);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -201,16 +201,16 @@ public class PriorityOrderTests
 
         IRepository repository = stub;
 
-        #region source-priority
         // Source returns 1 for active user (when no OnCall is set)
         var fromSource = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(1, fromSource);
 
-        // OnCall overrides source
+        #region source-priority
+        // OnCall takes precedence over source
         stub.GetPriority.OnCall((user) => 42);
+        #endregion
         var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(42, fromOnCall);
-        #endregion
     }
 }
 
@@ -251,9 +251,10 @@ public class CompleteSourceExampleTests
         stub.Source(realDataSource);
 
         #region source-complete-example
-        // Override Read for specific test scenario
+        // OnCall takes full control - source not consulted even for non-matches
         stub.Read.OnCall((filename) =>
             filename == "config.txt" ? "Test Config" : null);
+        #endregion
 
         IDataSource dataSource = stub;
 
@@ -269,6 +270,5 @@ public class CompleteSourceExampleTests
         // Write delegates entirely to source (no OnCall configured)
         dataSource.Write("output.txt", "New Data");
         Assert.Equal("New Data", realDataSource.Read("output.txt"));
-        #endregion
     }
 }

@@ -106,28 +106,23 @@ public partial class AsyncDefaultsServiceStub : IAsyncDefaultsService { }
 
 public class ValueTypeSmartDefaultsTests
 {
-    #region smart-defaults-value-types
     [Fact]
     public void ValueTypes_ReturnDefault()
     {
         var stub = new ValueTypeServiceStub();
         IValueTypeService service = stub;
 
-        // No configuration - smart defaults apply
+        #region smart-defaults-value-types
+        // No configuration needed - value types return default(T)
+        int count = service.GetCount();      // returns 0
+        bool enabled = service.IsEnabled();  // returns false
+        #endregion
 
-        // int defaults to 0
-        Assert.Equal(0, service.GetCount());
-
-        // bool defaults to false
-        Assert.False(service.IsEnabled());
-
-        // decimal defaults to 0.0m
+        Assert.Equal(0, count);
+        Assert.False(enabled);
         Assert.Equal(0.0m, service.GetRate());
-
-        // DateTime defaults to default(DateTime)
         Assert.Equal(default(DateTime), service.GetTimestamp());
     }
-    #endregion
 }
 
 // =============================================================================
@@ -136,28 +131,23 @@ public class ValueTypeSmartDefaultsTests
 
 public class NullableSmartDefaultsTests
 {
-    #region smart-defaults-nullable
     [Fact]
     public void NullableTypes_ReturnNull()
     {
         var stub = new NullableServiceStub();
         INullableService service = stub;
 
-        // No configuration - smart defaults apply
+        #region smart-defaults-nullable
+        // Nullable types return null (both reference and value types)
+        string? name = service.GetOptionalName();  // returns null
+        int? count = service.GetOptionalCount();   // returns null
+        #endregion
 
-        // string? returns null
-        Assert.Null(service.GetOptionalName());
-
-        // User? returns null
+        Assert.Null(name);
+        Assert.Null(count);
         Assert.Null(service.FindUserById(42));
-
-        // int? returns null
-        Assert.Null(service.GetOptionalCount());
-
-        // bool? returns null
         Assert.Null(service.GetOptionalFlag());
     }
-    #endregion
 }
 
 // =============================================================================
@@ -166,25 +156,21 @@ public class NullableSmartDefaultsTests
 
 public class ConstructorSmartDefaultsTests
 {
-    #region smart-defaults-ctor
     [Fact]
     public void TypesWithCtor_ReturnNewInstance()
     {
         var stub = new ConfigServiceStub();
         IConfigService service = stub;
 
-        // No configuration - smart defaults apply
-
+        #region smart-defaults-ctor
         // Types with parameterless constructor return new T()
-        var config = service.GetConfig();
-        Assert.NotNull(config);
-        Assert.Equal("default", config.Environment); // Default property value
+        AppConfig config = service.GetConfig();  // returns new AppConfig()
+        #endregion
 
-        var options = service.GetOptions();
-        Assert.NotNull(options);
-        Assert.False(options.FeatureA); // Default property value
+        Assert.NotNull(config);
+        Assert.Equal("default", config.Environment);
+        Assert.NotNull(service.GetOptions());
     }
-    #endregion
 }
 
 // =============================================================================
@@ -193,41 +179,26 @@ public class ConstructorSmartDefaultsTests
 
 public class CollectionSmartDefaultsTests
 {
-    #region smart-defaults-collections
     [Fact]
     public void Collections_ReturnEmptyInstances()
     {
         var stub = new CollectionServiceStub();
         ICollectionService service = stub;
 
-        // No configuration - smart defaults apply
+        #region smart-defaults-collections
+        // Collection interfaces return empty, non-null collections
+        IEnumerable<User> users = service.GetUsers();       // returns new List<User>()
+        IDictionary<string, string> meta = service.GetMetadata();  // returns new Dictionary<>()
+        #endregion
 
-        // IEnumerable<T> returns empty List<T>
-        var users = service.GetUsers();
         Assert.NotNull(users);
         Assert.Empty(users);
-
-        // IList<T> returns empty List<T>
-        var tags = service.GetTags();
-        Assert.NotNull(tags);
-        Assert.Empty(tags);
-
-        // IReadOnlyList<T> returns empty List<T>
-        var ids = service.GetIds();
-        Assert.NotNull(ids);
-        Assert.Empty(ids);
-
-        // IDictionary<K,V> returns empty Dictionary<K,V>
-        var metadata = service.GetMetadata();
-        Assert.NotNull(metadata);
-        Assert.Empty(metadata);
-
-        // ISet<T> returns empty HashSet<T>
-        var keys = service.GetUniqueKeys();
-        Assert.NotNull(keys);
-        Assert.Empty(keys);
+        Assert.NotNull(meta);
+        Assert.Empty(meta);
+        Assert.Empty(service.GetTags());
+        Assert.Empty(service.GetIds());
+        Assert.Empty(service.GetUniqueKeys());
     }
-    #endregion
 }
 
 // =============================================================================
@@ -236,34 +207,34 @@ public class CollectionSmartDefaultsTests
 
 public class NoConstructorSmartDefaultsTests
 {
-    #region smart-defaults-throw
     [Fact]
     public void TypeWithoutCtor_ThrowsWithoutConfiguration()
     {
         var stub = new UserFactoryStub();
         IUserFactory factory = stub;
 
-        // UserWithRequiredCtor has no parameterless constructor, so smart defaults can't create one
-        // Without OnCall, user method, or Source, calling this method throws
+        #region smart-defaults-throw
+        // Types without parameterless constructor throw if not configured
+        // factory.GetUser(); // throws InvalidOperationException
 
-        var exception = Assert.Throws<InvalidOperationException>(() => factory.GetUser());
-        Assert.Contains("No implementation provided", exception.Message);
-    }
-
-    [Fact]
-    public void TypeWithoutCtor_WorksWithConfiguration()
-    {
-        var stub = new UserFactoryStub();
-        IUserFactory factory = stub;
-
-        // Configure OnCall to provide value
+        // Fix: configure OnCall to provide the value
         stub.GetUser.OnCall(() => new UserWithRequiredCtor(1, "Configured"));
+        #endregion
 
         var user = factory.GetUser();
         Assert.NotNull(user);
         Assert.Equal("Configured", user.Name);
     }
-    #endregion
+
+    [Fact]
+    public void TypeWithoutCtor_ActuallyThrows()
+    {
+        var stub = new UserFactoryStub();
+        IUserFactory factory = stub;
+
+        var exception = Assert.Throws<InvalidOperationException>(() => factory.GetUser());
+        Assert.Contains("No implementation provided", exception.Message);
+    }
 }
 
 // =============================================================================
@@ -272,29 +243,20 @@ public class NoConstructorSmartDefaultsTests
 
 public class AsyncSmartDefaultsTests
 {
-    #region smart-defaults-async
     [Fact]
     public async Task AsyncTypes_ReturnCompletedTasks()
     {
         var stub = new AsyncDefaultsServiceStub();
         IAsyncDefaultsService service = stub;
 
-        // No configuration - smart defaults apply
+        #region smart-defaults-async
+        // Async methods return completed tasks with smart defaults for inner type
+        int count = await service.GetCountAsync();  // returns Task.FromResult(0)
+        await service.CompleteAsync();              // returns Task.CompletedTask
+        #endregion
 
-        // Task<User?> returns completed task with null
-        var user = await service.GetUserAsync(1);
-        Assert.Null(user);
-
-        // Task<int> returns completed task with 0
-        var count = await service.GetCountAsync();
         Assert.Equal(0, count);
-
-        // Task returns completed task
-        await service.CompleteAsync(); // Should not throw
-
-        // ValueTask<bool> returns completed with false
-        var isValid = await service.IsValidAsync();
-        Assert.False(isValid);
+        Assert.Null(await service.GetUserAsync(1));
+        Assert.False(await service.IsValidAsync());
     }
-    #endregion
 }

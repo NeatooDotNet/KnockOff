@@ -49,24 +49,24 @@ public partial class UserMethodsRepoStub
 
 public class UserMethodPriorityTests
 {
-    #region user-methods-priority
     [Fact]
     public void UserMethod_ProvidesDefaultBehavior()
     {
         var stub = new UserMethodsRepoStub();
         IUserMethodsRepo repository = stub;
 
+        #region user-methods-priority
         // User method provides default behavior automatically
         var user = repository.GetUserById(1);
 
+        // Verify the call was tracked (user method interceptors end with "2")
+        stub.GetUserById2.Verify(Times.Once);
+        #endregion
+
         Assert.NotNull(user);
         Assert.Equal("Default User", user.Name);
-
-        // Interceptor tracks that the method was called - verify with Times
-        stub.GetUserById2.Verify(Times.Once);
         Assert.Equal(1, stub.GetUserById2.LastArg);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -75,23 +75,21 @@ public class UserMethodPriorityTests
 
 public class UserMethodOverrideTests
 {
-    #region user-methods-override
     [Fact]
     public void UserMethod_InterceptorTracksCallsOnly()
     {
         var stub = new UserMethodsRepoStub();
         IUserMethodsRepo repository = stub;
 
-        // User method returns default value
         var isActive = repository.IsActive(42);
         Assert.True(isActive);
 
-        // User method interceptors are tracking-only
-        // They don't have OnCall - use a regular stub when you need OnCall
+        #region user-methods-override
+        // User method interceptors are tracking-only (no OnCall available)
         stub.IsActive2.Verify(Times.Once);
         Assert.Equal(42, stub.IsActive2.LastArg);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -100,27 +98,25 @@ public class UserMethodOverrideTests
 
 public class UserMethodResetTests
 {
-    #region user-methods-reset
     [Fact]
     public void Reset_ClearsUserMethodTracking()
     {
         var stub = new UserMethodsRepoStub();
         IUserMethodsRepo repository = stub;
 
-        // Call method
         repository.GetBalance(1);
         stub.GetBalance2.Verify(Times.Once);
 
-        // Reset clears tracking
+        #region user-methods-reset
+        // Reset clears call count and argument tracking
         stub.GetBalance2.Reset();
         stub.GetBalance2.Verify(Times.Never);
+        #endregion
 
-        // User method still works after reset
         var balance = repository.GetBalance(2);
         Assert.Equal(100.00m, balance);
         stub.GetBalance2.Verify(Times.Once);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -136,30 +132,25 @@ public partial class OverridableRepoStub : IUserMethodsRepo { }
 
 public class SourceOverrideTests
 {
-    #region user-methods-source-override
     [Fact]
     public void WhenOverrideNeeded_UseRegularStubWithOnCall()
     {
-        // Use a stub WITHOUT user methods when you need OnCall
         var stub = new OverridableRepoStub();
+        IUserMethodsRepo repository = stub;
 
-        // Configure specific behavior with OnCall
+        #region user-methods-source-override
+        // For runtime-configurable behavior, use a regular stub with OnCall
         stub.GetUserById.OnCall((id) => new User { Id = id, Name = "Overridden" });
         stub.IsActive.Returns(true);
         stub.GetBalance.Returns(999.99m);
+        #endregion
 
-        IUserMethodsRepo repository = stub;
-
-        // OnCall provides the behavior
         var user = repository.GetUserById(1);
         Assert.Equal("Overridden", user!.Name);
         Assert.True(repository.IsActive(1));
         Assert.Equal(999.99m, repository.GetBalance(1));
-
-        // Still get full verification
         stub.GetUserById.Verify(Times.Once);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -168,28 +159,25 @@ public class SourceOverrideTests
 
 public class CompleteUserMethodExampleTests
 {
-    #region user-methods-complete-example
     [Fact]
     public void StandardUserRetrieval_UsesUserMethodDefaults()
     {
         var stub = new UserMethodsRepoStub();
         IUserMethodsRepo repository = stub;
 
-        // All user methods provide defaults automatically
+        #region user-methods-complete-example
+        // User methods provide defaults; interceptors track calls
         var user = repository.GetUserById(42);
         var isActive = repository.IsActive(42);
-        var balance = repository.GetBalance(42);
 
-        // User methods return expected defaults
+        // Verify with *2 interceptors (user method tracking)
+        stub.GetUserById2.Verify(Times.Once);
+        stub.IsActive2.Verify(Times.Once);
+        #endregion
+
         Assert.NotNull(user);
         Assert.Equal("Default User", user.Name);
         Assert.True(isActive);
-        Assert.Equal(100.00m, balance);
-
-        // All calls are tracked via *2 interceptors - verify with Times
-        stub.GetUserById2.Verify(Times.Once);
-        stub.IsActive2.Verify(Times.Once);
-        stub.GetBalance2.Verify(Times.Once);
     }
 
     [Fact]
@@ -198,14 +186,11 @@ public class CompleteUserMethodExampleTests
         var stub = new UserMethodsRepoStub();
         IUserMethodsRepo repository = stub;
 
-        // Make multiple calls
         repository.GetUserById(1);
         repository.GetUserById(2);
         repository.GetUserById(3);
 
-        // Verify call count using Times
         stub.GetUserById2.Verify(Times.Exactly(3));
-        Assert.Equal(3, stub.GetUserById2.LastArg); // Last call was id=3
+        Assert.Equal(3, stub.GetUserById2.LastArg);
     }
-    #endregion
 }

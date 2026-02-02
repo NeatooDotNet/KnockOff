@@ -63,22 +63,11 @@ User methods provide permanent compile-time behavior. If you need runtime-config
 
 <!-- snippet: user-methods-priority -->
 ```cs
-[Fact]
-public void UserMethod_ProvidesDefaultBehavior()
-{
-    var stub = new UserMethodsRepoStub();
-    IUserMethodsRepo repository = stub;
+// User method provides default behavior automatically
+var user = repository.GetUserById(1);
 
-    // User method provides default behavior automatically
-    var user = repository.GetUserById(1);
-
-    Assert.NotNull(user);
-    Assert.Equal("Default User", user.Name);
-
-    // Interceptor tracks that the method was called - verify with Times
-    stub.GetUserById2.Verify(Times.Once);
-    Assert.Equal(1, stub.GetUserById2.LastArg);
-}
+// Verify the call was tracked (user method interceptors end with "2")
+stub.GetUserById2.Verify(Times.Once);
 ```
 <!-- endSnippet -->
 
@@ -90,21 +79,9 @@ User method interceptors provide call tracking without behavior configuration. U
 
 <!-- snippet: user-methods-override -->
 ```cs
-[Fact]
-public void UserMethod_InterceptorTracksCallsOnly()
-{
-    var stub = new UserMethodsRepoStub();
-    IUserMethodsRepo repository = stub;
-
-    // User method returns default value
-    var isActive = repository.IsActive(42);
-    Assert.True(isActive);
-
-    // User method interceptors are tracking-only
-    // They don't have OnCall - use a regular stub when you need OnCall
-    stub.IsActive2.Verify(Times.Once);
-    Assert.Equal(42, stub.IsActive2.LastArg);
-}
+// User method interceptors are tracking-only (no OnCall available)
+stub.IsActive2.Verify(Times.Once);
+Assert.Equal(42, stub.IsActive2.LastArg);
 ```
 <!-- endSnippet -->
 
@@ -118,25 +95,9 @@ Call `Reset()` on the interceptor to clear call count and argument tracking. The
 
 <!-- snippet: user-methods-reset -->
 ```cs
-[Fact]
-public void Reset_ClearsUserMethodTracking()
-{
-    var stub = new UserMethodsRepoStub();
-    IUserMethodsRepo repository = stub;
-
-    // Call method
-    repository.GetBalance(1);
-    stub.GetBalance2.Verify(Times.Once);
-
-    // Reset clears tracking
-    stub.GetBalance2.Reset();
-    stub.GetBalance2.Verify(Times.Never);
-
-    // User method still works after reset
-    var balance = repository.GetBalance(2);
-    Assert.Equal(100.00m, balance);
-    stub.GetBalance2.Verify(Times.Once);
-}
+// Reset clears call count and argument tracking
+stub.GetBalance2.Reset();
+stub.GetBalance2.Verify(Times.Never);
 ```
 <!-- endSnippet -->
 
@@ -150,28 +111,10 @@ User method interceptors do not have `OnCall` because the protected method defin
 
 <!-- snippet: user-methods-source-override -->
 ```cs
-[Fact]
-public void WhenOverrideNeeded_UseRegularStubWithOnCall()
-{
-    // Use a stub WITHOUT user methods when you need OnCall
-    var stub = new OverridableRepoStub();
-
-    // Configure specific behavior with OnCall
-    stub.GetUserById.OnCall((id) => new User { Id = id, Name = "Overridden" });
-    stub.IsActive.Returns(true);
-    stub.GetBalance.Returns(999.99m);
-
-    IUserMethodsRepo repository = stub;
-
-    // OnCall provides the behavior
-    var user = repository.GetUserById(1);
-    Assert.Equal("Overridden", user!.Name);
-    Assert.True(repository.IsActive(1));
-    Assert.Equal(999.99m, repository.GetBalance(1));
-
-    // Still get full verification
-    stub.GetUserById.Verify(Times.Once);
-}
+// For runtime-configurable behavior, use a regular stub with OnCall
+stub.GetUserById.OnCall((id) => new User { Id = id, Name = "Overridden" });
+stub.IsActive.Returns(true);
+stub.GetBalance.Returns(999.99m);
 ```
 <!-- endSnippet -->
 
@@ -199,44 +142,13 @@ Implement the most common success scenario in user methods. Tests verify the hap
 
 <!-- snippet: user-methods-complete-example -->
 ```cs
-[Fact]
-public void StandardUserRetrieval_UsesUserMethodDefaults()
-{
-    var stub = new UserMethodsRepoStub();
-    IUserMethodsRepo repository = stub;
+// User methods provide defaults; interceptors track calls
+var user = repository.GetUserById(42);
+var isActive = repository.IsActive(42);
 
-    // All user methods provide defaults automatically
-    var user = repository.GetUserById(42);
-    var isActive = repository.IsActive(42);
-    var balance = repository.GetBalance(42);
-
-    // User methods return expected defaults
-    Assert.NotNull(user);
-    Assert.Equal("Default User", user.Name);
-    Assert.True(isActive);
-    Assert.Equal(100.00m, balance);
-
-    // All calls are tracked via *2 interceptors - verify with Times
-    stub.GetUserById2.Verify(Times.Once);
-    stub.IsActive2.Verify(Times.Once);
-    stub.GetBalance2.Verify(Times.Once);
-}
-
-[Fact]
-public void MultipleCallsTrackedCorrectly()
-{
-    var stub = new UserMethodsRepoStub();
-    IUserMethodsRepo repository = stub;
-
-    // Make multiple calls
-    repository.GetUserById(1);
-    repository.GetUserById(2);
-    repository.GetUserById(3);
-
-    // Verify call count using Times
-    stub.GetUserById2.Verify(Times.Exactly(3));
-    Assert.Equal(3, stub.GetUserById2.LastArg); // Last call was id=3
-}
+// Verify with *2 interceptors (user method tracking)
+stub.GetUserById2.Verify(Times.Once);
+stub.IsActive2.Verify(Times.Once);
 ```
 <!-- endSnippet -->
 

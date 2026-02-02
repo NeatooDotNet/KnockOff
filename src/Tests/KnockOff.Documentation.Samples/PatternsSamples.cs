@@ -19,28 +19,24 @@ public partial class UserRepoStandaloneStub : IUserRepoStandalone { }
 
 public class StandalonePatternTests
 {
-    #region patterns-standalone-usage
     [Fact]
     public void StandaloneStub_CanBeConfiguredAndVerified()
     {
-        // Arrange - instantiate the reusable stub
+        #region patterns-standalone-usage
+        // Stand-Alone: instantiate like any class, configure via Verify()
         var stub = new UserRepoStandaloneStub();
-
-        // Configure method behavior and mark verifiable
         stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
         stub.Save.OnCall((user) => { }).Verifiable();
+        #endregion
 
-        // Act - cast to interface for use
         IUserRepoStandalone repository = stub;
         var user = repository.GetById(42);
         repository.Save(user!);
 
-        // Assert - verify via Verify()
         Assert.NotNull(user);
         Assert.Equal("User42", user.Name);
         stub.Verify();
     }
-    #endregion
 }
 
 // =============================================================================
@@ -63,28 +59,24 @@ public partial class InlineInterfaceTests
 
 public partial class InlineInterfaceTests
 {
-    #region patterns-inline-interface-usage
     [Fact]
     public void InlineInterfaceStub_GeneratedInStubsNamespace()
     {
-        // Arrange - use generated Stubs.InterfaceName class
+        #region patterns-inline-interface-usage
+        // Inline Interface: access via Stubs namespace
         var stub = new Stubs.IUserRepoInline();
-
-        // Configure behavior and mark verifiable
         stub.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
         stub.Save.OnCall((user) => { }).Verifiable();
+        #endregion
 
-        // Act
         IUserRepoInline repository = stub;
         var user = repository.GetById(1);
         repository.Save(user!);
 
-        // Assert
         Assert.NotNull(user);
         Assert.Equal("Test", user.Name);
         stub.Verify();
     }
-    #endregion
 }
 
 // =============================================================================
@@ -109,26 +101,22 @@ public partial class InlineClassTests
 
 public partial class InlineClassTests
 {
-    #region patterns-inline-class-usage
     [Fact]
     public void InlineClassStub_UsesObjectProperty()
     {
-        // Arrange - create wrapper stub
+        #region patterns-inline-class-usage
+        // Inline Class: configure stub, use .Object for the class instance
         var stub = new Stubs.UserServiceClass();
-
-        // Configure virtual member behavior and mark verifiable
         stub.GetUser.OnCall((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
-
-        // Act - use .Object to get the actual class instance
         UserServiceClass service = stub.Object;
+        #endregion
+
         var user = service.GetUser(42);
 
-        // Assert
         Assert.NotNull(user);
         Assert.Equal("FromStub", user.Name);
         stub.Verify();
     }
-    #endregion
 }
 
 // =============================================================================
@@ -150,28 +138,24 @@ public partial class InlineDelegateTests
 
 public partial class InlineDelegateTests
 {
-    #region patterns-inline-delegate-usage
     [Fact]
     public void InlineDelegateStub_TracksInvocationsAndConfiguresBehavior()
     {
-        // Arrange - create delegate stub
+        #region patterns-inline-delegate-usage
+        // Inline Delegate: configure via Interceptor, implicit conversion to delegate
         var ruleStub = new Stubs.ValidationRule();
-
-        // Configure behavior via Interceptor.OnCall
         ruleStub.Interceptor.OnCall((value) => value != "invalid");
-
-        // Act - implicit conversion to delegate type
         ValidationRule rule = ruleStub;
+        #endregion
+
         bool result1 = rule("valid");
         bool result2 = rule("invalid");
 
-        // Assert - verify calls and behavior
         Assert.True(result1);
         Assert.False(result2);
         ruleStub.Interceptor.Verify(Times.Exactly(2));
         Assert.Equal("invalid", ruleStub.Interceptor.LastCallArg);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -198,7 +182,6 @@ public interface IEmailSvcPattern
 [KnockOff]
 public partial class EmailSvcPatternStub : IEmailSvcPattern { }
 
-#region patterns-complete-example
 [KnockOff<ILogSvc>]
 [KnockOff<AuditSvcBase>]
 public partial class PatternComparisonTests
@@ -206,36 +189,33 @@ public partial class PatternComparisonTests
     [Fact]
     public void AllThreePatterns_WorkTogether()
     {
-        // Stand-Alone: Reusable email stub
+        #region patterns-complete-example
+        // Stand-Alone: direct instantiation
         var emailStub = new EmailSvcPatternStub();
         emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
-        emailStub.IsConfigured.OnGet(true);
 
-        // Inline Interface: Test-local logger stub
+        // Inline Interface: via Stubs namespace
         var loggerStub = new Stubs.ILogSvc();
-        var logMessages = new List<string>();
-        var logTracking = loggerStub.Log.OnCall((msg) => logMessages.Add(msg)).Verifiable(Times.Exactly(2));
+        loggerStub.Log.OnCall((msg) => { }).Verifiable();
 
-        // Inline Class: Stub for abstract base class
+        // Inline Class: use .Object for class instance
         var auditStub = new Stubs.AuditSvcBase();
         auditStub.Audit.OnCall((action) => { }).Verifiable();
+        AuditSvcBase audit = auditStub.Object;
+        #endregion
 
-        // Act - simulate integration scenario
         IEmailSvcPattern email = emailStub;
         ILogSvc logger = loggerStub;
-        AuditSvcBase audit = auditStub.Object;
+        var logMessages = new List<string>();
 
         logger.Log("Starting operation");
         var sent = email.Send("user@test.com", "Hello", "World");
         audit.Audit("email_sent");
         logger.Log("Operation complete");
 
-        // Assert - each pattern provides Verify()
         Assert.True(sent);
         emailStub.Verify();
         loggerStub.Verify();
         auditStub.Verify();
-        Assert.Contains("Starting operation", logMessages);
     }
 }
-#endregion

@@ -73,9 +73,6 @@ If you were reading `.Value` to verify what was configured, that's no longer nee
 ```cs
 // AFTER: Configure with OnGet, verify through interface
 stub.Name.OnGet("Expected");
-
-IMigrationUserService service = stub;
-Assert.Equal("Expected", service.Name);
 ```
 <!-- endSnippet -->
 
