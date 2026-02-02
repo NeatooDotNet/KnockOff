@@ -26,6 +26,85 @@ No `Arg.Is<>()`. No `x.Arg<int>()`. The parameter is just `id`.
 
 ---
 
+## Method Overload Resolution
+
+**The Problem:** When an interface has overloaded methods with the same parameter count but different types:
+
+<!-- snippet: readme-method-overload-interface -->
+```cs
+public interface IFormatter
+{
+    string Format(string input, bool uppercase);
+    string Format(string input, int maxLength);
+}
+```
+<!-- endSnippet -->
+
+### Any-Value Matching
+
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-any-value -->
+```cs
+// Arg.Any<T>() required - compiler needs the types to resolve overload
+formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
+formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-knockoff-any-value -->
+```cs
+// Explicit parameter types resolve the overload - standard C# syntax
+stub.Format.OnCall((string input, bool uppercase) => "bool overload");
+stub.Format.OnCall((string input, int maxLength) => "int overload");
+```
+<!-- endSnippet -->
+
+### Specific-Value Matching
+
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-specific-value -->
+```cs
+// Specific value matching - literals work when all args are specific
+formatter.Format("test", true).Returns("UPPERCASE");
+formatter.Format("test", 10).Returns("truncated");
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-knockoff-specific-value -->
+```cs
+// Specific value matching - parameter types resolve the overload
+stub.Format.When("test", true).Returns("UPPERCASE");
+stub.Format.When("test", 10).Returns("truncated");
+```
+<!-- endSnippet -->
+
+### Argument Access
+
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-argument-access -->
+```cs
+// To use argument values, extract from CallInfo:
+formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
+    .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-knockoff-argument-access -->
+```cs
+// Arguments are directly available with names and types:
+stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+```
+<!-- endSnippet -->
+
+**The Difference:**
+- NSubstitute: `Arg.Any<bool>()` + `x.ArgAt<bool>(1)` to match any value and access arguments
+- KnockOff: `(string input, bool uppercase)` - standard C# lambda with named, typed parameters
+
+---
+
 ## Unique Feature: Source Delegation
 
 Delegate to a real implementation, override only what you need:
