@@ -173,18 +173,21 @@ public partial class UserMethodBasicsDemo
     }
 
     // =========================================================================
-    // DESIGN QUESTION: Why No OnCall() on User Method Interceptors?
+    // DESIGN DECISION: OnCall() WILL Supersede User Methods
     // =========================================================================
-    // The user method IS the behavior - OnCall would create ambiguity:
-    // - Should OnCall override the user method?
-    // - Should it wrap it?
-    // - Should it be called before or after?
+    // User methods provide shareable defaults. OnCall/Returns override per test.
     //
-    // CURRENT DECISION: User methods are the final word. If you need
-    // runtime-configurable behavior, don't use a user method for that member.
+    // RATIONALE: Stubs should be shareable yet configurable per test.
+    // - User method = sensible default for most tests
+    // - OnCall/Returns = override when a specific test needs different behavior
     //
-    // ALTERNATIVE CONSIDERED: OnCall that wraps user method
-    // REJECTED: Adds complexity. User methods should be "set and forget".
+    // This matches how generic user methods already work (see GenericUserMethodStub.g.cs):
+    //   if (Callback is { } callback) return callback();  // OnCall wins
+    //   return UserMethod();                              // Fallback
+    //
+    // TODO: Generator currently creates tracking-only interceptors for non-generic
+    // user methods. See docs/todos/user-method-oncall-support.md for the work
+    // to add OnCall/Returns support.
     // =========================================================================
 }
 
@@ -521,6 +524,10 @@ public partial class GenericUserMethodDemo
 // - Async user methods (Task<T>, Task, ValueTask<T>) - see AsyncUserMethodStub
 // - Generic user methods with Of<T>() pattern - see GenericUserMethodStub
 //
+// **PLANNED ENHANCEMENT:**
+// - OnCall/Returns on non-generic user method interceptors (supersedes user method)
+// - See docs/todos/user-method-oncall-support.md
+//
 // **BUGS DISCOVERED:**
 // 1. USER METHOD OVERLOADS - Generator produces invalid code
 //    - RecordCall has only one signature (first overload's)
@@ -552,10 +559,9 @@ public partial class GenericUserMethodDemo
 //    A: YES - Generic user methods work with the Of<T>() pattern.
 //       - Generator creates *2 interceptors (Create2, Transform2, etc.)
 //       - Access typed tracking via stub.Create2.Of<T>()
-//       - NOTABLE: Generic user method interceptors DO have OnCall!
-//         This differs from non-generic user methods which are tracking-only.
-//       - The OnCall on Of<T>() typed handlers allows overriding specific
+//       - OnCall on Of<T>() typed handlers allows overriding specific
 //         type instantiations while user method handles the general case.
 //       - See GenericUserMethodStub for working examples
+//       - Non-generic user methods will also get OnCall (see planned enhancement)
 //
 // =============================================================================
