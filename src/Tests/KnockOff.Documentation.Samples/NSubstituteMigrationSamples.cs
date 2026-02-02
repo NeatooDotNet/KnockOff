@@ -32,30 +32,34 @@ public partial class NSubUserRepoStub : INSubUserRepo { }
 
 public class CreateStubNSubTests
 {
-    #region nsub-migration-create-stub-nsub
     [Fact]
     public void CreateStub_NSubstituteApproach()
     {
+        #region nsub-migration-create-stub-nsub
+        // NSubstitute: Create proxy at runtime with a single line
         var substitute = Substitute.For<INSubUserRepo>();
+        #endregion
+
         INSubUserRepo repository = substitute;
 
         Assert.NotNull(repository);
     }
-    #endregion
 }
 
 public class CreateStubKnockOffTests
 {
-    #region nsub-migration-create-stub-knockoff
     [Fact]
     public void CreateStub_KnockOffApproach()
     {
+        #region nsub-migration-create-stub-knockoff
+        // KnockOff: Instantiate the generated stub class
         var stub = new NSubUserRepoStub();
+        #endregion
+
         INSubUserRepo repository = stub;
 
         Assert.NotNull(repository);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -64,15 +68,16 @@ public class CreateStubKnockOffTests
 
 public class ReturnsNSubTests
 {
-    #region nsub-migration-returns-nsub
     [Fact]
     public void Returns_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
         var testUser = new User { Id = 42, Name = "Alice" };
 
+        #region nsub-migration-returns-nsub
         // NSubstitute's elegant fluent API
         substitute.GetUser(Arg.Any<int>()).Returns(testUser);
+        #endregion
 
         INSubUserRepo repository = substitute;
         var user = repository.GetUser(42);
@@ -80,20 +85,20 @@ public class ReturnsNSubTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 }
 
 public class ReturnsKnockOffTests
 {
-    #region nsub-migration-returns-knockoff
     [Fact]
     public void Returns_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
         var testUser = new User { Id = 42, Name = "Alice" };
 
+        #region nsub-migration-returns-knockoff
         // KnockOff uses OnCall with typed delegate
         stub.GetUser.OnCall((id) => testUser);
+        #endregion
 
         INSubUserRepo repository = stub;
         var user = repository.GetUser(42);
@@ -101,7 +106,6 @@ public class ReturnsKnockOffTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -110,19 +114,16 @@ public class ReturnsKnockOffTests
 
 public class ReturnsWithArgsNSubTests
 {
-    #region nsub-migration-returns-args-nsub
     [Fact]
     public void ReturnsWithArgs_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
 
-        // NSubstitute: Access args through callback in Returns
+        #region nsub-migration-returns-args-nsub
+        // NSubstitute: Access args through callInfo.Arg<T>()
         substitute.GetUser(Arg.Any<int>())
-            .Returns(callInfo => new User
-            {
-                Id = callInfo.Arg<int>(),
-                Name = $"User{callInfo.Arg<int>()}"
-            });
+            .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = $"User{callInfo.Arg<int>()}" });
+        #endregion
 
         INSubUserRepo repository = substitute;
         var user = repository.GetUser(42);
@@ -131,23 +132,19 @@ public class ReturnsWithArgsNSubTests
         Assert.Equal(42, user.Id);
         Assert.Equal("User42", user.Name);
     }
-    #endregion
 }
 
 public class ReturnsWithArgsKnockOffTests
 {
-    #region nsub-migration-returns-args-knockoff
     [Fact]
     public void ReturnsWithArgs_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
 
+        #region nsub-migration-returns-args-knockoff
         // KnockOff: Arguments are directly available in the delegate
-        stub.GetUser.OnCall((id) => new User
-        {
-            Id = id,
-            Name = $"User{id}"
-        });
+        stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+        #endregion
 
         INSubUserRepo repository = stub;
         var user = repository.GetUser(42);
@@ -156,7 +153,6 @@ public class ReturnsWithArgsKnockOffTests
         Assert.Equal(42, user.Id);
         Assert.Equal("User42", user.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -165,15 +161,16 @@ public class ReturnsWithArgsKnockOffTests
 
 public class ReturnsForAnyArgsNSubTests
 {
-    #region nsub-migration-returns-anyargs-nsub
     [Fact]
     public void ReturnsForAnyArgs_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
         var testUser = new User { Id = 1, Name = "Default" };
 
+        #region nsub-migration-returns-anyargs-nsub
         // ReturnsForAnyArgs: matches any argument combination
         substitute.GetUser(default).ReturnsForAnyArgs(testUser);
+        #endregion
 
         INSubUserRepo repository = substitute;
         var user1 = repository.GetUser(1);
@@ -182,21 +179,20 @@ public class ReturnsForAnyArgsNSubTests
         Assert.Equal("Default", user1?.Name);
         Assert.Equal("Default", user2?.Name);
     }
-    #endregion
 }
 
 public class ReturnsForAnyArgsKnockOffTests
 {
-    #region nsub-migration-returns-anyargs-knockoff
     [Fact]
     public void ReturnsForAnyArgs_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
         var testUser = new User { Id = 1, Name = "Default" };
 
-        // KnockOff: OnCall inherently matches any arguments
-        // (no separate "ForAnyArgs" needed)
+        #region nsub-migration-returns-anyargs-knockoff
+        // KnockOff: OnCall inherently matches any arguments (no "ForAnyArgs" needed)
         stub.GetUser.OnCall((id) => testUser);
+        #endregion
 
         INSubUserRepo repository = stub;
         var user1 = repository.GetUser(1);
@@ -205,7 +201,6 @@ public class ReturnsForAnyArgsKnockOffTests
         Assert.Equal("Default", user1?.Name);
         Assert.Equal("Default", user2?.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -214,43 +209,42 @@ public class ReturnsForAnyArgsKnockOffTests
 
 public class PropertySetupNSubTests
 {
-    #region nsub-migration-property-nsub
     [Fact]
     public void PropertySetup_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
 
+        #region nsub-migration-property-nsub
         // NSubstitute: elegant property Returns
         substitute.ConnectionString.Returns("server=localhost");
         substitute.IsConnected.Returns(true);
+        #endregion
 
         INSubUserRepo repository = substitute;
 
         Assert.Equal("server=localhost", repository.ConnectionString);
         Assert.True(repository.IsConnected);
     }
-    #endregion
 }
 
 public class PropertySetupKnockOffTests
 {
-    #region nsub-migration-property-knockoff
     [Fact]
     public void PropertySetup_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
 
-        // KnockOff: Use OnGet(value) for all properties
+        #region nsub-migration-property-knockoff
+        // KnockOff: Use OnGet(value) for property getters
         stub.ConnectionString.OnGet("server=localhost");
-        // For read-only properties, also use OnGet(value)
         stub.IsConnected.OnGet(true);
+        #endregion
 
         INSubUserRepo repository = stub;
 
         Assert.Equal("server=localhost", repository.ConnectionString);
         Assert.True(repository.IsConnected);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -259,7 +253,6 @@ public class PropertySetupKnockOffTests
 
 public class ReceivedNSubTests
 {
-    #region nsub-migration-received-nsub
     [Fact]
     public void Received_NSubstituteApproach()
     {
@@ -268,23 +261,25 @@ public class ReceivedNSubTests
         INSubUserRepo repository = substitute;
         repository.SaveUser(new User { Id = 1, Name = "Bob" });
 
+        #region nsub-migration-received-nsub
         // NSubstitute's intuitive Received() syntax
         substitute.Received().SaveUser(Arg.Any<User>());
         substitute.Received(1).SaveUser(Arg.Any<User>());
+        #endregion
     }
-    #endregion
 }
 
 public class ReceivedKnockOffTests
 {
-    #region nsub-migration-received-knockoff
     [Fact]
     public void Received_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
 
-        // Mark method as verifiable during setup
+        #region nsub-migration-received-knockoff
+        // KnockOff: Mark as verifiable during setup, then Verify()
         stub.SaveUser.OnCall((user) => { }).Verifiable();
+        #endregion
 
         INSubUserRepo repository = stub;
         repository.SaveUser(new User { Id = 1, Name = "Bob" });
@@ -292,10 +287,9 @@ public class ReceivedKnockOffTests
         // Verify() checks all members marked with .Verifiable()
         stub.Verify();
 
-        // Or verify with explicit Times via tracking
+        // Or verify with explicit Times
         stub.SaveUser.Verify(Times.Once);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -304,7 +298,6 @@ public class ReceivedKnockOffTests
 
 public class DidNotReceiveNSubTests
 {
-    #region nsub-migration-didnotreceive-nsub
     [Fact]
     public void DidNotReceive_NSubstituteApproach()
     {
@@ -313,28 +306,28 @@ public class DidNotReceiveNSubTests
         INSubUserRepo repository = substitute;
         // Don't call DeleteUser
 
+        #region nsub-migration-didnotreceive-nsub
         // NSubstitute's DidNotReceive - beautifully readable
         substitute.DidNotReceive().DeleteUser(Arg.Any<int>());
+        #endregion
     }
-    #endregion
 }
 
 public class DidNotReceiveKnockOffTests
 {
-    #region nsub-migration-didnotreceive-knockoff
     [Fact]
     public void DidNotReceive_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
-        var tracking = stub.DeleteUser.OnCall((id) => { });
 
         INSubUserRepo repository = stub;
         // Don't call DeleteUser
 
-        // KnockOff: Use Times.Never for "did not receive"
-        tracking.Verify(Times.Never);
+        #region nsub-migration-didnotreceive-knockoff
+        // KnockOff: Use Verify(Times.Never) for "did not receive"
+        stub.DeleteUser.Verify(Times.Never);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -343,16 +336,17 @@ public class DidNotReceiveKnockOffTests
 
 public class WhenDoNSubTests
 {
-    #region nsub-migration-whendo-nsub
     [Fact]
     public void WhenDo_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
         var savedUsers = new List<User>();
 
+        #region nsub-migration-whendo-nsub
         // NSubstitute: When...Do for void methods with side effects
         substitute.When(x => x.SaveUser(Arg.Any<User>()))
             .Do(callInfo => savedUsers.Add(callInfo.Arg<User>()));
+        #endregion
 
         INSubUserRepo repository = substitute;
         repository.SaveUser(new User { Id = 1, Name = "Alice" });
@@ -362,23 +356,20 @@ public class WhenDoNSubTests
         Assert.Equal("Alice", savedUsers[0].Name);
         Assert.Equal("Bob", savedUsers[1].Name);
     }
-    #endregion
 }
 
 public class WhenDoKnockOffTests
 {
-    #region nsub-migration-whendo-knockoff
     [Fact]
     public void WhenDo_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
         var savedUsers = new List<User>();
 
+        #region nsub-migration-whendo-knockoff
         // KnockOff: OnCall handles side effects directly
-        stub.SaveUser.OnCall((user) =>
-        {
-            savedUsers.Add(user);
-        });
+        stub.SaveUser.OnCall((user) => { savedUsers.Add(user); });
+        #endregion
 
         INSubUserRepo repository = stub;
         repository.SaveUser(new User { Id = 1, Name = "Alice" });
@@ -388,7 +379,6 @@ public class WhenDoKnockOffTests
         Assert.Equal("Alice", savedUsers[0].Name);
         Assert.Equal("Bob", savedUsers[1].Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -397,17 +387,18 @@ public class WhenDoKnockOffTests
 
 public class ReturnsAndDoesNSubTests
 {
-    #region nsub-migration-returnsanddoes-nsub
     [Fact]
     public void ReturnsAndDoes_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
         var accessLog = new List<int>();
 
+        #region nsub-migration-returnsanddoes-nsub
         // NSubstitute: AndDoes for side effects with return value
         substitute.GetUser(Arg.Any<int>())
             .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = "Test" })
             .AndDoes(callInfo => accessLog.Add(callInfo.Arg<int>()));
+        #endregion
 
         INSubUserRepo repository = substitute;
         var user1 = repository.GetUser(1);
@@ -416,24 +407,20 @@ public class ReturnsAndDoesNSubTests
         Assert.Equal(new[] { 1, 2 }, accessLog);
         Assert.Equal("Test", user1?.Name);
     }
-    #endregion
 }
 
 public class ReturnsAndDoesKnockOffTests
 {
-    #region nsub-migration-returnsanddoes-knockoff
     [Fact]
     public void ReturnsAndDoes_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
         var accessLog = new List<int>();
 
+        #region nsub-migration-returnsanddoes-knockoff
         // KnockOff: Side effects and return in same delegate
-        stub.GetUser.OnCall((id) =>
-        {
-            accessLog.Add(id);
-            return new User { Id = id, Name = "Test" };
-        });
+        stub.GetUser.OnCall((id) => { accessLog.Add(id); return new User { Id = id, Name = "Test" }; });
+        #endregion
 
         INSubUserRepo repository = stub;
         var user1 = repository.GetUser(1);
@@ -442,7 +429,6 @@ public class ReturnsAndDoesKnockOffTests
         Assert.Equal(new[] { 1, 2 }, accessLog);
         Assert.Equal("Test", user1?.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -451,19 +437,16 @@ public class ReturnsAndDoesKnockOffTests
 
 public class ArgMatchersNSubTests
 {
-    #region nsub-migration-argmatchers-nsub
     [Fact]
     public void ArgMatchers_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
 
+        #region nsub-migration-argmatchers-nsub
         // Arg.Is<T>() for conditional matching
         substitute.GetUser(Arg.Is<int>(id => id > 0))
-            .Returns(callInfo => new User
-            {
-                Id = callInfo.Arg<int>(),
-                Name = "Valid User"
-            });
+            .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = "Valid User" });
+        #endregion
 
         INSubUserRepo repository = substitute;
 
@@ -473,20 +456,19 @@ public class ArgMatchersNSubTests
         Assert.NotNull(validUser);
         Assert.Null(invalidUser); // No setup matched
     }
-    #endregion
 }
 
 public class ArgMatchersKnockOffTests
 {
-    #region nsub-migration-argmatchers-knockoff
     [Fact]
     public void ArgMatchers_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
 
+        #region nsub-migration-argmatchers-knockoff
         // KnockOff: Conditional logic in the callback
-        stub.GetUser.OnCall((id) =>
-            id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+        stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+        #endregion
 
         INSubUserRepo repository = stub;
 
@@ -496,7 +478,6 @@ public class ArgMatchersKnockOffTests
         Assert.NotNull(validUser);
         Assert.Null(invalidUser);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -505,15 +486,16 @@ public class ArgMatchersKnockOffTests
 
 public class AsyncMethodNSubTests
 {
-    #region nsub-migration-async-nsub
     [Fact]
     public async Task AsyncMethod_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
         var testUser = new User { Id = 42, Name = "Alice" };
 
-        // NSubstitute: Returns works seamlessly with Task
+        #region nsub-migration-async-nsub
+        // NSubstitute: Returns works seamlessly with Task (auto-wraps)
         substitute.GetUserAsync(Arg.Any<int>()).Returns(testUser);
+        #endregion
 
         INSubUserRepo repository = substitute;
         var user = await repository.GetUserAsync(42);
@@ -521,20 +503,20 @@ public class AsyncMethodNSubTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 }
 
 public class AsyncMethodKnockOffTests
 {
-    #region nsub-migration-async-knockoff
     [Fact]
     public async Task AsyncMethod_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
         var testUser = new User { Id = 42, Name = "Alice" };
 
+        #region nsub-migration-async-knockoff
         // KnockOff: Must wrap in Task.FromResult explicitly
         stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+        #endregion
 
         INSubUserRepo repository = stub;
         var user = await repository.GetUserAsync(42);
@@ -542,7 +524,6 @@ public class AsyncMethodKnockOffTests
         Assert.NotNull(user);
         Assert.Equal("Alice", user.Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -551,18 +532,16 @@ public class AsyncMethodKnockOffTests
 
 public class MultipleArgsNSubTests
 {
-    #region nsub-migration-multiargs-nsub
     [Fact]
     public void MultipleArgs_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
 
-        // NSubstitute: Multiple Arg matchers
+        #region nsub-migration-multiargs-nsub
+        // NSubstitute: Multiple Arg matchers, access via ArgAt<T>(index)
         substitute.FindUsers(Arg.Any<string>(), Arg.Is<int>(x => x > 0))
-            .Returns(callInfo => new[]
-            {
-                new User { Name = callInfo.ArgAt<string>(0) }
-            });
+            .Returns(callInfo => new[] { new User { Name = callInfo.ArgAt<string>(0) } });
+        #endregion
 
         INSubUserRepo repository = substitute;
         var users = repository.FindUsers("Alice", 10);
@@ -570,23 +549,20 @@ public class MultipleArgsNSubTests
         Assert.Single(users);
         Assert.Equal("Alice", users.First().Name);
     }
-    #endregion
 }
 
 public class MultipleArgsKnockOffTests
 {
-    #region nsub-migration-multiargs-knockoff
     [Fact]
     public void MultipleArgs_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
 
+        #region nsub-migration-multiargs-knockoff
         // KnockOff: Named parameters directly in delegate
         stub.FindUsers.OnCall((name, limit) =>
-        {
-            if (limit <= 0) return Enumerable.Empty<User>();
-            return new[] { new User { Name = name } };
-        });
+            limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = name } });
+        #endregion
 
         INSubUserRepo repository = stub;
         var users = repository.FindUsers("Alice", 10);
@@ -594,7 +570,6 @@ public class MultipleArgsKnockOffTests
         Assert.Single(users);
         Assert.Equal("Alice", users.First().Name);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -603,7 +578,6 @@ public class MultipleArgsKnockOffTests
 
 public class ReceivedWithArgsNSubTests
 {
-    #region nsub-migration-received-args-nsub
     [Fact]
     public void ReceivedWithArgs_NSubstituteApproach()
     {
@@ -613,17 +587,17 @@ public class ReceivedWithArgsNSubTests
         repository.GetUser(42);
         repository.GetUser(99);
 
+        #region nsub-migration-received-args-nsub
         // NSubstitute: Verify specific argument was used
         substitute.Received().GetUser(42);
         substitute.Received().GetUser(99);
         substitute.DidNotReceive().GetUser(1);
+        #endregion
     }
-    #endregion
 }
 
 public class ReceivedWithArgsKnockOffTests
 {
-    #region nsub-migration-received-args-knockoff
     [Fact]
     public void ReceivedWithArgs_KnockOffApproach()
     {
@@ -631,25 +605,18 @@ public class ReceivedWithArgsKnockOffTests
         var calledIds = new List<int>();
 
         // Capture arguments for later verification
-        stub.GetUser.OnCall((id) =>
-        {
-            calledIds.Add(id);
-            return null;
-        });
+        stub.GetUser.OnCall((id) => { calledIds.Add(id); return null; });
 
         INSubUserRepo repository = stub;
         repository.GetUser(42);
         repository.GetUser(99);
 
-        // KnockOff: Inspect captured arguments
+        #region nsub-migration-received-args-knockoff
+        // KnockOff: Inspect captured arguments or use LastCallArg
         Assert.Contains(42, calledIds);
-        Assert.Contains(99, calledIds);
-        Assert.DoesNotContain(1, calledIds);
-
-        // Or use LastCallArg for the most recent call
         Assert.Equal(99, stub.GetUser.LastCallArg);
+        #endregion
     }
-    #endregion
 }
 
 // =============================================================================
@@ -658,7 +625,6 @@ public class ReceivedWithArgsKnockOffTests
 
 public class ClearReceivedNSubTests
 {
-    #region nsub-migration-clear-nsub
     [Fact]
     public void ClearReceived_NSubstituteApproach()
     {
@@ -668,37 +634,36 @@ public class ClearReceivedNSubTests
         repository.GetUser(1);
         repository.GetUser(2);
 
-        // NSubstitute: Clear call history
+        #region nsub-migration-clear-nsub
+        // NSubstitute: Clear all call history at once
         substitute.ClearReceivedCalls();
+        #endregion
 
         substitute.DidNotReceive().GetUser(Arg.Any<int>());
     }
-    #endregion
 }
 
 public class ClearReceivedKnockOffTests
 {
-    #region nsub-migration-clear-knockoff
     [Fact]
     public void ClearReceived_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
-        var tracking = stub.GetUser.OnCall((id) => null);
+        stub.GetUser.OnCall((id) => null);
 
         INSubUserRepo repository = stub;
         repository.GetUser(1);
         repository.GetUser(2);
 
-        // Verify calls were made
-        tracking.Verify(Times.Exactly(2));
+        stub.GetUser.Verify(Times.Exactly(2));
 
-        // KnockOff: Reset clears call tracking
+        #region nsub-migration-clear-knockoff
+        // KnockOff: Reset clears call tracking per-interceptor
         stub.GetUser.Reset();
+        #endregion
 
-        // Now verify no calls
-        tracking.Verify(Times.Never);
+        stub.GetUser.Verify(Times.Never);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -707,40 +672,39 @@ public class ClearReceivedKnockOffTests
 
 public class ThrowsNSubTests
 {
-    #region nsub-migration-throws-nsub
     [Fact]
     public void Throws_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
 
-        // NSubstitute: Throws extension
+        #region nsub-migration-throws-nsub
+        // NSubstitute: Throw in Returns callback
         substitute.GetUser(Arg.Any<int>())
             .Returns<User?>(_ => throw new InvalidOperationException("Database offline"));
+        #endregion
 
         INSubUserRepo repository = substitute;
 
         Assert.Throws<InvalidOperationException>(() => repository.GetUser(1));
     }
-    #endregion
 }
 
 public class ThrowsKnockOffTests
 {
-    #region nsub-migration-throws-knockoff
     [Fact]
     public void Throws_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
 
+        #region nsub-migration-throws-knockoff
         // KnockOff: Throw directly in callback
-        stub.GetUser.OnCall((id) =>
-            throw new InvalidOperationException("Database offline"));
+        stub.GetUser.OnCall((id) => throw new InvalidOperationException("Database offline"));
+        #endregion
 
         INSubUserRepo repository = stub;
 
         Assert.Throws<InvalidOperationException>(() => repository.GetUser(1));
     }
-    #endregion
 }
 
 // =============================================================================
@@ -783,12 +747,26 @@ public class UserServiceNSub
 public class CompleteNSubstituteTests
 {
     #region nsub-migration-complete-nsub
-    private readonly INSubUserRepo _substitute;
+    // NSubstitute: Create substitute in constructor
+    private readonly INSubUserRepo _substitute = Substitute.For<INSubUserRepo>();
+
+    // Setup: .Returns() for return values
+    // _substitute.GetUserAsync(1).Returns(user);
+
+    // Verification: .Received() after the call
+    // await _substitute.Received(1).GetUserAsync(1);
+
+    // Argument matching: Arg.Is<T>() predicates
+    // _substitute.Received().SaveUser(Arg.Is<User>(u => u.Name == "Bob"));
+
+    // Negative verification: .DidNotReceive()
+    // _substitute.DidNotReceive().DeleteUser(Arg.Any<int>());
+    #endregion
+
     private readonly UserServiceNSub _service;
 
     public CompleteNSubstituteTests()
     {
-        _substitute = Substitute.For<INSubUserRepo>();
         _service = new UserServiceNSub(_substitute);
     }
 
@@ -836,7 +814,6 @@ public class CompleteNSubstituteTests
         Assert.False(result);
         _substitute.DidNotReceive().DeleteUser(Arg.Any<int>());
     }
-    #endregion
 }
 
 // =============================================================================
@@ -846,12 +823,26 @@ public class CompleteNSubstituteTests
 public class CompleteKnockOffNSubTests
 {
     #region nsub-migration-complete-knockoff
-    private readonly NSubUserRepoStub _stub;
+    // KnockOff: Instantiate stub in constructor
+    private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
+
+    // Setup: .OnCall() with typed delegate, .Verifiable() for verification
+    // _stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
+
+    // Verification: .Verify() checks all .Verifiable() members
+    // _stub.Verify();
+
+    // Argument capture: capture in the callback delegate
+    // _stub.SaveUser.OnCall((user) => { savedUser = user; }).Verifiable();
+
+    // Negative verification: .Verify(Times.Never)
+    // _stub.DeleteUser.Verify(Times.Never);
+    #endregion
+
     private readonly UserServiceNSub _service;
 
     public CompleteKnockOffNSubTests()
     {
-        _stub = new NSubUserRepoStub();
         _service = new UserServiceNSub(_stub);
     }
 
@@ -871,10 +862,7 @@ public class CompleteKnockOffNSubTests
     public void SaveUser_CallsRepository()
     {
         User? savedUser = null;
-        _stub.SaveUser.OnCall((user) =>
-        {
-            savedUser = user;
-        }).Verifiable();
+        _stub.SaveUser.OnCall((user) => { savedUser = user; }).Verifiable();
 
         _service.SaveUser(new User { Id = 1, Name = "Bob" });
 
@@ -899,14 +887,12 @@ public class CompleteKnockOffNSubTests
     public void TryDeleteUser_WhenUserNotFound_ReturnsFalse()
     {
         _stub.GetUser.OnCall((id) => null);
-        var deleteTracking = _stub.DeleteUser.OnCall((id) => { });
 
         var result = _service.TryDeleteUser(1);
 
         Assert.False(result);
-        deleteTracking.Verify(Times.Never);
+        _stub.DeleteUser.Verify(Times.Never);
     }
-    #endregion
 }
 
 // =============================================================================
@@ -915,22 +901,17 @@ public class CompleteKnockOffNSubTests
 
 public class WhenPredicateNSubTests
 {
-    #region nsub-migration-when-predicate-nsub
     [Fact]
     public void WhenPredicate_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
 
-        // Arg.Is<T>() with predicate per parameter
+        #region nsub-migration-when-predicate-nsub
+        // Arg.Is<T>() with predicate per parameter for conditional matching
         substitute.GetUser(Arg.Is<int>(id => id > 0))
-            .Returns(callInfo => new User
-            {
-                Id = callInfo.Arg<int>(),
-                Name = "Valid User"
-            });
-
-        substitute.GetUser(Arg.Is<int>(id => id <= 0))
-            .Returns((User?)null);
+            .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = "Valid User" });
+        substitute.GetUser(Arg.Is<int>(id => id <= 0)).Returns((User?)null);
+        #endregion
 
         INSubUserRepo repository = substitute;
 
@@ -939,21 +920,19 @@ public class WhenPredicateNSubTests
         Assert.Null(repository.GetUser(0));
         Assert.Null(repository.GetUser(-5));
     }
-    #endregion
 }
 
 public class WhenPredicateKnockOffTests
 {
-    #region nsub-migration-when-predicate-knockoff
     [Fact]
     public void WhenPredicate_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
 
-        // For permanent predicate matching, use OnCall with conditionals
-        // (When() is for sequential/consumable matching)
-        stub.GetUser.OnCall((id) =>
-            id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+        #region nsub-migration-when-predicate-knockoff
+        // OnCall with conditionals for permanent predicate matching
+        stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+        #endregion
 
         INSubUserRepo repository = stub;
 
@@ -962,7 +941,6 @@ public class WhenPredicateKnockOffTests
         Assert.Null(repository.GetUser(0));
         Assert.Null(repository.GetUser(-5));
     }
-    #endregion
 }
 
 // =============================================================================
@@ -971,15 +949,16 @@ public class WhenPredicateKnockOffTests
 
 public class WhenValuesNSubTests
 {
-    #region nsub-migration-when-values-nsub
     [Fact]
     public void WhenValues_NSubstituteApproach()
     {
         var substitute = Substitute.For<INSubUserRepo>();
 
-        // Exact value matching
+        #region nsub-migration-when-values-nsub
+        // Exact value matching with literals
         substitute.GetUser(42).Returns(new User { Id = 42, Name = "Alice" });
         substitute.GetUser(99).Returns(new User { Id = 99, Name = "Bob" });
+        #endregion
 
         INSubUserRepo repository = substitute;
 
@@ -987,20 +966,20 @@ public class WhenValuesNSubTests
         Assert.Equal("Bob", repository.GetUser(99)?.Name);
         Assert.Null(repository.GetUser(1)); // No match
     }
-    #endregion
 }
 
 public class WhenValuesKnockOffTests
 {
-    #region nsub-migration-when-values-knockoff
     [Fact]
     public void WhenValues_KnockOffApproach()
     {
         var stub = new NSubUserRepoStub();
 
+        #region nsub-migration-when-values-knockoff
         // When() with exact values
         stub.GetUser.When(42).Returns(new User { Id = 42, Name = "Alice" });
         stub.GetUser.When(99).Returns(new User { Id = 99, Name = "Bob" });
+        #endregion
 
         INSubUserRepo repository = stub;
 
@@ -1008,5 +987,4 @@ public class WhenValuesKnockOffTests
         Assert.Equal("Bob", repository.GetUser(99)?.Name);
         Assert.Null(repository.GetUser(1)); // No match
     }
-    #endregion
 }

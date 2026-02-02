@@ -119,14 +119,8 @@ Replace `Substitute.For<T>()` calls with KnockOff stub classes.
 
 <!-- snippet: nsub-migration-create-stub-nsub -->
 ```cs
-[Fact]
-public void CreateStub_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-    INSubUserRepo repository = substitute;
-
-    Assert.NotNull(repository);
-}
+// NSubstitute: Create proxy at runtime with a single line
+var substitute = Substitute.For<INSubUserRepo>();
 ```
 <!-- endSnippet -->
 
@@ -134,14 +128,8 @@ public void CreateStub_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-create-stub-knockoff -->
 ```cs
-[Fact]
-public void CreateStub_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    INSubUserRepo repository = stub;
-
-    Assert.NotNull(repository);
-}
+// KnockOff: Instantiate the generated stub class
+var stub = new NSubUserRepoStub();
 ```
 <!-- endSnippet -->
 
@@ -162,21 +150,8 @@ Replace `.Returns()` with `OnCall` property assignments.
 
 <!-- snippet: nsub-migration-returns-nsub -->
 ```cs
-[Fact]
-public void Returns_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-    var testUser = new User { Id = 42, Name = "Alice" };
-
-    // NSubstitute's elegant fluent API
-    substitute.GetUser(Arg.Any<int>()).Returns(testUser);
-
-    INSubUserRepo repository = substitute;
-    var user = repository.GetUser(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// NSubstitute's elegant fluent API
+substitute.GetUser(Arg.Any<int>()).Returns(testUser);
 ```
 <!-- endSnippet -->
 
@@ -184,21 +159,8 @@ public void Returns_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-returns-knockoff -->
 ```cs
-[Fact]
-public void Returns_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    var testUser = new User { Id = 42, Name = "Alice" };
-
-    // KnockOff uses OnCall with typed delegate
-    stub.GetUser.OnCall((id) => testUser);
-
-    INSubUserRepo repository = stub;
-    var user = repository.GetUser(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// KnockOff uses OnCall with typed delegate
+stub.GetUser.OnCall((id) => testUser);
 ```
 <!-- endSnippet -->
 
@@ -214,22 +176,8 @@ Replace `.ReturnsForAnyArgs()` with standard `OnCall`.
 
 <!-- snippet: nsub-migration-returns-anyargs-nsub -->
 ```cs
-[Fact]
-public void ReturnsForAnyArgs_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-    var testUser = new User { Id = 1, Name = "Default" };
-
-    // ReturnsForAnyArgs: matches any argument combination
-    substitute.GetUser(default).ReturnsForAnyArgs(testUser);
-
-    INSubUserRepo repository = substitute;
-    var user1 = repository.GetUser(1);
-    var user2 = repository.GetUser(999);
-
-    Assert.Equal("Default", user1?.Name);
-    Assert.Equal("Default", user2?.Name);
-}
+// ReturnsForAnyArgs: matches any argument combination
+substitute.GetUser(default).ReturnsForAnyArgs(testUser);
 ```
 <!-- endSnippet -->
 
@@ -237,23 +185,8 @@ public void ReturnsForAnyArgs_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-returns-anyargs-knockoff -->
 ```cs
-[Fact]
-public void ReturnsForAnyArgs_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    var testUser = new User { Id = 1, Name = "Default" };
-
-    // KnockOff: OnCall inherently matches any arguments
-    // (no separate "ForAnyArgs" needed)
-    stub.GetUser.OnCall((id) => testUser);
-
-    INSubUserRepo repository = stub;
-    var user1 = repository.GetUser(1);
-    var user2 = repository.GetUser(999);
-
-    Assert.Equal("Default", user1?.Name);
-    Assert.Equal("Default", user2?.Name);
-}
+// KnockOff: OnCall inherently matches any arguments (no "ForAnyArgs" needed)
+stub.GetUser.OnCall((id) => testUser);
 ```
 <!-- endSnippet -->
 
@@ -269,26 +202,9 @@ Replace `callInfo.Arg<T>()` with direct argument access.
 
 <!-- snippet: nsub-migration-returns-args-nsub -->
 ```cs
-[Fact]
-public void ReturnsWithArgs_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    // NSubstitute: Access args through callback in Returns
-    substitute.GetUser(Arg.Any<int>())
-        .Returns(callInfo => new User
-        {
-            Id = callInfo.Arg<int>(),
-            Name = $"User{callInfo.Arg<int>()}"
-        });
-
-    INSubUserRepo repository = substitute;
-    var user = repository.GetUser(42);
-
-    Assert.NotNull(user);
-    Assert.Equal(42, user.Id);
-    Assert.Equal("User42", user.Name);
-}
+// NSubstitute: Access args through callInfo.Arg<T>()
+substitute.GetUser(Arg.Any<int>())
+    .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = $"User{callInfo.Arg<int>()}" });
 ```
 <!-- endSnippet -->
 
@@ -296,25 +212,8 @@ public void ReturnsWithArgs_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-returns-args-knockoff -->
 ```cs
-[Fact]
-public void ReturnsWithArgs_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-
-    // KnockOff: Arguments are directly available in the delegate
-    stub.GetUser.OnCall((id) => new User
-    {
-        Id = id,
-        Name = $"User{id}"
-    });
-
-    INSubUserRepo repository = stub;
-    var user = repository.GetUser(42);
-
-    Assert.NotNull(user);
-    Assert.Equal(42, user.Id);
-    Assert.Equal("User42", user.Name);
-}
+// KnockOff: Arguments are directly available in the delegate
+stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
 ```
 <!-- endSnippet -->
 
@@ -330,20 +229,9 @@ Replace property `.Returns()` with `.Value` assignments.
 
 <!-- snippet: nsub-migration-property-nsub -->
 ```cs
-[Fact]
-public void PropertySetup_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    // NSubstitute: elegant property Returns
-    substitute.ConnectionString.Returns("server=localhost");
-    substitute.IsConnected.Returns(true);
-
-    INSubUserRepo repository = substitute;
-
-    Assert.Equal("server=localhost", repository.ConnectionString);
-    Assert.True(repository.IsConnected);
-}
+// NSubstitute: elegant property Returns
+substitute.ConnectionString.Returns("server=localhost");
+substitute.IsConnected.Returns(true);
 ```
 <!-- endSnippet -->
 
@@ -351,21 +239,9 @@ public void PropertySetup_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-property-knockoff -->
 ```cs
-[Fact]
-public void PropertySetup_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-
-    // KnockOff: Use OnGet(value) for all properties
-    stub.ConnectionString.OnGet("server=localhost");
-    // For read-only properties, also use OnGet(value)
-    stub.IsConnected.OnGet(true);
-
-    INSubUserRepo repository = stub;
-
-    Assert.Equal("server=localhost", repository.ConnectionString);
-    Assert.True(repository.IsConnected);
-}
+// KnockOff: Use OnGet(value) for property getters
+stub.ConnectionString.OnGet("server=localhost");
+stub.IsConnected.OnGet(true);
 ```
 <!-- endSnippet -->
 
@@ -381,18 +257,9 @@ Replace `.Received()` with `Verifiable()` + `Verify()` or direct `Verify(Times)`
 
 <!-- snippet: nsub-migration-received-nsub -->
 ```cs
-[Fact]
-public void Received_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    INSubUserRepo repository = substitute;
-    repository.SaveUser(new User { Id = 1, Name = "Bob" });
-
-    // NSubstitute's intuitive Received() syntax
-    substitute.Received().SaveUser(Arg.Any<User>());
-    substitute.Received(1).SaveUser(Arg.Any<User>());
-}
+// NSubstitute's intuitive Received() syntax
+substitute.Received().SaveUser(Arg.Any<User>());
+substitute.Received(1).SaveUser(Arg.Any<User>());
 ```
 <!-- endSnippet -->
 
@@ -400,23 +267,8 @@ public void Received_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-received-knockoff -->
 ```cs
-[Fact]
-public void Received_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-
-    // Mark method as verifiable during setup
-    stub.SaveUser.OnCall((user) => { }).Verifiable();
-
-    INSubUserRepo repository = stub;
-    repository.SaveUser(new User { Id = 1, Name = "Bob" });
-
-    // Verify() checks all members marked with .Verifiable()
-    stub.Verify();
-
-    // Or verify with explicit Times via tracking
-    stub.SaveUser.Verify(Times.Once);
-}
+// KnockOff: Mark as verifiable during setup, then Verify()
+stub.SaveUser.OnCall((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -432,17 +284,8 @@ Replace `.DidNotReceive()` with `Times.Never`.
 
 <!-- snippet: nsub-migration-didnotreceive-nsub -->
 ```cs
-[Fact]
-public void DidNotReceive_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    INSubUserRepo repository = substitute;
-    // Don't call DeleteUser
-
-    // NSubstitute's DidNotReceive - beautifully readable
-    substitute.DidNotReceive().DeleteUser(Arg.Any<int>());
-}
+// NSubstitute's DidNotReceive - beautifully readable
+substitute.DidNotReceive().DeleteUser(Arg.Any<int>());
 ```
 <!-- endSnippet -->
 
@@ -450,18 +293,8 @@ public void DidNotReceive_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-didnotreceive-knockoff -->
 ```cs
-[Fact]
-public void DidNotReceive_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    var tracking = stub.DeleteUser.OnCall((id) => { });
-
-    INSubUserRepo repository = stub;
-    // Don't call DeleteUser
-
-    // KnockOff: Use Times.Never for "did not receive"
-    tracking.Verify(Times.Never);
-}
+// KnockOff: Use Verify(Times.Never) for "did not receive"
+stub.DeleteUser.Verify(Times.Never);
 ```
 <!-- endSnippet -->
 
@@ -477,20 +310,10 @@ Replace `.Received()` with specific arguments with argument capture or `LastCall
 
 <!-- snippet: nsub-migration-received-args-nsub -->
 ```cs
-[Fact]
-public void ReceivedWithArgs_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    INSubUserRepo repository = substitute;
-    repository.GetUser(42);
-    repository.GetUser(99);
-
-    // NSubstitute: Verify specific argument was used
-    substitute.Received().GetUser(42);
-    substitute.Received().GetUser(99);
-    substitute.DidNotReceive().GetUser(1);
-}
+// NSubstitute: Verify specific argument was used
+substitute.Received().GetUser(42);
+substitute.Received().GetUser(99);
+substitute.DidNotReceive().GetUser(1);
 ```
 <!-- endSnippet -->
 
@@ -498,31 +321,9 @@ public void ReceivedWithArgs_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-received-args-knockoff -->
 ```cs
-[Fact]
-public void ReceivedWithArgs_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    var calledIds = new List<int>();
-
-    // Capture arguments for later verification
-    stub.GetUser.OnCall((id) =>
-    {
-        calledIds.Add(id);
-        return null;
-    });
-
-    INSubUserRepo repository = stub;
-    repository.GetUser(42);
-    repository.GetUser(99);
-
-    // KnockOff: Inspect captured arguments
-    Assert.Contains(42, calledIds);
-    Assert.Contains(99, calledIds);
-    Assert.DoesNotContain(1, calledIds);
-
-    // Or use LastCallArg for the most recent call
-    Assert.Equal(99, stub.GetUser.LastCallArg);
-}
+// KnockOff: Inspect captured arguments or use LastCallArg
+Assert.Contains(42, calledIds);
+Assert.Equal(99, stub.GetUser.LastCallArg);
 ```
 <!-- endSnippet -->
 
@@ -538,24 +339,9 @@ Replace multiple `Arg.*` matchers with named callback parameters.
 
 <!-- snippet: nsub-migration-multiargs-nsub -->
 ```cs
-[Fact]
-public void MultipleArgs_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    // NSubstitute: Multiple Arg matchers
-    substitute.FindUsers(Arg.Any<string>(), Arg.Is<int>(x => x > 0))
-        .Returns(callInfo => new[]
-        {
-            new User { Name = callInfo.ArgAt<string>(0) }
-        });
-
-    INSubUserRepo repository = substitute;
-    var users = repository.FindUsers("Alice", 10);
-
-    Assert.Single(users);
-    Assert.Equal("Alice", users.First().Name);
-}
+// NSubstitute: Multiple Arg matchers, access via ArgAt<T>(index)
+substitute.FindUsers(Arg.Any<string>(), Arg.Is<int>(x => x > 0))
+    .Returns(callInfo => new[] { new User { Name = callInfo.ArgAt<string>(0) } });
 ```
 <!-- endSnippet -->
 
@@ -563,24 +349,9 @@ public void MultipleArgs_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-multiargs-knockoff -->
 ```cs
-[Fact]
-public void MultipleArgs_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-
-    // KnockOff: Named parameters directly in delegate
-    stub.FindUsers.OnCall((name, limit) =>
-    {
-        if (limit <= 0) return Enumerable.Empty<User>();
-        return new[] { new User { Name = name } };
-    });
-
-    INSubUserRepo repository = stub;
-    var users = repository.FindUsers("Alice", 10);
-
-    Assert.Single(users);
-    Assert.Equal("Alice", users.First().Name);
-}
+// KnockOff: Named parameters directly in delegate
+stub.FindUsers.OnCall((name, limit) =>
+    limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = name } });
 ```
 <!-- endSnippet -->
 
@@ -596,24 +367,9 @@ Replace `.When().Do()` with logic in `OnCall`.
 
 <!-- snippet: nsub-migration-whendo-nsub -->
 ```cs
-[Fact]
-public void WhenDo_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-    var savedUsers = new List<User>();
-
-    // NSubstitute: When...Do for void methods with side effects
-    substitute.When(x => x.SaveUser(Arg.Any<User>()))
-        .Do(callInfo => savedUsers.Add(callInfo.Arg<User>()));
-
-    INSubUserRepo repository = substitute;
-    repository.SaveUser(new User { Id = 1, Name = "Alice" });
-    repository.SaveUser(new User { Id = 2, Name = "Bob" });
-
-    Assert.Equal(2, savedUsers.Count);
-    Assert.Equal("Alice", savedUsers[0].Name);
-    Assert.Equal("Bob", savedUsers[1].Name);
-}
+// NSubstitute: When...Do for void methods with side effects
+substitute.When(x => x.SaveUser(Arg.Any<User>()))
+    .Do(callInfo => savedUsers.Add(callInfo.Arg<User>()));
 ```
 <!-- endSnippet -->
 
@@ -621,26 +377,8 @@ public void WhenDo_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-whendo-knockoff -->
 ```cs
-[Fact]
-public void WhenDo_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    var savedUsers = new List<User>();
-
-    // KnockOff: OnCall handles side effects directly
-    stub.SaveUser.OnCall((user) =>
-    {
-        savedUsers.Add(user);
-    });
-
-    INSubUserRepo repository = stub;
-    repository.SaveUser(new User { Id = 1, Name = "Alice" });
-    repository.SaveUser(new User { Id = 2, Name = "Bob" });
-
-    Assert.Equal(2, savedUsers.Count);
-    Assert.Equal("Alice", savedUsers[0].Name);
-    Assert.Equal("Bob", savedUsers[1].Name);
-}
+// KnockOff: OnCall handles side effects directly
+stub.SaveUser.OnCall((user) => { savedUsers.Add(user); });
 ```
 <!-- endSnippet -->
 
@@ -656,24 +394,10 @@ Replace `.Returns().AndDoes()` with combined logic in `OnCall`.
 
 <!-- snippet: nsub-migration-returnsanddoes-nsub -->
 ```cs
-[Fact]
-public void ReturnsAndDoes_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-    var accessLog = new List<int>();
-
-    // NSubstitute: AndDoes for side effects with return value
-    substitute.GetUser(Arg.Any<int>())
-        .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = "Test" })
-        .AndDoes(callInfo => accessLog.Add(callInfo.Arg<int>()));
-
-    INSubUserRepo repository = substitute;
-    var user1 = repository.GetUser(1);
-    var user2 = repository.GetUser(2);
-
-    Assert.Equal(new[] { 1, 2 }, accessLog);
-    Assert.Equal("Test", user1?.Name);
-}
+// NSubstitute: AndDoes for side effects with return value
+substitute.GetUser(Arg.Any<int>())
+    .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = "Test" })
+    .AndDoes(callInfo => accessLog.Add(callInfo.Arg<int>()));
 ```
 <!-- endSnippet -->
 
@@ -681,26 +405,8 @@ public void ReturnsAndDoes_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-returnsanddoes-knockoff -->
 ```cs
-[Fact]
-public void ReturnsAndDoes_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    var accessLog = new List<int>();
-
-    // KnockOff: Side effects and return in same delegate
-    stub.GetUser.OnCall((id) =>
-    {
-        accessLog.Add(id);
-        return new User { Id = id, Name = "Test" };
-    });
-
-    INSubUserRepo repository = stub;
-    var user1 = repository.GetUser(1);
-    var user2 = repository.GetUser(2);
-
-    Assert.Equal(new[] { 1, 2 }, accessLog);
-    Assert.Equal("Test", user1?.Name);
-}
+// KnockOff: Side effects and return in same delegate
+stub.GetUser.OnCall((id) => { accessLog.Add(id); return new User { Id = id, Name = "Test" }; });
 ```
 <!-- endSnippet -->
 
@@ -716,27 +422,9 @@ Replace `Arg.Is<T>()` with conditional logic in callbacks.
 
 <!-- snippet: nsub-migration-argmatchers-nsub -->
 ```cs
-[Fact]
-public void ArgMatchers_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    // Arg.Is<T>() for conditional matching
-    substitute.GetUser(Arg.Is<int>(id => id > 0))
-        .Returns(callInfo => new User
-        {
-            Id = callInfo.Arg<int>(),
-            Name = "Valid User"
-        });
-
-    INSubUserRepo repository = substitute;
-
-    var validUser = repository.GetUser(1);
-    var invalidUser = repository.GetUser(-1);
-
-    Assert.NotNull(validUser);
-    Assert.Null(invalidUser); // No setup matched
-}
+// Arg.Is<T>() for conditional matching
+substitute.GetUser(Arg.Is<int>(id => id > 0))
+    .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = "Valid User" });
 ```
 <!-- endSnippet -->
 
@@ -744,23 +432,8 @@ public void ArgMatchers_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-argmatchers-knockoff -->
 ```cs
-[Fact]
-public void ArgMatchers_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-
-    // KnockOff: Conditional logic in the callback
-    stub.GetUser.OnCall((id) =>
-        id > 0 ? new User { Id = id, Name = "Valid User" } : null);
-
-    INSubUserRepo repository = stub;
-
-    var validUser = repository.GetUser(1);
-    var invalidUser = repository.GetUser(-1);
-
-    Assert.NotNull(validUser);
-    Assert.Null(invalidUser);
-}
+// KnockOff: Conditional logic in the callback
+stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
 ```
 <!-- endSnippet -->
 
@@ -776,29 +449,10 @@ For permanent predicate matching that applies to multiple calls, both frameworks
 
 <!-- snippet: nsub-migration-when-predicate-nsub -->
 ```cs
-[Fact]
-public void WhenPredicate_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    // Arg.Is<T>() with predicate per parameter
-    substitute.GetUser(Arg.Is<int>(id => id > 0))
-        .Returns(callInfo => new User
-        {
-            Id = callInfo.Arg<int>(),
-            Name = "Valid User"
-        });
-
-    substitute.GetUser(Arg.Is<int>(id => id <= 0))
-        .Returns((User?)null);
-
-    INSubUserRepo repository = substitute;
-
-    Assert.NotNull(repository.GetUser(1));
-    Assert.NotNull(repository.GetUser(100));
-    Assert.Null(repository.GetUser(0));
-    Assert.Null(repository.GetUser(-5));
-}
+// Arg.Is<T>() with predicate per parameter for conditional matching
+substitute.GetUser(Arg.Is<int>(id => id > 0))
+    .Returns(callInfo => new User { Id = callInfo.Arg<int>(), Name = "Valid User" });
+substitute.GetUser(Arg.Is<int>(id => id <= 0)).Returns((User?)null);
 ```
 <!-- endSnippet -->
 
@@ -806,23 +460,8 @@ public void WhenPredicate_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-when-predicate-knockoff -->
 ```cs
-[Fact]
-public void WhenPredicate_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-
-    // For permanent predicate matching, use OnCall with conditionals
-    // (When() is for sequential/consumable matching)
-    stub.GetUser.OnCall((id) =>
-        id > 0 ? new User { Id = id, Name = "Valid User" } : null);
-
-    INSubUserRepo repository = stub;
-
-    Assert.NotNull(repository.GetUser(1));
-    Assert.NotNull(repository.GetUser(100));
-    Assert.Null(repository.GetUser(0));
-    Assert.Null(repository.GetUser(-5));
-}
+// OnCall with conditionals for permanent predicate matching
+stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
 ```
 <!-- endSnippet -->
 
@@ -838,21 +477,9 @@ Both frameworks support exact value matching.
 
 <!-- snippet: nsub-migration-when-values-nsub -->
 ```cs
-[Fact]
-public void WhenValues_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    // Exact value matching
-    substitute.GetUser(42).Returns(new User { Id = 42, Name = "Alice" });
-    substitute.GetUser(99).Returns(new User { Id = 99, Name = "Bob" });
-
-    INSubUserRepo repository = substitute;
-
-    Assert.Equal("Alice", repository.GetUser(42)?.Name);
-    Assert.Equal("Bob", repository.GetUser(99)?.Name);
-    Assert.Null(repository.GetUser(1)); // No match
-}
+// Exact value matching with literals
+substitute.GetUser(42).Returns(new User { Id = 42, Name = "Alice" });
+substitute.GetUser(99).Returns(new User { Id = 99, Name = "Bob" });
 ```
 <!-- endSnippet -->
 
@@ -860,21 +487,9 @@ public void WhenValues_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-when-values-knockoff -->
 ```cs
-[Fact]
-public void WhenValues_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-
-    // When() with exact values
-    stub.GetUser.When(42).Returns(new User { Id = 42, Name = "Alice" });
-    stub.GetUser.When(99).Returns(new User { Id = 99, Name = "Bob" });
-
-    INSubUserRepo repository = stub;
-
-    Assert.Equal("Alice", repository.GetUser(42)?.Name);
-    Assert.Equal("Bob", repository.GetUser(99)?.Name);
-    Assert.Null(repository.GetUser(1)); // No match
-}
+// When() with exact values
+stub.GetUser.When(42).Returns(new User { Id = 42, Name = "Alice" });
+stub.GetUser.When(99).Returns(new User { Id = 99, Name = "Bob" });
 ```
 <!-- endSnippet -->
 
@@ -890,21 +505,8 @@ Replace seamless async `.Returns()` with explicit `Task.FromResult()`.
 
 <!-- snippet: nsub-migration-async-nsub -->
 ```cs
-[Fact]
-public async Task AsyncMethod_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-    var testUser = new User { Id = 42, Name = "Alice" };
-
-    // NSubstitute: Returns works seamlessly with Task
-    substitute.GetUserAsync(Arg.Any<int>()).Returns(testUser);
-
-    INSubUserRepo repository = substitute;
-    var user = await repository.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// NSubstitute: Returns works seamlessly with Task (auto-wraps)
+substitute.GetUserAsync(Arg.Any<int>()).Returns(testUser);
 ```
 <!-- endSnippet -->
 
@@ -912,21 +514,8 @@ public async Task AsyncMethod_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-async-knockoff -->
 ```cs
-[Fact]
-public async Task AsyncMethod_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    var testUser = new User { Id = 42, Name = "Alice" };
-
-    // KnockOff: Must wrap in Task.FromResult explicitly
-    stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
-
-    INSubUserRepo repository = stub;
-    var user = await repository.GetUserAsync(42);
-
-    Assert.NotNull(user);
-    Assert.Equal("Alice", user.Name);
-}
+// KnockOff: Must wrap in Task.FromResult explicitly
+stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
@@ -942,20 +531,8 @@ Replace `.ClearReceivedCalls()` with `.Reset()`.
 
 <!-- snippet: nsub-migration-clear-nsub -->
 ```cs
-[Fact]
-public void ClearReceived_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    INSubUserRepo repository = substitute;
-    repository.GetUser(1);
-    repository.GetUser(2);
-
-    // NSubstitute: Clear call history
-    substitute.ClearReceivedCalls();
-
-    substitute.DidNotReceive().GetUser(Arg.Any<int>());
-}
+// NSubstitute: Clear all call history at once
+substitute.ClearReceivedCalls();
 ```
 <!-- endSnippet -->
 
@@ -963,25 +540,8 @@ public void ClearReceived_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-clear-knockoff -->
 ```cs
-[Fact]
-public void ClearReceived_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-    var tracking = stub.GetUser.OnCall((id) => null);
-
-    INSubUserRepo repository = stub;
-    repository.GetUser(1);
-    repository.GetUser(2);
-
-    // Verify calls were made
-    tracking.Verify(Times.Exactly(2));
-
-    // KnockOff: Reset clears call tracking
-    stub.GetUser.Reset();
-
-    // Now verify no calls
-    tracking.Verify(Times.Never);
-}
+// KnockOff: Reset clears call tracking per-interceptor
+stub.GetUser.Reset();
 ```
 <!-- endSnippet -->
 
@@ -997,19 +557,9 @@ Replace exception `.Returns()` with throw in callback.
 
 <!-- snippet: nsub-migration-throws-nsub -->
 ```cs
-[Fact]
-public void Throws_NSubstituteApproach()
-{
-    var substitute = Substitute.For<INSubUserRepo>();
-
-    // NSubstitute: Throws extension
-    substitute.GetUser(Arg.Any<int>())
-        .Returns<User?>(_ => throw new InvalidOperationException("Database offline"));
-
-    INSubUserRepo repository = substitute;
-
-    Assert.Throws<InvalidOperationException>(() => repository.GetUser(1));
-}
+// NSubstitute: Throw in Returns callback
+substitute.GetUser(Arg.Any<int>())
+    .Returns<User?>(_ => throw new InvalidOperationException("Database offline"));
 ```
 <!-- endSnippet -->
 
@@ -1017,19 +567,8 @@ public void Throws_NSubstituteApproach()
 
 <!-- snippet: nsub-migration-throws-knockoff -->
 ```cs
-[Fact]
-public void Throws_KnockOffApproach()
-{
-    var stub = new NSubUserRepoStub();
-
-    // KnockOff: Throw directly in callback
-    stub.GetUser.OnCall((id) =>
-        throw new InvalidOperationException("Database offline"));
-
-    INSubUserRepo repository = stub;
-
-    Assert.Throws<InvalidOperationException>(() => repository.GetUser(1));
-}
+// KnockOff: Throw directly in callback
+stub.GetUser.OnCall((id) => throw new InvalidOperationException("Database offline"));
 ```
 <!-- endSnippet -->
 
@@ -1045,59 +584,20 @@ This example shows a full test class migrated from NSubstitute to KnockOff.
 
 <!-- snippet: nsub-migration-complete-nsub -->
 ```cs
-private readonly INSubUserRepo _substitute;
-private readonly UserServiceNSub _service;
+// NSubstitute: Create substitute in constructor
+private readonly INSubUserRepo _substitute = Substitute.For<INSubUserRepo>();
 
-public CompleteNSubstituteTests()
-{
-    _substitute = Substitute.For<INSubUserRepo>();
-    _service = new UserServiceNSub(_substitute);
-}
+// Setup: .Returns() for return values
+// _substitute.GetUserAsync(1).Returns(user);
 
-[Fact]
-public async Task GetUser_ReturnsUser()
-{
-    var user = new User { Id = 1, Name = "Alice" };
-    _substitute.GetUserAsync(1).Returns(user);
+// Verification: .Received() after the call
+// await _substitute.Received(1).GetUserAsync(1);
 
-    var result = await _service.GetUserAsync(1);
+// Argument matching: Arg.Is<T>() predicates
+// _substitute.Received().SaveUser(Arg.Is<User>(u => u.Name == "Bob"));
 
-    Assert.Equal("Alice", result?.Name);
-    await _substitute.Received(1).GetUserAsync(1);
-}
-
-[Fact]
-public void SaveUser_CallsRepository()
-{
-    var user = new User { Id = 1, Name = "Bob" };
-
-    _service.SaveUser(user);
-
-    _substitute.Received().SaveUser(Arg.Is<User>(u => u.Name == "Bob"));
-}
-
-[Fact]
-public void TryDeleteUser_WhenUserExists_DeletesAndReturnsTrue()
-{
-    var user = new User { Id = 1, Name = "Charlie" };
-    _substitute.GetUser(1).Returns(user);
-
-    var result = _service.TryDeleteUser(1);
-
-    Assert.True(result);
-    _substitute.Received().DeleteUser(1);
-}
-
-[Fact]
-public void TryDeleteUser_WhenUserNotFound_ReturnsFalse()
-{
-    _substitute.GetUser(1).Returns((User?)null);
-
-    var result = _service.TryDeleteUser(1);
-
-    Assert.False(result);
-    _substitute.DidNotReceive().DeleteUser(Arg.Any<int>());
-}
+// Negative verification: .DidNotReceive()
+// _substitute.DidNotReceive().DeleteUser(Arg.Any<int>());
 ```
 <!-- endSnippet -->
 
@@ -1105,66 +605,20 @@ public void TryDeleteUser_WhenUserNotFound_ReturnsFalse()
 
 <!-- snippet: nsub-migration-complete-knockoff -->
 ```cs
-private readonly NSubUserRepoStub _stub;
-private readonly UserServiceNSub _service;
+// KnockOff: Instantiate stub in constructor
+private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
 
-public CompleteKnockOffNSubTests()
-{
-    _stub = new NSubUserRepoStub();
-    _service = new UserServiceNSub(_stub);
-}
+// Setup: .OnCall() with typed delegate, .Verifiable() for verification
+// _stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
 
-[Fact]
-public async Task GetUser_ReturnsUser()
-{
-    var user = new User { Id = 1, Name = "Alice" };
-    _stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
+// Verification: .Verify() checks all .Verifiable() members
+// _stub.Verify();
 
-    var result = await _service.GetUserAsync(1);
+// Argument capture: capture in the callback delegate
+// _stub.SaveUser.OnCall((user) => { savedUser = user; }).Verifiable();
 
-    Assert.Equal("Alice", result?.Name);
-    _stub.Verify();
-}
-
-[Fact]
-public void SaveUser_CallsRepository()
-{
-    User? savedUser = null;
-    _stub.SaveUser.OnCall((user) =>
-    {
-        savedUser = user;
-    }).Verifiable();
-
-    _service.SaveUser(new User { Id = 1, Name = "Bob" });
-
-    _stub.Verify();
-    Assert.Equal("Bob", savedUser?.Name);
-}
-
-[Fact]
-public void TryDeleteUser_WhenUserExists_DeletesAndReturnsTrue()
-{
-    var user = new User { Id = 1, Name = "Charlie" };
-    _stub.GetUser.OnCall((id) => user);
-    _stub.DeleteUser.OnCall((id) => { }).Verifiable();
-
-    var result = _service.TryDeleteUser(1);
-
-    Assert.True(result);
-    _stub.Verify();
-}
-
-[Fact]
-public void TryDeleteUser_WhenUserNotFound_ReturnsFalse()
-{
-    _stub.GetUser.OnCall((id) => null);
-    var deleteTracking = _stub.DeleteUser.OnCall((id) => { });
-
-    var result = _service.TryDeleteUser(1);
-
-    Assert.False(result);
-    deleteTracking.Verify(Times.Never);
-}
+// Negative verification: .Verify(Times.Never)
+// _stub.DeleteUser.Verify(Times.Never);
 ```
 <!-- endSnippet -->
 
