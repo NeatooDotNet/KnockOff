@@ -41,21 +41,32 @@ public interface IFormatter
 <!-- endSnippet -->
 
 **NSubstitute** - Must use `Arg.Any<T>()` to match any value:
-```csharp
-var formatter = Substitute.For<IFormatter>();
 
-// Arg.Any<T>() required - compiler needs the types to resolve overload
-formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
-formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
+<!-- snippet: readme-method-overload-nsubstitute -->
+```cs
+[Fact]
+public void NSubstitute_OverloadResolution()
+{
+    var formatter = Substitute.For<IFormatter>();
 
-// Specific value matching - literals work when all args are specific
-formatter.Format("test", true).Returns("UPPERCASE");
-formatter.Format("test", 10).Returns("truncated");
+    // Arg.Any<T>() required - compiler needs the types to resolve overload
+    formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
+    formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
 
-// To use argument values, extract from CallInfo:
-formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
-    .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
+    // Specific value matching - literals work when all args are specific
+    formatter.Format("test", true).Returns("UPPERCASE");
+    formatter.Format("test", 10).Returns("truncated");
+
+    // To use argument values, extract from CallInfo:
+    formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
+        .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
+
+    // Verify it works
+    Assert.Equal("HELLO", formatter.Format("hello", true));
+    Assert.Equal("hello", formatter.Format("hello", false));
+}
 ```
+<!-- endSnippet -->
 
 **KnockOff** - Just write C# with typed parameters:
 
