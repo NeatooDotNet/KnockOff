@@ -26,6 +26,56 @@ No `Arg.Is<>()`. No `x.Arg<int>()`. The parameter is just `id`.
 
 ---
 
+## Method Overload Resolution
+
+**The Problem:** When an interface has overloaded methods with the same parameter count but different types:
+```csharp
+public interface IFormatter
+{
+    string Format(string input, bool uppercase);
+    string Format(string input, int maxLength);
+}
+```
+
+**NSubstitute** - Must use `Arg.Any<T>()` to match any value:
+```csharp
+var formatter = Substitute.For<IFormatter>();
+
+// Arg.Any<T>() required - compiler needs the types to resolve overload
+formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
+formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
+
+// Specific value matching - literals work when all args are specific
+formatter.Format("test", true).Returns("UPPERCASE");
+formatter.Format("test", 10).Returns("truncated");
+
+// To use argument values, extract from CallInfo:
+formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
+    .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
+```
+
+**KnockOff** - Just write C# with typed parameters:
+```csharp
+var stub = new FormatterStub();
+
+// Explicit parameter types resolve the overload - standard C# syntax
+stub.Format.OnCall((string input, bool uppercase) => "bool overload");
+stub.Format.OnCall((string input, int maxLength) => "int overload");
+
+// Specific value matching - parameter types resolve the overload
+stub.Format.When("test", true).Returns("UPPERCASE");
+stub.Format.When("test", 10).Returns("truncated");
+
+// Arguments are directly available with names and types:
+stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+```
+
+**The Difference:**
+- NSubstitute: `Arg.Any<bool>()` + `x.ArgAt<bool>(1)` to match any value and access arguments
+- KnockOff: `(string input, bool uppercase)` - standard C# lambda with named, typed parameters
+
+---
+
 ## Unique Feature: Source Delegation
 
 Delegate to a real implementation, override only what you need:
