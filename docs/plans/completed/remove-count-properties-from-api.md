@@ -2,8 +2,8 @@
 
 **Date:** 2026-01-22
 **Related Todo:** [Remove Count Properties from Public API](../todos/remove-count-properties-from-api.md)
-**Status:** Ready for Implementation
-**Last Updated:** 2026-01-22
+**Status:** Implemented
+**Last Updated:** 2026-02-01
 
 ---
 

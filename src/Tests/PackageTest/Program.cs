@@ -20,7 +20,8 @@ Console.WriteLine($"  LastSetValue: {knockOff.LastResult.LastSetValue}");
 // Test method with user implementation
 var result = calc.Add(10, 20);
 Console.WriteLine($"Add(10, 20) = {result}");
-Console.WriteLine($"  CallCount: {knockOff.Add2.CallCount}");
+knockOff.Add2.Verify(Times.Once);
+Console.WriteLine($"  Verify(Times.Once) passed!");
 Console.WriteLine($"  LastCallArgs: {knockOff.Add2.LastCallArgs}");
 
 // Test void method

@@ -73,11 +73,11 @@ internal static class IndexerInterceptorRenderer
 			// Aggregate counts (private - use VerifyGet/VerifySet to check)
 			if (model.HasGetter)
 			{
-				w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?.CallCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking.CallCount; return sum; } }");
+				w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
 			}
 			if (model.HasSetter)
 			{
-				w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?.CallCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking.CallCount; return sum; } }");
+				w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?._callCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking._callCount; return sum; } }");
 			}
 			if (model.HasGetter || model.HasSetter)
 			{
@@ -88,7 +88,7 @@ internal static class IndexerInterceptorRenderer
 			if (model.HasGetter)
 			{
 				w.Line($"/// <summary>The key from the last getter access (from most recently called registration).</summary>");
-				w.Line($"public {model.NullableKeyType} LastGetKey {{ get {{ if ((_onGetTracking?.CallCount ?? 0) > 0) return _onGetTracking!.LastKey; if (_getSequence != null) for (int i = _getSequence.Count - 1; i >= 0; i--) if (_getSequence[i].Tracking.CallCount > 0) return _getSequence[i].Tracking.LastKey; return _unconfiguredGetCount > 0 ? _unconfiguredLastGetKey : default; }} }}");
+				w.Line($"public {model.NullableKeyType} LastGetKey {{ get {{ if ((_onGetTracking?._callCount ?? 0) > 0) return _onGetTracking!.LastKey; if (_getSequence != null) for (int i = _getSequence.Count - 1; i >= 0; i--) if (_getSequence[i].Tracking._callCount > 0) return _getSequence[i].Tracking.LastKey; return _unconfiguredGetCount > 0 ? _unconfiguredLastGetKey : default; }} }}");
 				w.Line();
 			}
 
@@ -96,7 +96,7 @@ internal static class IndexerInterceptorRenderer
 			if (model.HasSetter)
 			{
 				w.Line($"/// <summary>The key-value pair from the last setter access (from most recently called registration).</summary>");
-				w.Line($"public ({model.KeyType} Key, {model.ValueType} Value)? LastSetEntry {{ get {{ if ((_onSetTracking?.CallCount ?? 0) > 0) return _onSetTracking!.LastEntry; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking.CallCount > 0) return _setSequence[i].Tracking.LastEntry; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetEntry : default; }} }}");
+				w.Line($"public ({model.KeyType} Key, {model.ValueType} Value)? LastSetEntry {{ get {{ if ((_onSetTracking?._callCount ?? 0) > 0) return _onSetTracking!.LastEntry; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking._callCount > 0) return _setSequence[i].Tracking.LastEntry; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetEntry : default; }} }}");
 				w.Line();
 			}
 
@@ -534,7 +534,7 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"private {keyType} _lastKey = default!;");
 			w.Line();
 
-			w.Line("internal int CallCount { get; private set; }");
+			w.Line("internal int _callCount;");
 			w.Line();
 
 			w.Line($"/// <summary>Last key passed to this getter callback. Default if never called.</summary>");
@@ -542,11 +542,11 @@ internal static class IndexerInterceptorRenderer
 			w.Line();
 
 			w.Line("/// <summary>Records a call to this callback.</summary>");
-			w.Line($"public void RecordCall({keyType} key) {{ CallCount++; _lastKey = key; }}");
+			w.Line($"public void RecordCall({keyType} key) {{ _callCount++; _lastKey = key; }}");
 			w.Line();
 
 			w.Line("/// <summary>Resets tracking state.</summary>");
-			w.Line("public void Reset() { CallCount = 0; _lastKey = default!; }");
+			w.Line("public void Reset() { _callCount = 0; _lastKey = default!; }");
 			w.Line();
 
 			w.Line("/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>");
@@ -557,8 +557,8 @@ internal static class IndexerInterceptorRenderer
 			w.Line("public void Verify(global::KnockOff.Times times)");
 			using (w.Braces())
 			{
-				w.Line("if (!times.Validate(CallCount))");
-				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"indexer getter\", times, CallCount));");
+				w.Line("if (!times.Validate(_callCount))");
+				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"indexer getter\", times, _callCount));");
 			}
 			w.Line();
 
@@ -623,7 +623,7 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"private ({keyType} Key, {valueType} Value)? _lastEntry;");
 			w.Line();
 
-			w.Line("internal int CallCount { get; private set; }");
+			w.Line("internal int _callCount;");
 			w.Line();
 
 			w.Line($"/// <summary>Last key and value passed to this setter callback. Null if never called.</summary>");
@@ -631,11 +631,11 @@ internal static class IndexerInterceptorRenderer
 			w.Line();
 
 			w.Line("/// <summary>Records a call to this callback.</summary>");
-			w.Line($"public void RecordCall({keyType} key, {valueType} value) {{ CallCount++; _lastEntry = (key, value); }}");
+			w.Line($"public void RecordCall({keyType} key, {valueType} value) {{ _callCount++; _lastEntry = (key, value); }}");
 			w.Line();
 
 			w.Line("/// <summary>Resets tracking state.</summary>");
-			w.Line("public void Reset() { CallCount = 0; _lastEntry = null; }");
+			w.Line("public void Reset() { _callCount = 0; _lastEntry = null; }");
 			w.Line();
 
 			w.Line("/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>");
@@ -646,8 +646,8 @@ internal static class IndexerInterceptorRenderer
 			w.Line("public void Verify(global::KnockOff.Times times)");
 			using (w.Braces())
 			{
-				w.Line("if (!times.Validate(CallCount))");
-				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"indexer setter\", times, CallCount));");
+				w.Line("if (!times.Validate(_callCount))");
+				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"indexer setter\", times, _callCount));");
 			}
 			w.Line();
 

@@ -910,10 +910,10 @@ internal static class FlatRenderer
 					w.Line("if (times.IsForever)");
 					using (w.Braces())
 					{
-						w.Line("if (tracking.CallCount == 0)");
+						w.Line("if (tracking._callCount == 0)");
 						w.Line("\treturn false;");
 					}
-					w.Line("else if (!times.Verify(tracking.CallCount))");
+					w.Line("else if (!times.Verify(tracking._callCount))");
 					w.Line("\treturn false;");
 				}
 				w.Line("return true;");
@@ -998,12 +998,12 @@ internal static class FlatRenderer
 			w.Line();
 
 			// Advance sequence if times exhausted (and not Forever)
-			w.Line("if (!times.IsForever && tracking.CallCount >= times.Count)");
+			w.Line("if (!times.IsForever && tracking._callCount >= times.Count)");
 			using (w.Braces())
 			{
 				w.Line("if (_sequenceIndex < _sequence.Count - 1)");
 				w.Line("\t_sequenceIndex++;");
-				w.Line("else if (tracking.CallCount > times.Count)");
+				w.Line("else if (tracking._callCount > times.Count)");
 				w.Line($"\tthrow global::KnockOff.StubException.SequenceExhausted(\"{method.MethodName}\");");
 			}
 			w.Line();
@@ -1053,8 +1053,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// CallCount property (internal - use Verify(Times) for public API)
-			w.Line("internal int CallCount { get; private set; }");
+			// CallCount field (private - parent interceptor can access since this is a nested class)
+			w.Line("internal int _callCount;");
 			w.Line();
 
 			// LastArg/LastArgs property (non-nullable to match interface)
@@ -1076,16 +1076,16 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Records a call to this callback.</summary>");
 			if (method.TrackableParameters.Count == 0)
 			{
-				w.Line("public void RecordCall() => CallCount++;");
+				w.Line("public void RecordCall() => _callCount++;");
 			}
 			else if (method.TrackableParameters.Count == 1)
 			{
 				var param = method.TrackableParameters.GetArray()![0];
-				w.Line($"public void RecordCall({param.Type} {param.EscapedName}) {{ CallCount++; _lastArg = {param.EscapedName}; }}");
+				w.Line($"public void RecordCall({param.Type} {param.EscapedName}) {{ _callCount++; _lastArg = {param.EscapedName}; }}");
 			}
 			else
 			{
-				w.Line($"public void RecordCall({method.LastCallType} args) {{ CallCount++; _lastArgs = args; }}");
+				w.Line($"public void RecordCall({method.LastCallType} args) {{ _callCount++; _lastArgs = args; }}");
 			}
 			w.Line();
 
@@ -1093,21 +1093,21 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Resets tracking state.</summary>");
 			if (method.TrackableParameters.Count == 0)
 			{
-				w.Line("public void Reset() => CallCount = 0;");
+				w.Line("public void Reset() => _callCount = 0;");
 			}
 			else if (method.TrackableParameters.Count == 1)
 			{
-				w.Line("public void Reset() { CallCount = 0; _lastArg = default!; }");
+				w.Line("public void Reset() { _callCount = 0; _lastArg = default!; }");
 			}
 			else
 			{
-				w.Line("public void Reset() { CallCount = 0; _lastArgs = default; }");
+				w.Line("public void Reset() { _callCount = 0; _lastArgs = default; }");
 			}
 			w.Line();
 
 			// Verify method
 			w.Line("/// <summary>Verifies call count satisfies the Times constraint. Defaults to AtLeastOnce.</summary>");
-			w.Line("public bool Verify(global::KnockOff.Times times = default) => (times == default ? global::KnockOff.Times.AtLeastOnce : times).Verify(CallCount);");
+			w.Line("public bool Verify(global::KnockOff.Times times = default) => (times == default ? global::KnockOff.Times.AtLeastOnce : times).Verify(_callCount);");
 		}
 		w.Line();
 	}
@@ -1135,7 +1135,7 @@ internal static class FlatRenderer
 				{
 					w.Line("var total = 0;");
 					w.Line("foreach (var (_, _, tracking) in _interceptor._sequence)");
-					w.Line("\ttotal += tracking.CallCount;");
+					w.Line("\ttotal += tracking._callCount;");
 					w.Line("return total;");
 				}
 			}
@@ -1160,7 +1160,7 @@ internal static class FlatRenderer
 				w.Line("foreach (var (_, times, tracking) in _interceptor._sequence)");
 				using (w.Braces())
 				{
-					w.Line("if (!times.Verify(tracking.CallCount))");
+					w.Line("if (!times.Verify(tracking._callCount))");
 					w.Line("\treturn false;");
 				}
 				w.Line("return true;");
@@ -1294,10 +1294,10 @@ internal static class FlatRenderer
 						w.Line("if (times.IsForever)");
 						using (w.Braces())
 						{
-							w.Line("if (tracking.CallCount == 0)");
+							w.Line("if (tracking._callCount == 0)");
 							w.Line("\treturn false;");
 						}
-						w.Line("else if (!times.Verify(tracking.CallCount))");
+						w.Line("else if (!times.Verify(tracking._callCount))");
 						w.Line("\treturn false;");
 					}
 				}
@@ -1393,12 +1393,12 @@ internal static class FlatRenderer
 			w.Line($"tracking.RecordCall({trackingArgs});");
 			w.Line();
 
-			w.Line("if (!times.IsForever && tracking.CallCount >= times.Count)");
+			w.Line("if (!times.IsForever && tracking._callCount >= times.Count)");
 			using (w.Braces())
 			{
 				w.Line($"if (_sequenceIndex_{suffix} < _sequence_{suffix}.Count - 1)");
 				w.Line($"\t_sequenceIndex_{suffix}++;");
-				w.Line("else if (tracking.CallCount > times.Count)");
+				w.Line("else if (tracking._callCount > times.Count)");
 				w.Line($"\tthrow global::KnockOff.StubException.SequenceExhausted(\"{method.MethodName}\");");
 			}
 			w.Line();
@@ -1434,8 +1434,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// CallCount (internal - use Verify(Times) for public API)
-			w.Line("internal int CallCount { get; private set; }");
+			// CallCount field (private - parent interceptor can access since this is a nested class)
+			w.Line("internal int _callCount;");
 			w.Line();
 
 			if (method.TrackableParameters.Count == 1)
@@ -1452,30 +1452,30 @@ internal static class FlatRenderer
 
 			if (method.TrackableParameters.Count == 0)
 			{
-				w.Line("public void RecordCall() => CallCount++;");
+				w.Line("public void RecordCall() => _callCount++;");
 			}
 			else if (method.TrackableParameters.Count == 1)
 			{
 				var param = method.TrackableParameters.GetArray()![0];
-				w.Line($"public void RecordCall({param.Type} {param.EscapedName}) {{ CallCount++; _lastArg = {param.EscapedName}; }}");
+				w.Line($"public void RecordCall({param.Type} {param.EscapedName}) {{ _callCount++; _lastArg = {param.EscapedName}; }}");
 			}
 			else
 			{
-				w.Line($"public void RecordCall({method.LastCallType} args) {{ CallCount++; _lastArgs = args; }}");
+				w.Line($"public void RecordCall({method.LastCallType} args) {{ _callCount++; _lastArgs = args; }}");
 			}
 			w.Line();
 
 			if (method.TrackableParameters.Count == 0)
-				w.Line("public void Reset() => CallCount = 0;");
+				w.Line("public void Reset() => _callCount = 0;");
 			else if (method.TrackableParameters.Count == 1)
-				w.Line("public void Reset() { CallCount = 0; _lastArg = default!; }");
+				w.Line("public void Reset() { _callCount = 0; _lastArg = default!; }");
 			else
-				w.Line("public void Reset() { CallCount = 0; _lastArgs = default; }");
+				w.Line("public void Reset() { _callCount = 0; _lastArgs = default; }");
 			w.Line();
 
 			// Verify method
 			w.Line("/// <summary>Verifies call count satisfies the Times constraint. Defaults to AtLeastOnce.</summary>");
-			w.Line("public bool Verify(global::KnockOff.Times times = default) => (times == default ? global::KnockOff.Times.AtLeastOnce : times).Verify(CallCount);");
+			w.Line("public bool Verify(global::KnockOff.Times times = default) => (times == default ? global::KnockOff.Times.AtLeastOnce : times).Verify(_callCount);");
 		}
 		w.Line();
 	}
@@ -1502,7 +1502,7 @@ internal static class FlatRenderer
 				{
 					w.Line("var total = 0;");
 					w.Line($"foreach (var (_, _, tracking) in _interceptor._sequence_{suffix})");
-					w.Line("\ttotal += tracking.CallCount;");
+					w.Line("\ttotal += tracking._callCount;");
 					w.Line("return total;");
 				}
 			}
@@ -1526,10 +1526,10 @@ internal static class FlatRenderer
 					w.Line("if (times.IsForever)");
 					using (w.Braces())
 					{
-						w.Line("if (tracking.CallCount == 0)");
+						w.Line("if (tracking._callCount == 0)");
 						w.Line("\treturn false;");
 					}
-					w.Line("else if (!times.Verify(tracking.CallCount))");
+					w.Line("else if (!times.Verify(tracking._callCount))");
 					w.Line("\treturn false;");
 				}
 				w.Line("return true;");
@@ -1565,8 +1565,8 @@ internal static class FlatRenderer
 			}
 			w.Line();
 
-			// CallCount property (internal - use Verify(Times) for public API)
-			w.Line("internal int CallCount { get; private set; }");
+			// CallCount field (private - parent interceptor can access since this is a nested class)
+			w.Line("internal int _callCount;");
 			w.Line();
 
 			// Verifiable state
@@ -1593,16 +1593,16 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Records a method call.</summary>");
 			if (method.TrackableParameters.Count == 0)
 			{
-				w.Line("internal void RecordCall() => CallCount++;");
+				w.Line("internal void RecordCall() => _callCount++;");
 			}
 			else if (method.TrackableParameters.Count == 1)
 			{
 				var param = method.TrackableParameters.GetArray()![0];
-				w.Line($"internal void RecordCall({param.Type} {param.EscapedName}) {{ CallCount++; _lastArg = {param.EscapedName}; }}");
+				w.Line($"internal void RecordCall({param.Type} {param.EscapedName}) {{ _callCount++; _lastArg = {param.EscapedName}; }}");
 			}
 			else
 			{
-				w.Line($"internal void RecordCall({method.LastCallType} args) {{ CallCount++; _lastArgs = args; }}");
+				w.Line($"internal void RecordCall({method.LastCallType} args) {{ _callCount++; _lastArgs = args; }}");
 			}
 			w.Line();
 
@@ -1610,15 +1610,15 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Resets tracking state.</summary>");
 			if (method.TrackableParameters.Count == 0)
 			{
-				w.Line("public void Reset() => CallCount = 0;");
+				w.Line("public void Reset() => _callCount = 0;");
 			}
 			else if (method.TrackableParameters.Count == 1)
 			{
-				w.Line("public void Reset() { CallCount = 0; _lastArg = default!; }");
+				w.Line("public void Reset() { _callCount = 0; _lastArg = default!; }");
 			}
 			else
 			{
-				w.Line("public void Reset() { CallCount = 0; _lastArgs = default; }");
+				w.Line("public void Reset() { _callCount = 0; _lastArgs = default; }");
 			}
 			w.Line();
 
@@ -1629,7 +1629,7 @@ internal static class FlatRenderer
 			{
 				w.Line("if (!_isVerifiable) return null;");
 				w.Line("var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
-				w.Line($"if (!times.Validate(CallCount)) return new global::KnockOff.VerificationFailure(\"{method.MethodName}\", times, CallCount);");
+				w.Line($"if (!times.Validate(_callCount)) return new global::KnockOff.VerificationFailure(\"{method.MethodName}\", times, _callCount);");
 				w.Line("return null;");
 			}
 			w.Line();
@@ -1643,8 +1643,8 @@ internal static class FlatRenderer
 			w.Line("public void Verify(global::KnockOff.Times times)");
 			using (w.Braces())
 			{
-				w.Line("if (!times.Validate(CallCount))");
-				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, CallCount));");
+				w.Line("if (!times.Validate(_callCount))");
+				w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, _callCount));");
 			}
 			w.Line();
 
@@ -1783,7 +1783,7 @@ internal static class FlatRenderer
 			w.Line();
 
 			// CallCount - private field with explicit interface implementation for aggregation
-			w.Line("private int _callCount;");
+			w.Line("internal int _callCount;");
 			w.Line("int IGenericMethodCallTracker.CallCount => _callCount;");
 			w.Line();
 

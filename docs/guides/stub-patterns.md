@@ -276,7 +276,7 @@ public void InlineDelegateStub_TracksInvocationsAndConfiguresBehavior()
 ### Benefits
 
 - **Implicit conversion**: Stub converts to delegate type automatically
-- **Invocation tracking**: Access `CallCount`, `LastCallArg`, `LastCallArgs`
+- **Invocation tracking**: Use `Verify()`, `LastCallArg`, `LastCallArgs`
 - **Behavior configuration**: Use `OnCall` to define custom logic
 - **Verification**: Use `Verify()` and `Times` constraints
 
