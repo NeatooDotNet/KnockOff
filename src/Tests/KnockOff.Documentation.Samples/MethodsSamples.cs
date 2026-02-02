@@ -321,7 +321,7 @@ public class MethodResetTests
         // Verify one call was made
         tracking.Verify(Times.Once);
 
-        // Reset clears CallCount on the interceptor
+        // Reset clears tracking state on the interceptor
         stub.ProcessData.Reset();
 
         // After reset, Verify(Times.Never) passes via tracking

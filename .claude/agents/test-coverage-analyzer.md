@@ -27,11 +27,11 @@ Analyze test coverage to ensure features work correctly across all KnockOff patt
 ### 1. Identify the Feature
 
 Determine what feature is being tested:
-- Method interceptors (OnCall, CallCount, LastCallArg)
-- Property interceptors (Value, OnGet, OnSet, GetCount, SetCount)
+- Method interceptors (OnCall, Verify, LastCallArg)
+- Property interceptors (Value, OnGet, OnSet, VerifyGet, VerifySet)
 - Indexer interceptors (Backing, OnGet, OnSet)
-- Event interceptors (Raise, AddCount, HasSubscribers)
-- Generic methods (Of<T>(), TotalCallCount)
+- Event interceptors (Raise, VerifyAdd, HasSubscribers)
+- Generic methods (Of<T>(), Verify)
 - Overloaded methods (Method1, Method2 suffixes)
 - User-defined methods (compile-time defaults)
 - Reset() functionality
@@ -125,7 +125,7 @@ Based on Roslyn source generator constraints, suggest tests for:
 ## Tools Available
 
 - **Glob**: Find test files by pattern (`**/*Tests.cs`)
-- **Grep**: Search for specific test scenarios (`OnCall`, `CallCount`, etc.)
+- **Grep**: Search for specific test scenarios (`OnCall`, `Verify`, etc.)
 - **Read**: Read test files to understand coverage
 - **Bash**: Run `dotnet test` to verify tests pass
 

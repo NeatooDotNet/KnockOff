@@ -306,7 +306,7 @@ For each interface:
 
 1. **Compilation** - Stub compiles without errors
 2. **Interceptor generation** - All members have interceptors (except marker interfaces)
-3. **Call tracking** - CallCount, WasCalled work correctly
+3. **Call tracking** - Verify(), WasCalled work correctly
 4. **Argument capture** - LastCallArgs captures method arguments
 5. **Callbacks** - OnCall/OnGet/OnSet delegate to custom behavior
 6. **Reset** - Reset() clears tracking state
