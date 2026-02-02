@@ -10,6 +10,7 @@
 // - Strict mode behavior
 // -----------------------------------------------------------------------------
 
+using System.Text;
 using Design.Domain.Services;
 using KnockOff;
 
@@ -369,6 +370,146 @@ public partial class StrictModeUserMethodDemo
 }
 
 // =============================================================================
+// ASYNC USER METHODS
+// =============================================================================
+
+[KnockOff]
+public partial class AsyncUserMethodStub : IAsyncUserMethodService { }
+
+public partial class AsyncUserMethodStub
+{
+    // =========================================================================
+    // Async User Methods - Task<T>
+    // =========================================================================
+    // QUESTION: Can user methods be async and return Task<T>?
+    // Let's find out...
+    // =========================================================================
+
+    protected async Task<string> ProcessAsync(string input)
+    {
+        // Simulate async work
+        await Task.Delay(1);
+        return $"[Async: {input}]";
+    }
+
+    protected async Task ExecuteAsync(string command)
+    {
+        // Async void method
+        await Task.Delay(1);
+        // Side effect here
+    }
+
+    protected async ValueTask<int> ComputeAsync(int value)
+    {
+        // ValueTask version
+        await Task.Yield();
+        return value * 2;
+    }
+}
+
+[KnockOff<IAsyncUserMethodService>]
+public partial class AsyncUserMethodDemo
+{
+    public async Task AsyncUserMethod_BasicUsage()
+    {
+        var stub = new AsyncUserMethodStub();
+        IAsyncUserMethodService service = stub;
+
+        // Call async user method
+        var result = await service.ProcessAsync("hello");
+        // result == "[Async: hello]"
+
+        // Verify with *2 interceptor
+        stub.ProcessAsync2.Verify(Times.Once);
+    }
+
+    public async Task AsyncUserMethod_VoidTask()
+    {
+        var stub = new AsyncUserMethodStub();
+        IAsyncUserMethodService service = stub;
+
+        await service.ExecuteAsync("command");
+
+        stub.ExecuteAsync2.Verify(Times.Once);
+        // LastArg should capture the command
+        var lastCommand = stub.ExecuteAsync2.LastArg;
+    }
+
+    public async Task AsyncUserMethod_ValueTask()
+    {
+        var stub = new AsyncUserMethodStub();
+        IAsyncUserMethodService service = stub;
+
+        var result = await service.ComputeAsync(21);
+        // result == 42
+
+        stub.ComputeAsync2.Verify(Times.Once);
+    }
+}
+
+// =============================================================================
+// GENERIC USER METHODS
+// =============================================================================
+
+[KnockOff]
+public partial class GenericUserMethodStub : IGenericUserMethodService { }
+
+public partial class GenericUserMethodStub
+{
+    // =========================================================================
+    // Generic User Methods
+    // =========================================================================
+    // QUESTION: Can user methods be generic?
+    // - How does the generator handle type parameters?
+    // - How does tracking work with generic returns?
+    // =========================================================================
+
+    protected T Create<T>() where T : new()
+    {
+        // Generic user method with constraint
+        return new T();
+    }
+
+    protected TOut Transform<TIn, TOut>(TIn input) where TOut : new()
+    {
+        // Multi-type-parameter generic method
+        return new TOut();
+    }
+
+    protected T Clone<T>(T source) where T : ICloneable
+    {
+        // Generic with interface constraint
+        return (T)source.Clone();
+    }
+}
+
+[KnockOff<IGenericUserMethodService>]
+public partial class GenericUserMethodDemo
+{
+    public void GenericUserMethod_Create()
+    {
+        var stub = new GenericUserMethodStub();
+        IGenericUserMethodService service = stub;
+
+        // Call generic user method
+        var list = service.Create<List<int>>();
+
+        // How do we verify? What's the interceptor name?
+        // stub.Create2.Verify()?  Or stub.Create2.Of<List<int>>().Verify()?
+    }
+
+    public void GenericUserMethod_Transform()
+    {
+        var stub = new GenericUserMethodStub();
+        IGenericUserMethodService service = stub;
+
+        var result = service.Transform<string, StringBuilder>("hello");
+
+        // Multi-type-parameter tracking?
+    }
+}
+
+// =============================================================================
 // DESIGN FINDINGS AND QUESTIONS
 // =============================================================================
 //
@@ -377,34 +518,44 @@ public partial class StrictModeUserMethodDemo
 // - *2 interceptor with Verify(), LastArg, LastArgs, Reset(), Verifiable()
 // - Mixed stubs (some methods with user impl, some without)
 // - Strict mode bypass for user methods
+// - Async user methods (Task<T>, Task, ValueTask<T>) - see AsyncUserMethodStub
+// - Generic user methods with Of<T>() pattern - see GenericUserMethodStub
 //
 // **BUGS DISCOVERED:**
 // 1. USER METHOD OVERLOADS - Generator produces invalid code
 //    - RecordCall has only one signature (first overload's)
 //    - Other overloads pass wrong argument types
 //    - See detailed analysis above
+//    - Tracked in: docs/todos/user-method-overload-bug.md
 //
 // 2. PARTIAL OVERLOAD COVERAGE - Same bug as #1
 //    - If you implement only some overloads, same RecordCall issue
 //
-// **QUESTIONS STILL TO EXPLORE:**
+// **ANSWERED QUESTIONS:**
 //
 // 1. INLINE PATTERN SUPPORT
 //    Q: Can inline stubs ([KnockOff<T>]) have user methods?
-//    - Inline stubs generate the entire class
-//    - User methods require partial class with protected methods
-//    - This seems incompatible - document the limitation
+//    A: NO - Inline stubs generate the entire class. User methods require
+//       a partial class where you can add protected methods. These are
+//       fundamentally incompatible patterns.
 //
 // 2. ASYNC USER METHODS
 //    Q: Do async user methods work as expected?
-//    - Task<T> return type with async/await
-//    - ValueTask<T> support
-//    - Needs testing and documentation
+//    A: YES - Task<T>, Task, and ValueTask<T> all work correctly.
+//       - Generator creates *2 interceptors (ProcessAsync2, ExecuteAsync2, etc.)
+//       - Interceptors are tracking-only (Verify, LastArg, Reset)
+//       - No OnCall on async user method interceptors
+//       - See AsyncUserMethodStub for working examples
 //
 // 3. GENERIC USER METHODS
 //    Q: Can user methods be generic?
-//    - protected T Create<T>() where T : new()
-//    - How does tracking work?
-//    - Needs testing and documentation
+//    A: YES - Generic user methods work with the Of<T>() pattern.
+//       - Generator creates *2 interceptors (Create2, Transform2, etc.)
+//       - Access typed tracking via stub.Create2.Of<T>()
+//       - NOTABLE: Generic user method interceptors DO have OnCall!
+//         This differs from non-generic user methods which are tracking-only.
+//       - The OnCall on Of<T>() typed handlers allows overriding specific
+//         type instantiations while user method handles the general case.
+//       - See GenericUserMethodStub for working examples
 //
 // =============================================================================
