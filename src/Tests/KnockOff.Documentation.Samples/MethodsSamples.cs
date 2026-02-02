@@ -465,6 +465,11 @@ public interface IProcessSvc
     void Process();
 }
 
+public interface IDataSvc
+{
+    Task<string> GetDataAsync(int id);
+}
+
 // =============================================================================
 // Stubs for Sequence Samples
 // =============================================================================
@@ -484,12 +489,76 @@ public partial class ValueSvcStub : IValueSvc { }
 [KnockOff]
 public partial class ProcessSvcStub : IProcessSvc { }
 
+[KnockOff]
+public partial class DataSvcStub : IDataSvc { }
+
 // =============================================================================
 // Sequence Samples
 // =============================================================================
 
 public class SequenceTests
 {
+    [Fact]
+    public void Sequence_ParamsSyntax()
+    {
+        var stub = new ValueSvcStub();
+
+        #region methods-sequence-params
+        // NSubstitute-style concise syntax: Returns(first, params rest)
+        stub.GetValue.Returns(1, 2, 3);
+
+        IValueSvc service = stub;
+
+        Assert.Equal(1, service.GetValue());
+        Assert.Equal(2, service.GetValue());
+        Assert.Equal(3, service.GetValue());
+
+        // After exhaustion: repeats last value (NSubstitute behavior)
+        Assert.Equal(3, service.GetValue());
+        #endregion
+    }
+
+    [Fact]
+    public async Task Sequence_ParamsAsync()
+    {
+        var stub = new DataSvcStub();
+
+        #region methods-sequence-params-async
+        // Async methods auto-wrap values - no Task.FromResult needed
+        stub.GetDataAsync.Returns("first", "second", "third");
+
+        IDataSvc service = stub;
+
+        Assert.Equal("first", await service.GetDataAsync(1));
+        Assert.Equal("second", await service.GetDataAsync(2));
+        Assert.Equal("third", await service.GetDataAsync(3));
+
+        // After exhaustion: repeats last value
+        Assert.Equal("third", await service.GetDataAsync(4));
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_CallbackThenParams()
+    {
+        var stub = new CalculatorSvcStub();
+
+        #region methods-sequence-callback-then-params
+        // OnCall for computed first value, then params for constants
+        stub.Calculate
+            .OnCall((x, y) => x + y)      // First call: compute x + y
+            .ThenReturns(100, 200, 300);  // Then: constant values
+
+        ICalculatorSvc calc = stub;
+
+        Assert.Equal(8, calc.Calculate(5, 3));   // 5 + 3 = 8 (computed)
+        Assert.Equal(100, calc.Calculate(0, 0)); // constant
+        Assert.Equal(200, calc.Calculate(0, 0)); // constant
+        Assert.Equal(300, calc.Calculate(0, 0)); // constant
+        Assert.Equal(300, calc.Calculate(0, 0)); // repeats last
+        #endregion
+    }
+
     [Fact]
     public void Sequence_BasicStatusProgression()
     {
@@ -588,22 +657,44 @@ public class SequenceTests
     {
         var stub = new ValueSvcStub();
 
-        #region methods-sequence-exhaustion-thendefault
-        // Sequence with ThenDefault() returns default after exhaustion
+        #region methods-sequence-then-default
+        // ThenDefault() returns default(T) after exhaustion instead of repeating
         stub.GetValue
             .OnCall(() => 1)
             .ThenCall(() => 2)
-            .ThenCall(() => 3)
             .ThenDefault();
 
         IValueSvc service = stub;
 
         Assert.Equal(1, service.GetValue());
         Assert.Equal(2, service.GetValue());
-        Assert.Equal(3, service.GetValue());
 
-        // After exhaustion: default(int) = 0 due to ThenDefault()
+        // After exhaustion with ThenDefault: returns default(int) = 0
         Assert.Equal(0, service.GetValue());
+        Assert.Equal(0, service.GetValue()); // continues returning default
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_StrictModeThrows()
+    {
+        var stub = new ValueSvcStub();
+
+        #region methods-sequence-strict
+        // Strict mode throws on sequence exhaustion
+        stub.Strict = true;
+
+        stub.GetValue
+            .OnCall(() => 1)
+            .ThenCall(() => 2);
+
+        IValueSvc service = stub;
+
+        Assert.Equal(1, service.GetValue());
+        Assert.Equal(2, service.GetValue());
+
+        // Third call throws StubException.SequenceExhausted in strict mode
+        Assert.Throws<StubException>(() => service.GetValue());
         #endregion
     }
 

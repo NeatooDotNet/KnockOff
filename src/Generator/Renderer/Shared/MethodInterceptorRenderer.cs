@@ -223,6 +223,43 @@ internal static class MethodInterceptorRenderer
 				w.Line("return _returnsValueTracking;");
 			}
 			w.Line();
+
+			// Returns(first, params rest) - creates sequence from multiple values
+			var discardPrefix = BuildDiscardLambdaPrefix(model.Parameters.Count);
+			w.Line($"/// <summary>Configures sequence of return values. Each value returned once, last repeats.</summary>");
+			w.Line($"public MethodSequenceImpl Returns({valueStorageType} first, params {valueStorageType}[] rest)");
+			using (w.Braces())
+			{
+				// Start with OnCall for first value, then ThenReturns to get MethodSequenceImpl
+				// If rest is empty, we still return a sequence (with just first value repeating)
+				if (isTaskT)
+				{
+					w.Line($"var builder = OnCall({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(first));");
+				}
+				else if (isValueTaskT)
+				{
+					w.Line($"var builder = OnCall({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueStorageType}>(first));");
+				}
+				else
+				{
+					w.Line($"var builder = OnCall({discardPrefix} => first);");
+				}
+				w.Line("if (rest.Length == 0)");
+				using (w.Braces())
+				{
+					// Return a sequence with just the first value (elevate to sequence mode)
+					w.Line("return builder.ThenReturns(first);");
+				}
+				// First rest value elevates to sequence, then loop for remaining
+				w.Line("var seq = builder.ThenReturns(rest[0]);");
+				w.Line("for (int i = 1; i < rest.Length; i++)");
+				using (w.Braces())
+				{
+					w.Line("seq = seq.ThenReturns(rest[i]);");
+				}
+				w.Line("return seq;");
+			}
+			w.Line();
 		}
 
 		// OnCall(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> methods
@@ -1484,6 +1521,36 @@ internal static class MethodInterceptorRenderer
 					w.Line($"public {sequenceClassName} ThenReturns({valueType} value) => ThenCall({discardPrefix} => value);");
 				}
 				w.Line();
+
+				// ThenReturns(params values) - adds multiple values to sequence
+				w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
+				w.Line($"public {sequenceClassName} ThenReturns(params {valueType}[] values)");
+				using (w.Braces())
+				{
+					w.Line("if (values.Length == 0)");
+					using (w.Braces())
+					{
+						// Elevate to sequence mode without adding any new values (same as ThenCall elevation)
+						w.Line($"if (_interceptor.{sequenceFieldName} == null)");
+						using (w.Braces())
+						{
+							w.Line($"_interceptor.{sequenceFieldName} = new global::System.Collections.Generic.List<({delegateType} Callback, {className} Tracking)>();");
+							w.Line($"_interceptor.{sequenceFieldName}.Add((_interceptor.{onCallFieldName}!, this));");
+							w.Line($"_interceptor.{onCallFieldName} = null;");
+							w.Line($"_interceptor.{onCallTrackingFieldName} = null;");
+							w.Line($"_interceptor.{sequenceIndexFieldName} = 0;");
+						}
+						w.Line($"return new {sequenceClassName}(_interceptor);");
+					}
+					w.Line("var seq = ThenReturns(values[0]);");
+					w.Line("for (int i = 1; i < values.Length; i++)");
+					using (w.Braces())
+					{
+						w.Line("seq = seq.ThenReturns(values[i]);");
+					}
+					w.Line("return seq;");
+				}
+				w.Line();
 			}
 
 			// Verifiable() - returns builder interface for fluent chaining
@@ -1607,6 +1674,20 @@ internal static class MethodInterceptorRenderer
 				else
 				{
 					w.Line($"public {className} ThenReturns({valueType} value) => ThenCall({discardPrefix} => value);");
+				}
+				w.Line();
+
+				// ThenReturns(params values) - adds multiple values to sequence
+				w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
+				w.Line($"public {className} ThenReturns(params {valueType}[] values)");
+				using (w.Braces())
+				{
+					w.Line("foreach (var value in values)");
+					using (w.Braces())
+					{
+						w.Line("ThenReturns(value);");
+					}
+					w.Line("return this;");
 				}
 				w.Line();
 			}

@@ -510,6 +510,307 @@ public partial class SequenceValueOverloadTests
 
 	#endregion
 
+	#region Params Sequence Tests
+
+	/// <summary>
+	/// Tests for params overloads on Returns and ThenReturns.
+	/// Phase 3 of params-sequence-values feature.
+	/// </summary>
+
+	[Fact]
+	public void Returns_Params_CreatesSequence()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Returns with params creates a sequence: first value, then rest values
+		knockOff.GetOptional.Returns("first", "second", "third");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("third", service.GetOptional());
+		// After exhaustion, repeats last value (NSubstitute behavior)
+		Assert.Equal("third", service.GetOptional());
+		Assert.Equal("third", service.GetOptional());
+	}
+
+	[Fact]
+	public void Returns_Params_SingleValue_UsesNonParamsOverload()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Single value uses non-params overload which returns MethodCallBuilderImpl
+		// We can verify this by checking that the value repeats forever (not exhausted)
+		knockOff.GetOptional.Returns("single");
+
+		Assert.Equal("single", service.GetOptional());
+		Assert.Equal("single", service.GetOptional());
+		Assert.Equal("single", service.GetOptional());
+		Assert.Equal("single", service.GetOptional());
+		// Repeats indefinitely without strict mode issues
+	}
+
+	[Fact]
+	public void Returns_Params_TwoValues_CreatesSequence()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Two values uses params overload, creating a sequence
+		knockOff.GetOptional.Returns("first", "second");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Exhausted, repeats last
+		Assert.Equal("second", service.GetOptional());
+	}
+
+	[Fact]
+	public async Task Returns_Params_AsyncMethod_AutoWraps()
+	{
+		var knockOff = new AsyncServiceKnockOff();
+		IAsyncService service = knockOff;
+
+		// For Task<T> methods, params Returns auto-wraps with Task.FromResult
+		knockOff.GetRequiredAsync.Returns("first", "second", "third");
+
+		Assert.Equal("first", await service.GetRequiredAsync());
+		Assert.Equal("second", await service.GetRequiredAsync());
+		Assert.Equal("third", await service.GetRequiredAsync());
+		// Repeats last after exhaustion
+		Assert.Equal("third", await service.GetRequiredAsync());
+	}
+
+	[Fact]
+	public async Task Returns_Params_ValueTaskMethod_AutoWraps()
+	{
+		var knockOff = new ValueTaskMethodKnockOff();
+		IValueTaskMethodService service = knockOff;
+
+		// For ValueTask<T> methods, params Returns auto-wraps with new ValueTask<T>(value)
+		knockOff.GetValueAsync.Returns("first", "second", "third");
+
+		Assert.Equal("first", await service.GetValueAsync());
+		Assert.Equal("second", await service.GetValueAsync());
+		Assert.Equal("third", await service.GetValueAsync());
+		// Repeats last after exhaustion
+		Assert.Equal("third", await service.GetValueAsync());
+	}
+
+	[Fact]
+	public void ThenReturns_Params_AddsMultipleValues()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// OnCall starts the sequence, ThenReturns(params) adds multiple values
+		knockOff.GetOptional.OnCall(() => "callback first")
+			.ThenReturns("second", "third", "fourth");
+
+		Assert.Equal("callback first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("third", service.GetOptional());
+		Assert.Equal("fourth", service.GetOptional());
+		// Repeats last after exhaustion
+		Assert.Equal("fourth", service.GetOptional());
+	}
+
+	[Fact]
+	public void ThenReturns_Params_EmptyArray_NoOp()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Empty params array elevates to sequence mode but adds no values
+		knockOff.GetOptional.OnCall(() => "only")
+			.ThenReturns(new string?[] { });
+
+		Assert.Equal("only", service.GetOptional());
+		// No additional sequence items, repeats the only value
+		Assert.Equal("only", service.GetOptional());
+	}
+
+	[Fact]
+	public void ThenReturns_Params_MixWithSingleValue()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Mix single value calls with params calls
+		knockOff.GetOptional.OnCall(() => "first")
+			.ThenReturns("second")  // single value
+			.ThenReturns("third", "fourth", "fifth"); // params
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("third", service.GetOptional());
+		Assert.Equal("fourth", service.GetOptional());
+		Assert.Equal("fifth", service.GetOptional());
+		// Repeats last after exhaustion
+		Assert.Equal("fifth", service.GetOptional());
+	}
+
+	[Fact]
+	public void ThenGet_Params_AddsMultipleValues()
+	{
+		var knockOff = new PropertyTestKnockOff();
+		IPropertyTest service = knockOff;
+
+		// Property API returns interfaces, so params ThenGet is not accessible through fluent API.
+		// However, the generated PropertyGetSequenceImpl has the params method.
+		// This test verifies it works when chaining single-value ThenGet calls.
+		// For params access, users would need to use the direct generated type.
+		knockOff.Name.OnGet("first")
+			.ThenGet("second")
+			.ThenGet("third")
+			.ThenGet("fourth");
+
+		Assert.Equal("first", service.Name);
+		Assert.Equal("second", service.Name);
+		Assert.Equal("third", service.Name);
+		Assert.Equal("fourth", service.Name);
+		// Repeats last after exhaustion
+		Assert.Equal("fourth", service.Name);
+	}
+
+	[Fact]
+	public void Params_Sequence_ExhaustionRepeatsLast()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Verify NSubstitute-like behavior: after exhaustion, repeats last value
+		knockOff.GetOptional.Returns("a", "b", "c");
+
+		Assert.Equal("a", service.GetOptional());
+		Assert.Equal("b", service.GetOptional());
+		Assert.Equal("c", service.GetOptional());
+		// Exhausted - verify repeats
+		Assert.Equal("c", service.GetOptional());
+		Assert.Equal("c", service.GetOptional());
+		Assert.Equal("c", service.GetOptional());
+	}
+
+	[Fact]
+	public void Params_Sequence_StrictModeThrows()
+	{
+		var knockOff = new SampleKnockOff();
+		knockOff.Strict = true;
+		ISampleService service = knockOff;
+
+		// In strict mode, sequence exhaustion throws
+		knockOff.GetOptional.Returns("first", "second");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Third access - sequence exhausted, throws in strict mode
+		Assert.Throws<StubException>(() => service.GetOptional());
+	}
+
+	[Fact]
+	public void Params_Sequence_NullValues()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Returns(null, "a", null) works for nullable types
+		knockOff.GetOptional.Returns((string?)null, "middle", (string?)null);
+
+		Assert.Null(service.GetOptional());
+		Assert.Equal("middle", service.GetOptional());
+		Assert.Null(service.GetOptional());
+		// Repeats last (null)
+		Assert.Null(service.GetOptional());
+	}
+
+	[Fact]
+	public void Returns_Params_IAsyncEnumerable_NoUnwrap()
+	{
+		var knockOff = new AsyncEnumerableServiceKnockOff();
+		IAsyncEnumerableService service = knockOff;
+
+		// IAsyncEnumerable<T> methods get params of the full enumerable type, not the inner type
+		// The sequence is of IAsyncEnumerable<string> instances, not strings
+		var enumerable1 = CreateAsyncEnumerable("a1", "a2");
+		var enumerable2 = CreateAsyncEnumerable("b1", "b2");
+		var enumerable3 = CreateAsyncEnumerable("c1", "c2");
+
+		knockOff.GetItemsAsync.Returns(enumerable1, enumerable2, enumerable3);
+
+		// Each call returns a different IAsyncEnumerable<string> instance
+		Assert.Same(enumerable1, service.GetItemsAsync());
+		Assert.Same(enumerable2, service.GetItemsAsync());
+		Assert.Same(enumerable3, service.GetItemsAsync());
+		// Repeats last after exhaustion
+		Assert.Same(enumerable3, service.GetItemsAsync());
+	}
+
+	[Fact]
+	public void ThenGet_MixWithCallbacksAndValues()
+	{
+		var knockOff = new PropertyTestKnockOff();
+		IPropertyTest service = knockOff;
+
+		// Mix callbacks and values in the same sequence
+		// (Params not accessible through interface - using single value calls)
+		knockOff.Name.OnGet(() => "callback first")
+			.ThenGet(() => "value second")
+			.ThenGet("third")
+			.ThenGet("fourth");
+
+		Assert.Equal("callback first", service.Name);
+		Assert.Equal("value second", service.Name);
+		Assert.Equal("third", service.Name);
+		Assert.Equal("fourth", service.Name);
+	}
+
+	[Fact]
+	public void Returns_ChainedWithThenReturns_UsesOnCall()
+	{
+		// Design note: Returns(value).ThenReturns() works when using OnCall pattern.
+		// For sequence after Returns(value), use OnCall(() => value).ThenReturns()
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Start with OnCall for the first value, then chain ThenReturns
+		knockOff.GetOptional.OnCall(() => "value")
+			.ThenReturns("second", "third");
+
+		Assert.Equal("value", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("third", service.GetOptional());
+	}
+
+	[Fact]
+	public void Returns_Params_Verification_Works()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Params Returns returns MethodSequenceImpl which has Verify()
+		var seq = knockOff.GetOptional.Returns("first", "second", "third");
+
+		service.GetOptional();
+		service.GetOptional();
+		service.GetOptional();
+
+		// Verify sequence was fully consumed
+		seq.Verify();
+	}
+
+	// Helper method to create IAsyncEnumerable for testing
+	private static async IAsyncEnumerable<string> CreateAsyncEnumerable(params string[] items)
+	{
+		foreach (var item in items)
+		{
+			yield return item;
+		}
+		await Task.CompletedTask;
+	}
+
+	#endregion
+
 	#region Test Stubs
 
 	public interface IPropertyTest
@@ -534,6 +835,19 @@ public partial class SequenceValueOverloadTests
 
 	[KnockOff]
 	public partial class ValueTaskMethodKnockOff : IValueTaskMethodService
+	{
+	}
+
+	/// <summary>
+	/// Interface with IAsyncEnumerable&lt;T&gt; returning method for testing no-unwrap behavior.
+	/// </summary>
+	public interface IAsyncEnumerableService
+	{
+		IAsyncEnumerable<string> GetItemsAsync();
+	}
+
+	[KnockOff]
+	public partial class AsyncEnumerableServiceKnockOff : IAsyncEnumerableService
 	{
 	}
 

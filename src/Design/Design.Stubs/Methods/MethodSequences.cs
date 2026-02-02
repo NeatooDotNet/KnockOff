@@ -2,6 +2,8 @@
 // Design.Stubs - Method Sequences
 // -----------------------------------------------------------------------------
 // This file demonstrates sequence APIs for methods:
+// - Returns(first, params rest) for concise value sequences (NSubstitute-style)
+// - OnCall().ThenReturns(params values) for adding multiple values to sequences
 // - OnCall().ThenCall() for callback sequences
 // - OnCall().ThenReturns() for value sequences
 // - ThenDefault() to return default(T) after exhaustion instead of repeating
@@ -18,7 +20,7 @@ namespace Design.Stubs.Methods;
 // METHOD SEQUENCES
 // =============================================================================
 //
-// NSUBSTITUTE COMPARISON: KnockOff matches NSubstitute's sequence exhaustion behavior.
+// NSUBSTITUTE COMPARISON: KnockOff now matches NSubstitute's concise syntax.
 //
 // NSubstitute:
 //   substitute.Method().Returns(1, 2, 3);
@@ -27,12 +29,15 @@ namespace Design.Stubs.Methods;
 //   substitute.Method(); // 3
 //   substitute.Method(); // 3 (repeats last)
 //
-// KnockOff (equivalent):
-//   stub.Method.OnCall(() => 1).ThenReturns(2).ThenReturns(3);
+// KnockOff (NEW - NSubstitute-style params syntax):
+//   stub.Method.Returns(1, 2, 3);          // Concise sequence syntax
 //   stub.Method(); // 1
 //   stub.Method(); // 2
 //   stub.Method(); // 3
 //   stub.Method(); // 3 (repeats last)
+//
+// KnockOff (original explicit syntax - still supported):
+//   stub.Method.OnCall(() => 1).ThenReturns(2).ThenReturns(3);
 //
 // KnockOff extends this with ThenDefault() for explicit default termination:
 //   stub.Method.OnCall(() => 1).ThenReturns(2).ThenDefault();
@@ -43,8 +48,153 @@ namespace Design.Stubs.Methods;
 // =============================================================================
 
 [KnockOff<ICalculator>]
+[KnockOff<IDataService>]
 public partial class MethodSequencesDemo
 {
+    // =========================================================================
+    // Returns(first, params rest) - Concise Value Sequences (NSubstitute-style)
+    // =========================================================================
+    // DESIGN DECISION: Returns(first, params rest) creates a sequence from
+    // multiple values in a single call, matching NSubstitute's Returns(x, y, z).
+    //
+    // NSUBSTITUTE COMPARISON:
+    //   NSubstitute:  substitute.Method().Returns(1, 2, 3);
+    //   KnockOff:     stub.Method.Returns(1, 2, 3);
+    //
+    // Both produce identical behavior: returns 1, 2, 3, then repeats 3.
+    //
+    // GENERATOR BEHAVIOR: The params overload is distinct from Returns(value):
+    //
+    //   // Single value - repeats indefinitely
+    //   public MethodCallBuilderImpl Returns(int value) { ... }
+    //
+    //   // Params - creates sequence, returns MethodSequenceImpl
+    //   public MethodSequenceImpl Returns(int first, params int[] rest) { ... }
+    //
+    // C# overload resolution ensures Returns(42) calls the single-value overload.
+    // =========================================================================
+
+    public void Returns_Params_CreatesSequence()
+    {
+        var stub = new Stubs.ICalculator();
+
+        // NSubstitute-style: Returns(first, params rest)
+        // Creates sequence: 1, 2, 3, then repeats 3
+        stub.Add.Returns(1, 2, 3);
+
+        ICalculator calc = stub;
+
+        var r1 = calc.Add(0, 0); // 1
+        var r2 = calc.Add(0, 0); // 2
+        var r3 = calc.Add(0, 0); // 3
+        var r4 = calc.Add(0, 0); // 3 (repeats last)
+    }
+
+    public void Returns_SingleValue_RepeatsIndefinitely()
+    {
+        var stub = new Stubs.ICalculator();
+
+        // Single value - no params - repeats forever
+        stub.Add.Returns(42);
+
+        ICalculator calc = stub;
+
+        var r1 = calc.Add(0, 0); // 42
+        var r2 = calc.Add(0, 0); // 42
+        var r3 = calc.Add(0, 0); // 42 (still 42)
+    }
+
+    // =========================================================================
+    // ThenReturns(params values) - Add Multiple Values to Sequence
+    // =========================================================================
+    // DESIGN DECISION: ThenReturns(params values) adds multiple values at once.
+    // This is useful when building sequences with OnCall() for the first value.
+    //
+    // GENERATOR BEHAVIOR: Params version loops over single-value ThenReturns:
+    //
+    //   public MethodSequenceImpl ThenReturns(params int[] values)
+    //   {
+    //       foreach (var value in values)
+    //           ThenReturns(value);
+    //       return this;
+    //   }
+    // =========================================================================
+
+    public void ThenReturns_Params_AddsMultipleValues()
+    {
+        var stub = new Stubs.ICalculator();
+
+        // OnCall for first, then add multiple with params
+        stub.Add
+            .OnCall((a, b) => a + b)  // First: compute a + b
+            .ThenReturns(100, 200, 300);  // Then: 100, 200, 300
+
+        ICalculator calc = stub;
+
+        var r1 = calc.Add(1, 2);   // 3 (computed)
+        var r2 = calc.Add(0, 0);   // 100
+        var r3 = calc.Add(0, 0);   // 200
+        var r4 = calc.Add(0, 0);   // 300
+        var r5 = calc.Add(0, 0);   // 300 (repeats last)
+    }
+
+    // =========================================================================
+    // Async Methods with Params - Auto-Wrapping
+    // =========================================================================
+    // DESIGN DECISION: For Task<T> and ValueTask<T> methods, params values are
+    // auto-wrapped just like single-value Returns(). No Task.FromResult needed.
+    //
+    // GENERATOR BEHAVIOR: The first value uses Task.FromResult in the OnCall,
+    // and subsequent values use the existing ThenReturns auto-wrapping:
+    //
+    //   public MethodSequenceImpl Returns(string first, params string[] rest)
+    //   {
+    //       var seq = OnCall(() => Task.FromResult(first));
+    //       foreach (var value in rest)
+    //           seq = seq.ThenReturns(value);  // ThenReturns auto-wraps
+    //       return seq;
+    //   }
+    // =========================================================================
+
+    public async Task Returns_Params_AsyncAutoWraps()
+    {
+        var stub = new Stubs.IDataService();
+
+        // Params with async - values auto-wrapped
+        stub.GetDataAsync.Returns("first", "second", "third");
+
+        IDataService service = stub;
+
+        var r1 = await service.GetDataAsync(1); // "first"
+        var r2 = await service.GetDataAsync(2); // "second"
+        var r3 = await service.GetDataAsync(3); // "third"
+        var r4 = await service.GetDataAsync(4); // "third" (repeats)
+    }
+
+    // =========================================================================
+    // Params Sequence Verification
+    // =========================================================================
+    // DESIGN DECISION: Params sequences return MethodSequenceImpl, which
+    // supports Verify() and Verifiable() for sequence completion checks.
+    // =========================================================================
+
+    public void Returns_Params_SupportsVerification()
+    {
+        var stub = new Stubs.ICalculator();
+
+        // Returns with params is verifiable
+        var sequence = stub.Add.Returns(1, 2, 3);
+
+        ICalculator calc = stub;
+
+        calc.Add(0, 0); // 1
+        calc.Add(0, 0); // 2
+        calc.Add(0, 0); // 3
+
+        // Verify sequence was fully consumed
+        sequence.Verify(); // Passes - all 3 values used
+    }
+
     // =========================================================================
     // OnCall().ThenCall() - Callback Sequences
     // =========================================================================
@@ -102,10 +252,13 @@ public partial class MethodSequencesDemo
     }
 
     // =========================================================================
-    // OnCall().ThenReturns() - Value Sequences
+    // OnCall().ThenReturns() - Value Sequences (Explicit Syntax)
     // =========================================================================
     // DESIGN DECISION: ThenReturns(value) provides a cleaner syntax for
     // sequences of constant values, avoiding the need for explicit lambdas.
+    //
+    // For most use cases, prefer Returns(x, y, z) which is more concise.
+    // Use OnCall().ThenReturns() when you need a callback for the first value.
     //
     // GENERATOR BEHAVIOR: ThenReturns() wraps the value in a callback:
     //
@@ -118,9 +271,6 @@ public partial class MethodSequencesDemo
     // For async methods, ThenReturns auto-wraps values:
     //   Task<T>:      ThenReturns(value) => ThenCall(() => Task.FromResult(value))
     //   ValueTask<T>: ThenReturns(value) => ThenCall(() => new ValueTask<T>(value))
-    //
-    // NOTE: Returns().ThenReturns() is NOT supported. Start sequences with
-    // OnCall() to enable chaining. Use OnCall(() => value) for constant first value.
     // =========================================================================
 
     public void ThenReturns_CreatesSequenceOfValues()

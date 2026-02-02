@@ -641,8 +641,8 @@ Assert.Equal("Pending", service.GetStatus());
 Assert.Equal("Processing", service.GetStatus());
 Assert.Equal("Complete", service.GetStatus());
 
-// After sequence exhausted: returns null in non-strict mode
-Assert.Null(service.GetStatus());
+// After sequence exhausted: repeats last value in non-strict mode (NSubstitute behavior)
+Assert.Equal("Complete", service.GetStatus());
 ```
 <!-- endSnippet -->
 

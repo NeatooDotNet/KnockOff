@@ -65,7 +65,7 @@ tracking.Verify();
 ```
 <!-- endSnippet -->
 
-#### When to Use Value vs Callback
+#### When to Use Value, Params Sequence, or Callback
 
 <!-- snippet: methods-oncall-value-vs-callback -->
 ```cs
@@ -81,6 +81,25 @@ stub.GetUserName.OnCall((userId) => userId > 100 ? "Admin" : "User");
 // Both return tracking objects for verification
 ```
 <!-- endSnippet -->
+
+**Params sequences** (NSubstitute-style):
+
+```cs
+// Use PARAMS SEQUENCE for multiple constant values:
+// Returns 1, then 2, then 3, then repeats 3
+stub.Calculate.Returns(1, 2, 3);
+
+// Mix callbacks with params for complex sequences:
+// First call uses callback, then returns 100, 200, 300
+stub.Calculate.OnCall((x) => x * 2).ThenReturns(100, 200, 300);
+```
+
+| Scenario | Recommended Syntax |
+|----------|-------------------|
+| Fixed value (always same) | `Returns(value)` |
+| Constant sequence | `Returns(first, second, ...)` |
+| Dynamic based on args | `OnCall((args) => computed)` |
+| Callback then constants | `OnCall(cb).ThenReturns(x, y, z)` |
 
 ### Methods with Multiple Parameters
 
@@ -323,6 +342,111 @@ public async Task TaskVoid_SimplifiedCallback_AutoReturnsCompletedTask()
 
 ---
 
+## Method Sequences
+
+When a method should return different values on successive calls, use sequences. KnockOff supports NSubstitute-style concise syntax for creating value sequences.
+
+### Concise Value Sequences (NSubstitute-style)
+
+Use `Returns(first, ...rest)` to create a sequence from multiple values in a single call:
+
+```cs
+// Returns 1 on first call, 2 on second, 3 on third and all subsequent calls
+stub.Calculate.Returns(1, 2, 3);
+
+ICalculator calc = stub;
+var r1 = calc.Calculate(0);  // 1
+var r2 = calc.Calculate(0);  // 2
+var r3 = calc.Calculate(0);  // 3
+var r4 = calc.Calculate(0);  // 3 (repeats last value)
+```
+
+This matches NSubstitute's syntax for easier migration:
+- NSubstitute: `substitute.Method().Returns(1, 2, 3);`
+- KnockOff: `stub.Method.Returns(1, 2, 3);`
+
+### Single Value vs Params Sequence
+
+C# overload resolution distinguishes between single values and sequences:
+
+```cs
+// Single value - repeats indefinitely (no sequence)
+stub.Calculate.Returns(42);
+
+// Params sequence - progresses through values, repeats last
+stub.Calculate.Returns(1, 2, 3);
+```
+
+### Mixing Callbacks with Params
+
+Use `OnCall()` for the first value when you need callback logic, then `ThenReturns(params)` for subsequent constant values:
+
+```cs
+// First call: compute dynamically
+// Then: return 100, 200, 300 in sequence
+stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200, 300);
+
+ICalculator calc = stub;
+var r1 = calc.Add(1, 2);  // 3 (computed: 1 + 2)
+var r2 = calc.Add(0, 0);  // 100
+var r3 = calc.Add(0, 0);  // 200
+var r4 = calc.Add(0, 0);  // 300
+var r5 = calc.Add(0, 0);  // 300 (repeats last)
+```
+
+### Async Methods with Params Sequences
+
+For `Task<T>` and `ValueTask<T>` methods, params values are auto-wrapped - no `Task.FromResult()` needed:
+
+```cs
+// Async values auto-wrapped - no Task.FromResult needed
+stub.GetDataAsync.Returns("first", "second", "third");
+
+IDataService service = stub;
+var r1 = await service.GetDataAsync(1);  // "first"
+var r2 = await service.GetDataAsync(2);  // "second"
+var r3 = await service.GetDataAsync(3);  // "third"
+var r4 = await service.GetDataAsync(4);  // "third" (repeats)
+```
+
+### Sequence Exhaustion Behavior
+
+By default, sequences repeat the last value after exhaustion (matching NSubstitute):
+
+```cs
+stub.GetValue.Returns(1, 2);
+
+var r1 = calc.GetValue();  // 1
+var r2 = calc.GetValue();  // 2
+var r3 = calc.GetValue();  // 2 (repeats last)
+var r4 = calc.GetValue();  // 2 (still repeats)
+```
+
+For different exhaustion behaviors:
+
+| Behavior | How to Configure |
+|----------|-----------------|
+| Repeat last value (default) | `Returns(1, 2, 3)` or `OnCall(...).ThenReturns(...)` |
+| Return default(T) | `OnCall(...).ThenReturns(...).ThenDefault()` |
+| Throw exception | Set `stub.Strict = true` |
+
+### Sequence Verification
+
+Params sequences support verification to ensure all values were consumed:
+
+```cs
+var sequence = stub.Calculate.Returns(1, 2, 3);
+
+ICalculator calc = stub;
+calc.Calculate(0);  // 1
+calc.Calculate(0);  // 2
+calc.Calculate(0);  // 3
+
+sequence.Verify();  // Passes - all 3 values used
+```
+
+---
+
 ## Handling Overloaded Methods
 
 When an interface has overloaded methods, KnockOff distinguishes them by the callback signature. The fully-typed lambda tells KnockOff which overload to configure:
@@ -428,8 +552,11 @@ Assert.Equal("new@test.com", savedUser.Email);
 |------|------|
 | Configure void method | `stub.Method.OnCall((args) => { })` |
 | Configure method with callback | `stub.Method.OnCall((args) => returnValue)` |
-| Configure method with value | `stub.Method.OnCall(fixedValue)` |
-| Configure async Task<T> (simplified) | `stub.AsyncMethod.OnCall((args) => value)` |
+| Configure method with value | `stub.Method.Returns(fixedValue)` |
+| Create value sequence (NSubstitute-style) | `stub.Method.Returns(1, 2, 3)` |
+| Mix callback with value sequence | `stub.Method.OnCall(cb).ThenReturns(x, y, z)` |
+| Configure async Task<T> (simplified) | `stub.AsyncMethod.Returns(value)` |
+| Configure async Task<T> sequence | `stub.AsyncMethod.Returns(v1, v2, v3)` |
 | Configure async Task (void, simplified) | `stub.AsyncMethod.OnCall((args) => { action(); })` |
 | Verify method was called | `tracking.Verify()` |
 | Verify call count | `tracking.Verify(Times.Exactly(n))` |
@@ -444,7 +571,10 @@ Assert.Equal("new@test.com", savedUser.Email);
 ## Key Takeaways
 
 - **OnCall signature**: Callback receives only the method parameters
-- **Value vs Callback**: Use `OnCall(value)` for fixed returns, `OnCall(callback)` for dynamic logic
+- **Value vs Callback**: Use `Returns(value)` for fixed returns, `OnCall(callback)` for dynamic logic
+- **Params sequences**: Use `Returns(1, 2, 3)` for concise value sequences (matches NSubstitute)
+- **Sequence exhaustion**: Last value repeats after exhaustion (NSubstitute-like behavior)
+- **Async auto-wrapping**: Params values auto-wrap for `Task<T>` and `ValueTask<T>` - no `Task.FromResult()` needed
 - **Verification**: Use `tracking.Verify(Times)` for single methods or `.Verifiable()` + `stub.Verify()` for batch
 - **Arguments**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Distinguished by callback parameter types - use explicit types in lambdas
@@ -452,4 +582,4 @@ Assert.Equal("new@test.com", savedUser.Email);
 
 ---
 
-**UPDATED:** 2026-01-27
+**UPDATED:** 2026-02-02

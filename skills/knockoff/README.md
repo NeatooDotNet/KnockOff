@@ -65,13 +65,17 @@ stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
 stub.GetUser.When(42).Returns(adminUser);
 stub.GetUser.When(id => id < 0).Returns(null);
 
-// Sequences repeat last value after exhaustion (matching NSubstitute)
-stub.GetNext.OnCall(() => 1).ThenCall(() => 2).ThenCall(() => 3);
-// After 3 calls, continues returning 3
+// Value sequences (NSubstitute-style) - repeats last after exhaustion
+stub.GetNext.Returns(1, 2, 3);
+// Returns: 1, 2, 3, 3, 3... (repeats last value)
+
+// Mix callbacks with value sequences
+stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
+// First call: computed. Then: 100, 200, 200, 200...
 
 // Use ThenDefault() to return default(T) instead of repeating
-stub.GetNext.OnCall(() => 1).ThenCall(() => 2).ThenDefault();
-// After 2 calls, returns 0 (default)
+stub.GetNext.Returns(1, 2).ThenDefault();
+// Returns: 1, 2, 0, 0... (default after exhaustion)
 ```
 
 ### Verification
@@ -88,7 +92,7 @@ tracking.Verify(Times.Once);
 
 ### Critical Gotchas
 
-1. **Sequences repeat last value** - After all callbacks consumed, sequences repeat the last value (matching NSubstitute). Use `ThenDefault()` to return `default(T)` instead, or Strict mode to throw
+1. **Sequences repeat last value** - `Returns(1, 2, 3)` repeats the last value after exhaustion (matching NSubstitute). Use `ThenDefault()` to return `default(T)` instead, or Strict mode to throw
 2. **Events use Handler property** - `stub.EventInterceptor.Handler?.Invoke(...)` (no Raise method)
 3. **Class stubs use .Object** - `stub.Object` to get the class instance
 4. **Times.Between() doesn't exist** - Use `AtLeast` + `AtMost` instead
@@ -109,4 +113,4 @@ The **knockoff-usage** skill provides comprehensive documentation:
 
 ---
 
-**UPDATED:** 2026-02-01
+**UPDATED:** 2026-02-02

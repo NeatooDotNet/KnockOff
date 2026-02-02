@@ -260,11 +260,77 @@ This is useful when reusing a stub instance across multiple test phases or asser
 
 ## Sequences
 
-Use sequences when a method should behave differently across multiple calls. Sequences are created by chaining `ThenCall()` after the initial `OnCall()` configuration.
+Use sequences when a method should behave differently across multiple calls. KnockOff provides two approaches:
 
-### Basic Method Sequences
+1. **Params syntax** (recommended for constant values) - `Returns(first, params rest)` creates a sequence in a single call
+2. **Callback chaining** (for dynamic values) - Chain `ThenCall()` or `ThenReturns()` after `OnCall()`
 
-Configure different behavior for successive calls:
+### Concise Value Sequences (Params Syntax)
+
+For constant value sequences, use the concise params syntax:
+
+<!-- snippet: methods-sequence-params -->
+```cs
+// NSubstitute-style concise syntax: Returns(first, params rest)
+stub.GetValue.Returns(1, 2, 3);
+
+IValueSvc service = stub;
+
+Assert.Equal(1, service.GetValue());
+Assert.Equal(2, service.GetValue());
+Assert.Equal(3, service.GetValue());
+
+// After exhaustion: repeats last value (NSubstitute behavior)
+Assert.Equal(3, service.GetValue());
+```
+<!-- endSnippet -->
+
+This matches NSubstitute's `Returns(x, y, z)` syntax for easy migration. The sequence repeats the last value after exhaustion.
+
+### Async Methods with Params
+
+Async methods auto-wrap values - no `Task.FromResult` needed:
+
+<!-- snippet: methods-sequence-params-async -->
+```cs
+// Async methods auto-wrap values - no Task.FromResult needed
+stub.GetDataAsync.Returns("first", "second", "third");
+
+IDataSvc service = stub;
+
+Assert.Equal("first", await service.GetDataAsync(1));
+Assert.Equal("second", await service.GetDataAsync(2));
+Assert.Equal("third", await service.GetDataAsync(3));
+
+// After exhaustion: repeats last value
+Assert.Equal("third", await service.GetDataAsync(4));
+```
+<!-- endSnippet -->
+
+### Mixing Callbacks with Value Params
+
+Use `OnCall()` for the first callback, then `ThenReturns()` with params for subsequent values:
+
+<!-- snippet: methods-sequence-callback-then-params -->
+```cs
+// OnCall for computed first value, then params for constants
+stub.Calculate
+    .OnCall((x, y) => x + y)      // First call: compute x + y
+    .ThenReturns(100, 200, 300);  // Then: constant values
+
+ICalculatorSvc calc = stub;
+
+Assert.Equal(8, calc.Calculate(5, 3));   // 5 + 3 = 8 (computed)
+Assert.Equal(100, calc.Calculate(0, 0)); // constant
+Assert.Equal(200, calc.Calculate(0, 0)); // constant
+Assert.Equal(300, calc.Calculate(0, 0)); // constant
+Assert.Equal(300, calc.Calculate(0, 0)); // repeats last
+```
+<!-- endSnippet -->
+
+### Callback Sequences
+
+For callback sequences or mixed sequences with dynamic values, chain `ThenCall()` after `OnCall()`:
 
 <!-- snippet: methods-sequence-basic -->
 ```cs
@@ -353,9 +419,9 @@ Assert.Equal(1, service.GetValue());
 Assert.Equal(2, service.GetValue());
 Assert.Equal(3, service.GetValue());
 
-// After exhaustion: repeats last value (NSubstitute-like behavior)
+// After exhaustion: repeats last value in non-strict mode (NSubstitute behavior)
 Assert.Equal(3, service.GetValue());
-Assert.Equal(3, service.GetValue()); // continues repeating
+Assert.Equal(3, service.GetValue());
 ```
 <!-- endSnippet -->
 
@@ -519,7 +585,8 @@ Assert.Equal("new@test.com", savedUser.Email);
 - **Times options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`
 - **Argument capture**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Configure using fully-typed lambda to distinguish which overload
-- **Sequences**: Chain `ThenCall()` for different behavior across successive calls; exhausted sequences repeat the last value by default
+- **Sequences**: Use `Returns(1, 2, 3)` for constant value sequences (NSubstitute-style); use `ThenCall()` chaining for callback sequences
+- **Async auto-wrapping**: Async methods auto-wrap params values - no `Task.FromResult` needed
 - **ThenDefault()**: Opt-in to returning `default(T)` after sequence exhaustion instead of repeating
 - **Reset**: Clears call count, captured arguments, and removes callbacks
 
@@ -530,4 +597,4 @@ Next: [Property Interceptors](properties.md) for get/set tracking and configurat
 
 ---
 
-**UPDATED:** 2026-02-01
+**UPDATED:** 2026-02-02

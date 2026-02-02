@@ -316,6 +316,52 @@ public class PropertySequenceTests
     }
     #endregion
 
+    #region properties-sequence-exhaustion
+    [Fact]
+    public void Sequence_ExhaustionRepeatsLastValue()
+    {
+        var stub = new ConfigPropsStub();
+
+        // Configure a sequence of three values
+        stub.Name.OnGet("first")
+            .ThenGet("second")
+            .ThenGet("third");
+
+        IConfigProps config = stub;
+
+        // Each read advances through the sequence
+        Assert.Equal("first", config.Name);
+        Assert.Equal("second", config.Name);
+        Assert.Equal("third", config.Name);
+
+        // After exhaustion, repeats the last value
+        Assert.Equal("third", config.Name);
+        Assert.Equal("third", config.Name);
+    }
+    #endregion
+
+    #region properties-sequence-thendefault
+    [Fact]
+    public void Sequence_ThenDefault_ReturnsDefaultAfterExhaustion()
+    {
+        var stub = new ConfigPropsStub();
+
+        // ThenDefault() changes exhaustion behavior
+        stub.Name.OnGet("first")
+            .ThenGet("second")
+            .ThenDefault();
+
+        IConfigProps config = stub;
+
+        Assert.Equal("first", config.Name);
+        Assert.Equal("second", config.Name);
+
+        // After exhaustion, returns default (null for string)
+        Assert.Null(config.Name);
+        Assert.Null(config.Name);
+    }
+    #endregion
+
     #region properties-onset-then-sequence
     [Fact]
     public void OnSet_ThenSet_ReactsDifferentlyToSuccessiveWrites()

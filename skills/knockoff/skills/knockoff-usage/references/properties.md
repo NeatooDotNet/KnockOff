@@ -445,6 +445,64 @@ public void Sequence_VerifiesLikeRegularCallbacks()
 ```
 <!-- endSnippet -->
 
+### Sequence Exhaustion Behavior
+
+After a sequence returns all configured values, subsequent reads **repeat the last value** by default. This matches NSubstitute's behavior.
+
+<!-- snippet: properties-sequence-exhaustion -->
+```cs
+[Fact]
+public void Sequence_ExhaustionRepeatsLastValue()
+{
+    var stub = new ConfigPropsStub();
+
+    // Configure a sequence of three values
+    stub.Name.OnGet("first")
+        .ThenGet("second")
+        .ThenGet("third");
+
+    IConfigProps config = stub;
+
+    // Each read advances through the sequence
+    Assert.Equal("first", config.Name);
+    Assert.Equal("second", config.Name);
+    Assert.Equal("third", config.Name);
+
+    // After exhaustion, repeats the last value
+    Assert.Equal("third", config.Name);
+    Assert.Equal("third", config.Name);
+}
+```
+<!-- endSnippet -->
+
+To return `default(T)` after exhaustion instead, chain `.ThenDefault()`:
+
+<!-- snippet: properties-sequence-thendefault -->
+```cs
+[Fact]
+public void Sequence_ThenDefault_ReturnsDefaultAfterExhaustion()
+{
+    var stub = new ConfigPropsStub();
+
+    // ThenDefault() changes exhaustion behavior
+    stub.Name.OnGet("first")
+        .ThenGet("second")
+        .ThenDefault();
+
+    IConfigProps config = stub;
+
+    Assert.Equal("first", config.Name);
+    Assert.Equal("second", config.Name);
+
+    // After exhaustion, returns default (null for string)
+    Assert.Null(config.Name);
+    Assert.Null(config.Name);
+}
+```
+<!-- endSnippet -->
+
+**Note:** In strict mode (`stub.Strict = true`), accessing an exhausted sequence throws `StubException` instead of repeating the last value.
+
 ---
 
 ## OnGet Configuration Priority
@@ -631,7 +689,8 @@ Choose your configuration approach based on the test scenario:
 | `ThenGet(T value)` | `IPropertyGetSequence<T>` | Add static value to getter sequence |
 | `ThenGet(Func<T> callback)` | `IPropertyGetSequence<T>` | Add callback to getter sequence |
 | `ThenSet(Action<T> callback)` | `IPropertySetSequence<T>` | Add callback to setter sequence |
+| `ThenDefault()` | `void` | Terminate sequence with default(T) after exhaustion instead of repeating last value |
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-02

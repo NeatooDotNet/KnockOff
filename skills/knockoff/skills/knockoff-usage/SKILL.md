@@ -14,16 +14,16 @@ KnockOff is a Roslyn Source Generator that creates test stubs at compile time. S
 
 ### 1. Sequences REPEAT Last Value After Exhaustion
 
-Sequences repeat the last callback after all values are consumed (matching NSubstitute):
+Sequences repeat the last value after exhaustion (matching NSubstitute):
 
 ```cs
-stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 999);
+stub.Add.Returns(1, 999);
 calc.Add(0, 0); // Returns 1
 calc.Add(0, 0); // Returns 999
 calc.Add(0, 0); // Returns 999 (repeats last value!)
 
 // Use ThenDefault() to return default(T) instead of repeating
-stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 999).ThenDefault();
+stub.Add.Returns(1, 999).ThenDefault();
 calc.Add(0, 0); // Returns 1
 calc.Add(0, 0); // Returns 999
 calc.Add(0, 0); // Returns 0 (default - ThenDefault() terminates with default)
@@ -196,16 +196,19 @@ stub.GetUserAsync.OnCall((id) => new User { Id = id });  // Returns Task<User>
 stub.SaveAsync.OnCall((user) => { });  // Returns Task.CompletedTask
 ```
 
-### Sequences with ThenCall()
+### Sequences (NSubstitute-style)
 
 ```cs
-stub.GetNext
-    .OnCall(() => "first")
-    .ThenCall(() => "second")
-    .ThenCall(() => "third");
+// Concise value sequences (preferred)
+stub.GetNext.Returns("first", "second", "third");
 // After third call, repeats "third" (NSubstitute-like behavior)
-// Use ThenDefault() to return default(T) instead:
-// .ThenCall(() => "third").ThenDefault();
+
+// Mix callbacks with value sequences
+stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
+// First: computed, then 100, 200, 200...
+
+// Use ThenDefault() to return default(T) instead of repeating:
+stub.GetNext.Returns("first", "second").ThenDefault();
 ```
 
 ### When() - Argument Matching
@@ -448,16 +451,16 @@ public delegate string MyOperation(int value);
 
 ```cs
 // Sequences repeat last value by default (NSubstitute-like behavior)
-stub.GetNext.OnCall(() => 1).ThenCall(() => 2);
+stub.GetNext.Returns(1, 2);
 // After 2 calls, returns 2 (repeats last value)
 
 // Use ThenDefault() to return default(T) instead of repeating
-stub.GetNext.OnCall(() => 1).ThenCall(() => 2).ThenDefault();
+stub.GetNext.Returns(1, 2).ThenDefault();
 // After 2 calls, returns 0 (default)
 
 // Use Strict mode to throw when sequence exhausted
 stub.Strict = true;
-stub.GetNext.OnCall(() => 1).ThenCall(() => 2);
+stub.GetNext.Returns(1, 2);
 // Third call throws StubException.SequenceExhausted
 ```
 
@@ -476,4 +479,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-01
+**UPDATED:** 2026-02-02

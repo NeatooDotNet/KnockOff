@@ -136,6 +136,14 @@ The `OnCall` method returns `IMethodTracking<T>` (or `IMethodTrackingArgs<TArgs>
 
 **Note**: `Verifiable()` and `Verifiable(Times)` return the interceptor instance, enabling fluent chaining with `OnCall`.
 
+### Configuration Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `OnCall(callback)` | `IMethodTracking<T>` | Configures callback. Repeats indefinitely |
+| `Returns(T value)` | `IMethodCallBuilder` | Configures constant return value. Repeats indefinitely |
+| `Returns(T first, params T[] rest)` | `IMethodSequence` | Creates sequence from multiple values. Last value repeats after exhaustion |
+
 ### OnCall Signatures
 
 The `OnCall` property type varies based on method signature:
@@ -150,6 +158,19 @@ The `OnCall` property type varies based on method signature:
 | `R M(T1 a, T2 b)` | `Func<T1, T2, R>` |
 
 When `OnCall` is set, the callback is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
+
+### Sequence Building Methods
+
+When a method returns a value, sequences can be built using these methods on `IMethodSequence`:
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `ThenReturns(T value)` | `IMethodSequence` | Adds single constant value to sequence |
+| `ThenReturns(params T[] values)` | `IMethodSequence` | Adds multiple constant values to sequence |
+| `ThenCall(callback)` | `IMethodSequence` | Adds callback to sequence |
+| `ThenDefault()` | `void` | Terminates sequence; return `default(T)` after exhaustion instead of repeating |
+
+**Sequence Exhaustion Behavior**: By default, after all values/callbacks are consumed, the last one repeats indefinitely (NSubstitute-like). Use `ThenDefault()` to return `default(T)` after exhaustion, or enable `Strict` mode to throw an exception.
 
 ### Methods
 
@@ -200,6 +221,19 @@ Generated for interface properties. Tracks get/set operations and supports get/s
 | `OnGet(Func<T>)` | `IPropertyGetTracking` | Configures getter callback that repeats indefinitely |
 | `OnGet(T)` | `IPropertyGetTracking` | Configures getter to return specified value (convenience overload) |
 | `OnSet(Action<T>)` | `IPropertySetTracking<T>` | Configures setter callback that repeats indefinitely |
+
+### Getter Sequence Building Methods
+
+When a property has a getter, sequences can be built using these methods on `IPropertyGetSequence`:
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `ThenGet(T value)` | `IPropertyGetSequence<T>` | Adds single constant value to getter sequence |
+| `ThenGet(Func<T>)` | `IPropertyGetSequence<T>` | Adds callback to getter sequence |
+| `ThenGet(params T[] values)` | `IPropertyGetSequence<T>` | Adds multiple constant values to getter sequence |
+| `ThenDefault()` | `void` | Terminates sequence; return `default(T)` after exhaustion instead of repeating |
+
+**Sequence Exhaustion Behavior**: By default, after all values/callbacks are consumed, the last one repeats indefinitely. Use `ThenDefault()` to return `default(T)` after exhaustion.
 
 ### Tracking Properties
 
@@ -643,4 +677,4 @@ If any verification fails, `Verify()` throws an exception detailing which interc
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-02

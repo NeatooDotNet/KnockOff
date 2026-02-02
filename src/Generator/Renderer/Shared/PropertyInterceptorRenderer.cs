@@ -838,6 +838,36 @@ internal static class PropertyInterceptorRenderer
 			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet({valueType} value) => ThenGet(() => value);");
 			w.Line();
 
+			// ThenGet(params values) - adds multiple values to sequence
+			w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(params {valueType}[] values)");
+			using (w.Braces())
+			{
+				w.Line("if (values.Length == 0)");
+				using (w.Braces())
+				{
+					// Elevate to sequence mode without adding any new values (same as ThenGet elevation)
+					w.Line("if (_interceptor._getSequence == null)");
+					using (w.Braces())
+					{
+						w.Line($"_interceptor._getSequence = new global::System.Collections.Generic.List<(global::System.Func<{valueType}> Callback, PropertyGetBuilderImpl Tracking)>();");
+						w.Line("_interceptor._getSequence.Add((_interceptor._onGet!, this));");
+						w.Line("_interceptor._onGet = null;");
+						w.Line("_interceptor._onGetTracking = null;");
+						w.Line("_interceptor._getSequenceIndex = 0;");
+					}
+					w.Line("return new PropertyGetSequenceImpl(_interceptor);");
+				}
+				w.Line("var seq = ThenGet(values[0]);");
+				w.Line("for (int i = 1; i < values.Length; i++)");
+				using (w.Braces())
+				{
+					w.Line("seq = seq.ThenGet(values[i]);");
+				}
+				w.Line("return seq;");
+			}
+			w.Line();
+
 			w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
 			w.Line($"public global::KnockOff.IPropertyGetBuilder<{valueType}> Verifiable()");
 			using (w.Braces())
@@ -975,6 +1005,20 @@ internal static class PropertyInterceptorRenderer
 			// ThenGet(value) - wrapper method for value-based sequence chaining
 			w.Line($"/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>");
 			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet({valueType} value) => ThenGet(() => value);");
+			w.Line();
+
+			// ThenGet(params values) - adds multiple values to sequence
+			w.Line($"/// <summary>Adds multiple values to the sequence. Each value returned once.</summary>");
+			w.Line($"public global::KnockOff.IPropertyGetSequence<{valueType}> ThenGet(params {valueType}[] values)");
+			using (w.Braces())
+			{
+				w.Line("foreach (var value in values)");
+				using (w.Braces())
+				{
+					w.Line("ThenGet(value);");
+				}
+				w.Line("return this;");
+			}
 			w.Line();
 
 			w.Line("/// <summary>Verifies the entire sequence was executed (all callbacks invoked). Throws VerificationException if incomplete.</summary>");
