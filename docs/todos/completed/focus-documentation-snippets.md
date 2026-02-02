@@ -1,6 +1,6 @@
 # Focus Documentation Snippets
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-02-02
 **Last Updated:** 2026-02-02
@@ -31,31 +31,31 @@ Apply the "focused snippets" pattern established in the README's method overload
 Work document-by-document, updating both the markdown file and corresponding C# sample file.
 
 ### High Priority (Migration & Core Guides)
-- [ ] `docs/migration/from-nsubstitute.md` (36 snippets)
-- [ ] `docs/guides/parameter-matching.md` (28 snippets)
-- [ ] `docs/guides/methods.md` (24 snippets)
-- [ ] `docs/guides/delegates.md` (23 snippets)
-- [ ] `docs/guides/properties.md` (18 snippets)
-- [ ] `docs/migration/from-moq.md` (17 snippets)
+- [x] `docs/migration/from-nsubstitute.md` (36 snippets)
+- [x] `docs/guides/parameter-matching.md` (28 snippets)
+- [x] `docs/guides/methods.md` (24 snippets)
+- [x] `docs/guides/delegates.md` (23 snippets)
+- [x] `docs/guides/properties.md` (18 snippets)
+- [x] `docs/migration/from-moq.md` (17 snippets)
 
 ### Medium Priority (Feature Guides)
-- [ ] `docs/guides/verification.md` (16 snippets)
-- [ ] `docs/guides/indexers.md` (15 snippets)
-- [ ] `docs/migration/property-value-removal.md` (12 snippets)
-- [ ] `docs/getting-started.md` (10 snippets)
-- [ ] `docs/guides/stub-patterns.md` (9 snippets)
-- [ ] `docs/guides/async-patterns.md` (9 snippets)
-- [ ] `docs/guides/generic-methods.md` (9 snippets)
+- [x] `docs/guides/verification.md` (16 snippets)
+- [x] `docs/guides/indexers.md` (15 snippets)
+- [x] `docs/migration/property-value-removal.md` (12 snippets)
+- [x] `docs/getting-started.md` (10 snippets)
+- [x] `docs/guides/stub-patterns.md` (9 snippets)
+- [x] `docs/guides/async-patterns.md` (9 snippets)
+- [x] `docs/guides/generic-methods.md` (9 snippets)
 
 ### Lower Priority (Troubleshooting & Reference)
-- [ ] `docs/troubleshooting.md` (8 snippets)
-- [ ] `docs/guides/advanced-callbacks.md` (8 snippets)
-- [ ] `docs/guides/events.md` (8 snippets)
-- [ ] `docs/reference/interceptor-api.md` (7 snippets)
-- [ ] `docs/reference/smart-defaults.md` (6 snippets)
-- [ ] `docs/guides/user-methods.md` (6 snippets)
-- [ ] `docs/guides/source-delegation.md` (6 snippets)
-- [ ] `docs/reference/attribute-options.md` (4 snippets)
+- [x] `docs/troubleshooting.md` (8 snippets)
+- [x] `docs/guides/advanced-callbacks.md` (8 snippets)
+- [x] `docs/guides/events.md` (8 snippets)
+- [x] `docs/reference/interceptor-api.md` (7 snippets)
+- [x] `docs/reference/smart-defaults.md` (6 snippets)
+- [x] `docs/guides/user-methods.md` (6 snippets)
+- [x] `docs/guides/source-delegation.md` (6 snippets)
+- [x] `docs/reference/attribute-options.md` (4 snippets)
 
 ---
 
@@ -74,6 +74,10 @@ Work document-by-document, updating both the markdown file and corresponding C# 
 
 ## Progress Log
 
+**2026-02-02:** Completed all 21 documents (~270 snippets) using docs-code-samples agent. Committed as `1513262` and merged via PR #35.
+
 ---
 
 ## Results / Conclusions
+
+All documentation snippets have been focused. Net reduction of ~4,400 lines (5,966 removed, 1,522 added across 45 files). Documentation is now cleaner and easier to scan for side-by-side comparisons.
