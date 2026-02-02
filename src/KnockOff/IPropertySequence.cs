@@ -34,6 +34,11 @@ public interface IPropertyGetSequence<TValue>
     /// Returns this for fluent chaining.
     /// </summary>
     IPropertyGetSequence<TValue> Verifiable();
+
+    /// <summary>
+    /// Terminates sequence with default(T) after exhaustion instead of repeating last value.
+    /// </summary>
+    void ThenDefault();
 }
 
 /// <summary>
@@ -64,4 +69,9 @@ public interface IPropertySetSequence<TValue>
     /// Returns this for fluent chaining.
     /// </summary>
     IPropertySetSequence<TValue> Verifiable();
+
+    /// <summary>
+    /// Terminates sequence with default(T) after exhaustion instead of repeating last value.
+    /// </summary>
+    void ThenDefault();
 }

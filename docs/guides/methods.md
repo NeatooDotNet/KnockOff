@@ -337,7 +337,7 @@ The callback signature matches the method signature, just like `OnCall()`.
 
 ### Sequence Exhaustion
 
-After the sequence is exhausted (all callbacks consumed), subsequent calls return `default(T)` in non-strict mode or throw in strict mode:
+After the sequence is exhausted (all callbacks consumed), subsequent calls **repeat the last value** by default. This matches NSubstitute's behavior for easier migration and more forgiving tests.
 
 <!-- snippet: methods-sequence-exhaustion -->
 ```cs
@@ -353,8 +353,55 @@ Assert.Equal(1, service.GetValue());
 Assert.Equal(2, service.GetValue());
 Assert.Equal(3, service.GetValue());
 
-// After exhaustion: default(int) = 0 in non-strict mode
+// After exhaustion: repeats last value (NSubstitute-like behavior)
+Assert.Equal(3, service.GetValue());
+Assert.Equal(3, service.GetValue()); // continues repeating
+```
+<!-- endSnippet -->
+
+### Returning Default After Exhaustion
+
+Use `ThenDefault()` when you want the sequence to return `default(T)` after exhaustion instead of repeating the last value:
+
+<!-- snippet: methods-sequence-then-default -->
+```cs
+// ThenDefault() returns default(T) after exhaustion instead of repeating
+stub.GetValue
+    .OnCall(() => 1)
+    .ThenCall(() => 2)
+    .ThenDefault();
+
+IValueSvc service = stub;
+
+Assert.Equal(1, service.GetValue());
+Assert.Equal(2, service.GetValue());
+
+// After exhaustion with ThenDefault: returns default(int) = 0
 Assert.Equal(0, service.GetValue());
+Assert.Equal(0, service.GetValue()); // continues returning default
+```
+<!-- endSnippet -->
+
+### Strict Mode Sequence Exhaustion
+
+In strict mode, exhausted sequences throw `StubException.SequenceExhausted` regardless of `ThenDefault()`:
+
+<!-- snippet: methods-sequence-strict -->
+```cs
+// Strict mode throws on sequence exhaustion
+stub.Strict = true;
+
+stub.GetValue
+    .OnCall(() => 1)
+    .ThenCall(() => 2);
+
+IValueSvc service = stub;
+
+Assert.Equal(1, service.GetValue());
+Assert.Equal(2, service.GetValue());
+
+// Third call throws StubException.SequenceExhausted in strict mode
+Assert.Throws<StubException>(() => service.GetValue());
 ```
 <!-- endSnippet -->
 
@@ -472,7 +519,8 @@ Assert.Equal("new@test.com", savedUser.Email);
 - **Times options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`
 - **Argument capture**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Configure using fully-typed lambda to distinguish which overload
-- **Sequences**: Chain `ThenCall()` for different behavior across successive calls
+- **Sequences**: Chain `ThenCall()` for different behavior across successive calls; exhausted sequences repeat the last value by default
+- **ThenDefault()**: Opt-in to returning `default(T)` after sequence exhaustion instead of repeating
 - **Reset**: Clears call count, captured arguments, and removes callbacks
 
 Next: [Property Interceptors](properties.md) for get/set tracking and configuration.
@@ -482,4 +530,4 @@ Next: [Property Interceptors](properties.md) for get/set tracking and configurat
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-01

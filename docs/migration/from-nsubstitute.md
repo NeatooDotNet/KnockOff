@@ -1316,7 +1316,9 @@ stub.GetUser
     .ThenCall((id) => user3);
 ```
 
-**Key difference:** NSubstitute's sequence repeats the last value forever. KnockOff's sequence exhausts and returns `default(T)` in non-strict mode (or throws in strict mode).
+**Behavior match:** KnockOff now matches NSubstitute's sequence exhaustion behavior - both repeat the last value after exhaustion.
+
+**KnockOff extension:** Use `ThenDefault()` to explicitly return `default(T)` after exhaustion instead of repeating (NSubstitute has no equivalent). In strict mode, sequences throw `StubException.SequenceExhausted` on exhaustion.
 
 ---
 
@@ -1351,4 +1353,4 @@ KnockOff earns its place when:
 
 ---
 
-**UPDATED:** 2026-01-30
+**UPDATED:** 2026-02-01

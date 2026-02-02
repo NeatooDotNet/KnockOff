@@ -12,15 +12,21 @@ KnockOff is a Roslyn Source Generator that creates test stubs at compile time. S
 
 **Read this section first to avoid common mistakes.**
 
-### 1. Sequences EXHAUST - They Do NOT Repeat
+### 1. Sequences REPEAT Last Value After Exhaustion
 
-Sequences return `default` after all callbacks are consumed:
+Sequences repeat the last callback after all values are consumed (matching NSubstitute):
 
 ```cs
 stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 999);
 calc.Add(0, 0); // Returns 1
 calc.Add(0, 0); // Returns 999
-calc.Add(0, 0); // Returns 0 (default - EXHAUSTED, not 999!)
+calc.Add(0, 0); // Returns 999 (repeats last value!)
+
+// Use ThenDefault() to return default(T) instead of repeating
+stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 999).ThenDefault();
+calc.Add(0, 0); // Returns 1
+calc.Add(0, 0); // Returns 999
+calc.Add(0, 0); // Returns 0 (default - ThenDefault() terminates with default)
 ```
 
 ### 2. Events Use Handler Property - No Raise() Method
@@ -197,7 +203,9 @@ stub.GetNext
     .OnCall(() => "first")
     .ThenCall(() => "second")
     .ThenCall(() => "third");
-// After third call, returns default (exhausts)
+// After third call, repeats "third" (NSubstitute-like behavior)
+// Use ThenDefault() to return default(T) instead:
+// .ThenCall(() => "third").ThenDefault();
 ```
 
 ### When() - Argument Matching
@@ -436,16 +444,21 @@ public delegate string MyOperation(int value);
 [KnockOff<MyOperation>]
 ```
 
-### Expecting Sequences to Repeat
+### Expecting Sequences to Return Default After Exhaustion
 
 ```cs
-// WRONG assumption: Last value repeats
+// Sequences repeat last value by default (NSubstitute-like behavior)
 stub.GetNext.OnCall(() => 1).ThenCall(() => 2);
-// After 2 calls, returns 0 (default), NOT 2
+// After 2 calls, returns 2 (repeats last value)
 
-// RIGHT: If you need infinite, use OnCall with state
-var counter = 0;
-stub.GetNext.OnCall(() => ++counter);
+// Use ThenDefault() to return default(T) instead of repeating
+stub.GetNext.OnCall(() => 1).ThenCall(() => 2).ThenDefault();
+// After 2 calls, returns 0 (default)
+
+// Use Strict mode to throw when sequence exhausted
+stub.Strict = true;
+stub.GetNext.OnCall(() => 1).ThenCall(() => 2);
+// Third call throws StubException.SequenceExhausted
 ```
 
 ---

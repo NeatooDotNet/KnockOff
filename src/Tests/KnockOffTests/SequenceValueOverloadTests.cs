@@ -204,7 +204,7 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void OnGet_ThenGet_Exhausted_ReturnsDefaultInNonStrictMode()
+	public void OnGet_ThenGet_Exhausted_RepeatsLastValueInNonStrictMode()
 	{
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
@@ -214,7 +214,23 @@ public partial class SequenceValueOverloadTests
 
 		Assert.Equal("first", service.Name);
 		Assert.Equal("second", service.Name);
-		// Third access - sequence exhausted, returns default in non-strict mode
+		// Third access - sequence exhausted, repeats last value in non-strict mode (NSubstitute behavior)
+		Assert.Equal("second", service.Name);
+		Assert.Equal("second", service.Name);
+	}
+
+	[Fact]
+	public void OnGet_ThenGet_WithThenDefault_ReturnsDefaultInNonStrictMode()
+	{
+		var knockOff = new PropertyTestKnockOff();
+		IPropertyTest service = knockOff;
+
+		// Create sequence with ThenDefault() to return default after exhaustion
+		knockOff.Name.OnGet("first").ThenGet("second").ThenDefault();
+
+		Assert.Equal("first", service.Name);
+		Assert.Equal("second", service.Name);
+		// Third access - sequence exhausted, returns default due to ThenDefault()
 		Assert.Null(service.Name);
 	}
 
@@ -285,7 +301,7 @@ public partial class SequenceValueOverloadTests
 	}
 
 	[Fact]
-	public void MethodOnCall_ThenCall_Exhausted_ReturnsDefaultInNonStrictMode()
+	public void MethodOnCall_ThenCall_Exhausted_RepeatsLastValueInNonStrictMode()
 	{
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
@@ -295,7 +311,23 @@ public partial class SequenceValueOverloadTests
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
-		// Third access - sequence exhausted, returns default in non-strict mode
+		// Third access - sequence exhausted, repeats last value in non-strict mode (NSubstitute behavior)
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+	}
+
+	[Fact]
+	public void MethodOnCall_ThenCall_WithThenDefault_ReturnsDefaultInNonStrictMode()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Create sequence with ThenDefault() to return default after exhaustion
+		knockOff.GetOptional.OnCall(() => "first").ThenCall(() => "second").ThenDefault();
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Third access - sequence exhausted, returns default due to ThenDefault()
 		Assert.Null(service.GetOptional());
 	}
 
@@ -317,6 +349,167 @@ public partial class SequenceValueOverloadTests
 
 	#endregion
 
+	#region Method Sequence Value Overload Tests
+
+	/// <summary>
+	/// Tests for method sequence value overloads (ThenReturns).
+	/// Phase 2 of method-sequence-value-overloads feature.
+	///
+	/// DESIGN NOTE: Returns().ThenReturns() is NOT supported by design.
+	/// ThenReturns is available on sequences started with OnCall().
+	/// Use OnCall(() => value) to start a sequence with a constant value.
+	/// </summary>
+
+	[Fact]
+	public void OnCall_ThenReturns_ReturnsSequence()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// OnCall starts the sequence, ThenReturns adds values to it
+		knockOff.GetOptional.OnCall(() => "first")
+			.ThenReturns("second")
+			.ThenReturns("third");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("third", service.GetOptional());
+	}
+
+	[Fact]
+	public void OnCall_ThenReturns_MixedSequence()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Mix callbacks and values in the same sequence
+		knockOff.GetOptional.OnCall(() => "callback first")
+			.ThenReturns("value second")
+			.ThenCall(() => "callback third")
+			.ThenReturns("value fourth");
+
+		Assert.Equal("callback first", service.GetOptional());
+		Assert.Equal("value second", service.GetOptional());
+		Assert.Equal("callback third", service.GetOptional());
+		Assert.Equal("value fourth", service.GetOptional());
+	}
+
+	[Fact]
+	public async Task AsyncMethod_ThenReturns_AutoWraps()
+	{
+		var knockOff = new AsyncServiceKnockOff();
+		IAsyncService service = knockOff;
+
+		// ThenReturns for Task<T> methods auto-wraps with Task.FromResult
+		knockOff.GetRequiredAsync.OnCall(() => Task.FromResult("first"))
+			.ThenReturns("second")
+			.ThenReturns("third");
+
+		Assert.Equal("first", await service.GetRequiredAsync());
+		Assert.Equal("second", await service.GetRequiredAsync());
+		Assert.Equal("third", await service.GetRequiredAsync());
+	}
+
+	[Fact]
+	public async Task ValueTaskMethod_ThenReturns_AutoWraps()
+	{
+		var knockOff = new ValueTaskMethodKnockOff();
+		IValueTaskMethodService service = knockOff;
+
+		// ThenReturns for ValueTask<T> methods auto-wraps with new ValueTask<T>(value)
+		knockOff.GetValueAsync.OnCall(() => new ValueTask<string>("first"))
+			.ThenReturns("second")
+			.ThenReturns("third");
+
+		Assert.Equal("first", await service.GetValueAsync());
+		Assert.Equal("second", await service.GetValueAsync());
+		Assert.Equal("third", await service.GetValueAsync());
+	}
+
+	[Fact]
+	public void ThenReturns_TracksCorrectly()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		var sequence = knockOff.GetOptional.OnCall(() => "a")
+			.ThenReturns("b")
+			.ThenReturns("c");
+
+		service.GetOptional();
+		service.GetOptional();
+		service.GetOptional();
+
+		// Verify sequence was fully consumed
+		sequence.Verify();
+		knockOff.GetOptional.Verify(Times.Exactly(3));
+	}
+
+	[Fact]
+	public void ThenReturns_SequenceExhaustion_RepeatsLastValueInNonStrictMode()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Create sequence with ThenReturns to enable exhaustion
+		knockOff.GetOptional.OnCall(() => "first").ThenReturns("second");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Third access - sequence exhausted, repeats last value in non-strict mode (NSubstitute behavior)
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+	}
+
+	[Fact]
+	public void ThenReturns_WithThenDefault_ReturnsDefaultInNonStrictMode()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Create sequence with ThenDefault() to return default after exhaustion
+		knockOff.GetOptional.OnCall(() => "first").ThenReturns("second").ThenDefault();
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Third access - sequence exhausted, returns default due to ThenDefault()
+		Assert.Null(service.GetOptional());
+	}
+
+	[Fact]
+	public void ThenReturns_SequenceExhaustion_ThrowsInStrictMode()
+	{
+		var knockOff = new SampleKnockOff();
+		knockOff.Strict = true;
+		ISampleService service = knockOff;
+
+		// Create sequence with ThenReturns to enable exhaustion
+		knockOff.GetOptional.OnCall(() => "first").ThenReturns("second");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Third access - sequence exhausted, throws in strict mode
+		Assert.Throws<StubException>(() => service.GetOptional());
+	}
+
+	[Fact]
+	public void ThenReturns_NullValue_WorksCorrectly()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// ThenReturns with null should work (may need cast for nullable types)
+		knockOff.GetOptional.OnCall(() => "first")
+			.ThenReturns((string?)null)
+			.ThenReturns("third");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Null(service.GetOptional());
+		Assert.Equal("third", service.GetOptional());
+	}
+
+	#endregion
+
 	#region Test Stubs
 
 	public interface IPropertyTest
@@ -328,6 +521,19 @@ public partial class SequenceValueOverloadTests
 
 	[KnockOff]
 	public partial class PropertyTestKnockOff : IPropertyTest
+	{
+	}
+
+	/// <summary>
+	/// Interface with ValueTask&lt;T&gt; returning method for testing auto-wrapping.
+	/// </summary>
+	public interface IValueTaskMethodService
+	{
+		ValueTask<string> GetValueAsync();
+	}
+
+	[KnockOff]
+	public partial class ValueTaskMethodKnockOff : IValueTaskMethodService
 	{
 	}
 

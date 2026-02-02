@@ -29,8 +29,8 @@ public partial class PropertySequencesDemo
     //   public IPropertyGetSequence<string> ThenGet(string value) { ... }
     //   public IPropertyGetSequence<string> ThenGet(Func<string> callback) { ... }
     //
-    // DESIGN DECISION: Sequences exhaust after all values are consumed.
-    // After exhaustion, unconfigured gets return default(T).
+    // DESIGN DECISION: After exhaustion, the last value repeats (NSubstitute-like).
+    // Use ThenDefault() to return default(T) after exhaustion instead.
     // =========================================================================
 
     public void ThenGet_GetterSequence()
@@ -47,7 +47,7 @@ public partial class PropertySequencesDemo
         var r1 = entity.Name; // "First"
         var r2 = entity.Name; // "Second"
         var r3 = entity.Name; // "Final"
-        var r4 = entity.Name; // null (sequence exhausted, returns default)
+        var r4 = entity.Name; // "Final" (repeats last value)
     }
 
     // =========================================================================
@@ -71,7 +71,7 @@ public partial class PropertySequencesDemo
         var r1 = entity.Name; // "Static first"
         var r2 = entity.Name; // "Dynamic 1"
         var r3 = entity.Name; // "Static final"
-        var r4 = entity.Name; // null (sequence exhausted)
+        var r4 = entity.Name; // "Static final" (repeats last value)
     }
 
     // =========================================================================
@@ -97,7 +97,33 @@ public partial class PropertySequencesDemo
         entity.Description = "A"; // log: ["First: A"]
         entity.Description = "B"; // log: [..., "Second: B"]
         entity.Description = "C"; // log: [..., "Final: C"]
-        entity.Description = "D"; // No callback - sequence exhausted
+        entity.Description = "D"; // log: [..., "Final: D"] (repeats last callback)
+    }
+
+    // =========================================================================
+    // ThenDefault() - Explicit Default Termination
+    // =========================================================================
+    // DESIGN DECISION: ThenDefault() configures the sequence to return default(T)
+    // after exhaustion instead of repeating the last value.
+    //
+    // This matches KnockOff's original behavior and is useful when tests need
+    // to detect or handle exhaustion explicitly.
+    // =========================================================================
+
+    public void ThenDefault_ReturnsDefaultAfterExhaustion()
+    {
+        var stub = new Stubs.IEntity();
+
+        stub.Name.OnGet("First")
+            .ThenGet("Second")
+            .ThenDefault();  // Return default after exhaustion
+
+        IEntity entity = stub;
+
+        var r1 = entity.Name; // "First"
+        var r2 = entity.Name; // "Second"
+        var r3 = entity.Name; // null (default - sequence exhausted)
+        var r4 = entity.Name; // null (still default)
     }
 
     // =========================================================================

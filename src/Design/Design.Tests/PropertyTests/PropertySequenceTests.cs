@@ -27,13 +27,30 @@ public class PropertySequenceTests
     }
 
     [Fact]
-    public void ThenGet_ExhaustsAfterAllCallbacks()
+    public void ThenGet_RepeatsLastValueAfterExhaustion()
     {
-        // ACTUAL BEHAVIOR: Sequences do NOT repeat the last value.
-        // After all values are consumed, unconfigured gets return default.
+        // ACTUAL BEHAVIOR: Sequences repeat the last value (NSubstitute-like).
+        // Use ThenDefault() to return default(T) after exhaustion instead.
         var stub = new PropertySequencesDemo.Stubs.IEntity();
         stub.Name.OnGet("First")
             .ThenGet("Final");
+
+        Design.Domain.Entities.IEntity entity = stub;
+
+        Assert.Equal("First", entity.Name);
+        Assert.Equal("Final", entity.Name);
+        Assert.Equal("Final", entity.Name); // Repeats last value
+        Assert.Equal("Final", entity.Name); // Still repeats
+    }
+
+    [Fact]
+    public void ThenDefault_ReturnsDefaultAfterExhaustion()
+    {
+        // ThenDefault() causes sequence to return default(T) after exhaustion
+        var stub = new PropertySequencesDemo.Stubs.IEntity();
+        stub.Name.OnGet("First")
+            .ThenGet("Final")
+            .ThenDefault();
 
         Design.Domain.Entities.IEntity entity = stub;
 
@@ -79,15 +96,36 @@ public class PropertySequenceTests
     }
 
     [Fact]
-    public void ThenSet_ExhaustsAfterAllCallbacks()
+    public void ThenSet_RepeatsLastCallbackAfterExhaustion()
     {
-        // ACTUAL BEHAVIOR: Sequences do NOT repeat the last callback.
-        // After all callbacks are consumed, sets are not tracked.
+        // ACTUAL BEHAVIOR: Sequences repeat the last callback (NSubstitute-like).
+        // Use ThenDefault() to skip callbacks after exhaustion instead.
         var stub = new PropertySequencesDemo.Stubs.IEntity();
         var log = new List<string>();
 
         stub.Description.OnSet(v => log.Add($"First: {v}"))
             .ThenSet(v => log.Add($"Final: {v}"));
+
+        Design.Domain.Entities.IEntity entity = stub;
+
+        entity.Description = "A";
+        entity.Description = "B";
+        entity.Description = "C"; // Repeats last callback
+        entity.Description = "D"; // Repeats last callback
+
+        Assert.Equal(["First: A", "Final: B", "Final: C", "Final: D"], log);
+    }
+
+    [Fact]
+    public void ThenSet_ThenDefault_SkipsAfterExhaustion()
+    {
+        // ThenDefault() causes sequence to skip callbacks after exhaustion
+        var stub = new PropertySequencesDemo.Stubs.IEntity();
+        var log = new List<string>();
+
+        stub.Description.OnSet(v => log.Add($"First: {v}"))
+            .ThenSet(v => log.Add($"Final: {v}"))
+            .ThenDefault();
 
         Design.Domain.Entities.IEntity entity = stub;
 

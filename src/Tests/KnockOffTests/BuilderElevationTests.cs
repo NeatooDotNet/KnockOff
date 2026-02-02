@@ -161,7 +161,7 @@ public class BuilderElevationTests
     }
 
     [Fact]
-    public void OnCall_ThenCall_ExhaustedInNonStrictMode_ReturnsDefault()
+    public void OnCall_ThenCall_ExhaustedInNonStrictMode_RepeatsLastValue()
     {
         // Arrange
         var stub = new BuilderElevationStub();
@@ -177,7 +177,29 @@ public class BuilderElevationTests
         svc.Calculate(0);
         var result = svc.Calculate(0);  // Beyond sequence
 
-        // Assert - should return default (0 for int)
+        // Assert - should repeat last value (NSubstitute behavior)
+        Assert.Equal(200, result);
+    }
+
+    [Fact]
+    public void OnCall_ThenCall_WithThenDefault_ReturnsDefault()
+    {
+        // Arrange
+        var stub = new BuilderElevationStub();
+        stub.Strict = false;
+        stub.Calculate
+            .OnCall(x => 100)
+            .ThenCall(x => 200)
+            .ThenDefault();  // Explicitly request default after exhaustion
+
+        IBuilderElevationService svc = stub;
+
+        // Act - exhaust the sequence
+        svc.Calculate(0);
+        svc.Calculate(0);
+        var result = svc.Calculate(0);  // Beyond sequence
+
+        // Assert - should return default (0 for int) due to ThenDefault()
         Assert.Equal(0, result);
     }
 

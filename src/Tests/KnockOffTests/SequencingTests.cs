@@ -107,7 +107,7 @@ public class SequencingTests
     }
 
     [Fact]
-    public void ExhaustedSequence_InNonStrictMode_ReturnsDefault()
+    public void ExhaustedSequence_InNonStrictMode_RepeatsLastValue()
     {
         var stub = new SequenceTestKnockOff();
         stub.Strict = false;
@@ -119,7 +119,25 @@ public class SequencingTests
         svc.Add(1, 2);  // First - OK
         svc.Add(1, 2);  // Second - OK
 
-        Assert.Equal(0, svc.Add(1, 2));  // Third - exhausted, returns default in non-strict
+        Assert.Equal(200, svc.Add(1, 2));  // Third - exhausted, repeats last value in non-strict
+        Assert.Equal(200, svc.Add(1, 2));  // Fourth - still repeats last value
+    }
+
+    [Fact]
+    public void ExhaustedSequence_WithThenDefault_ReturnsDefault()
+    {
+        var stub = new SequenceTestKnockOff();
+        stub.Strict = false;
+        stub.Add
+            .OnCall((a, b) => 100)
+            .ThenCall((a, b) => 200)
+            .ThenDefault();  // Explicitly request default after exhaustion
+
+        ISequenceTestService svc = stub;
+        svc.Add(1, 2);  // First - OK
+        svc.Add(1, 2);  // Second - OK
+
+        Assert.Equal(0, svc.Add(1, 2));  // Third - exhausted, returns default due to ThenDefault()
     }
 
     [Fact]

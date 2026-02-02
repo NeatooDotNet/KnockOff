@@ -560,7 +560,7 @@ public class SequenceTests
     }
 
     [Fact]
-    public void Sequence_Exhaustion_ReturnsDefault()
+    public void Sequence_Exhaustion_RepeatsLastValue()
     {
         var stub = new ValueSvcStub();
 
@@ -577,7 +577,32 @@ public class SequenceTests
         Assert.Equal(2, service.GetValue());
         Assert.Equal(3, service.GetValue());
 
-        // After exhaustion: default(int) = 0 in non-strict mode
+        // After exhaustion: repeats last value in non-strict mode (NSubstitute behavior)
+        Assert.Equal(3, service.GetValue());
+        Assert.Equal(3, service.GetValue());
+        #endregion
+    }
+
+    [Fact]
+    public void Sequence_Exhaustion_WithThenDefault_ReturnsDefault()
+    {
+        var stub = new ValueSvcStub();
+
+        #region methods-sequence-exhaustion-thendefault
+        // Sequence with ThenDefault() returns default after exhaustion
+        stub.GetValue
+            .OnCall(() => 1)
+            .ThenCall(() => 2)
+            .ThenCall(() => 3)
+            .ThenDefault();
+
+        IValueSvc service = stub;
+
+        Assert.Equal(1, service.GetValue());
+        Assert.Equal(2, service.GetValue());
+        Assert.Equal(3, service.GetValue());
+
+        // After exhaustion: default(int) = 0 due to ThenDefault()
         Assert.Equal(0, service.GetValue());
         #endregion
     }

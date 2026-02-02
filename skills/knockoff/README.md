@@ -65,8 +65,13 @@ stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
 stub.GetUser.When(42).Returns(adminUser);
 stub.GetUser.When(id => id < 0).Returns(null);
 
-// Sequences (exhaust after all consumed - don't repeat!)
+// Sequences repeat last value after exhaustion (matching NSubstitute)
 stub.GetNext.OnCall(() => 1).ThenCall(() => 2).ThenCall(() => 3);
+// After 3 calls, continues returning 3
+
+// Use ThenDefault() to return default(T) instead of repeating
+stub.GetNext.OnCall(() => 1).ThenCall(() => 2).ThenDefault();
+// After 2 calls, returns 0 (default)
 ```
 
 ### Verification
@@ -83,7 +88,7 @@ tracking.Verify(Times.Once);
 
 ### Critical Gotchas
 
-1. **Sequences exhaust** - They return `default` after all callbacks consumed, NOT repeat last value
+1. **Sequences repeat last value** - After all callbacks consumed, sequences repeat the last value (matching NSubstitute). Use `ThenDefault()` to return `default(T)` instead, or Strict mode to throw
 2. **Events use Handler property** - `stub.EventInterceptor.Handler?.Invoke(...)` (no Raise method)
 3. **Class stubs use .Object** - `stub.Object` to get the class instance
 4. **Times.Between() doesn't exist** - Use `AtLeast` + `AtMost` instead

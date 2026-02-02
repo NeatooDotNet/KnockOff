@@ -1,6 +1,6 @@
 # Method Sequence Value Overloads
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-02-01
 **Last Updated:** 2026-02-01
@@ -46,12 +46,12 @@ For async methods (`Task<T>`, `ValueTask<T>`), auto-wrap with `Task.FromResult(v
 
 ## Tasks
 
-- [ ] Update `IMethodSequence` interface documentation (note generated value overload)
-- [ ] Modify `MethodSequenceImpl` generation to add `ThenReturns(TValue value)` overload
-- [ ] Handle async wrapping for Task<T> and ValueTask<T> return types
-- [ ] Add tests for all four patterns (Standalone, Inline Interface, Inline Class, Delegate)
-- [ ] Update Design.Stubs/Methods/MethodSequences.cs to document the new pattern
-- [ ] Verify sequence exhaustion behavior works correctly with value overloads
+- [x] Update `IMethodSequence` interface documentation (note generated value overload)
+- [x] Modify `MethodSequenceImpl` generation to add `ThenReturns(TValue value)` overload
+- [x] Handle async wrapping for Task<T> and ValueTask<T> return types
+- [x] Add tests for all four patterns (Standalone, Inline Interface, Inline Class, Delegate)
+- [x] Update Design.Stubs/Methods/MethodSequences.cs to document the new pattern
+- [x] Verify sequence exhaustion behavior works correctly with value overloads
 
 ---
 
@@ -59,6 +59,25 @@ For async methods (`Task<T>`, `ValueTask<T>`), auto-wrap with `Task.FromResult(v
 
 **2026-02-01:** Architect completed design and verification. Plan ready for developer review.
 
+**2026-02-01:** Developer implementation complete:
+- Phase 1: Generator changes to add `ThenReturns(TValue value)` to both `MethodSequenceImpl` and `MethodCallBuilderImpl`
+- Phase 2: Added 8 new tests for value sequences, fixed double-counting bug in sequence tracking
+- Phase 3: Updated Design.Stubs documentation and added Design.Tests
+
 ---
 
 ## Results / Conclusions
+
+**Completed 2026-02-01**
+
+Successfully added `ThenReturns(TValue value)` method to generated method sequences. Users can now write:
+
+```csharp
+stub.GetOptional.OnCall(() => "first")
+    .ThenReturns("second")
+    .ThenReturns("third");
+```
+
+For async methods, values are auto-wrapped with `Task.FromResult()` or `new ValueTask<T>()`.
+
+Note: `Returns().ThenReturns()` is NOT supported by design. Sequences must start with `OnCall()`. Use `OnCall(() => value)` to start with a constant value.
