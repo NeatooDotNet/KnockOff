@@ -96,9 +96,12 @@ service.Name = "test";
 | Interceptor | Reset Clears | Reset Preserves |
 |-------------|--------------|-----------------|
 | Method | Tracking, callbacks | Nothing |
+| User Method | Tracking (call count, LastArg) | **OnCall configuration** |
 | Property | Tracking, LastSetValue, callbacks | Verifiable flag |
 | Indexer | Tracking, LastGetKey, LastSetEntry | **Backing dictionary** |
 | Event | Tracking counts | **Active subscribers** |
+
+**Note:** User method interceptors (numbered interceptors like `GetById2`) preserve OnCall configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
 
 ---
 
@@ -123,6 +126,8 @@ var stub = new UserRepoStub();
 stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 IUserRepo repo = stub;
 ```
+
+**User Methods:** Stand-Alone stubs can define protected methods that provide default behavior. See the User Methods section below.
 
 ### Inline Interface Pattern
 
@@ -361,6 +366,86 @@ var stub = new ServiceStub().Strict();
 
 // Assembly-wide default
 [assembly: KnockOffStrict]
+```
+
+---
+
+## User Methods (Stand-Alone Only)
+
+User methods let you define default stub behavior at compile time. The user method is the fallback when no `OnCall` is configured.
+
+### Defining User Methods
+
+Add protected methods matching interface signatures:
+
+```cs
+[KnockOff]
+public partial class UserRepoStub : IUserRepo { }
+
+public partial class UserRepoStub
+{
+    // Protected method provides default behavior
+    protected User? GetById(int id) => new User { Id = id, Name = "Default" };
+}
+```
+
+When you define a user method, KnockOff generates a **numbered interceptor** (e.g., `GetById2`) for tracking and override capability.
+
+### OnCall Supersedes User Method
+
+Use `OnCall()` to override the user method for specific tests:
+
+```cs
+var stub = new UserRepoStub();
+
+// Without OnCall: user method is called
+var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
+
+// With OnCall: callback supersedes user method
+stub.GetById2.OnCall(id => new User { Id = id, Name = "Override" });
+var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
+```
+
+### Returns for Constant Values
+
+Use `Returns()` for constant return values:
+
+```cs
+stub.GetById2.Returns(new User { Id = 99, Name = "Fixed" });
+```
+
+For async methods (`Task<T>`, `ValueTask<T>`), `Returns()` auto-wraps the value:
+
+```cs
+// Returns auto-wraps in Task.FromResult
+stub.GetUserAsync2.Returns(new User { Id = 1 });
+```
+
+### Tracking Works with OnCall
+
+User method interceptors provide full tracking even when using `OnCall`:
+
+```cs
+stub.GetById2.OnCall(id => new User { Id = id });
+repo.GetById(42);
+
+stub.GetById2.Verify(Times.Once);
+Assert.Equal(42, stub.GetById2.LastArg);
+```
+
+### Reset Preserves OnCall Configuration
+
+`Reset()` clears tracking state but preserves the OnCall configuration:
+
+```cs
+stub.GetById2.OnCall(id => new User { Id = id });
+repo.GetById(1);
+stub.GetById2.Verify(Times.Once);
+
+stub.GetById2.Reset();
+stub.GetById2.Verify(Times.Never);  // Tracking cleared
+
+repo.GetById(2);  // Still uses OnCall callback
 ```
 
 ---

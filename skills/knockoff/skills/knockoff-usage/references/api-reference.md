@@ -108,6 +108,44 @@ stub.Verify();
 
 Generated for non-generic interface methods. Tracks call counts, captures arguments, and supports callback configuration.
 
+### User Method Interceptors (Stand-Alone Pattern)
+
+When you define a **user method** (protected method matching an interface signature), KnockOff generates a **numbered interceptor** (e.g., `GetById2`). This interceptor:
+
+- Tracks all calls to the interface method
+- Allows `OnCall()` to supersede the user method
+- Uses the user method as fallback when no `OnCall` is configured
+
+```cs
+[KnockOff]
+public partial class RepoStub : IRepo { }
+
+public partial class RepoStub
+{
+    protected User? GetById(int id) => new User { Id = id, Name = "Default" };
+}
+
+// Usage:
+var stub = new RepoStub();
+IRepo repo = stub;
+
+// User method provides default behavior
+var user1 = repo.GetById(1);  // Returns "Default"
+
+// OnCall supersedes user method
+stub.GetById2.OnCall(id => new User { Id = id, Name = "Override" });
+var user2 = repo.GetById(2);  // Returns "Override"
+
+// Returns for constant values (auto-wraps for async)
+stub.GetById2.Returns(new User { Id = 99 });
+
+// Full tracking works with OnCall
+stub.GetById2.Verify(Times.Exactly(2));
+Assert.Equal(2, stub.GetById2.LastArg);
+```
+
+**Reset behavior for user method interceptors:** `Reset()` clears tracking state (call count, LastArg) but preserves the OnCall configuration.
+
 ### Properties
 
 | Property | Type | Description |
@@ -450,6 +488,7 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
 | **Method** | Tracking state, callbacks, sequence index | N/A |
+| **User Method** | Tracking state (call count, LastArg) | OnCall configuration |
 | **Property** | Tracking state, `LastSetValue`, sequence indices | OnGet/OnSet callbacks, verifiable marking |
 | **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, sequence indices | `Backing` dictionary, OnGet/OnSet callbacks |
 | **Event** | Tracking counts | Active subscribers, verifiable marking |

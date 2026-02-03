@@ -21,7 +21,11 @@ internal sealed record FlatGenerationUnit(
     EquatableArray<FlatMethodModel> Methods,
     /// <summary>Method groups for interceptor generation (groups overloads by name).</summary>
     EquatableArray<FlatMethodGroup> MethodGroups,
+    /// <summary>User method groups for tracking-only interceptors (groups user method overloads by name).</summary>
+    EquatableArray<FlatMethodGroup> UserMethodGroups,
     EquatableArray<FlatGenericMethodHandlerModel> GenericMethodHandlers,
+    /// <summary>Generic user method handler groups for tracking-only interceptors with overloads.</summary>
+    EquatableArray<FlatGenericMethodHandlerGroup> GenericUserMethodHandlerGroups,
     EquatableArray<FlatEventModel> Events,
     /// <summary>Source providers for Source(T) methods - one per interface in the hierarchy.</summary>
     EquatableArray<SourceProviderInfo> SourceProviders,

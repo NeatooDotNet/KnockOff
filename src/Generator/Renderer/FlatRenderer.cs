@@ -114,17 +114,24 @@ internal static class FlatRenderer
 				}
 			}
 
-			// Render user-defined method interceptor classes (tracking-only, not in groups)
-			foreach (var method in unit.Methods.Where(m => !m.IsGenericMethod && m.UserMethodCall != null))
+			// Render user-defined method interceptor classes (tracking-only, grouped for overload support)
+			foreach (var group in unit.UserMethodGroups)
 			{
-				if (renderedInterceptorClasses.Add(method.InterceptorClassName))
-					RenderUserMethodInterceptorClass(w, method);
+				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
+					RenderUserMethodGroupInterceptorClass(w, group);
 			}
 
 			foreach (var handler in unit.GenericMethodHandlers)
 			{
 				if (renderedInterceptorClasses.Add(handler.InterceptorClassName))
 					RenderGenericMethodHandler(w, handler, classNameWithTypeParams);
+			}
+
+			// Render generic user method handler groups (for overloaded generic user methods)
+			foreach (var handlerGroup in unit.GenericUserMethodHandlerGroups)
+			{
+				if (renderedInterceptorClasses.Add(handlerGroup.InterceptorClassName))
+					RenderGenericUserMethodHandlerGroup(w, handlerGroup, classNameWithTypeParams);
 			}
 
 			foreach (var evt in unit.Events)
@@ -149,6 +156,20 @@ internal static class FlatRenderer
 					.Where(g => g.Methods.Select(GetSignatureSuffix).Distinct().Count() > 1)
 					.Select(g => g.InterceptorName));
 
+			// Build set of user method interceptor names that have multiple UNIQUE overloads (need suffixed RecordCall)
+			var multiOverloadUserMethodInterceptors = new HashSet<string>(
+				unit.UserMethodGroups
+					.Where(g => g.Methods.Select(GetSignatureSuffix).Distinct().Count() > 1)
+					.Select(g => g.InterceptorName));
+
+			// Build set of generic user method interceptor names that have multiple overloads (need suffixed RecordCall/Callback)
+			// A generic handler group needs suffixes if it has multiple type arities OR multiple signatures per arity
+			var multiOverloadGenericUserMethodInterceptors = new HashSet<string>(
+				unit.GenericUserMethodHandlerGroups
+					.Where(g => g.TypeArityGroups.Count > 1 ||
+					            g.TypeArityGroups.Any(a => a.SignatureGroups.Count > 1))
+					.Select(g => g.InterceptorName));
+
 			// Build indexer access map for multi-indexer groups
 			var indexerAccessMap = BuildIndexerAccessMap(unit.IndexerGroups);
 
@@ -160,7 +181,7 @@ internal static class FlatRenderer
 				RenderIndexerImplementation(w, indexer, indexerAccessMap);
 
 			foreach (var method in unit.Methods)
-				RenderMethodImplementation(w, method, multiOverloadInterceptors);
+				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadUserMethodInterceptors, multiOverloadGenericUserMethodInterceptors, unit.GenericUserMethodHandlerGroups);
 
 			foreach (var evt in unit.Events)
 				RenderEventImplementation(w, evt);
@@ -1542,17 +1563,300 @@ internal static class FlatRenderer
 	}
 
 	/// <summary>
-	/// Renders a tracking-only interceptor for user-defined methods.
-	/// No OnCall methods - the user's method is used directly.
+	/// Renders an interceptor for a group of user-defined method overloads.
+	/// Handles both single-method groups and multi-overload groups with per-signature RecordCall.
+	/// </summary>
+	private static void RenderUserMethodGroupInterceptorClass(CodeWriter w, FlatMethodGroup group)
+	{
+		// Deduplicate methods by signature suffix
+		var renderedSuffixes = new HashSet<string>();
+		var uniqueMethods = new List<FlatMethodModel>();
+		foreach (var method in group.Methods)
+		{
+			var suffix = GetSignatureSuffix(method);
+			if (renderedSuffixes.Add(suffix))
+			{
+				uniqueMethods.Add(method);
+			}
+		}
+
+		// If only one unique signature, use the simpler single-method interceptor
+		if (uniqueMethods.Count == 1)
+		{
+			RenderUserMethodInterceptorClass(w, uniqueMethods[0]);
+			return;
+		}
+
+		// Multi-overload user method group
+		var firstMethod = group.Methods.GetArray()![0];
+		var trackingInterface = "global::KnockOff.IMethodTracking";
+
+		w.Line($"/// <summary>Tracks calls to {firstMethod.MethodName} (user-defined overloaded implementation). OnCall supersedes user method.</summary>");
+		w.Line($"public sealed class {group.InterceptorClassName} : {trackingInterface}");
+		using (w.Braces())
+		{
+			// Aggregate call count (shared across all overloads)
+			w.Line("private int _callCount;");
+			w.Line();
+
+			// Verifiable state (aggregate)
+			w.Line("private bool _isVerifiable;");
+			w.Line("private global::KnockOff.Times? _verifiableTimes;");
+			w.Line();
+
+			// Per-signature: delegate, storage, lastArg/lastArgs
+			foreach (var method in uniqueMethods)
+			{
+				var suffix = GetSignatureSuffix(method);
+
+				// Build suffixed delegate name and type
+				var baseDelegateName = method.CustomDelegateName ?? $"{method.MethodName}Delegate";
+				var suffixedDelegateName = $"{baseDelegateName}_{suffix}";
+				var suffixedDelegateType = suffixedDelegateName;
+
+				// Custom delegate if needed (always need for multi-overload since each signature differs)
+				if (method.NeedsCustomDelegate && method.CustomDelegateSignature != null)
+				{
+					// Replace the base delegate name with suffixed name in the signature
+					var suffixedSignature = method.CustomDelegateSignature.Replace(baseDelegateName, suffixedDelegateName);
+					w.Line($"/// <summary>Delegate for {method.MethodName}({GetParamTypeList(method)}).</summary>");
+					w.Line(suffixedSignature);
+					w.Line();
+				}
+				else if (!method.NeedsCustomDelegate)
+				{
+					// For void methods with no ref/out, generate a custom delegate with suffix
+					var paramTypes = method.Parameters.Count > 0
+						? string.Join(", ", method.Parameters.Select(p => p.Type))
+						: "";
+					var delegateParams = method.Parameters.Count > 0
+						? string.Join(", ", method.Parameters.Select(p => $"{p.Type} {p.EscapedName}"))
+						: "";
+					w.Line($"/// <summary>Delegate for {method.MethodName}({GetParamTypeList(method)}).</summary>");
+					w.Line($"public delegate void {suffixedDelegateName}({delegateParams});");
+					w.Line();
+				}
+
+				// OnCall storage
+				w.Line($"private {suffixedDelegateType}? _onCall_{suffix};");
+				w.Line();
+
+				// LastArg/LastArgs storage per signature
+				if (method.TrackableParameters.Count == 1)
+				{
+					var param = method.TrackableParameters.GetArray()![0];
+					w.Line($"private {param.Type} _lastArg_{suffix} = default!;");
+				}
+				else if (method.TrackableParameters.Count > 1)
+				{
+					w.Line($"private {method.LastCallType} _lastArgs_{suffix};");
+				}
+				w.Line();
+			}
+
+			// Per-signature LastArg/LastArgs properties
+			foreach (var method in uniqueMethods)
+			{
+				var suffix = GetSignatureSuffix(method);
+
+				if (method.TrackableParameters.Count == 1)
+				{
+					var param = method.TrackableParameters.GetArray()![0];
+					w.Line($"/// <summary>Last argument passed to {method.MethodName}({GetParamTypeList(method)}). Default if never called.</summary>");
+					w.Line($"public {param.Type} LastArg_{suffix} => _lastArg_{suffix};");
+					w.Line();
+				}
+				else if (method.TrackableParameters.Count > 1)
+				{
+					w.Line($"/// <summary>Last arguments passed to {method.MethodName}({GetParamTypeList(method)}). Default if never called.</summary>");
+					w.Line($"public {method.LastCallType} LastArgs_{suffix} => _lastArgs_{suffix};");
+					w.Line();
+				}
+			}
+
+			// Per-signature RecordCall methods
+			foreach (var method in uniqueMethods)
+			{
+				var suffix = GetSignatureSuffix(method);
+
+				w.Line($"/// <summary>Records a call to {method.MethodName}({GetParamTypeList(method)}).</summary>");
+				if (method.TrackableParameters.Count == 0)
+				{
+					w.Line($"internal void RecordCall_{suffix}() => _callCount++;");
+				}
+				else if (method.TrackableParameters.Count == 1)
+				{
+					var param = method.TrackableParameters.GetArray()![0];
+					w.Line($"internal void RecordCall_{suffix}({param.Type} {param.EscapedName}) {{ _callCount++; _lastArg_{suffix} = {param.EscapedName}; }}");
+				}
+				else
+				{
+					w.Line($"internal void RecordCall_{suffix}({method.LastCallType} args) {{ _callCount++; _lastArgs_{suffix} = args; }}");
+				}
+				w.Line();
+			}
+
+			// Per-signature OnCall methods
+			foreach (var method in uniqueMethods)
+			{
+				var suffix = GetSignatureSuffix(method);
+				var baseDelegateName = method.CustomDelegateName ?? $"{method.MethodName}Delegate";
+				var suffixedDelegateType = $"{baseDelegateName}_{suffix}";
+				var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(method.ReturnType);
+				var isVoidLike = method.IsVoid || method.ReturnType == "global::System.Threading.Tasks.Task";
+
+				w.Line($"/// <summary>Configures callback that supersedes the user method for {method.MethodName}({GetParamTypeList(method)}). Returns tracking interface.</summary>");
+				w.Line($"public {trackingInterface} OnCall_{suffix}({suffixedDelegateType} callback)");
+				using (w.Braces())
+				{
+					w.Line($"_onCall_{suffix} = callback;");
+					w.Line("return this;");
+				}
+				w.Line();
+
+				// Returns method for non-void methods
+				if (!isVoidLike)
+				{
+					var discardLambda = method.Parameters.Count switch
+					{
+						0 => "()",
+						1 => "_",
+						_ => "(" + string.Join(", ", Enumerable.Repeat("_", method.Parameters.Count)) + ")"
+					};
+
+					string valueExpression;
+					string parameterType;
+					if (isTaskT)
+					{
+						valueExpression = $"global::System.Threading.Tasks.Task.FromResult(value)";
+						parameterType = innerType;
+					}
+					else if (isValueTaskT)
+					{
+						valueExpression = $"new global::System.Threading.Tasks.ValueTask<{innerType}>(value)";
+						parameterType = innerType;
+					}
+					else
+					{
+						valueExpression = "value";
+						parameterType = method.ReturnType;
+					}
+
+					w.Line($"/// <summary>Configures constant return value that supersedes the user method for {method.MethodName}({GetParamTypeList(method)}).</summary>");
+					w.Line($"public {trackingInterface} Returns_{suffix}({parameterType} value) => OnCall_{suffix}({discardLambda} => {valueExpression});");
+					w.Line();
+				}
+			}
+
+			// Per-signature Callback properties (internal) - for interface implementation to check
+			foreach (var method in uniqueMethods)
+			{
+				var suffix = GetSignatureSuffix(method);
+				var baseDelegateName = method.CustomDelegateName ?? $"{method.MethodName}Delegate";
+				var suffixedDelegateType = $"{baseDelegateName}_{suffix}";
+
+				w.Line($"/// <summary>Gets the configured callback for {method.MethodName}({GetParamTypeList(method)}) (internal use).</summary>");
+				w.Line($"internal {suffixedDelegateType}? Callback_{suffix} => _onCall_{suffix};");
+				w.Line();
+			}
+
+			// Aggregate Reset method
+			w.Line("/// <summary>Resets tracking state for all overloads.</summary>");
+			w.Line("public void Reset()");
+			using (w.Braces())
+			{
+				w.Line("_callCount = 0;");
+				foreach (var method in uniqueMethods)
+				{
+					var suffix = GetSignatureSuffix(method);
+					if (method.TrackableParameters.Count == 1)
+					{
+						w.Line($"_lastArg_{suffix} = default!;");
+					}
+					else if (method.TrackableParameters.Count > 1)
+					{
+						w.Line($"_lastArgs_{suffix} = default;");
+					}
+				}
+			}
+			w.Line();
+
+			// Aggregate CheckVerification method - for Stub.Verify() aggregation
+			w.Line("/// <summary>Checks verification for Stub.Verify().</summary>");
+			w.Line($"internal global::KnockOff.VerificationFailure? CheckVerification()");
+			using (w.Braces())
+			{
+				w.Line("if (!_isVerifiable) return null;");
+				w.Line("var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+				w.Line($"if (!times.Validate(_callCount)) return new global::KnockOff.VerificationFailure(\"{firstMethod.MethodName}\", times, _callCount);");
+				w.Line("return null;");
+			}
+			w.Line();
+
+			// Aggregate Verify methods
+			w.Line("/// <summary>Verifies aggregate call count is at least once. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+			w.Line();
+
+			w.Line("/// <summary>Verifies aggregate call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify(global::KnockOff.Times times)");
+			using (w.Braces())
+			{
+				w.Line("if (!times.Validate(_callCount))");
+				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{firstMethod.MethodName}\", times, _callCount));");
+			}
+			w.Line();
+
+			// Aggregate Verifiable methods
+			w.Line("/// <summary>Marks for verification by Stub.Verify().</summary>");
+			w.Line("public global::KnockOff.IMethodTracking Verifiable()");
+			using (w.Braces())
+			{
+				w.Line("_isVerifiable = true;");
+				w.Line("_verifiableTimes = null;");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint.</summary>");
+			w.Line("public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times)");
+			using (w.Braces())
+			{
+				w.Line("_isVerifiable = true;");
+				w.Line("_verifiableTimes = times;");
+				w.Line("return this;");
+			}
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders an interceptor for user-defined methods with OnCall/Returns support.
+	/// OnCall supersedes the user method; user method is the fallback.
 	/// </summary>
 	private static void RenderUserMethodInterceptorClass(CodeWriter w, FlatMethodModel method)
 	{
 		var trackingInterface = GetTrackingInterface(method);
+		var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(method.ReturnType);
+		var isVoidLike = method.IsVoid || method.ReturnType == "global::System.Threading.Tasks.Task";
 
-		w.Line($"/// <summary>Tracks calls to {method.MethodName} (user-defined implementation).</summary>");
+		w.Line($"/// <summary>Tracks calls to {method.MethodName} (user-defined implementation). OnCall supersedes user method.</summary>");
 		w.Line($"public sealed class {method.InterceptorClassName} : {trackingInterface}");
 		using (w.Braces())
 		{
+			// Delegate declaration
+			if (method.NeedsCustomDelegate && method.CustomDelegateSignature != null)
+			{
+				w.Line($"/// <summary>Delegate for {method.MethodName}.</summary>");
+				w.Line(method.CustomDelegateSignature);
+				w.Line();
+			}
+
+			// OnCall storage field
+			var delegateType = method.OnCallDelegateType.TrimEnd('?');
+			w.Line($"private {delegateType}? _onCall;");
+			w.Line();
+
 			// LastArg/LastArgs storage (non-nullable to match interface)
 			if (method.TrackableParameters.Count == 1)
 			{
@@ -1604,6 +1908,56 @@ internal static class FlatRenderer
 			{
 				w.Line($"internal void RecordCall({method.LastCallType} args) {{ _callCount++; _lastArgs = args; }}");
 			}
+			w.Line();
+
+			// OnCall method - supersedes user method when configured
+			w.Line($"/// <summary>Configures callback that supersedes the user method. Returns tracking interface.</summary>");
+			w.Line($"public {trackingInterface} OnCall({delegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line("_onCall = callback;");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// Returns method (non-void methods only)
+			if (!isVoidLike)
+			{
+				// Build lambda with correct number of discards based on parameter count
+				var discardLambda = method.Parameters.Count switch
+				{
+					0 => "()",
+					1 => "_",
+					_ => "(" + string.Join(", ", Enumerable.Repeat("_", method.Parameters.Count)) + ")"
+				};
+
+				// For async methods, wrap value in Task.FromResult or ValueTask
+				string valueExpression;
+				string parameterType;
+				if (isTaskT)
+				{
+					valueExpression = $"global::System.Threading.Tasks.Task.FromResult(value)";
+					parameterType = innerType;
+				}
+				else if (isValueTaskT)
+				{
+					valueExpression = $"new global::System.Threading.Tasks.ValueTask<{innerType}>(value)";
+					parameterType = innerType;
+				}
+				else
+				{
+					valueExpression = "value";
+					parameterType = method.ReturnType;
+				}
+
+				w.Line($"/// <summary>Configures constant return value that supersedes the user method.</summary>");
+				w.Line($"public {trackingInterface} Returns({parameterType} value) => OnCall({discardLambda} => {valueExpression});");
+				w.Line();
+			}
+
+			// Callback property (internal) - for interface implementation to check
+			w.Line($"/// <summary>Gets the configured callback (internal use).</summary>");
+			w.Line($"internal {delegateType}? Callback => _onCall;");
 			w.Line();
 
 			// Reset method
@@ -1873,6 +2227,225 @@ internal static class FlatRenderer
 
 	#endregion
 
+	#region Generic User Method Handler Group
+
+	private static void RenderGenericUserMethodHandlerGroup(CodeWriter w, FlatGenericMethodHandlerGroup group, string className)
+	{
+		w.Line($"/// <summary>Interceptor for {group.MethodName} (generic user method with Of&lt;T&gt;() access).</summary>");
+		using (w.Block($"public sealed class {group.InterceptorClassName}"))
+		{
+			// Each type arity gets its own dictionary
+			foreach (var arity in group.TypeArityGroups)
+			{
+				var dictSuffix = arity.TypeParameterCount > 1 ? $"_{arity.TypeParameterCount}" : "";
+				w.Line($"private readonly global::System.Collections.Generic.Dictionary<{arity.KeyType}, object> _typedHandlers{dictSuffix} = new();");
+			}
+			w.Line();
+
+			// Of<T>() method for each type arity
+			foreach (var arity in group.TypeArityGroups)
+			{
+				var dictSuffix = arity.TypeParameterCount > 1 ? $"_{arity.TypeParameterCount}" : "";
+				w.Line($"/// <summary>Gets the typed handler for the specified type argument(s).</summary>");
+				w.Line($"public {arity.TypedHandlerClassName}<{arity.TypeParameterNames}> Of<{arity.TypeParameterNames}>(){arity.ConstraintClauses}");
+				using (w.Braces())
+				{
+					w.Line($"var key = {arity.KeyConstruction};");
+					w.Line($"if (!_typedHandlers{dictSuffix}.TryGetValue(key, out var handler))");
+					using (w.Braces())
+					{
+						w.Line($"handler = new {arity.TypedHandlerClassName}<{arity.TypeParameterNames}>();");
+						w.Line($"_typedHandlers{dictSuffix}[key] = handler;");
+					}
+					w.Line($"return ({arity.TypedHandlerClassName}<{arity.TypeParameterNames}>)handler;");
+				}
+				w.Line();
+			}
+
+			// Aggregate tracking
+			if (group.TypeArityGroups.Count == 1)
+			{
+				w.Line("private int TotalCallCount => _typedHandlers.Values.Sum(h => ((IGenericMethodCallTracker)h).CallCount);");
+			}
+			else
+			{
+				var dictNames = string.Join(".Concat(", group.TypeArityGroups.Select((a, i) =>
+					$"_typedHandlers{(a.TypeParameterCount > 1 ? $"_{a.TypeParameterCount}" : "")}.Values"));
+				dictNames += string.Join("", Enumerable.Range(0, group.TypeArityGroups.Count - 1).Select(_ => ")"));
+				w.Line($"private int TotalCallCount => {dictNames}.Sum(h => ((IGenericMethodCallTracker)h).CallCount);");
+			}
+			w.Line();
+
+			// CalledTypeArguments - only for single-arity, too complex for mixed
+			if (group.TypeArityGroups.Count == 1)
+			{
+				var arity = group.TypeArityGroups.First();
+				w.Line($"/// <summary>All type argument(s) that were used in calls.</summary>");
+				w.Line($"public global::System.Collections.Generic.IReadOnlyList<{arity.KeyType}> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();");
+				w.Line();
+			}
+
+			// Reset method
+			w.Line("/// <summary>Resets all typed handlers.</summary>");
+			using (w.Block("public void Reset()"))
+			{
+				foreach (var arity in group.TypeArityGroups)
+				{
+					var dictSuffix = arity.TypeParameterCount > 1 ? $"_{arity.TypeParameterCount}" : "";
+					w.Line($"foreach (var handler in _typedHandlers{dictSuffix}.Values)");
+					w.Line($"\t((IResettable)handler).Reset();");
+					w.Line($"_typedHandlers{dictSuffix}.Clear();");
+				}
+			}
+			w.Line();
+
+			// Verify methods
+			w.Line("/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+			w.Line();
+
+			w.Line("/// <summary>Verifies total call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify(global::KnockOff.Times times)");
+			using (w.Braces())
+			{
+				w.Line("if (!times.Validate(TotalCallCount))");
+				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{group.MethodName}\", times, TotalCallCount));");
+			}
+			w.Line();
+
+			// Nested Typed Handler Classes (one per type arity)
+			foreach (var arity in group.TypeArityGroups)
+			{
+				RenderGenericUserMethodTypedHandlerClass(w, group.MethodName, arity);
+			}
+		}
+		w.Line();
+	}
+
+	private static void RenderGenericUserMethodTypedHandlerClass(CodeWriter w, string methodName, FlatGenericTypeArityGroup arity)
+	{
+		w.Line($"/// <summary>Typed handler for {methodName} with specific type arguments.</summary>");
+		w.Line($"public sealed class {arity.TypedHandlerClassName}<{arity.TypeParameterNames}> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking{arity.ConstraintClauses}");
+		using (w.Braces())
+		{
+			// Delegates (one per signature)
+			foreach (var sig in arity.SignatureGroups)
+			{
+				w.Line($"/// <summary>Delegate for {methodName}{sig.SignatureSuffix}.</summary>");
+				w.Line(sig.DelegateSignature);
+			}
+			w.Line();
+
+			// Private callback fields (one per signature)
+			foreach (var sig in arity.SignatureGroups)
+			{
+				w.Line($"private {sig.DelegateName}? _onCall{sig.SignatureSuffix};");
+			}
+			w.Line();
+
+			// CallCount
+			w.Line("internal int _callCount;");
+			w.Line("int IGenericMethodCallTracker.CallCount => _callCount;");
+			w.Line();
+
+			// Per-signature LastCallArg/LastCallArgs storage
+			foreach (var sig in arity.SignatureGroups)
+			{
+				var paramArray = sig.AllParameters.GetArray() ?? Array.Empty<ParameterModel>();
+				if (paramArray.Length == 1)
+				{
+					w.Line($"/// <summary>The argument from the most recent call to {methodName}{sig.SignatureSuffix}.</summary>");
+					w.Line($"public {sig.LastCallType} LastCallArg{sig.SignatureSuffix} {{ get; private set; }}");
+				}
+				else if (paramArray.Length > 1)
+				{
+					w.Line($"/// <summary>The arguments from the most recent call to {methodName}{sig.SignatureSuffix}.</summary>");
+					w.Line($"public {sig.LastCallType}? LastCallArgs{sig.SignatureSuffix} {{ get; private set; }}");
+				}
+			}
+			if (arity.SignatureGroups.Count > 0)
+				w.Line();
+
+			// OnCall methods (one per signature)
+			foreach (var sig in arity.SignatureGroups)
+			{
+				w.Line($"/// <summary>Sets the callback invoked when this signature is called. Returns this handler for tracking.</summary>");
+				w.Line($"public global::KnockOff.IMethodTracking OnCall{sig.SignatureSuffix}({sig.DelegateName} callback) {{ _onCall{sig.SignatureSuffix} = callback; return this; }}");
+			}
+			w.Line();
+
+			// Callback properties (one per signature)
+			foreach (var sig in arity.SignatureGroups)
+			{
+				w.Line($"/// <summary>Gets the configured callback for {methodName}{sig.SignatureSuffix} (internal use).</summary>");
+				w.Line($"internal {sig.DelegateName}? Callback{sig.SignatureSuffix} => _onCall{sig.SignatureSuffix};");
+			}
+			w.Line();
+
+			// RecordCall methods (one per signature)
+			foreach (var sig in arity.SignatureGroups)
+			{
+				var paramArray = sig.AllParameters.GetArray() ?? Array.Empty<ParameterModel>();
+				w.Line($"/// <summary>Records a method call for {methodName}{sig.SignatureSuffix}.</summary>");
+				if (paramArray.Length == 0)
+				{
+					w.Line($"internal void RecordCall{sig.SignatureSuffix}() => _callCount++;");
+				}
+				else if (paramArray.Length == 1)
+				{
+					var param = paramArray[0];
+					w.Line($"internal void RecordCall{sig.SignatureSuffix}({param.NullableType} {param.EscapedName}) {{ _callCount++; LastCallArg{sig.SignatureSuffix} = {param.EscapedName}; }}");
+				}
+				else
+				{
+					var paramList = string.Join(", ", paramArray.Select(p => $"{p.NullableType} {p.EscapedName}"));
+					var tupleConstruction = string.Join(", ", paramArray.Select(p => p.EscapedName));
+					w.Line($"internal void RecordCall{sig.SignatureSuffix}({paramList}) {{ _callCount++; LastCallArgs{sig.SignatureSuffix} = ({tupleConstruction}); }}");
+				}
+			}
+			w.Line();
+
+			// Reset
+			w.Line("/// <summary>Resets all tracking state.</summary>");
+			var resetParts = new List<string> { "_callCount = 0" };
+			foreach (var sig in arity.SignatureGroups)
+			{
+				resetParts.Add($"_onCall{sig.SignatureSuffix} = null");
+				var paramArray = sig.AllParameters.GetArray() ?? Array.Empty<ParameterModel>();
+				if (paramArray.Length == 1)
+					resetParts.Add($"LastCallArg{sig.SignatureSuffix} = default");
+				else if (paramArray.Length > 1)
+					resetParts.Add($"LastCallArgs{sig.SignatureSuffix} = default");
+			}
+			w.Line($"public void Reset() {{ {string.Join("; ", resetParts)}; }}");
+			w.Line();
+
+			// Verify methods
+			w.Line("/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+			w.Line();
+
+			w.Line("/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify(global::KnockOff.Times times)");
+			using (w.Braces())
+			{
+				w.Line("if (!times.Validate(_callCount))");
+				w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{methodName}\", times, _callCount));");
+			}
+			w.Line();
+
+			// Verifiable methods
+			w.Line("/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+			w.Line("public global::KnockOff.IMethodTracking Verifiable() => this;");
+			w.Line();
+
+			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
+			w.Line("public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Times times) => this;");
+		}
+	}
+
+	#endregion
+
 	#region Event Interceptor Class
 
 	private static void RenderEventInterceptorClass(CodeWriter w, FlatEventModel evt)
@@ -2120,6 +2693,17 @@ internal static class FlatRenderer
 			w.Line();
 		}
 
+		// Generic user method handler groups (for overloaded generic user methods)
+		foreach (var handlerGroup in unit.GenericUserMethodHandlerGroups)
+		{
+			if (!renderedProperties.Add(handlerGroup.InterceptorName))
+				continue;
+			var newKeyword = handlerGroup.NeedsNewKeyword ? "new " : "";
+			w.Line($"/// <summary>Interceptor for {handlerGroup.MethodName} (generic user method with overloads).</summary>");
+			w.Line($"public {newKeyword}{handlerGroup.InterceptorClassName} {handlerGroup.InterceptorName} {{ get; }} = new();");
+			w.Line();
+		}
+
 		// Events
 		foreach (var evt in unit.Events)
 		{
@@ -2155,9 +2739,8 @@ internal static class FlatRenderer
 		// Must check all member types: methods, user methods, properties, events
 		// NOTE: Indexers excluded - there's a separate bug where indexer container accessor paths are wrong
 		// TODO: Fix indexer verification accessor paths (see IndexerGroups vs individual Indexers)
-		var hasUserMethods = unit.Methods.Any(m => !m.IsGenericMethod && m.UserMethodCall != null);
 		if (unit.MethodGroups.Count > 0
-			|| hasUserMethods
+			|| unit.UserMethodGroups.Count > 0
 			|| unit.Properties.Count > 0
 			|| unit.Events.Count > 0)
 		{
@@ -2180,9 +2763,8 @@ internal static class FlatRenderer
 			.ToList();
 
 		// Get unique user-defined method interceptor names (tracking-only, always configured)
-		var userMethodInterceptorNames = unit.Methods
-			.Where(m => !m.IsGenericMethod && m.UserMethodCall != null)
-			.Select(m => m.InterceptorName)
+		var userMethodInterceptorNames = unit.UserMethodGroups
+			.Select(g => g.InterceptorName)
 			.Distinct()
 			.ToList();
 
@@ -2449,7 +3031,13 @@ internal static class FlatRenderer
 
 	#region Method Implementation
 
-	private static void RenderMethodImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadInterceptors)
+	private static void RenderMethodImplementation(
+		CodeWriter w,
+		FlatMethodModel method,
+		HashSet<string> multiOverloadInterceptors,
+		HashSet<string> multiOverloadUserMethodInterceptors,
+		HashSet<string> multiOverloadGenericUserMethodInterceptors,
+		EquatableArray<FlatGenericMethodHandlerGroup> genericUserMethodHandlerGroups)
 	{
 		// Handle method delegation (e.g., IRule.RunRule(IValidateBase) delegates to IRule<T>.RunRule(T))
 		if (method.DelegationTarget != null && method.DelegationTargetInterface != null)
@@ -2461,14 +3049,14 @@ internal static class FlatRenderer
 		// Generic methods use method-based OnCall API via typed handlers
 		if (method.IsGenericMethod)
 		{
-			RenderGenericMethodImplementation(w, method);
+			RenderGenericMethodImplementation(w, method, multiOverloadGenericUserMethodInterceptors, genericUserMethodHandlerGroups);
 			return;
 		}
 
 		// User-defined methods: record call and delegate to user's implementation
 		if (method.UserMethodCall != null)
 		{
-			RenderUserMethodImplementation(w, method);
+			RenderUserMethodImplementation(w, method, multiOverloadUserMethodInterceptors);
 			return;
 		}
 
@@ -2493,27 +3081,47 @@ internal static class FlatRenderer
 		w.Line();
 	}
 
-	private static void RenderUserMethodImplementation(CodeWriter w, FlatMethodModel method)
+	private static void RenderUserMethodImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadUserMethodInterceptors)
 	{
+		// Determine if this user method is part of an overload group (needs suffixed RecordCall/Callback)
+		var isMultiOverload = multiOverloadUserMethodInterceptors.Contains(method.InterceptorName);
+		var suffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
+
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
 		using (w.Braces())
 		{
 			// Build record call args
 			var recordCallArgs = BuildTrackingArgs(method);
 
-			// Record the call
-			w.Line($"{method.InterceptorName}.RecordCall({recordCallArgs});");
+			// Record the call (with signature suffix for overloads)
+			w.Line($"{method.InterceptorName}.RecordCall{suffix}({recordCallArgs});");
 
-			// Call user's method
+			// Build callback args (all parameters)
+			var callbackArgs = method.Parameters.Count > 0
+				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+				: "";
+
+			// OnCall callback supersedes user method when configured (with signature suffix for overloads)
+			var callbackProperty = isMultiOverload ? $"Callback{suffix}" : "Callback";
 			if (method.IsVoid)
+			{
+				w.Line($"if ({method.InterceptorName}.{callbackProperty} is {{ }} callback) {{ callback({callbackArgs}); return; }}");
 				w.Line($"{method.UserMethodCall};");
+			}
 			else
+			{
+				w.Line($"if ({method.InterceptorName}.{callbackProperty} is {{ }} callback) return callback({callbackArgs});");
 				w.Line($"return {method.UserMethodCall};");
+			}
 		}
 		w.Line();
 	}
 
-	private static void RenderGenericMethodImplementation(CodeWriter w, FlatMethodModel method)
+	private static void RenderGenericMethodImplementation(
+		CodeWriter w,
+		FlatMethodModel method,
+		HashSet<string> multiOverloadGenericUserMethodInterceptors,
+		EquatableArray<FlatGenericMethodHandlerGroup> genericUserMethodHandlerGroups)
 	{
 		// Generic methods use the method-based OnCall API via typed handlers
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
@@ -2527,17 +3135,40 @@ internal static class FlatRenderer
 
 			var interceptorAccess = $"{method.InterceptorName}{method.OfTypeAccess}";
 
-			// Record the call
-			w.Line($"{interceptorAccess}.RecordCall({method.RecordCallArgs});");
+			// Check if this is a generic user method in an overload group
+			var isMultiOverloadGenericUserMethod = multiOverloadGenericUserMethodInterceptors.Contains(method.InterceptorName);
+			var suffix = "";
+			string recordCallArgs;
+			if (isMultiOverloadGenericUserMethod && method.UserMethodCall != null)
+			{
+				// Find the signature suffix from the handler group
+				suffix = GetGenericUserMethodSignatureSuffix(method, genericUserMethodHandlerGroups);
+				// For generic user method overloads, pass ALL parameters (including generic-typed ones)
+				// because the typed handler knows the concrete types
+				recordCallArgs = method.Parameters.Count > 0
+					? string.Join(", ", method.Parameters.Where(p => p.RefKind != Microsoft.CodeAnalysis.RefKind.Out).Select(p => p.EscapedName))
+					: "";
+			}
+			else
+			{
+				// Regular generic methods use RecordCallArgs (excludes generic-typed params)
+				recordCallArgs = method.RecordCallArgs;
+			}
+
+			// Record the call (with suffix for overloaded generic user methods)
+			w.Line($"{interceptorAccess}.RecordCall{suffix}({recordCallArgs});");
 
 			// Build onCall args (no stub parameter)
 			var onCallArgs = method.Parameters.Count > 0
 				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
 				: "";
 
+			// Callback property (with suffix for overloaded generic user methods)
+			var callbackProperty = string.IsNullOrEmpty(suffix) ? "Callback" : $"Callback{suffix}";
+
 			if (method.IsVoid)
 			{
-				w.Line($"if ({interceptorAccess}.Callback is {{ }} onCallCallback)");
+				w.Line($"if ({interceptorAccess}.{callbackProperty} is {{ }} onCallCallback)");
 				w.Line($"{{ onCallCallback({onCallArgs}); return; }}");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				// User-defined method takes priority over default
@@ -2548,7 +3179,7 @@ internal static class FlatRenderer
 			}
 			else if (method.ThrowsOnDefault)
 			{
-				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
+				w.Line($"if ({interceptorAccess}.{callbackProperty} is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				// User-defined method takes priority over throwing
@@ -2559,7 +3190,7 @@ internal static class FlatRenderer
 			}
 			else
 			{
-				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
+				w.Line($"if ({interceptorAccess}.{callbackProperty} is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				// User-defined method takes priority over default
@@ -2570,6 +3201,51 @@ internal static class FlatRenderer
 			}
 		}
 		w.Line();
+	}
+
+	/// <summary>
+	/// Gets the signature suffix for a generic user method from the handler groups.
+	/// </summary>
+	private static string GetGenericUserMethodSignatureSuffix(
+		FlatMethodModel method,
+		EquatableArray<FlatGenericMethodHandlerGroup> handlerGroups)
+	{
+		var group = handlerGroups.FirstOrDefault(g => g.InterceptorName == method.InterceptorName);
+		if (group == null)
+			return "";
+
+		// Strip angle brackets from method's type parameter list for comparison
+		// TypeParameterList has angle brackets (e.g., "<T>"), TypeParameterNames does not (e.g., "T")
+		var methodTypeParams = method.TypeParameterList.TrimStart('<').TrimEnd('>');
+
+		// Find the type arity group matching this method's type parameters
+		var arityGroup = group.TypeArityGroups.FirstOrDefault(a => a.TypeParameterNames == methodTypeParams);
+		if (arityGroup == null)
+			return "";
+
+		// Find the signature group matching this method
+		// We need to match by parameter types
+		var paramArray = method.Parameters.GetArray() ?? Array.Empty<ParameterModel>();
+		foreach (var sig in arityGroup.SignatureGroups)
+		{
+			var sigParams = sig.AllParameters.GetArray() ?? Array.Empty<ParameterModel>();
+			if (paramArray.Length == sigParams.Length)
+			{
+				var match = true;
+				for (int i = 0; i < paramArray.Length; i++)
+				{
+					if (paramArray[i].Type != sigParams[i].Type)
+					{
+						match = false;
+						break;
+					}
+				}
+				if (match)
+					return sig.SignatureSuffix;
+			}
+		}
+
+		return "";
 	}
 
 	private static void RenderMethodDelegation(CodeWriter w, FlatMethodModel method)
@@ -2620,6 +3296,34 @@ internal static class FlatRenderer
 			w.Line($"remove => {evt.InterceptorName}.RecordRemove(value);");
 		}
 		w.Line();
+	}
+
+	#endregion
+
+	#region Async Type Helpers
+
+	/// <summary>
+	/// Analyzes a return type for async patterns and extracts the inner type.
+	/// Used for Returns() auto-wrapping in user method interceptors.
+	/// </summary>
+	private static (string InnerType, bool IsTaskT, bool IsValueTaskT) GetAsyncTypeInfo(string returnType)
+	{
+		const string TaskPrefix = "global::System.Threading.Tasks.Task<";
+		const string ValueTaskPrefix = "global::System.Threading.Tasks.ValueTask<";
+
+		if (returnType.StartsWith(TaskPrefix) && returnType.EndsWith(">"))
+		{
+			var innerType = returnType.Substring(TaskPrefix.Length, returnType.Length - TaskPrefix.Length - 1);
+			return (innerType, true, false);
+		}
+
+		if (returnType.StartsWith(ValueTaskPrefix) && returnType.EndsWith(">"))
+		{
+			var innerType = returnType.Substring(ValueTaskPrefix.Length, returnType.Length - ValueTaskPrefix.Length - 1);
+			return (innerType, false, true);
+		}
+
+		return (returnType, false, false);
 	}
 
 	#endregion

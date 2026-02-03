@@ -2,11 +2,9 @@
 
 # User Methods
 
-User methods let you define default stub behavior at compile time by writing protected methods in your stub class. They provide reusable defaults across tests while remaining testable through tracking interceptors.
+User methods let you define default stub behavior at compile time by writing protected methods in your stub class. Tests can override these defaults using `OnCall()` when needed.
 
 **Availability**: User methods work only with the **Stand-Alone pattern** (`[KnockOff]` on a class implementing an interface). They are not available in Inline Interface or Inline Class patterns.
-
-**Important**: User method interceptors are tracking-only. They do not have `OnCall` for configuring behavior. The protected method implementation is the behavior.
 
 ---
 
@@ -22,8 +20,8 @@ public partial class UserMethodsRepoStub : IUserMethodsRepo { }
 // User methods provide default behavior
 public partial class UserMethodsRepoStub
 {
-    // Protected method matches interface method signature
-    // This becomes the behavior (user method interceptors have no OnCall)
+    // Protected method matches interface member signature
+    // This is the fallback when no OnCall is configured
     protected User? GetUserById(int id)
     {
         return new User { Id = id, Name = "Default User" };
@@ -54,20 +52,60 @@ public partial class UserMethodsRepoStub
 
 When you define a protected method matching an interface member signature:
 
-1. KnockOff generates an explicit interface implementation that calls your protected method
-2. The interceptor tracks calls but does not provide `OnCall` configuration
-3. Your protected method implementation provides the behavior
-4. Tests verify calls through the interceptor using `Verify()` and `LastArg`
+1. KnockOff generates an explicit interface implementation
+2. When called, the interceptor checks for `OnCall` configuration first
+3. If `OnCall` is configured, it supersedes the user method
+4. If no `OnCall` is configured, the user method is called as the fallback
 
-User methods provide permanent compile-time behavior. If you need runtime-configurable behavior, use a regular stub without user methods (see [When You Need Runtime-Configurable Behavior](#when-you-need-runtime-configurable-behavior) below).
+This allows you to define sensible defaults while still being able to override them in specific tests.
 
-<!-- snippet: user-methods-priority -->
+<!-- snippet: user-methods-fallback -->
 ```cs
-// User method provides default behavior automatically
+// No OnCall configured - user method provides behavior
 var user = repository.GetUserById(1);
 
-// Verify the call was tracked (user method interceptors end with "2")
+// Verify the call was tracked
 stub.GetUserById2.Verify(Times.Once);
+```
+<!-- endSnippet -->
+
+---
+
+## Overriding with OnCall
+
+Use `OnCall()` to override the user method for specific tests. The callback supersedes the user method.
+
+<!-- snippet: user-methods-oncall -->
+```cs
+// OnCall supersedes the user method
+stub.GetUserById2.OnCall(id => new User { Id = id, Name = "Overridden" });
+
+var user = repository.GetUserById(42);
+Assert.Equal("Overridden", user!.Name);
+```
+<!-- endSnippet -->
+
+For constant return values, use `Returns()`:
+
+<!-- snippet: user-methods-returns -->
+```cs
+// Returns() for constant values
+stub.GetBalance2.Returns(500.00m);
+
+var balance = repository.GetBalance(1);
+Assert.Equal(500.00m, balance);
+```
+<!-- endSnippet -->
+
+For async methods, `Returns()` auto-wraps the value in `Task.FromResult`:
+
+<!-- snippet: user-methods-async-returns -->
+```cs
+// Returns auto-wraps value in Task.FromResult for async methods
+stub.GetUserByIdAsync2.Returns(new User { Id = 99, Name = "Test User" });
+
+var user = await repository.GetUserByIdAsync(99);
+Assert.Equal("Test User", user!.Name);
 ```
 <!-- endSnippet -->
 
@@ -75,27 +113,30 @@ stub.GetUserById2.Verify(Times.Once);
 
 ## Tracking and Verification
 
-User method interceptors provide call tracking without behavior configuration. Use them to verify the user method was called with expected arguments.
+User method interceptors provide full tracking capabilities. Tracking works the same whether using the user method or an `OnCall` override.
 
-<!-- snippet: user-methods-override -->
+<!-- snippet: user-methods-tracking -->
 ```cs
-// User method interceptors are tracking-only (no OnCall available)
+stub.IsActive2.Returns(false);
+repository.IsActive(42);
+
+// Tracking works whether using OnCall or user method
 stub.IsActive2.Verify(Times.Once);
 Assert.Equal(42, stub.IsActive2.LastArg);
 ```
 <!-- endSnippet -->
 
-User method interceptors have the same verification API as regular interceptors: `Verify()`, `LastArg`, and `Reset()`. They omit `OnCall` because the protected method defines the behavior.
+User method interceptors have the same tracking API as regular interceptors: `Verify()`, `LastArg`, and `Reset()`.
 
 ---
 
 ## Resetting Call Tracking
 
-Call `Reset()` on the interceptor to clear call count and argument tracking. The user method behavior remains unchanged since it's defined in your protected method.
+Call `Reset()` to clear call count and argument tracking. The `OnCall` configuration is preserved.
 
 <!-- snippet: user-methods-reset -->
 ```cs
-// Reset clears call count and argument tracking
+// Reset clears tracking state but preserves OnCall configuration
 stub.GetBalance2.Reset();
 stub.GetBalance2.Verify(Times.Never);
 ```
@@ -105,36 +146,49 @@ This is useful when reusing a stub instance across multiple test phases or when 
 
 ---
 
-## When You Need Runtime-Configurable Behavior
+## Shareable Stub Pattern
 
-User method interceptors do not have `OnCall` because the protected method defines the behavior at compile time. If you need runtime-configurable behavior for specific tests, use a regular stub without user methods:
+User methods enable a powerful pattern: define sensible defaults in a base stub class, then override specific methods in tests that need different behavior.
 
-<!-- snippet: user-methods-source-override -->
+<!-- snippet: user-methods-shareable-base -->
 ```cs
-// For runtime-configurable behavior, use a regular stub with OnCall
-stub.GetUserById.OnCall((id) => new User { Id = id, Name = "Overridden" });
-stub.IsActive.Returns(true);
-stub.GetBalance.Returns(999.99m);
+[KnockOff]
+public partial class NotificationServiceStub : INotificationService { }
+
+public partial class NotificationServiceStub
+{
+    // Default: emails succeed
+    protected bool SendEmail(string to, string subject) => true;
+
+    // Default: no pending notifications
+    protected int GetPendingCount() => 0;
+}
 ```
 <!-- endSnippet -->
 
-User methods provide permanent compile-time behavior. If a test requires different behavior, create a separate stub class without user methods and use `OnCall` to configure it. See the [Methods guide](methods.md) for `OnCall` patterns.
+Most tests use the defaults:
 
----
+<!-- snippet: user-methods-shareable-default -->
+```cs
+// Most tests use the defaults
+var sent = service.SendEmail("user@test.com", "Welcome");
+Assert.True(sent); // Default behavior: success
+```
+<!-- endSnippet -->
 
-## Common Patterns
+Specific tests override when needed:
 
-### Shared Test Data Setup
+<!-- snippet: user-methods-shareable-override -->
+```cs
+// Specific test overrides to simulate failure
+stub.SendEmail2.Returns(false);
 
-Define user methods that return consistent test data across all tests. Tests verify behavior using the tracking interceptors.
+var sent = service.SendEmail("user@test.com", "Welcome");
+Assert.False(sent); // OnCall supersedes user method
+```
+<!-- endSnippet -->
 
-**Use case**: Repository stubs that return standard test entities by default. Tests verify the stub was called correctly and check the returned data.
-
-### Default "Happy Path" Implementations
-
-Implement the most common success scenario in user methods. Tests verify the happy path executes correctly.
-
-**Use case**: Service stubs where most tests assume operations succeed. Tests can verify success paths without configuring callbacks for every method.
+This pattern keeps test code DRY while maintaining flexibility for edge cases.
 
 ---
 
@@ -142,13 +196,14 @@ Implement the most common success scenario in user methods. Tests verify the hap
 
 <!-- snippet: user-methods-complete-example -->
 ```cs
-// User methods provide defaults; interceptors track calls
+// User method provides default; OnCall can override
 var user = repository.GetUserById(42);
-var isActive = repository.IsActive(42);
-
-// Verify with *2 interceptors (user method tracking)
 stub.GetUserById2.Verify(Times.Once);
-stub.IsActive2.Verify(Times.Once);
+
+// Override for next call
+stub.GetUserById2.OnCall(id => new User { Id = id, Name = "Custom" });
+var customUser = repository.GetUserById(99);
+Assert.Equal("Custom", customUser!.Name);
 ```
 <!-- endSnippet -->
 
@@ -158,14 +213,14 @@ stub.IsActive2.Verify(Times.Once);
 
 - User methods only work with the Stand-Alone pattern (`[KnockOff]` on class)
 - Define protected methods matching interface member signatures
-- They provide compile-time behavior that cannot be changed with `OnCall`
-- Interceptors provide tracking only: `Verify()`, `LastArg`, `Reset()`
-- No `OnCall` available on user method interceptors
-- If you need runtime-configurable behavior, use a regular stub without user methods
-- Ideal for shared test data and common "happy path" scenarios where behavior is constant
+- User methods are the fallback when no `OnCall` is configured
+- `OnCall()` supersedes the user method when configured
+- `Returns()` provides constant values (auto-wraps for async methods)
+- `Reset()` clears tracking but preserves `OnCall` configuration
+- Ideal for the shareable stub pattern: defaults in base class, overrides in tests
 
 Next: [Source Delegation](source-delegation.md) for partial stubbing patterns where you want to delegate to a real implementation.
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-02

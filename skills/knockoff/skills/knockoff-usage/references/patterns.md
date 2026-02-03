@@ -68,7 +68,9 @@ stub.Save.OnCall((user) => { }).Verifiable();
 - **Interface access**: Cast to interface type or assign to interface variable
 - **Verification**: Call `stub.Verify()` or individual interceptor `.Verify()`
 - **User methods**: Define protected methods matching interface signatures to provide default behavior
-- **Numbered interceptors**: When you define a user method, the generator creates a numbered interceptor (e.g., `GetById2`) to track calls without interfering with your implementation
+- **Numbered interceptors**: When you define a user method, the generator creates a numbered interceptor (e.g., `GetById2`) for tracking and override capability
+- **OnCall supersedes user method**: Use `stub.GetById2.OnCall(...)` to override the user method for specific tests
+- **User method as fallback**: When no `OnCall` is configured, the user method is called
 
 ### Benefits
 
