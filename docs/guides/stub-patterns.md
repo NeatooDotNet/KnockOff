@@ -68,6 +68,10 @@ stub.Save.OnCall((user) => { }).Verifiable();
 - **Partial class**: Must remember to mark the class as `partial`
 - **Manual interface**: Must manually implement the interface signature
 
+### Base Class and User Methods
+
+KnockOff generates a base class (e.g., `UserRepoStandaloneStubBase`) with virtual methods for each interface member. You can override these methods using the `_` suffix to provide custom implementations while keeping interceptor names clean. See [User Methods](user-methods.md) for details.
+
 ---
 
 ## Inline Interface Pattern

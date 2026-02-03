@@ -186,8 +186,34 @@ Common diagnostics:
 - **KO001:** Class must be partial
 - **KO002:** Unsupported member type
 - **KO003:** Interface not found
+- **KO0200:** Standalone stub cannot have base class (see section below)
 
 Review the build output messages for specific guidance on resolving each diagnostic.
+
+---
+
+### KO0200: Standalone stub cannot have base class
+
+**Error message:** `Standalone stub 'YourStubClass' cannot have base class 'YourBaseClass'. KnockOff generates a base class for user method support. Remove the base class or use inline stub pattern instead.`
+
+**Cause:** KnockOff generates a base class (`YourStubBase`) containing virtual methods for user method support. C# does not allow multiple inheritance, so user-defined base classes conflict with KnockOff's generated base class.
+
+```csharp
+public class MyBaseClass { }
+
+[KnockOff]
+public partial class MyStub : MyBaseClass, IMyService { }  // ERROR: KO0200
+```
+
+**Solutions:**
+
+1. **Remove the base class** from the standalone stub if the base class behavior is not essential
+2. **Use inline stub pattern** if you need the stub inside a class that has a base class:
+   ```csharp
+   [KnockOff<IMyService>]
+   public partial class MyTestContainer { }
+   ```
+3. **Use composition instead of inheritance** if you need shared behavior across stubs—inject or delegate to the shared logic rather than inheriting from a base class
 
 ---
 

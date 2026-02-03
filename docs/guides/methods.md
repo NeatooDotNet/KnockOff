@@ -144,6 +144,8 @@ stub.Find.OnCall((string name) => new User { Id = 1, Name = name });
 
 Overloads are numbered in the order they appear in the interface definition.
 
+**Stand-Alone pattern with user methods:** Each overload gets its own virtual method in the generated base class. You can selectively override specific overloads without affecting others. See the [User Methods: Overloads](user-methods.md#overloads) section for details.
+
 ---
 
 ## Resetting Interceptors
@@ -360,4 +362,4 @@ Next: [Property Interceptors](properties.md) for get/set tracking and configurat
 
 ---
 
-**UPDATED:** 2026-02-02
+**UPDATED:** 2026-02-03
