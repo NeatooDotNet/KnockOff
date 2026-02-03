@@ -113,6 +113,21 @@ public interface IGenericUserMethodService
 }
 
 /// <summary>
+/// Interface with overloaded generic methods for testing generic user method overloads.
+/// </summary>
+public interface IOverloadedGenericUserMethodService
+{
+    /// <summary>Single-parameter generic overload.</summary>
+    T Process<T>(T input);
+
+    /// <summary>Two-parameter generic overload.</summary>
+    T Process<T>(T input, string options);
+
+    /// <summary>Multi-type-parameter version.</summary>
+    TOut Process<TIn, TOut>(TIn input) where TOut : new();
+}
+
+/// <summary>
 /// Interface with properties and methods for testing coexistence.
 /// </summary>
 public interface IUserMethodWithPropertiesService

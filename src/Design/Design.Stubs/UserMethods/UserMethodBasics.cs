@@ -288,11 +288,11 @@ public partial class UserMethodBasicsDemo
 // TODO: Fix generator, then enable tests below.
 // =============================================================================
 
-// DISABLED - Generator bugs prevent compilation
-#if ENABLE_USER_METHOD_OVERLOAD_TESTS
+// Generator fix: Per-signature RecordCall methods now generated for user method overloads
 [KnockOff]
 public partial class OverloadedUserMethodStub : IOverloadedUserMethodService { }
 
+#pragma warning disable CA1062 // Validate arguments of public methods
 public partial class OverloadedUserMethodStub
 {
     protected string Format(string input) => input.ToUpperInvariant();
@@ -301,7 +301,7 @@ public partial class OverloadedUserMethodStub
     protected void Log(string message) { }
     protected void Log(string message, int level) { }
 }
-#endif
+#pragma warning restore CA1062
 
 // =============================================================================
 // MIXED SCENARIOS - Some Methods with User Impl, Some Without
@@ -368,25 +368,31 @@ public partial class MixedUserMethodDemo
 }
 
 // =============================================================================
-// PARTIAL USER METHOD COVERAGE FOR OVERLOADS - GENERATOR BUG
+// PARTIAL USER METHOD COVERAGE FOR OVERLOADS
 // =============================================================================
-// COMMENTED OUT - Same generator bugs as above apply here.
-// When only SOME overloads have user methods, the generator produces
-// invalid code with duplicate variables and missing RecordCall methods.
+// When only SOME overloads have user methods:
+// - User-method overloads use the *2 interceptor with tracking-only behavior
+// - Non-user-method overloads use the regular interceptor with OnCall API
+//
+// Example: Format has 3 overloads, but only Format(string) has a user method.
+// - stub.Format2 tracks calls to Format(string) via user method
+// - stub.Format tracks calls to Format(string,bool) and Format(string,bool,int) via OnCall
 // =============================================================================
 
-// TODO: Enable when generator is fixed
-/*
 [KnockOff]
 public partial class PartialOverloadUserMethodStub : IOverloadedUserMethodService { }
 
+#pragma warning disable CA1062 // Validate arguments of public methods
 public partial class PartialOverloadUserMethodStub
 {
+    // Only Format(string) has a user method - the other two Format overloads do NOT
     protected string Format(string input) => $"[User1: {input}]";
+
+    // All Log overloads have user methods
     protected void Log(string message) { }
     protected void Log(string message, int level) { }
 }
-*/
+#pragma warning restore CA1062
 
 // =============================================================================
 // STRICT MODE AND USER METHODS
@@ -565,6 +571,57 @@ public partial class GenericUserMethodDemo
         var result = service.Transform<string, StringBuilder>("hello");
 
         // Multi-type-parameter tracking?
+    }
+}
+
+// =============================================================================
+// OVERLOADED GENERIC USER METHODS
+// =============================================================================
+// This tests the case where an interface has overloaded generic methods and
+// the user provides user methods for all overloads. The generator must produce
+// per-signature RecordCall methods within the typed handler.
+// =============================================================================
+
+// Generator fix: Per-signature RecordCall methods now generated for overloaded generic user methods
+[KnockOff]
+public partial class OverloadedGenericUserMethodStub : IOverloadedGenericUserMethodService { }
+
+public partial class OverloadedGenericUserMethodStub
+{
+    // Single-parameter generic overload
+    protected T Process<T>(T input) => input;
+
+    // Two-parameter generic overload
+    protected T Process<T>(T input, string options) => input;
+
+    // Multi-type-parameter overload
+    protected TOut Process<TIn, TOut>(TIn input) where TOut : new() => new TOut();
+}
+
+[KnockOff<IOverloadedGenericUserMethodService>]
+public partial class OverloadedGenericUserMethodDemo
+{
+    public void OverloadedGenericUserMethod_Usage()
+    {
+        var stub = new OverloadedGenericUserMethodStub();
+        IOverloadedGenericUserMethodService service = stub;
+
+        // Call single-parameter overload
+        var r1 = service.Process("hello");
+
+        // Call two-parameter overload
+        var r2 = service.Process("hello", "uppercase");
+
+        // Call multi-type-parameter overload
+        var r3 = service.Process<string, StringBuilder>("hello");
+
+        // All calls should be tracked via Process2.Of<T>()
+        // stub.Process2.Of<string>().Verify(Times.Exactly(2));  // r1 and r2
+        // stub.Process2.Of<string, StringBuilder>().Verify(Times.Once);  // r3
+
+        // Per-signature tracking within Of<T>():
+        // stub.Process2.Of<string>().LastArg_T == "hello" (from r1)
+        // stub.Process2.Of<string>().LastArgs_T_String == ("hello", "uppercase") (from r2)
     }
 }
 

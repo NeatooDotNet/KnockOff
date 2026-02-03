@@ -49,6 +49,18 @@ internal static class FlatModelBuilder
 				Methods: new EquatableArray<FlatMethodModel>(g.ToArray())))
 			.ToList();
 
+		// Group user methods by interceptor name for per-signature RecordCall support
+		// This groups methods where UserMethodCall != null (i.e., methods with user implementations)
+		var flatUserMethodGroups = methods
+			.Where(m => !m.IsGenericMethod && m.UserMethodCall != null)
+			.GroupBy(m => m.InterceptorName)
+			.Select(g => new FlatMethodGroup(
+				InterceptorName: g.Key,
+				InterceptorClassName: g.First().InterceptorClassName,
+				NeedsNewKeyword: g.Any(m => m.NeedsNewKeyword),
+				Methods: new EquatableArray<FlatMethodModel>(g.ToArray())))
+			.ToList();
+
 		// Group indexers by BaseName for OfXxx pattern
 		var flatIndexerGroups = indexers
 			.GroupBy(i => i.BaseName)
@@ -68,6 +80,9 @@ internal static class FlatModelBuilder
 		// Build source providers for Source(T) methods
 		var sourceProviders = BuildSourceProviders(typeInfo.Interfaces, properties, indexers, flatIndexerGroups, methods, genericHandlers, nameMap);
 
+		// Build generic user method handler groups (for overloaded generic user methods)
+		var genericUserMethodHandlerGroups = BuildGenericUserMethodHandlerGroups(methods, nameMap);
+
 		return new FlatGenerationUnit(
 			ClassName: typeInfo.ClassName,
 			Namespace: typeInfo.Namespace,
@@ -79,7 +94,9 @@ internal static class FlatModelBuilder
 			IndexerGroups: new EquatableArray<FlatIndexerGroup>(flatIndexerGroups.ToArray()),
 			Methods: methods,
 			MethodGroups: new EquatableArray<FlatMethodGroup>(flatMethodGroups.ToArray()),
+			UserMethodGroups: new EquatableArray<FlatMethodGroup>(flatUserMethodGroups.ToArray()),
 			GenericMethodHandlers: genericHandlers,
+			GenericUserMethodHandlerGroups: genericUserMethodHandlerGroups,
 			Events: events,
 			SourceProviders: sourceProviders,
 			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),
@@ -102,11 +119,16 @@ internal static class FlatModelBuilder
 		var nameMap = new Dictionary<string, string>();
 		var usedNames = new HashSet<string>();
 
-		// Reserve names used by user methods to avoid conflicts
+		// Reserve names used by user methods to avoid conflicts with interceptor property names.
+		// A user method named "Format" means we can't have an interceptor property named "Format"
+		// because that would create a name collision at the class level.
 		foreach (var userMethod in userMethods)
 		{
 			usedNames.Add(userMethod.Name);
 		}
+
+		// Build a quick lookup for user methods by (name, param count, param types)
+		var userMethodLookup = BuildUserMethodLookup(userMethods);
 
 		// Count indexers to determine naming strategy
 		var indexerCount = SymbolHelpers.CountIndexers(flatMembers);
@@ -146,14 +168,8 @@ internal static class FlatModelBuilder
 			if (isMixed)
 			{
 				// Mixed group: handle non-generic and generic overloads separately
-				// All non-generic overloads share one interceptor name
-				var finalName = GetUniqueInterceptorName(methodName, usedNames);
-				usedNames.Add(finalName);
-				foreach (var overload in nonGenericOverloads)
-				{
-					var key = GetMemberKey(overload);
-					nameMap[key] = finalName;
-				}
+				// For non-generic, split by user method presence
+				AssignNamesForOverloadGroup(methodName, nonGenericOverloads, userMethodLookup, nameMap, usedNames);
 
 				// Generic overloads use a handler with Generic suffix
 				var genericName = methodName + GenericSuffix;
@@ -184,25 +200,10 @@ internal static class FlatModelBuilder
 					nameMap[key] = finalName; // All overloads use same base interceptor name
 				}
 			}
-			else if (overloads.Count == 1)
-			{
-				// Single method - no overload suffix
-				var key = GetMemberKey(overloads[0]);
-				var finalName = GetUniqueInterceptorName(methodName, usedNames);
-				nameMap[key] = finalName;
-				usedNames.Add(finalName);
-			}
 			else
 			{
-				// Multiple overloads - all share the same interceptor name
-				// The interceptor class will have multiple OnCall overloads with suffixed delegates
-				var finalName = GetUniqueInterceptorName(methodName, usedNames);
-				usedNames.Add(finalName);
-				foreach (var overload in overloads)
-				{
-					var key = GetMemberKey(overload);
-					nameMap[key] = finalName;
-				}
+				// Non-generic overloads - split by user method presence
+				AssignNamesForOverloadGroup(methodName, overloads, userMethodLookup, nameMap, usedNames);
 			}
 		}
 
@@ -251,6 +252,57 @@ internal static class FlatModelBuilder
 			// For methods, key is name + parameter types
 			var paramTypes = string.Join(",", member.Parameters.Select(p => p.Type));
 			return $"method:{member.Name}({paramTypes})";
+		}
+	}
+
+	/// <summary>
+	/// Assigns interceptor names for a group of method overloads with the same name.
+	/// Handles partial user method coverage: overloads WITH user methods get one name,
+	/// overloads WITHOUT user methods get a different name.
+	/// </summary>
+	private static void AssignNamesForOverloadGroup(
+		string methodName,
+		List<InterfaceMemberInfo> overloads,
+		HashSet<string> userMethodLookup,
+		Dictionary<string, string> nameMap,
+		HashSet<string> usedNames)
+	{
+		// Split overloads by whether they have a matching user method
+		var withUserMethod = overloads.Where(o => HasMatchingUserMethod(o, userMethodLookup)).ToList();
+		var withoutUserMethod = overloads.Where(o => !HasMatchingUserMethod(o, userMethodLookup)).ToList();
+
+		if (withUserMethod.Count > 0 && withoutUserMethod.Count > 0)
+		{
+			// Partial coverage: overloads are split between user method and regular interceptors
+			// Overloads WITH user methods use one interceptor name (e.g., Format2)
+			var userMethodName = GetUniqueInterceptorName(methodName, usedNames);
+			usedNames.Add(userMethodName);
+			foreach (var overload in withUserMethod)
+			{
+				var key = GetMemberKey(overload);
+				nameMap[key] = userMethodName;
+			}
+
+			// Overloads WITHOUT user methods use a different interceptor name (e.g., Format3)
+			var regularName = GetUniqueInterceptorName(methodName, usedNames);
+			usedNames.Add(regularName);
+			foreach (var overload in withoutUserMethod)
+			{
+				var key = GetMemberKey(overload);
+				nameMap[key] = regularName;
+			}
+		}
+		else
+		{
+			// All overloads are the same (all with user methods or all without)
+			// They share a single interceptor name
+			var finalName = GetUniqueInterceptorName(methodName, usedNames);
+			usedNames.Add(finalName);
+			foreach (var overload in overloads)
+			{
+				var key = GetMemberKey(overload);
+				nameMap[key] = finalName;
+			}
 		}
 	}
 
@@ -597,7 +649,11 @@ internal static class FlatModelBuilder
 		var processedGenericGroups = new HashSet<string>();
 		var generatedImplementations = new HashSet<string>();
 
+		// Build user method lookup for checking
+		var userMethodLookup = BuildUserMethodLookup(typeInfo.UserMethods);
+
 		// First pass: Build generic method handlers from FlatMembers (deduplicated)
+		// Skip groups where ANY overload has a user method (those use GenericUserMethodHandlerGroups)
 		foreach (var member in typeInfo.FlatMembers)
 		{
 			if (member.IsProperty || member.IsIndexer)
@@ -612,6 +668,28 @@ internal static class FlatModelBuilder
 
 					if (methodGroups.TryGetValue(groupName, out var group))
 					{
+						// Check if ANY generic overload in this group has a user method
+						var genericOverloadsWithUserMethod = group.Overloads
+							.Where(o => o.IsGenericMethod)
+							.Where(o => HasMatchingUserMethodForOverload(group.Name, group.ReturnType, o, userMethodLookup))
+							.ToList();
+
+						if (genericOverloadsWithUserMethod.Count > 0)
+						{
+							// Only skip if there are MULTIPLE overloads (either multiple type arities or multiple signatures)
+							// Single-signature generic user methods use the regular GenericMethodHandlers pattern
+							var genericOverloads = group.Overloads.Where(o => o.IsGenericMethod).ToList();
+							var typeArityCount = genericOverloads.Select(o => string.Join(",", o.TypeParameters.Select(tp => tp.Name))).Distinct().Count();
+							var hasOverloads = typeArityCount > 1 || genericOverloads.Count > 1;
+
+							if (hasOverloads)
+							{
+								// Skip - will be handled by GenericUserMethodHandlerGroups
+								continue;
+							}
+							// else: single-signature, use regular GenericMethodHandlers pattern
+						}
+
 						var isMixed = IsMixedMethodGroup(group);
 						if (isMixed)
 						{
@@ -1066,6 +1144,178 @@ internal static class FlatModelBuilder
 			IsVoid: isVoid,
 			ReturnType: group.ReturnType,
 			NeedsNewKeyword: NeedsNewKeyword(interceptorName));
+	}
+
+	/// <summary>
+	/// Builds generic user method handler groups.
+	/// Groups generic methods that have user methods by interceptor name, then by type parameter arity.
+	/// Only creates handler groups for methods that HAVE overloads (multiple type arities or multiple signatures).
+	/// Single-signature generic user methods use the regular GenericMethodHandlers pattern.
+	/// </summary>
+	private static EquatableArray<FlatGenericMethodHandlerGroup> BuildGenericUserMethodHandlerGroups(
+		EquatableArray<FlatMethodModel> methods,
+		Dictionary<string, string> nameMap)
+	{
+		// Filter to generic methods with user methods
+		var genericUserMethods = methods
+			.Where(m => m.IsGenericMethod && m.UserMethodCall != null)
+			.ToList();
+
+		if (genericUserMethods.Count == 0)
+			return new EquatableArray<FlatGenericMethodHandlerGroup>(Array.Empty<FlatGenericMethodHandlerGroup>());
+
+		// Group by interceptor name (e.g., "Process2")
+		// Only keep groups that have ACTUAL overloads (multiple type arities or multiple signatures within an arity)
+		var handlerGroups = genericUserMethods
+			.GroupBy(m => m.InterceptorName)
+			.Where(interceptorGroup =>
+			{
+				// Check if this group has overloads
+				var typeArityCount = interceptorGroup.Select(m => m.TypeParameterList).Distinct().Count();
+				if (typeArityCount > 1)
+					return true; // Multiple type arities = overloaded
+
+				// Check if any single type arity has multiple signatures
+				return interceptorGroup
+					.GroupBy(m => m.TypeParameterList)
+					.Any(arityGroup => arityGroup.Count() > 1);
+			})
+			.Select(interceptorGroup =>
+			{
+				var interceptorName = interceptorGroup.Key;
+				var interceptorClassName = $"{interceptorName}Interceptor";
+				var methodName = interceptorGroup.First().MethodName;
+
+				// Group by type parameter count to create different Of<>() methods
+				var typeArityGroups = interceptorGroup
+					.GroupBy(m => m.TypeParameterList) // Group by type param signature (e.g., "<T>" or "<TIn, TOut>")
+					.Select(arityGroup =>
+					{
+						var firstMethod = arityGroup.First();
+						var typeParams = firstMethod.TypeParameterDecl; // e.g., "<T>" or "<TIn, TOut>"
+						// TypeParameterList has angle brackets, strip them to get just the names
+						var typeParamListRaw = firstMethod.TypeParameterList; // e.g., "<T>" or "<TIn, TOut>"
+						var typeParamList = typeParamListRaw.TrimStart('<').TrimEnd('>'); // e.g., "T" or "TIn, TOut"
+						var constraints = firstMethod.ConstraintClauses;
+						var typeParamCount = typeParamList.Split(',').Length;
+
+						// Build key type and construction
+						var keyType = typeParamCount == 1
+							? "global::System.Type"
+							: $"({string.Join(", ", Enumerable.Range(0, typeParamCount).Select(_ => "global::System.Type"))})";
+						var keyConstruction = typeParamCount == 1
+							? $"typeof({typeParamList})"
+							: $"({string.Join(", ", typeParamList.Split(',').Select(tp => $"typeof({tp.Trim()})"))})";
+
+						// Make class name unique by including type parameter count for multi-arity groups
+						var typedHandlerClassName = typeParamCount == 1
+							? $"{methodName}TypedHandler"
+							: $"{methodName}TypedHandler{typeParamCount}";
+
+						// Build signature groups within this type arity
+						var signatureGroups = arityGroup
+							.Select(m =>
+							{
+								// Compute signature suffix based on parameters
+								var suffix = ComputeSignatureSuffixForGeneric(m.Parameters, typeParamList);
+
+								// Build delegate signature
+								var paramArray = m.Parameters.GetArray() ?? Array.Empty<ParameterModel>();
+								var delegateParams = string.Join(", ", paramArray.Select(p => $"{p.RefPrefix}{p.Type} {p.EscapedName}"));
+								var delegateName = $"{methodName}Delegate{suffix}";
+								var delegateSignature = m.IsVoid
+									? $"public delegate void {delegateName}({delegateParams});"
+									: $"public delegate {m.ReturnType} {delegateName}({delegateParams});";
+
+								// Non-generic params (for LastCallArg tracking)
+								var nonGenericParams = paramArray
+									.Where(p => !typeParamList.Split(',').Select(tp => tp.Trim()).Any(tp => p.Type.Contains(tp)))
+									.ToEquatableArray();
+
+								// LastCall type
+								string? lastCallType = null;
+								if (paramArray.Length == 1)
+								{
+									lastCallType = paramArray[0].NullableType;
+								}
+								else if (paramArray.Length > 1)
+								{
+									lastCallType = $"({string.Join(", ", paramArray.Select(p => $"{p.NullableType} {p.EscapedName}"))})";
+								}
+
+								return new FlatGenericSignatureGroup(
+									SignatureSuffix: suffix,
+									DelegateSignature: delegateSignature,
+									DelegateName: delegateName,
+									AllParameters: m.Parameters,
+									NonGenericParams: nonGenericParams,
+									LastCallType: lastCallType,
+									IsVoid: m.IsVoid,
+									ReturnType: m.ReturnType,
+									RecordCallArgs: m.RecordCallArgs);
+							})
+							.ToEquatableArray();
+
+						return new FlatGenericTypeArityGroup(
+							TypeParameterNames: typeParamList,
+							TypeParameterCount: typeParamCount,
+							KeyType: keyType,
+							KeyConstruction: keyConstruction,
+							ConstraintClauses: constraints,
+							TypedHandlerClassName: typedHandlerClassName,
+							SignatureGroups: signatureGroups,
+							IsVoid: arityGroup.Any(m => m.IsVoid),
+							ReturnType: firstMethod.ReturnType);
+					})
+					.ToEquatableArray();
+
+				return new FlatGenericMethodHandlerGroup(
+					InterceptorName: interceptorName,
+					InterceptorClassName: interceptorClassName,
+					MethodName: methodName,
+					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
+					TypeArityGroups: typeArityGroups);
+			})
+			.ToArray();
+
+		return new EquatableArray<FlatGenericMethodHandlerGroup>(handlerGroups);
+	}
+
+	/// <summary>
+	/// Computes a signature suffix for a generic method overload based on parameters.
+	/// Uses type parameter names for generic parameters, type names for non-generic parameters.
+	/// </summary>
+	private static string ComputeSignatureSuffixForGeneric(EquatableArray<ParameterModel> parameters, string typeParamList)
+	{
+		var paramArray = parameters.GetArray();
+		if (paramArray == null || paramArray.Length == 0)
+			return "";
+
+		var typeParams = new HashSet<string>(typeParamList.Split(',').Select(tp => tp.Trim()));
+		var suffixParts = new List<string>();
+
+		foreach (var param in paramArray)
+		{
+			// Check if the parameter type is or contains a type parameter
+			var paramType = param.Type;
+			var basePart = paramType;
+
+			// Simplify the type for the suffix
+			// If it's a type parameter (like T, TIn, TOut), use it directly
+			// Otherwise, use GetTypeSuffix for standard types
+			if (typeParams.Contains(paramType.TrimEnd('?')))
+			{
+				basePart = paramType.TrimEnd('?');
+			}
+			else
+			{
+				basePart = GetTypeSuffix(paramType);
+			}
+
+			suffixParts.Add(basePart);
+		}
+
+		return suffixParts.Count > 0 ? $"_{string.Join("_", suffixParts)}" : "";
 	}
 
 	#endregion
@@ -1685,6 +1935,57 @@ internal static class FlatModelBuilder
 	/// </summary>
 	private static bool NeedsNewKeyword(string interceptorName) =>
 		ObjectMemberNames.Contains(interceptorName);
+
+	/// <summary>
+	/// Builds a lookup table for user methods keyed by their signature.
+	/// This allows quick lookup to determine if a specific interface method overload has a matching user method.
+	/// </summary>
+	private static HashSet<string> BuildUserMethodLookup(EquatableArray<UserMethodInfo> userMethods)
+	{
+		var lookup = new HashSet<string>(StringComparer.Ordinal);
+		var methods = userMethods.GetArray();
+		if (methods == null) return lookup;
+
+		foreach (var method in methods)
+		{
+			var signature = BuildMethodSignatureKey(method.Name, method.ReturnType, method.Parameters, method.IsGenericMethod, method.TypeParameters);
+			lookup.Add(signature);
+		}
+		return lookup;
+	}
+
+	/// <summary>
+	/// Builds a unique signature key for a method based on name, return type, and parameter types.
+	/// </summary>
+	private static string BuildMethodSignatureKey(string name, string returnType, EquatableArray<ParameterInfo> parameters, bool isGenericMethod, EquatableArray<TypeParameterInfo> typeParameters)
+	{
+		var paramTypes = parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var typeParams = typeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+
+		// Include type parameter count for generic methods
+		var genericPart = isGenericMethod ? $"`{typeParams.Length}" : "";
+		var paramPart = string.Join(",", paramTypes.Select(p => p.Type));
+		return $"{name}{genericPart}({paramPart}):{returnType}";
+	}
+
+	/// <summary>
+	/// Checks if an interface member has a matching user method.
+	/// </summary>
+	private static bool HasMatchingUserMethod(InterfaceMemberInfo member, HashSet<string> userMethodLookup)
+	{
+		var signature = BuildMethodSignatureKey(member.Name, member.ReturnType, member.Parameters, member.IsGenericMethod, member.TypeParameters);
+		return userMethodLookup.Contains(signature);
+	}
+
+	/// <summary>
+	/// Checks if a method overload has a matching user method.
+	/// Note: This requires the method name from the group since MethodOverloadInfo doesn't have it.
+	/// </summary>
+	private static bool HasMatchingUserMethodForOverload(string methodName, string returnType, MethodOverloadInfo overload, HashSet<string> userMethodLookup)
+	{
+		var signature = BuildMethodSignatureKey(methodName, returnType, overload.Parameters, overload.IsGenericMethod, overload.TypeParameters);
+		return userMethodLookup.Contains(signature);
+	}
 
 	#endregion
 

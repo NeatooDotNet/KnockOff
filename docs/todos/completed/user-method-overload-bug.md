@@ -1,6 +1,6 @@
 # User Method Overload Generator Bug
 
-**Status:** Open
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-02-02
 **Last Updated:** 2026-02-02
@@ -108,16 +108,18 @@ stub.Format2_3.Verify();  // 3-param overload
 
 ## Plans
 
+- [User Method Overload Fix](../plans/user-method-overload-fix.md)
+
 ---
 
 ## Tasks
 
-- [ ] Investigate generator code path for user method overloads
-- [ ] Choose solution approach
-- [ ] Implement fix in generator
-- [ ] Add tests for user method overloads
-- [ ] Update Design.Stubs to enable commented-out tests
-- [ ] Update documentation
+- [x] Investigate generator code path for user method overloads
+- [x] Choose solution approach (Option 1: Generate RecordCall overloads)
+- [x] Implement fix in generator
+- [x] Add tests for user method overloads
+- [x] Update Design.Stubs to enable commented-out tests
+- [x] Update documentation
 
 ---
 
@@ -125,6 +127,47 @@ stub.Format2_3.Verify();  // 3-param overload
 
 **2026-02-02:** Bug discovered while creating user method design documentation in `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs`. See that file for detailed analysis and disabled test code.
 
+**2026-02-02:** Architectural analysis completed by knockoff-architect. Root cause identified: user method interceptors are rendered individually with deduplication by `InterceptorClassName`, causing only the first overload's `RecordCall` signature to be generated. Recommended solution: Option 1 (generate RecordCall overloads), consistent with how regular method overloads work. See plan for implementation details.
+
+**2026-02-02:** Developer concerns addressed by knockoff-architect:
+- Generic user method overloads: Now IN SCOPE with complete design (Phase 5)
+- FlatMethodGroup reuse: Confirmed - no new model type needed
+- RenderVerifyMethods integration: Keep separate with architectural rationale documented
+
 ---
 
 ## Results / Conclusions
+
+**Completed:** 2026-02-02
+
+### Summary
+
+Fixed the generator bug where user method overloads produced invalid code. The fix generates per-signature `RecordCall` methods for user method interceptors, consistent with how regular method overloads are handled.
+
+### Implementation Highlights
+
+1. **FlatMethodGroup reuse**: User method overloads are grouped using the existing `FlatMethodGroup` model, stored in `FlatGenerationUnit.UserMethodGroups`
+
+2. **Per-signature generation**: User method interceptors now generate:
+   - Per-signature `RecordCall_{suffix}` methods
+   - Per-signature `LastArg_{suffix}` / `LastArgs_{suffix}` properties
+   - Per-signature `OnCall_{suffix}` / `Returns_{suffix}` methods
+   - Per-signature `Callback_{suffix}` properties
+   - Aggregate `_callCount` and `Verify()` methods
+
+3. **Partial coverage support**: When only some overloads have user methods, the generator correctly splits them:
+   - User method overloads use `*2` interceptor with tracking-only behavior
+   - Non-user-method overloads use a separate interceptor (`*3`, etc.) with full OnCall API
+
+4. **Generic user method overloads**: Extended to support per-signature tracking within `Of<T>()` typed handlers
+
+### Tests Enabled
+
+All previously disabled test code is now enabled:
+- `OverloadedUserMethodStub` - non-generic user method overloads
+- `PartialOverloadUserMethodStub` - partial user method coverage
+- `OverloadedGenericUserMethodStub` - generic user method overloads
+
+### All Tests Pass
+
+All 5,647+ tests pass across net8.0, net9.0, and net10.0 target frameworks.
