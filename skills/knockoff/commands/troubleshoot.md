@@ -514,6 +514,7 @@ Run through these checks systematically:
 **KO001** - Interface not found → Check type accessibility
 **KO002** - Multiple candidates → Disambiguate type reference
 **KO003** - Unsupported member type → Check diagnostics for details
+**KO0200** - Standalone stub cannot have user-defined base class → Remove base class or use Inline pattern
 
 ---
 

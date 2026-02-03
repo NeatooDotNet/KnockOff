@@ -197,8 +197,8 @@ For stand-alone stubs, you can add custom methods to provide default behavior or
 ```cs
 public partial class UserRepoCmdStub
 {
-    // User method provides default test data
-    protected IEnumerable<User> FindAll()
+    // Override the generated virtual method (with _ suffix) to provide default test data
+    protected override IEnumerable<User> FindAll_()
     {
         return new[]
         {
@@ -210,7 +210,7 @@ public partial class UserRepoCmdStub
 ```
 <!-- endSnippet -->
 
-When you define a user method that matches an interface member, KnockOff generates a tracking interceptor for it. The interceptor name includes a numeric suffix to avoid conflicts (e.g., `FindAll2` for the `FindAll` method). Use this interceptor to verify the user method was called.
+KnockOff generates a base class with virtual methods that you can override. Override the method with an underscore suffix (e.g., `FindAll_` for the `FindAll` interface method) to provide default behavior. The interceptor uses the clean name (e.g., `stub.FindAll`) for tracking and verification.
 
 ## Step 7: Verify and Build
 

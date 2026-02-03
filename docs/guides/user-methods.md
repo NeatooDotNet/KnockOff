@@ -20,19 +20,19 @@ public partial class UserMethodsRepoStub : IUserMethodsRepo { }
 // User methods provide default behavior
 public partial class UserMethodsRepoStub
 {
-    // Override the virtual method with underscore suffix
+    // Protected method matches interface member signature
     // This is the fallback when no OnCall is configured
-    protected override User? GetUserById_(int id)
+    protected User? GetUserById(int id)
     {
         return new User { Id = id, Name = "Default User" };
     }
 
-    protected override bool IsActive_(int userId)
+    protected bool IsActive(int userId)
     {
         return true; // Default: users are active
     }
 
-    protected override decimal GetBalance_(int userId)
+    protected decimal GetBalance(int userId)
     {
         return 100.00m; // Default test balance
     }
@@ -74,8 +74,8 @@ This provides compile-time safety: if you typo the method name or get the signat
 // No OnCall configured - user method provides behavior
 var user = repository.GetUserById(1);
 
-// Verify the call was tracked (clean name, no suffix)
-stub.GetUserById.Verify(Times.Once);
+// Verify the call was tracked
+stub.GetUserById2.Verify(Times.Once);
 ```
 <!-- endSnippet -->
 
@@ -90,7 +90,7 @@ Use `OnCall()` to override the user method for specific tests. The callback supe
 <!-- snippet: user-methods-oncall -->
 ```cs
 // OnCall supersedes the user method
-stub.GetUserById.OnCall(id => new User { Id = id, Name = "Overridden" });
+stub.GetUserById2.OnCall(id => new User { Id = id, Name = "Overridden" });
 
 var user = repository.GetUserById(42);
 Assert.Equal("Overridden", user!.Name);
@@ -102,7 +102,7 @@ For constant return values, use `Returns()`:
 <!-- snippet: user-methods-returns -->
 ```cs
 // Returns() for constant values
-stub.GetBalance.Returns(500.00m);
+stub.GetBalance2.Returns(500.00m);
 
 var balance = repository.GetBalance(1);
 Assert.Equal(500.00m, balance);
@@ -114,7 +114,7 @@ For async methods, `Returns()` auto-wraps the value in `Task.FromResult`:
 <!-- snippet: user-methods-async-returns -->
 ```cs
 // Returns auto-wraps value in Task.FromResult for async methods
-stub.GetUserByIdAsync.Returns(new User { Id = 99, Name = "Test User" });
+stub.GetUserByIdAsync2.Returns(new User { Id = 99, Name = "Test User" });
 
 var user = await repository.GetUserByIdAsync(99);
 Assert.Equal("Test User", user!.Name);
@@ -129,12 +129,12 @@ User method interceptors provide full tracking capabilities. Tracking works the 
 
 <!-- snippet: user-methods-tracking -->
 ```cs
-stub.IsActive.Returns(false);
+stub.IsActive2.Returns(false);
 repository.IsActive(42);
 
 // Tracking works whether using OnCall or user method
-stub.IsActive.Verify(Times.Once);
-Assert.Equal(42, stub.IsActive.LastArg);
+stub.IsActive2.Verify(Times.Once);
+Assert.Equal(42, stub.IsActive2.LastArg);
 ```
 <!-- endSnippet -->
 
@@ -149,8 +149,8 @@ Call `Reset()` to clear call count and argument tracking. The `OnCall` configura
 <!-- snippet: user-methods-reset -->
 ```cs
 // Reset clears tracking state but preserves OnCall configuration
-stub.GetBalance.Reset();
-stub.GetBalance.Verify(Times.Never);
+stub.GetBalance2.Reset();
+stub.GetBalance2.Verify(Times.Never);
 ```
 <!-- endSnippet -->
 
@@ -170,10 +170,10 @@ public partial class NotificationServiceStub : INotificationService { }
 public partial class NotificationServiceStub
 {
     // Default: emails succeed
-    protected override bool SendEmail_(string to, string subject) => true;
+    protected bool SendEmail(string to, string subject) => true;
 
     // Default: no pending notifications
-    protected override int GetPendingCount_() => 0;
+    protected int GetPendingCount() => 0;
 }
 ```
 <!-- endSnippet -->
@@ -193,7 +193,7 @@ Specific tests override when needed:
 <!-- snippet: user-methods-shareable-override -->
 ```cs
 // Specific test overrides to simulate failure
-stub.SendEmail.Returns(false);
+stub.SendEmail2.Returns(false);
 
 var sent = service.SendEmail("user@test.com", "Welcome");
 Assert.False(sent); // OnCall supersedes user method
@@ -210,10 +210,10 @@ This pattern keeps test code DRY while maintaining flexibility for edge cases.
 ```cs
 // User method provides default; OnCall can override
 var user = repository.GetUserById(42);
-stub.GetUserById.Verify(Times.Once);
+stub.GetUserById2.Verify(Times.Once);
 
 // Override for next call
-stub.GetUserById.OnCall(id => new User { Id = id, Name = "Custom" });
+stub.GetUserById2.OnCall(id => new User { Id = id, Name = "Custom" });
 var customUser = repository.GetUserById(99);
 Assert.Equal("Custom", customUser!.Name);
 ```
