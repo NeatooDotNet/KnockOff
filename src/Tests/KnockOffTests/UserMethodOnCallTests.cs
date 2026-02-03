@@ -17,7 +17,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.OnCall(x => x * 100); // Override user method (which does x * 10)
+        stub.GetValue.OnCall(x => x * 100); // Override user method (which does x * 10)
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -33,7 +33,7 @@ public class UserMethodOnCallTests
         // Arrange
         var stub = new StrictModeUserMethodStub();
         var callbackInvoked = false;
-        stub.DoSomething2.OnCall(() => callbackInvoked = true);
+        stub.DoSomething.OnCall(() => callbackInvoked = true);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -52,7 +52,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Returns(999); // Override user method
+        stub.GetValue.Returns(999); // Override user method
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -93,7 +93,7 @@ public class UserMethodOnCallTests
         service.DoSomething(); // Should not throw
 
         // Assert - Verify it was tracked
-        stub.DoSomething2.Verify(Times.Once);
+        stub.DoSomething.Verify(Times.Once);
     }
 
     #endregion
@@ -105,17 +105,17 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.OnCall(x => x * 100);
+        stub.GetValue.OnCall(x => x * 100);
 
         IStrictModeUserMethodTest service = stub;
         service.GetValue(5);
-        stub.GetValue2.Verify(Times.Once);
+        stub.GetValue.Verify(Times.Once);
 
         // Act - Reset tracking state
-        stub.GetValue2.Reset();
+        stub.GetValue.Reset();
 
         // Assert - OnCall configuration is preserved, tracking is cleared
-        stub.GetValue2.Verify(Times.Never);
+        stub.GetValue.Verify(Times.Never);
         var result = service.GetValue(3);
         Assert.Equal(300, result); // Still uses OnCall (3 * 100)
     }
@@ -125,18 +125,18 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Returns(42);
+        stub.GetValue.Returns(42);
 
         IStrictModeUserMethodTest service = stub;
         service.GetValue(1);
         service.GetValue(2);
-        stub.GetValue2.Verify(Times.Exactly(2));
+        stub.GetValue.Verify(Times.Exactly(2));
 
         // Act
-        stub.GetValue2.Reset();
+        stub.GetValue.Reset();
 
         // Assert - Call count is cleared
-        stub.GetValue2.Verify(Times.Never);
+        stub.GetValue.Verify(Times.Never);
     }
 
     #endregion
@@ -148,7 +148,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new MultiParamUserMethodStub();
-        stub.Calculate2.OnCall((a, b) => a - b); // Override user method (which does a + b)
+        stub.Calculate.OnCall((a, b) => a - b); // Override user method (which does a + b)
 
         // Act
         IMultiParamUserMethodService service = stub;
@@ -163,7 +163,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new MultiParamUserMethodStub();
-        stub.Calculate2.Returns(999);
+        stub.Calculate.Returns(999);
 
         // Act
         IMultiParamUserMethodService service = stub;
@@ -182,14 +182,14 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.OnCall(x => x * 100);
+        stub.GetValue.OnCall(x => x * 100);
 
         // Act
         IStrictModeUserMethodTest service = stub;
         service.GetValue(7);
 
         // Assert - LastArg still tracks even with OnCall
-        Assert.Equal(7, stub.GetValue2.LastArg);
+        Assert.Equal(7, stub.GetValue.LastArg);
     }
 
     [Fact]
@@ -197,7 +197,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.OnCall(x => 42).Verifiable();
+        stub.GetValue.OnCall(x => 42).Verifiable();
 
         // Act - Don't call the method
 
@@ -210,7 +210,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.OnCall(x => x);
+        stub.GetValue.OnCall(x => x);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -218,7 +218,7 @@ public class UserMethodOnCallTests
         service.GetValue(2);
 
         // Assert
-        stub.GetValue2.Verify(Times.Exactly(2));
+        stub.GetValue.Verify(Times.Exactly(2));
     }
 
     #endregion
@@ -230,7 +230,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new AsyncUserMethodTestStub();
-        stub.ProcessAsync2.OnCall(input => Task.FromResult($"[OnCall: {input}]"));
+        stub.ProcessAsync.OnCall(input => Task.FromResult($"[OnCall: {input}]"));
 
         // Act
         IAsyncUserMethodTestService service = stub;
@@ -245,7 +245,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new AsyncUserMethodTestStub();
-        stub.ProcessAsync2.Returns("constant value"); // Returns auto-wraps in Task.FromResult
+        stub.ProcessAsync.Returns("constant value"); // Returns auto-wraps in Task.FromResult
 
         // Act
         IAsyncUserMethodTestService service = stub;
@@ -275,7 +275,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new AsyncUserMethodTestStub();
-        stub.ComputeAsync2.Returns(42); // Returns auto-wraps in new ValueTask<int>()
+        stub.ComputeAsync.Returns(42); // Returns auto-wraps in new ValueTask<int>()
 
         // Act
         IAsyncUserMethodTestService service = stub;
@@ -304,7 +304,7 @@ public partial class MultiParamUserMethodStub : IMultiParamUserMethodService
 
 public partial class MultiParamUserMethodStub
 {
-    protected int Calculate(int a, int b)
+    protected override int Calculate_(int a, int b)
     {
         return a + b; // Default: addition
     }
@@ -325,13 +325,13 @@ public partial class AsyncUserMethodTestStub : IAsyncUserMethodTestService
 
 public partial class AsyncUserMethodTestStub
 {
-    protected async Task<string> ProcessAsync(string input)
+    protected override async Task<string> ProcessAsync_(string input)
     {
         await Task.Yield();
         return $"[Async: {input}]";
     }
 
-    protected async ValueTask<int> ComputeAsync(int value)
+    protected override async ValueTask<int> ComputeAsync_(int value)
     {
         await Task.Yield();
         return value * 2;

@@ -16,7 +16,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable();
+        stub.GetValue.Verifiable();
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -31,7 +31,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable();
+        stub.GetValue.Verifiable();
         // Don't call the method
 
         // Act & Assert
@@ -43,7 +43,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable(Times.Exactly(2));
+        stub.GetValue.Verifiable(Times.Exactly(2));
 
         // Act - Call exactly twice
         IStrictModeUserMethodTest service = stub;
@@ -59,7 +59,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable(Times.Exactly(2));
+        stub.GetValue.Verifiable(Times.Exactly(2));
 
         // Act - Call only once (expected 2)
         IStrictModeUserMethodTest service = stub;
@@ -74,7 +74,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        // Don't mark GetValue2 as verifiable
+        // Don't mark GetValue as verifiable
         // Don't call the method either
 
         // Assert - Should pass because nothing is marked verifiable
@@ -90,8 +90,8 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable();
-        stub.DoSomething2.Verifiable();
+        stub.GetValue.Verifiable();
+        stub.DoSomething.Verifiable();
         // Don't call either method
 
         // Act
@@ -106,8 +106,8 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable();
-        stub.DoSomething2.Verifiable();
+        stub.GetValue.Verifiable();
+        stub.DoSomething.Verifiable();
 
         // Act - Call GetValue but not DoSomething
         IStrictModeUserMethodTest service = stub;
@@ -173,7 +173,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.DoSomething2.Verifiable();
+        stub.DoSomething.Verifiable();
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -188,7 +188,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.DoSomething2.Verifiable();
+        stub.DoSomething.Verifiable();
         // Don't call the method
 
         // Act & Assert
@@ -204,14 +204,14 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable();
+        stub.GetValue.Verifiable();
 
         // Act - Call, verify passes, reset, verify fails (call count reset but verifiable preserved)
         IStrictModeUserMethodTest service = stub;
         service.GetValue(5);
         stub.Verify(); // Should pass
 
-        stub.GetValue2.Reset();
+        stub.GetValue.Reset();
 
         // Assert - Verifiable marking preserved, but needs new call
         Assert.Throws<VerificationException>(() => stub.Verify());
@@ -222,14 +222,14 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable();
+        stub.GetValue.Verifiable();
 
         // Act
         IStrictModeUserMethodTest service = stub;
         service.GetValue(5);
         stub.Verify(); // Should pass
 
-        stub.GetValue2.Reset();
+        stub.GetValue.Reset();
         service.GetValue(10); // Call again after reset
 
         // Assert - Should pass again
@@ -251,8 +251,8 @@ public class UserMethodVerificationTests
         service.GetValue(5);
 
         // Assert - Individual Verify() on the interceptor should work
-        stub.GetValue2.Verify(); // Should not throw
-        stub.GetValue2.Verify(Times.Once);
+        stub.GetValue.Verify(); // Should not throw
+        stub.GetValue.Verify(Times.Once);
     }
 
     [Fact]
@@ -263,7 +263,7 @@ public class UserMethodVerificationTests
         // Don't call the method
 
         // Act & Assert
-        Assert.Throws<VerificationException>(() => stub.GetValue2.Verify());
+        Assert.Throws<VerificationException>(() => stub.GetValue.Verify());
     }
 
     #endregion
@@ -291,7 +291,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue2.Verifiable();
+        stub.GetValue.Verifiable();
 
         // Act
         IStrictModeUserMethodTest service = stub;

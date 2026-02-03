@@ -60,15 +60,15 @@ public partial class RepoStub : IRepo { }
 
 public partial class RepoStub
 {
-    // User method provides default behavior
-    protected User? GetById(int id) => new User { Id = id, Name = "Default" };
+    // Override virtual method with underscore suffix - compiler enforces signature!
+    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 
-// User method is fallback; OnCall supersedes it
-stub.GetById2.OnCall(id => new User { Id = id, Name = "Override" });
+// User override is fallback; OnCall supersedes it
+stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 
 // Returns for constant values (auto-wraps for async)
-stub.GetById2.Returns(new User { Id = 99 });
+stub.GetById.Returns(new User { Id = 99 });
 ```
 
 ### Method Configuration

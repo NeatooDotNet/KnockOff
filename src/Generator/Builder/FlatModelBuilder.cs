@@ -39,8 +39,9 @@ internal static class FlatModelBuilder
 		var events = BuildEventModels(typeInfo, nameMap);
 
 		// Group non-generic methods by interceptor name for multi-overload support
+		// Exclude methods with user implementations (legacy UserMethodCall or new HasUserOverride)
 		var flatMethodGroups = methods
-			.Where(m => !m.IsGenericMethod && m.UserMethodCall == null)
+			.Where(m => !m.IsGenericMethod && m.UserMethodCall == null && !m.HasUserOverride)
 			.GroupBy(m => m.InterceptorName)
 			.Select(g => new FlatMethodGroup(
 				InterceptorName: g.Key,
@@ -50,9 +51,9 @@ internal static class FlatModelBuilder
 			.ToList();
 
 		// Group user methods by interceptor name for per-signature RecordCall support
-		// This groups methods where UserMethodCall != null (i.e., methods with user implementations)
+		// This groups methods where UserMethodCall != null (legacy) or HasUserOverride (new base class pattern)
 		var flatUserMethodGroups = methods
-			.Where(m => !m.IsGenericMethod && m.UserMethodCall != null)
+			.Where(m => !m.IsGenericMethod && (m.UserMethodCall != null || m.HasUserOverride))
 			.GroupBy(m => m.InterceptorName)
 			.Select(g => new FlatMethodGroup(
 				InterceptorName: g.Key,
@@ -652,6 +653,9 @@ internal static class FlatModelBuilder
 		// Build user method lookup for checking
 		var userMethodLookup = BuildUserMethodLookup(typeInfo.UserMethods);
 
+		// Build user override method lookup for base class pattern
+		var userOverrideMethods = new HashSet<string>(typeInfo.UserOverrideMethods.GetArray() ?? Array.Empty<string>());
+
 		// First pass: Build generic method handlers from FlatMembers (deduplicated)
 		// Skip groups where ANY overload has a user method (those use GenericUserMethodHandlerGroups)
 		foreach (var member in typeInfo.FlatMembers)
@@ -741,7 +745,7 @@ internal static class FlatModelBuilder
 				}
 				else
 				{
-					var model = BuildMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface, signatureSuffix);
+					var model = BuildMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface, signatureSuffix, userOverrideMethods);
 					methods.Add(model);
 				}
 			}
@@ -774,7 +778,8 @@ internal static class FlatModelBuilder
 		string className,
 		InterfaceMemberInfo? delegationTarget,
 		string? delegationInterface,
-		string signatureSuffix)
+		string signatureSuffix,
+		HashSet<string> userOverrideMethods)
 	{
 		var interceptorClassName = $"{interceptorName}Interceptor";
 		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
@@ -882,6 +887,7 @@ internal static class FlatModelBuilder
 			DefaultExpression: defaultExpr,
 			ThrowsOnDefault: throwsOnDefault,
 			UserMethodCall: userMethodCall,
+			HasUserOverride: userOverrideMethods.Contains(member.Name),
 			SimpleInterfaceName: simpleIfaceName,
 			TypeParameterDecl: "",
 			TypeParameterList: "",
@@ -1007,6 +1013,7 @@ internal static class FlatModelBuilder
 			DefaultExpression: defaultExpr,
 			ThrowsOnDefault: throwsOnDefault,
 			UserMethodCall: userMethodCall,
+			HasUserOverride: false, // Generic methods excluded from base class pattern per design
 			SimpleInterfaceName: simpleIfaceName,
 			TypeParameterDecl: typeParamDecl,
 			TypeParameterList: typeParamList,
@@ -2057,8 +2064,9 @@ internal static class FlatModelBuilder
 
 		foreach (var method in methods)
 		{
-			// Skip user method implementations and delegation targets
-			if (method.UserMethodCall != null || method.DelegationTarget != null)
+			// Skip user method implementations (legacy UserMethodCall or new HasUserOverride) and delegation targets
+			// User methods don't support source delegation - they have fixed implementations
+			if (method.UserMethodCall != null || method.HasUserOverride || method.DelegationTarget != null)
 				continue;
 			// Skip generic methods - they use handlers, not direct interceptors
 			if (method.IsGenericMethod)

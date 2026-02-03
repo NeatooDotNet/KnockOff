@@ -25,6 +25,11 @@ internal sealed record KnockOffTypeInfo(
 	/// </summary>
 	EquatableArray<EventMemberInfo> FlatEvents,
 	/// <summary>
+	/// Method names (without "_" suffix) that have user-defined "protected override" methods.
+	/// Used for base class user method pattern.
+	/// </summary>
+	EquatableArray<string> UserOverrideMethods,
+	/// <summary>
 	/// When true, the generated constructor defaults to strict mode (throws on unconfigured calls).
 	/// From [KnockOff(Strict = true)].
 	/// </summary>

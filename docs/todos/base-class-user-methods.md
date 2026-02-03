@@ -57,9 +57,10 @@ public GetByIdInterceptor GetById { get; }  // No suffix!
 - [x] Analyze overload handling with base class approach
 - [x] Analyze generic method handling with base class approach
 - [x] Determine if properties should be supported (currently methods only)
+- [x] Resolve source generator timing question (SYNTACTIC detection works!)
+- [x] Investigate exception-free fallback (conditional generation solves this)
 - [ ] Design the generated base class structure
-- [ ] Handle edge case: user already has a base class (block or error)
-- [ ] Handle source generator timing for override detection
+- [ ] Handle edge case: user already has a base class (block with KO0200)
 - [ ] Implementation planning
 
 ---
@@ -85,6 +86,42 @@ Explored the base class approach through conversation. Key findings:
 **Generic methods:** Recommend EXCLUDING from base class pattern. Current `.Of<T>()` pattern is already good for type-specific configuration. User override would be a single method for all type arguments, losing the per-type flexibility.
 
 **Properties:** Currently NOT supported (code explicitly filters `!member.IsProperty`). The base class pattern could work for properties, but defer to Phase 2. Methods are higher priority and more common use case.
+
+### 2026-02-02 - Syntactic Override Detection Breakthrough
+
+**Performance Concern Raised:** Throwing `NotImplementedException` in base class virtual methods would drastically slow tests. Exception handling is expensive in .NET.
+
+**Investigation Result:** Syntactic detection IS possible!
+
+Key insight: The `override` keyword is a **syntax token**, not a semantic property. We can detect it via:
+- `classSymbol.DeclaringSyntaxReferences` - gives all partial class declarations
+- `MethodDeclarationSyntax.Modifiers.Any(m => m.IsKind(SyntaxKind.OverrideKeyword))` - works without base class
+
+**Solution:** Conditional code generation:
+- If override detected syntactically: generate `return GetById_(id);`
+- If no override detected: generate `return Task.FromResult<Order>(default!);` (no exception!)
+
+This gives us:
+1. No exceptions in hot paths (critical for test performance)
+2. No runtime reflection needed
+3. Clean names, signature enforcement, IntelliSense - all preserved
+4. Compatible with incremental generation
+
+### 2026-02-02 - Developer Concerns Addressed
+
+Updated plan to address 6 developer concerns:
+
+1. **Generic standalone stubs**: Documented how `RepoStub<T>` generates `RepoStubBase<T>` with type parameters and constraints propagated.
+
+2. **Test strategy**: Defined 7 new test categories and enumerated 2 existing test files requiring migration (47 total references to `*2` pattern).
+
+3. **Base class file structure**: Decided on two files per stub (`{ClassName}.Base.g.cs` and `{ClassName}.g.cs`).
+
+4. **Model/Builder/Renderer responsibilities**: Mapped changes to each pipeline component. Transform detects overrides syntactically, Builder populates `HasUserOverride`, Renderer conditionally generates override vs interceptor path.
+
+5. **Existing tests migration**: Detailed the changes needed (add `override`, add `_` suffix, remove `2` from tracker access).
+
+6. **Source delegation + user override interaction**: Documented the priority chain: OnCall > Source > User Override > Strict > Default. Key insight: generator produces different code based on override detection, no runtime check needed.
 
 ---
 

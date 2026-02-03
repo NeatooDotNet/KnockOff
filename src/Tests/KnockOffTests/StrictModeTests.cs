@@ -283,8 +283,8 @@ public class StrictModeTests
 		var result = service.GetValue(5);
 
 		Assert.Equal(50, result); // User method multiplies by 10
-		stub.GetValue2.Verify(Times.Once);
-		Assert.Equal(5, stub.GetValue2.LastArg);
+		stub.GetValue.Verify(Times.Once);
+		Assert.Equal(5, stub.GetValue.LastArg);
 	}
 
 	[Fact]
@@ -311,7 +311,7 @@ public class StrictModeTests
 		// Void user method executes without throwing
 		service.DoSomething();
 
-		stub.DoSomething2.Verify(Times.Once);
+		stub.DoSomething.Verify(Times.Once);
 	}
 
 	#endregion
@@ -374,13 +374,13 @@ public partial class StrictModeUserMethodStub : IStrictModeUserMethodTest
 public partial class StrictModeUserMethodStub
 {
 	// User method - bypasses strict mode
-	protected int GetValue(int x)
+	protected override int GetValue_(int x)
 	{
 		return x * 10;
 	}
 
 	// User void method - bypasses strict mode
-	protected void DoSomething()
+	protected override void DoSomething_()
 	{
 		// Intentionally empty - just proves it doesn't throw
 	}

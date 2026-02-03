@@ -47,9 +47,9 @@ public partial class UserRepoStandaloneStub : IUserRepoStandalone { }
 <!-- endSnippet -->
 
 The source generator produces:
+- A base class with virtual protected methods (e.g., `GetById_`) for user method overrides
 - Explicit interface implementations for all members
 - Interceptor properties named after each interface member (e.g., `Save`, `GetById`)
-- When you define a user method, a numbered interceptor is created for tracking (e.g., `GetById2`)
 
 ### Usage in Tests
 
@@ -67,10 +67,10 @@ stub.Save.OnCall((user) => { }).Verifiable();
 - **Instantiation**: `new MyStub()`
 - **Interface access**: Cast to interface type or assign to interface variable
 - **Verification**: Call `stub.Verify()` or individual interceptor `.Verify()`
-- **User methods**: Define protected methods matching interface signatures to provide default behavior
-- **Numbered interceptors**: When you define a user method, the generator creates a numbered interceptor (e.g., `GetById2`) for tracking and override capability
-- **OnCall supersedes user method**: Use `stub.GetById2.OnCall(...)` to override the user method for specific tests
-- **User method as fallback**: When no `OnCall` is configured, the user method is called
+- **User methods**: Override virtual methods (with underscore suffix, e.g., `GetById_`) to provide default behavior
+- **Clean interceptor names**: The interceptor uses the clean name (e.g., `GetById`) regardless of whether a user override exists
+- **OnCall supersedes user method**: Use `stub.GetById.OnCall(...)` to override the user method for specific tests
+- **User method as fallback**: When no `OnCall` is configured, the user override is called
 
 ### Benefits
 
