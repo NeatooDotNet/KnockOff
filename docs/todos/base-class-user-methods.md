@@ -3,7 +3,7 @@
 **Status:** In Progress
 **Priority:** High
 **Created:** 2026-02-02
-**Last Updated:** 2026-02-02
+**Last Updated:** 2026-02-03
 
 ---
 
@@ -49,6 +49,7 @@ public GetByIdInterceptor GetById { get; }  // No suffix!
 ## Plans
 
 - [Base Class User Methods Design](../plans/base-class-user-methods-design.md)
+- [Base Class Follow-up Fixes](../plans/base-class-followup-fixes.md)
 
 ---
 
