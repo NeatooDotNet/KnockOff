@@ -52,6 +52,25 @@ To use this plugin in other projects:
 | Inline Class | `[KnockOff<MyClass>]` | `new Stubs.MyClass()` then `.Object` |
 | Inline Delegate | `[KnockOff<MyDelegate>]` | `new Stubs.MyDelegate()` |
 
+### User Methods (Stand-Alone Only)
+
+```cs
+[KnockOff]
+public partial class RepoStub : IRepo { }
+
+public partial class RepoStub
+{
+    // User method provides default behavior
+    protected User? GetById(int id) => new User { Id = id, Name = "Default" };
+}
+
+// User method is fallback; OnCall supersedes it
+stub.GetById2.OnCall(id => new User { Id = id, Name = "Override" });
+
+// Returns for constant values (auto-wraps for async)
+stub.GetById2.Returns(new User { Id = 99 });
+```
+
 ### Method Configuration
 
 ```cs
