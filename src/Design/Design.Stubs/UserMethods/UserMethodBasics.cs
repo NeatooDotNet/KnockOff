@@ -173,7 +173,7 @@ public partial class UserMethodBasicsDemo
     }
 
     // =========================================================================
-    // DESIGN DECISION: OnCall() WILL Supersede User Methods
+    // OnCall() Supersedes User Methods
     // =========================================================================
     // User methods provide shareable defaults. OnCall/Returns override per test.
     //
@@ -181,14 +181,70 @@ public partial class UserMethodBasicsDemo
     // - User method = sensible default for most tests
     // - OnCall/Returns = override when a specific test needs different behavior
     //
-    // This matches how generic user methods already work (see GenericUserMethodStub.g.cs):
-    //   if (Callback is { } callback) return callback();  // OnCall wins
-    //   return UserMethod();                              // Fallback
+    // GENERATED CODE PATTERN:
+    //   if (Interceptor.Callback is { } callback) return callback(args);  // OnCall wins
+    //   return UserMethod(args);                                          // Fallback
     //
-    // TODO: Generator currently creates tracking-only interceptors for non-generic
-    // user methods. See docs/todos/user-method-oncall-support.md for the work
-    // to add OnCall/Returns support.
+    // Reset() behavior: Clears tracking state but PRESERVES OnCall configuration.
+    // This matches regular interceptor semantics.
     // =========================================================================
+
+    public void OnCall_SupersedesUserMethod()
+    {
+        var stub = new BasicUserMethodStub();
+
+        // By default, user method is called
+        IUserMethodService service = stub;
+        var defaultResult = service.Process("hello");
+        // defaultResult == "[Processed: hello]" (from user method)
+
+        // OnCall supersedes the user method for per-test override
+        stub.Process2.OnCall(input => $"[Override: {input}]");
+        var overrideResult = service.Process("hello");
+        // overrideResult == "[Override: hello]" (OnCall wins)
+
+        stub.Process2.Verify(Times.Exactly(2)); // Both calls tracked
+    }
+
+    public void Returns_SupersedesUserMethod()
+    {
+        var stub = new BasicUserMethodStub();
+        stub.Process2.Returns("constant"); // Returns is shorthand for OnCall(_ => value)
+
+        IUserMethodService service = stub;
+        var result = service.Process("ignored");
+        // result == "constant" (Returns wins, ignores argument)
+    }
+
+    public void VoidMethod_OnCallSupersedes()
+    {
+        var stub = new BasicUserMethodStub();
+        var callbackInvoked = false;
+        stub.Execute2.OnCall(cmd => callbackInvoked = true);
+
+        IUserMethodService service = stub;
+        service.Execute("test");
+
+        // callbackInvoked == true (OnCall was invoked, not user method)
+        stub.Execute2.Verify(Times.Once);
+    }
+
+    public void Reset_PreservesOnCallConfiguration()
+    {
+        var stub = new BasicUserMethodStub();
+        stub.Calculate2.OnCall((a, b) => a * b); // Override addition with multiplication
+
+        IUserMethodService service = stub;
+        service.Calculate(3, 4);
+        stub.Calculate2.Verify(Times.Once);
+
+        // Reset clears tracking but preserves OnCall
+        stub.Calculate2.Reset();
+        stub.Calculate2.Verify(Times.Never);
+
+        var result = service.Calculate(5, 6);
+        // result == 30 (OnCall still active: 5 * 6)
+    }
 }
 
 // =============================================================================
@@ -523,10 +579,7 @@ public partial class GenericUserMethodDemo
 // - Strict mode bypass for user methods
 // - Async user methods (Task<T>, Task, ValueTask<T>) - see AsyncUserMethodStub
 // - Generic user methods with Of<T>() pattern - see GenericUserMethodStub
-//
-// **PLANNED ENHANCEMENT:**
 // - OnCall/Returns on non-generic user method interceptors (supersedes user method)
-// - See docs/todos/user-method-oncall-support.md
 //
 // **BUGS DISCOVERED:**
 // 1. USER METHOD OVERLOADS - Generator produces invalid code
@@ -550,8 +603,8 @@ public partial class GenericUserMethodDemo
 //    Q: Do async user methods work as expected?
 //    A: YES - Task<T>, Task, and ValueTask<T> all work correctly.
 //       - Generator creates *2 interceptors (ProcessAsync2, ExecuteAsync2, etc.)
-//       - Interceptors are tracking-only (Verify, LastArg, Reset)
-//       - No OnCall on async user method interceptors
+//       - Interceptors have OnCall/Returns with auto-wrap (Task.FromResult/ValueTask)
+//       - Plain Task returns (void-like) have OnCall but no Returns
 //       - See AsyncUserMethodStub for working examples
 //
 // 3. GENERIC USER METHODS

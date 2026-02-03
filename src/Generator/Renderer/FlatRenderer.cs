@@ -1542,17 +1542,32 @@ internal static class FlatRenderer
 	}
 
 	/// <summary>
-	/// Renders a tracking-only interceptor for user-defined methods.
-	/// No OnCall methods - the user's method is used directly.
+	/// Renders an interceptor for user-defined methods with OnCall/Returns support.
+	/// OnCall supersedes the user method; user method is the fallback.
 	/// </summary>
 	private static void RenderUserMethodInterceptorClass(CodeWriter w, FlatMethodModel method)
 	{
 		var trackingInterface = GetTrackingInterface(method);
+		var (innerType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(method.ReturnType);
+		var isVoidLike = method.IsVoid || method.ReturnType == "global::System.Threading.Tasks.Task";
 
-		w.Line($"/// <summary>Tracks calls to {method.MethodName} (user-defined implementation).</summary>");
+		w.Line($"/// <summary>Tracks calls to {method.MethodName} (user-defined implementation). OnCall supersedes user method.</summary>");
 		w.Line($"public sealed class {method.InterceptorClassName} : {trackingInterface}");
 		using (w.Braces())
 		{
+			// Delegate declaration
+			if (method.NeedsCustomDelegate && method.CustomDelegateSignature != null)
+			{
+				w.Line($"/// <summary>Delegate for {method.MethodName}.</summary>");
+				w.Line(method.CustomDelegateSignature);
+				w.Line();
+			}
+
+			// OnCall storage field
+			var delegateType = method.OnCallDelegateType.TrimEnd('?');
+			w.Line($"private {delegateType}? _onCall;");
+			w.Line();
+
 			// LastArg/LastArgs storage (non-nullable to match interface)
 			if (method.TrackableParameters.Count == 1)
 			{
@@ -1604,6 +1619,56 @@ internal static class FlatRenderer
 			{
 				w.Line($"internal void RecordCall({method.LastCallType} args) {{ _callCount++; _lastArgs = args; }}");
 			}
+			w.Line();
+
+			// OnCall method - supersedes user method when configured
+			w.Line($"/// <summary>Configures callback that supersedes the user method. Returns tracking interface.</summary>");
+			w.Line($"public {trackingInterface} OnCall({delegateType} callback)");
+			using (w.Braces())
+			{
+				w.Line("_onCall = callback;");
+				w.Line("return this;");
+			}
+			w.Line();
+
+			// Returns method (non-void methods only)
+			if (!isVoidLike)
+			{
+				// Build lambda with correct number of discards based on parameter count
+				var discardLambda = method.Parameters.Count switch
+				{
+					0 => "()",
+					1 => "_",
+					_ => "(" + string.Join(", ", Enumerable.Repeat("_", method.Parameters.Count)) + ")"
+				};
+
+				// For async methods, wrap value in Task.FromResult or ValueTask
+				string valueExpression;
+				string parameterType;
+				if (isTaskT)
+				{
+					valueExpression = $"global::System.Threading.Tasks.Task.FromResult(value)";
+					parameterType = innerType;
+				}
+				else if (isValueTaskT)
+				{
+					valueExpression = $"new global::System.Threading.Tasks.ValueTask<{innerType}>(value)";
+					parameterType = innerType;
+				}
+				else
+				{
+					valueExpression = "value";
+					parameterType = method.ReturnType;
+				}
+
+				w.Line($"/// <summary>Configures constant return value that supersedes the user method.</summary>");
+				w.Line($"public {trackingInterface} Returns({parameterType} value) => OnCall({discardLambda} => {valueExpression});");
+				w.Line();
+			}
+
+			// Callback property (internal) - for interface implementation to check
+			w.Line($"/// <summary>Gets the configured callback (internal use).</summary>");
+			w.Line($"internal {delegateType}? Callback => _onCall;");
 			w.Line();
 
 			// Reset method
@@ -2504,11 +2569,22 @@ internal static class FlatRenderer
 			// Record the call
 			w.Line($"{method.InterceptorName}.RecordCall({recordCallArgs});");
 
-			// Call user's method
+			// Build callback args (all parameters)
+			var callbackArgs = method.Parameters.Count > 0
+				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
+				: "";
+
+			// OnCall callback supersedes user method when configured
 			if (method.IsVoid)
+			{
+				w.Line($"if ({method.InterceptorName}.Callback is {{ }} callback) {{ callback({callbackArgs}); return; }}");
 				w.Line($"{method.UserMethodCall};");
+			}
 			else
+			{
+				w.Line($"if ({method.InterceptorName}.Callback is {{ }} callback) return callback({callbackArgs});");
 				w.Line($"return {method.UserMethodCall};");
+			}
 		}
 		w.Line();
 	}
@@ -2620,6 +2696,34 @@ internal static class FlatRenderer
 			w.Line($"remove => {evt.InterceptorName}.RecordRemove(value);");
 		}
 		w.Line();
+	}
+
+	#endregion
+
+	#region Async Type Helpers
+
+	/// <summary>
+	/// Analyzes a return type for async patterns and extracts the inner type.
+	/// Used for Returns() auto-wrapping in user method interceptors.
+	/// </summary>
+	private static (string InnerType, bool IsTaskT, bool IsValueTaskT) GetAsyncTypeInfo(string returnType)
+	{
+		const string TaskPrefix = "global::System.Threading.Tasks.Task<";
+		const string ValueTaskPrefix = "global::System.Threading.Tasks.ValueTask<";
+
+		if (returnType.StartsWith(TaskPrefix) && returnType.EndsWith(">"))
+		{
+			var innerType = returnType.Substring(TaskPrefix.Length, returnType.Length - TaskPrefix.Length - 1);
+			return (innerType, true, false);
+		}
+
+		if (returnType.StartsWith(ValueTaskPrefix) && returnType.EndsWith(">"))
+		{
+			var innerType = returnType.Substring(ValueTaskPrefix.Length, returnType.Length - ValueTaskPrefix.Length - 1);
+			return (innerType, false, true);
+		}
+
+		return (returnType, false, false);
 	}
 
 	#endregion
