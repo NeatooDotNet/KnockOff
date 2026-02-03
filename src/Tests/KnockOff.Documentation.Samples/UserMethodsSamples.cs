@@ -1,4 +1,5 @@
 using KnockOff;
+using System.Threading.Tasks;
 
 namespace KnockOff.Documentation.Samples.UserMethods;
 
@@ -13,6 +14,11 @@ public interface IUserMethodsRepo
     decimal GetBalance(int userId);
 }
 
+public interface IAsyncUserMethodRepo
+{
+    Task<User?> GetUserByIdAsync(int id);
+}
+
 // =============================================================================
 // Stubs with User Methods
 // =============================================================================
@@ -24,8 +30,8 @@ public partial class UserMethodsRepoStub : IUserMethodsRepo { }
 // User methods provide default behavior
 public partial class UserMethodsRepoStub
 {
-    // Protected method matches interface method signature
-    // This becomes the behavior (user method interceptors have no OnCall)
+    // Protected method matches interface member signature
+    // This is the fallback when no OnCall is configured
     protected User? GetUserById(int id)
     {
         return new User { Id = id, Name = "Default User" };
@@ -43,11 +49,23 @@ public partial class UserMethodsRepoStub
 }
 #endregion
 
+// Async user method stub
+[KnockOff]
+public partial class AsyncUserMethodRepoStub : IAsyncUserMethodRepo { }
+
+public partial class AsyncUserMethodRepoStub
+{
+    protected Task<User?> GetUserByIdAsync(int id)
+    {
+        return Task.FromResult<User?>(new User { Id = id, Name = "Default User" });
+    }
+}
+
 // =============================================================================
-// Priority Tests - User methods provide defaults
+// Fallback Tests - User methods provide defaults when no OnCall configured
 // =============================================================================
 
-public class UserMethodPriorityTests
+public class UserMethodFallbackTests
 {
     [Fact]
     public void UserMethod_ProvidesDefaultBehavior()
@@ -55,11 +73,11 @@ public class UserMethodPriorityTests
         var stub = new UserMethodsRepoStub();
         IUserMethodsRepo repository = stub;
 
-        #region user-methods-priority
-        // User method provides default behavior automatically
+        #region user-methods-fallback
+        // No OnCall configured - user method provides behavior
         var user = repository.GetUserById(1);
 
-        // Verify the call was tracked (user method interceptors end with "2")
+        // Verify the call was tracked
         stub.GetUserById2.Verify(Times.Once);
         #endregion
 
@@ -70,22 +88,83 @@ public class UserMethodPriorityTests
 }
 
 // =============================================================================
-// Override Tests - Cannot override with OnCall (tracking only)
+// OnCall Tests - OnCall supersedes user method
 // =============================================================================
 
-public class UserMethodOverrideTests
+public class UserMethodOnCallTests
 {
     [Fact]
-    public void UserMethod_InterceptorTracksCallsOnly()
+    public void OnCall_SupersedesUserMethod()
     {
         var stub = new UserMethodsRepoStub();
         IUserMethodsRepo repository = stub;
 
-        var isActive = repository.IsActive(42);
-        Assert.True(isActive);
+        #region user-methods-oncall
+        // OnCall supersedes the user method
+        stub.GetUserById2.OnCall(id => new User { Id = id, Name = "Overridden" });
 
-        #region user-methods-override
-        // User method interceptors are tracking-only (no OnCall available)
+        var user = repository.GetUserById(42);
+        Assert.Equal("Overridden", user!.Name);
+        #endregion
+
+        stub.GetUserById2.Verify(Times.Once);
+    }
+
+    [Fact]
+    public void Returns_SupersedesUserMethod()
+    {
+        var stub = new UserMethodsRepoStub();
+        IUserMethodsRepo repository = stub;
+
+        #region user-methods-returns
+        // Returns() for constant values
+        stub.GetBalance2.Returns(500.00m);
+
+        var balance = repository.GetBalance(1);
+        Assert.Equal(500.00m, balance);
+        #endregion
+    }
+}
+
+// =============================================================================
+// Async OnCall Tests - Returns auto-wraps in Task.FromResult
+// =============================================================================
+
+public class UserMethodAsyncOnCallTests
+{
+    [Fact]
+    public async Task Returns_AutoWrapsForAsyncMethods()
+    {
+        var stub = new AsyncUserMethodRepoStub();
+        IAsyncUserMethodRepo repository = stub;
+
+        #region user-methods-async-returns
+        // Returns auto-wraps value in Task.FromResult for async methods
+        stub.GetUserByIdAsync2.Returns(new User { Id = 99, Name = "Test User" });
+
+        var user = await repository.GetUserByIdAsync(99);
+        Assert.Equal("Test User", user!.Name);
+        #endregion
+    }
+}
+
+// =============================================================================
+// Verification Tests - Tracking still works with OnCall
+// =============================================================================
+
+public class UserMethodVerificationTests
+{
+    [Fact]
+    public void TrackingWorksWithOnCall()
+    {
+        var stub = new UserMethodsRepoStub();
+        IUserMethodsRepo repository = stub;
+
+        #region user-methods-tracking
+        stub.IsActive2.Returns(false);
+        repository.IsActive(42);
+
+        // Tracking works whether using OnCall or user method
         stub.IsActive2.Verify(Times.Once);
         Assert.Equal(42, stub.IsActive2.LastArg);
         #endregion
@@ -99,57 +178,87 @@ public class UserMethodOverrideTests
 public class UserMethodResetTests
 {
     [Fact]
-    public void Reset_ClearsUserMethodTracking()
+    public void Reset_ClearsTrackingButPreservesOnCall()
     {
         var stub = new UserMethodsRepoStub();
         IUserMethodsRepo repository = stub;
 
+        stub.GetBalance2.Returns(999.99m);
         repository.GetBalance(1);
         stub.GetBalance2.Verify(Times.Once);
 
         #region user-methods-reset
-        // Reset clears call count and argument tracking
+        // Reset clears tracking state but preserves OnCall configuration
         stub.GetBalance2.Reset();
         stub.GetBalance2.Verify(Times.Never);
         #endregion
 
+        // OnCall configuration is preserved after reset
         var balance = repository.GetBalance(2);
-        Assert.Equal(100.00m, balance);
+        Assert.Equal(999.99m, balance);
         stub.GetBalance2.Verify(Times.Once);
     }
 }
 
 // =============================================================================
-// Runtime-Configurable Behavior - Use a regular stub when OnCall is needed
+// Shareable Stub Pattern - Base class defaults, tests override
 // =============================================================================
 
 /// <summary>
-/// When you need runtime-configurable behavior, use a stub without user methods.
-/// User method interceptors don't have OnCall - the protected method IS the behavior.
+/// Interface for shareable stub pattern example.
 /// </summary>
-[KnockOff]
-public partial class OverridableRepoStub : IUserMethodsRepo { }
+public interface INotificationService
+{
+    bool SendEmail(string to, string subject);
+    int GetPendingCount();
+}
 
-public class SourceOverrideTests
+/// <summary>
+/// Base stub with sensible defaults for common test scenarios.
+/// Tests can override specific methods using OnCall when needed.
+/// </summary>
+#region user-methods-shareable-base
+[KnockOff]
+public partial class NotificationServiceStub : INotificationService { }
+
+public partial class NotificationServiceStub
+{
+    // Default: emails succeed
+    protected bool SendEmail(string to, string subject) => true;
+
+    // Default: no pending notifications
+    protected int GetPendingCount() => 0;
+}
+#endregion
+
+public class ShareableStubPatternTests
 {
     [Fact]
-    public void WhenOverrideNeeded_UseRegularStubWithOnCall()
+    public void TestUsesDefaultBehavior()
     {
-        var stub = new OverridableRepoStub();
-        IUserMethodsRepo repository = stub;
+        var stub = new NotificationServiceStub();
+        INotificationService service = stub;
 
-        #region user-methods-source-override
-        // For runtime-configurable behavior, use a regular stub with OnCall
-        stub.GetUserById.OnCall((id) => new User { Id = id, Name = "Overridden" });
-        stub.IsActive.Returns(true);
-        stub.GetBalance.Returns(999.99m);
+        #region user-methods-shareable-default
+        // Most tests use the defaults
+        var sent = service.SendEmail("user@test.com", "Welcome");
+        Assert.True(sent); // Default behavior: success
         #endregion
+    }
 
-        var user = repository.GetUserById(1);
-        Assert.Equal("Overridden", user!.Name);
-        Assert.True(repository.IsActive(1));
-        Assert.Equal(999.99m, repository.GetBalance(1));
-        stub.GetUserById.Verify(Times.Once);
+    [Fact]
+    public void TestOverridesForFailureScenario()
+    {
+        var stub = new NotificationServiceStub();
+        INotificationService service = stub;
+
+        #region user-methods-shareable-override
+        // Specific test overrides to simulate failure
+        stub.SendEmail2.Returns(false);
+
+        var sent = service.SendEmail("user@test.com", "Welcome");
+        Assert.False(sent); // OnCall supersedes user method
+        #endregion
     }
 }
 
@@ -166,18 +275,18 @@ public class CompleteUserMethodExampleTests
         IUserMethodsRepo repository = stub;
 
         #region user-methods-complete-example
-        // User methods provide defaults; interceptors track calls
+        // User method provides default; OnCall can override
         var user = repository.GetUserById(42);
-        var isActive = repository.IsActive(42);
-
-        // Verify with *2 interceptors (user method tracking)
         stub.GetUserById2.Verify(Times.Once);
-        stub.IsActive2.Verify(Times.Once);
+
+        // Override for next call
+        stub.GetUserById2.OnCall(id => new User { Id = id, Name = "Custom" });
+        var customUser = repository.GetUserById(99);
+        Assert.Equal("Custom", customUser!.Name);
         #endregion
 
         Assert.NotNull(user);
         Assert.Equal("Default User", user.Name);
-        Assert.True(isActive);
     }
 
     [Fact]
