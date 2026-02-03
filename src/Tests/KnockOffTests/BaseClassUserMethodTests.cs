@@ -432,17 +432,17 @@ public class BaseClassUserMethodTests
     }
 
     [Fact]
-    public void Overload_NoUserOverride_UsesInterceptorOrDefault()
+    public void Overload_NoUserOverride_ThrowsWithoutOnCall()
     {
         // Arrange - stub with user override on only one overload
+        // After the fix, the non-overridden overload uses the regular interceptor path
+        // which throws InvalidOperationException when no OnCall is configured
         var stub = new OverloadedUserMethodStub();
         IOverloadedUserMethodService service = stub;
 
-        // Act - call overload WITHOUT user override
-        var result = service.Format("hello", true);
-
-        // Assert - returns default (null for string) since no override or OnCall
-        Assert.Null(result);
+        // Act & Assert - non-overridden overload throws because no OnCall configured
+        // This is the expected behavior for regular method interceptors
+        Assert.Throws<InvalidOperationException>(() => service.Format("hello", true));
     }
 
     [Fact]
@@ -450,8 +450,8 @@ public class BaseClassUserMethodTests
     {
         // Arrange
         var stub = new OverloadedUserMethodStub();
-        // User method stubs with overloads use suffixed OnCall methods
-        stub.Format.OnCall_String_String(input => "ONCALL:" + input);
+        // User override overload uses Format (single-overload interceptor)
+        stub.Format.OnCall(input => "ONCALL:" + input);
         IOverloadedUserMethodService service = stub;
 
         // Act
@@ -466,8 +466,8 @@ public class BaseClassUserMethodTests
     {
         // Arrange
         var stub = new OverloadedUserMethodStub();
-        // Configure OnCall for the second overload (which has no user override)
-        stub.Format.OnCall_String_Boolean_String((input, upper) => upper ? input.ToUpper() : input);
+        // Non-overridden overload uses Format2 (separate interceptor after fix)
+        stub.Format2.OnCall((input, upper) => upper ? input.ToUpper() : input);
         IOverloadedUserMethodService service = stub;
 
         // Act
@@ -482,8 +482,8 @@ public class BaseClassUserMethodTests
     {
         // Arrange - one overload uses user override, another uses OnCall
         var stub = new OverloadedUserMethodStub();
-        // Only configure OnCall for the second overload
-        stub.Format.OnCall_String_Boolean_String((input, upper) => "ONCALL:" + (upper ? input.ToUpper() : input));
+        // Each overload now has its own interceptor (Format for overridden, Format2 for non-overridden)
+        stub.Format2.OnCall((input, upper) => "ONCALL:" + (upper ? input.ToUpper() : input));
         IOverloadedUserMethodService service = stub;
 
         // Act
@@ -493,6 +493,24 @@ public class BaseClassUserMethodTests
         // Assert
         Assert.Equal("USER:hello", result1);          // User override
         Assert.Equal("ONCALL:WORLD", result2);        // OnCall
+    }
+
+    [Fact]
+    public void Overload_NoUserOverride_StrictModeThrows()
+    {
+        // Arrange - strict mode with non-overridden overload
+        // This verifies the fix: before the fix, strict mode did NOT throw
+        // because HasUserOverride was incorrectly true for ALL overloads
+        var stub = new OverloadedUserMethodStub().Strict();
+        IOverloadedUserMethodService service = stub;
+
+        // Act & Assert - non-overridden overload should throw in strict mode
+        // The first overload has user override, so it should NOT throw
+        var result = service.Format("hello");
+        Assert.Equal("USER:hello", result);
+
+        // The second overload does NOT have user override, so it SHOULD throw
+        Assert.Throws<StubException>(() => service.Format("hello", true));
     }
 
     #endregion

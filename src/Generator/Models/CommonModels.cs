@@ -25,8 +25,10 @@ internal sealed record KnockOffTypeInfo(
 	/// </summary>
 	EquatableArray<EventMemberInfo> FlatEvents,
 	/// <summary>
-	/// Method names (without "_" suffix) that have user-defined "protected override" methods.
-	/// Used for base class user method pattern.
+	/// Method signatures (format: "MethodName_(ParamType1,ParamType2,...)") that have user-defined
+	/// "protected override" methods. Used for base class user method pattern.
+	/// Note: Does not include return type since C# forbids return-type overloading.
+	/// Examples: "Format_(string)", "Format_(string,bool)", "TryParse_(string,out int)".
 	/// </summary>
 	EquatableArray<string> UserOverrideMethods,
 	/// <summary>

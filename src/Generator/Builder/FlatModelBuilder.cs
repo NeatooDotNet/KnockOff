@@ -22,8 +22,11 @@ internal static class FlatModelBuilder
 
 	public static FlatGenerationUnit Build(KnockOffTypeInfo typeInfo)
 	{
+		// Build user override methods lookup for base class pattern
+		var userOverrideMethods = new HashSet<string>(typeInfo.UserOverrideMethods.GetArray() ?? Array.Empty<string>());
+
 		// Build name map for collision resolution
-		var nameMap = BuildNameMap(typeInfo.FlatMembers, typeInfo.FlatEvents, typeInfo.UserMethods);
+		var nameMap = BuildNameMap(typeInfo.FlatMembers, typeInfo.FlatEvents, typeInfo.UserMethods, userOverrideMethods);
 
 		// Group methods for overload handling
 		var methodGroups = GroupMethodsByName(typeInfo.FlatMembers.Where(m => !m.IsProperty && !m.IsIndexer));
@@ -110,12 +113,13 @@ internal static class FlatModelBuilder
 	/// <summary>
 	/// Builds a map from member keys to collision-safe interceptor names.
 	/// For example, if two interfaces both have "Value" property, they map to "Value" and "Value2".
-	/// Also avoids conflicts with user-defined methods.
+	/// Also avoids conflicts with user-defined methods (both legacy and base class pattern).
 	/// </summary>
 	private static Dictionary<string, string> BuildNameMap(
 		EquatableArray<InterfaceMemberInfo> flatMembers,
 		EquatableArray<EventMemberInfo> flatEvents,
-		EquatableArray<UserMethodInfo> userMethods)
+		EquatableArray<UserMethodInfo> userMethods,
+		HashSet<string> userOverrideMethods)
 	{
 		var nameMap = new Dictionary<string, string>();
 		var usedNames = new HashSet<string>();
@@ -170,7 +174,7 @@ internal static class FlatModelBuilder
 			{
 				// Mixed group: handle non-generic and generic overloads separately
 				// For non-generic, split by user method presence
-				AssignNamesForOverloadGroup(methodName, nonGenericOverloads, userMethodLookup, nameMap, usedNames);
+				AssignNamesForOverloadGroup(methodName, nonGenericOverloads, userMethodLookup, userOverrideMethods, nameMap, usedNames);
 
 				// Generic overloads use a handler with Generic suffix
 				var genericName = methodName + GenericSuffix;
@@ -204,7 +208,7 @@ internal static class FlatModelBuilder
 			else
 			{
 				// Non-generic overloads - split by user method presence
-				AssignNamesForOverloadGroup(methodName, overloads, userMethodLookup, nameMap, usedNames);
+				AssignNamesForOverloadGroup(methodName, overloads, userMethodLookup, userOverrideMethods, nameMap, usedNames);
 			}
 		}
 
@@ -260,17 +264,19 @@ internal static class FlatModelBuilder
 	/// Assigns interceptor names for a group of method overloads with the same name.
 	/// Handles partial user method coverage: overloads WITH user methods get one name,
 	/// overloads WITHOUT user methods get a different name.
+	/// Checks both legacy UserMethods and new base class pattern UserOverrideMethods.
 	/// </summary>
 	private static void AssignNamesForOverloadGroup(
 		string methodName,
 		List<InterfaceMemberInfo> overloads,
 		HashSet<string> userMethodLookup,
+		HashSet<string> userOverrideMethods,
 		Dictionary<string, string> nameMap,
 		HashSet<string> usedNames)
 	{
-		// Split overloads by whether they have a matching user method
-		var withUserMethod = overloads.Where(o => HasMatchingUserMethod(o, userMethodLookup)).ToList();
-		var withoutUserMethod = overloads.Where(o => !HasMatchingUserMethod(o, userMethodLookup)).ToList();
+		// Split overloads by whether they have a matching user method (legacy or base class pattern)
+		var withUserMethod = overloads.Where(o => HasMatchingUserMethod(o, userMethodLookup) || HasMatchingUserOverride(o, userOverrideMethods)).ToList();
+		var withoutUserMethod = overloads.Where(o => !HasMatchingUserMethod(o, userMethodLookup) && !HasMatchingUserOverride(o, userOverrideMethods)).ToList();
 
 		if (withUserMethod.Count > 0 && withoutUserMethod.Count > 0)
 		{
@@ -887,7 +893,7 @@ internal static class FlatModelBuilder
 			DefaultExpression: defaultExpr,
 			ThrowsOnDefault: throwsOnDefault,
 			UserMethodCall: userMethodCall,
-			HasUserOverride: userOverrideMethods.Contains(member.Name),
+			HasUserOverride: userOverrideMethods.Contains(BuildOverrideSignatureKeyFromMember(member)),
 			SimpleInterfaceName: simpleIfaceName,
 			TypeParameterDecl: "",
 			TypeParameterList: "",
@@ -1702,6 +1708,65 @@ internal static class FlatModelBuilder
 	};
 
 	/// <summary>
+	/// Builds a signature key from InterfaceMemberInfo for matching against user override methods.
+	/// Format: "MethodName_(ParamType1,ParamType2,...)" - matches the format from DetectUserOverrideMethods.
+	/// Includes ref/out/in modifiers as they affect the signature.
+	/// </summary>
+	private static string BuildOverrideSignatureKeyFromMember(InterfaceMemberInfo member)
+	{
+		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+		var paramParts = paramArray.Select(p =>
+		{
+			var prefix = p.RefKind switch
+			{
+				RefKind.Ref => "ref ",
+				RefKind.Out => "out ",
+				RefKind.In => "in ",
+				RefKind.RefReadOnlyParameter => "ref readonly ",
+				_ => ""
+			};
+			return prefix + NormalizeTypeForOverrideMatching(p.Type);
+		});
+		// The generated base class method has underscore suffix, so signature key uses it too
+		return $"{member.Name}_({string.Join(",", paramParts)})";
+	}
+
+	/// <summary>
+	/// Normalizes type names for matching user override methods.
+	/// Converts fully qualified types to C# keywords and removes global:: prefix.
+	/// This ensures semantic model types match syntax-based type names.
+	/// </summary>
+	private static string NormalizeTypeForOverrideMatching(string type)
+	{
+		// Remove global:: prefix
+		var result = type.Replace("global::", "");
+
+		// Map fully qualified System types to keywords
+		result = result switch
+		{
+			"System.String" => "string",
+			"System.Int32" => "int",
+			"System.Int64" => "long",
+			"System.Boolean" => "bool",
+			"System.Double" => "double",
+			"System.Single" => "float",
+			"System.Decimal" => "decimal",
+			"System.Char" => "char",
+			"System.Byte" => "byte",
+			"System.SByte" => "sbyte",
+			"System.Int16" => "short",
+			"System.UInt16" => "ushort",
+			"System.UInt32" => "uint",
+			"System.UInt64" => "ulong",
+			"System.Object" => "object",
+			"System.Void" => "void",
+			_ => result
+		};
+
+		return result;
+	}
+
+	/// <summary>
 	/// Formats a parameter with ref/out/in keyword.
 	/// </summary>
 	private static string FormatParameterWithRefKind(ParameterInfo p)
@@ -1976,7 +2041,7 @@ internal static class FlatModelBuilder
 	}
 
 	/// <summary>
-	/// Checks if an interface member has a matching user method.
+	/// Checks if an interface member has a matching user method (legacy pattern).
 	/// </summary>
 	private static bool HasMatchingUserMethod(InterfaceMemberInfo member, HashSet<string> userMethodLookup)
 	{
@@ -1985,7 +2050,17 @@ internal static class FlatModelBuilder
 	}
 
 	/// <summary>
-	/// Checks if a method overload has a matching user method.
+	/// Checks if an interface member has a matching user override method (base class pattern).
+	/// Uses the signature key format from DetectUserOverrideMethods.
+	/// </summary>
+	private static bool HasMatchingUserOverride(InterfaceMemberInfo member, HashSet<string> userOverrideMethods)
+	{
+		var signatureKey = BuildOverrideSignatureKeyFromMember(member);
+		return userOverrideMethods.Contains(signatureKey);
+	}
+
+	/// <summary>
+	/// Checks if a method overload has a matching user method (legacy pattern).
 	/// Note: This requires the method name from the group since MethodOverloadInfo doesn't have it.
 	/// </summary>
 	private static bool HasMatchingUserMethodForOverload(string methodName, string returnType, MethodOverloadInfo overload, HashSet<string> userMethodLookup)

@@ -96,7 +96,7 @@ public partial class KnockOffGenerator
 	/// as a syntax token, which works even before the generated base class exists.
 	/// </summary>
 	/// <param name="classSymbol">The class symbol to scan for override methods</param>
-	/// <returns>A set of method names (without the _ suffix) that have user overrides</returns>
+	/// <returns>A set of method signature keys (format: "MethodName_(ParamType1,ParamType2,...)") that have user overrides</returns>
 	private static HashSet<string> DetectUserOverrideMethods(INamedTypeSymbol classSymbol)
 	{
 		var overrideMethods = new HashSet<string>();
@@ -119,10 +119,9 @@ public partial class KnockOffGenerator
 						// Check for our naming convention: ends with _
 						if (methodName.EndsWith("_"))
 						{
-							// Store the method name WITHOUT the _ suffix
-							// This is the "clean" name that matches the interface method
-							var cleanName = methodName.Substring(0, methodName.Length - 1);
-							overrideMethods.Add(cleanName);
+							// Build full signature key including parameter types
+							var signatureKey = BuildOverrideSignatureKey(method);
+							overrideMethods.Add(signatureKey);
 						}
 					}
 				}
@@ -130,5 +129,74 @@ public partial class KnockOffGenerator
 		}
 
 		return overrideMethods;
+	}
+
+	/// <summary>
+	/// Builds a signature key from a MethodDeclarationSyntax for matching user override methods.
+	/// Format: "MethodName_(ParamType1,ParamType2,...)" - NO return type since C# forbids return-type overloading.
+	/// Includes ref/out/in modifiers as they affect the signature.
+	/// </summary>
+	private static string BuildOverrideSignatureKey(MethodDeclarationSyntax method)
+	{
+		var name = method.Identifier.Text;
+		var paramParts = method.ParameterList.Parameters
+			.Select(p =>
+			{
+				// Get modifier prefix (ref, out, in, ref readonly, params)
+				var modifiers = p.Modifiers;
+				var prefix = "";
+				if (modifiers.Any(m => m.IsKind(SyntaxKind.RefKeyword)))
+				{
+					if (modifiers.Any(m => m.IsKind(SyntaxKind.ReadOnlyKeyword)))
+						prefix = "ref readonly ";
+					else
+						prefix = "ref ";
+				}
+				else if (modifiers.Any(m => m.IsKind(SyntaxKind.OutKeyword)))
+					prefix = "out ";
+				else if (modifiers.Any(m => m.IsKind(SyntaxKind.InKeyword)))
+					prefix = "in ";
+				// Note: params not included - it doesn't affect method signature identity
+
+				// Normalize the type name
+				var typeName = NormalizeSyntaxType(p.Type?.ToString() ?? "object");
+				return prefix + typeName;
+			})
+			.ToArray();
+		return $"{name}({string.Join(",", paramParts)})";
+	}
+
+	/// <summary>
+	/// Normalizes type names to match what users would write in their override methods.
+	/// Handles common differences between semantic and syntax representations.
+	/// </summary>
+	private static string NormalizeSyntaxType(string type)
+	{
+		// Remove global:: prefix (user code won't have it)
+		var result = type.Replace("global::", "");
+
+		// Map fully qualified System types to keywords
+		result = result switch
+		{
+			"System.String" => "string",
+			"System.Int32" => "int",
+			"System.Int64" => "long",
+			"System.Boolean" => "bool",
+			"System.Double" => "double",
+			"System.Single" => "float",
+			"System.Decimal" => "decimal",
+			"System.Char" => "char",
+			"System.Byte" => "byte",
+			"System.SByte" => "sbyte",
+			"System.Int16" => "short",
+			"System.UInt16" => "ushort",
+			"System.UInt32" => "uint",
+			"System.UInt64" => "ulong",
+			"System.Object" => "object",
+			"System.Void" => "void",
+			_ => result
+		};
+
+		return result;
 	}
 }
