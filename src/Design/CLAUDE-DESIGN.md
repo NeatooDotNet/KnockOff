@@ -13,9 +13,11 @@ This file provides guidance for Claude Code agents working with the KnockOff Des
 | Pattern | Attribute | Example |
 |---------|-----------|---------|
 | Standalone | `[KnockOff]` on partial class | `CalculatorStub.cs` |
+| Generic Standalone | `[KnockOff]` on generic class | `new RepositoryStub<T>()` |
 | Inline Interface | `[KnockOff<IInterface>]` | `new Stubs.ICalculator()` |
 | Inline Class | `[KnockOff<AbstractClass>]` | `new Stubs.ServiceBase()` |
 | Inline Delegate | `[KnockOff<DelegateType>]` | `new Stubs.ArithmeticOperation()` |
+| Open Generic | `[KnockOff(typeof(IFoo<>))]` | `new Stubs.IRepository<User>()` |
 
 ### Member Types
 

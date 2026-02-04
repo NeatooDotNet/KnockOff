@@ -248,11 +248,11 @@ public partial class IRuleOfCustomTypeTests
         var customStub = new CustomValidateBaseStub();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule1.OnCall((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.OnCall((ICustomValidateBase target, CancellationToken? token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(customStub, null);
 
-        stub.RunRule1.Verify();
+        stub.RunRule.Verify();
     }
 
     /// <summary>
@@ -272,11 +272,11 @@ public partial class IRuleOfCustomTypeTests
         var customStub = new CustomValidateBaseStub();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule1.OnCall((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.OnCall((IValidateBase target, CancellationToken? token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await baseRule.RunRule(customStub, null);
 
         // The call should be tracked (delegated to the typed implementation)
-        stub.RunRule1.Verify();
+        stub.RunRule.Verify();
     }
 }

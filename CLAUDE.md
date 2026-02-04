@@ -18,12 +18,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **ALWAYS consider all patterns and members when creating todos or plans.** Missing a pattern or member type leads to incomplete implementations.
 
-### Four Patterns
+### Six Patterns
 
-1. **Stand-alone** - `[KnockOff]` on partial class that implements interface/extends class
-2. **Inline interface** - `[KnockOff<IInterface>]` generates nested stub class
-3. **Inline class** - `[KnockOff<ConcreteClass>]` generates nested stub for virtual/abstract members
-4. **Inline delegate** - `[KnockOff<DelegateType>]` generates stub for delegate invocation
+**Standalone Patterns** (file-based, reusable across tests):
+1. **Standalone** - `[KnockOff]` on partial class implementing interface
+2. **Generic Standalone** - `[KnockOff]` on generic partial class: `class Stub<T> : IService<T>`
+
+**Inline Patterns** (nested within test class):
+3. **Inline Interface** - `[KnockOff<IInterface>]` generates nested stub class
+4. **Inline Class** - `[KnockOff<ConcreteClass>]` generates nested stub for virtual/abstract members
+5. **Inline Delegate** - `[KnockOff<DelegateType>]` generates stub for delegate invocation
+6. **Open Generic** - `[KnockOff(typeof(T<>))]` generates generic nested stub from open generic type
 
 ### Four Member Types
 
@@ -35,7 +40,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Scope Checklist for Todos/Plans
 
 When defining scope, explicitly state which patterns and members are affected:
-- [ ] Which patterns? (all 4, or specific subset)
+- [ ] Which patterns? (all 6, or specific subset)
 - [ ] Which member types? (all 4, or specific subset)
 - [ ] Are there pattern+member combinations that need special handling?
 

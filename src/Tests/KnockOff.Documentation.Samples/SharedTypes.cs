@@ -16,6 +16,16 @@ public class User
 }
 
 /// <summary>
+/// Product entity for documentation examples.
+/// </summary>
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public decimal Price { get; set; }
+}
+
+/// <summary>
 /// Order entity for documentation examples.
 /// </summary>
 public class Order

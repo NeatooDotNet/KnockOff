@@ -8,11 +8,7 @@ allowed-tools: Read, Write, Glob, Grep, AskUserQuestion
 
 # Create KnockOff Stub
 
-Create a KnockOff stub for testing. This command guides you through creating a stub using one of three patterns:
-
-1. **Stand-Alone** - Dedicated stub class file (recommended for shared stubs)
-2. **Inline Interface** - Attribute on test class for interface stubs
-3. **Inline Class** - Attribute on test class for class stubs
+Create a KnockOff stub for testing. This command supports all KnockOff patterns - see [patterns.md](../skills/knockoff-usage/references/patterns.md) for the complete list.
 
 Follow this workflow:
 
@@ -268,4 +264,4 @@ Samples demonstrate:
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-03

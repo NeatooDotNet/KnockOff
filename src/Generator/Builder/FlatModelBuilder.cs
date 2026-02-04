@@ -1366,7 +1366,13 @@ internal static class FlatModelBuilder
 
 			// Create overload infos
 			var overloadInfos = overloads
-				.Select(o => new MethodOverloadInfo(o.Parameters, o.IsGenericMethod, o.TypeParameters))
+				.Select(o => new MethodOverloadInfo(
+					o.Parameters,
+					o.ReturnType,
+					o.ReturnType == "void",
+					o.IsNullable,
+					o.IsGenericMethod,
+					o.TypeParameters))
 				.ToArray();
 
 			result[methodName] = new MethodGroupInfo(
