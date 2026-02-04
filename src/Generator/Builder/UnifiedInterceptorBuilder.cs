@@ -103,14 +103,28 @@ internal static class UnifiedInterceptorBuilder
 
 		foreach (var sig in overloads)
 		{
-			var suffix = GetSignatureSuffix(sig.Parameters, sig.ReturnType);
-			if (seen.Add(suffix))
+			// Deduplicate by PARAMETERS ONLY (ignore return type for deduplication).
+			// Same-params-different-return (like ISet<T>.Add void vs bool) should be ONE signature.
+			// Different-params (like Transform(int)->string vs Transform(string)->int) remain distinct.
+			var paramKey = GetParameterOnlyKey(sig.Parameters);
+			if (seen.Add(paramKey))
 			{
 				unique.Add(sig);
 			}
 		}
 
 		return unique;
+	}
+
+	/// <summary>
+	/// Gets a key based only on parameter types, ignoring return type.
+	/// Used for deduplication when same-params-different-return overloads should merge.
+	/// </summary>
+	private static string GetParameterOnlyKey(EquatableArray<ParameterModel> parameters)
+	{
+		if (parameters.Count == 0)
+			return "NoParams";
+		return string.Join("_", parameters.Select(p => GetTypeSuffix(p.Type)));
 	}
 
 	private static MethodOverloadSignature BuildOverloadSignature(

@@ -18,13 +18,13 @@ public class InlineStubBugTests
 
 		var entity = new SampleEntity { Id = 1 };
 
-		// Set up sync callback - Fetch2 is the sync overload
-		stub.Fetch2.OnCall((e) => new SampleArea { Id = e.Id });
+		// Set up sync callback - C# overload resolution picks the right OnCall based on return type
+		stub.Fetch.OnCall((SampleEntity e) => new SampleArea { Id = e.Id });
 
 		// Call the sync overload
 		var result = factory.Fetch(entity);
 
-		stub.Fetch2.Verify();
+		stub.Fetch.Verify();
 		Assert.Equal(1, result.Id);
 	}
 
@@ -34,8 +34,8 @@ public class InlineStubBugTests
 		var stub = new InlineMixedReturnTypesStub.Stubs.IFactoryWithMixedReturnTypes();
 		IFactoryWithMixedReturnTypes factory = stub;
 
-		// Set up async callback - Fetch1 is the async overload
-		stub.Fetch1.OnCall((id) =>
+		// Set up async callback - C# overload resolution picks the right OnCall based on return type
+		stub.Fetch.OnCall((long id) =>
 			Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
 
 		// Call the async overload
@@ -43,7 +43,7 @@ public class InlineStubBugTests
 
 		Assert.NotNull(result);
 		Assert.Equal(42, result!.Id);
-		stub.Fetch1.Verify();
+		stub.Fetch.Verify();
 	}
 
 	#endregion

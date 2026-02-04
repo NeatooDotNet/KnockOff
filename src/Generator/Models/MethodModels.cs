@@ -16,10 +16,13 @@ internal sealed record MethodGroupInfo(
 	EquatableArray<CombinedParameterInfo> CombinedParameters) : IEquatable<MethodGroupInfo>;
 
 /// <summary>
-/// Represents a single method overload's parameters
+/// Represents a single method overload's parameters and return type
 /// </summary>
 internal sealed record MethodOverloadInfo(
 	EquatableArray<ParameterInfo> Parameters,
+	string ReturnType,
+	bool IsVoid,
+	bool IsNullable,
 	bool IsGenericMethod,
 	EquatableArray<TypeParameterInfo> TypeParameters) : IEquatable<MethodOverloadInfo>;
 

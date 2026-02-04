@@ -165,10 +165,10 @@ public partial class OpenGenericClassOverloadTests
         // Arrange
         var stub = new Stubs.RepositoryBase<TestEntity>();
 
-        // For class stubs, overloaded methods use numbered interceptors (GetDefault1, GetDefault2)
-        // This differs from interface stubs which use C# overload resolution
-        stub.GetDefault1.OnCall(() => new TestEntity { Id = 0, Name = "Default" });
-        stub.GetDefault2.OnCall((filter) => new TestEntity { Id = 1, Name = $"Filtered: {filter}" });
+        // Class stubs now use the same overload API as interface stubs
+        // C# overload resolution determines which OnCall to use based on lambda signature
+        stub.GetDefault.OnCall(() => new TestEntity { Id = 0, Name = "Default" });
+        stub.GetDefault.OnCall((string filter) => new TestEntity { Id = 1, Name = $"Filtered: {filter}" });
 
         RepositoryBase<TestEntity> repo = stub.Object;
 

@@ -342,16 +342,16 @@ internal static class InlineModelBuilder
             var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
             var hasRefOrOut = parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
 
-            // Determine default expression
-            var defaultExpr = group.IsVoid ? "" : GetDefaultExpressionForReturn(group.ReturnType, group.IsNullable);
-            var throwsOnDefault = !group.IsVoid && !group.IsNullable && IsUninstantiableType(group.ReturnType);
+            // Determine default expression - use per-overload return type for mixed return type groups
+            var defaultExpr = overload.IsVoid ? "" : GetDefaultExpressionForReturn(overload.ReturnType, overload.IsNullable);
+            var throwsOnDefault = !overload.IsVoid && !overload.IsNullable && IsUninstantiableType(overload.ReturnType);
 
             signatures.Add(new MethodSignatureInfo(
                 Parameters: parameters,
                 TrackableParameters: trackableParams,
                 ParameterDeclarations: UnifiedInterceptorBuilder.BuildParameterDeclarations(parameters),
-                ReturnType: group.ReturnType,
-                IsVoid: group.IsVoid,
+                ReturnType: overload.ReturnType,
+                IsVoid: overload.IsVoid,
                 HasRefOrOutParams: hasRefOrOut,
                 DefaultExpression: defaultExpr,
                 ThrowsOnDefault: throwsOnDefault));
@@ -856,7 +856,7 @@ internal static class InlineModelBuilder
         // Compute invoke suffix for multi-overload groups
         // Count unique signatures (excluding generic methods)
         var nonGenericOverloads = group.Overloads.Where(o => !o.IsGenericMethod).ToArray();
-        var isMultiOverload = GetUniqueSignatureCount(nonGenericOverloads, group.ReturnType) > 1;
+        var isMultiOverload = GetUniqueSignatureCount(nonGenericOverloads) > 1;
 
         var invokeSuffix = "";
         if (isMultiOverload)
@@ -871,7 +871,9 @@ internal static class InlineModelBuilder
                     RefKind: p.RefKind,
                     RefPrefix: GetRefKindPrefix(p.RefKind)))
                 .ToEquatableArray();
-            invokeSuffix = "_" + UnifiedInterceptorBuilder.GetSignatureSuffix(paramModels, group.ReturnType);
+            // Use member.ReturnType (not group.ReturnType) - each member needs its own suffix
+            // when overloads have different return types
+            invokeSuffix = "_" + UnifiedInterceptorBuilder.GetSignatureSuffix(paramModels, member.ReturnType);
         }
 
         return new InlineInterfaceImplementation(
@@ -906,22 +908,17 @@ internal static class InlineModelBuilder
             OutParameterInitializations: outParamInits);
     }
 
-    private static int GetUniqueSignatureCount(MethodOverloadInfo[] overloads, string returnType)
+    private static int GetUniqueSignatureCount(MethodOverloadInfo[] overloads)
     {
         var seen = new HashSet<string>();
         foreach (var overload in overloads)
         {
-            var paramModels = (overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>())
-                .Select(p => new ParameterModel(
-                    Name: p.Name,
-                    EscapedName: EscapeIdentifier(p.Name),
-                    Type: p.Type,
-                    NullableType: MakeNullable(p.Type),
-                    RefKind: p.RefKind,
-                    RefPrefix: GetRefKindPrefix(p.RefKind)))
-                .ToEquatableArray();
-            var suffix = UnifiedInterceptorBuilder.GetSignatureSuffix(paramModels, returnType);
-            seen.Add(suffix);
+            // Count unique signatures based on PARAMETERS ONLY (ignore return type).
+            // Same-params-different-return (like ISet<T>.Add) count as ONE signature.
+            var paramTypes = (overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>())
+                .Select(p => GetTypeSuffix(p.Type));
+            var paramKey = paramTypes.Any() ? string.Join("_", paramTypes) : "NoParams";
+            seen.Add(paramKey);
         }
         return seen.Count;
     }
@@ -1196,34 +1193,18 @@ internal static class InlineModelBuilder
 
     /// <summary>
     /// Determines if two methods with the same name can share an interceptor.
-    /// They cannot if:
-    /// 1. Different return types AND different parameters (both need separate interceptors)
-    /// 2. Same parameter name has different types across overloads (type mismatch in combined params)
+    /// They cannot share if: same parameter name has different types across overloads.
+    /// Different return types are handled by signature-based delegate types and storage suffixes.
     /// </summary>
     private static bool AreMethodsCompatibleForSharedInterceptor(InterfaceMemberInfo m1, InterfaceMemberInfo m2)
     {
-        // Check if any shared parameter names have different types - this is always incompatible
+        // Check if any shared parameter names have different types - this is the only incompatibility
+        // Different return types work fine: OnCall(Func<int,string>) vs OnCall(Func<string,int>)
+        // are distinguishable by C# overload resolution, and storage uses signature suffixes
         var m1Params = m1.Parameters.ToDictionary(p => p.Name, p => p.Type);
         foreach (var p2 in m2.Parameters)
         {
             if (m1Params.TryGetValue(p2.Name, out var m1Type) && m1Type != p2.Type)
-                return false;
-        }
-
-        // If parameter names/types are compatible, check return types
-        // Methods with same parameters but different return types (like BCL IEnumerable)
-        // typically use delegation, so they're compatible for sharing an interceptor
-        // Only split when return types differ AND there are different parameters that
-        // would cause confusion about which callback to use
-        if (m1.ReturnType != m2.ReturnType)
-        {
-            // Different return types with different parameter sets need separate interceptors
-            var m1ParamNames = new HashSet<string>(m1.Parameters.Select(p => p.Name));
-            var m2ParamNames = new HashSet<string>(m2.Parameters.Select(p => p.Name));
-
-            // If parameters are completely different or partially different,
-            // we need separate interceptors because users would want different callbacks
-            if (!m1ParamNames.SetEquals(m2ParamNames))
                 return false;
         }
 
@@ -1343,7 +1324,13 @@ internal static class InlineModelBuilder
         }
 
         var overloadInfos = overloads
-            .Select(o => new MethodOverloadInfo(o.Parameters, o.IsGenericMethod, o.TypeParameters))
+            .Select(o => new MethodOverloadInfo(
+                o.Parameters,
+                o.ReturnType,
+                o.ReturnType == "void",
+                o.IsNullable,
+                o.IsGenericMethod,
+                o.TypeParameters))
             .ToArray();
 
         return new MethodGroupInfo(

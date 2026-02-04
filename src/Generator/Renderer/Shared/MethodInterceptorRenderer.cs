@@ -141,6 +141,9 @@ internal static class MethodInterceptorRenderer
 
 		// Track unconfigured calls
 		w.Line("private int _unconfiguredCallCount;");
+		w.Line("/// <summary>Count of calls that were not handled by any configured behavior (used for class stub base fallback).</summary>");
+		w.Line("internal int UnconfiguredCallCount => _unconfiguredCallCount;");
+		w.Line();
 		if (model.LastArgType != null)
 		{
 			var nullableType = model.LastArgType.EndsWith("?") ? model.LastArgType : $"{model.LastArgType}?";
@@ -386,6 +389,10 @@ internal static class MethodInterceptorRenderer
 
 		// Track unconfigured calls (shared across all overloads)
 		w.Line("private int _unconfiguredCallCount;");
+		w.Line();
+
+		w.Line("/// <summary>Count of calls that were not handled by any configured behavior (used for class stub base fallback).</summary>");
+		w.Line("internal int UnconfiguredCallCount => _unconfiguredCallCount;");
 		w.Line();
 
 		// Generate delegates and storage for each unique overload

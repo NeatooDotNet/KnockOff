@@ -31,7 +31,7 @@ internal sealed record InlineClassStubModel(
     /// <summary>Indexer interceptors.</summary>
     EquatableArray<InlineClassIndexerModel> Indexers,
     /// <summary>Method interceptors.</summary>
-    EquatableArray<InlineClassMethodModel> Methods,
+    EquatableArray<UnifiedMethodInterceptorModel> Methods,
     /// <summary>Event interceptors.</summary>
     EquatableArray<InlineClassEventModel> Events,
     /// <summary>Interceptor properties to generate on the wrapper class.</summary>
@@ -243,7 +243,9 @@ internal sealed record InlineClassImplMethodModel(
     /// <summary>Input argument list for RecordCall (e.g., "name, count").</summary>
     string InputArgumentList,
     /// <summary>OnCall argument list (e.g., "_stub, name, count").</summary>
-    string OnCallArgumentList);
+    string OnCallArgumentList,
+    /// <summary>Invoke suffix for multi-overload interceptors (e.g., "_NoParams_TNullable"). Empty for single-signature interceptors.</summary>
+    string InvokeSuffix);
 
 /// <summary>
 /// Model for an event override in the Impl class.

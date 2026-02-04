@@ -1,6 +1,6 @@
 # Class Stub Overload API Consistency
 
-**Status:** Open
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-02-03
 **Last Updated:** 2026-02-03
@@ -49,6 +49,8 @@ stub.GetDefault.OnCall((filter) => ...);              // T? GetDefault(string fi
 
 ## Plans
 
+- [Class Stub Overload Consistency Design](../plans/class-stub-overload-design.md)
+
 ---
 
 ## Tasks
@@ -82,6 +84,16 @@ This is the first time class stubs with overloaded methods have been tested - ex
 Tested `[KnockOff<RepositoryBase<TestEntity>>]` (inline class with closed generic) and confirmed it also generates numbered interceptors (`GetDefault1Interceptor`, `GetDefault2Interceptor`).
 
 **Conclusion:** Both class-based patterns (inline class and open generic class) are affected. The issue is in the generator's class stub handling, not specific to open generics.
+
+### 2026-02-03: Architecture investigation complete
+
+Performed deep codebase analysis to identify root cause and design solution.
+
+**Root cause:** `ClassModelBuilder.cs` uses a simpler approach that always numbers overloaded methods, while `InlineModelBuilder.cs` (for interfaces) leverages `UnifiedInterceptorBuilder` for overload-aware interceptor generation.
+
+**Solution:** Modify `ClassModelBuilder` to use the same unified builder pattern as interfaces, including compatibility checks for when numbered interceptors are still appropriate.
+
+**Plan created:** See [Class Stub Overload Consistency Design](../plans/class-stub-overload-design.md)
 
 ---
 
