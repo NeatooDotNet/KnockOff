@@ -29,7 +29,7 @@ internal static class ClassModelBuilder
             ? SymbolHelpers.ReplaceUnboundGeneric(cls.FullName, typeParamList)
             : cls.FullName;
 
-        // Group methods by name for overload handling
+        // Group methods by name with compatibility checking for overload handling
         var methodGroups = GroupMethodsByName(cls.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
         // Count indexers to determine naming strategy
@@ -48,7 +48,7 @@ internal static class ClassModelBuilder
         // Build models for interceptor classes
         var properties = new List<InlineClassPropertyModel>();
         var indexers = new List<InlineClassIndexerModel>();
-        var methods = new List<InlineClassMethodModel>();
+        var methods = new List<UnifiedMethodInterceptorModel>();
         var events = new List<InlineClassEventModel>();
         var interceptorProperties = new List<InlineInterceptorPropertyModel>();
         var resetStatements = new List<string>();
@@ -81,23 +81,35 @@ internal static class ClassModelBuilder
             }
         }
 
-        // Build method interceptors
-        foreach (var group in methodGroups.Values)
+        // Build method interceptors using UnifiedInterceptorBuilder
+        // Each group (compatible or numbered) gets ONE interceptor
+        foreach (var group in methodGroups)
         {
-            var hasOverloads = group.Members.Count > 1;
-            for (int i = 0; i < group.Members.Count; i++)
-            {
-                var member = group.Members.GetArray()![i];
-                var handlerName = hasOverloads ? $"{group.Name}{i + 1}" : group.Name;
-                var methodModel = BuildMethodModel(member, stubClassName, handlerName, typeParamList, constraintClause);
-                methods.Add(methodModel);
-                interceptorProperties.Add(new InlineInterceptorPropertyModel(
-                    PropertyName: handlerName,
-                    InterceptorTypeName: $"{methodModel.InterceptorClassName}{typeParamList}",
-                    NeedsNewKeyword: false,
-                    Description: $"Interceptor for {group.Name}."));
-                resetStatements.Add($"{handlerName}.Reset();");
-            }
+            var interceptorClassName = $"{stubClassName}_{group.GroupName}Interceptor";
+            var ownerClassName = $"Stubs.{stubClassName}{typeParamList}";
+
+            // Convert ClassMemberInfo to MethodSignatureInfo for UnifiedInterceptorBuilder
+            var signatures = group.Members
+                .Select(m => ToMethodSignatureInfo(m))
+                .ToList();
+
+            var methodModel = UnifiedInterceptorBuilder.BuildMethodInterceptor(
+                interceptorClassName: interceptorClassName,
+                methodName: group.MethodName,
+                declaringInterface: "",  // Class stubs don't have a declaring interface
+                ownerClassName: ownerClassName,
+                ownerTypeParameters: "",
+                overloads: signatures);
+
+            methods.Add(methodModel);
+
+            // One interceptor property per group
+            interceptorProperties.Add(new InlineInterceptorPropertyModel(
+                PropertyName: group.GroupName,
+                InterceptorTypeName: $"{interceptorClassName}{typeParamList}",
+                NeedsNewKeyword: false,
+                Description: $"Interceptor for {group.MethodName}."));
+            resetStatements.Add($"{group.GroupName}.Reset();");
         }
 
         // Build event interceptors
@@ -135,15 +147,25 @@ internal static class ClassModelBuilder
             }
         }
 
-        // Impl methods
-        foreach (var group in methodGroups.Values)
+        // Impl methods - one per actual method overload, with signature suffix for multi-overload interceptors
+        foreach (var group in methodGroups)
         {
-            var hasOverloads = group.Members.Count > 1;
-            for (int i = 0; i < group.Members.Count; i++)
+            // Find the corresponding method model to check if it has overloads
+            var methodModel = methods.First(m => m.MethodName == group.MethodName &&
+                m.InterceptorClassName == $"{stubClassName}_{group.GroupName}Interceptor");
+            var hasOverloads = methodModel.Overloads.Count > 0;
+
+            foreach (var member in group.Members)
             {
-                var member = group.Members.GetArray()![i];
-                var handlerName = hasOverloads ? $"{group.Name}{i + 1}" : group.Name;
-                implMethods.Add(BuildImplMethodModel(member, handlerName));
+                // For multi-overload interceptors, compute the invoke suffix
+                var invokeSuffix = "";
+                if (hasOverloads)
+                {
+                    var sig = ToMethodSignatureInfo(member);
+                    invokeSuffix = "_" + UnifiedInterceptorBuilder.GetSignatureSuffix(sig.Parameters, sig.ReturnType);
+                }
+
+                implMethods.Add(BuildImplMethodModel(member, group.GroupName, invokeSuffix, hasOverloads));
             }
         }
 
@@ -177,6 +199,73 @@ internal static class ClassModelBuilder
             HasRequiredMembers: hasRequiredMembers,
             RequiredMemberNames: requiredMemberNames);
     }
+
+    #region Method Grouping
+
+    /// <summary>
+    /// Represents a group of method overloads that share a single interceptor.
+    /// </summary>
+    private sealed class MethodGroup
+    {
+        public string MethodName { get; }
+        public string GroupName { get; }
+        public List<ClassMemberInfo> Members { get; }
+
+        public MethodGroup(string methodName, string groupName, List<ClassMemberInfo> members)
+        {
+            MethodName = methodName;
+            GroupName = groupName;
+            Members = members;
+        }
+    }
+
+    /// <summary>
+    /// Groups methods by name. All overloads share a single interceptor with multiple OnCall signatures.
+    /// </summary>
+    private static List<MethodGroup> GroupMethodsByName(IEnumerable<ClassMemberInfo> methods)
+    {
+        return methods
+            .GroupBy(m => m.Name)
+            .Select(g => new MethodGroup(g.Key, g.Key, g.ToList()))
+            .ToList();
+    }
+
+    #endregion
+
+    #region MethodSignatureInfo Conversion
+
+    /// <summary>
+    /// Converts a ClassMemberInfo to MethodSignatureInfo for use with UnifiedInterceptorBuilder.
+    /// </summary>
+    private static MethodSignatureInfo ToMethodSignatureInfo(ClassMemberInfo member)
+    {
+        var parameters = member.Parameters
+            .Select(p => new ParameterModel(
+                Name: p.Name,
+                EscapedName: EscapeIdentifier(p.Name),
+                Type: p.Type,
+                NullableType: MakeNullable(p.Type),
+                RefKind: p.RefKind,
+                RefPrefix: GetRefKindPrefix(p.RefKind)))
+            .ToEquatableArray();
+
+        var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
+        var hasRefOrOut = parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
+        var isVoid = member.ReturnType == "void";
+        var defaultExpr = isVoid ? "" : "default!";
+
+        return new MethodSignatureInfo(
+            Parameters: parameters,
+            TrackableParameters: trackableParams,
+            ParameterDeclarations: UnifiedInterceptorBuilder.BuildParameterDeclarations(parameters),
+            ReturnType: member.ReturnType,
+            IsVoid: isVoid,
+            HasRefOrOutParams: hasRefOrOut,
+            DefaultExpression: defaultExpr,
+            ThrowsOnDefault: false);
+    }
+
+    #endregion
 
     #region Model Building
 
@@ -233,76 +322,6 @@ internal static class ClassModelBuilder
             ParameterDeclarations: paramSig,
             ArgumentList: argList,
             KeyExpression: keyExpr,
-            StubClassName: stubClassRef,
-            TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
-    }
-
-    private static InlineClassMethodModel BuildMethodModel(
-        ClassMemberInfo member,
-        string stubClassName,
-        string handlerName,
-        string typeParamList,
-        string constraintClause)
-    {
-        var interceptClassName = $"{stubClassName}_{handlerName}Interceptor";
-        var stubClassRef = $"Stubs.{stubClassName}{typeParamList}";
-
-        var inputParams = GetInputParameters(member.Parameters).ToArray();
-
-        // Build delegate type (no stub parameter - callbacks only get method parameters)
-        var delegateParamTypes = string.Join(", ", inputParams.Select(p => p.Type));
-        var isVoid = member.ReturnType == "void";
-        string delegateType;
-        if (isVoid)
-        {
-            delegateType = string.IsNullOrEmpty(delegateParamTypes)
-                ? "global::System.Action"
-                : $"global::System.Action<{delegateParamTypes}>";
-        }
-        else
-        {
-            delegateType = string.IsNullOrEmpty(delegateParamTypes)
-                ? $"global::System.Func<{member.ReturnType}>"
-                : $"global::System.Func<{delegateParamTypes}, {member.ReturnType}>";
-        }
-
-        // Build input parameters model
-        var inputParamModels = inputParams.Select(p => new ParameterModel(
-            Name: p.Name,
-            EscapedName: EscapeIdentifier(p.Name),
-            Type: p.Type,
-            NullableType: MakeNullable(p.Type),
-            RefKind: p.RefKind,
-            RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
-
-        // LastCallArg/Args types
-        string? lastCallArgType = null;
-        string? lastCallArgsType = null;
-        if (inputParams.Length == 1)
-        {
-            lastCallArgType = MakeNullable(inputParams[0].Type);
-        }
-        else if (inputParams.Length > 1)
-        {
-            lastCallArgsType = $"({string.Join(", ", inputParams.Select(p => $"{MakeNullable(p.Type)} {p.Name}"))})?";
-        }
-
-        var paramDecl = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
-        var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
-
-        return new InlineClassMethodModel(
-            InterceptorClassName: interceptClassName,
-            HandlerName: handlerName,
-            MethodName: member.Name,
-            ReturnType: member.ReturnType,
-            IsVoid: isVoid,
-            ParameterDeclarations: paramDecl,
-            ArgumentList: argList,
-            InputParameters: inputParamModels,
-            DelegateType: delegateType,
-            LastCallArgType: lastCallArgType,
-            LastCallArgsType: lastCallArgsType,
             StubClassName: stubClassRef,
             TypeParameterList: typeParamList,
             ConstraintClauses: constraintClause);
@@ -369,7 +388,11 @@ internal static class ClassModelBuilder
             ConcreteTypeForNew: member.ConcreteTypeForNew);
     }
 
-    private static InlineClassImplMethodModel BuildImplMethodModel(ClassMemberInfo member, string handlerName)
+    private static InlineClassImplMethodModel BuildImplMethodModel(
+        ClassMemberInfo member,
+        string handlerName,
+        string invokeSuffix,
+        bool hasOverloads)
     {
         var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
         var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
@@ -394,40 +417,13 @@ internal static class ClassModelBuilder
             ParameterDeclarations: paramList,
             ArgumentList: argList,
             InputArgumentList: inputArgList,
-            OnCallArgumentList: onCallArgs);
+            OnCallArgumentList: onCallArgs,
+            InvokeSuffix: invokeSuffix);
     }
 
     #endregion
 
     #region Helper Methods
-
-    private static Dictionary<string, ClassMethodGroupInfo> GroupMethodsByName(IEnumerable<ClassMemberInfo> methods)
-    {
-        var tempGroups = new Dictionary<string, List<ClassMemberInfo>>();
-
-        foreach (var method in methods)
-        {
-            if (!tempGroups.TryGetValue(method.Name, out var list))
-            {
-                list = new List<ClassMemberInfo>();
-                tempGroups[method.Name] = list;
-            }
-            list.Add(method);
-        }
-
-        return tempGroups.ToDictionary(
-            kvp => kvp.Key,
-            kvp =>
-            {
-                var first = kvp.Value[0];
-                return new ClassMethodGroupInfo(
-                    kvp.Key,
-                    first.ReturnType,
-                    first.ReturnType == "void",
-                    first.IsNullable,
-                    kvp.Value);
-            });
-    }
 
     private static IEnumerable<ParameterInfo> GetInputParameters(EquatableArray<ParameterInfo> parameters) =>
         parameters.Where(p => p.RefKind != RefKind.Out);

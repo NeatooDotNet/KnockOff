@@ -3,7 +3,7 @@ namespace KnockOff.Tests;
 /// <summary>
 /// Tests for inline stub versions of Bug 1 and Bug 2.
 /// These verify that inline stubs ([KnockOff&lt;T&gt;]) handle:
-/// - Method overloads with different return types (T vs Task{T})
+/// - Method overloads with different parameter AND return types
 /// - Generic interface inheritance type mismatches
 /// </summary>
 public class InlineStubBugTests
@@ -18,13 +18,13 @@ public class InlineStubBugTests
 
 		var entity = new SampleEntity { Id = 1 };
 
-		// Set up sync callback - Fetch2 is the sync overload
-		stub.Fetch2.OnCall((e) => new SampleArea { Id = e.Id });
+		// Set up sync callback - C# overload resolution picks the right OnCall based on lambda parameter type
+		stub.Fetch.OnCall((SampleEntity e) => new SampleArea { Id = e.Id });
 
 		// Call the sync overload
 		var result = factory.Fetch(entity);
 
-		stub.Fetch2.Verify();
+		stub.Fetch.Verify();
 		Assert.Equal(1, result.Id);
 	}
 
@@ -34,8 +34,8 @@ public class InlineStubBugTests
 		var stub = new InlineMixedReturnTypesStub.Stubs.IFactoryWithMixedReturnTypes();
 		IFactoryWithMixedReturnTypes factory = stub;
 
-		// Set up async callback - Fetch1 is the async overload
-		stub.Fetch1.OnCall((id) =>
+		// Set up async callback - C# overload resolution picks the right OnCall based on lambda parameter type
+		stub.Fetch.OnCall((long id) =>
 			Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
 
 		// Call the async overload
@@ -43,7 +43,7 @@ public class InlineStubBugTests
 
 		Assert.NotNull(result);
 		Assert.Equal(42, result!.Id);
-		stub.Fetch1.Verify();
+		stub.Fetch.Verify();
 	}
 
 	#endregion
@@ -59,14 +59,14 @@ public class InlineStubBugTests
 		var target = new SampleTarget { Value = "test" };
 		var expectedResult = new SampleResult { Success = true };
 
-		// Set up callback for typed version - Execute1 takes ISampleTarget
-		stub.Execute1.OnCall((t, ct) =>
+		// Set up callback for typed version - Execute takes ISampleTarget
+		stub.Execute.OnCall((ISampleTarget t, CancellationToken? ct) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via typed interface
 		var result = rule.Execute(target, CancellationToken.None);
 
-		stub.Execute1.Verify();
+		stub.Execute.Verify();
 	}
 
 	[Fact]
@@ -78,15 +78,15 @@ public class InlineStubBugTests
 		var target = new SampleTarget { Value = "base-call" };
 		var expectedResult = new SampleResult { Success = true };
 
-		// Set up callback for base version - Execute2 takes ISampleRuleTarget
-		stub.Execute2.OnCall((t, ct) =>
+		// Set up callback for base version - Execute takes ISampleRuleTarget
+		stub.Execute.OnCall((ISampleRuleTarget t, CancellationToken? ct) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via base interface
 		var result = rule.Execute(target, CancellationToken.None);
 
 		Assert.NotNull(result);
-		stub.Execute2.Verify();
+		stub.Execute.Verify();
 	}
 
 	#endregion
