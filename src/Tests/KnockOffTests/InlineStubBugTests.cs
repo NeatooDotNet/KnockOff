@@ -3,7 +3,7 @@ namespace KnockOff.Tests;
 /// <summary>
 /// Tests for inline stub versions of Bug 1 and Bug 2.
 /// These verify that inline stubs ([KnockOff&lt;T&gt;]) handle:
-/// - Method overloads with different return types (T vs Task{T})
+/// - Method overloads with different parameter AND return types
 /// - Generic interface inheritance type mismatches
 /// </summary>
 public class InlineStubBugTests
@@ -18,7 +18,7 @@ public class InlineStubBugTests
 
 		var entity = new SampleEntity { Id = 1 };
 
-		// Set up sync callback - C# overload resolution picks the right OnCall based on return type
+		// Set up sync callback - C# overload resolution picks the right OnCall based on lambda parameter type
 		stub.Fetch.OnCall((SampleEntity e) => new SampleArea { Id = e.Id });
 
 		// Call the sync overload
@@ -34,7 +34,7 @@ public class InlineStubBugTests
 		var stub = new InlineMixedReturnTypesStub.Stubs.IFactoryWithMixedReturnTypes();
 		IFactoryWithMixedReturnTypes factory = stub;
 
-		// Set up async callback - C# overload resolution picks the right OnCall based on return type
+		// Set up async callback - C# overload resolution picks the right OnCall based on lambda parameter type
 		stub.Fetch.OnCall((long id) =>
 			Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
 

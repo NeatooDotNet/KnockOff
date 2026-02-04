@@ -1,11 +1,12 @@
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for Bug 1: Method overloads with different return types.
+/// Tests for Bug 1: Method overloads with different parameter and return types.
 ///
-/// When an interface has method overloads where one returns T and another returns Task{T},
-/// KnockOff generates a single Fetch interceptor with multiple OnCall overloads.
-/// The compiler resolves the correct overload based on the callback's return type.
+/// When an interface has method overloads with different parameter types (long vs SampleEntity)
+/// and different return types (Task{T} vs T), KnockOff generates a single Fetch interceptor
+/// with multiple OnCall overloads. The compiler resolves the correct overload based on the
+/// callback's parameter type (the lambda signature).
 ///
 /// Example: IFactoryWithMixedReturnTypes with Fetch(long) -> Task{T} and Fetch(entity) -> T
 /// </summary>
@@ -19,7 +20,7 @@ public class ReturnTypeMismatchBugTests
 
 		var entity = new SampleEntity { Id = 1 };
 
-		// Set up sync callback - compiler resolves based on return type (ISampleArea vs Task<ISampleArea?>)
+		// Set up sync callback - compiler resolves based on lambda parameter type (SampleEntity vs long)
 		var trackingSync = stub.Fetch.OnCall((e) => new SampleArea { Id = e.Id });
 
 		// Call the sync overload
@@ -55,7 +56,7 @@ public class ReturnTypeMismatchBugTests
 
 		var entity = new SampleEntity { Id = 99 };
 
-		// Set up callbacks for both - different return types resolve to different OnCall overloads
+		// Set up callbacks for both - different parameter types resolve to different OnCall overloads
 		var trackingAsync = stub.Fetch.OnCall((id) => Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
 		var trackingSync = stub.Fetch.OnCall((e) => new SampleArea { Id = e.Id });
 
@@ -95,13 +96,14 @@ public class SampleEntity
 }
 
 /// <summary>
-/// Interface with method overloads that have DIFFERENT return types.
+/// Interface with method overloads that have different parameter AND return types.
 /// This pattern is common in Neatoo factories:
-/// - Async method takes an ID and returns Task{T}
-/// - Sync method takes an EF entity and returns T directly
+/// - Async method takes an ID (long) and returns Task{T}
+/// - Sync method takes an EF entity (SampleEntity) and returns T directly
 ///
-/// The generator creates a single Fetch interceptor with multiple OnCall
-/// overloads that are resolved by the compiler based on return type.
+/// The methods are valid C# overloads because they have different parameter types.
+/// The generator creates a single Fetch interceptor with multiple OnCall overloads
+/// that are resolved by the compiler based on the lambda's parameter type.
 /// </summary>
 public interface IFactoryWithMixedReturnTypes
 {
