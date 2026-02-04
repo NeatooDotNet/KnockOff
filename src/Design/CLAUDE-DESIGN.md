@@ -55,6 +55,7 @@ src/Design/Design.Stubs/
   Properties/            # Property stubbing
   Indexers/              # Indexer stubbing
   Events/                # Event stubbing
+  UserMethods/           # User-defined methods (base class pattern)
   Advanced/              # Strict mode, Source(), verification
 ```
 
@@ -124,6 +125,22 @@ Use `AtLeast` and `AtMost` instead:
 // Right:
 stub.Add.Verify(Times.AtLeast(1));
 stub.Add.Verify(Times.AtMost(5));
+```
+
+### 7. User Methods Use Base Class Pattern
+
+User methods (protected overrides in standalone stubs) require `override` keyword and underscore suffix:
+
+```csharp
+// Generated base class creates virtual methods with underscore suffix:
+// protected virtual string Process_(string input) => default!;
+
+// Your override must use 'override' keyword and '_' suffix:
+protected override string Process_(string input) => $"[Processed: {input}]";
+
+// Interceptor uses clean name (no underscore):
+stub.Process.Verify(Times.Once);
+stub.Process.OnCall(input => "override");  // Supersedes user method
 ```
 
 ## When Updating Documentation
