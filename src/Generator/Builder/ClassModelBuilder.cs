@@ -30,7 +30,7 @@ internal static class ClassModelBuilder
             : cls.FullName;
 
         // Group methods by name with compatibility checking for overload handling
-        var methodGroups = GroupMethodsByNameWithCompatibility(cls.Members.Where(m => !m.IsProperty && !m.IsIndexer));
+        var methodGroups = GroupMethodsByName(cls.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
         // Count indexers to determine naming strategy
         var indexerCount = SymbolHelpers.CountClassIndexers(cls.Members);
@@ -200,26 +200,10 @@ internal static class ClassModelBuilder
             RequiredMemberNames: requiredMemberNames);
     }
 
-    #region Compatibility Checking
-
-    /// <summary>
-    /// All method overloads with the same name are always compatible and share a single interceptor.
-    /// C# overload resolution handles all cases:
-    /// - Different param types: OnCall(Action&lt;string&gt;) vs OnCall(Action&lt;int&gt;) are distinguishable
-    /// - Different param counts: OnCall(Action) vs OnCall(Action&lt;string&gt;) are distinguishable
-    /// - Different return types: OnCall(Func&lt;int,string&gt;) vs OnCall(Func&lt;string,int&gt;) are distinguishable
-    /// Storage uses signature-based suffixes to keep callbacks separate internally.
-    /// </summary>
-    private static bool AreAllOverloadsCompatible(List<ClassMemberInfo> overloads) => true;
-
-    #endregion
-
     #region Method Grouping
 
     /// <summary>
-    /// Represents a group of methods that share a single interceptor.
-    /// For compatible overloads: one group with all overloads.
-    /// For incompatible overloads: separate numbered groups.
+    /// Represents a group of method overloads that share a single interceptor.
     /// </summary>
     private sealed class MethodGroup
     {
@@ -236,54 +220,14 @@ internal static class ClassModelBuilder
     }
 
     /// <summary>
-    /// Groups methods by name, checking compatibility for overload sharing.
-    /// Compatible overloads share a single interceptor with multiple OnCall signatures.
-    /// Incompatible overloads get numbered interceptors (Method1, Method2).
+    /// Groups methods by name. All overloads share a single interceptor with multiple OnCall signatures.
     /// </summary>
-    private static List<MethodGroup> GroupMethodsByNameWithCompatibility(IEnumerable<ClassMemberInfo> methods)
+    private static List<MethodGroup> GroupMethodsByName(IEnumerable<ClassMemberInfo> methods)
     {
-        var result = new List<MethodGroup>();
-
-        // First, group by method name
-        var tempGroups = new Dictionary<string, List<ClassMemberInfo>>();
-        foreach (var method in methods)
-        {
-            if (!tempGroups.TryGetValue(method.Name, out var list))
-            {
-                list = new List<ClassMemberInfo>();
-                tempGroups[method.Name] = list;
-            }
-            list.Add(method);
-        }
-
-        // For each name group, check compatibility
-        foreach (var kvp in tempGroups)
-        {
-            var methodName = kvp.Key;
-            var overloads = kvp.Value;
-
-            if (overloads.Count == 1)
-            {
-                // Single method - no overloads
-                result.Add(new MethodGroup(methodName, methodName, overloads));
-            }
-            else if (AreAllOverloadsCompatible(overloads))
-            {
-                // All compatible - single group
-                result.Add(new MethodGroup(methodName, methodName, overloads));
-            }
-            else
-            {
-                // Incompatible - create numbered groups (one per overload)
-                for (int i = 0; i < overloads.Count; i++)
-                {
-                    var groupName = $"{methodName}{i + 1}";
-                    result.Add(new MethodGroup(methodName, groupName, new List<ClassMemberInfo> { overloads[i] }));
-                }
-            }
-        }
-
-        return result;
+        return methods
+            .GroupBy(m => m.Name)
+            .Select(g => new MethodGroup(g.Key, g.Key, g.ToList()))
+            .ToList();
     }
 
     #endregion

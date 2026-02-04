@@ -1192,66 +1192,25 @@ internal static class InlineModelBuilder
     }
 
     /// <summary>
-    /// All method overloads with the same name are always compatible and share a single interceptor.
-    /// C# overload resolution handles all cases:
-    /// - Different param types: OnCall(Action&lt;string&gt;) vs OnCall(Action&lt;int&gt;) are distinguishable
-    /// - Different param counts: OnCall(Action) vs OnCall(Action&lt;string&gt;) are distinguishable
-    /// - Different return types: OnCall(Func&lt;int,string&gt;) vs OnCall(Func&lt;string,int&gt;) are distinguishable
-    /// Storage uses signature-based suffixes to keep callbacks separate internally.
-    /// </summary>
-    private static bool AreAllOverloadsCompatible(List<InterfaceMemberInfo> overloads) => true;
-
-    /// <summary>
-    /// Groups methods by name, splitting into separate numbered groups when overloads are incompatible.
+    /// Groups methods by name. All overloads share a single interceptor with multiple OnCall signatures.
     /// Returns both the groups dictionary (keyed by group name) and a member-to-group-name mapping.
     /// </summary>
     private static (Dictionary<string, MethodGroupInfo> Groups, Dictionary<string, string> MemberKeyToGroupName) GroupMethodsByName(IEnumerable<InterfaceMemberInfo> methods)
     {
-        // First, group all methods by name
-        var methodsByName = new Dictionary<string, List<InterfaceMemberInfo>>();
-
-        foreach (var method in methods.Where(m => !m.IsProperty))
-        {
-            if (!methodsByName.TryGetValue(method.Name, out var list))
-            {
-                list = new List<InterfaceMemberInfo>();
-                methodsByName[method.Name] = list;
-            }
-            list.Add(method);
-        }
-
         var groups = new Dictionary<string, MethodGroupInfo>();
         var memberKeyToGroupName = new Dictionary<string, string>();
 
-        foreach (var kvp in methodsByName)
+        foreach (var g in methods.Where(m => !m.IsProperty).GroupBy(m => m.Name))
         {
-            var methodName = kvp.Key;
-            var overloads = kvp.Value;
+            var methodName = g.Key;
+            var overloads = g.ToList();
 
-            // Check if all overloads are compatible (can share one interceptor)
-            if (overloads.Count == 1 || AreAllOverloadsCompatible(overloads))
-            {
-                // All compatible - create single group with combined parameters
-                var group = BuildMethodGroup(methodName, overloads);
-                groups[methodName] = group;
+            var group = BuildMethodGroup(methodName, overloads);
+            groups[methodName] = group;
 
-                // Map all members to this group
-                foreach (var overload in overloads)
-                {
-                    memberKeyToGroupName[GetMemberKey(overload)] = methodName;
-                }
-            }
-            else
+            foreach (var overload in overloads)
             {
-                // Incompatible overloads - create separate numbered groups
-                for (int i = 0; i < overloads.Count; i++)
-                {
-                    var overload = overloads[i];
-                    var numberedName = $"{methodName}{i + 1}";
-                    var group = BuildMethodGroup(numberedName, new List<InterfaceMemberInfo> { overload });
-                    groups[numberedName] = group;
-                    memberKeyToGroupName[GetMemberKey(overload)] = numberedName;
-                }
+                memberKeyToGroupName[GetMemberKey(overload)] = methodName;
             }
         }
 
@@ -1259,7 +1218,7 @@ internal static class InlineModelBuilder
     }
 
     /// <summary>
-    /// Builds a MethodGroupInfo from a list of compatible overloads.
+    /// Builds a MethodGroupInfo from a list of overloads sharing the same name.
     /// </summary>
     private static MethodGroupInfo BuildMethodGroup(string groupName, List<InterfaceMemberInfo> overloads)
     {
