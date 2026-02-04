@@ -364,7 +364,7 @@ stub.ProcessData.Reset();
 
 ## User Method Interceptors (Stand-Alone Pattern)
 
-When you define a **user method** (protected method matching an interface signature in a Stand-Alone stub), KnockOff generates a **numbered interceptor** (e.g., `GetById2`). These interceptors support `OnCall()` and `Returns()` to override the user method.
+When you define a **user method** (override a virtual method with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). These interceptors support `OnCall()` and `Returns()` to override the user method.
 
 ### OnCall Supersedes User Method
 
@@ -374,7 +374,8 @@ public partial class RepoStub : IRepo { }
 
 public partial class RepoStub
 {
-    protected User? GetById(int id) => new User { Id = id, Name = "Default" };
+    // Override virtual method with underscore suffix - compiler enforces signature!
+    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 
 // Usage:
@@ -384,21 +385,21 @@ IRepo repo = stub;
 // Without OnCall: user method provides behavior
 var user1 = repo.GetById(1);  // Name = "Default"
 
-// With OnCall: callback supersedes user method
-stub.GetById2.OnCall(id => new User { Id = id, Name = "Override" });
+// With OnCall: callback supersedes user method (clean interceptor name)
+stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Name = "Override"
 ```
 
 ### Returns for Constant Values
 
 ```cs
-stub.GetById2.Returns(new User { Id = 99, Name = "Fixed" });
+stub.GetById.Returns(new User { Id = 99, Name = "Fixed" });
 ```
 
 For async methods (`Task<T>`, `ValueTask<T>`), `Returns()` auto-wraps the value:
 
 ```cs
-stub.GetUserAsync2.Returns(new User { Id = 1 });  // Auto-wrapped in Task.FromResult
+stub.GetUserAsync.Returns(new User { Id = 1 });  // Auto-wrapped in Task.FromResult
 ```
 
 ### Full Tracking Support
@@ -406,11 +407,11 @@ stub.GetUserAsync2.Returns(new User { Id = 1 });  // Auto-wrapped in Task.FromRe
 User method interceptors provide full tracking even when using `OnCall`:
 
 ```cs
-stub.GetById2.OnCall(id => new User { Id = id });
+stub.GetById.OnCall(id => new User { Id = id });
 repo.GetById(42);
 
-stub.GetById2.Verify(Times.Once);
-Assert.Equal(42, stub.GetById2.LastArg);
+stub.GetById.Verify(Times.Once);
+Assert.Equal(42, stub.GetById.LastArg);
 ```
 
 ### Reset Preserves OnCall Configuration
@@ -418,12 +419,12 @@ Assert.Equal(42, stub.GetById2.LastArg);
 Unlike regular method interceptors, user method interceptors preserve `OnCall` configuration across `Reset()`:
 
 ```cs
-stub.GetById2.OnCall(id => new User { Id = id });
+stub.GetById.OnCall(id => new User { Id = id });
 repo.GetById(1);
-stub.GetById2.Verify(Times.Once);
+stub.GetById.Verify(Times.Once);
 
-stub.GetById2.Reset();
-stub.GetById2.Verify(Times.Never);  // Tracking cleared
+stub.GetById.Reset();
+stub.GetById.Verify(Times.Never);  // Tracking cleared
 
 repo.GetById(2);  // Still uses OnCall callback (not reset to user method)
 ```
@@ -463,9 +464,9 @@ var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
 | Get last single arg | `tracking.LastArg` |
 | Get last multiple args | `tracking.LastArgs` (named tuple) |
 | Reset interceptor | `stub.Method.Reset()` |
-| Override user method | `stub.Method2.OnCall((args) => returnValue)` |
-| Override user method (constant) | `stub.Method2.Returns(value)` |
-| Override async user method | `stub.AsyncMethod2.Returns(value)` (auto-wraps) |
+| Override user method | `stub.Method.OnCall((args) => returnValue)` |
+| Override user method (constant) | `stub.Method.Returns(value)` |
+| Override async user method | `stub.AsyncMethod.Returns(value)` (auto-wraps) |
 
 ---
 
@@ -480,8 +481,8 @@ var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
 - **Arguments**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Distinguished by callback parameter types - use explicit types in lambdas
 - **Reset**: Clears call counts and tracking state
-- **User methods**: Define protected methods in Stand-Alone stubs for default behavior
-- **User method override**: Use `stub.Method2.OnCall()` or `stub.Method2.Returns()` to supersede user method
+- **User methods**: Override virtual methods (with underscore suffix) in Stand-Alone stubs for default behavior
+- **User method override**: Use `stub.Method.OnCall()` or `stub.Method.Returns()` to supersede user method
 - **User method reset**: `Reset()` preserves OnCall configuration (different from regular interceptors)
 
 ---

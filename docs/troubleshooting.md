@@ -186,8 +186,69 @@ Common diagnostics:
 - **KO001:** Class must be partial
 - **KO002:** Unsupported member type
 - **KO003:** Interface not found
+- **KO0200:** Standalone stub cannot have base class (see section below)
 
 Review the build output messages for specific guidance on resolving each diagnostic.
+
+---
+
+### KO0200: Standalone stub cannot have base class
+
+**Error message:** `Standalone stub 'YourStubClass' cannot have base class 'YourBaseClass'. KnockOff generates a base class for user method support. Remove the base class or use inline stub pattern instead.`
+
+**Cause:** KnockOff generates a base class (`YourStubBase`) containing virtual methods for user method support. C# does not allow multiple inheritance, so user-defined base classes conflict with KnockOff's generated base class.
+
+```csharp
+public class MyBaseClass { }
+
+[KnockOff]
+public partial class MyStub : MyBaseClass, IMyService { }  // ERROR: KO0200
+```
+
+**Understanding user methods:**
+
+User methods let you add custom default behavior to stubs by overriding generated virtual methods with an underscore suffix. KnockOff generates a base class with these methods so you can override them in your stub class:
+
+```csharp
+public interface IUserRepository
+{
+    User? GetById(int id);
+}
+
+[KnockOff]
+public partial class UserRepoStub : IUserRepository
+{
+    // Override the generated virtual method with underscore suffix
+    protected override User? GetById_(int id)
+    {
+        return new User { Id = id, Name = "Default User" };
+    }
+}
+
+// In tests:
+var stub = new UserRepoStub();
+// Calls your GetById_ override by default
+var user = stub.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
+
+// You can still override per-test with OnCall
+stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
+```
+
+**Key points:**
+- Use `protected override` keyword
+- Add underscore suffix to method name (e.g., `GetById_`)
+- User methods provide default behavior for all tests
+- Individual tests can still override with `OnCall`
+
+**Solutions:**
+
+1. **Remove the base class** from the standalone stub if the base class behavior is not essential—KnockOff's generated base class provides user method support
+2. **Use inline stub pattern** if you need the stub inside a class that has a base class:
+   ```csharp
+   [KnockOff<IMyService>]
+   public partial class MyTestContainer { }
+   ```
+3. **Use composition instead of inheritance** if you need shared behavior across stubs—inject or delegate to the shared logic rather than inheriting from a base class
 
 ---
 

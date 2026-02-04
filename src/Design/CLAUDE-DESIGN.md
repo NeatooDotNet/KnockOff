@@ -13,9 +13,11 @@ This file provides guidance for Claude Code agents working with the KnockOff Des
 | Pattern | Attribute | Example |
 |---------|-----------|---------|
 | Standalone | `[KnockOff]` on partial class | `CalculatorStub.cs` |
+| Generic Standalone | `[KnockOff]` on generic class | `new RepositoryStub<T>()` |
 | Inline Interface | `[KnockOff<IInterface>]` | `new Stubs.ICalculator()` |
 | Inline Class | `[KnockOff<AbstractClass>]` | `new Stubs.ServiceBase()` |
 | Inline Delegate | `[KnockOff<DelegateType>]` | `new Stubs.ArithmeticOperation()` |
+| Open Generic | `[KnockOff(typeof(IFoo<>))]` | `new Stubs.IRepository<User>()` |
 
 ### Member Types
 
@@ -55,6 +57,7 @@ src/Design/Design.Stubs/
   Properties/            # Property stubbing
   Indexers/              # Indexer stubbing
   Events/                # Event stubbing
+  UserMethods/           # User-defined methods (base class pattern)
   Advanced/              # Strict mode, Source(), verification
 ```
 
@@ -124,6 +127,22 @@ Use `AtLeast` and `AtMost` instead:
 // Right:
 stub.Add.Verify(Times.AtLeast(1));
 stub.Add.Verify(Times.AtMost(5));
+```
+
+### 7. User Methods Use Base Class Pattern
+
+User methods (protected overrides in standalone stubs) require `override` keyword and underscore suffix:
+
+```csharp
+// Generated base class creates virtual methods with underscore suffix:
+// protected virtual string Process_(string input) => default!;
+
+// Your override must use 'override' keyword and '_' suffix:
+protected override string Process_(string input) => $"[Processed: {input}]";
+
+// Interceptor uses clean name (no underscore):
+stub.Process.Verify(Times.Once);
+stub.Process.OnCall(input => "override");  // Supersedes user method
 ```
 
 ## When Updating Documentation

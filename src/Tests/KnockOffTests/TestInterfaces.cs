@@ -14,7 +14,7 @@ public interface ISampleService
 [KnockOff]
 public partial class SampleKnockOff : ISampleService
 {
-	protected int GetValue(int input) => input * 2;
+	protected override int GetValue_(int input) => input * 2;
 }
 
 #endregion
@@ -75,8 +75,8 @@ public interface IAsyncService
 [KnockOff]
 public partial class AsyncServiceKnockOff : IAsyncService
 {
-	protected Task<int> GetValueAsync(int input) => Task.FromResult(input * 3);
-	protected ValueTask<int> GetValueValueTaskAsync(int input) => new(input * 4);
+	protected override Task<int> GetValueAsync_(int input) => Task.FromResult(input * 3);
+	protected override ValueTask<int> GetValueValueTaskAsync_(int input) => new(input * 4);
 }
 
 #endregion
@@ -254,13 +254,13 @@ public interface IKeyLookup
 [KnockOff]
 public partial class DataProviderKnockOff : IDataProvider
 {
-	protected string GetData(int id) => $"Data-{id}";
+	protected override string GetData_(int id) => $"Data-{id}";
 }
 
 [KnockOff]
 public partial class KeyLookupKnockOff : IKeyLookup
 {
-	protected int GetData(string key) => key.Length;
+	protected override int GetData_(string key) => key.Length;
 }
 
 #endregion

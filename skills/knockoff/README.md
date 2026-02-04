@@ -10,7 +10,7 @@ This plugin provides comprehensive assistance for using the KnockOff stub librar
 
 Automatically activates when you ask about:
 - Creating stubs with `[KnockOff]` or `[KnockOff<T>]` attributes
-- The four stub patterns (Stand-Alone, Inline Interface, Inline Class, Inline Delegate)
+- The six stub patterns (Standalone, Generic Standalone, Inline Interface, Inline Class, Inline Delegate, Open Generic)
 - Configuring behavior with `Returns`, `OnCall`, `OnGet`, `OnSet`
 - Argument matching with `When()` API
 - Sequential callbacks with `ThenCall`, `ThenGet`, `ThenSet`
@@ -43,14 +43,16 @@ To use this plugin in other projects:
 
 ## Quick API Reference
 
-### Four Patterns
+### Six Patterns
 
 | Pattern | Attribute | Access |
 |---------|-----------|--------|
-| Stand-Alone | `[KnockOff]` on partial class | `new MyStub()` |
+| Standalone | `[KnockOff]` on partial class | `new MyStub()` |
+| Generic Standalone | `[KnockOff]` on generic partial class | `new MyStub<T>()` |
 | Inline Interface | `[KnockOff<IInterface>]` | `new Stubs.IInterface()` |
 | Inline Class | `[KnockOff<MyClass>]` | `new Stubs.MyClass()` then `.Object` |
 | Inline Delegate | `[KnockOff<MyDelegate>]` | `new Stubs.MyDelegate()` |
+| Open Generic | `[KnockOff(typeof(IFoo<>))]` | `new Stubs.IFoo<T>()` |
 
 ### User Methods (Stand-Alone Only)
 
@@ -60,15 +62,15 @@ public partial class RepoStub : IRepo { }
 
 public partial class RepoStub
 {
-    // User method provides default behavior
-    protected User? GetById(int id) => new User { Id = id, Name = "Default" };
+    // Override virtual method with underscore suffix - compiler enforces signature!
+    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 
-// User method is fallback; OnCall supersedes it
-stub.GetById2.OnCall(id => new User { Id = id, Name = "Override" });
+// User override is fallback; OnCall supersedes it
+stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 
 // Returns for constant values (auto-wraps for async)
-stub.GetById2.Returns(new User { Id = 99 });
+stub.GetById.Returns(new User { Id = 99 });
 ```
 
 ### Method Configuration
@@ -123,7 +125,7 @@ tracking.Verify(Times.Once);
 The **knockoff-usage** skill provides comprehensive documentation:
 
 - [Main Skill Guide](skills/knockoff-usage/SKILL.md) - Complete guide with gotchas
-- [Stub Patterns](skills/knockoff-usage/references/patterns.md) - All four patterns with examples
+- [Stub Patterns](skills/knockoff-usage/references/patterns.md) - All six patterns with examples
 - [Methods Guide](skills/knockoff-usage/references/methods.md) - Method configuration and verification
 - [Properties Guide](skills/knockoff-usage/references/properties.md) - Property interceptors
 - [API Reference](skills/knockoff-usage/references/api-reference.md) - Complete interceptor API
@@ -132,4 +134,4 @@ The **knockoff-usage** skill provides comprehensive documentation:
 
 ---
 
-**UPDATED:** 2026-02-02
+**UPDATED:** 2026-02-03

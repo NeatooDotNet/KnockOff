@@ -18,7 +18,7 @@ KnockOff generates five types of interceptors, each exposed through properties o
 
 All interceptors provide a `Reset()` method to clear tracking state and callbacks.
 
-**Pattern Note**: The three KnockOff patterns (Standalone, Inline Interface, Inline Class) all expose the same interceptor API. The only difference is how you declare the stub class.
+**Pattern Note**: The three KnockOff patterns (Standalone, Inline Interface, Inline Class) all expose the same interceptor API. The only difference is how you declare the stub class. For Stand-Alone stubs, KnockOff also generates a base class with virtual methods that you can override to provide custom behavior. See the [User Methods Guide](../guides/user-methods.md) for details.
 
 ---
 
@@ -521,4 +521,4 @@ getTracking.Verify(Times.Once);       // Tracking object verification
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-03

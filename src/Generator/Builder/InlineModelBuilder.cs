@@ -342,16 +342,16 @@ internal static class InlineModelBuilder
             var trackableParams = UnifiedInterceptorBuilder.GetTrackableParameters(parameters);
             var hasRefOrOut = parameters.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
 
-            // Determine default expression
-            var defaultExpr = group.IsVoid ? "" : GetDefaultExpressionForReturn(group.ReturnType, group.IsNullable);
-            var throwsOnDefault = !group.IsVoid && !group.IsNullable && IsUninstantiableType(group.ReturnType);
+            // Determine default expression - use per-overload return type for mixed return type groups
+            var defaultExpr = overload.IsVoid ? "" : GetDefaultExpressionForReturn(overload.ReturnType, overload.IsNullable);
+            var throwsOnDefault = !overload.IsVoid && !overload.IsNullable && IsUninstantiableType(overload.ReturnType);
 
             signatures.Add(new MethodSignatureInfo(
                 Parameters: parameters,
                 TrackableParameters: trackableParams,
                 ParameterDeclarations: UnifiedInterceptorBuilder.BuildParameterDeclarations(parameters),
-                ReturnType: group.ReturnType,
-                IsVoid: group.IsVoid,
+                ReturnType: overload.ReturnType,
+                IsVoid: overload.IsVoid,
                 HasRefOrOutParams: hasRefOrOut,
                 DefaultExpression: defaultExpr,
                 ThrowsOnDefault: throwsOnDefault));
@@ -856,7 +856,7 @@ internal static class InlineModelBuilder
         // Compute invoke suffix for multi-overload groups
         // Count unique signatures (excluding generic methods)
         var nonGenericOverloads = group.Overloads.Where(o => !o.IsGenericMethod).ToArray();
-        var isMultiOverload = GetUniqueSignatureCount(nonGenericOverloads, group.ReturnType) > 1;
+        var isMultiOverload = GetUniqueSignatureCount(nonGenericOverloads) > 1;
 
         var invokeSuffix = "";
         if (isMultiOverload)
@@ -871,7 +871,9 @@ internal static class InlineModelBuilder
                     RefKind: p.RefKind,
                     RefPrefix: GetRefKindPrefix(p.RefKind)))
                 .ToEquatableArray();
-            invokeSuffix = "_" + UnifiedInterceptorBuilder.GetSignatureSuffix(paramModels, group.ReturnType);
+            // Use member.ReturnType (not group.ReturnType) - each member needs its own suffix
+            // when overloads have different return types
+            invokeSuffix = "_" + UnifiedInterceptorBuilder.GetSignatureSuffix(paramModels, member.ReturnType);
         }
 
         return new InlineInterfaceImplementation(
@@ -906,22 +908,17 @@ internal static class InlineModelBuilder
             OutParameterInitializations: outParamInits);
     }
 
-    private static int GetUniqueSignatureCount(MethodOverloadInfo[] overloads, string returnType)
+    private static int GetUniqueSignatureCount(MethodOverloadInfo[] overloads)
     {
         var seen = new HashSet<string>();
         foreach (var overload in overloads)
         {
-            var paramModels = (overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>())
-                .Select(p => new ParameterModel(
-                    Name: p.Name,
-                    EscapedName: EscapeIdentifier(p.Name),
-                    Type: p.Type,
-                    NullableType: MakeNullable(p.Type),
-                    RefKind: p.RefKind,
-                    RefPrefix: GetRefKindPrefix(p.RefKind)))
-                .ToEquatableArray();
-            var suffix = UnifiedInterceptorBuilder.GetSignatureSuffix(paramModels, returnType);
-            seen.Add(suffix);
+            // Count unique signatures based on PARAMETERS ONLY (ignore return type).
+            // Same-params-different-return (like ISet<T>.Add) count as ONE signature.
+            var paramTypes = (overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>())
+                .Select(p => GetTypeSuffix(p.Type));
+            var paramKey = paramTypes.Any() ? string.Join("_", paramTypes) : "NoParams";
+            seen.Add(paramKey);
         }
         return seen.Count;
     }
@@ -1195,92 +1192,25 @@ internal static class InlineModelBuilder
     }
 
     /// <summary>
-    /// Determines if two methods with the same name can share an interceptor.
-    /// They cannot if:
-    /// 1. Different return types AND different parameters (both need separate interceptors)
-    /// 2. Same parameter name has different types across overloads (type mismatch in combined params)
-    /// </summary>
-    private static bool AreMethodsCompatibleForSharedInterceptor(InterfaceMemberInfo m1, InterfaceMemberInfo m2)
-    {
-        // Check if any shared parameter names have different types - this is always incompatible
-        var m1Params = m1.Parameters.ToDictionary(p => p.Name, p => p.Type);
-        foreach (var p2 in m2.Parameters)
-        {
-            if (m1Params.TryGetValue(p2.Name, out var m1Type) && m1Type != p2.Type)
-                return false;
-        }
-
-        // If parameter names/types are compatible, check return types
-        // Methods with same parameters but different return types (like BCL IEnumerable)
-        // typically use delegation, so they're compatible for sharing an interceptor
-        // Only split when return types differ AND there are different parameters that
-        // would cause confusion about which callback to use
-        if (m1.ReturnType != m2.ReturnType)
-        {
-            // Different return types with different parameter sets need separate interceptors
-            var m1ParamNames = new HashSet<string>(m1.Parameters.Select(p => p.Name));
-            var m2ParamNames = new HashSet<string>(m2.Parameters.Select(p => p.Name));
-
-            // If parameters are completely different or partially different,
-            // we need separate interceptors because users would want different callbacks
-            if (!m1ParamNames.SetEquals(m2ParamNames))
-                return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Groups methods by name, splitting into separate numbered groups when overloads are incompatible.
+    /// Groups methods by name. All overloads share a single interceptor with multiple OnCall signatures.
     /// Returns both the groups dictionary (keyed by group name) and a member-to-group-name mapping.
     /// </summary>
     private static (Dictionary<string, MethodGroupInfo> Groups, Dictionary<string, string> MemberKeyToGroupName) GroupMethodsByName(IEnumerable<InterfaceMemberInfo> methods)
     {
-        // First, group all methods by name
-        var methodsByName = new Dictionary<string, List<InterfaceMemberInfo>>();
-
-        foreach (var method in methods.Where(m => !m.IsProperty))
-        {
-            if (!methodsByName.TryGetValue(method.Name, out var list))
-            {
-                list = new List<InterfaceMemberInfo>();
-                methodsByName[method.Name] = list;
-            }
-            list.Add(method);
-        }
-
         var groups = new Dictionary<string, MethodGroupInfo>();
         var memberKeyToGroupName = new Dictionary<string, string>();
 
-        foreach (var kvp in methodsByName)
+        foreach (var g in methods.Where(m => !m.IsProperty).GroupBy(m => m.Name))
         {
-            var methodName = kvp.Key;
-            var overloads = kvp.Value;
+            var methodName = g.Key;
+            var overloads = g.ToList();
 
-            // Check if all overloads are compatible (can share one interceptor)
-            if (overloads.Count == 1 || AreAllOverloadsCompatible(overloads))
-            {
-                // All compatible - create single group with combined parameters
-                var group = BuildMethodGroup(methodName, overloads);
-                groups[methodName] = group;
+            var group = BuildMethodGroup(methodName, overloads);
+            groups[methodName] = group;
 
-                // Map all members to this group
-                foreach (var overload in overloads)
-                {
-                    memberKeyToGroupName[GetMemberKey(overload)] = methodName;
-                }
-            }
-            else
+            foreach (var overload in overloads)
             {
-                // Incompatible overloads - create separate numbered groups
-                for (int i = 0; i < overloads.Count; i++)
-                {
-                    var overload = overloads[i];
-                    var numberedName = $"{methodName}{i + 1}";
-                    var group = BuildMethodGroup(numberedName, new List<InterfaceMemberInfo> { overload });
-                    groups[numberedName] = group;
-                    memberKeyToGroupName[GetMemberKey(overload)] = numberedName;
-                }
+                memberKeyToGroupName[GetMemberKey(overload)] = methodName;
             }
         }
 
@@ -1288,23 +1218,7 @@ internal static class InlineModelBuilder
     }
 
     /// <summary>
-    /// Checks if all overloads in a list are compatible with each other for sharing an interceptor.
-    /// </summary>
-    private static bool AreAllOverloadsCompatible(List<InterfaceMemberInfo> overloads)
-    {
-        for (int i = 0; i < overloads.Count; i++)
-        {
-            for (int j = i + 1; j < overloads.Count; j++)
-            {
-                if (!AreMethodsCompatibleForSharedInterceptor(overloads[i], overloads[j]))
-                    return false;
-            }
-        }
-        return true;
-    }
-
-    /// <summary>
-    /// Builds a MethodGroupInfo from a list of compatible overloads.
+    /// Builds a MethodGroupInfo from a list of overloads sharing the same name.
     /// </summary>
     private static MethodGroupInfo BuildMethodGroup(string groupName, List<InterfaceMemberInfo> overloads)
     {
@@ -1343,7 +1257,13 @@ internal static class InlineModelBuilder
         }
 
         var overloadInfos = overloads
-            .Select(o => new MethodOverloadInfo(o.Parameters, o.IsGenericMethod, o.TypeParameters))
+            .Select(o => new MethodOverloadInfo(
+                o.Parameters,
+                o.ReturnType,
+                o.ReturnType == "void",
+                o.IsNullable,
+                o.IsGenericMethod,
+                o.TypeParameters))
             .ToArray();
 
         return new MethodGroupInfo(

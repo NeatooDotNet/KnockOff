@@ -42,7 +42,7 @@ stub.Changed.VerifyAdd();
 
 ### Accessing Interceptors Across Usage Patterns
 
-The interceptor API works identically across all three KnockOff usage patterns:
+The interceptor API works identically across all six KnockOff patterns (see [patterns.md](patterns.md) for details).
 
 **Standalone Pattern** - `[KnockOff]` on a class implementing an interface:
 
@@ -110,7 +110,7 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 
 ### User Method Interceptors (Stand-Alone Pattern)
 
-When you define a **user method** (protected method matching an interface signature), KnockOff generates a **numbered interceptor** (e.g., `GetById2`). This interceptor:
+When you define a **user method** (override a virtual method with underscore suffix), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). This interceptor:
 
 - Tracks all calls to the interface method
 - Allows `OnCall()` to supersede the user method
@@ -122,7 +122,8 @@ public partial class RepoStub : IRepo { }
 
 public partial class RepoStub
 {
-    protected User? GetById(int id) => new User { Id = id, Name = "Default" };
+    // Override virtual method with underscore suffix - compiler enforces signature!
+    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 
 // Usage:
@@ -132,16 +133,16 @@ IRepo repo = stub;
 // User method provides default behavior
 var user1 = repo.GetById(1);  // Returns "Default"
 
-// OnCall supersedes user method
-stub.GetById2.OnCall(id => new User { Id = id, Name = "Override" });
+// OnCall supersedes user method (clean interceptor name)
+stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns "Override"
 
 // Returns for constant values (auto-wraps for async)
-stub.GetById2.Returns(new User { Id = 99 });
+stub.GetById.Returns(new User { Id = 99 });
 
 // Full tracking works with OnCall
-stub.GetById2.Verify(Times.Exactly(2));
-Assert.Equal(2, stub.GetById2.LastArg);
+stub.GetById.Verify(Times.Exactly(2));
+Assert.Equal(2, stub.GetById.LastArg);
 ```
 
 **Reset behavior for user method interceptors:** `Reset()` clears tracking state (call count, LastArg) but preserves the OnCall configuration.
@@ -597,4 +598,4 @@ If any verification fails, `Verify()` throws an exception detailing which interc
 
 ---
 
-**UPDATED:** 2026-02-02
+**UPDATED:** 2026-02-03

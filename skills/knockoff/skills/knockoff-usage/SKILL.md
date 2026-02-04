@@ -101,7 +101,7 @@ service.Name = "test";
 | Indexer | Tracking, LastGetKey, LastSetEntry | **Backing dictionary** |
 | Event | Tracking counts | **Active subscribers** |
 
-**Note:** User method interceptors (numbered interceptors like `GetById2`) preserve OnCall configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
+**Note:** User method interceptors (e.g., `GetById` when you have a `GetById_` override) preserve OnCall configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
 
 ---
 
@@ -109,13 +109,15 @@ service.Name = "test";
 
 | Need | Pattern | Instantiation |
 |------|---------|---------------|
-| Reusable stub across files | Stand-Alone | `new MyStub()` |
-| Custom methods on stub | Stand-Alone | `new MyStub()` |
+| Reusable stub across files | Standalone | `new MyStub()` |
+| Custom methods on stub | Standalone | `new MyStub()` |
+| Reusable generic stub with type parameters | Generic Standalone | `new MyStub<T>()` |
 | Quick test-local stub | Inline Interface | `new Stubs.IService()` |
 | Stub a class (virtual/abstract) | Inline Class | `new Stubs.MyClass()` then `.Object` |
 | Stub a delegate | Inline Delegate | `new Stubs.MyDelegate()` |
+| Test-local stub for generic interface | Open Generic | `new Stubs.IFoo<T>()` |
 
-### Stand-Alone Pattern
+### Standalone Pattern
 
 ```cs
 [KnockOff]
@@ -376,7 +378,7 @@ User methods let you define default stub behavior at compile time. The user meth
 
 ### Defining User Methods
 
-Add protected methods matching interface signatures:
+Override virtual methods with underscore suffix - the compiler enforces signature correctness:
 
 ```cs
 [KnockOff]
@@ -384,12 +386,12 @@ public partial class UserRepoStub : IUserRepo { }
 
 public partial class UserRepoStub
 {
-    // Protected method provides default behavior
-    protected User? GetById(int id) => new User { Id = id, Name = "Default" };
+    // Override virtual method with underscore suffix - compiler enforces signature!
+    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 ```
 
-When you define a user method, KnockOff generates a **numbered interceptor** (e.g., `GetById2`) for tracking and override capability.
+The interceptor uses a clean name (e.g., `GetById`, not `GetById2`) regardless of whether you override the method.
 
 ### OnCall Supersedes User Method
 
@@ -397,12 +399,13 @@ Use `OnCall()` to override the user method for specific tests:
 
 ```cs
 var stub = new UserRepoStub();
+IUserRepo repo = stub;
 
 // Without OnCall: user method is called
 var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
 
-// With OnCall: callback supersedes user method
-stub.GetById2.OnCall(id => new User { Id = id, Name = "Override" });
+// With OnCall: callback supersedes user method (clean interceptor name)
+stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
 ```
 
@@ -411,14 +414,14 @@ var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
 Use `Returns()` for constant return values:
 
 ```cs
-stub.GetById2.Returns(new User { Id = 99, Name = "Fixed" });
+stub.GetById.Returns(new User { Id = 99, Name = "Fixed" });
 ```
 
 For async methods (`Task<T>`, `ValueTask<T>`), `Returns()` auto-wraps the value:
 
 ```cs
 // Returns auto-wraps in Task.FromResult
-stub.GetUserAsync2.Returns(new User { Id = 1 });
+stub.GetUserAsync.Returns(new User { Id = 1 });
 ```
 
 ### Tracking Works with OnCall
@@ -426,11 +429,11 @@ stub.GetUserAsync2.Returns(new User { Id = 1 });
 User method interceptors provide full tracking even when using `OnCall`:
 
 ```cs
-stub.GetById2.OnCall(id => new User { Id = id });
+stub.GetById.OnCall(id => new User { Id = id });
 repo.GetById(42);
 
-stub.GetById2.Verify(Times.Once);
-Assert.Equal(42, stub.GetById2.LastArg);
+stub.GetById.Verify(Times.Once);
+Assert.Equal(42, stub.GetById.LastArg);
 ```
 
 ### Reset Preserves OnCall Configuration
@@ -438,12 +441,12 @@ Assert.Equal(42, stub.GetById2.LastArg);
 `Reset()` clears tracking state but preserves the OnCall configuration:
 
 ```cs
-stub.GetById2.OnCall(id => new User { Id = id });
+stub.GetById.OnCall(id => new User { Id = id });
 repo.GetById(1);
-stub.GetById2.Verify(Times.Once);
+stub.GetById.Verify(Times.Once);
 
-stub.GetById2.Reset();
-stub.GetById2.Verify(Times.Never);  // Tracking cleared
+stub.GetById.Reset();
+stub.GetById.Verify(Times.Never);  // Tracking cleared
 
 repo.GetById(2);  // Still uses OnCall callback
 ```
@@ -564,4 +567,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-02
+**UPDATED:** 2026-02-03

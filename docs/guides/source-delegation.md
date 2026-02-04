@@ -95,7 +95,7 @@ The first match wins. This means you can set a source for baseline behavior and 
 
 **Important**: `OnCall` (both callback and value overloads) take complete control once configured. If `OnCall` is set, the source is never consulted for that member, even if the callback returns `null` or a default value.
 
-**Note**: The Flat/Stand-Alone pattern (`[KnockOff] partial class Stub : IInterface`) also supports user-defined methods, which execute between OnCall and Source in the priority chain. See the [User Methods Guide](user-methods.md) for details on this pattern-specific feature.
+**Note**: The Stand-Alone pattern (`[KnockOff] partial class Stub : IInterface`) also supports user methods—`protected override` methods with an underscore suffix (e.g., `protected override User GetById_(int id)`)—that execute between OnCall and Source in the priority chain. See the [User Methods Guide](user-methods.md) for details on this pattern-specific feature.
 
 <!-- snippet: source-priority -->
 ```cs

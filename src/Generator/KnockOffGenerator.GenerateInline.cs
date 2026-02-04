@@ -21,6 +21,7 @@ public partial class KnockOffGenerator
 				"KO0008" => KO0008_TypeParameterArityMismatch,
 				"KO0010" => KO0010_MultipleInterfaces,
 				"KO0100" => KO0100_MethodOverloadsNotSupported,
+				"KO0200" => KO0200_CannotHaveBaseClass,
 				"KO1001" => KO1001_TypeMustBeInterfaceClassOrDelegate,
 				"KO1002" => KO1002_NameCollision,
 				"KO1003" => KO1003_StubsTypeConflict,

@@ -2,32 +2,57 @@
 
 # Stub Patterns
 
-KnockOff supports three fundamental patterns for creating test stubs: Stand-Alone, Inline Interface, and Inline Class. Each pattern solves different testing scenarios with varying trade-offs in reusability, ceremony, and capabilities.
+KnockOff supports six distinct patterns for creating test stubs, organized into two categories:
 
-The Inline Interface pattern also supports **delegate types**, allowing you to stub validation rules, factories, and callbacks. This specialized use case is covered in the Inline Delegate section below.
+**Standalone Patterns** (file-based, reusable across tests):
+1. **Standalone** - Dedicated stub class implementing interface
+2. **Generic Standalone** - Generic stub class with type parameters
+
+**Inline Patterns** (nested within test class):
+3. **Inline Interface** - Nested stub for closed generic interface
+4. **Inline Class** - Nested stub for class with virtual members
+5. **Inline Delegate** - Nested stub for delegate types
+6. **Open Generic** - Nested generic stub from open generic type
+
+## Pattern Relationships
+
+```
+Standalone Patterns (file-based, reusable)
+|-- 1. Standalone         - [KnockOff] class Stub : IFoo
+|-- 2. Generic Standalone - [KnockOff] class Stub<T> : IFoo<T>
+
+Inline Patterns (nested within test class)
+|-- 3. Inline Interface   - [KnockOff<IFoo>]
+|-- 4. Inline Class       - [KnockOff<SomeClass>]
+|-- 5. Inline Delegate    - [KnockOff<SomeDelegate>]
+|-- 6. Open Generic       - [KnockOff(typeof(IFoo<>))]
+```
 
 ## Quick Decision Guide
 
 | If you need... | Use this pattern |
 |----------------|------------------|
-| Reusable stub across multiple test files | Stand-Alone / Flat |
-| Custom methods on your stub | Stand-Alone / Flat |
+| Reusable stub across multiple test files | Standalone |
+| Custom methods on your stub | Standalone |
+| Reusable generic stub with type parameters | Generic Standalone |
 | Quick, test-local stub | Inline Interface |
 | No extra stub files | Inline Interface |
 | Stub a class (not interface) | Inline Class |
 | Stub a delegate type | Inline Delegate |
+| Test-local stub for generic interface | Open Generic |
 
 ---
 
-## Stand-Alone / Flat Pattern
+## Standalone Pattern
 
-The Stand-Alone pattern creates a dedicated stub class in its own file. This stub can be reused across test files and supports adding custom methods.
+The Standalone pattern creates a dedicated stub class in its own file. This stub can be reused across test files and supports adding custom methods.
 
 ### When to Use
 
 - You need the same stub in multiple test files
 - You want to add helper methods or custom behavior to the stub
 - You prefer explicit, discoverable stub classes in IntelliSense
+- You need the cleanest instantiation syntax (`new MyStub()`)
 
 ### Basic Setup
 
@@ -61,12 +86,100 @@ stub.Save.OnCall((user) => { }).Verifiable();
 - **User methods**: Add custom methods directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
+- **Clean syntax**: Simple `new MyStub()` instantiation
 
 ### Trade-offs
 
 - **Extra file**: Requires a dedicated .cs file for each stub
 - **Partial class**: Must remember to mark the class as `partial`
 - **Manual interface**: Must manually implement the interface signature
+
+### Base Class and User Methods
+
+The Standalone pattern generates a base class (e.g., `UserRepoStandaloneStubBase`) that your stub inherits from. This base class exposes `protected virtual` methods for each interface member, allowing you to add custom stub behavior through inheritance.
+
+Override these methods using the **underscore suffix convention** (`_`) to provide default implementations:
+
+```cs
+[KnockOff]
+public partial class UserRepoStandaloneStub : IUserRepoStandalone
+{
+    // Override base class method with underscore suffix
+    protected override User? GetById_(int id)
+    {
+        return new User { Id = id, Name = "Default User" };
+    }
+}
+```
+
+The interceptor name remains clean (`GetById`), while your implementation uses the suffix (`GetById_`). This keeps user methods separate from the generated code. See [User Methods](user-methods.md) for complete details and advanced patterns.
+
+---
+
+## Generic Standalone Pattern
+
+The Generic Standalone pattern creates a reusable generic stub class that can be instantiated with different type arguments across your test suite.
+
+### When to Use
+
+- You need a reusable stub for a generic interface (e.g., `IRepository<T>`)
+- You want to use the same stub definition with different type arguments
+- You need the same stub in multiple test files with various types
+- You prefer clean instantiation syntax with type parameters
+
+### Basic Setup
+
+<!-- snippet: patterns-generic-standalone-basic -->
+```cs
+public interface IRepositoryGeneric<T> where T : class
+{
+    T? GetById(int id);
+    void Save(T entity);
+    IEnumerable<T> GetAll();
+}
+
+[KnockOff]
+public partial class RepositoryGenericStub<T> : IRepositoryGeneric<T> where T : class { }
+```
+<!-- endSnippet -->
+
+### Usage in Tests
+
+<!-- snippet: patterns-generic-standalone-usage -->
+```cs
+// Generic Standalone: reusable across multiple type arguments
+var userRepo = new RepositoryGenericStub<User>();
+userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
+userRepo.Save.OnCall((entity) => { }).Verifiable();
+
+var productRepo = new RepositoryGenericStub<Product>();
+productRepo.GetById.OnCall((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
+```
+<!-- endSnippet -->
+
+### Benefits
+
+- **Single definition**: Define once, use with any type argument
+- **Reusable**: Share across multiple test files
+- **Type-safe**: Compiler enforces type constraints
+- **Clean syntax**: `new RepositoryStub<User>()` - clear and readable
+- **User methods**: Supports custom helper methods like Standalone
+
+### Trade-offs
+
+- **Extra file**: Requires a dedicated .cs file for the stub
+- **Partial class**: Must mark as `partial`
+- **Constraints must match**: Type constraints must mirror the interface
+
+### Generic Standalone vs Open Generic
+
+| Aspect | Generic Standalone | Open Generic |
+|--------|-------------------|--------------|
+| **Syntax** | `[KnockOff] class Stub<T> : IFoo<T>` | `[KnockOff(typeof(IFoo<>))]` |
+| **Instantiation** | `new Stub<User>()` | `new Stubs.IFoo<User>()` |
+| **Reusability** | Across test files | Within one test class |
+| **User methods** | Yes | No |
+| **Best for** | Shared generic stubs | One-time use |
 
 ---
 
@@ -79,6 +192,7 @@ The Inline Interface pattern generates a stub class scoped to your test class. T
 - You need a stub only within one test class
 - You don't need custom methods on the stub
 - You want minimal ceremony and no extra files
+- The interface is non-generic or you want a closed generic stub
 
 ### Basic Setup
 
@@ -108,6 +222,7 @@ stub.Save.OnCall((user) => { }).Verifiable();
 - **Scoped**: Stub exists only for this test class, reducing namespace pollution
 - **Less ceremony**: No separate file, no manual interface implementation
 - **Automatic**: Stub class generated from interface definition
+- **Co-located**: Stub definition and usage in same file
 
 ### Trade-offs
 
@@ -126,6 +241,7 @@ The Inline Class pattern generates a stub for abstract or virtual class members.
 - You need to stub a class (not an interface)
 - The class has `virtual` or `abstract` members you want to intercept
 - You cannot or don't want to extract an interface
+- You're testing code that depends on a concrete class
 
 ### Basic Setup
 
@@ -163,16 +279,18 @@ UserServiceClass service = stub.Object;
 - **Stub classes**: Works with classes, not just interfaces
 - **No interface extraction**: Avoids creating interfaces just for testing
 - **Virtual members**: Intercepts any `virtual` or `abstract` members
+- **Inheritance**: Properly inherits from the target class
 
 ### Trade-offs
 
 - **Must use .Object**: The stub is a wrapper; use `.Object` property to get the actual instance
 - **Virtual/abstract only**: Only overrides members marked `virtual` or `abstract`
-- **No user methods**: Cannot add custom methods like Stand-Alone pattern
+- **No user methods**: Cannot add custom methods like Standalone pattern
+- **Class limitations**: Subject to any sealed/non-virtual restrictions
 
 ---
 
-## Inline Delegate Pattern (Specialized Use Case)
+## Inline Delegate Pattern
 
 The Inline Delegate pattern is a specialized use of the Inline Interface pattern for delegate types. It generates a stub for delegates, allowing you to test code that accepts delegates as parameters, such as validation rules, factories, or callbacks.
 
@@ -226,21 +344,73 @@ ValidationRule rule = ruleStub;
 
 ---
 
+## Open Generic Pattern
+
+The Open Generic pattern generates a generic stub class within your test class that can be instantiated with any type argument. Use this when you need a test-local generic stub without creating a separate file.
+
+### When to Use
+
+- You need a generic stub only within one test class
+- You don't need custom methods on the stub
+- You want to test with multiple type arguments in one test class
+- You prefer inline definition over a separate file
+
+### Basic Setup
+
+<!-- snippet: patterns-open-generic-basic -->
+```cs
+[KnockOff(typeof(IServiceOpenGeneric<>))]
+public partial class OpenGenericTests
+{
+    // The generator creates Stubs.IServiceOpenGeneric<T>
+}
+```
+<!-- endSnippet -->
+
+### Usage in Tests
+
+<!-- snippet: patterns-open-generic-usage -->
+```cs
+// Open Generic: instantiate with any type argument
+var userStub = new Stubs.IServiceOpenGeneric<User>();
+userStub.GetItem.OnCall((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+
+var productStub = new Stubs.IServiceOpenGeneric<Product>();
+productStub.GetItem.OnCall((id) => new Product { Id = id, Name = "FromStub" }).Verifiable();
+```
+<!-- endSnippet -->
+
+### Benefits
+
+- **Flexible**: Use any type argument without defining separate stubs
+- **No extra files**: Stub defined inline with tests
+- **Type constraints**: Preserves constraints from the original generic type
+- **Multiple types**: Use different type arguments in the same test class
+
+### Trade-offs
+
+- **Test-local only**: Cannot reuse across multiple test classes
+- **No user methods**: Cannot add custom methods to the generated stub
+- **typeof syntax**: Requires `typeof(IFoo<>)` with empty angle brackets
+- **Stubs namespace**: Must use `Stubs.IFoo<T>` syntax
+
+> **NOTE:** For reusable generic stubs across multiple test files, use the [Generic Standalone](#generic-standalone-pattern) pattern instead.
+
+---
+
 ## Pattern Comparison
 
-**Note**: Inline Delegate is a specialized use case of the Inline Interface pattern for delegate types.
-
-| Feature | Stand-Alone | Inline Interface | Inline Class | Inline Delegate |
-|---------|-------------|------------------|--------------|-----------------|
-| **Reusable across test files** | Yes | No | No | No |
-| **Custom user methods** | Yes | No | No | No |
-| **Extra file required** | Yes | No | No | No |
-| **Supports interfaces** | Yes | Yes | No | No |
-| **Supports classes** | No | No | Yes | No |
-| **Supports delegates** | No | No | No | Yes |
-| **IntelliSense visible** | Yes | Within test class | Within test class | Within test class |
-| **Instantiation syntax** | `new MyStub()` | `new Stubs.IFoo()` | `new Stubs.Foo().Object` | `new Stubs.DelegateName()` |
-| **Best for** | Shared stubs | Local stubs | Class stubs | Delegate stubs |
+| Feature | Standalone | Generic Standalone | Inline Interface | Inline Class | Inline Delegate | Open Generic |
+|---------|------------|-------------------|------------------|--------------|-----------------|--------------|
+| **Reusable across test files** | Yes | Yes | No | No | No | No |
+| **Custom user methods** | Yes | Yes | No | No | No | No |
+| **Extra file required** | Yes | Yes | No | No | No | No |
+| **Supports interfaces** | Yes | Yes | Yes | No | No | Yes |
+| **Supports classes** | No | No | No | Yes | No | Yes |
+| **Supports delegates** | No | No | No | No | Yes | Yes |
+| **Supports generics** | No | Yes | Closed only | Closed only | Closed only | Yes |
+| **Instantiation syntax** | `new MyStub()` | `new MyStub<T>()` | `new Stubs.IFoo()` | `new Stubs.Foo().Object` | `new Stubs.Del()` | `new Stubs.IFoo<T>()` |
+| **Best for** | Shared stubs | Shared generic stubs | Local stubs | Class stubs | Delegate stubs | Local generic stubs |
 
 ---
 
@@ -248,57 +418,88 @@ ValidationRule rule = ruleStub;
 
 Follow this decision tree to select the appropriate pattern:
 
-1. **Do you need to stub a delegate type?**
-   - Yes → **Inline Delegate** pattern (specialized use of Inline Interface)
-   - No → Continue to step 2
-
-2. **Do you need to stub a class (not an interface)?**
-   - Yes → **Inline Class** pattern
-   - No → Continue to step 3
-
-3. **Do you need the stub in multiple test files?**
-   - Yes → **Stand-Alone** pattern
-   - No → Continue to step 4
-
-4. **Do you need custom methods on the stub?**
-   - Yes → **Stand-Alone** pattern
-   - No → **Inline Interface** pattern
-
-**The three fundamental patterns** (Stand-Alone, Inline Interface, Inline Class) cover all architectural scenarios. Inline Delegate is a specialized application of Inline Interface for delegate types.
+```
+Is it a DELEGATE type?
+|-- YES --> Inline Delegate pattern
+|           [KnockOff<ValidationRule>]
+|
+|-- NO --> Is it a GENERIC interface/class?
+    |
+    |-- YES --> Do you need the stub in MULTIPLE test files?
+    |   |
+    |   |-- YES --> Generic Standalone pattern
+    |   |           [KnockOff] class Stub<T> : IRepo<T>
+    |   |
+    |   |-- NO --> Open Generic pattern
+    |              [KnockOff(typeof(IRepo<>))]
+    |
+    |-- NO --> Is it a CLASS (not interface)?
+        |
+        |-- YES --> Inline Class pattern
+        |           [KnockOff<SomeClass>]
+        |
+        |-- NO --> Do you need the stub in MULTIPLE test files?
+            |
+            |-- YES --> Standalone pattern
+            |           [KnockOff] class Stub : IFoo
+            |
+            |-- NO --> Do you need CUSTOM METHODS on the stub?
+                |
+                |-- YES --> Standalone pattern
+                |           [KnockOff] class Stub : IFoo
+                |
+                |-- NO --> Inline Interface pattern
+                           [KnockOff<IFoo>]
+```
 
 ### Examples by Scenario
 
 | Scenario | Recommended Pattern |
 |----------|---------------------|
-| Repository stub used in 5+ test classes | Stand-Alone |
-| Stub with `WithAdminUser()` helper method | Stand-Alone |
+| Repository stub used in 5+ test classes | Standalone |
+| Stub with `WithAdminUser()` helper method | Standalone |
+| Generic repository shared across tests | Generic Standalone |
 | Quick stub for single test class | Inline Interface |
 | Stub a `DbContext` with virtual `DbSet` properties | Inline Class |
 | Stub an abstract base class | Inline Class |
 | Stub a validation rule delegate | Inline Delegate |
 | Stub a factory function delegate | Inline Delegate |
-| Stub an event handler delegate | Inline Delegate |
+| Generic service stub for one test class | Open Generic |
+| `IRepository<T>` for multiple types in one test | Open Generic |
 
 ---
 
 ## Complete Example
 
-This example demonstrates all three fundamental patterns (Stand-Alone, Inline Interface, Inline Class) working together in a realistic test scenario.
+This example demonstrates all six patterns working together in a realistic test scenario.
 
 <!-- snippet: patterns-complete-example -->
 ```cs
-// Stand-Alone: direct instantiation
+// 1. Standalone: direct instantiation
 var emailStub = new EmailSvcPatternStub();
 emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
 
-// Inline Interface: via Stubs namespace
-var loggerStub = new Stubs.ILogSvc();
+// 2. Generic Standalone: reusable with type args
+var notifierStub = new NotifierStub<User>();
+notifierStub.Notify.OnCall((item) => { }).Verifiable();
+
+// 3. Inline Interface: via Stubs namespace
+var loggerStub = new CompleteExampleInlineHost.Stubs.ILogSvc();
 loggerStub.Log.OnCall((msg) => { }).Verifiable();
 
-// Inline Class: use .Object for class instance
-var auditStub = new Stubs.AuditSvcBase();
+// 4. Inline Class: use .Object for class instance
+var auditStub = new CompleteExampleInlineHost.Stubs.AuditSvcBase();
 auditStub.Audit.OnCall((action) => { }).Verifiable();
 AuditSvcBase audit = auditStub.Object;
+
+// 5. Inline Delegate: implicit conversion
+var ruleStub = new InlineDelegateTests.Stubs.ValidationRule();
+ruleStub.Interceptor.OnCall((value) => true);
+ValidationRule rule = ruleStub;
+
+// 6. Open Generic: inline stub with type args
+var processorStub = new CompleteExampleOpenGenericHost.Stubs.IProcessor<Order>();
+processorStub.Process.OnCall((item) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -314,4 +515,4 @@ AuditSvcBase audit = auditStub.Object;
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-03

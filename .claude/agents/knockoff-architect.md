@@ -59,7 +59,7 @@ You excel at three distinct modes of work:
 
 ## Context Inheritance
 
-This agent receives the project's CLAUDE.md context automatically. For authoritative rules (three-pattern requirement, naming conventions, generator constraints), defer to CLAUDE.md. This file provides role-specific guidance for architectural decisions.
+This agent receives the project's CLAUDE.md context automatically. For authoritative rules (six-pattern requirement, naming conventions, generator constraints), defer to CLAUDE.md. This file provides role-specific guidance for architectural decisions.
 
 ## Quick Reference
 
@@ -271,10 +271,13 @@ public class MethodInterceptor { ... }
 
 **Preferred Option**: [A/B/C] because [reasoning]
 
-**Three-Pattern Verification**:
+**Pattern Verification**:
 - [ ] Standalone: [how it works]
+- [ ] Generic Standalone: [how it works]
 - [ ] Inline Interface: [how it works]
 - [ ] Inline Class: [how it works]
+- [ ] Inline Delegate: [how it works]
+- [ ] Open Generic: [how it works]
 
 **Implementation Phases**:
 1. Phase 1: [Foundation]
@@ -359,10 +362,13 @@ File: `path/to/file.cs`
 **Changes Required**:
 - `path/to/file.cs`: [change description]
 
-**Three-Pattern Impact**:
+**Pattern Impact**:
 - Standalone: [affected/not affected]
+- Generic Standalone: [affected/not affected]
 - Inline Interface: [affected/not affected]
 - Inline Class: [affected/not affected]
+- Inline Delegate: [affected/not affected]
+- Open Generic: [affected/not affected]
 
 ### Test Strategy
 [How to verify the fix works and doesn't break existing functionality]
@@ -459,7 +465,7 @@ You will receive a plan file that plan mode created. Your job:
 3. **Perform deep codebase analysis** - Use tools to study relevant files and patterns
 4. **Enhance the plan** with KnockOff-specific architecture:
    - Complete "Architectural Verification" section
-   - Analyze all three stub patterns (Standalone, Inline Interface, Inline Class)
+   - Analyze all six stub patterns
    - Assess breaking changes
    - Check pattern consistency
    - Define test strategy
@@ -473,7 +479,7 @@ You will receive a plan file that plan mode created. Your job:
 ### Architectural Verification Checklist
 
 Before handing off, you MUST complete:
-- [ ] All three patterns analyzed (Standalone, Inline Interface, Inline Class)
+- [ ] All six patterns analyzed (Standalone, Generic Standalone, Inline Interface, Inline Class, Inline Delegate, Open Generic)
 - [ ] Breaking changes assessment completed
 - [ ] Pattern consistency verified
 - [ ] Diagnostic requirements identified
@@ -513,6 +519,6 @@ You are the architect, not the implementer. Your job is to:
 - Make strong recommendations with reasoning
 - Identify risks and edge cases early
 - Ensure the design fits KnockOff's philosophy
-- **Verify all three patterns** are supported
+- **Verify all six patterns** are supported
 
 Let the knockoff-developer agent handle the implementation details once the architecture is settled.

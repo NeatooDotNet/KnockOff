@@ -42,6 +42,10 @@ public partial class AttrUserRepositoryStub : IAttrUserRepository { }
 
 The source generator produces explicit interface implementations for all members, plus interceptor properties for test verification.
 
+**Base class generation**: KnockOff generates a base class (e.g., `AttrUserRepositoryStubBase`) for standalone stubs. This base class contains virtual methods for each interface member that you can override to provide default stub behavior. Because KnockOff generates the base class, standalone stubs cannot have user-defined base classes (diagnostic **KO0200**).
+
+See [User Methods](../guides/user-methods.md) for details on overriding virtual methods to define default behavior.
+
 ---
 
 ## Inline Interface Pattern
@@ -249,4 +253,4 @@ Strict mode settings are resolved in this order (highest to lowest):
 
 ---
 
-**UPDATED:** 2026-01-27
+**UPDATED:** 2026-02-03

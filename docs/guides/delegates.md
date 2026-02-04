@@ -192,6 +192,8 @@ stub.Interceptor.Verify(Times.Exactly(3));
 
 KnockOff supports closed generic delegates using standard generic attribute syntax and open generic delegates using `typeof()`.
 
+> **NOTE:** Open generic delegate stubs use the Open Generic pattern (`[KnockOff(typeof(Delegate<>))]`). For details on when to choose this pattern versus defining a Generic Standalone stub, see [Stub Patterns - Open Generic](stub-patterns.md#open-generic-pattern).
+
 ### Closed Generic Delegates
 
 <!-- snippet: delegate-stub-closed-generic -->

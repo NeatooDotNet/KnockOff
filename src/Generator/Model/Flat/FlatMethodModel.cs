@@ -27,7 +27,8 @@ internal sealed record FlatMethodModel(
     string? CustomDelegateSignature,
     string DefaultExpression,
     bool ThrowsOnDefault,
-    string? UserMethodCall,
+    /// <summary>True if user provided a protected override method (base class pattern).</summary>
+    bool HasUserOverride,
     string SimpleInterfaceName,
     string TypeParameterDecl,
     string TypeParameterList,

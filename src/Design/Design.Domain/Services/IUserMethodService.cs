@@ -2,7 +2,7 @@
 // Design.Domain - Interfaces for demonstrating user-defined method patterns
 // -----------------------------------------------------------------------------
 // These interfaces are designed to explore and document user method behavior:
-// - Basic user methods (protected methods matching interface signatures)
+// - Basic user methods (protected override methods with underscore suffix)
 // - User method overloads (multiple signatures, same name)
 // - Async user methods
 // - Generic user methods
@@ -13,7 +13,7 @@ namespace Design.Domain.Services;
 
 /// <summary>
 /// Basic interface for demonstrating user-defined methods.
-/// User methods are protected methods in the stub that match interface signatures.
+/// User methods are protected override methods with underscore suffix (e.g., Process_).
 /// </summary>
 public interface IUserMethodService
 {

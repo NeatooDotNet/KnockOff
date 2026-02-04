@@ -12,7 +12,6 @@ internal sealed record KnockOffTypeInfo(
 	/// </summary>
 	EquatableArray<TypeParameterInfo> TypeParameters,
 	EquatableArray<InterfaceInfo> Interfaces,
-	EquatableArray<UserMethodInfo> UserMethods,
 	EquatableArray<DiagnosticInfo> Diagnostics,
 	/// <summary>
 	/// Flat collection of all members from all interfaces, deduplicated.
@@ -24,6 +23,13 @@ internal sealed record KnockOffTypeInfo(
 	/// Used for generating event interceptors directly on stub class in v10.9+ flat API.
 	/// </summary>
 	EquatableArray<EventMemberInfo> FlatEvents,
+	/// <summary>
+	/// Method signatures (format: "MethodName_(ParamType1,ParamType2,...)") that have user-defined
+	/// "protected override" methods. Used for base class user method pattern.
+	/// Note: Does not include return type since C# forbids return-type overloading.
+	/// Examples: "Format_(string)", "Format_(string,bool)", "TryParse_(string,out int)".
+	/// </summary>
+	EquatableArray<string> UserOverrideMethods,
 	/// <summary>
 	/// When true, the generated constructor defaults to strict mode (throws on unconfigured calls).
 	/// From [KnockOff(Strict = true)].

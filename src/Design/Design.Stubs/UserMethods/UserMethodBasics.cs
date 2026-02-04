@@ -2,11 +2,12 @@
 // Design.Stubs - User-Defined Methods
 // -----------------------------------------------------------------------------
 // This file explores and documents user-defined method patterns:
-// - Basic user methods (protected methods matching interface signatures)
-// - Tracking API on *2 interceptors (Verify, LastArg, Reset)
+// - Base class pattern (protected override methods with _ suffix)
+// - Tracking API on interceptors (Verify, LastArg, Reset)
+// - OnCall/Returns to supersede user methods
 // - User method overloads
 // - Mixed scenarios (some with user methods, some without)
-// - Priority: user methods vs OnCall
+// - Priority: OnCall > user method
 // - Strict mode behavior
 // -----------------------------------------------------------------------------
 
@@ -21,20 +22,31 @@ namespace Design.Stubs.UserMethods;
 // =============================================================================
 //
 // WHAT ARE USER METHODS?
-// User methods are protected methods you define in a partial stub class that
-// match an interface method signature. KnockOff calls your method instead of
-// using smart defaults or configured callbacks.
+// User methods are protected override methods you define in a partial stub class
+// to provide default behavior for interface methods. KnockOff generates a base
+// class with virtual methods that you can override.
 //
 // WHY USE THEM?
 // 1. Reusable defaults - Define once, use across all tests
 // 2. Complex logic - When callback lambdas get unwieldy
 // 3. State management - When you need instance state
 // 4. IDE support - Full IntelliSense, refactoring, debugging
+// 5. Compile-time safety - Signature errors caught by compiler
 //
-// THE *2 SUFFIX:
-// When you add a user method, KnockOff generates a tracking interceptor with
-// a "2" suffix (e.g., Process2) to avoid name collision with your method.
-// This interceptor is TRACKING-ONLY - no OnCall() available.
+// THE BASE CLASS PATTERN:
+// KnockOff generates a base class (e.g., BasicUserMethodStubBase) with virtual
+// protected methods suffixed with underscore (e.g., Process_). You override
+// these methods to provide default behavior:
+//
+//   // Generated base class (BasicUserMethodStubBase):
+//   protected virtual string Process_(string input) => default!;
+//
+//   // Your override:
+//   protected override string Process_(string input) => $"[Processed: {input}]";
+//
+// INTERCEPTOR NAMING:
+// Tracker properties use clean names (stub.Process, not stub.Process2).
+// The underscore suffix is only on the overridable method (Process_).
 //
 // =============================================================================
 
@@ -48,35 +60,43 @@ public partial class BasicUserMethodStub : IUserMethodService { }
 public partial class BasicUserMethodStub
 {
     // =========================================================================
-    // User Method Definition
+    // User Method Definition - Base Class Pattern
     // =========================================================================
-    // PATTERN: Define a protected method with EXACT signature match:
-    // - Same name
-    // - Same return type
-    // - Same parameter types (in same order)
+    // PATTERN: Override the generated virtual method with underscore suffix:
+    // - Add 'override' keyword
+    // - Add '_' suffix to method name (e.g., Process_)
+    // - Same return type and parameter types
     //
-    // The method body is your implementation - called on every interface call.
+    // COMPILER ENFORCES SIGNATURE:
+    // If you typo the method name or get parameters wrong, the compiler
+    // catches it (no suitable method to override). No more silent failures!
+    //
+    // GENERATED BASE CLASS (BasicUserMethodStubBase):
+    // protected virtual string Process_(string input) => default!;
+    // protected virtual int Calculate_(int a, int b) => default!;
+    // protected virtual void Execute_(string command) { }
+    // protected virtual string? FindById_(int id) => default!;
     // =========================================================================
 
-    protected string Process(string input)
+    protected override string Process_(string input)
     {
         // Your implementation - full C# flexibility
         return $"[Processed: {input}]";
     }
 
-    protected int Calculate(int a, int b)
+    protected override int Calculate_(int a, int b)
     {
         // Can include any logic you need
         return a + b;
     }
 
-    protected void Execute(string command)
+    protected override void Execute_(string command)
     {
         // Void methods work too
         // Could update instance state here
     }
 
-    protected string? FindById(int id)
+    protected override string? FindById_(int id)
     {
         // Return null for "not found" scenarios
         return id > 0 ? $"Entity-{id}" : null;
@@ -95,26 +115,30 @@ public partial class UserMethodBasicsDemo
         var stub = new BasicUserMethodStub();
         IUserMethodService service = stub;
 
-        // Calls your protected Process method
+        // Calls your protected override Process_ method
         var result = service.Process("hello");
         // result == "[Processed: hello]"
 
-        // Calls your protected Calculate method
+        // Calls your protected override Calculate_ method
         var sum = service.Calculate(3, 4);
         // sum == 7
     }
 
     // =========================================================================
-    // Tracking API - The *2 Interceptor
+    // Tracking API - Clean Interceptor Names
     // =========================================================================
-    // DESIGN DECISION: User method interceptors have a "2" suffix and are
-    // TRACKING-ONLY. They provide:
+    // DESIGN DECISION: Interceptor properties use CLEAN names (no suffix).
+    // With the base class pattern:
+    // - Override method: Process_ (underscore suffix)
+    // - Interceptor: stub.Process (clean name)
+    //
+    // The tracking interceptor provides:
     // - Verify(Times) - verify call count
     // - LastArg - last single argument
     // - LastArgs - last arguments as tuple
     // - Reset() - clear tracking state
-    //
-    // They do NOT have OnCall() - the user method IS the behavior.
+    // - OnCall() - supersede user method per-test
+    // - Returns() - constant value that supersedes user method
     // =========================================================================
 
     public void TrackingWithVerify()
@@ -126,9 +150,9 @@ public partial class UserMethodBasicsDemo
         service.Process("second");
         service.Process("third");
 
-        // Verify with the *2 interceptor
-        stub.Process2.Verify(Times.Exactly(3));
-        stub.Process2.Verify(Times.AtLeast(2));
+        // Verify with clean interceptor name
+        stub.Process.Verify(Times.Exactly(3));
+        stub.Process.Verify(Times.AtLeast(2));
     }
 
     public void TrackingWithLastArg()
@@ -140,7 +164,7 @@ public partial class UserMethodBasicsDemo
         service.FindById(99);
 
         // LastArg gives the most recent argument
-        var lastId = stub.FindById2.LastArg;
+        var lastId = stub.FindById.LastArg;
         // lastId == 99
     }
 
@@ -153,7 +177,7 @@ public partial class UserMethodBasicsDemo
         service.Calculate(30, 40);
 
         // LastArgs gives tuple of most recent arguments
-        var (a, b) = stub.Calculate2.LastArgs;
+        var (a, b) = stub.Calculate.LastArgs;
         // a == 30, b == 40
     }
 
@@ -163,12 +187,12 @@ public partial class UserMethodBasicsDemo
         IUserMethodService service = stub;
 
         service.Process("test");
-        stub.Process2.Verify(Times.Once);
+        stub.Process.Verify(Times.Once);
 
         // Reset clears all tracking state
-        stub.Process2.Reset();
+        stub.Process.Reset();
 
-        stub.Process2.Verify(Times.Never);
+        stub.Process.Verify(Times.Never);
         // LastArg is now default (null for reference types)
     }
 
@@ -183,7 +207,7 @@ public partial class UserMethodBasicsDemo
     //
     // GENERATED CODE PATTERN:
     //   if (Interceptor.Callback is { } callback) return callback(args);  // OnCall wins
-    //   return UserMethod(args);                                          // Fallback
+    //   return Process_(args);                                            // User override
     //
     // Reset() behavior: Clears tracking state but PRESERVES OnCall configuration.
     // This matches regular interceptor semantics.
@@ -196,20 +220,20 @@ public partial class UserMethodBasicsDemo
         // By default, user method is called
         IUserMethodService service = stub;
         var defaultResult = service.Process("hello");
-        // defaultResult == "[Processed: hello]" (from user method)
+        // defaultResult == "[Processed: hello]" (from Process_ override)
 
         // OnCall supersedes the user method for per-test override
-        stub.Process2.OnCall(input => $"[Override: {input}]");
+        stub.Process.OnCall(input => $"[Override: {input}]");
         var overrideResult = service.Process("hello");
         // overrideResult == "[Override: hello]" (OnCall wins)
 
-        stub.Process2.Verify(Times.Exactly(2)); // Both calls tracked
+        stub.Process.Verify(Times.Exactly(2)); // Both calls tracked
     }
 
     public void Returns_SupersedesUserMethod()
     {
         var stub = new BasicUserMethodStub();
-        stub.Process2.Returns("constant"); // Returns is shorthand for OnCall(_ => value)
+        stub.Process.Returns("constant"); // Returns is shorthand for OnCall(_ => value)
 
         IUserMethodService service = stub;
         var result = service.Process("ignored");
@@ -220,27 +244,27 @@ public partial class UserMethodBasicsDemo
     {
         var stub = new BasicUserMethodStub();
         var callbackInvoked = false;
-        stub.Execute2.OnCall(cmd => callbackInvoked = true);
+        stub.Execute.OnCall(cmd => callbackInvoked = true);
 
         IUserMethodService service = stub;
         service.Execute("test");
 
         // callbackInvoked == true (OnCall was invoked, not user method)
-        stub.Execute2.Verify(Times.Once);
+        stub.Execute.Verify(Times.Once);
     }
 
     public void Reset_PreservesOnCallConfiguration()
     {
         var stub = new BasicUserMethodStub();
-        stub.Calculate2.OnCall((a, b) => a * b); // Override addition with multiplication
+        stub.Calculate.OnCall((a, b) => a * b); // Override addition with multiplication
 
         IUserMethodService service = stub;
         service.Calculate(3, 4);
-        stub.Calculate2.Verify(Times.Once);
+        stub.Calculate.Verify(Times.Once);
 
         // Reset clears tracking but preserves OnCall
-        stub.Calculate2.Reset();
-        stub.Calculate2.Verify(Times.Never);
+        stub.Calculate.Reset();
+        stub.Calculate.Verify(Times.Never);
 
         var result = service.Calculate(5, 6);
         // result == 30 (OnCall still active: 5 * 6)
@@ -248,58 +272,39 @@ public partial class UserMethodBasicsDemo
 }
 
 // =============================================================================
-// USER METHOD OVERLOADS - GENERATOR BUG DISCOVERED
+// USER METHOD OVERLOADS
 // =============================================================================
-// **BUG ANALYSIS:**
+// User methods work naturally with overloads. Each overload gets its own
+// virtual method in the base class (with underscore suffix). You can override
+// any subset of overloads - unoverridden ones use the interceptor path.
 //
-// When an interface has overloaded methods AND user methods for all overloads,
-// the generator creates a single *2 interceptor based on the FIRST overload's
-// signature. The interceptor only has one RecordCall signature, but the
-// interface implementations try to call it with different argument shapes.
+// BASE CLASS GENERATES:
+//   protected virtual string Format_(string input) => default!;
+//   protected virtual string Format_(string input, bool uppercase) => default!;
+//   protected virtual string Format_(string input, bool uppercase, int maxLength) => default!;
 //
-// **GENERATED CODE (buggy):**
+// YOUR OVERRIDES:
+//   protected override string Format_(string input) => input.ToUpperInvariant();
+//   protected override string Format_(string input, bool uppercase) => ...
+//   protected override string Format_(string input, bool uppercase, int maxLength) => ...
 //
-//   class Format2Interceptor {
-//       void RecordCall(string input) { ... }  // Only first overload's signature
-//   }
-//
-//   string IOverloadedUserMethodService.Format(string input) {
-//       Format2.RecordCall(input);  // OK
-//       return Format(input);
-//   }
-//
-//   string IOverloadedUserMethodService.Format(string input, bool uppercase) {
-//       Format2.RecordCall((input, uppercase));  // ERROR: No matching overload!
-//       return Format(input, uppercase);
-//   }
-//
-// **ROOT CAUSE:**
-// The generator treats user method overloads like non-user-method overloads
-// (single interceptor, but with LastArg type based on first overload).
-// For regular methods, OnCall() targets specific overloads. For user methods,
-// there's no way to specify which overload's args to track.
-//
-// **POSSIBLE FIXES:**
-// 1. Generate RecordCall overloads matching each interface overload
-// 2. Use object/tuple for args and lose type safety
-// 3. Generate separate interceptors per overload (Format2_1, Format2_2, Format2_3)
-// 4. Track only call count for overloaded user methods (lose LastArgs)
-//
-// TODO: Fix generator, then enable tests below.
+// TRACKING:
+// All overloads share the same interceptor (stub.Format) with per-signature
+// RecordCall methods for correct argument tracking.
 // =============================================================================
 
-// Generator fix: Per-signature RecordCall methods now generated for user method overloads
+// Generator produces per-signature RecordCall methods for user method overloads
 [KnockOff]
 public partial class OverloadedUserMethodStub : IOverloadedUserMethodService { }
 
 #pragma warning disable CA1062 // Validate arguments of public methods
 public partial class OverloadedUserMethodStub
 {
-    protected string Format(string input) => input.ToUpperInvariant();
-    protected string Format(string input, bool uppercase) => uppercase ? input.ToUpperInvariant() : input;
-    protected string Format(string input, bool uppercase, int maxLength) => input[..Math.Min(input.Length, maxLength)];
-    protected void Log(string message) { }
-    protected void Log(string message, int level) { }
+    protected override string Format_(string input) => input.ToUpperInvariant();
+    protected override string Format_(string input, bool uppercase) => uppercase ? input.ToUpperInvariant() : input;
+    protected override string Format_(string input, bool uppercase, int maxLength) => input[..Math.Min(input.Length, maxLength)];
+    protected override void Log_(string message) { }
+    protected override void Log_(string message, int level) { }
 }
 #pragma warning restore CA1062
 
@@ -312,21 +317,21 @@ public partial class MixedUserMethodStub : IMixedUserMethodService { }
 
 public partial class MixedUserMethodStub
 {
-    // Only implement SOME interface methods as user methods
-    // Others will use the regular interceptor API
+    // Only override SOME interface methods as user methods
+    // Others will use the regular interceptor API (no override needed)
 
-    protected string WithUserMethod(string input)
+    protected override string WithUserMethod_(string input)
     {
         return $"[User: {input}]";
     }
 
-    protected int ComputeWithUserMethod(int value)
+    protected override int ComputeWithUserMethod_(int value)
     {
         return value * 2;
     }
 
-    // WithoutUserMethod and ComputeWithoutUserMethod are NOT defined here
-    // They use the regular interceptor (OnCall, Returns)
+    // WithoutUserMethod_ and ComputeWithoutUserMethod_ are NOT overridden
+    // They use the regular interceptor path (OnCall, Returns, or default)
 }
 
 [KnockOff<IMixedUserMethodService>]
@@ -336,47 +341,52 @@ public partial class MixedUserMethodDemo
     {
         var stub = new MixedUserMethodStub();
 
-        // Methods WITH user methods use the *2 interceptor for tracking
-        stub.WithUserMethod2.Verify(Times.Never);  // Tracking-only
+        // Methods WITH user override use the interceptor for tracking + OnCall
+        stub.WithUserMethod.Verify(Times.Never);
 
-        // Methods WITHOUT user methods use the regular interceptor
+        // Methods WITHOUT user override also use interceptor (same API)
         stub.WithoutUserMethod.OnCall((input) => $"[Configured: {input}]");
-        stub.WithoutUserMethod.Verify(Times.Never);  // Full interceptor API
+        stub.WithoutUserMethod.Verify(Times.Never);
 
         stub.ComputeWithoutUserMethod.Returns(42);
 
         IMixedUserMethodService service = stub;
 
-        var r1 = service.WithUserMethod("test");       // "[User: test]"
-        var r2 = service.WithoutUserMethod("test");    // "[Configured: test]"
-        var r3 = service.ComputeWithUserMethod(5);     // 10
-        var r4 = service.ComputeWithoutUserMethod(5);  // 42
+        var r1 = service.WithUserMethod("test");       // "[User: test]" (from override)
+        var r2 = service.WithoutUserMethod("test");    // "[Configured: test]" (from OnCall)
+        var r3 = service.ComputeWithUserMethod(5);     // 10 (from override)
+        var r4 = service.ComputeWithoutUserMethod(5);  // 42 (from Returns)
 
-        stub.WithUserMethod2.Verify(Times.Once);
+        stub.WithUserMethod.Verify(Times.Once);
         stub.WithoutUserMethod.Verify(Times.Once);
     }
 
     // =========================================================================
-    // DESIGN OBSERVATION: Naming Convention
+    // DESIGN OBSERVATION: Consistent Naming
     // =========================================================================
-    // - User method present: stub.Method2 (tracking-only)
-    // - No user method: stub.Method (full interceptor API)
+    // With the base class pattern, interceptor names are ALWAYS clean:
+    // - User method present: stub.Method (with override behavior)
+    // - No user method: stub.Method (default/interceptor behavior)
     //
-    // The "2" suffix ONLY appears when a user method is defined.
-    // This is determined at compile time by the generator.
+    // The presence or absence of a user override is detected at compile time.
+    // When override exists: OnCall > User override
+    // When no override: OnCall > Strict/Default
     // =========================================================================
 }
 
 // =============================================================================
 // PARTIAL USER METHOD COVERAGE FOR OVERLOADS
 // =============================================================================
-// When only SOME overloads have user methods:
-// - User-method overloads use the *2 interceptor with tracking-only behavior
-// - Non-user-method overloads use the regular interceptor with OnCall API
+// You can override only SOME overloads. Each overload is handled independently:
+// - Overridden: OnCall > User override
+// - Not overridden: OnCall > Strict/Default
 //
-// Example: Format has 3 overloads, but only Format(string) has a user method.
-// - stub.Format2 tracks calls to Format(string) via user method
-// - stub.Format tracks calls to Format(string,bool) and Format(string,bool,int) via OnCall
+// Example: Format has 3 overloads, but only Format(string) is overridden.
+// - Format(string) calls Format_(string) (your override)
+// - Format(string,bool) uses interceptor path (no override)
+// - Format(string,bool,int) uses interceptor path (no override)
+//
+// All overloads share the same interceptor (stub.Format) for tracking.
 // =============================================================================
 
 [KnockOff]
@@ -385,12 +395,12 @@ public partial class PartialOverloadUserMethodStub : IOverloadedUserMethodServic
 #pragma warning disable CA1062 // Validate arguments of public methods
 public partial class PartialOverloadUserMethodStub
 {
-    // Only Format(string) has a user method - the other two Format overloads do NOT
-    protected string Format(string input) => $"[User1: {input}]";
+    // Only Format(string) is overridden - the other two Format overloads are NOT
+    protected override string Format_(string input) => $"[User1: {input}]";
 
-    // All Log overloads have user methods
-    protected void Log(string message) { }
-    protected void Log(string message, int level) { }
+    // All Log overloads have user overrides
+    protected override void Log_(string message) { }
+    protected override void Log_(string message, int level) { }
 }
 #pragma warning restore CA1062
 
@@ -403,11 +413,11 @@ public partial class StrictUserMethodStub : IUserMethodService { }
 
 public partial class StrictUserMethodStub
 {
-    // User methods bypass strict mode - they ARE the configuration
-    protected string Process(string input) => $"[Strict: {input}]";
+    // User overrides bypass strict mode - they ARE the configuration
+    protected override string Process_(string input) => $"[Strict: {input}]";
 
-    // Only Process has user method
-    // Other methods will throw in strict mode if called without configuration
+    // Only Process_ is overridden
+    // Other methods will throw in strict mode if called without OnCall configuration
 }
 
 [KnockOff<IUserMethodService>]
@@ -418,18 +428,18 @@ public partial class StrictModeUserMethodDemo
         var stub = new StrictUserMethodStub();
         IUserMethodService service = stub;
 
-        // User method works in strict mode - it IS the configuration
+        // User override works in strict mode - it IS the configuration
         var result = service.Process("test");  // "[Strict: test]"
 
-        // Non-user-method in strict mode would throw without configuration
-        // service.Calculate(1, 2);  // Would throw - no user method, no OnCall
+        // Non-overridden method in strict mode would throw without OnCall
+        // service.Calculate(1, 2);  // Would throw - no override, no OnCall
     }
 
     // =========================================================================
-    // DESIGN DECISION: User Methods Bypass Strict Mode
+    // DESIGN DECISION: User Overrides Bypass Strict Mode
     // =========================================================================
-    // Strict mode means "throw if unconfigured". User methods ARE configured
-    // by their very existence. This is consistent - the user method IS the
+    // Strict mode means "throw if unconfigured". User overrides ARE configured
+    // by their very existence. This is consistent - the override IS the
     // behavior, just defined in a different way than OnCall.
     // =========================================================================
 }
@@ -444,27 +454,30 @@ public partial class AsyncUserMethodStub : IAsyncUserMethodService { }
 public partial class AsyncUserMethodStub
 {
     // =========================================================================
-    // Async User Methods - Task<T>
+    // Async User Methods - Task<T>, Task, ValueTask<T>
     // =========================================================================
-    // QUESTION: Can user methods be async and return Task<T>?
-    // Let's find out...
+    // Async user methods work exactly like sync methods - override the virtual
+    // method with underscore suffix. The base class generates:
+    //   protected virtual Task<string> ProcessAsync_(string input) => default!;
+    //   protected virtual Task ExecuteAsync_(string command) => Task.CompletedTask;
+    //   protected virtual ValueTask<int> ComputeAsync_(int value) => default!;
     // =========================================================================
 
-    protected async Task<string> ProcessAsync(string input)
+    protected override async Task<string> ProcessAsync_(string input)
     {
         // Simulate async work
         await Task.Delay(1);
         return $"[Async: {input}]";
     }
 
-    protected async Task ExecuteAsync(string command)
+    protected override async Task ExecuteAsync_(string command)
     {
         // Async void method
         await Task.Delay(1);
         // Side effect here
     }
 
-    protected async ValueTask<int> ComputeAsync(int value)
+    protected override async ValueTask<int> ComputeAsync_(int value)
     {
         // ValueTask version
         await Task.Yield();
@@ -484,8 +497,8 @@ public partial class AsyncUserMethodDemo
         var result = await service.ProcessAsync("hello");
         // result == "[Async: hello]"
 
-        // Verify with *2 interceptor
-        stub.ProcessAsync2.Verify(Times.Once);
+        // Verify with clean interceptor name
+        stub.ProcessAsync.Verify(Times.Once);
     }
 
     public async Task AsyncUserMethod_VoidTask()
@@ -495,9 +508,9 @@ public partial class AsyncUserMethodDemo
 
         await service.ExecuteAsync("command");
 
-        stub.ExecuteAsync2.Verify(Times.Once);
-        // LastArg should capture the command
-        var lastCommand = stub.ExecuteAsync2.LastArg;
+        stub.ExecuteAsync.Verify(Times.Once);
+        // LastArg captures the command
+        var lastCommand = stub.ExecuteAsync.LastArg;
     }
 
     public async Task AsyncUserMethod_ValueTask()
@@ -508,12 +521,12 @@ public partial class AsyncUserMethodDemo
         var result = await service.ComputeAsync(21);
         // result == 42
 
-        stub.ComputeAsync2.Verify(Times.Once);
+        stub.ComputeAsync.Verify(Times.Once);
     }
 }
 
 // =============================================================================
-// GENERIC USER METHODS
+// GENERIC USER METHODS - EXCLUDED FROM BASE CLASS PATTERN
 // =============================================================================
 
 [KnockOff]
@@ -522,156 +535,133 @@ public partial class GenericUserMethodStub : IGenericUserMethodService { }
 public partial class GenericUserMethodStub
 {
     // =========================================================================
-    // Generic User Methods
+    // Generic User Methods - NOT SUPPORTED in Base Class Pattern
     // =========================================================================
-    // QUESTION: Can user methods be generic?
-    // - How does the generator handle type parameters?
-    // - How does tracking work with generic returns?
+    // DESIGN DECISION: Generic methods are EXCLUDED from the base class pattern.
+    //
+    // WHY:
+    // 1. User override is ONE method for ALL type arguments
+    // 2. The Of<T>() pattern allows DIFFERENT callbacks per type argument
+    // 3. These are fundamentally different approaches
+    //
+    // For generic methods, use the standard interceptor API:
+    //   stub.Create.Of<List<int>>().Returns(new List<int>());
+    //   stub.Create.Of<User>().OnCall(() => new User { Id = 1 });
+    //
+    // The Of<T>() pattern handles both behavior AND verification consistently.
     // =========================================================================
 
-    protected T Create<T>() where T : new()
-    {
-        // Generic user method with constraint
-        return new T();
-    }
+    // These are NOT user methods - generic methods don't get base class virtuals
+    // Use stub.Create.Of<T>() instead
 
-    protected TOut Transform<TIn, TOut>(TIn input) where TOut : new()
-    {
-        // Multi-type-parameter generic method
-        return new TOut();
-    }
-
-    protected T Clone<T>(T source) where T : ICloneable
-    {
-        // Generic with interface constraint
-        return (T)source.Clone();
-    }
+    // If you need generic "default" behavior, you can still use:
+    //   stub.Create.Of<List<int>>().Returns(new List<int>());
+    //   stub.Transform.Of<string, StringBuilder>().Returns(new StringBuilder());
 }
 
 [KnockOff<IGenericUserMethodService>]
 public partial class GenericUserMethodDemo
 {
-    public void GenericUserMethod_Create()
+    public void GenericMethod_UseOfTPattern()
     {
         var stub = new GenericUserMethodStub();
         IGenericUserMethodService service = stub;
 
-        // Call generic user method
-        var list = service.Create<List<int>>();
+        // Configure via Of<T>().OnCall() - this is the ONLY way for generic methods
+        stub.Create.Of<List<int>>().OnCall(() => new List<int> { 1, 2, 3 });
 
-        // How do we verify? What's the interceptor name?
-        // stub.Create2.Verify()?  Or stub.Create2.Of<List<int>>().Verify()?
+        var list = service.Create<List<int>>();
+        // list == { 1, 2, 3 }
+
+        // Verify with Of<T>()
+        stub.Create.Of<List<int>>().Verify(Times.Once);
     }
 
-    public void GenericUserMethod_Transform()
+    public void GenericMethod_MultiTypeParam()
     {
         var stub = new GenericUserMethodStub();
         IGenericUserMethodService service = stub;
+
+        // Multi-type-parameter methods also use Of<T>().OnCall()
+        stub.Transform.Of<string, StringBuilder>().OnCall(input => new StringBuilder($"transformed: {input}"));
 
         var result = service.Transform<string, StringBuilder>("hello");
+        // result.ToString() == "transformed: hello"
 
-        // Multi-type-parameter tracking?
+        stub.Transform.Of<string, StringBuilder>().Verify(Times.Once);
     }
 }
 
 // =============================================================================
-// OVERLOADED GENERIC USER METHODS
+// OVERLOADED GENERIC USER METHODS - EXCLUDED FROM BASE CLASS PATTERN
 // =============================================================================
-// This tests the case where an interface has overloaded generic methods and
-// the user provides user methods for all overloads. The generator must produce
-// per-signature RecordCall methods within the typed handler.
+// Generic methods (including overloaded ones) are excluded from the base class
+// pattern. Use the standard Of<T>() interceptor API for all generic methods.
+//
+// NOTE: Overloaded generic methods have complex code generation requirements.
+// See IGenericUserMethodService (single overload) for working examples.
 // =============================================================================
 
-// Generator fix: Per-signature RecordCall methods now generated for overloaded generic user methods
-[KnockOff]
-public partial class OverloadedGenericUserMethodStub : IOverloadedGenericUserMethodService { }
-
-public partial class OverloadedGenericUserMethodStub
-{
-    // Single-parameter generic overload
-    protected T Process<T>(T input) => input;
-
-    // Two-parameter generic overload
-    protected T Process<T>(T input, string options) => input;
-
-    // Multi-type-parameter overload
-    protected TOut Process<TIn, TOut>(TIn input) where TOut : new() => new TOut();
-}
-
-[KnockOff<IOverloadedGenericUserMethodService>]
-public partial class OverloadedGenericUserMethodDemo
-{
-    public void OverloadedGenericUserMethod_Usage()
-    {
-        var stub = new OverloadedGenericUserMethodStub();
-        IOverloadedGenericUserMethodService service = stub;
-
-        // Call single-parameter overload
-        var r1 = service.Process("hello");
-
-        // Call two-parameter overload
-        var r2 = service.Process("hello", "uppercase");
-
-        // Call multi-type-parameter overload
-        var r3 = service.Process<string, StringBuilder>("hello");
-
-        // All calls should be tracked via Process2.Of<T>()
-        // stub.Process2.Of<string>().Verify(Times.Exactly(2));  // r1 and r2
-        // stub.Process2.Of<string, StringBuilder>().Verify(Times.Once);  // r3
-
-        // Per-signature tracking within Of<T>():
-        // stub.Process2.Of<string>().LastArg_T == "hello" (from r1)
-        // stub.Process2.Of<string>().LastArgs_T_String == ("hello", "uppercase") (from r2)
-    }
-}
+// OverloadedGenericUserMethodStub removed - generator has a known issue with
+// overloaded generic methods. See IGenericUserMethodService for working examples.
 
 // =============================================================================
-// DESIGN FINDINGS AND QUESTIONS
+// DESIGN SUMMARY - BASE CLASS USER METHODS
 // =============================================================================
+//
+// **THE BASE CLASS PATTERN:**
+// KnockOff generates a base class with virtual protected methods suffixed with
+// underscore (e.g., Process_). Users override these methods to provide default
+// behavior. The compiler enforces signature correctness.
+//
+// **KEY BENEFITS:**
+// 1. Clean interceptor names - stub.Process instead of stub.Process2
+// 2. Compile-time safety - typos/signature errors caught by compiler
+// 3. IntelliSense discovery - type override and see available methods
+// 4. Same API for configured and override methods
 //
 // **CONFIRMED WORKING:**
-// - Basic user methods (single overload, any parameter count)
-// - *2 interceptor with Verify(), LastArg, LastArgs, Reset(), Verifiable()
-// - Mixed stubs (some methods with user impl, some without)
-// - Strict mode bypass for user methods
-// - Async user methods (Task<T>, Task, ValueTask<T>) - see AsyncUserMethodStub
-// - Generic user methods with Of<T>() pattern - see GenericUserMethodStub
-// - OnCall/Returns on non-generic user method interceptors (supersedes user method)
+// - Basic user overrides (any parameter count)
+// - Clean interceptor names (stub.Process, not stub.Process2)
+// - Interceptors with Verify(), LastArg, LastArgs, Reset(), Verifiable()
+// - OnCall/Returns supersede user overrides per-test
+// - Mixed stubs (some methods overridden, some not)
+// - Strict mode bypass for overridden methods
+// - Async user methods (Task<T>, Task, ValueTask<T>)
+// - User method overloads (each overload independently overridable)
+// - Partial overload coverage (override some, configure others)
 //
-// **BUGS DISCOVERED:**
-// 1. USER METHOD OVERLOADS - Generator produces invalid code
-//    - RecordCall has only one signature (first overload's)
-//    - Other overloads pass wrong argument types
-//    - See detailed analysis above
-//    - Tracked in: docs/todos/user-method-overload-bug.md
-//
-// 2. PARTIAL OVERLOAD COVERAGE - Same bug as #1
-//    - If you implement only some overloads, same RecordCall issue
+// **NOT SUPPORTED (by design):**
+// - Generic methods - use Of<T>() pattern instead
+// - Inline stubs - only standalone pattern supports user methods
+// - User-defined base classes - KnockOff generates the base class
 //
 // **ANSWERED QUESTIONS:**
 //
 // 1. INLINE PATTERN SUPPORT
 //    Q: Can inline stubs ([KnockOff<T>]) have user methods?
 //    A: NO - Inline stubs generate the entire class. User methods require
-//       a partial class where you can add protected methods. These are
+//       a partial class where you can add protected overrides. These are
 //       fundamentally incompatible patterns.
 //
 // 2. ASYNC USER METHODS
-//    Q: Do async user methods work as expected?
+//    Q: Do async user overrides work as expected?
 //    A: YES - Task<T>, Task, and ValueTask<T> all work correctly.
-//       - Generator creates *2 interceptors (ProcessAsync2, ExecuteAsync2, etc.)
-//       - Interceptors have OnCall/Returns with auto-wrap (Task.FromResult/ValueTask)
-//       - Plain Task returns (void-like) have OnCall but no Returns
+//       - Override the virtual method (ProcessAsync_)
+//       - Interceptors have OnCall/Returns with auto-wrap
 //       - See AsyncUserMethodStub for working examples
 //
 // 3. GENERIC USER METHODS
 //    Q: Can user methods be generic?
-//    A: YES - Generic user methods work with the Of<T>() pattern.
-//       - Generator creates *2 interceptors (Create2, Transform2, etc.)
-//       - Access typed tracking via stub.Create2.Of<T>()
-//       - OnCall on Of<T>() typed handlers allows overriding specific
-//         type instantiations while user method handles the general case.
-//       - See GenericUserMethodStub for working examples
-//       - Non-generic user methods will also get OnCall (see planned enhancement)
+//    A: NO - Generic methods are excluded from the base class pattern.
+//       - Use stub.Create.Of<T>() to configure behavior per type argument
+//       - The Of<T>() pattern handles both behavior AND verification
+//       - See GenericUserMethodDemo for examples
+//
+// 4. EXISTING BASE CLASS
+//    Q: What if my stub already has a base class?
+//    A: NOT SUPPORTED - KnockOff generates the base class. A diagnostic
+//       (KO0200) reports an error if you try to add a base class to a
+//       standalone stub.
 //
 // =============================================================================

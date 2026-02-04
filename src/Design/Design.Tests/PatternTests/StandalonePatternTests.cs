@@ -57,7 +57,7 @@ public class StandalonePatternTests
     {
         var stub = new CalculatorStub();
 
-        // Standalone stubs can have user-defined methods
+        // Standalone stubs can have custom helper methods
         stub.MarkUsed();
 
         Assert.True(stub.WasUsed);

@@ -672,10 +672,10 @@ public partial class KnockOffGenerator
 				ContainingTypes: containingTypes,
 				TypeParameters: classTypeParameters,
 				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
-				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
+				UserOverrideMethods: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
 
@@ -709,12 +709,40 @@ public partial class KnockOffGenerator
 					ContainingTypes: containingTypes,
 					TypeParameters: classTypeParameters,
 					Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
-					UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 					Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 					FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 					FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
+					UserOverrideMethods: EquatableArray<string>.Empty,
 					Strict: strict);
 			}
+		}
+
+		// Check for user-defined base class (KO0200)
+		// The generator needs to control the base class for user method override support.
+		// If the class already has a base class other than object, emit an error.
+		if (classSymbol.BaseType is { } baseType && baseType.SpecialType != SpecialType.System_Object)
+		{
+			var location = classDeclaration.Identifier.GetLocation();
+			var lineSpan = location.GetLineSpan();
+			diagnostics.Add(new DiagnosticInfo(
+				"KO0200",
+				filePath,
+				lineSpan.StartLinePosition.Line,
+				lineSpan.StartLinePosition.Character,
+				new[] { classSymbol.Name, baseType.ToDisplayString() }));
+
+			// Return with diagnostics but no generation
+			return new KnockOffTypeInfo(
+				Namespace: namespaceName,
+				ClassName: classSymbol.Name,
+				ContainingTypes: containingTypes,
+				TypeParameters: classTypeParameters,
+				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
+				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
+				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
+				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
+				UserOverrideMethods: EquatableArray<string>.Empty,
+				Strict: strict);
 		}
 
 		// Get all implemented interfaces (includes inheritance chain)
@@ -796,9 +824,6 @@ public partial class KnockOffGenerator
 			}
 		}
 
-		// Get user-defined methods that could override interface methods
-		var userMethods = GetUserDefinedMethods(classSymbol, interfaceInfos);
-
 		// Create flat, deduplicated collections for the new v10.9+ API
 		var (flatMembers, flatEvents) = FlattenAndDeduplicateMembers(interfaceInfos, allInterfaces);
 
@@ -833,12 +858,16 @@ public partial class KnockOffGenerator
 				ContainingTypes: containingTypes,
 				TypeParameters: classTypeParameters,
 				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
-				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
+				UserOverrideMethods: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
+
+		// Detect user override methods using syntactic detection (base class pattern)
+		var userOverrideMethods = DetectUserOverrideMethods(classSymbol);
+		var userOverrideMethodsArray = new EquatableArray<string>(userOverrideMethods.ToArray());
 
 		return new KnockOffTypeInfo(
 			Namespace: namespaceName,
@@ -846,10 +875,10 @@ public partial class KnockOffGenerator
 			ContainingTypes: containingTypes,
 			TypeParameters: classTypeParameters,
 			Interfaces: new EquatableArray<InterfaceInfo>(interfaceInfos.ToArray()),
-			UserMethods: userMethods,
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 			FlatMembers: new EquatableArray<InterfaceMemberInfo>(flatMembers),
 			FlatEvents: new EquatableArray<EventMemberInfo>(flatEvents),
+			UserOverrideMethods: userOverrideMethodsArray,
 			Strict: strict);
 	}
 

@@ -1,9 +1,20 @@
 // -----------------------------------------------------------------------------
-// Design.Stubs - All Four Stub Patterns Side-by-Side
+// Design.Stubs - All Six Stub Patterns Side-by-Side
 // -----------------------------------------------------------------------------
-// This file is part of the Design Source of Truth. It demonstrates ALL FOUR
+// This file is part of the Design Source of Truth. It demonstrates ALL SIX
 // stub patterns that KnockOff supports, with extensive documentation of
 // when to use each pattern and what gets generated.
+//
+// THE SIX PATTERNS:
+// 1. Standalone          - [KnockOff] partial class Stub : IService
+// 1B. Generic Standalone - [KnockOff] partial class Stub<T> : IService<T>
+// 2. Inline Interface    - [KnockOff<IService>]
+// 3. Inline Class        - [KnockOff<ConcreteClass>]
+// 4. Inline Delegate     - [KnockOff<DelegateType>]
+// 5. Open Generic        - [KnockOff(typeof(T<>))]
+//
+// Note: Generic Standalone is numbered 1B because it is a variant of the
+// Standalone pattern. User documentation numbers sequentially 1-6.
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Abstractions;
@@ -69,6 +80,127 @@ public partial class CalculatorStub : ICalculator
     public void MarkUsed()
     {
         WasUsed = true;
+    }
+}
+
+// =============================================================================
+// PATTERN 1B: GENERIC STANDALONE STUB
+// =============================================================================
+//
+// A generic standalone stub is a reusable stub class with type parameters that
+// implements a generic interface. Like the non-generic standalone pattern, it
+// lives in its own file and can be shared across multiple test classes.
+//
+// WHEN TO USE:
+// - You need a reusable stub for a generic interface (IRepository<T>, IService<T>)
+// - Multiple tests need the same generic stub with different type arguments
+// - You want to share stub setup code across test classes
+// - You need to add custom methods or state to a generic stub
+// - You're writing a test fixture that parameterizes on a type
+//
+// SYNTAX:
+//
+//   [KnockOff]
+//   public partial class RepositoryStub<T> : IRepository<T> where T : class { }
+//
+// The stub class must:
+// - Have the [KnockOff] attribute
+// - Be declared as `partial`
+// - Implement a generic interface
+// - Declare the same type parameters as the interface
+// - Include the same constraints as the interface (where T : class, etc.)
+//
+// GENERATED CODE:
+// For this class:
+//
+//   [KnockOff]
+//   public partial class RepositoryStub<T> : IRepository<T> where T : class { }
+//
+// The generator produces (in RepositoryStub.g.cs):
+//
+//   public partial class RepositoryStub<T> : IKnockOffStub
+//   {
+//       public bool Strict { get; set; }
+//       public GetByIdInterceptor GetById { get; }
+//       public SaveInterceptor Save { get; }
+//       public GetAllInterceptor GetAll { get; }
+//       public CountInterceptor Count { get; }
+//
+//       // Nested interceptor classes use T from the outer class
+//       public class GetByIdInterceptor : Interceptor<int, T?> { ... }
+//       public class SaveInterceptor : Interceptor<T, ValueTuple> { ... }
+//       public class GetAllInterceptor : Interceptor<ValueTuple, IEnumerable<T>> { ... }
+//       public class CountInterceptor : PropertyInterceptor<int> { ... }
+//
+//       T? IRepository<T>.GetById(int id) => GetById.Call(id);
+//       void IRepository<T>.Save(T entity) => Save.Call(entity);
+//       IEnumerable<T> IRepository<T>.GetAll() => GetAll.Call();
+//       int IRepository<T>.Count { get => Count.Get(); set => Count.Set(value); }
+//   }
+//
+// USAGE IN TESTS:
+//
+//   // Create stubs with different type arguments
+//   var userRepo = new RepositoryStub<User>();
+//   var productRepo = new RepositoryStub<Product>();
+//   var orderRepo = new RepositoryStub<Order>();
+//
+//   // Configure each stub independently
+//   userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
+//   productRepo.GetById.OnCall((id) => new Product { Id = id, Price = 9.99m });
+//
+//   // Use as interface implementations
+//   IRepository<User> userService = userRepo;
+//   IRepository<Product> productService = productRepo;
+//
+//   // Verify calls per-instance
+//   userRepo.GetById.Verify(Times.Once);
+//
+// VS OPEN GENERIC PATTERN (PATTERN 6):
+//
+//   | Aspect              | Generic Standalone                  | Open Generic                          |
+//   |---------------------|-------------------------------------|---------------------------------------|
+//   | Declaration         | [KnockOff] class Stub<T> : IFoo<T>  | [KnockOff(typeof(IFoo<>))]            |
+//   | Location            | Separate file (reusable)            | Nested in test class                  |
+//   | Instantiation       | new RepositoryStub<User>()          | new Stubs.IRepository<User>()         |
+//   | Custom methods      | Yes (add to partial class)          | No                                    |
+//   | Shared across tests | Yes                                 | No (scoped to containing class)       |
+//   | Best for            | Test fixtures, shared utilities     | One-off generic interface tests       |
+//
+// DESIGN RATIONALE:
+// Generic standalone stubs fill a gap between non-generic standalone stubs and
+// open generic inline stubs. While open generic inline stubs are convenient for
+// one-off usage, they cannot be shared across test classes or extended with
+// custom methods. Generic standalone stubs provide the reusability and
+// extensibility of standalone stubs while supporting generic type parameters.
+//
+// CONSTRAINT PROPAGATION:
+// The generator preserves all type constraints from the interface. If the
+// interface has `where T : class, IEntity, new()`, the stub class must also
+// declare these constraints, and the generated code will enforce them.
+//
+// MULTIPLE TYPE PARAMETERS:
+// Generic standalone stubs support any number of type parameters:
+//
+//   [KnockOff]
+//   public partial class CacheStub<TKey, TValue> : ICache<TKey, TValue>
+//       where TKey : notnull { }
+//
+//   var cache = new CacheStub<string, int>();
+//
+// =============================================================================
+
+[KnockOff]
+public partial class GenericServiceStub<T> : IGenericService<T> where T : class
+{
+    // Like non-generic standalone stubs, users can add custom methods or state.
+    // This is NOT possible with open generic inline stubs.
+    private readonly List<T> _savedEntities = [];
+    public IReadOnlyList<T> SavedEntities => _savedEntities;
+
+    public void TrackSave(T entity)
+    {
+        _savedEntities.Add(entity);
     }
 }
 
@@ -290,7 +422,7 @@ public partial class InlineDelegateExample
 }
 
 // =============================================================================
-// PATTERN 5: OPEN GENERIC STUB (via typeof syntax)
+// PATTERN 6: OPEN GENERIC STUB (via typeof syntax)
 // =============================================================================
 // Use this pattern when:
 // - You need to stub an open generic interface like IRepository<T>
@@ -344,11 +476,21 @@ public partial class OpenGenericExample
 // DESIGN DECISION SUMMARY
 // =============================================================================
 //
-// DESIGN DECISION: Four distinct patterns serve different use cases:
-// - Standalone: Reusable stubs, custom methods/state, shared across tests
-// - Inline Interface: Scoped to test class, fewer files, no custom methods
-// - Inline Class: Virtual/abstract members, base class fallback behavior
-// - Inline Delegate: Named delegates with .Interceptor configuration
+// DESIGN DECISION: Six distinct patterns serve different use cases:
+//
+// STANDALONE PATTERNS (file-based, reusable across tests):
+// 1. Standalone: Reusable stubs, custom methods/state, shared across tests
+// 1B. Generic Standalone: Same as Standalone but with generic type parameters
+//
+// INLINE PATTERNS (nested within test class):
+// 2. Inline Interface: Scoped to test class, fewer files, no custom methods
+// 3. Inline Class: Virtual/abstract members, base class fallback behavior
+// 4. Inline Delegate: Named delegates with .Interceptor configuration
+// 5. Open Generic: Generic nested stubs from open generic types (typeof(T<>))
+//
+// KEY TRADE-OFF: Standalone vs Open Generic for generic interfaces:
+// - Generic Standalone: Reusable, can add custom methods, lives in own file
+// - Open Generic: Quick one-off usage, nested in test class, no custom methods
 //
 // DESIGN DECISION: Inline stubs generate a nested `Stubs` class to isolate
 // generated types from user code. Multiple [KnockOff<T>] attributes on the

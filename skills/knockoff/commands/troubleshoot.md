@@ -43,7 +43,7 @@ Follow these steps systematically:
   7. Other (describe)
 
 **Gather context:**
-- Which pattern is being used? (Stand-Alone, Inline Interface, Inline Class)
+- Which pattern is being used? (see [patterns.md](../skills/knockoff-usage/references/patterns.md))
 - Error message if available
 - File path if relevant
 
@@ -124,9 +124,7 @@ stub.GetUser.OnCall((int id, bool includeDeleted) =>
 4. Look for Generated/ folder contents
 
 **Fix:**
-1. Ensure attribute is correct:
-   - Stand-Alone: `[KnockOff]` on class implementing interface
-   - Inline: `[KnockOff<IInterface>]` on test class
+1. Ensure attribute is correct (see [patterns.md](../skills/knockoff-usage/references/patterns.md) for all six patterns)
 2. Clean and rebuild solution
 3. Check Error List for analyzer diagnostics
 
@@ -480,7 +478,7 @@ After diagnosis:
 Run through these checks systematically:
 
 **Basic Setup:**
-- [ ] Class marked `partial`? (Stand-Alone pattern only)
+- [ ] Class marked `partial`? (Standalone patterns only)
 - [ ] Attribute spelled correctly? (`[KnockOff]` or `[KnockOff<T>]`)
 - [ ] Interface/class accessible from test project?
 - [ ] Using statements present?
@@ -514,7 +512,8 @@ Run through these checks systematically:
 **KO001** - Interface not found → Check type accessibility
 **KO002** - Multiple candidates → Disambiguate type reference
 **KO003** - Unsupported member type → Check diagnostics for details
+**KO0200** - Standalone stub cannot have user-defined base class → Remove base class or use Inline pattern
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-03

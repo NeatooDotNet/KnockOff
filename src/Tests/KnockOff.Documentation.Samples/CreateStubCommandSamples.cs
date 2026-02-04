@@ -142,8 +142,8 @@ public partial class UserRepoCmdStub : IUserRepoCmd { }
 #region command-create-stub-user-methods
 public partial class UserRepoCmdStub
 {
-    // User method provides default test data
-    protected IEnumerable<User> FindAll()
+    // Override the generated virtual method (with _ suffix) to provide default test data
+    protected override IEnumerable<User> FindAll_()
     {
         return new[]
         {
