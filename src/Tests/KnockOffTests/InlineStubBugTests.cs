@@ -59,14 +59,14 @@ public class InlineStubBugTests
 		var target = new SampleTarget { Value = "test" };
 		var expectedResult = new SampleResult { Success = true };
 
-		// Set up callback for typed version - Execute1 takes ISampleTarget
-		stub.Execute1.OnCall((t, ct) =>
+		// Set up callback for typed version - Execute takes ISampleTarget
+		stub.Execute.OnCall((ISampleTarget t, CancellationToken? ct) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via typed interface
 		var result = rule.Execute(target, CancellationToken.None);
 
-		stub.Execute1.Verify();
+		stub.Execute.Verify();
 	}
 
 	[Fact]
@@ -78,15 +78,15 @@ public class InlineStubBugTests
 		var target = new SampleTarget { Value = "base-call" };
 		var expectedResult = new SampleResult { Success = true };
 
-		// Set up callback for base version - Execute2 takes ISampleRuleTarget
-		stub.Execute2.OnCall((t, ct) =>
+		// Set up callback for base version - Execute takes ISampleRuleTarget
+		stub.Execute.OnCall((ISampleRuleTarget t, CancellationToken? ct) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via base interface
 		var result = rule.Execute(target, CancellationToken.None);
 
 		Assert.NotNull(result);
-		stub.Execute2.Verify();
+		stub.Execute.Verify();
 	}
 
 	#endregion

@@ -203,40 +203,14 @@ internal static class ClassModelBuilder
     #region Compatibility Checking
 
     /// <summary>
-    /// Checks if two methods can share a single interceptor.
-    /// Compatible when: parameter names with same types across overloads (or new parameters).
-    /// Different return types are handled by signature-based delegate types and storage suffixes.
+    /// All method overloads with the same name are always compatible and share a single interceptor.
+    /// C# overload resolution handles all cases:
+    /// - Different param types: OnCall(Action&lt;string&gt;) vs OnCall(Action&lt;int&gt;) are distinguishable
+    /// - Different param counts: OnCall(Action) vs OnCall(Action&lt;string&gt;) are distinguishable
+    /// - Different return types: OnCall(Func&lt;int,string&gt;) vs OnCall(Func&lt;string,int&gt;) are distinguishable
+    /// Storage uses signature-based suffixes to keep callbacks separate internally.
     /// </summary>
-    private static bool AreMethodsCompatibleForSharedInterceptor(ClassMemberInfo m1, ClassMemberInfo m2)
-    {
-        // Check if shared parameter names have different types - this is the only incompatibility
-        // Different return types work fine: OnCall(Func<int,string>) vs OnCall(Func<string,int>)
-        // are distinguishable by C# overload resolution, and storage uses signature suffixes
-        var m1Params = m1.Parameters.ToDictionary(p => p.Name, p => p.Type);
-        foreach (var p2 in m2.Parameters)
-        {
-            if (m1Params.TryGetValue(p2.Name, out var m1Type) && m1Type != p2.Type)
-                return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Checks if all overloads in a list are mutually compatible for a shared interceptor.
-    /// </summary>
-    private static bool AreAllOverloadsCompatible(List<ClassMemberInfo> overloads)
-    {
-        for (int i = 0; i < overloads.Count; i++)
-        {
-            for (int j = i + 1; j < overloads.Count; j++)
-            {
-                if (!AreMethodsCompatibleForSharedInterceptor(overloads[i], overloads[j]))
-                    return false;
-            }
-        }
-        return true;
-    }
+    private static bool AreAllOverloadsCompatible(List<ClassMemberInfo> overloads) => true;
 
     #endregion
 
