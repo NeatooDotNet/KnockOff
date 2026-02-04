@@ -62,12 +62,24 @@ stub.Save.OnCall((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
+### User Methods
+
+You can provide default behavior by overriding virtual methods in the stub class. Use `protected override` with the underscore suffix:
+
+```cs
+public partial class UserRepoStandaloneStub
+{
+    // Override virtual method with underscore suffix - compiler enforces signature!
+    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
+}
+```
+
 ### Key Points
 
 - **Instantiation**: `new MyStub()`
 - **Interface access**: Cast to interface type or assign to interface variable
 - **Verification**: Call `stub.Verify()` or individual interceptor `.Verify()`
-- **User methods**: Override virtual methods (with underscore suffix, e.g., `GetById_`) to provide default behavior
+- **User methods**: Override virtual methods with `protected override` and underscore suffix (e.g., `GetById_`) to provide default behavior
 - **Clean interceptor names**: The interceptor uses the clean name (e.g., `GetById`) regardless of whether a user override exists
 - **OnCall supersedes user method**: Use `stub.GetById.OnCall(...)` to override the user method for specific tests
 - **User method as fallback**: When no `OnCall` is configured, the user override is called

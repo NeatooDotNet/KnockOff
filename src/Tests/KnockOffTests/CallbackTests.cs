@@ -35,8 +35,8 @@ public class CallbackTests
 
 		// User method returns input * 2
 		Assert.Equal(10, result);
-		Assert.Equal(5, knockOff.GetValue2.LastArg);
-		knockOff.GetValue2.Verify(Times.Once);
+		Assert.Equal(5, knockOff.GetValue.LastArg);
+		knockOff.GetValue.Verify(Times.Once);
 	}
 
 	[Fact]
@@ -150,7 +150,7 @@ public class CallbackTests
 
 		// User method returns input * 3
 		Assert.Equal(21, result);
-		Assert.Equal(7, knockOff.GetValueAsync2.LastArg);
+		Assert.Equal(7, knockOff.GetValueAsync.LastArg);
 	}
 
 	[Fact]

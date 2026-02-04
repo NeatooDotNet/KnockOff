@@ -672,7 +672,6 @@ public partial class KnockOffGenerator
 				ContainingTypes: containingTypes,
 				TypeParameters: classTypeParameters,
 				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
-				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
@@ -710,7 +709,6 @@ public partial class KnockOffGenerator
 					ContainingTypes: containingTypes,
 					TypeParameters: classTypeParameters,
 					Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
-					UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 					Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 					FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 					FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
@@ -740,7 +738,6 @@ public partial class KnockOffGenerator
 				ContainingTypes: containingTypes,
 				TypeParameters: classTypeParameters,
 				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
-				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
@@ -827,9 +824,6 @@ public partial class KnockOffGenerator
 			}
 		}
 
-		// Get user-defined methods that could override interface methods
-		var userMethods = GetUserDefinedMethods(classSymbol, interfaceInfos);
-
 		// Create flat, deduplicated collections for the new v10.9+ API
 		var (flatMembers, flatEvents) = FlattenAndDeduplicateMembers(interfaceInfos, allInterfaces);
 
@@ -864,7 +858,6 @@ public partial class KnockOffGenerator
 				ContainingTypes: containingTypes,
 				TypeParameters: classTypeParameters,
 				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
-				UserMethods: new EquatableArray<UserMethodInfo>(Array.Empty<UserMethodInfo>()),
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
@@ -882,7 +875,6 @@ public partial class KnockOffGenerator
 			ContainingTypes: containingTypes,
 			TypeParameters: classTypeParameters,
 			Interfaces: new EquatableArray<InterfaceInfo>(interfaceInfos.ToArray()),
-			UserMethods: userMethods,
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 			FlatMembers: new EquatableArray<InterfaceMemberInfo>(flatMembers),
 			FlatEvents: new EquatableArray<EventMemberInfo>(flatEvents),

@@ -70,7 +70,23 @@ stub.Save.OnCall((user) => { }).Verifiable();
 
 ### Base Class and User Methods
 
-KnockOff generates a base class (e.g., `UserRepoStandaloneStubBase`) with virtual methods for each interface member. You can override these methods using the `_` suffix to provide custom implementations while keeping interceptor names clean. See [User Methods](user-methods.md) for details.
+The Stand-Alone pattern generates a base class (e.g., `UserRepoStandaloneStubBase`) that your stub inherits from. This base class exposes `protected virtual` methods for each interface member, allowing you to add custom stub behavior through inheritance.
+
+Override these methods using the **underscore suffix convention** (`_`) to provide default implementations:
+
+```cs
+[KnockOff]
+public partial class UserRepoStandaloneStub : IUserRepoStandalone
+{
+    // Override base class method with underscore suffix
+    protected override User? GetById_(int id)
+    {
+        return new User { Id = id, Name = "Default User" };
+    }
+}
+```
+
+The interceptor name remains clean (`GetById`), while your implementation uses the suffix (`GetById_`). This keeps user methods separate from the generated code. See [User Methods](user-methods.md) for complete details and advanced patterns.
 
 ---
 

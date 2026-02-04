@@ -21,7 +21,6 @@ internal sealed record FlatPropertyModel(
     string? SetterPragmaDisable,
     string? SetterPragmaRestore,
     string SimpleInterfaceName,
-    string? UserMethodName,
     bool NeedsNewKeyword,
     InterfaceMemberInfo? DelegationTarget,
     string? DelegationTargetInterface);

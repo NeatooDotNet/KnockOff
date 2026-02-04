@@ -12,7 +12,6 @@ internal sealed record KnockOffTypeInfo(
 	/// </summary>
 	EquatableArray<TypeParameterInfo> TypeParameters,
 	EquatableArray<InterfaceInfo> Interfaces,
-	EquatableArray<UserMethodInfo> UserMethods,
 	EquatableArray<DiagnosticInfo> Diagnostics,
 	/// <summary>
 	/// Flat collection of all members from all interfaces, deduplicated.

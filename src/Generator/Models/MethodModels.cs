@@ -4,13 +4,6 @@ using Microsoft.CodeAnalysis;
 
 namespace KnockOff;
 
-internal sealed record UserMethodInfo(
-	string Name,
-	string ReturnType,
-	EquatableArray<ParameterInfo> Parameters,
-	bool IsGenericMethod,
-	EquatableArray<TypeParameterInfo> TypeParameters) : IEquatable<UserMethodInfo>;
-
 /// <summary>
 /// Represents a group of method overloads with the same name
 /// </summary>

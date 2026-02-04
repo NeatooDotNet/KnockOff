@@ -20,9 +20,9 @@ Console.WriteLine($"  LastSetValue: {knockOff.LastResult.LastSetValue}");
 // Test method with user implementation
 var result = calc.Add(10, 20);
 Console.WriteLine($"Add(10, 20) = {result}");
-knockOff.Add2.Verify(Times.Once);
+knockOff.Add.Verify(Times.Once);
 Console.WriteLine($"  Verify(Times.Once) passed!");
-Console.WriteLine($"  LastCallArgs: {knockOff.Add2.LastCallArgs}");
+Console.WriteLine($"  LastCallArgs: {knockOff.Add.LastCallArgs}");
 
 // Test void method
 calc.Clear();
@@ -46,5 +46,5 @@ public interface ICalculator
 public partial class CalculatorKnockOff : ICalculator
 {
     // User method for Add
-    protected int Add(int a, int b) => a + b;
+    protected override int Add_(int a, int b) => a + b;
 }

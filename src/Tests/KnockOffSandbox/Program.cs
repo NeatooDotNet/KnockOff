@@ -38,11 +38,11 @@ Console.WriteLine();
 Console.WriteLine("Method with single param (typed access):");
 var greeting = service.GetGreeting("World");
 Console.WriteLine($"  Result: {greeting}");
-knockOff.GetGreeting2.Verify(Times.Once);
+knockOff.GetGreeting.Verify(Times.Once);
 Console.WriteLine($"  Verified: Verify(Times.Once) passed");
 
 // User-defined method tracking has LastArg directly on the interceptor
-string lastArg = knockOff.GetGreeting2.LastArg;
+string lastArg = knockOff.GetGreeting.LastArg;
 Console.WriteLine($"  LastArg: {lastArg}");
 Console.WriteLine();
 
@@ -95,6 +95,6 @@ namespace KnockOff.Sandbox
 	public partial class UserServiceKnockOff : IUserService
 	{
 		// User-defined protected method - generator will call this for GetGreeting
-		protected string GetGreeting(string name) => $"Hello, {name}!";
+		protected override string GetGreeting_(string name) => $"Hello, {name}!";
 	}
 }

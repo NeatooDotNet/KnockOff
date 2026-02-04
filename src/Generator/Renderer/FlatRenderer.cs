@@ -1016,13 +1016,6 @@ internal static class FlatRenderer
 			return;
 		}
 
-		// Legacy user-defined methods get tracking-only interceptor
-		if (method.UserMethodCall != null)
-		{
-			RenderUserMethodInterceptorClass(w, method);
-			return;
-		}
-
 		w.Line($"/// <summary>Tracks and configures behavior for {method.MethodName}.</summary>");
 		using (w.Block($"public sealed class {method.InterceptorClassName}"))
 		{
@@ -3222,13 +3215,6 @@ internal static class FlatRenderer
 			return;
 		}
 
-		// Legacy user-defined methods (without base class pattern): record call and delegate to user's implementation
-		if (method.UserMethodCall != null)
-		{
-			RenderUserMethodImplementation(w, method, multiOverloadUserMethodInterceptors);
-			return;
-		}
-
 		// Determine if this method is part of an overload group (needs suffixed Invoke)
 		var isMultiOverload = multiOverloadInterceptors.Contains(method.InterceptorName);
 		var invokeSuffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
@@ -3246,42 +3232,6 @@ internal static class FlatRenderer
 				w.Line($"{method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");
 			else
 				w.Line($"return {method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");
-		}
-		w.Line();
-	}
-
-	private static void RenderUserMethodImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadUserMethodInterceptors)
-	{
-		// Determine if this user method is part of an overload group (needs suffixed RecordCall/Callback)
-		var isMultiOverload = multiOverloadUserMethodInterceptors.Contains(method.InterceptorName);
-		var suffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
-
-		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
-		using (w.Braces())
-		{
-			// Build record call args
-			var recordCallArgs = BuildTrackingArgs(method);
-
-			// Record the call (with signature suffix for overloads)
-			w.Line($"{method.InterceptorName}.RecordCall{suffix}({recordCallArgs});");
-
-			// Build callback args (all parameters)
-			var callbackArgs = method.Parameters.Count > 0
-				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
-				: "";
-
-			// OnCall callback supersedes user method when configured (with signature suffix for overloads)
-			var callbackProperty = isMultiOverload ? $"Callback{suffix}" : "Callback";
-			if (method.IsVoid)
-			{
-				w.Line($"if ({method.InterceptorName}.{callbackProperty} is {{ }} callback) {{ callback({callbackArgs}); return; }}");
-				w.Line($"{method.UserMethodCall};");
-			}
-			else
-			{
-				w.Line($"if ({method.InterceptorName}.{callbackProperty} is {{ }} callback) return callback({callbackArgs});");
-				w.Line($"return {method.UserMethodCall};");
-			}
 		}
 		w.Line();
 	}
@@ -3351,69 +3301,37 @@ internal static class FlatRenderer
 
 			var interceptorAccess = $"{method.InterceptorName}{method.OfTypeAccess}";
 
-			// Check if this is a generic user method in an overload group
-			var isMultiOverloadGenericUserMethod = multiOverloadGenericUserMethodInterceptors.Contains(method.InterceptorName);
-			var suffix = "";
-			string recordCallArgs;
-			if (isMultiOverloadGenericUserMethod && method.UserMethodCall != null)
-			{
-				// Find the signature suffix from the handler group
-				suffix = GetGenericUserMethodSignatureSuffix(method, genericUserMethodHandlerGroups);
-				// For generic user method overloads, pass ALL parameters (including generic-typed ones)
-				// because the typed handler knows the concrete types
-				recordCallArgs = method.Parameters.Count > 0
-					? string.Join(", ", method.Parameters.Where(p => p.RefKind != Microsoft.CodeAnalysis.RefKind.Out).Select(p => p.EscapedName))
-					: "";
-			}
-			else
-			{
-				// Regular generic methods use RecordCallArgs (excludes generic-typed params)
-				recordCallArgs = method.RecordCallArgs;
-			}
+			// Generic methods use RecordCallArgs (excludes generic-typed params)
+			var recordCallArgs = method.RecordCallArgs;
 
-			// Record the call (with suffix for overloaded generic user methods)
-			w.Line($"{interceptorAccess}.RecordCall{suffix}({recordCallArgs});");
+			// Record the call
+			w.Line($"{interceptorAccess}.RecordCall({recordCallArgs});");
 
 			// Build onCall args (no stub parameter)
 			var onCallArgs = method.Parameters.Count > 0
 				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
 				: "";
 
-			// Callback property (with suffix for overloaded generic user methods)
-			var callbackProperty = string.IsNullOrEmpty(suffix) ? "Callback" : $"Callback{suffix}";
-
 			if (method.IsVoid)
 			{
-				w.Line($"if ({interceptorAccess}.{callbackProperty} is {{ }} onCallCallback)");
+				w.Line($"if ({interceptorAccess}.Callback is {{ }} onCallCallback)");
 				w.Line($"{{ onCallCallback({onCallArgs}); return; }}");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
-				// User-defined method takes priority over default
-				if (method.UserMethodCall != null)
-				{
-					w.Line($"{method.UserMethodCall};");
-				}
+				// Generic methods don't support user overrides - just return for void
 			}
 			else if (method.ThrowsOnDefault)
 			{
-				w.Line($"if ({interceptorAccess}.{callbackProperty} is {{ }} callback)");
+				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
-				// User-defined method takes priority over throwing
-				if (method.UserMethodCall != null)
-					w.Line($"return {method.UserMethodCall};");
-				else
-					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Use {interceptorAccess}.OnCall(callback) or define a protected method '{method.MethodName}' in your partial class.\");");
+				w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Use {interceptorAccess}.OnCall(callback).\");");
 			}
 			else
 			{
-				w.Line($"if ({interceptorAccess}.{callbackProperty} is {{ }} callback)");
+				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
-				// User-defined method takes priority over default
-				if (method.UserMethodCall != null)
-					w.Line($"return {method.UserMethodCall};");
-				else
-					w.Line($"return {method.DefaultExpression};");
+				w.Line($"return {method.DefaultExpression};");
 			}
 		}
 		w.Line();

@@ -7,52 +7,54 @@ namespace KnockOff.Tests;
 /// </summary>
 public class GenericMethodBugTests
 {
-	#region Bug 1: User Method Detection for Generic Methods
+	#region Generic Methods with OnCall
 
 	/// <summary>
-	/// Tests that user-defined protected generic methods are detected and called by the generator.
+	/// Tests that generic methods use OnCall for configuration.
+	/// NOTE: Generic methods do NOT support user overrides by design. Use OnCall instead.
 	/// </summary>
 	[Fact]
-	public void GenericMethod_UserMethod_ShouldBeCalledInsteadOfDefault()
+	public void GenericMethod_OnCall_ReturnsConfiguredValue()
 	{
 		var knockOff = new GenericMethodWithUserMethodKnockOff();
 		IGenericMethodWithUserMethod service = knockOff;
+
+		knockOff.Create.Of<TestEntity>().OnCall(() => new TestEntity { Id = 999 });
 
 		var result = service.Create<TestEntity>();
 
-		// User method sets Id = 999
 		Assert.Equal(999, result.Id);
-		knockOff.Create2.Of<TestEntity>().Verify();
+		knockOff.Create.Of<TestEntity>().Verify();
 	}
 
 	[Fact]
-	public void GenericMethod_UserMethod_WithParameter_ShouldTransformValue()
+	public void GenericMethod_OnCall_WithParameter_TransformsValue()
 	{
 		var knockOff = new GenericMethodWithUserMethodKnockOff();
 		IGenericMethodWithUserMethod service = knockOff;
 
-		// User method doubles integers
+		// OnCall doubles integers
+		knockOff.Transform.Of<int>().OnCall((value) => value * 2);
+		knockOff.Transform.Of<string>().OnCall((value) => value + "_transformed");
+
 		var result = service.Transform(21);
 		Assert.Equal(42, result);
 
-		// User method appends "_transformed" to strings
 		var stringResult = service.Transform("hello");
 		Assert.Equal("hello_transformed", stringResult);
 	}
 
 	[Fact]
-	public void GenericMethod_UserMethod_OnCallTakesPriority()
+	public void GenericMethod_MultipleTypeParams_OnCall()
 	{
-		// OnCall should still take priority over user method
 		var knockOff = new GenericMethodWithUserMethodKnockOff();
 		IGenericMethodWithUserMethod service = knockOff;
 
-		knockOff.Create2.Of<TestEntity>().OnCall(() => new TestEntity { Id = 123 });
+		knockOff.Convert.Of<int, TestEntity>().OnCall((input) => new TestEntity { Id = input * 10 });
 
-		var result = service.Create<TestEntity>();
+		var result = service.Convert<int, TestEntity>(5);
 
-		// OnCall value, not user method value (999)
-		Assert.Equal(123, result.Id);
+		Assert.Equal(50, result.Id);
 	}
 
 	#endregion
@@ -236,39 +238,13 @@ public interface IGenericMethodWithUserMethod
 }
 
 /// <summary>
-/// KnockOff with user-defined generic methods that should take priority over defaults.
+/// KnockOff for testing generic methods.
+/// NOTE: Generic methods do NOT support user overrides by design.
+/// Use OnCall to configure behavior instead.
 /// </summary>
 [KnockOff]
 public partial class GenericMethodWithUserMethodKnockOff : IGenericMethodWithUserMethod
 {
-	// User method - should be called instead of smart default
-	protected T Create<T>() where T : new()
-	{
-		var instance = new T();
-		// Mark it somehow - for TestEntity, set Id to 999
-		if (instance is TestEntity entity)
-			entity.Id = 999;
-		return instance;
-	}
-
-	// User method for transform - doubles integers, appends to strings
-	protected T Transform<T>(T value)
-	{
-		if (value is int i)
-			return (T)(object)(i * 2);
-		if (value is string s)
-			return (T)(object)(s + "_transformed");
-		return value;
-	}
-
-	// User method for convert - special handling
-	protected TOut Convert<TIn, TOut>(TIn input) where TOut : new()
-	{
-		var result = new TOut();
-		if (result is TestEntity entity && input is int id)
-			entity.Id = id * 10;
-		return result;
-	}
 }
 
 /// <summary>

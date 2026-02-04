@@ -205,9 +205,44 @@ public class MyBaseClass { }
 public partial class MyStub : MyBaseClass, IMyService { }  // ERROR: KO0200
 ```
 
+**Understanding user methods:**
+
+User methods let you add custom default behavior to stubs by overriding generated virtual methods with an underscore suffix. KnockOff generates a base class with these methods so you can override them in your stub class:
+
+```csharp
+public interface IUserRepository
+{
+    User? GetById(int id);
+}
+
+[KnockOff]
+public partial class UserRepoStub : IUserRepository
+{
+    // Override the generated virtual method with underscore suffix
+    protected override User? GetById_(int id)
+    {
+        return new User { Id = id, Name = "Default User" };
+    }
+}
+
+// In tests:
+var stub = new UserRepoStub();
+// Calls your GetById_ override by default
+var user = stub.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
+
+// You can still override per-test with OnCall
+stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
+```
+
+**Key points:**
+- Use `protected override` keyword
+- Add underscore suffix to method name (e.g., `GetById_`)
+- User methods provide default behavior for all tests
+- Individual tests can still override with `OnCall`
+
 **Solutions:**
 
-1. **Remove the base class** from the standalone stub if the base class behavior is not essential
+1. **Remove the base class** from the standalone stub if the base class behavior is not essential—KnockOff's generated base class provides user method support
 2. **Use inline stub pattern** if you need the stub inside a class that has a base class:
    ```csharp
    [KnockOff<IMyService>]
