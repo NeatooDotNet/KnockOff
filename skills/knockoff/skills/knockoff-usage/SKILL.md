@@ -109,13 +109,15 @@ service.Name = "test";
 
 | Need | Pattern | Instantiation |
 |------|---------|---------------|
-| Reusable stub across files | Stand-Alone | `new MyStub()` |
-| Custom methods on stub | Stand-Alone | `new MyStub()` |
+| Reusable stub across files | Standalone | `new MyStub()` |
+| Custom methods on stub | Standalone | `new MyStub()` |
+| Reusable generic stub with type parameters | Generic Standalone | `new MyStub<T>()` |
 | Quick test-local stub | Inline Interface | `new Stubs.IService()` |
 | Stub a class (virtual/abstract) | Inline Class | `new Stubs.MyClass()` then `.Object` |
 | Stub a delegate | Inline Delegate | `new Stubs.MyDelegate()` |
+| Test-local stub for generic interface | Open Generic | `new Stubs.IFoo<T>()` |
 
-### Stand-Alone Pattern
+### Standalone Pattern
 
 ```cs
 [KnockOff]
@@ -565,4 +567,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-02
+**UPDATED:** 2026-02-03

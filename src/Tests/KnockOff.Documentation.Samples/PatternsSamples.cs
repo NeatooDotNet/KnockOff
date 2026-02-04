@@ -159,7 +159,101 @@ public partial class InlineDelegateTests
 }
 
 // =============================================================================
-// Complete Example - All Three Patterns Together
+// Generic Standalone Pattern
+// =============================================================================
+
+#region patterns-generic-standalone-basic
+public interface IRepositoryGeneric<T> where T : class
+{
+    T? GetById(int id);
+    void Save(T entity);
+    IEnumerable<T> GetAll();
+}
+
+[KnockOff]
+public partial class RepositoryGenericStub<T> : IRepositoryGeneric<T> where T : class { }
+#endregion
+
+public class GenericStandalonePatternTests
+{
+    [Fact]
+    public void GenericStandaloneStub_CanBeInstantiatedWithDifferentTypes()
+    {
+        #region patterns-generic-standalone-usage
+        // Generic Standalone: reusable across multiple type arguments
+        var userRepo = new RepositoryGenericStub<User>();
+        userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        userRepo.Save.OnCall((entity) => { }).Verifiable();
+
+        var productRepo = new RepositoryGenericStub<Product>();
+        productRepo.GetById.OnCall((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
+        #endregion
+
+        IRepositoryGeneric<User> userRepository = userRepo;
+        var user = userRepository.GetById(1);
+        userRepository.Save(user!);
+
+        IRepositoryGeneric<Product> productRepository = productRepo;
+        var product = productRepository.GetById(42);
+
+        Assert.NotNull(user);
+        Assert.Equal("Test", user.Name);
+        Assert.NotNull(product);
+        Assert.Equal("Widget", product.Name);
+        userRepo.Verify();
+        productRepo.Verify();
+    }
+}
+
+// =============================================================================
+// Open Generic Pattern
+// =============================================================================
+
+public interface IServiceOpenGeneric<T>
+{
+    T? GetItem(int id);
+    void Process(T item);
+}
+
+#region patterns-open-generic-basic
+[KnockOff(typeof(IServiceOpenGeneric<>))]
+public partial class OpenGenericTests
+{
+    // The generator creates Stubs.IServiceOpenGeneric<T>
+}
+#endregion
+
+public partial class OpenGenericTests
+{
+    [Fact]
+    public void OpenGenericStub_CanBeInstantiatedWithDifferentTypes()
+    {
+        #region patterns-open-generic-usage
+        // Open Generic: instantiate with any type argument
+        var userStub = new Stubs.IServiceOpenGeneric<User>();
+        userStub.GetItem.OnCall((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
+
+        var productStub = new Stubs.IServiceOpenGeneric<Product>();
+        productStub.GetItem.OnCall((id) => new Product { Id = id, Name = "FromStub" }).Verifiable();
+        #endregion
+
+        IServiceOpenGeneric<User> userService = userStub;
+        var user = userService.GetItem(1);
+
+        IServiceOpenGeneric<Product> productService = productStub;
+        var product = productService.GetItem(42);
+
+        Assert.NotNull(user);
+        Assert.Equal("FromStub", user.Name);
+        Assert.NotNull(product);
+        Assert.Equal("FromStub", product.Name);
+        userStub.Verify();
+        productStub.Verify();
+    }
+}
+
+// =============================================================================
+// Complete Example - All Six Patterns Together
 // =============================================================================
 
 public interface ILogSvc
@@ -179,43 +273,85 @@ public interface IEmailSvcPattern
     bool IsConfigured { get; }
 }
 
+// Generic standalone stub for notifications
+public interface INotifier<T>
+{
+    void Notify(T item);
+}
+
+// Open generic interface for complete example
+public interface IProcessor<T>
+{
+    void Process(T item);
+}
+
 [KnockOff]
 public partial class EmailSvcPatternStub : IEmailSvcPattern { }
 
+[KnockOff]
+public partial class NotifierStub<T> : INotifier<T> { }
+
+// Host for inline interface and inline class stubs used in complete example
 [KnockOff<ILogSvc>]
 [KnockOff<AuditSvcBase>]
-public partial class PatternComparisonTests
+public partial class CompleteExampleInlineHost { }
+
+// Separate host for open generic stub to avoid filename conflict
+[KnockOff(typeof(IProcessor<>))]
+public partial class CompleteExampleOpenGenericHost { }
+
+public class PatternComparisonTests
 {
     [Fact]
-    public void AllThreePatterns_WorkTogether()
+    public void AllSixPatterns_WorkTogether()
     {
         #region patterns-complete-example
-        // Stand-Alone: direct instantiation
+        // 1. Standalone: direct instantiation
         var emailStub = new EmailSvcPatternStub();
         emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
 
-        // Inline Interface: via Stubs namespace
-        var loggerStub = new Stubs.ILogSvc();
+        // 2. Generic Standalone: reusable with type args
+        var notifierStub = new NotifierStub<User>();
+        notifierStub.Notify.OnCall((item) => { }).Verifiable();
+
+        // 3. Inline Interface: via Stubs namespace
+        var loggerStub = new CompleteExampleInlineHost.Stubs.ILogSvc();
         loggerStub.Log.OnCall((msg) => { }).Verifiable();
 
-        // Inline Class: use .Object for class instance
-        var auditStub = new Stubs.AuditSvcBase();
+        // 4. Inline Class: use .Object for class instance
+        var auditStub = new CompleteExampleInlineHost.Stubs.AuditSvcBase();
         auditStub.Audit.OnCall((action) => { }).Verifiable();
         AuditSvcBase audit = auditStub.Object;
+
+        // 5. Inline Delegate: implicit conversion
+        var ruleStub = new InlineDelegateTests.Stubs.ValidationRule();
+        ruleStub.Interceptor.OnCall((value) => true);
+        ValidationRule rule = ruleStub;
+
+        // 6. Open Generic: inline stub with type args
+        var processorStub = new CompleteExampleOpenGenericHost.Stubs.IProcessor<Order>();
+        processorStub.Process.OnCall((item) => { }).Verifiable();
         #endregion
 
         IEmailSvcPattern email = emailStub;
         ILogSvc logger = loggerStub;
-        var logMessages = new List<string>();
+        INotifier<User> notifier = notifierStub;
+        IProcessor<Order> processor = processorStub;
 
         logger.Log("Starting operation");
         var sent = email.Send("user@test.com", "Hello", "World");
+        notifier.Notify(new User { Id = 1, Name = "Test" });
         audit.Audit("email_sent");
+        var isValid = rule("test");
+        processor.Process(new Order { Id = 1 });
         logger.Log("Operation complete");
 
         Assert.True(sent);
+        Assert.True(isValid);
         emailStub.Verify();
+        notifierStub.Verify();
         loggerStub.Verify();
         auditStub.Verify();
+        processorStub.Verify();
     }
 }
