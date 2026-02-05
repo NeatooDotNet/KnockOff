@@ -8,6 +8,8 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v10.34.0](v10.34.0.md) | 2026-02-04 | **Breaking:** Sequence exhaustion repeats last value, standalone class stubs (patterns 3 & 4), params sequence overloads |
+| [v10.33.0](v10.33.0.md) | 2026-02-01 | Verifiable support for user-defined methods |
 | [v10.32.0](v10.32.0.md) | 2026-01-30 | **Breaking:** OnCall(value)→Returns(value), When() API for parameter matching |
 | [v10.30.0](v10.30.0.md) | 2026-01-27 | Assembly-wide strict mode with `[assembly: KnockOffStrict]` |
 | [v10.27.0](v10.27.0.md) | 2026-01-26 | **Breaking:** Unified callback API to method syntax, removed .Value property, added value-based overloads |
@@ -34,6 +36,8 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v10.34.0](v10.34.0.md) - 2026-02-04 - **Breaking:** Sequence exhaustion repeats last value, standalone class stubs (patterns 3 & 4), params sequence overloads
+- [v10.33.0](v10.33.0.md) - 2026-02-01 - Verifiable support for user-defined methods
 - [v10.32.0](v10.32.0.md) - 2026-01-30 - **Breaking:** OnCall(value)→Returns(value), When() API for parameter matching
 - [v10.31.0](v10.31.0.md) - 2026-01-27 - Source delegation bug fix for inherited interface members
 - [v10.30.0](v10.30.0.md) - 2026-01-27 - Assembly-wide strict mode with `[assembly: KnockOffStrict]`
