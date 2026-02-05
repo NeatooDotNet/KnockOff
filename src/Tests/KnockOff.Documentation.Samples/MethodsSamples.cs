@@ -435,6 +435,34 @@ public partial class DataSvcStub : IDataSvc { }
 public class SequenceTests
 {
     [Fact]
+    public void Sequence_ParamsIntro()
+    {
+        var stub = new ValueSvcStub();
+        var addStub = new CalculatorSvcStub();
+
+        #region methods-params-sequence-intro
+        // Use PARAMS SEQUENCE for multiple constant values:
+        // Returns 1, then 2, then 3, then repeats 3
+        stub.GetValue.Returns(1, 2, 3);
+
+        // Mix callbacks with params for complex sequences:
+        // First call uses callback, then returns 100, 200, 300
+        addStub.Calculate.OnCall((x, y) => x + y).ThenReturns(100, 200, 300);
+        #endregion
+
+        IValueSvc service = stub;
+        ICalculatorSvc calc = addStub;
+
+        Assert.Equal(1, service.GetValue());
+        Assert.Equal(2, service.GetValue());
+        Assert.Equal(3, service.GetValue());
+        Assert.Equal(3, service.GetValue());
+
+        Assert.Equal(8, calc.Calculate(5, 3));   // computed
+        Assert.Equal(100, calc.Calculate(0, 0)); // constant
+    }
+
+    [Fact]
     public void Sequence_ParamsSyntax()
     {
         var stub = new ValueSvcStub();
@@ -668,5 +696,138 @@ public class SequenceTests
         processor.Process();
 
         stub.Verify();
+    }
+
+    [Fact]
+    public void Sequence_NSubstituteStyleFull()
+    {
+        var stub = new ValueSvcStub();
+
+        #region methods-sequence-nsub-style
+        // Returns 1 on first call, 2 on second, 3 on third and all subsequent calls
+        stub.GetValue.Returns(1, 2, 3);
+
+        IValueSvc calc = stub;
+        var r1 = calc.GetValue();  // 1
+        var r2 = calc.GetValue();  // 2
+        var r3 = calc.GetValue();  // 3
+        var r4 = calc.GetValue();  // 3 (repeats last value)
+        #endregion
+
+        Assert.Equal(1, r1);
+        Assert.Equal(2, r2);
+        Assert.Equal(3, r3);
+        Assert.Equal(3, r4);
+    }
+
+    [Fact]
+    public void Sequence_SingleVsParams()
+    {
+        var singleStub = new ValueSvcStub();
+        var paramsStub = new ValueSvcStub();
+
+        #region methods-single-vs-params
+        // Single value - repeats indefinitely (no sequence)
+        singleStub.GetValue.Returns(42);
+
+        // Params sequence - progresses through values, repeats last
+        paramsStub.GetValue.Returns(1, 2, 3);
+        #endregion
+
+        IValueSvc single = singleStub;
+        IValueSvc multi = paramsStub;
+
+        Assert.Equal(42, single.GetValue());
+        Assert.Equal(42, single.GetValue());
+
+        Assert.Equal(1, multi.GetValue());
+        Assert.Equal(2, multi.GetValue());
+        Assert.Equal(3, multi.GetValue());
+        Assert.Equal(3, multi.GetValue());
+    }
+
+    [Fact]
+    public void Sequence_CallbackThenParamsFull()
+    {
+        var stub = new CalculatorSvcStub();
+
+        #region methods-sequence-callback-then-params-full
+        // First call: compute dynamically
+        // Then: return 100, 200, 300 in sequence
+        stub.Calculate.OnCall((a, b) => a + b).ThenReturns(100, 200, 300);
+
+        ICalculatorSvc calc = stub;
+        var r1 = calc.Calculate(1, 2);  // 3 (computed: 1 + 2)
+        var r2 = calc.Calculate(0, 0);  // 100
+        var r3 = calc.Calculate(0, 0);  // 200
+        var r4 = calc.Calculate(0, 0);  // 300
+        var r5 = calc.Calculate(0, 0);  // 300 (repeats last)
+        #endregion
+
+        Assert.Equal(3, r1);
+        Assert.Equal(100, r2);
+        Assert.Equal(200, r3);
+        Assert.Equal(300, r4);
+        Assert.Equal(300, r5);
+    }
+
+    [Fact]
+    public async Task Sequence_ParamsAsyncFull()
+    {
+        var stub = new DataSvcStub();
+
+        #region methods-sequence-params-async-full
+        // Async values auto-wrapped - no Task.FromResult needed
+        stub.GetDataAsync.Returns("first", "second", "third");
+
+        IDataSvc service = stub;
+        var r1 = await service.GetDataAsync(1);  // "first"
+        var r2 = await service.GetDataAsync(2);  // "second"
+        var r3 = await service.GetDataAsync(3);  // "third"
+        var r4 = await service.GetDataAsync(4);  // "third" (repeats)
+        #endregion
+
+        Assert.Equal("first", r1);
+        Assert.Equal("second", r2);
+        Assert.Equal("third", r3);
+        Assert.Equal("third", r4);
+    }
+
+    [Fact]
+    public void Sequence_ExhaustionParams()
+    {
+        var stub = new ValueSvcStub();
+
+        #region methods-sequence-exhaustion-params
+        stub.GetValue.Returns(1, 2);
+
+        IValueSvc calc = stub;
+        var r1 = calc.GetValue();  // 1
+        var r2 = calc.GetValue();  // 2
+        var r3 = calc.GetValue();  // 2 (repeats last)
+        var r4 = calc.GetValue();  // 2 (still repeats)
+        #endregion
+
+        Assert.Equal(1, r1);
+        Assert.Equal(2, r2);
+        Assert.Equal(2, r3);
+        Assert.Equal(2, r4);
+    }
+
+    [Fact]
+    public void Sequence_ParamsVerify()
+    {
+        var stub = new ValueSvcStub();
+
+        #region methods-sequence-params-verify
+        var sequence = stub.GetValue.Returns(1, 2, 3);
+
+        IValueSvc calc = stub;
+        calc.GetValue();  // 1
+        calc.GetValue();  // 2
+        calc.GetValue();  // 3
+
+        sequence.Verify();  // Passes - all 3 values used
+        #endregion
     }
 }

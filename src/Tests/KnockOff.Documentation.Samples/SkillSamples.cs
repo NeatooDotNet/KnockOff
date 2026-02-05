@@ -1,126 +1,107 @@
 using KnockOff;
+using KnockOff.Documentation.Samples; // For User type
 
 namespace KnockOff.Documentation.Samples.Skill;
 
 // =============================================================================
-// Stand-Alone Pattern Samples
+// Stand-Alone Pattern Samples (matches SKILL.md)
 // =============================================================================
 
-#region skill-standalone-pattern-define
 public interface ISkillUserRepo
 {
     User? GetById(int id);
     void Save(User user);
 }
 
+#region skill-standalone-pattern
 [KnockOff]
 public partial class SkillUserRepoStub : ISkillUserRepo { }
 #endregion
 
 public class StandalonePatternTests
 {
-    #region skill-standalone-pattern-usage
+    #region skill-standalone-usage
     [Fact]
     public void StandaloneStub_ConfigureAndVerify()
     {
-        // Create the stub
         var stub = new SkillUserRepoStub();
-
-        // Configure behavior
-        stub.GetById.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+        stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
         stub.Save.OnCall((user) => { }).Verifiable();
-
-        // Use as interface
         ISkillUserRepo repo = stub;
+
         var user = repo.GetById(42);
         repo.Save(user!);
 
-        // Verify calls
         stub.Verify();
     }
     #endregion
 }
 
 // =============================================================================
-// Inline Interface Pattern Samples
+// Inline Interface Pattern Samples (matches SKILL.md)
 // =============================================================================
 
-public interface ISkillEmailSvc
+public interface ISkillEmailService
 {
     bool Send(string to, string subject);
 }
 
-#region skill-inline-interface-pattern-define
-[KnockOff<ISkillEmailSvc>]
-public partial class SkillEmailSvcTests
+#region skill-inline-interface-pattern
+[KnockOff<ISkillEmailService>]
+public partial class SkillEmailTests
 {
-    // Generator creates Stubs.ISkillEmailSvc inside this class
+    [Fact]
+    public void Test()
+    {
+        var stub = new Stubs.ISkillEmailService();
+        stub.Send.OnCall((to, subj) => true).Verifiable();
+        ISkillEmailService email = stub;
+    }
 }
 #endregion
 
-public partial class SkillEmailSvcTests
-{
-    #region skill-inline-interface-pattern-usage
-    [Fact]
-    public void InlineInterfaceStub_ConfigureAndVerify()
-    {
-        // Create stub from nested Stubs class
-        var stub = new Stubs.ISkillEmailSvc();
-
-        // Configure behavior
-        stub.Send.OnCall((to, subject) => true).Verifiable();
-
-        // Use as interface
-        ISkillEmailSvc email = stub;
-        var result = email.Send("test@example.com", "Hello");
-
-        // Verify
-        Assert.True(result);
-        stub.Verify();
-    }
-    #endregion
-}
-
 // =============================================================================
-// Inline Class Pattern Samples
+// Inline Class Pattern Samples (matches SKILL.md)
 // =============================================================================
 
-#region skill-inline-class-pattern-define
-public class SkillDataSvc
+public class SkillDataServiceBase
 {
     public virtual string? GetData(int id) => null;
-    public virtual bool IsConnected { get; set; }
 }
 
-[KnockOff<SkillDataSvc>]
-public partial class SkillDataSvcTests
+#region skill-inline-class-pattern
+[KnockOff<SkillDataServiceBase>]
+public partial class SkillDataTests
 {
-    // Generator creates Stubs.SkillDataSvc inside this class
+    [Fact]
+    public void Test()
+    {
+        var stub = new Stubs.SkillDataServiceBase();
+        stub.GetData.OnCall((id) => "test").Verifiable();
+        SkillDataServiceBase service = stub.Object;  // Use .Object!
+    }
 }
 #endregion
 
-public partial class SkillDataSvcTests
+// =============================================================================
+// Inline Delegate Pattern Samples (matches SKILL.md)
+// =============================================================================
+
+public delegate bool SkillValidationRule(string value);
+
+#region skill-inline-delegate-pattern
+[KnockOff<SkillValidationRule>]  // delegate bool SkillValidationRule(string value);
+public partial class SkillValidationTests
 {
-    #region skill-inline-class-pattern-usage
     [Fact]
-    public void InlineClassStub_UseObjectProperty()
+    public void Test()
     {
-        // Create stub from nested Stubs class
-        var stub = new Stubs.SkillDataSvc();
-
-        // Configure behavior
-        stub.GetData.OnCall((id) => $"Data-{id}").Verifiable();
-
-        // Use .Object to get the actual class instance
-        SkillDataSvc service = stub.Object;
-        var data = service.GetData(42);
-
-        // Verify
-        Assert.Equal("Data-42", data);
-        stub.Verify();
+        var stub = new Stubs.SkillValidationRule();
+        stub.Interceptor.OnCall((val) => val != "invalid");
+        SkillValidationRule rule = stub;  // Implicit conversion
     }
-    #endregion
 }
+#endregion
 
 // =============================================================================
 // Method OnCall Examples
@@ -142,7 +123,6 @@ public class MethodOnCallTests
     {
         var stub = new SkillConfigSvcStub();
 
-        #region skill-method-oncall-examples
         // VALUE syntax - for fixed return values
         stub.GetValue.Returns("default-value");
 
@@ -151,7 +131,6 @@ public class MethodOnCallTests
 
         // Void methods use Action callback
         stub.SetValue.OnCall((key, value) => { /* track or validate */ });
-        #endregion
     }
 }
 
@@ -175,7 +154,6 @@ public class PropertyConfigTests
     {
         var stub = new SkillAppConfigStub();
 
-        #region skill-property-configuration-examples
         // OnGet with value - simplest syntax
         stub.Timeout.OnGet(30);
 
@@ -184,7 +162,6 @@ public class PropertyConfigTests
 
         // OnSet - intercept property writes
         stub.ApiKey.OnSet((value) => { /* validate or track */ });
-        #endregion
     }
 }
 
@@ -201,14 +178,13 @@ public interface ISkillLogger
 [KnockOff]
 public partial class SkillLoggerStub : ISkillLogger { }
 
-public class VerificationTests
+public class SkillVerificationTests
 {
     [Fact]
     public void Verifiable_BatchVerification()
     {
         var stub = new SkillLoggerStub();
 
-        #region skill-verifiable-batch
         // Mark methods as verifiable
         stub.Log.OnCall((msg) => { }).Verifiable();
         stub.LogError.OnCall((msg) => { }).Verifiable();
@@ -219,7 +195,6 @@ public class VerificationTests
 
         // Single Verify() checks all marked members
         stub.Verify();
-        #endregion
     }
 
     [Fact]
@@ -227,7 +202,6 @@ public class VerificationTests
     {
         var stub = new SkillLoggerStub();
 
-        #region skill-times-constraints
         // Verify specific call counts
         var tracking = stub.Log.OnCall((msg) => { });
 
@@ -238,7 +212,6 @@ public class VerificationTests
         tracking.Verify(Times.Exactly(2));  // Exactly 2 calls
         tracking.Verify(Times.AtLeast(1));  // At least 1 call
         // Times.Once, Times.Never, Times.AtMost(n) also available
-        #endregion
     }
 }
 
@@ -261,7 +234,6 @@ public class ArgumentAccessTests
     {
         var stub = new SkillNotifierStub();
 
-        #region skill-accessing-arguments
         var tracking = stub.Notify.OnCall((userId, message) => { });
 
         ISkillNotifier notifier = stub;
@@ -271,28 +243,25 @@ public class ArgumentAccessTests
         var (userId, message) = tracking.LastArgs;
         Assert.Equal(42, userId);
         Assert.Equal("Hello", message);
-        #endregion
     }
 }
 
 // =============================================================================
-// Common Gotchas
+// Common Gotchas - Missing Partial
 // =============================================================================
-
-// NOTE: These samples demonstrate CORRECT patterns.
-// The gotcha descriptions in SKILL.md explain the problem;
-// the code shows the solution.
 
 public interface ISkillFoo
 {
     void DoSomething();
 }
 
-#region skill-gotcha-missing-partial
 // CORRECT: Include 'partial' keyword
 [KnockOff]
 public partial class SkillFooStub : ISkillFoo { }
-#endregion
+
+// =============================================================================
+// Common Gotchas - Wrong Signature
+// =============================================================================
 
 public interface ISkillBar
 {
@@ -309,12 +278,14 @@ public class GotchaTests
     {
         var stub = new SkillBarStub();
 
-        #region skill-gotcha-wrong-signature
         // CORRECT: Callback signature matches method parameters exactly
         stub.Process.OnCall((int id, string name) => { /* ... */ });
-        #endregion
     }
 }
+
+// =============================================================================
+// Common Gotchas - Missing .Object
+// =============================================================================
 
 public class SkillAbstractBase
 {
@@ -329,13 +300,15 @@ public partial class GotchaMissingObjectTests
     {
         var stub = new Stubs.SkillAbstractBase();
 
-        #region skill-gotcha-missing-object
         // CORRECT: Use .Object for inline class stubs
         SkillAbstractBase service = stub.Object;
         _ = service.GetName();
-        #endregion
     }
 }
+
+// =============================================================================
+// Common Gotchas - Async Auto-Wrap
+// =============================================================================
 
 public interface ISkillAsyncSvc
 {
@@ -352,7 +325,6 @@ public class AsyncGotchaTests
     {
         var stub = new SkillAsyncSvcStub();
 
-        #region skill-gotcha-async-autowrap
         // CORRECT: KnockOff auto-wraps - just pass the value directly
         stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
 
@@ -360,6 +332,5 @@ public class AsyncGotchaTests
         ISkillAsyncSvc service = stub;
         var user = await service.GetUserAsync(1);
         Assert.Equal("Alice", user!.Name);
-        #endregion
     }
 }

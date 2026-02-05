@@ -117,10 +117,8 @@ public class BasicCallVerificationTests
         repository.Refresh();
         repository.Refresh();
 
-        #region verify-times-exactly
         // Verify exactly N calls
         tracking.Verify(Times.Exactly(3));
-        #endregion
     }
 
     [Fact]

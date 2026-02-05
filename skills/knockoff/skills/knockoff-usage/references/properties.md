@@ -334,8 +334,9 @@ User properties provide several advantages over per-test configuration:
 
 Override protected virtual properties with the underscore suffix convention to provide default implementations:
 
+<!-- snippet: user-properties-interface-and-stub -->
 ```cs
-public interface IUserService
+public interface ISkillUserSvc
 {
     int Count { get; }
     string Name { get; set; }
@@ -343,9 +344,9 @@ public interface IUserService
 }
 
 [KnockOff]
-public partial class UserServiceStub : IUserService { }
+public partial class SkillUserSvcStub : ISkillUserSvc { }
 
-public partial class UserServiceStub
+public partial class SkillUserSvcStub
 {
     private int _count;
     private string _name = "";
@@ -371,14 +372,16 @@ public partial class UserServiceStub
     public void SetCount(int value) => _count = value;
 }
 ```
+<!-- endSnippet -->
 
 ### Using Stubs with User Properties
 
+<!-- snippet: user-properties-basic-usage -->
 ```cs
-var stub = new UserServiceStub();
+var stub = new SkillUserSvcStub();
 stub.SetCount(42);
 
-IUserService service = stub;
+ISkillUserSvc service = stub;
 
 // Get-only property uses your protected override Count_
 var count = service.Count;  // 42
@@ -390,16 +393,18 @@ var name = service.Name;    // "Test"
 // Set-only property uses your protected override Setting_
 service.Setting = "value";
 ```
+<!-- endSnippet -->
 
 ### OnGet/OnSet Supersede User Properties
 
 User properties provide shareable defaults. Use `OnGet()` or `OnSet()` to override per-test:
 
+<!-- snippet: user-properties-onget-onset-override -->
 ```cs
-var stub = new UserServiceStub();
+var stub = new SkillUserSvcStub();
 stub.SetCount(42);
 
-IUserService service = stub;
+ISkillUserSvc service = stub;
 
 // Default: user property is called
 var defaultValue = service.Count;  // 42
@@ -415,16 +420,18 @@ service.Name = "Test";
 // capturedValue == "Captured: Test"
 // The user override's backing field was NOT updated
 ```
+<!-- endSnippet -->
 
 ### Tracking Works Through User Properties
 
 User property interceptors provide full tracking even when using the user override:
 
+<!-- snippet: user-properties-tracking -->
 ```cs
-var stub = new UserServiceStub();
+var stub = new SkillUserSvcStub();
 stub.SetCount(100);
 
-IUserService service = stub;
+ISkillUserSvc service = stub;
 
 _ = service.Count;
 _ = service.Count;
@@ -433,15 +440,18 @@ _ = service.Count;
 stub.Count.VerifyGet(Times.Exactly(3));
 stub.Name.VerifySet(Times.Never);
 ```
+<!-- endSnippet -->
 
 ### Reset Preserves OnGet/OnSet Configuration
 
 `Reset()` clears tracking state but preserves the OnGet/OnSet configuration (matching regular interceptor semantics):
 
+<!-- snippet: user-properties-reset -->
 ```cs
+var stub = new SkillUserSvcStub();
 stub.Count.OnGet(100);  // Override user property
 
-IUserService service = stub;
+ISkillUserSvc service = stub;
 _ = service.Count;
 stub.Count.VerifyGet(Times.Once);
 
@@ -451,26 +461,29 @@ stub.Count.VerifyGet(Times.Never);
 
 var value = service.Count;  // 100 (OnGet still active)
 ```
+<!-- endSnippet -->
 
 ### Strict Mode Bypassed for User Properties
 
 User overrides bypass strict mode because they ARE the configuration:
 
+<!-- snippet: user-properties-strict-mode -->
 ```cs
-[KnockOff(Strict = true)]
-public partial class StrictStub : IUserService { }
-
-public partial class StrictStub
-{
-    protected override int Count_ => 10;  // This IS configured
-}
+// [KnockOff(Strict = true)]
+// public partial class StrictSkillUserSvcStub : ISkillUserSvc { }
+//
+// public partial class StrictSkillUserSvcStub
+// {
+//     protected override int Count_ => 10;  // This IS configured
+// }
 
 // Usage:
-var stub = new StrictStub();
-IUserService service = stub;
+var stub = new StrictSkillUserSvcStub();
+ISkillUserSvc service = stub;
 
 var count = service.Count;  // 10 (no exception - user override is configured)
 ```
+<!-- endSnippet -->
 
 ### Supported Patterns
 

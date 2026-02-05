@@ -60,15 +60,17 @@ stub.GetUserName.OnCall((userId) => userId > 100 ? "Admin" : "User");
 
 **Params sequences** (NSubstitute-style):
 
+<!-- snippet: methods-params-sequence-intro -->
 ```cs
 // Use PARAMS SEQUENCE for multiple constant values:
 // Returns 1, then 2, then 3, then repeats 3
-stub.Calculate.Returns(1, 2, 3);
+stub.GetValue.Returns(1, 2, 3);
 
 // Mix callbacks with params for complex sequences:
 // First call uses callback, then returns 100, 200, 300
-stub.Calculate.OnCall((x) => x * 2).ThenReturns(100, 200, 300);
+addStub.Calculate.OnCall((x, y) => x + y).ThenReturns(100, 200, 300);
 ```
+<!-- endSnippet -->
 
 | Scenario | Recommended Syntax |
 |----------|-------------------|
@@ -228,16 +230,18 @@ When a method should return different values on successive calls, use sequences.
 
 Use `Returns(first, ...rest)` to create a sequence from multiple values in a single call:
 
+<!-- snippet: methods-sequence-nsub-style -->
 ```cs
 // Returns 1 on first call, 2 on second, 3 on third and all subsequent calls
-stub.Calculate.Returns(1, 2, 3);
+stub.GetValue.Returns(1, 2, 3);
 
-ICalculator calc = stub;
-var r1 = calc.Calculate(0);  // 1
-var r2 = calc.Calculate(0);  // 2
-var r3 = calc.Calculate(0);  // 3
-var r4 = calc.Calculate(0);  // 3 (repeats last value)
+IValueSvc calc = stub;
+var r1 = calc.GetValue();  // 1
+var r2 = calc.GetValue();  // 2
+var r3 = calc.GetValue();  // 3
+var r4 = calc.GetValue();  // 3 (repeats last value)
 ```
+<!-- endSnippet -->
 
 This matches NSubstitute's syntax for easier migration:
 - NSubstitute: `substitute.Method().Returns(1, 2, 3);`
@@ -247,58 +251,67 @@ This matches NSubstitute's syntax for easier migration:
 
 C# overload resolution distinguishes between single values and sequences:
 
+<!-- snippet: methods-single-vs-params -->
 ```cs
 // Single value - repeats indefinitely (no sequence)
-stub.Calculate.Returns(42);
+singleStub.GetValue.Returns(42);
 
 // Params sequence - progresses through values, repeats last
-stub.Calculate.Returns(1, 2, 3);
+paramsStub.GetValue.Returns(1, 2, 3);
 ```
+<!-- endSnippet -->
 
 ### Mixing Callbacks with Params
 
 Use `OnCall()` for the first value when you need callback logic, then `ThenReturns(params)` for subsequent constant values:
 
+<!-- snippet: methods-sequence-callback-then-params-full -->
 ```cs
 // First call: compute dynamically
 // Then: return 100, 200, 300 in sequence
-stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200, 300);
+stub.Calculate.OnCall((a, b) => a + b).ThenReturns(100, 200, 300);
 
-ICalculator calc = stub;
-var r1 = calc.Add(1, 2);  // 3 (computed: 1 + 2)
-var r2 = calc.Add(0, 0);  // 100
-var r3 = calc.Add(0, 0);  // 200
-var r4 = calc.Add(0, 0);  // 300
-var r5 = calc.Add(0, 0);  // 300 (repeats last)
+ICalculatorSvc calc = stub;
+var r1 = calc.Calculate(1, 2);  // 3 (computed: 1 + 2)
+var r2 = calc.Calculate(0, 0);  // 100
+var r3 = calc.Calculate(0, 0);  // 200
+var r4 = calc.Calculate(0, 0);  // 300
+var r5 = calc.Calculate(0, 0);  // 300 (repeats last)
 ```
+<!-- endSnippet -->
 
 ### Async Methods with Params Sequences
 
 For `Task<T>` and `ValueTask<T>` methods, params values are auto-wrapped - no `Task.FromResult()` needed:
 
+<!-- snippet: methods-sequence-params-async-full -->
 ```cs
 // Async values auto-wrapped - no Task.FromResult needed
 stub.GetDataAsync.Returns("first", "second", "third");
 
-IDataService service = stub;
+IDataSvc service = stub;
 var r1 = await service.GetDataAsync(1);  // "first"
 var r2 = await service.GetDataAsync(2);  // "second"
 var r3 = await service.GetDataAsync(3);  // "third"
 var r4 = await service.GetDataAsync(4);  // "third" (repeats)
 ```
+<!-- endSnippet -->
 
 ### Sequence Exhaustion Behavior
 
 By default, sequences repeat the last value after exhaustion (matching NSubstitute):
 
+<!-- snippet: methods-sequence-exhaustion-params -->
 ```cs
 stub.GetValue.Returns(1, 2);
 
+IValueSvc calc = stub;
 var r1 = calc.GetValue();  // 1
 var r2 = calc.GetValue();  // 2
 var r3 = calc.GetValue();  // 2 (repeats last)
 var r4 = calc.GetValue();  // 2 (still repeats)
 ```
+<!-- endSnippet -->
 
 For different exhaustion behaviors:
 
@@ -312,16 +325,18 @@ For different exhaustion behaviors:
 
 Params sequences support verification to ensure all values were consumed:
 
+<!-- snippet: methods-sequence-params-verify -->
 ```cs
-var sequence = stub.Calculate.Returns(1, 2, 3);
+var sequence = stub.GetValue.Returns(1, 2, 3);
 
-ICalculator calc = stub;
-calc.Calculate(0);  // 1
-calc.Calculate(0);  // 2
-calc.Calculate(0);  // 3
+IValueSvc calc = stub;
+calc.GetValue();  // 1
+calc.GetValue();  // 2
+calc.GetValue();  // 3
 
 sequence.Verify();  // Passes - all 3 values used
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -368,19 +383,24 @@ When you define a **user method** (override a virtual method with underscore suf
 
 ### OnCall Supersedes User Method
 
+<!-- snippet: user-methods-standalone-example -->
 ```cs
 [KnockOff]
-public partial class RepoStub : IRepo { }
+public partial class SkillRepoStub : ISkillRepo { }
 
-public partial class RepoStub
+public partial class SkillRepoStub
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
+```
+<!-- endSnippet -->
 
+<!-- snippet: user-methods-standalone-usage -->
+```cs
 // Usage:
-var stub = new RepoStub();
-IRepo repo = stub;
+var stub = new SkillRepoStub();
+ISkillRepo repo = stub;
 
 // Without OnCall: user method provides behavior
 var user1 = repo.GetById(1);  // Name = "Default"
@@ -389,16 +409,14 @@ var user1 = repo.GetById(1);  // Name = "Default"
 stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Name = "Override"
 ```
+<!-- endSnippet -->
 
 ### Returns for Constant Values
 
+`Returns()` provides constant values. For async methods (`Task<T>`, `ValueTask<T>`), the value is auto-wrapped:
+
 ```cs
 stub.GetById.Returns(new User { Id = 99, Name = "Fixed" });
-```
-
-For async methods (`Task<T>`, `ValueTask<T>`), `Returns()` auto-wraps the value:
-
-```cs
 stub.GetUserAsync.Returns(new User { Id = 1 });  // Auto-wrapped in Task.FromResult
 ```
 
@@ -406,6 +424,7 @@ stub.GetUserAsync.Returns(new User { Id = 1 });  // Auto-wrapped in Task.FromRes
 
 User method interceptors provide full tracking even when using `OnCall`:
 
+<!-- snippet: user-methods-tracking-with-oncall -->
 ```cs
 stub.GetById.OnCall(id => new User { Id = id });
 repo.GetById(42);
@@ -413,11 +432,13 @@ repo.GetById(42);
 stub.GetById.Verify(Times.Once);
 Assert.Equal(42, stub.GetById.LastArg);
 ```
+<!-- endSnippet -->
 
 ### Reset Preserves OnCall Configuration
 
 Unlike regular method interceptors, user method interceptors preserve `OnCall` configuration across `Reset()`:
 
+<!-- snippet: user-methods-reset-preserves-oncall -->
 ```cs
 stub.GetById.OnCall(id => new User { Id = id });
 repo.GetById(1);
@@ -428,6 +449,7 @@ stub.GetById.Verify(Times.Never);  // Tracking cleared
 
 repo.GetById(2);  // Still uses OnCall callback (not reset to user method)
 ```
+<!-- endSnippet -->
 
 ---
 

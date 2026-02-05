@@ -481,6 +481,188 @@ public class PropertyPriorityTests
 }
 
 // =============================================================================
+// User Properties Samples
+// =============================================================================
+
+#region user-properties-interface-and-stub
+public interface ISkillUserSvc
+{
+    int Count { get; }
+    string Name { get; set; }
+    string Setting { set; }
+}
+
+[KnockOff]
+public partial class SkillUserSvcStub : ISkillUserSvc { }
+
+public partial class SkillUserSvcStub
+{
+    private int _count;
+    private string _name = "";
+    private string _setting = "";
+
+    // Get-only property override
+    protected override int Count_ => _count;
+
+    // Get/set property override
+    protected override string Name_
+    {
+        get => _name;
+        set => _name = value;
+    }
+
+    // Set-only property override
+    protected override string Setting_
+    {
+        set => _setting = value;
+    }
+
+    // Public methods for test setup
+    public void SetCount(int value) => _count = value;
+}
+#endregion
+
+// Strict mode stub for user properties
+[KnockOff(Strict = true)]
+public partial class StrictSkillUserSvcStub : ISkillUserSvc { }
+
+public partial class StrictSkillUserSvcStub
+{
+    protected override int Count_ => 10;  // This IS configured
+    protected override string Name_ { get => ""; set { } }
+    protected override string Setting_ { set { } }
+}
+
+public class UserPropertyBasicTests
+{
+    [Fact]
+    public void UserProperty_ProvidesDefaultBehavior()
+    {
+        #region user-properties-basic-usage
+        var stub = new SkillUserSvcStub();
+        stub.SetCount(42);
+
+        ISkillUserSvc service = stub;
+
+        // Get-only property uses your protected override Count_
+        var count = service.Count;  // 42
+
+        // Get/set property uses your protected override Name_
+        service.Name = "Test";
+        var name = service.Name;    // "Test"
+
+        // Set-only property uses your protected override Setting_
+        service.Setting = "value";
+        #endregion
+
+        Assert.Equal(42, count);
+        Assert.Equal("Test", name);
+    }
+}
+
+public class UserPropertyOnGetOnSetTests
+{
+    [Fact]
+    public void OnGetOnSet_SupersedesUserProperty()
+    {
+        #region user-properties-onget-onset-override
+        var stub = new SkillUserSvcStub();
+        stub.SetCount(42);
+
+        ISkillUserSvc service = stub;
+
+        // Default: user property is called
+        var defaultValue = service.Count;  // 42
+
+        // OnGet supersedes the user property for this test
+        stub.Count.OnGet(999);
+        var overrideValue = service.Count;  // 999
+
+        // OnSet supersedes the user property for this test
+        var capturedValue = "";
+        stub.Name.OnSet(v => capturedValue = $"Captured: {v}");
+        service.Name = "Test";
+        // capturedValue == "Captured: Test"
+        // The user override's backing field was NOT updated
+        #endregion
+
+        Assert.Equal(42, defaultValue);
+        Assert.Equal(999, overrideValue);
+        Assert.Equal("Captured: Test", capturedValue);
+    }
+}
+
+public class UserPropertyTrackingTests
+{
+    [Fact]
+    public void Tracking_WorksThroughUserProperties()
+    {
+        #region user-properties-tracking
+        var stub = new SkillUserSvcStub();
+        stub.SetCount(100);
+
+        ISkillUserSvc service = stub;
+
+        _ = service.Count;
+        _ = service.Count;
+        _ = service.Count;
+
+        stub.Count.VerifyGet(Times.Exactly(3));
+        stub.Name.VerifySet(Times.Never);
+        #endregion
+    }
+}
+
+public class UserPropertyResetTests
+{
+    [Fact]
+    public void Reset_PreservesOnGetOnSetConfiguration()
+    {
+        #region user-properties-reset
+        var stub = new SkillUserSvcStub();
+        stub.Count.OnGet(100);  // Override user property
+
+        ISkillUserSvc service = stub;
+        _ = service.Count;
+        stub.Count.VerifyGet(Times.Once);
+
+        // Reset clears tracking but preserves OnGet
+        stub.Count.Reset();
+        stub.Count.VerifyGet(Times.Never);
+
+        var value = service.Count;  // 100 (OnGet still active)
+        #endregion
+
+        Assert.Equal(100, value);
+    }
+}
+
+public class UserPropertyStrictModeTests
+{
+    [Fact]
+    public void StrictMode_BypassedForUserProperties()
+    {
+        #region user-properties-strict-mode
+        // [KnockOff(Strict = true)]
+        // public partial class StrictSkillUserSvcStub : ISkillUserSvc { }
+        //
+        // public partial class StrictSkillUserSvcStub
+        // {
+        //     protected override int Count_ => 10;  // This IS configured
+        // }
+
+        // Usage:
+        var stub = new StrictSkillUserSvcStub();
+        ISkillUserSvc service = stub;
+
+        var count = service.Count;  // 10 (no exception - user override is configured)
+        #endregion
+
+        Assert.Equal(10, count);
+    }
+}
+
+// =============================================================================
 // Complete Example
 // =============================================================================
 

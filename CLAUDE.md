@@ -57,29 +57,9 @@ When defining scope, explicitly state which patterns and members are affected:
 - `docs/release-notes/` - Release notes
 - `.claude/agents/` - Agent-specific guidance files
 
-**Do NOT load as reference:** `docs/todos/`, `docs/plans/`, `docs/release-notes/` are work artifacts, not reference documentation. Only access these when:
-- Actively working on a specific todo or plan
-- Adding a new release note
-Never load these folders to understand the codebase, research history, or problem-solve.
-
 ## Design Projects (Source of Truth)
 
-**The `src/Design/` directory is the authoritative source of truth for KnockOff's API.**
-
-When answering questions about how KnockOff works:
-1. Read the relevant file in `src/Design/Design.Stubs/`
-2. Trust the code and comments as ground truth
-3. Never guess - verify against these files
-
-Key files by topic:
-- **Stub patterns**: `StubPatterns/AllPatterns.cs`
-- **Methods**: `Methods/BasicMethods.cs`, `Methods/WhenMatching.cs`
-- **Properties**: `Properties/PropertyBasics.cs`
-- **Indexers**: `Indexers/IndexerBasics.cs`
-- **Events**: `Events/EventPatterns.cs`
-- **Advanced**: `Advanced/` (Source delegation, Strict mode, Verification)
-
-See `src/Design/CLAUDE-DESIGN.md` for Claude-specific guidance.
+`src/Design/` is the authoritative reference for KnockOff's API. **Read Design.Stubs files—not the generator or library code—to understand how KnockOff behaves.** Use Design projects when answering questions about KnockOff behavior, brainstorming enhancements, or evaluating feature ideas. See `.claude/rules/` for guidance when working in these directories.
 
 ## KnockOff Skill (`skills/knockoff/`)
 
@@ -122,6 +102,4 @@ Agent files in `.claude/agents/` provide role-specific guidance. They receive CL
 
 ## Documentation
 
-Documentation uses MarkdownSnippets for code synchronization. Samples are compiled and tested. Explore the codebase to understand the current structure and patterns.
-
-**Excluded from documentation pipeline:** `docs/todos/`, `docs/plans/`, `docs/release-notes/`, `.claude/`
+Documentation uses MarkdownSnippets. See `.claude/rules/` for guidance.
