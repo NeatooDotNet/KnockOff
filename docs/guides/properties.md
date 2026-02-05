@@ -311,6 +311,104 @@ stub.Name.VerifySet(Times.Never);
 
 ---
 
+## User Properties (Standalone Patterns)
+
+When using standalone patterns, you can define **user properties** by overriding the generated base class properties with an underscore suffix. This provides reusable default implementations that work across all tests.
+
+### When to Use
+
+- **Reusable defaults** - Define once, use across all tests
+- **Computed values** - When property values require logic
+- **State management** - When you need instance state with backing fields
+- **Constructor injection** - Pass data at stub construction time
+
+### Basic Setup
+
+Override protected virtual properties using the underscore suffix convention:
+
+```csharp
+public interface IMyRepo
+{
+    int Count { get; }
+    string Name { get; set; }
+}
+
+[KnockOff]
+public partial class MyRepoStub(List<User> users) : IMyRepo
+{
+    // Get-only property: return computed value
+    protected override int Count_ => users.Count;
+
+    // Get/set property: use backing field
+    private string _name = "";
+    protected override string Name_
+    {
+        get => _name;
+        set => _name = value;
+    }
+}
+```
+
+### Priority Order
+
+When multiple configurations exist:
+
+1. **OnGet/OnSet** - Per-test override (highest priority)
+2. **User property** - Shared default from protected override
+3. **Smart default** - Returns `default(T)` or throws in strict mode
+
+```csharp
+var stub = new MyRepoStub(new List<User> { new(), new() });
+IMyRepo repo = stub;
+
+// User property provides the default
+var count = repo.Count;  // 2
+
+// OnGet supersedes user property for this test
+stub.Count.OnGet(999);
+count = repo.Count;  // 999
+```
+
+### Tracking Works
+
+User property interceptors provide full tracking even when using the user override:
+
+```csharp
+var stub = new MyRepoStub(users);
+IMyRepo repo = stub;
+
+_ = repo.Count;
+_ = repo.Count;
+
+stub.Count.VerifyGet(Times.Exactly(2));
+```
+
+### Strict Mode Behavior
+
+User properties bypass strict mode because they ARE configured:
+
+```csharp
+[KnockOff(Strict = true)]
+public partial class StrictRepoStub : IMyRepo
+{
+    protected override int Count_ => 10;  // This IS configured - no exception
+}
+```
+
+### Supported Patterns
+
+User properties work with all four standalone patterns:
+
+| Pattern | User Property Support |
+|---------|----------------------|
+| Standalone | Yes |
+| Generic Standalone | Yes |
+| Standalone Class | Yes |
+| Generic Standalone Class | Yes |
+| Inline patterns (5-9) | No (entire class generated) |
+
+---
+
 ## Decision Guide
 
 Choose your configuration approach based on the test scenario:

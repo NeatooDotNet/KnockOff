@@ -50,4 +50,6 @@ internal sealed record StandaloneClassGenerationUnit(
     /// <summary>Required member names for initialization in Impl constructor.</summary>
     EquatableArray<string> RequiredMemberNames,
     /// <summary>Whether strict mode is enabled.</summary>
-    bool Strict);
+    bool Strict,
+    /// <summary>Properties for the base class (virtual protected, user can override with '_' suffix).</summary>
+    EquatableArray<BaseClassPropertyModel> BaseClassProperties);

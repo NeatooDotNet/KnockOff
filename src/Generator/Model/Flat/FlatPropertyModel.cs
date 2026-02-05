@@ -23,4 +23,9 @@ internal sealed record FlatPropertyModel(
     string SimpleInterfaceName,
     bool NeedsNewKeyword,
     InterfaceMemberInfo? DelegationTarget,
-    string? DelegationTargetInterface);
+    string? DelegationTargetInterface,
+    /// <summary>
+    /// True if the user has defined a "protected override" property with the _ suffix
+    /// in their partial class (base class user property pattern).
+    /// </summary>
+    bool HasUserOverride = false);

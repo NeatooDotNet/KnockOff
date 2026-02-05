@@ -378,14 +378,10 @@ public partial class StandaloneServiceStub
 //
 // =============================================================================
 
-<!-- snippet: patterns-generic-standalone-class-basic -->
-<!-- endSnippet -->
-
-<!-- snippet: patterns-generic-standalone-class-usage -->
-<!-- endSnippet -->
-
-// Placeholder for actual implementation - will be added by docs-code-samples agent
-// The snippets above should reference examples from PatternsSamples.cs
+// NOTE: Pattern 4 (Generic Standalone Class) code samples are in:
+// src/Tests/KnockOff.Documentation.Samples/PatternsSamples.cs
+// - #region patterns-generic-standalone-class-basic
+// - #region patterns-generic-standalone-class-usage
 
 // =============================================================================
 // PATTERN 5: INLINE INTERFACE STUB
