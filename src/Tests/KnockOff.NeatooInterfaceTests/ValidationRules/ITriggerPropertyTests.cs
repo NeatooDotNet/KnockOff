@@ -72,7 +72,7 @@ public partial class ITriggerPropertyTests
 
         trigger.IsMatch("TestProperty");
 
-        Assert.Equal("TestProperty", stub.IsMatch.LastCallArg);
+        Assert.Equal("TestProperty", stub.IsMatch.LastArg);
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public partial class ITriggerPropertyTests
         trigger.IsMatch("Third");
 
         stub.IsMatch.Verify(Times.Exactly(3));
-        Assert.Equal("Third", stub.IsMatch.LastCallArg);
+        Assert.Equal("Third", stub.IsMatch.LastArg);
     }
 
     #endregion
@@ -132,7 +132,7 @@ public partial class ITriggerPropertyTests
         stub.IsMatch.Reset();
 
         stub.IsMatch.Verify(Times.Never);
-        Assert.Null(stub.IsMatch.LastCallArg);
+        Assert.Null(stub.IsMatch.LastArg);
     }
 
     #endregion

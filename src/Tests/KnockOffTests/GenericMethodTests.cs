@@ -170,7 +170,7 @@ public class GenericMethodTests
 		service.Deserialize<TestEntity>("{\"first\":1}");
 		service.Deserialize<TestEntity>("{\"second\":2}");
 
-		Assert.Equal("{\"second\":2}", knockOff.Deserialize.Of<TestEntity>().LastCallArg);
+		Assert.Equal("{\"second\":2}", knockOff.Deserialize.Of<TestEntity>().LastArg);
 	}
 
 	[Fact]
@@ -184,7 +184,7 @@ public class GenericMethodTests
 		service.Find<User>(3);
 
 		knockOff.Find.Of<User>().Verify(Times.Exactly(3));
-		Assert.Equal(3, knockOff.Find.Of<User>().LastCallArg); // Last call was Find<User>(3)
+		Assert.Equal(3, knockOff.Find.Of<User>().LastArg); // Last call was Find<User>(3)
 	}
 
 	#endregion
@@ -442,7 +442,7 @@ public class GenericMethodTests
 		knockOff.Deserialize.Of<TestEntity>().Reset();
 
 		knockOff.Deserialize.Of<TestEntity>().Verify(Times.Never);
-		Assert.Null(knockOff.Deserialize.Of<TestEntity>().LastCallArg);
+		Assert.Null(knockOff.Deserialize.Of<TestEntity>().LastArg);
 	}
 
 	#endregion

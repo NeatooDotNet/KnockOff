@@ -612,9 +612,9 @@ public class ReceivedWithArgsKnockOffTests
         repository.GetUser(99);
 
         #region nsub-migration-received-args-knockoff
-        // KnockOff: Inspect captured arguments or use LastCallArg
+        // KnockOff: Inspect captured arguments or use LastArg
         Assert.Contains(42, calledIds);
-        Assert.Equal(99, stub.GetUser.LastCallArg);
+        Assert.Equal(99, stub.GetUser.LastArg);
         #endregion
     }
 }

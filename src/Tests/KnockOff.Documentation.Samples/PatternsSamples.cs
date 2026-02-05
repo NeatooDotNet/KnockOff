@@ -166,7 +166,7 @@ public partial class InlineDelegateTests
         Assert.True(result1);
         Assert.False(result2);
         ruleStub.Interceptor.Verify(Times.Exactly(2));
-        Assert.Equal("invalid", ruleStub.Interceptor.LastCallArg);
+        Assert.Equal("invalid", ruleStub.Interceptor.LastArg);
     }
 }
 

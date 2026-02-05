@@ -779,7 +779,7 @@ public class DelegatesCaptureKnockOffTests
         factory(42);
 
         // Built-in capture - no manual setup required
-        Assert.Equal(42, stub.Interceptor.LastCallArg);
+        Assert.Equal(42, stub.Interceptor.LastArg);
     }
 }
 

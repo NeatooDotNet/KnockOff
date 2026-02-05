@@ -33,4 +33,9 @@ internal sealed record MethodOverloadSignature(
     /// <summary>Default expression when no callback configured.</summary>
     string DefaultExpression,
     /// <summary>Whether to throw when no callback and no default available.</summary>
-    bool ThrowsOnDefault);
+    bool ThrowsOnDefault,
+    /// <summary>
+    /// User method name for this signature's fallback (e.g., "Process_"). Null if no user override exists.
+    /// In mixed overload groups, some signatures may have user overrides while others do not.
+    /// </summary>
+    string? UserMethodName = null);

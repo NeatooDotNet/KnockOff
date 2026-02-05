@@ -42,7 +42,7 @@ knockOff.GetGreeting.Verify(Times.Once);
 Console.WriteLine($"  Verified: Verify(Times.Once) passed");
 
 // User-defined method tracking has LastArg directly on the interceptor
-string lastArg = knockOff.GetGreeting.LastArg;
+string lastArg = knockOff.GetGreeting.LastArg!;
 Console.WriteLine($"  LastArg: {lastArg}");
 Console.WriteLine();
 

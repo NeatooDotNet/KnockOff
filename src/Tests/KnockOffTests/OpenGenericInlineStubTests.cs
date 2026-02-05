@@ -40,7 +40,7 @@ public class OpenGenericInlineStubTests
 
 		stub.Add.Verify(Times.Exactly(2));
 		stub.Add.Verify();
-		Assert.Equal("another", stub.Add.LastCallArg);
+		Assert.Equal("another", stub.Add.LastArg);
 	}
 
 	[Fact]
@@ -82,8 +82,8 @@ public class OpenGenericInlineStubTests
 
 		stringStub.Add.Verify(Times.Once);
 		intStub.Add.Verify(Times.Once);
-		Assert.Equal("test", stringStub.Add.LastCallArg);
-		Assert.Equal(42, intStub.Add.LastCallArg);
+		Assert.Equal("test", stringStub.Add.LastArg);
+		Assert.Equal(42, intStub.Add.LastArg);
 	}
 
 	#endregion
@@ -113,7 +113,7 @@ public class OpenGenericInlineStubTests
 		store.Set("key", 42);
 
 		stub.Set.Verify();
-		Assert.Equal(("key", 42), stub.Set.LastCallArgs);
+		Assert.Equal(("key", 42), stub.Set.LastArgs);
 	}
 
 	#endregion

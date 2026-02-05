@@ -107,20 +107,20 @@ public partial class DelegateStubsDemo
     }
 
     // =========================================================================
-    // LastCallArgs - Argument Tracking
+    // LastArgs - Argument Tracking
     // =========================================================================
     // DESIGN DECISION: The interceptor tracks the last call arguments via
-    // LastCallArgs property. For multi-argument delegates, this is a tuple.
-    // For single-argument delegates, it's LastCallArg (singular).
+    // LastArgs property. For multi-argument delegates, this is a tuple.
+    // For single-argument delegates, it's LastArg (singular).
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public (int? a, int? b)? LastCallArgs { get; private set; }
+    //   public (int? a, int? b)? LastArgs { get; private set; }
     //   // or for single arg:
-    //   public string? LastCallArg { get; private set; }
+    //   public string? LastArg { get; private set; }
     // =========================================================================
 
-    public void LastCallArgs_Tracking()
+    public void LastArgs_Tracking()
     {
         var stub = new Stubs.ArithmeticOperation();
         stub.Interceptor.Returns(0);
@@ -130,7 +130,7 @@ public partial class DelegateStubsDemo
         operation(5, 10);
 
         // Check the arguments
-        var args = stub.Interceptor.LastCallArgs;
+        var args = stub.Interceptor.LastArgs;
         // args?.a == 5
         // args?.b == 10
     }
@@ -163,13 +163,13 @@ public partial class DelegateStubsDemo
     }
 
     // =========================================================================
-    // Single Argument - LastCallArg
+    // Single Argument - LastArg
     // =========================================================================
-    // DESIGN DECISION: Single-argument delegates use LastCallArg (singular)
-    // instead of LastCallArgs.
+    // DESIGN DECISION: Single-argument delegates use LastArg (singular)
+    // instead of LastArgs.
     // =========================================================================
 
-    public void SingleArg_LastCallArg()
+    public void SingleArg_LastArg()
     {
         var stub = new Stubs.LogAction();
 
@@ -178,14 +178,14 @@ public partial class DelegateStubsDemo
         logger("Test message");
 
         // Single argument access
-        var arg = stub.Interceptor.LastCallArg;
+        var arg = stub.Interceptor.LastArg;
         // arg == "Test message"
     }
 
     // =========================================================================
     // No-Argument Delegates - SimpleAction Example
     // =========================================================================
-    // DESIGN DECISION: No-argument delegates have no LastCallArg/LastCallArgs.
+    // DESIGN DECISION: No-argument delegates have no LastArg/LastArgs.
     // They only track call count.
     //
     // Note: SimpleAction is a void delegate with no parameters.
@@ -304,7 +304,7 @@ public partial class DelegateStubsDemo
     // =========================================================================
     // Reset for Delegates
     // =========================================================================
-    // DESIGN DECISION: Reset() clears tracking (call count, LastCallArgs)
+    // DESIGN DECISION: Reset() clears tracking (call count, LastArgs)
     // but preserves configuration (OnCall, Returns).
     // =========================================================================
 

@@ -180,7 +180,7 @@ public class StandaloneClassStubTests
 
 		stub.Object.Execute("test-command");
 
-		Assert.Equal("test-command", stub.Execute.LastCallArg);
+		Assert.Equal("test-command", stub.Execute.LastArg);
 	}
 
 	[Fact]
@@ -245,7 +245,7 @@ public class StandaloneClassStubTests
 		stub.Execute.Reset();
 
 		stub.Execute.Verify(Times.Never);
-		Assert.Null(stub.Execute.LastCallArg);
+		Assert.Null(stub.Execute.LastArg);
 	}
 
 	[Fact]
@@ -437,7 +437,7 @@ public class AbstractStandaloneClassStubTests
 		var result = stub.Object.ExecuteQuery("SELECT 1");
 
 		Assert.Equal(0, result); // default(int)
-		Assert.Equal("SELECT 1", stub.ExecuteQuery.LastCallArg);
+		Assert.Equal("SELECT 1", stub.ExecuteQuery.LastArg);
 	}
 
 	[Fact]

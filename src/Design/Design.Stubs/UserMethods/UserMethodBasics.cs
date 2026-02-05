@@ -176,8 +176,8 @@ public partial class UserMethodBasicsDemo
         service.Calculate(10, 20);
         service.Calculate(30, 40);
 
-        // LastArgs gives tuple of most recent arguments
-        var (a, b) = stub.Calculate.LastArgs;
+        // LastArgs gives tuple of most recent arguments (nullable wrapper)
+        var (a, b) = stub.Calculate.LastArgs!.Value;
         // a == 30, b == 40
     }
 
@@ -604,6 +604,150 @@ public partial class GenericUserMethodDemo
 
 // OverloadedGenericUserMethodStub removed - generator has a known issue with
 // overloaded generic methods. See IGenericUserMethodService for working examples.
+
+// =============================================================================
+// WHEN CHAIN SUPPORT WITH USER METHODS
+// =============================================================================
+//
+// User method stubs now support the full .When() API. When chains have highest
+// priority, allowing per-test customization while preserving user method fallback.
+//
+// PRIORITY CHAIN:
+// 1. When chains (parameter-specific matching)
+// 2. Sequences (ThenCall chain)
+// 3. OnCall/Returns (explicit configuration)
+// 4. User Method (fallback - always called if nothing else matches)
+//
+// This is the same priority order as inline stubs, except user method replaces
+// Source/Strict as the final fallback.
+
+public static class WhenChainUserMethodDemo
+{
+    // =========================================================================
+    // BASIC WHEN MATCHING
+    // =========================================================================
+
+    public static void WhenMatchingWithUserMethodFallback()
+    {
+        var stub = new BasicUserMethodStub();
+        IUserMethodService service = stub;
+
+        // Configure When chain for specific values
+        stub.Process.When("special").Returns("[SPECIAL HANDLING]");
+
+        // Call with matching value - When chain handles it
+        var result1 = service.Process("special");  // Returns "[SPECIAL HANDLING]"
+
+        // Call with non-matching value - falls through to user method
+        var result2 = service.Process("normal");   // Returns user method result
+
+        // LastArg tracks the most recent call (from When or user method)
+        var lastInput = stub.Process.LastArg;      // "normal"
+    }
+
+    // =========================================================================
+    // PREDICATE WHEN MATCHING
+    // =========================================================================
+
+    public static void PredicateWhenWithUserMethodFallback()
+    {
+        var stub = new BasicUserMethodStub();
+        IUserMethodService service = stub;
+
+        // Configure predicate matching
+        stub.Process.When(input => input.StartsWith("VIP:", StringComparison.Ordinal))
+            .Returns("[VIP CUSTOMER]");
+
+        // Matching calls go to When chain
+        var vip = service.Process("VIP:12345");     // Returns "[VIP CUSTOMER]"
+
+        // Non-matching calls fall to user method
+        var regular = service.Process("REG:12345"); // Returns user method result
+    }
+
+    // =========================================================================
+    // WHEN CHAIN WITH THEN CHAINING
+    // =========================================================================
+
+    public static void WhenChainThenWhen()
+    {
+        var stub = new BasicUserMethodStub();
+        IUserMethodService service = stub;
+
+        // Chain of When matchers
+        stub.Process.When("first").Returns("[1st]")
+            .ThenWhen("second").Returns("[2nd]")
+            .ThenNone();  // Stop matching after sequence
+
+        // First three calls match the chain
+        var r1 = service.Process("first");    // "[1st]"
+        var r2 = service.Process("second");   // "[2nd]"
+        var r3 = service.Process("third");    // Falls to user method
+    }
+
+    // =========================================================================
+    // MULTIPLE PARAMETERS - CALCULATOR EXAMPLE
+    // =========================================================================
+
+    public static void MultiParameterWhenMatching()
+    {
+        var stub = new BasicUserMethodStub();
+        IUserMethodService service = stub;
+
+        // Configure specific parameter combinations
+        stub.Calculate.When(0, 0).Returns(0);  // Edge case
+        stub.Calculate.When((a, b) => a < 0 && b < 0).Returns(-1);  // Both negative
+
+        // Matching calls use When chain
+        var zero = service.Calculate(0, 0);      // 0 (from When)
+        var neg = service.Calculate(-5, -3);     // -1 (from predicate When)
+
+        // Non-matching calls fall to user method
+        var normal = service.Calculate(10, 20);  // User method result
+    }
+
+    // =========================================================================
+    // VERIFIABLE WHEN CHAINS
+    // =========================================================================
+
+    public static void VerifiableWhenChain()
+    {
+        var stub = new BasicUserMethodStub();
+        IUserMethodService service = stub;
+
+        // Mark When chain as verifiable
+        stub.Process.When("expected").Returns("result").Verifiable();
+
+        // Call the method
+        service.Process("expected");
+
+        // Verify the When chain was fully consumed
+        stub.Verify();  // Passes - When chain matched
+    }
+
+    // =========================================================================
+    // MIXED SCENARIO - WHEN, SEQUENCE, AND USER METHOD
+    // =========================================================================
+
+    public static void MixedConfiguration()
+    {
+        var stub = new BasicUserMethodStub();
+        IUserMethodService service = stub;
+
+        // Priority: When > Sequences > OnCall > User Method
+        stub.Process.When("priority1").Returns("[FROM WHEN]");
+
+        // First call matches When
+        var from_when = service.Process("priority1");  // "[FROM WHEN]"
+
+        // Subsequent calls fall to user method (When chain exhausted for non-matching)
+        var from_user = service.Process("anything");   // User method result
+
+        // You can also configure OnCall which takes precedence over user method
+        stub.Process.OnCall(input => $"[ONCALL: {input}]");
+        var from_oncall = service.Process("test");     // "[ONCALL: test]"
+    }
+}
 
 // =============================================================================
 // DESIGN SUMMARY - BASE CLASS USER METHODS

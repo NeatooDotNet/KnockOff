@@ -436,9 +436,9 @@ public class GenericMethodInterceptorApiTests
         stub.GetById.Of<User>().Verify(Times.Exactly(2));
         stub.GetById.Of<Product>().Verify(Times.Once);
 
-        // Typed LastCallArg: Per-type argument capture
-        Assert.Equal(3, stub.GetById.Of<User>().LastCallArg);
-        Assert.Equal(2, stub.GetById.Of<Product>().LastCallArg);
+        // Typed LastArg: Per-type argument capture
+        Assert.Equal(3, stub.GetById.Of<User>().LastArg);
+        Assert.Equal(2, stub.GetById.Of<Product>().LastArg);
 
         // Typed Reset: Clears only specific type
         stub.GetById.Of<User>().Reset();

@@ -170,7 +170,7 @@ public class OutParameterTests
 	}
 
 	[Fact]
-	public void OutParameter_LastCallArg_TracksInputParamsOnly()
+	public void OutParameter_LastArg_TracksInputParamsOnly()
 	{
 		var knockOff = new OutParameterServiceKnockOff();
 		IOutParameterService service = knockOff;

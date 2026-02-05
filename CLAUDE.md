@@ -47,6 +47,37 @@ When defining scope, explicitly state which patterns and members are affected:
 - [ ] Which member types? (all 4, or specific subset)
 - [ ] Are there pattern+member combinations that need special handling?
 
+### Pipeline Verification Rule
+
+**Each pattern group uses a separate code pipeline. A feature added to one pipeline does NOT exist in another.**
+
+| Patterns | Transform | Builder | Renderer |
+|---|---|---|---|
+| `[KnockOff]` interface (1,2) | `TransformClass` | `FlatModelBuilder` | `FlatRenderer` |
+| `[KnockOffBase<T>]` class (3,4) | `TransformStandaloneClass` | `StandaloneClassModelBuilder` | `StandaloneClassRenderer` |
+| Inline interface/class (5,6) | `TransformInlineStubClass` | `InlineModelBuilder` | `InlineRenderer` |
+| Open generic (7,8,9) | Various | Various | `InlineRenderer` |
+
+**When a plan claims a feature works across patterns:**
+1. Identify which pipelines are affected
+2. For each pipeline, grep the actual builder AND renderer code for the feature
+3. If the feature doesn't exist in a pipeline, say so - do NOT assume "same code path"
+4. "Same code path" is never an acceptable justification without tracing the actual call chain
+
+**Trust the compiler, not the plan.** Write a test. If it fails to compile, the feature doesn't exist.
+
+### Post-Implementation Review Order
+
+When reviewing completed work, follow this order. **Start with production code and keep it in context throughout.**
+
+1. **Production code** - Read the actual generator changes (builder, renderer, model). This is the source of truth.
+2. **Design** - Review against the plan. Does the implementation match what was designed? Are all claimed patterns actually implemented?
+3. **Tests** - Do tests exercise what the production code actually generates? Try to write a test for each claimed pattern.
+4. **Documentation** - Does it accurately describe what the production code does?
+5. **Skills** - Do skill files reflect the current state of the production code?
+
+**The key:** Everything gets reviewed *against* the production code, not the other way around. If the docs say a feature exists but the production code doesn't have it, the docs are wrong.
+
 ## Folder Structure
 
 - `src/` - Source code

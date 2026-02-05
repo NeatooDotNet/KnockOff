@@ -318,16 +318,18 @@ public class UserMethodInterceptorApiExampleTests
         stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Returns "Override"
 
-        // Returns for constant values (auto-wraps for async)
-        stub.GetById.Returns(new User { Id = 99 });
-
-        // Full tracking works with OnCall
+        // Full tracking works - counts all calls regardless of configuration
         stub.GetById.Verify(Times.Exactly(2));
         Assert.Equal(2, stub.GetById.LastArg);
+
+        // Returns for constant values (auto-wraps for async)
+        stub.GetById.Returns(new User { Id = 99 });
+        var user3 = repo.GetById(3);  // Returns User { Id = 99 }
         #endregion
 
         Assert.Equal("Default", user1!.Name);
         Assert.Equal("Override", user2!.Name);
+        Assert.Equal(99, user3!.Id);
     }
 }
 

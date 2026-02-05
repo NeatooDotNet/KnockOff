@@ -22,7 +22,7 @@ var result = calc.Add(10, 20);
 Console.WriteLine($"Add(10, 20) = {result}");
 knockOff.Add.Verify(Times.Once);
 Console.WriteLine($"  Verify(Times.Once) passed!");
-Console.WriteLine($"  LastCallArgs: {knockOff.Add.LastCallArgs}");
+Console.WriteLine($"  LastArgs: {knockOff.Add.LastArgs}");
 
 // Test void method
 calc.Clear();

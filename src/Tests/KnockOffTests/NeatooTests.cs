@@ -488,7 +488,7 @@ public partial class InlineValidateBaseTests
         _ = validate.GetProperty("TestProp");
 
         stub.GetProperty.Verify();
-        Assert.Equal("TestProp", stub.GetProperty.LastCallArg);
+        Assert.Equal("TestProp", stub.GetProperty.LastArg);
     }
 
     [Fact]
@@ -502,7 +502,7 @@ public partial class InlineValidateBaseTests
         var result = validate.TryGetProperty("TestProp", out _);
 
         stub.TryGetProperty.Verify();
-        Assert.Equal("TestProp", stub.TryGetProperty.LastCallArg);
+        Assert.Equal("TestProp", stub.TryGetProperty.LastArg);
     }
 
     [Fact]

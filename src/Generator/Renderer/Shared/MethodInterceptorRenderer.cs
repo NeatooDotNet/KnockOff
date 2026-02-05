@@ -466,7 +466,8 @@ internal static class MethodInterceptorRenderer
 		w.Line();
 
 		// Verify() methods for direct interceptor verification
-		RenderInterceptorVerifyMethods(w, model.MethodName);
+		// Skip Verifiable() for overload groups - they have per-signature verifiable fields
+		RenderInterceptorVerifyMethods(w, model.MethodName, isOverloadGroup: true);
 
 		// OnCall overloads for each unique signature
 		foreach (var overload in model.Overloads)
@@ -633,7 +634,9 @@ internal static class MethodInterceptorRenderer
 		InterceptorRenderOptions options,
 		string? signatureSuffix)
 	{
-		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter);
+		// Include stub parameter when user method fallback is needed and we have a stub type
+		var needsStubParam = options.UserMethodFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.UserMethodName);
+		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
 		var returnType = model.IsVoid ? "void" : model.ReturnType;
 
 		// Determine if value overload exists for this method
@@ -801,31 +804,51 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority chain: Source > Strict > Default
-			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			// Final fallback: User Method > Source > Strict > Default
+			if (options.UserMethodFallback && !string.IsNullOrEmpty(model.UserMethodName))
 			{
-				w.Line("#pragma warning disable CS8601, SYSLIB0050");
-				var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				// User method fallback - user method IS the configured behavior, bypasses Source/Strict
+				var userMethodCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				// Call via stub parameter if available (flat stubs), otherwise direct call (inline stubs)
+				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
 				if (model.IsVoid)
 				{
-					w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
+					w.Line($"{methodPrefix}{model.UserMethodName}({userMethodCallArgs});");
+					w.Line("return;");
 				}
 				else
 				{
-					w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
+					w.Line($"return {methodPrefix}{model.UserMethodName}({userMethodCallArgs});");
 				}
-				w.Line("#pragma warning restore CS8601, SYSLIB0050");
 			}
-
-			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
-			if (model.IsVoid)
-				w.Line("return;");
-			else if (model.ThrowsOnDefault)
-				w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via OnCall.\");");
 			else
 			{
-				var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
-				w.Line($"return {defaultExpr};");
+				// Standard fallback: Source > Strict > Default
+				if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				{
+					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+					if (model.IsVoid)
+					{
+						w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
+					}
+					else
+					{
+						w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
+					}
+					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+				}
+
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
+				if (model.IsVoid)
+					w.Line("return;");
+				else if (model.ThrowsOnDefault)
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via OnCall.\");");
+				else
+				{
+					var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
+					w.Line($"return {defaultExpr};");
+				}
 			}
 		}
 		w.Line();
@@ -837,7 +860,9 @@ internal static class MethodInterceptorRenderer
 		MethodOverloadSignature overload,
 		InterceptorRenderOptions options)
 	{
-		var invokeParams = BuildInvokeParams(overload.Parameters, options.IncludeStrictParameter);
+		// Include stub parameter when user method fallback is needed and we have a stub type
+		var needsStubParam = options.UserMethodFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(overload.UserMethodName);
+		var invokeParams = BuildInvokeParams(overload.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
 		var returnType = overload.IsVoid ? "void" : overload.ReturnType;
 
 		w.Line($"/// <summary>Invokes configured callback for {model.MethodName}({GetParamTypeList(overload.Parameters)}).</summary>");
@@ -975,31 +1000,51 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority chain: Source > Strict > Default
-			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			// Final fallback: User Method (per-signature) > Source > Strict > Default
+			if (options.UserMethodFallback && !string.IsNullOrEmpty(overload.UserMethodName))
 			{
-				w.Line("#pragma warning disable CS8601, SYSLIB0050");
-				var sourceCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				// User method fallback - user method IS the configured behavior, bypasses Source/Strict
+				var userMethodCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				// Call via stub parameter if available (flat stubs), otherwise direct call (inline stubs)
+				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
 				if (overload.IsVoid)
 				{
-					w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
+					w.Line($"{methodPrefix}{overload.UserMethodName}({userMethodCallArgs});");
+					w.Line("return;");
 				}
 				else
 				{
-					w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
+					w.Line($"return {methodPrefix}{overload.UserMethodName}({userMethodCallArgs});");
 				}
-				w.Line("#pragma warning restore CS8601, SYSLIB0050");
 			}
-
-			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
-			if (overload.IsVoid)
-				w.Line("return;");
-			else if (overload.ThrowsOnDefault)
-				w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via OnCall.\");");
 			else
 			{
-				var defaultExpr = string.IsNullOrEmpty(overload.DefaultExpression) ? "default!" : overload.DefaultExpression;
-				w.Line($"return {defaultExpr};");
+				// Standard fallback: Source > Strict > Default
+				if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				{
+					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					var sourceCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+					if (overload.IsVoid)
+					{
+						w.Line($"if (_source is {{ }} src) {{ src.{model.MethodName}({sourceCallArgs}); return; }}");
+					}
+					else
+					{
+						w.Line($"if (_source is {{ }} src) return src.{model.MethodName}({sourceCallArgs});");
+					}
+					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+				}
+
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
+				if (overload.IsVoid)
+					w.Line("return;");
+				else if (overload.ThrowsOnDefault)
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via OnCall.\");");
+				else
+				{
+					var defaultExpr = string.IsNullOrEmpty(overload.DefaultExpression) ? "default!" : overload.DefaultExpression;
+					w.Line($"return {defaultExpr};");
+				}
 			}
 		}
 		w.Line();
@@ -2520,11 +2565,13 @@ internal static class MethodInterceptorRenderer
 		return string.Join(", ", parameters.Select(p => p.Type));
 	}
 
-	private static string BuildInvokeParams(EquatableArray<ParameterModel> parameters, bool includeStrict)
+	private static string BuildInvokeParams(EquatableArray<ParameterModel> parameters, bool includeStrict, string? stubTypeName = null)
 	{
 		var parts = new List<string>();
 		if (includeStrict)
 			parts.Add("bool strict");
+		if (!string.IsNullOrEmpty(stubTypeName))
+			parts.Add($"{stubTypeName} stub");
 		foreach (var p in parameters)
 		{
 			parts.Add($"{p.RefPrefix}{p.Type} {p.EscapedName}");
@@ -2676,7 +2723,7 @@ internal static class MethodInterceptorRenderer
 
 	/// <summary>
 	/// Renders aggregate tracking properties for backward compatibility (single-signature).
-	/// These provide LastCallArg/LastCallArgs for argument tracking.
+	/// These provide LastArg/LastArgs for argument tracking.
 	/// </summary>
 	private static void RenderBackwardCompatibleTrackingProperties(
 		CodeWriter w,
@@ -2695,7 +2742,7 @@ internal static class MethodInterceptorRenderer
 		w.Line($"private int TotalCallCount {{ get {{ var sum = _unconfiguredCallCount + (_onCallTracking?._callCount ?? 0){valueTrackingPart}{simplifiedTrackingPart}{simplifiedVoidTrackingPart}; if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking._callCount; return sum; }} }}");
 		w.Line();
 
-		// LastCallArg - for single param methods
+		// LastArg - for single param methods (aggregate across all call sources)
 		// Note: value tracking also has LastArg when there are trackable parameters
 		if (lastArgType != null)
 		{
@@ -2714,11 +2761,11 @@ internal static class MethodInterceptorRenderer
 			getterParts.Add("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking._callCount > 0) return _sequence[i].Tracking.LastArg;");
 			getterParts.Add("return _unconfiguredCallCount > 0 ? _unconfiguredLastArg : default;");
 
-			w.Line($"public {nullableType} LastCallArg {{ get {{ {string.Join(" ", getterParts)} }} }}");
+			w.Line($"public {nullableType} LastArg {{ get {{ {string.Join(" ", getterParts)} }} }}");
 			w.Line();
 		}
 
-		// LastCallArgs - for multi-param methods
+		// LastArgs - for multi-param methods (aggregate across all call sources)
 		if (lastArgsType != null)
 		{
 			var nullableType = lastArgsType.EndsWith("?") ? lastArgsType : $"{lastArgsType}?";
@@ -2736,7 +2783,7 @@ internal static class MethodInterceptorRenderer
 			getterParts.Add("if (_sequence != null) for (int i = _sequence.Count - 1; i >= 0; i--) if (_sequence[i].Tracking._callCount > 0) return _sequence[i].Tracking.LastArgs;");
 			getterParts.Add("return _unconfiguredCallCount > 0 ? _unconfiguredLastArgs : default;");
 
-			w.Line($"public {nullableType} LastCallArgs {{ get {{ {string.Join(" ", getterParts)} }} }}");
+			w.Line($"public {nullableType} LastArgs {{ get {{ {string.Join(" ", getterParts)} }} }}");
 			w.Line();
 		}
 	}
@@ -2773,8 +2820,10 @@ internal static class MethodInterceptorRenderer
 
 	/// <summary>
 	/// Renders Verify() and Verify(Times) methods on an interceptor class.
+	/// Also renders Verifiable() methods for marking interceptors for Stub.Verify() (single-signature only).
 	/// </summary>
-	private static void RenderInterceptorVerifyMethods(CodeWriter w, string methodName)
+	/// <param name="isOverloadGroup">True for overload groups which have per-signature verifiable fields.</param>
+	private static void RenderInterceptorVerifyMethods(CodeWriter w, string methodName, bool isOverloadGroup = false)
 	{
 		w.Line("/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>");
 		w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
@@ -2788,6 +2837,29 @@ internal static class MethodInterceptorRenderer
 			w.Line($"\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{methodName}\", times, TotalCallCount));");
 		}
 		w.Line();
+
+		// Verifiable() methods - only for single-signature interceptors
+		// Overload groups have per-signature verifiable marking on their builders
+		if (!isOverloadGroup)
+		{
+			w.Line("/// <summary>Marks for verification by Stub.Verify().</summary>");
+			w.Line("public void Verifiable()");
+			using (w.Braces())
+			{
+				w.Line("_isVerifiable = true;");
+				w.Line("_verifiableTimes = null;");
+			}
+			w.Line();
+
+			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint.</summary>");
+			w.Line("public void Verifiable(global::KnockOff.Times times)");
+			using (w.Braces())
+			{
+				w.Line("_isVerifiable = true;");
+				w.Line("_verifiableTimes = times;");
+			}
+			w.Line();
+		}
 	}
 
 	#endregion

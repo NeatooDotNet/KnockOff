@@ -68,7 +68,7 @@ public class BasicTests
 		Assert.Equal(84, result);
 		knockOff.GetValue.Verify(Times.Once);
 
-		int lastArg = knockOff.GetValue.LastArg;
+		int lastArg = knockOff.GetValue.LastArg!.Value;
 		Assert.Equal(42, lastArg);
 	}
 
