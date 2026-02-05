@@ -68,9 +68,6 @@ public class StandAlonePatternTests
 // Inline interface pattern: [KnockOff<IInterface>] generates stub in Stubs namespace
 [KnockOff<IAttrUserRepository>]
 public partial class InlineInterfacePatternTests { }
-
-// Generated stub accessed via Stubs namespace
-// var stub = new InlineInterfacePatternTests.Stubs.IAttrUserRepository();
 #endregion
 
 public partial class InlineInterfacePatternTests
@@ -78,11 +75,13 @@ public partial class InlineInterfacePatternTests
     [Fact]
     public void InlineInterface_GeneratesStubInStubsNamespace()
     {
-        var stub = new Stubs.IAttrUserRepository();
-
+        #region attr-inline-interface-usage
+        // Access the generated stub through the Stubs namespace
+        var stub = new InlineInterfacePatternTests.Stubs.IAttrUserRepository();
         stub.GetById.OnCall((id) => new User { Id = id, Name = "Inline User" });
-
         IAttrUserRepository repository = stub;
+        #endregion
+
         var user = repository.GetById(1);
 
         Assert.NotNull(user);
@@ -98,10 +97,6 @@ public partial class InlineInterfacePatternTests
 // Inline class pattern: [KnockOff<ConcreteClass>] generates stub inheriting from class
 [KnockOff<EmailServiceBase>]
 public partial class InlineClassPatternTests { }
-
-// Generated stub inherits from EmailServiceBase
-// var stub = new InlineClassPatternTests.Stubs.EmailServiceBase();
-// EmailServiceBase service = stub.Object;  // Cast to base class type
 #endregion
 
 public partial class InlineClassPatternTests
@@ -109,11 +104,14 @@ public partial class InlineClassPatternTests
     [Fact]
     public void InlineClass_ProvidesObjectProperty()
     {
-        var stub = new Stubs.EmailServiceBase();
-
-        EmailServiceBase service = stub.Object;
-
+        #region attr-inline-class-usage
+        // Generated stub inherits from EmailServiceBase
+        var stub = new InlineClassPatternTests.Stubs.EmailServiceBase();
         stub.Send.OnCall((to, subject, body) => { }).Verifiable();
+
+        // Use .Object to get the base class type
+        EmailServiceBase service = stub.Object;
+        #endregion
 
         service.Send("test@example.com", "Hello", "World");
 
@@ -131,11 +129,6 @@ public partial class InlineClassPatternTests
 [KnockOff<IAttrEmailService>]
 [KnockOff<IAttrLogger>]
 public partial class MultipleStubsPatternTests { }
-
-// Each interface gets its own stub in the Stubs namespace
-// var userRepo = new MultipleStubsPatternTests.Stubs.IAttrUserRepository();
-// var emailService = new MultipleStubsPatternTests.Stubs.IAttrEmailService();
-// var logger = new MultipleStubsPatternTests.Stubs.IAttrLogger();
 #endregion
 
 public partial class MultipleStubsPatternTests
@@ -143,13 +136,16 @@ public partial class MultipleStubsPatternTests
     [Fact]
     public void MultipleStubs_GeneratesEachInStubsNamespace()
     {
-        var userRepo = new Stubs.IAttrUserRepository();
-        var emailService = new Stubs.IAttrEmailService();
-        var logger = new Stubs.IAttrLogger();
+        #region attr-multiple-usage
+        // Each interface gets its own stub in the Stubs namespace
+        var userRepo = new MultipleStubsPatternTests.Stubs.IAttrUserRepository();
+        var emailService = new MultipleStubsPatternTests.Stubs.IAttrEmailService();
+        var logger = new MultipleStubsPatternTests.Stubs.IAttrLogger();
 
         userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
         emailService.Send.OnCall((to, subject, body) => { }).Verifiable();
         logger.Log.OnCall((message) => { }).Verifiable();
+        #endregion
 
         IAttrUserRepository repo = userRepo;
         IAttrEmailService email = emailService;

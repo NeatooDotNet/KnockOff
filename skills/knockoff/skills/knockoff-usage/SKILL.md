@@ -146,65 +146,88 @@ Use AskUserQuestion to recommend converting to standalone:
 
 ### Standalone Pattern
 
+<!-- snippet: skill-standalone-pattern -->
 ```cs
 [KnockOff]
-public partial class UserRepoStub : IUserRepo { }
-
-// Usage:
-var stub = new UserRepoStub();
-stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
-IUserRepo repo = stub;
+public partial class SkillUserRepoStub : ISkillUserRepo { }
 ```
+<!-- endSnippet -->
+
+Usage:
+
+<!-- snippet: skill-standalone-usage -->
+```cs
+[Fact]
+public void StandaloneStub_ConfigureAndVerify()
+{
+    var stub = new SkillUserRepoStub();
+    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+    stub.Save.OnCall((user) => { }).Verifiable();
+    ISkillUserRepo repo = stub;
+
+    var user = repo.GetById(42);
+    repo.Save(user!);
+
+    stub.Verify();
+}
+```
+<!-- endSnippet -->
 
 **User Methods & Properties:** Stand-Alone stubs can define protected methods and properties that provide default behavior. See the User Methods and User Properties sections below.
 
 ### Inline Interface Pattern
 
+<!-- snippet: skill-inline-interface-pattern -->
 ```cs
-[KnockOff<IEmailService>]
-public partial class EmailTests
+[KnockOff<ISkillEmailService>]
+public partial class SkillEmailTests
 {
     [Fact]
     public void Test()
     {
-        var stub = new Stubs.IEmailService();
+        var stub = new Stubs.ISkillEmailService();
         stub.Send.OnCall((to, subj) => true).Verifiable();
-        IEmailService email = stub;
+        ISkillEmailService email = stub;
     }
 }
 ```
+<!-- endSnippet -->
 
 ### Inline Class Pattern
 
+<!-- snippet: skill-inline-class-pattern -->
 ```cs
-[KnockOff<DataServiceBase>]
-public partial class DataTests
+[KnockOff<SkillDataServiceBase>]
+public partial class SkillDataTests
 {
     [Fact]
     public void Test()
     {
-        var stub = new Stubs.DataServiceBase();
+        var stub = new Stubs.SkillDataServiceBase();
         stub.GetData.OnCall((id) => "test").Verifiable();
-        DataServiceBase service = stub.Object;  // Use .Object!
+        SkillDataServiceBase service = stub.Object;  // Use .Object!
     }
 }
 ```
+<!-- endSnippet -->
 
 ### Inline Delegate Pattern
 
+<!-- snippet: skill-inline-delegate-pattern -->
 ```cs
-[KnockOff<ValidationRule>]  // delegate bool ValidationRule(string value);
-public partial class ValidationTests
+[KnockOff<SkillValidationRule>]  // delegate bool SkillValidationRule(string value);
+public partial class SkillValidationTests
 {
     [Fact]
     public void Test()
     {
-        var stub = new Stubs.ValidationRule();
+        var stub = new Stubs.SkillValidationRule();
         stub.Interceptor.OnCall((val) => val != "invalid");
-        ValidationRule rule = stub;  // Implicit conversion
+        SkillValidationRule rule = stub;  // Implicit conversion
     }
 }
 ```
+<!-- endSnippet -->
 
 ---
 

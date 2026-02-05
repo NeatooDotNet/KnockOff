@@ -65,6 +65,7 @@ The Standalone pattern creates a dedicated stub class in its own file. This stub
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-standalone-basic -->
 ```cs
 public interface IUserRepository
 {
@@ -73,22 +74,26 @@ public interface IUserRepository
 }
 
 [KnockOff]
-public partial class UserRepositoryStub : IUserRepository { }
+public partial class PtUserRepositoryStub : IUserRepository { }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-standalone-usage -->
 ```cs
 // Standalone: instantiate like any class, configure via Verify()
-var stub = new UserRepositoryStub();
+var stub = new PtUserRepositoryStub();
 stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" }).Verifiable();
 stub.Save.OnCall((user) => { }).Verifiable();
 
 IUserRepository repo = stub;
 var user = repo.GetById(42);
+repo.Save(user!);
 
 stub.Verify();
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -108,9 +113,10 @@ stub.Verify();
 
 Override protected virtual methods with the underscore suffix convention to provide default implementations:
 
+<!-- snippet: skill-patterns-user-methods -->
 ```cs
 [KnockOff]
-public partial class UserRepositoryStub : IUserRepository
+public partial class PtUserRepositoryStubWithDefaults : IUserRepository
 {
     // Override base class method with underscore suffix
     protected override User? GetById_(int id)
@@ -119,6 +125,7 @@ public partial class UserRepositoryStub : IUserRepository
     }
 }
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -135,6 +142,7 @@ The Generic Standalone pattern creates a reusable generic stub class that can be
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-generic-standalone-basic -->
 ```cs
 public interface IRepository<T> where T : class
 {
@@ -144,20 +152,23 @@ public interface IRepository<T> where T : class
 }
 
 [KnockOff]
-public partial class RepositoryStub<T> : IRepository<T> where T : class { }
+public partial class PtRepositoryStub<T> : IRepository<T> where T : class { }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-generic-standalone-usage -->
 ```cs
 // Generic Standalone: reusable across multiple type arguments
-var userRepo = new RepositoryStub<User>();
+var userRepo = new PtRepositoryStub<User>();
 userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
 userRepo.Save.OnCall((entity) => { }).Verifiable();
 
-var productRepo = new RepositoryStub<Product>();
+var productRepo = new PtRepositoryStub<Product>();
 productRepo.GetById.OnCall((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -199,23 +210,26 @@ The Standalone Class pattern creates a dedicated stub class for concrete or abst
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-standalone-class-basic -->
 ```cs
 // Target class with virtual members
 public abstract class ServiceBase
 {
     public abstract void Initialize();
-    public virtual string Name { get; set; }
+    public virtual string Name { get; set; } = "";
 }
 
 [KnockOffBase<ServiceBase>]
-public partial class ServiceStub { }
+public partial class PtServiceStub { }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-standalone-class-usage -->
 ```cs
 // Standalone Class: instantiate like any class, use .Object
-var stub = new ServiceStub();
+var stub = new PtServiceStub();
 stub.Initialize.OnCall(() => { }).Verifiable();
 stub.Name.OnGet(() => "TestService");
 
@@ -224,6 +238,7 @@ service.Initialize();
 
 stub.Verify();
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -255,6 +270,7 @@ The Generic Standalone Class pattern creates a reusable generic stub class for g
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-generic-standalone-class-basic -->
 ```cs
 public abstract class RepositoryBase<T> where T : class
 {
@@ -263,22 +279,26 @@ public abstract class RepositoryBase<T> where T : class
 }
 
 [KnockOffBase(typeof(RepositoryBase<>))]
-public partial class RepositoryStub<T> where T : class { }
+public partial class PtRepositoryBaseStub<T> where T : class { }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-generic-standalone-class-usage -->
 ```cs
 // Generic Standalone Class: reusable across multiple type arguments
-var userRepo = new RepositoryStub<User>();
+var userRepo = new PtRepositoryBaseStub<User>();
 userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
 userRepo.Save.OnCall((entity) => { }).Verifiable();
 
 RepositoryBase<User> repo = userRepo.Object;  // Use .Object!
 var user = repo.GetById(1);
+repo.Save(user!);
 
 userRepo.Verify();
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -322,16 +342,19 @@ The Inline Interface pattern generates a stub class scoped to your test class. T
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-inline-interface-basic -->
 ```cs
 [KnockOff<IEmailService>]
-public partial class EmailServiceTests
+public partial class PtEmailServiceTests
 {
     // The generator creates Stubs.IEmailService
 }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-inline-interface-usage -->
 ```cs
 // Inline Interface: access via Stubs namespace
 var stub = new Stubs.IEmailService();
@@ -342,6 +365,7 @@ email.Send("test@example.com", "Hello");
 
 stub.Verify();
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -371,6 +395,7 @@ The Inline Class pattern generates a stub for abstract or virtual class members.
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-inline-class-basic -->
 ```cs
 // Target class with virtual members
 public class UserService
@@ -381,14 +406,16 @@ public class UserService
 }
 
 [KnockOff<UserService>]
-public partial class UserServiceTests
+public partial class PtUserServiceTests
 {
     // The generator creates Stubs.UserService
 }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-inline-class-usage -->
 ```cs
 // Inline Class: configure stub, use .Object for the class instance
 var stub = new Stubs.UserService();
@@ -399,6 +426,7 @@ var user = service.GetUser(42);
 
 stub.Verify();
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -429,6 +457,7 @@ The Inline Delegate pattern is a specialized use of the Inline Interface pattern
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-inline-delegate-basic -->
 ```cs
 // Define delegate types
 public delegate bool ValidationRule(string value);
@@ -436,14 +465,16 @@ public delegate T Factory<T>();
 
 [KnockOff<ValidationRule>]
 [KnockOff<Factory<User>>]
-public partial class DelegateTests
+public partial class PtDelegateTests
 {
     // The generator creates Stubs.ValidationRule and Stubs.Factory
 }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-inline-delegate-usage -->
 ```cs
 // Inline Delegate: configure via Interceptor, implicit conversion to delegate
 var ruleStub = new Stubs.ValidationRule();
@@ -454,6 +485,7 @@ bool isValid = rule("test");
 
 ruleStub.Interceptor.Verify(Times.Once);
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -483,22 +515,19 @@ The Open Generic Interface pattern generates a generic stub class within your te
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-open-generic-interface-basic -->
 ```cs
-public interface IService<T>
-{
-    T? GetItem(int id);
-    void Process(T item);
-}
-
 [KnockOff(typeof(IService<>))]
-public partial class OpenGenericTests
+public partial class PtOpenGenericTests
 {
     // The generator creates Stubs.IService<T>
 }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-open-generic-interface-usage -->
 ```cs
 // Open Generic Interface: instantiate with any type argument
 var userStub = new Stubs.IService<User>();
@@ -513,6 +542,7 @@ var user = userService.GetItem(1);
 
 userStub.Verify();
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -546,33 +576,37 @@ The Open Generic Class pattern generates a generic stub class within your test c
 
 ### Basic Setup
 
+<!-- snippet: skill-patterns-open-generic-class-basic -->
 ```cs
-public abstract class ServiceBase<T>
+public abstract class ServiceBaseGeneric<T>
 {
     public abstract T? GetItem(int id);
     public abstract void Process(T item);
 }
 
-[KnockOff(typeof(ServiceBase<>))]
-public partial class OpenGenericClassTests
+[KnockOff(typeof(ServiceBaseGeneric<>))]
+public partial class PtOpenGenericClassTests
 {
-    // The generator creates Stubs.ServiceBase<T>
+    // The generator creates Stubs.ServiceBaseGeneric<T>
 }
 ```
+<!-- endSnippet -->
 
 ### Usage in Tests
 
+<!-- snippet: skill-patterns-open-generic-class-usage -->
 ```cs
 // Open Generic Class: instantiate with any type argument, use .Object
-var userStub = new Stubs.ServiceBase<User>();
+var userStub = new Stubs.ServiceBaseGeneric<User>();
 userStub.GetItem.OnCall((id) => new User { Id = id, Name = "FromStub" }).Verifiable();
 
 // IMPORTANT: .Object gives you the actual class instance
-ServiceBase<User> service = userStub.Object;
+ServiceBaseGeneric<User> service = userStub.Object;
 var user = service.GetItem(1);
 
 userStub.Verify();
 ```
+<!-- endSnippet -->
 
 ### Benefits
 
@@ -695,52 +729,55 @@ Is it a DELEGATE type?
 
 This example demonstrates all nine patterns working together:
 
+<!-- snippet: skill-patterns-complete-example -->
 ```cs
 // 1. Standalone: direct instantiation
-var emailStub = new EmailServiceStub();
+var emailStub = new PtEmailSvcStub();
 emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
-IEmailService email = emailStub;
+IEmailSvc email = emailStub;
 
 // 2. Generic Standalone: reusable with type args
-var notifierStub = new NotifierStub<User>();
+var notifierStub = new PtNotifierStub<User>();
 notifierStub.Notify.OnCall((item) => { }).Verifiable();
 INotifier<User> notifier = notifierStub;
 
 // 3. Standalone Class: reusable class stub, uses .Object
-var cacheStub = new CacheServiceStub();
-cacheStub.Get.OnCall((key) => "cached").Verifiable();
-CacheService cache = cacheStub.Object;
+var cacheStub = new PtServiceStub();
+cacheStub.Initialize.OnCall(() => { }).Verifiable();
+cacheStub.Name.OnGet(() => "TestService");
+ServiceBase cache = cacheStub.Object;
 
 // 4. Generic Standalone Class: reusable generic class stub, uses .Object
-var repoStub = new RepositoryStub<User>();
+var repoStub = new PtRepositoryBaseStub<User>();
 repoStub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 RepositoryBase<User> repo = repoStub.Object;
 
 // 5. Inline Interface: via Stubs namespace
-var loggerStub = new Stubs.ILogger();
+var loggerStub = new PtInlineHost.Stubs.ILogger();
 loggerStub.Log.OnCall((msg) => { }).Verifiable();
 ILogger logger = loggerStub;
 
 // 6. Inline Class: use .Object for class instance
-var auditStub = new Stubs.AuditService();
+var auditStub = new PtInlineHost.Stubs.AuditService();
 auditStub.Audit.OnCall((action) => { }).Verifiable();
 AuditService audit = auditStub.Object;
 
 // 7. Inline Delegate: implicit conversion
-var ruleStub = new Stubs.ValidationRule();
+var ruleStub = new PtDelegateHost.Stubs.ValidationRule();
 ruleStub.Interceptor.OnCall((value) => true);
 ValidationRule rule = ruleStub;
 
 // 8. Open Generic Interface: inline stub with type args
-var processorStub = new Stubs.IProcessor<Order>();
+var processorStub = new PtOpenGenericInterfaceHost.Stubs.IProcessor<Order>();
 processorStub.Process.OnCall((item) => { }).Verifiable();
 IProcessor<Order> processor = processorStub;
 
 // 9. Open Generic Class: inline stub with type args, uses .Object
-var serviceStub = new Stubs.ServiceBase<Order>();
+var serviceStub = new PtOpenGenericClassHost.Stubs.ServiceBaseGeneric<Order>();
 serviceStub.GetItem.OnCall((id) => new Order { Id = id }).Verifiable();
-ServiceBase<Order> service = serviceStub.Object;  // .Object required for class patterns
+ServiceBaseGeneric<Order> service = serviceStub.Object;  // .Object required for class patterns
 ```
+<!-- endSnippet -->
 
 ---
 

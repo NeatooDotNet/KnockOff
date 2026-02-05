@@ -10,24 +10,50 @@ Strict mode controls how stubs handle unconfigured members. When enabled, unconf
 
 Enable strict mode for individual stubs:
 
+**Via attribute property** (default for all instances):
+
+<!-- snippet: strict-attribute-property -->
 ```cs
-// Via attribute property (default for all instances)
 [KnockOff(Strict = true)]
-public partial class UserRepoStub : IUserRepo { }
+public partial class StrictUserRepoStub : IStrictUserRepo { }
+```
+<!-- endSnippet -->
 
-// Via generic attribute
-[KnockOff<IUserRepo>(Strict = true)]
-public partial class MyTests { }
+**Via generic attribute**:
 
+<!-- snippet: strict-inline-attribute -->
+```cs
+[KnockOff<IStrictUserRepo>(Strict = true)]
+public partial class StrictMyTests { }
+```
+<!-- endSnippet -->
+
+**Via constructor** (inline stubs only):
+
+<!-- snippet: strict-constructor -->
+```cs
 // Via constructor (inline stubs only)
-var stub = new Stubs.IUserRepo(strict: true);
+var stub = new Stubs.IStrictUserRepo(strict: true);
+```
+<!-- endSnippet -->
 
+**Via fluent extension method**:
+
+<!-- snippet: strict-fluent-extension -->
+```cs
 // Via fluent extension method
-var stub = new UserRepoStub().Strict();
+var stub = new StrictUserRepoStub().Strict();
+```
+<!-- endSnippet -->
 
+**Via property at runtime**:
+
+<!-- snippet: strict-property-runtime -->
+```cs
 // Via property at runtime
 stub.Strict = true;
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -38,16 +64,25 @@ Apply `[assembly: KnockOffStrict]` to make all stubs in an assembly default to s
 ```cs
 // In AssemblyInfo.cs or any file in your test project
 [assembly: KnockOffStrict]
-
-// All stubs now default to strict mode
-[KnockOff<IUserService>]
-public partial class UserTests { }
-
-// Unconfigured calls throw StubException
-var stub = new UserTests.Stubs.IUserService();
-IUserService service = stub;
-service.GetUser(42);  // Throws StubException!
 ```
+
+All stubs now default to strict mode:
+
+<!-- snippet: strict-assembly-usage -->
+```cs
+[KnockOff<IStrictUserService>]
+public partial class StrictUserTests { }
+```
+<!-- endSnippet -->
+
+Unconfigured calls throw StubException:
+
+<!-- snippet: strict-assembly-throws -->
+```cs
+// Unconfigured calls throw StubException
+// service.GetUser(42);  // Throws StubException!
+```
+<!-- endSnippet -->
 
 ---
 
@@ -57,17 +92,35 @@ Individual stubs can opt out when assembly-wide strict mode is enabled:
 
 ```cs
 [assembly: KnockOffStrict]
+```
 
+**Opt out via attribute property**:
+
+<!-- snippet: strict-opt-out-attribute -->
+```cs
 // Opt out via attribute property
-[KnockOff<ILegacyService>(Strict = false)]
-public partial class LegacyTests { }
+[KnockOff<IStrictLegacyService>(Strict = false)]
+public partial class StrictLegacyTests { }
+```
+<!-- endSnippet -->
 
+**Opt out via constructor** (inline stubs only):
+
+<!-- snippet: strict-opt-out-constructor -->
+```cs
 // Opt out via constructor (inline stubs only)
-var stub = new UserTests.Stubs.IUserService(strict: false);
+var stub = new Stubs.IStrictLegacyService(strict: false);
+```
+<!-- endSnippet -->
 
+**Opt out at runtime**:
+
+<!-- snippet: strict-opt-out-runtime -->
+```cs
 // Opt out at runtime
 stub.Strict = false;
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -97,4 +150,4 @@ Settings are resolved in this order (highest to lowest):
 
 ---
 
-**UPDATED:** 2026-01-27
+**UPDATED:** 2026-02-05

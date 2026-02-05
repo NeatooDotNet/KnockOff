@@ -67,9 +67,15 @@ Apply `[KnockOff<IService>]` to any test class to generate a stub implementing t
 // Inline interface pattern: [KnockOff<IInterface>] generates stub in Stubs namespace
 [KnockOff<IAttrUserRepository>]
 public partial class InlineInterfacePatternTests { }
+```
+<!-- endSnippet -->
 
-// Generated stub accessed via Stubs namespace
-// var stub = new InlineInterfacePatternTests.Stubs.IAttrUserRepository();
+<!-- snippet: attr-inline-interface-usage -->
+```cs
+// Access the generated stub through the Stubs namespace
+var stub = new InlineInterfacePatternTests.Stubs.IAttrUserRepository();
+stub.GetById.OnCall((id) => new User { Id = id, Name = "Inline User" });
+IAttrUserRepository repository = stub;
 ```
 <!-- endSnippet -->
 
@@ -96,10 +102,17 @@ Apply `[KnockOff<MyClass>]` to generate a stub for a concrete class with virtual
 // Inline class pattern: [KnockOff<ConcreteClass>] generates stub inheriting from class
 [KnockOff<EmailServiceBase>]
 public partial class InlineClassPatternTests { }
+```
+<!-- endSnippet -->
 
+<!-- snippet: attr-inline-class-usage -->
+```cs
 // Generated stub inherits from EmailServiceBase
-// var stub = new InlineClassPatternTests.Stubs.EmailServiceBase();
-// EmailServiceBase service = stub.Object;  // Cast to base class type
+var stub = new InlineClassPatternTests.Stubs.EmailServiceBase();
+stub.Send.OnCall((to, subject, body) => { }).Verifiable();
+
+// Use .Object to get the base class type
+EmailServiceBase service = stub.Object;
 ```
 <!-- endSnippet -->
 
@@ -128,11 +141,19 @@ Apply multiple `[KnockOff<T>]` attributes to generate stubs for several types in
 [KnockOff<IAttrEmailService>]
 [KnockOff<IAttrLogger>]
 public partial class MultipleStubsPatternTests { }
+```
+<!-- endSnippet -->
 
+<!-- snippet: attr-multiple-usage -->
+```cs
 // Each interface gets its own stub in the Stubs namespace
-// var userRepo = new MultipleStubsPatternTests.Stubs.IAttrUserRepository();
-// var emailService = new MultipleStubsPatternTests.Stubs.IAttrEmailService();
-// var logger = new MultipleStubsPatternTests.Stubs.IAttrLogger();
+var userRepo = new MultipleStubsPatternTests.Stubs.IAttrUserRepository();
+var emailService = new MultipleStubsPatternTests.Stubs.IAttrEmailService();
+var logger = new MultipleStubsPatternTests.Stubs.IAttrLogger();
+
+userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
+emailService.Send.OnCall((to, subject, body) => { }).Verifiable();
+logger.Log.OnCall((message) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 

@@ -158,10 +158,8 @@ public class ValueTaskMethodTests
     {
         var stub = new AsyncUserSvcStub();
 
-        #region async-valuetask-simplified-callback
         // Return unwrapped type - auto-wrapped in new ValueTask<T>()
         stub.GetCachedUserAsync.OnCall((id) => new User { Id = id, Name = "Cached" }).Verifiable();
-        #endregion
 
         IAsyncUserSvc service = stub;
         var user = await service.GetCachedUserAsync(42);

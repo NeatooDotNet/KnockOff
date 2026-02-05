@@ -263,6 +263,133 @@ public class ShareableStubPatternTests
 }
 
 // =============================================================================
+// Standalone Pattern Example - User Method with OnCall Override
+// =============================================================================
+
+public interface ISkillRepo
+{
+    User? GetById(int id);
+}
+
+#region user-methods-standalone-example
+[KnockOff]
+public partial class SkillRepoStub : ISkillRepo { }
+
+public partial class SkillRepoStub
+{
+    // Override virtual method with underscore suffix - compiler enforces signature!
+    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
+}
+#endregion
+
+// =============================================================================
+// API Reference Example - Comprehensive User Method Interceptor Demo
+// =============================================================================
+
+public interface IApiRepo
+{
+    User? GetById(int id);
+}
+
+#region user-method-interceptor-standalone-api-example
+[KnockOff]
+public partial class ApiRepoStub : IApiRepo { }
+
+public partial class ApiRepoStub
+{
+    // Override virtual method with underscore suffix - compiler enforces signature!
+    protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
+}
+#endregion
+
+public class UserMethodInterceptorApiExampleTests
+{
+    [Fact]
+    public void UserMethodInterceptor_CompleteApiExample()
+    {
+        #region user-method-interceptor-usage-api-example
+        var stub = new ApiRepoStub();
+        IApiRepo repo = stub;
+
+        // User method provides default behavior
+        var user1 = repo.GetById(1);  // Returns "Default"
+
+        // OnCall supersedes user method (clean interceptor name)
+        stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
+        var user2 = repo.GetById(2);  // Returns "Override"
+
+        // Returns for constant values (auto-wraps for async)
+        stub.GetById.Returns(new User { Id = 99 });
+
+        // Full tracking works with OnCall
+        stub.GetById.Verify(Times.Exactly(2));
+        Assert.Equal(2, stub.GetById.LastArg);
+        #endregion
+
+        Assert.Equal("Default", user1!.Name);
+        Assert.Equal("Override", user2!.Name);
+    }
+}
+
+public class UserMethodStandalonePatternTests
+{
+    [Fact]
+    public void UserMethod_FullExample()
+    {
+        #region user-methods-standalone-usage
+        // Usage:
+        var stub = new SkillRepoStub();
+        ISkillRepo repo = stub;
+
+        // Without OnCall: user method provides behavior
+        var user1 = repo.GetById(1);  // Name = "Default"
+
+        // With OnCall: callback supersedes user method (clean interceptor name)
+        stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
+        var user2 = repo.GetById(2);  // Name = "Override"
+        #endregion
+
+        Assert.Equal("Default", user1!.Name);
+        Assert.Equal("Override", user2!.Name);
+    }
+
+    [Fact]
+    public void UserMethod_TrackingWithOnCall()
+    {
+        var stub = new SkillRepoStub();
+        ISkillRepo repo = stub;
+
+        #region user-methods-tracking-with-oncall
+        stub.GetById.OnCall(id => new User { Id = id });
+        repo.GetById(42);
+
+        stub.GetById.Verify(Times.Once);
+        Assert.Equal(42, stub.GetById.LastArg);
+        #endregion
+    }
+
+    [Fact]
+    public void UserMethod_ResetPreservesOnCall()
+    {
+        var stub = new SkillRepoStub();
+        ISkillRepo repo = stub;
+
+        #region user-methods-reset-preserves-oncall
+        stub.GetById.OnCall(id => new User { Id = id });
+        repo.GetById(1);
+        stub.GetById.Verify(Times.Once);
+
+        stub.GetById.Reset();
+        stub.GetById.Verify(Times.Never);  // Tracking cleared
+
+        repo.GetById(2);  // Still uses OnCall callback (not reset to user method)
+        #endregion
+
+        Assert.Equal(2, stub.GetById.LastArg);
+    }
+}
+
+// =============================================================================
 // Complete Example
 // =============================================================================
 

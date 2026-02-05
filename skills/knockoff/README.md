@@ -59,6 +59,7 @@ To use this plugin in other projects:
 
 ### User Methods (Stand-Alone Only)
 
+<!-- snippet: skill-readme-user-methods -->
 ```cs
 [KnockOff]
 public partial class RepoStub : IRepo { }
@@ -68,6 +69,12 @@ public partial class RepoStub
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
+```
+<!-- endSnippet -->
+
+<!-- snippet: skill-readme-user-methods-usage -->
+```cs
+var stub = new RepoStub();
 
 // User override is fallback; OnCall supersedes it
 stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
@@ -75,9 +82,11 @@ stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 // Returns for constant values (auto-wraps for async)
 stub.GetById.Returns(new User { Id = 99 });
 ```
+<!-- endSnippet -->
 
 ### Method Configuration
 
+<!-- snippet: skill-readme-method-config -->
 ```cs
 // Fixed value
 stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
@@ -101,18 +110,24 @@ stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
 stub.GetNext.Returns(1, 2).ThenDefault();
 // Returns: 1, 2, 0, 0... (default after exhaustion)
 ```
+<!-- endSnippet -->
 
 ### Verification
 
+<!-- snippet: skill-readme-verification -->
 ```cs
 // Mark for batch verification
 stub.Save.OnCall((user) => { }).Verifiable();
+svc.Save(new User { Id = 1 }); // Call the method
 stub.Verify();  // Checks all Verifiable() members
 
 // Or verify individually
+stub.Save.Reset(); // Reset for second pattern demo
 var tracking = stub.Save.OnCall((user) => { });
+svc.Save(new User { Id = 2 }); // Call the method
 tracking.Verify(Times.Once);
 ```
+<!-- endSnippet -->
 
 ### Critical Gotchas
 
