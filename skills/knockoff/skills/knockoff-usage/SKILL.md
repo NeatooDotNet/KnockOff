@@ -98,10 +98,11 @@ service.Name = "test";
 | Method | Tracking, callbacks | Nothing |
 | User Method | Tracking (call count, LastArg) | **OnCall configuration** |
 | Property | Tracking, LastSetValue, callbacks | Verifiable flag |
+| User Property | Tracking (get/set counts, LastSetValue) | **OnGet/OnSet configuration** |
 | Indexer | Tracking, LastGetKey, LastSetEntry | **Backing dictionary** |
 | Event | Tracking counts | **Active subscribers** |
 
-**Note:** User method interceptors (e.g., `GetById` when you have a `GetById_` override) preserve OnCall configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
+**Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve OnCall/OnGet/OnSet configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
 
 ---
 
@@ -155,7 +156,7 @@ stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
 IUserRepo repo = stub;
 ```
 
-**User Methods:** Stand-Alone stubs can define protected methods that provide default behavior. See the User Methods section below.
+**User Methods & Properties:** Stand-Alone stubs can define protected methods and properties that provide default behavior. See the User Methods and User Properties sections below.
 
 ### Inline Interface Pattern
 
@@ -479,6 +480,78 @@ repo.GetById(2);  // Still uses OnCall callback
 
 ---
 
+## User Properties (Stand-Alone Only)
+
+User properties let you define default property behavior at compile time. The user property is the fallback when no `OnGet`/`OnSet` is configured.
+
+### Defining User Properties
+
+Override virtual properties with underscore suffix - the compiler enforces signature correctness:
+
+```cs
+[KnockOff]
+public partial class UserServiceStub : IUserService { }
+
+public partial class UserServiceStub
+{
+    private int _count;
+
+    // Override virtual property with underscore suffix - compiler enforces signature!
+    protected override int Count_ => _count;
+
+    public void SetCount(int value) => _count = value;
+}
+```
+
+The interceptor uses a clean name (e.g., `Count`, not `Count2`) regardless of whether you override the property.
+
+### OnGet/OnSet Supersede User Property
+
+Use `OnGet()` or `OnSet()` to override the user property for specific tests:
+
+```cs
+var stub = new UserServiceStub();
+stub.SetCount(42);
+IUserService service = stub;
+
+// Without OnGet: user property is called
+var count1 = service.Count;  // Returns 42 (from Count_ override)
+
+// With OnGet: OnGet supersedes user property (clean interceptor name)
+stub.Count.OnGet(999);
+var count2 = service.Count;  // Returns 999 (OnGet wins)
+```
+
+### Tracking Works with User Properties
+
+User property interceptors provide full tracking even when using the user override:
+
+```cs
+IUserService service = stub;
+_ = service.Count;
+_ = service.Count;
+
+stub.Count.VerifyGet(Times.Exactly(2));
+Assert.Equal(42, stub.Name.LastSetValue);  // If Name was set
+```
+
+### Reset Preserves OnGet/OnSet Configuration
+
+`Reset()` clears tracking state but preserves the OnGet/OnSet configuration:
+
+```cs
+stub.Count.OnGet(100);
+_ = service.Count;
+stub.Count.VerifyGet(Times.Once);
+
+stub.Count.Reset();
+stub.Count.VerifyGet(Times.Never);  // Tracking cleared
+
+_ = service.Count;  // Still uses OnGet (returns 100)
+```
+
+---
+
 ## Source Delegation
 
 Delegate unconfigured calls to a real implementation:
@@ -586,7 +659,7 @@ For detailed documentation, see the reference files in `references/`:
 
 - **`references/patterns.md`** - Complete pattern guide with examples
 - **`references/methods.md`** - Method configuration and verification
-- **`references/properties.md`** - Property interceptors
+- **`references/properties.md`** - Property interceptors and user properties
 - **`references/api-reference.md`** - Complete API reference
 - **`references/strict-mode.md`** - Strict mode configuration
 - **`references/moq-migration.md`** - Migration guide

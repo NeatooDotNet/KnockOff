@@ -676,6 +676,7 @@ public partial class KnockOffGenerator
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
 				UserOverrideMethods: EquatableArray<string>.Empty,
+				UserOverrideProperties: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
 
@@ -713,6 +714,7 @@ public partial class KnockOffGenerator
 					FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 					FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
 					UserOverrideMethods: EquatableArray<string>.Empty,
+					UserOverrideProperties: EquatableArray<string>.Empty,
 					Strict: strict);
 			}
 		}
@@ -742,6 +744,7 @@ public partial class KnockOffGenerator
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
 				UserOverrideMethods: EquatableArray<string>.Empty,
+				UserOverrideProperties: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
 
@@ -862,12 +865,17 @@ public partial class KnockOffGenerator
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
 				UserOverrideMethods: EquatableArray<string>.Empty,
+				UserOverrideProperties: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
 
 		// Detect user override methods using syntactic detection (base class pattern)
 		var userOverrideMethods = DetectUserOverrideMethods(classSymbol);
 		var userOverrideMethodsArray = new EquatableArray<string>(userOverrideMethods.ToArray());
+
+		// Detect user override properties using syntactic detection (base class pattern)
+		var userOverrideProperties = DetectUserOverrideProperties(classSymbol);
+		var userOverridePropertiesArray = new EquatableArray<string>(userOverrideProperties.ToArray());
 
 		return new KnockOffTypeInfo(
 			Namespace: namespaceName,
@@ -879,6 +887,7 @@ public partial class KnockOffGenerator
 			FlatMembers: new EquatableArray<InterfaceMemberInfo>(flatMembers),
 			FlatEvents: new EquatableArray<EventMemberInfo>(flatEvents),
 			UserOverrideMethods: userOverrideMethodsArray,
+			UserOverrideProperties: userOverridePropertiesArray,
 			Strict: strict);
 	}
 

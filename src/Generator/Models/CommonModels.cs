@@ -31,6 +31,12 @@ internal sealed record KnockOffTypeInfo(
 	/// </summary>
 	EquatableArray<string> UserOverrideMethods,
 	/// <summary>
+	/// Property names (with _ suffix) that have user-defined "protected override" properties.
+	/// Used for base class user property pattern.
+	/// Examples: "Count_", "Name_", "Value_".
+	/// </summary>
+	EquatableArray<string> UserOverrideProperties,
+	/// <summary>
 	/// When true, the generated constructor defaults to strict mode (throws on unconfigured calls).
 	/// From [KnockOff(Strict = true)].
 	/// </summary>

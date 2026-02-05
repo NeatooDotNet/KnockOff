@@ -25,6 +25,9 @@ internal static class FlatModelBuilder
 		// Build user override methods lookup for base class pattern
 		var userOverrideMethods = new HashSet<string>(typeInfo.UserOverrideMethods.GetArray() ?? Array.Empty<string>());
 
+		// Build user override properties lookup for base class pattern
+		var userOverrideProperties = new HashSet<string>(typeInfo.UserOverrideProperties.GetArray() ?? Array.Empty<string>());
+
 		// Build name map for collision resolution
 		var nameMap = BuildNameMap(typeInfo.FlatMembers, typeInfo.FlatEvents, userOverrideMethods);
 
@@ -36,7 +39,7 @@ internal static class FlatModelBuilder
 
 		// Build models
 		var className = typeInfo.ClassName + SymbolHelpers.FormatTypeParameterList(typeInfo.TypeParameters);
-		var properties = BuildPropertyModels(typeInfo, nameMap, className);
+		var properties = BuildPropertyModels(typeInfo, nameMap, className, userOverrideProperties);
 		var indexers = BuildIndexerModels(typeInfo, nameMap, indexerCount, className);
 		var (methods, genericHandlers) = BuildMethodModels(typeInfo, nameMap, methodGroups, className);
 		var events = BuildEventModels(typeInfo, nameMap);
@@ -310,7 +313,8 @@ internal static class FlatModelBuilder
 	private static EquatableArray<FlatPropertyModel> BuildPropertyModels(
 		KnockOffTypeInfo typeInfo,
 		Dictionary<string, string> nameMap,
-		string className)
+		string className,
+		HashSet<string> userOverrideProperties)
 	{
 		var properties = new List<FlatPropertyModel>();
 		var generatedImplementations = new HashSet<string>();
@@ -344,6 +348,10 @@ internal static class FlatModelBuilder
 				// Check for property delegation (IProperty.Value (object) -> IProperty<T>.Value (T))
 				var (delegationTarget, delegationInterface) = FindPropertyDelegationTarget(member, typeInfo.Interfaces);
 
+				// Check if this property has a user-defined override (base class pattern)
+				// User overrides use PropertyName_ suffix convention
+				var hasUserOverride = userOverrideProperties.Contains(member.Name + "_");
+
 				properties.Add(new FlatPropertyModel(
 					InterceptorName: interceptorName,
 					InterceptorClassName: interceptorClassName,
@@ -360,7 +368,8 @@ internal static class FlatModelBuilder
 					SimpleInterfaceName: simpleIfaceName,
 					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
 					DelegationTarget: delegationTarget,
-					DelegationTargetInterface: delegationInterface));
+					DelegationTargetInterface: delegationInterface,
+					HasUserOverride: hasUserOverride));
 			}
 		}
 

@@ -129,6 +129,9 @@ internal static class StandaloneClassModelBuilder
         // Build constructor models
         var constructors = cls.Constructors.Select(ctor => BuildConstructorModel(ctor, typeParamList)).ToEquatableArray();
 
+        // Build user override properties lookup for base class pattern
+        var userOverrideProperties = new HashSet<string>(info.UserOverrideProperties.GetArray() ?? Array.Empty<string>());
+
         // Build Impl class member models
         var implProperties = new List<InlineClassImplPropertyModel>();
         var implIndexers = new List<InlineClassImplIndexerModel>();
@@ -140,7 +143,9 @@ internal static class StandaloneClassModelBuilder
         {
             if (member.IsProperty && !member.IsIndexer)
             {
-                implProperties.Add(BuildImplPropertyModel(member));
+                // Check if this property has a user-defined override (PropertyName_ suffix)
+                var hasUserOverride = userOverrideProperties.Contains(member.Name + "_");
+                implProperties.Add(BuildImplPropertyModel(member, hasUserOverride));
             }
             else if (member.IsIndexer)
             {
@@ -184,6 +189,17 @@ internal static class StandaloneClassModelBuilder
             Name: ct.Name,
             AccessModifier: ct.AccessibilityModifier)).ToEquatableArray();
 
+        // Build base class properties (virtual protected properties for user override pattern)
+        var baseClassProperties = cls.Members
+            .Where(m => m.IsProperty && !m.IsIndexer)
+            .Select(m => new BaseClassPropertyModel(
+                PropertyName: m.Name,
+                ReturnType: m.ReturnType,
+                HasGetter: m.HasGetter,
+                HasSetter: m.HasSetter,
+                TargetMemberDescription: $"{cls.FullName}.{m.Name}"))
+            .ToEquatableArray();
+
         return new StandaloneClassGenerationUnit(
             ClassName: stubClassName,
             TargetClassName: cls.FullName,
@@ -204,7 +220,8 @@ internal static class StandaloneClassModelBuilder
             ImplEvents: implEvents.ToEquatableArray(),
             HasRequiredMembers: hasRequiredMembers,
             RequiredMemberNames: requiredMemberNames,
-            Strict: info.Strict);
+            Strict: info.Strict,
+            BaseClassProperties: baseClassProperties);
     }
 
     #region Method Grouping
@@ -358,7 +375,7 @@ internal static class StandaloneClassModelBuilder
             BaseCallArguments: argList);
     }
 
-    private static InlineClassImplPropertyModel BuildImplPropertyModel(ClassMemberInfo member)
+    private static InlineClassImplPropertyModel BuildImplPropertyModel(ClassMemberInfo member, bool hasUserOverride)
     {
         return new InlineClassImplPropertyModel(
             PropertyName: member.Name,
@@ -368,7 +385,8 @@ internal static class StandaloneClassModelBuilder
             HasGetter: member.HasGetter,
             HasSetter: member.HasSetter,
             IsInitOnly: member.IsInitOnly,
-            IsAbstract: member.IsAbstract);
+            IsAbstract: member.IsAbstract,
+            HasUserOverride: hasUserOverride);
     }
 
     private static InlineClassImplIndexerModel BuildImplIndexerModel(ClassMemberInfo member, int indexerCount)

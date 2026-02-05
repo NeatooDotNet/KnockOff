@@ -93,7 +93,7 @@ stub.Save.OnCall((user) => { }).Verifiable();
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
-- **User methods**: Add custom methods directly on the stub class
+- **User methods and properties**: Add custom methods and override properties directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **Clean syntax**: Simple `new MyStub()` instantiation
@@ -104,11 +104,11 @@ stub.Save.OnCall((user) => { }).Verifiable();
 - **Partial class**: Must remember to mark the class as `partial`
 - **Manual interface**: Must manually implement the interface signature
 
-### Base Class and User Methods
+### Base Class and User Methods/Properties
 
-The Standalone pattern generates a base class (e.g., `UserRepoStandaloneStubBase`) that your stub inherits from. This base class exposes `protected virtual` methods for each interface member, allowing you to add custom stub behavior through inheritance.
+The Standalone pattern generates a base class (e.g., `UserRepoStandaloneStubBase`) that your stub inherits from. This base class exposes `protected virtual` methods and properties for each interface member, allowing you to add custom stub behavior through inheritance.
 
-Override these methods using the **underscore suffix convention** (`_`) to provide default implementations:
+Override these members using the **underscore suffix convention** (`_`) to provide default implementations:
 
 <!-- snippet: patterns-user-methods -->
 ```cs
@@ -124,7 +124,7 @@ public partial class UserRepoWithUserMethodsStub : IUserRepoStandalone
 ```
 <!-- endSnippet -->
 
-The interceptor name remains clean (`GetById`), while your implementation uses the suffix (`GetById_`). This keeps user methods separate from the generated code. See [User Methods](user-methods.md) for complete details and advanced patterns.
+The interceptor name remains clean (`GetById`), while your implementation uses the suffix (`GetById_`). This keeps user methods and properties separate from the generated code. See [User Methods](user-methods.md) for methods and [Properties Guide](properties.md#user-properties-standalone-patterns) for user properties.
 
 ---
 
@@ -175,7 +175,7 @@ productRepo.GetById.OnCall((id) => new Product { Id = id, Name = "Widget" }).Ver
 - **Reusable**: Share across multiple test files
 - **Type-safe**: Compiler enforces type constraints
 - **Clean syntax**: `new RepositoryStub<User>()` - clear and readable
-- **User methods**: Supports custom helper methods like Standalone
+- **User methods and properties**: Supports custom helper methods and property overrides like Standalone
 
 ### Trade-offs
 
@@ -190,7 +190,7 @@ productRepo.GetById.OnCall((id) => new Product { Id = id, Name = "Widget" }).Ver
 | **Syntax** | `[KnockOff] class Stub<T> : IFoo<T>` | `[KnockOff(typeof(IFoo<>))]` |
 | **Instantiation** | `new Stub<User>()` | `new Stubs.IFoo<User>()` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods** | Yes | No |
+| **User methods/properties** | Yes | No |
 | **Best for** | Shared generic stubs | One-time use |
 
 ---
@@ -220,7 +220,7 @@ The Standalone Class pattern creates a dedicated stub class for concrete or abst
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
-- **User methods**: Add custom methods directly on the stub class
+- **User methods and properties**: Add custom methods and override properties directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **No interface needed**: Stub classes directly without creating interfaces
@@ -239,7 +239,7 @@ The Standalone Class pattern creates a dedicated stub class for concrete or abst
 | **Syntax** | `[KnockOffBase<Foo>] class Stub` | `[KnockOff<Foo>]` |
 | **Instantiation** | `new ServiceStub().Object` | `new Stubs.Service().Object` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods** | Yes | No |
+| **User methods/properties** | Yes | No |
 | **Best for** | Shared class stubs | One-time use |
 
 ---
@@ -272,7 +272,7 @@ The Generic Standalone Class pattern creates a reusable generic stub class for g
 - **Reusable**: Share across multiple test files
 - **Type-safe**: Compiler enforces type constraints
 - **Clean syntax**: `new RepositoryStub<User>().Object` - clear and readable
-- **User methods**: Supports custom helper methods like Standalone patterns
+- **User methods and properties**: Supports custom helper methods and property overrides like Standalone patterns
 - **No interface needed**: Stub generic classes directly
 
 ### Trade-offs
@@ -290,7 +290,7 @@ The Generic Standalone Class pattern creates a reusable generic stub class for g
 | **Syntax** | `[KnockOffBase(typeof(Foo<>))] class Stub<T>` | `[KnockOff(typeof(Foo<>))]` |
 | **Instantiation** | `new Stub<User>().Object` | `new Stubs.Foo<User>().Object` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods** | Yes | No |
+| **User methods/properties** | Yes | No |
 | **Best for** | Shared generic class stubs | One-time use |
 
 ---
@@ -590,7 +590,7 @@ userStub.Verify();
 | Feature | Standalone | Generic Standalone | Standalone Class | Generic Standalone Class | Inline Interface | Inline Class | Inline Delegate | Open Generic Interface | Open Generic Class |
 |---------|------------|-------------------|-----------------|--------------------------|------------------|--------------|-----------------|----------------------|-------------------|
 | **Reusable across test files** | Yes | Yes | Yes | Yes | No | No | No | No | No |
-| **Custom user methods** | Yes | Yes | Yes | Yes | No | No | No | No | No |
+| **Custom user methods/properties** | Yes | Yes | Yes | Yes | No | No | No | No | No |
 | **Extra file required** | Yes | Yes | Yes | Yes | No | No | No | No | No |
 | **Supports interfaces** | Yes | Yes | No | No | Yes | No | No | Yes | No |
 | **Supports classes** | No | No | Yes | Yes | No | Yes | No | No | Yes |

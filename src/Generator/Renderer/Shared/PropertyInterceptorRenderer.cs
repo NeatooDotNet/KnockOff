@@ -262,6 +262,10 @@ internal static class PropertyInterceptorRenderer
 
 		}
 
+		// User override support methods - these are used by RenderPropertyUserOverrideImplementation
+		// They separate tracking from callback invocation for the base class pattern
+		RenderUserOverrideSupportMethods(w, model);
+
 		// InvokeGet/InvokeSet methods
 		if (model.HasGetter)
 		{
@@ -291,6 +295,94 @@ internal static class PropertyInterceptorRenderer
 		{
 			RenderPropertySetBuilderImpl(w, model.ValueType, fullInterceptorClassName);
 			RenderPropertySetSequenceImpl(w, model.ValueType, fullInterceptorClassName);
+		}
+	}
+
+	#endregion
+
+	#region User Override Support Methods
+
+	/// <summary>
+	/// Renders methods for user override property support (base class pattern).
+	/// These methods separate tracking from callback invocation:
+	/// - RecordGet() / RecordSet(value) - tracking only
+	/// - HasOnGet / HasOnSet - check if callback is configured
+	/// - InvokeGetCallback() / InvokeSetCallback(value) - invoke callback without tracking
+	/// </summary>
+	private static void RenderUserOverrideSupportMethods(CodeWriter w, UnifiedPropertyInterceptorModel model)
+	{
+		// Getter support
+		if (model.HasGetter)
+		{
+			w.Line("/// <summary>Records a getter access (tracking only, does not invoke callback). Used by user override pattern.</summary>");
+			w.Line("internal void RecordGet() => _unconfiguredGetCount++;");
+			w.Line();
+
+			w.Line("/// <summary>Returns true if OnGet is configured (callback or sequence). Used by user override pattern.</summary>");
+			w.Line("internal bool HasOnGet => _onGet != null || (_getSequence?.Count ?? 0) > 0;");
+			w.Line();
+
+			w.Line("/// <summary>Invokes the configured getter callback without tracking. Used by user override pattern.</summary>");
+			w.Line($"internal {model.ValueType} InvokeGetCallback()");
+			using (w.Braces())
+			{
+				// Priority 1: Sequence (if present and not exhausted)
+				w.Line("if (_getSequence != null && _getSequenceIndex < _getSequence.Count)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _getSequence[_getSequenceIndex];");
+					w.Line("tracking.RecordCall();");
+					w.Line("_getSequenceIndex++;");
+					w.Line("return callback();");
+				}
+				// Priority 2: Repeating OnGet callback
+				w.Line("if (_onGet != null && _onGetTracking != null)");
+				using (w.Braces())
+				{
+					w.Line("_onGetTracking.RecordCall();");
+					w.Line("return _onGet();");
+				}
+				w.Line("throw new global::System.InvalidOperationException(\"InvokeGetCallback called without callback configured\");");
+			}
+			w.Line();
+		}
+
+		// Setter support
+		if (model.HasSetter)
+		{
+			w.Line("/// <summary>Records a setter access (tracking only, does not invoke callback). Used by user override pattern.</summary>");
+			w.Line($"internal void RecordSet({model.ValueType} value) {{ _unconfiguredSetCount++; _unconfiguredLastSetValue = value; }}");
+			w.Line();
+
+			w.Line("/// <summary>Returns true if OnSet is configured (callback or sequence). Used by user override pattern.</summary>");
+			w.Line("internal bool HasOnSet => _onSet != null || (_setSequence?.Count ?? 0) > 0;");
+			w.Line();
+
+			w.Line("/// <summary>Invokes the configured setter callback without tracking. Used by user override pattern.</summary>");
+			w.Line($"internal void InvokeSetCallback({model.ValueType} value)");
+			using (w.Braces())
+			{
+				// Priority 1: Sequence (if present and not exhausted)
+				w.Line("if (_setSequence != null && _setSequenceIndex < _setSequence.Count)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _setSequence[_setSequenceIndex];");
+					w.Line("tracking.RecordCall(value);");
+					w.Line("_setSequenceIndex++;");
+					w.Line("callback(value);");
+					w.Line("return;");
+				}
+				// Priority 2: Repeating OnSet callback
+				w.Line("if (_onSet != null && _onSetTracking != null)");
+				using (w.Braces())
+				{
+					w.Line("_onSetTracking.RecordCall(value);");
+					w.Line("_onSet(value);");
+					w.Line("return;");
+				}
+				w.Line("throw new global::System.InvalidOperationException(\"InvokeSetCallback called without callback configured\");");
+			}
+			w.Line();
 		}
 	}
 
