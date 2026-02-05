@@ -693,7 +693,7 @@ Is it a DELEGATE type?
 
 ## Complete Example
 
-This example demonstrates all seven patterns working together:
+This example demonstrates all nine patterns working together:
 
 ```cs
 // 1. Standalone: direct instantiation
@@ -706,27 +706,37 @@ var notifierStub = new NotifierStub<User>();
 notifierStub.Notify.OnCall((item) => { }).Verifiable();
 INotifier<User> notifier = notifierStub;
 
-// 3. Inline Interface: via Stubs namespace
+// 3. Standalone Class: reusable class stub, uses .Object
+var cacheStub = new CacheServiceStub();
+cacheStub.Get.OnCall((key) => "cached").Verifiable();
+CacheService cache = cacheStub.Object;
+
+// 4. Generic Standalone Class: reusable generic class stub, uses .Object
+var repoStub = new RepositoryStub<User>();
+repoStub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+RepositoryBase<User> repo = repoStub.Object;
+
+// 5. Inline Interface: via Stubs namespace
 var loggerStub = new Stubs.ILogger();
 loggerStub.Log.OnCall((msg) => { }).Verifiable();
 ILogger logger = loggerStub;
 
-// 4. Inline Class: use .Object for class instance
+// 6. Inline Class: use .Object for class instance
 var auditStub = new Stubs.AuditService();
 auditStub.Audit.OnCall((action) => { }).Verifiable();
 AuditService audit = auditStub.Object;
 
-// 5. Inline Delegate: implicit conversion
+// 7. Inline Delegate: implicit conversion
 var ruleStub = new Stubs.ValidationRule();
 ruleStub.Interceptor.OnCall((value) => true);
 ValidationRule rule = ruleStub;
 
-// 6. Open Generic Interface: inline stub with type args
+// 8. Open Generic Interface: inline stub with type args
 var processorStub = new Stubs.IProcessor<Order>();
 processorStub.Process.OnCall((item) => { }).Verifiable();
 IProcessor<Order> processor = processorStub;
 
-// 7. Open Generic Class: inline stub with type args, uses .Object
+// 9. Open Generic Class: inline stub with type args, uses .Object
 var serviceStub = new Stubs.ServiceBase<Order>();
 serviceStub.GetItem.OnCall((id) => new Order { Id = id }).Verifiable();
 ServiceBase<Order> service = serviceStub.Object;  // .Object required for class patterns

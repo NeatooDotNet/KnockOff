@@ -1,7 +1,7 @@
 ---
 name: KnockOff Usage
-description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "OnCall", "Returns", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "assembly-wide strict", "[assembly: KnockOffStrict]", "ThenCall", "ThenGet", "ThenSet", ".Of<T>()", "generic method interceptor", "Source() delegation", "When()", "argument matching", or needs guidance on creating, configuring, or verifying KnockOff test stubs.
-version: 2.0.0
+description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "OnCall", "Returns", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "assembly-wide strict", "[assembly: KnockOffStrict]", "ThenCall", "ThenGet", "ThenSet", ".Of<T>()", "generic method interceptor", "Source() delegation", "When()", "argument matching", or needs guidance on creating, configuring, or verifying KnockOff test stubs. IMPORTANT: When writing tests that need stubs, this skill MUST be consulted to check for existing stubs before creating new inline stubs - prefer standalone stubs when the same type is stubbed in multiple test classes.
+version: 2.1.0
 ---
 
 # KnockOff Usage Guide
@@ -102,6 +102,32 @@ service.Name = "test";
 | Event | Tracking counts | **Active subscribers** |
 
 **Note:** User method interceptors (e.g., `GetById` when you have a `GetById_` override) preserve OnCall configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
+
+---
+
+## PROACTIVE: Detect Duplicate Inline Stubs
+
+**When writing tests that need stubs, ALWAYS check for existing stubs first.**
+
+Before creating an inline stub with `[KnockOff<T>]`:
+
+1. **Search for existing standalone stubs** of the target type (e.g., `class *Stub : ITargetType`)
+2. **Search for existing inline stubs** using `[KnockOff<TargetType>]` in other test classes
+
+**If the same interface/class is already stubbed inline in 1+ other test classes:**
+
+Use AskUserQuestion to recommend converting to standalone:
+
+> "I noticed `IUserRepository` is already stubbed inline in `UserServiceTests.cs`. Creating another inline stub would duplicate the definition.
+>
+> **Recommendation:** Create a standalone `UserRepositoryStub` that both test classes can share."
+
+**Options to present:**
+1. **Create Stand-Alone stub (Recommended)** - Eliminates duplication, enables reuse
+2. **Add inline stub anyway** - Creates duplication (not recommended)
+3. **Reuse existing** - Move tests to the class that already has the inline stub
+
+**Why this matters:** Inline stubs are convenient for one-off usage, but when the same type is stubbed in multiple test classes, a standalone stub is cleaner and more maintainable.
 
 ---
 
@@ -567,4 +593,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-03
+**UPDATED:** 2026-02-04

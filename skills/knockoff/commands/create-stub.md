@@ -27,7 +27,33 @@ Search the codebase for the interface or class definition:
 
 If the type cannot be found, inform the user and ask for the file path.
 
-## Step 3: Choose Pattern
+## Step 3: Check for Existing Inline Stubs (IMPORTANT)
+
+**Before choosing a pattern, search for existing inline stubs of the same type.**
+
+Use Grep to search for existing `[KnockOff<TargetType>]` attributes:
+```
+Grep pattern: \[KnockOff<{TypeName}>\]
+```
+
+**If the type is already stubbed inline in 1+ test classes:**
+
+Use AskUserQuestion to inform the user and recommend standalone:
+
+> "I found `{TypeName}` is already stubbed inline in {N} test class(es):
+> - `{TestClass1}.cs`
+> - `{TestClass2}.cs`
+>
+> **Recommendation:** Convert to a Stand-Alone stub to avoid duplication. This allows all test classes to share one stub definition."
+
+**Options:**
+1. **Convert to Stand-Alone (Recommended)** - Create a standalone stub and I'll help you update the existing test classes to use it
+2. **Add another inline stub** - Add another `[KnockOff<T>]` attribute (creates duplication)
+3. **Use existing inline stub** - Don't create anything new; reuse from one of the existing test classes (may require moving tests)
+
+**If no existing inline stubs found:** Proceed to pattern selection.
+
+## Step 4: Choose Pattern (if no duplicates found)
 
 Use AskUserQuestion to ask which pattern:
 
@@ -57,7 +83,7 @@ Use AskUserQuestion to ask which pattern:
 - **Inline Interface**: Single test class needs a simple interface stub
 - **Inline Class**: Testing code that requires a class instance (not an interface)
 
-## Step 4: Determine File Location
+## Step 5: Determine File Location
 
 For Stand-Alone pattern:
 - Use AskUserQuestion to ask where to create the stub file
@@ -77,7 +103,7 @@ For Inline patterns:
 - If no suitable test class exists, offer to create a new test class
 - Ensure the test class is marked `partial` (or add it)
 
-## Step 5: Generate the Stub
+## Step 6: Generate the Stub
 
 ### Stand-Alone Pattern Template:
 
@@ -114,7 +140,7 @@ public partial class CmdInlineClassTests { }
 
 Ensure the class is marked `partial`.
 
-## Step 6: Show Usage Example
+## Step 7: Show Usage Example
 
 After creating the stub, show a usage example:
 
@@ -208,7 +234,7 @@ public partial class UserRepoCmdStub
 
 KnockOff generates a base class with virtual methods that you can override. Override the method with an underscore suffix (e.g., `FindAll_` for the `FindAll` interface method) to provide default behavior. The interceptor uses the clean name (e.g., `stub.FindAll`) for tracking and verification.
 
-## Step 7: Verify and Build
+## Step 8: Verify and Build
 
 After creating the stub:
 1. Inform the user of the file location and what was created
@@ -264,4 +290,4 @@ Samples demonstrate:
 
 ---
 
-**UPDATED:** 2026-02-03
+**UPDATED:** 2026-02-04

@@ -10,7 +10,7 @@ This plugin provides comprehensive assistance for using the KnockOff stub librar
 
 Automatically activates when you ask about:
 - Creating stubs with `[KnockOff]` or `[KnockOff<T>]` attributes
-- The seven stub patterns (Standalone, Generic Standalone, Inline Interface, Inline Class, Inline Delegate, Open Generic Interface, Open Generic Class)
+- The nine stub patterns (Standalone, Generic Standalone, Standalone Class, Generic Standalone Class, Inline Interface, Inline Class, Inline Delegate, Open Generic Interface, Open Generic Class)
 - Configuring behavior with `Returns`, `OnCall`, `OnGet`, `OnSet`
 - Argument matching with `When()` API
 - Sequential callbacks with `ThenCall`, `ThenGet`, `ThenSet`
@@ -43,17 +43,19 @@ To use this plugin in other projects:
 
 ## Quick API Reference
 
-### Seven Patterns
+### Nine Patterns
 
 | Pattern | Attribute | Access |
 |---------|-----------|--------|
 | Standalone | `[KnockOff]` on partial class | `new MyStub()` |
 | Generic Standalone | `[KnockOff]` on generic partial class | `new MyStub<T>()` |
+| Standalone Class | `[KnockOffBase<MyClass>]` on partial class | `new MyStub().Object` |
+| Generic Standalone Class | `[KnockOffBase(typeof(MyClass<>))]` on generic partial class | `new MyStub<T>().Object` |
 | Inline Interface | `[KnockOff<IInterface>]` | `new Stubs.IInterface()` |
-| Inline Class | `[KnockOff<MyClass>]` | `new Stubs.MyClass()` then `.Object` |
+| Inline Class | `[KnockOff<MyClass>]` | `new Stubs.MyClass().Object` |
 | Inline Delegate | `[KnockOff<MyDelegate>]` | `new Stubs.MyDelegate()` |
 | Open Generic Interface | `[KnockOff(typeof(IFoo<>))]` | `new Stubs.IFoo<T>()` |
-| Open Generic Class | `[KnockOff(typeof(Foo<>))]` | `new Stubs.Foo<T>()` then `.Object` |
+| Open Generic Class | `[KnockOff(typeof(Foo<>))]` | `new Stubs.Foo<T>().Object` |
 
 ### User Methods (Stand-Alone Only)
 
@@ -126,7 +128,7 @@ tracking.Verify(Times.Once);
 The **knockoff-usage** skill provides comprehensive documentation:
 
 - [Main Skill Guide](skills/knockoff-usage/SKILL.md) - Complete guide with gotchas
-- [Stub Patterns](skills/knockoff-usage/references/patterns.md) - All seven patterns with examples
+- [Stub Patterns](skills/knockoff-usage/references/patterns.md) - All nine patterns with examples
 - [Methods Guide](skills/knockoff-usage/references/methods.md) - Method configuration and verification
 - [Properties Guide](skills/knockoff-usage/references/properties.md) - Property interceptors
 - [API Reference](skills/knockoff-usage/references/api-reference.md) - Complete interceptor API
