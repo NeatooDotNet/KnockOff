@@ -279,6 +279,47 @@ internal static class FlatRenderer
 			{
 				RenderBaseClassMethod(w, method);
 			}
+
+			// Generate virtual protected properties for each interface property
+			// When multiple interfaces have the same property name but different accessors
+			// (e.g., IReadOnly.Name has getter only, IMutable.Name has get/set), we must pick one.
+			// We prefer the version with MORE accessors (get/set > get-only or set-only).
+			var propertiesToRender = new Dictionary<string, FlatPropertyModel>();
+
+			foreach (var property in unit.Properties)
+			{
+				// Skip delegation targets (these are synthetic properties)
+				if (property.DelegationTarget != null)
+					continue;
+
+				// Key by property name ONLY
+				// C# does not allow overloading properties by return type or accessors
+				var key = property.MemberName;
+
+				if (propertiesToRender.TryGetValue(key, out var existing))
+				{
+					// Conflict: same property name from different interfaces
+					// Prefer the version with MORE accessors
+					var existingAccessorCount = (existing.HasGetter ? 1 : 0) + (existing.HasSetter ? 1 : 0);
+					var newAccessorCount = (property.HasGetter ? 1 : 0) + (property.HasSetter ? 1 : 0);
+
+					if (newAccessorCount > existingAccessorCount)
+					{
+						propertiesToRender[key] = property;
+					}
+					// If same accessor count, keep first (stable ordering)
+				}
+				else
+				{
+					propertiesToRender[key] = property;
+				}
+			}
+
+			// Render the selected properties
+			foreach (var property in propertiesToRender.Values)
+			{
+				RenderBaseClassProperty(w, property);
+			}
 		}
 
 		// Close containing type wrappers for nested classes
@@ -347,6 +388,36 @@ internal static class FlatRenderer
 		else
 		{
 			w.Line($"protected virtual {returnType} {methodName}({method.ParameterDeclarations}) => default!;");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders a single virtual protected property in the base class.
+	/// Property name is suffixed with '_' to distinguish from interface property.
+	/// Returns default! to allow compilation without override.
+	/// </summary>
+	private static void RenderBaseClassProperty(CodeWriter w, FlatPropertyModel property)
+	{
+		var propertyName = $"{property.MemberName}_";
+		var returnType = property.ReturnType;
+
+		w.Line($"/// <summary>Override to provide default implementation for {property.DeclaringInterface}.{property.MemberName}.</summary>");
+
+		if (property.HasGetter && property.HasSetter)
+		{
+			// Get/set property - full property syntax
+			w.Line($"protected virtual {returnType} {propertyName} {{ get => default!; set {{ }} }}");
+		}
+		else if (property.HasGetter)
+		{
+			// Get-only property - expression-bodied
+			w.Line($"protected virtual {returnType} {propertyName} => default!;");
+		}
+		else if (property.HasSetter)
+		{
+			// Set-only property - block syntax
+			w.Line($"protected virtual {returnType} {propertyName} {{ set {{ }} }}");
 		}
 		w.Line();
 	}
@@ -3101,6 +3172,13 @@ internal static class FlatRenderer
 			return;
 		}
 
+		// User-defined properties with base class pattern: record access, check OnGet/OnSet, then delegate to virtual property
+		if (prop.HasUserOverride)
+		{
+			RenderPropertyUserOverrideImplementation(w, prop);
+			return;
+		}
+
 		w.Line($"{prop.ReturnType} {prop.DeclaringInterface}.{prop.MemberName}");
 		using (w.Braces())
 		{
@@ -3126,6 +3204,51 @@ internal static class FlatRenderer
 					if (prop.SetterPragmaRestore != null)
 						w.Line(prop.SetterPragmaRestore);
 				}
+			}
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the explicit interface implementation for a property with user override (base class pattern).
+	/// Priority chain: OnGet/OnSet > User Override (virtual property with _ suffix).
+	/// Unlike properties without user override, this does NOT fall through to Strict/Default.
+	/// </summary>
+	private static void RenderPropertyUserOverrideImplementation(CodeWriter w, FlatPropertyModel prop)
+	{
+		w.Line($"{prop.ReturnType} {prop.DeclaringInterface}.{prop.MemberName}");
+		using (w.Braces())
+		{
+			if (prop.HasGetter)
+			{
+				w.Line("get");
+				using (w.Braces())
+				{
+					// OnGet supersedes user override (InvokeGetCallback tracks internally)
+					w.Line($"if ({prop.InterceptorName}.HasOnGet) return {prop.InterceptorName}.InvokeGetCallback();");
+					// Record access only for user override path (to avoid double counting)
+					w.Line($"{prop.InterceptorName}.RecordGet();");
+					// User override (virtual property with _ suffix)
+					w.Line($"return {prop.MemberName}_;");
+				}
+			}
+
+			if (prop.HasSetter)
+			{
+				if (prop.SetterPragmaDisable != null)
+					w.Append(prop.SetterPragmaDisable);
+				w.Line("set");
+				using (w.Braces())
+				{
+					// OnSet supersedes user override (InvokeSetCallback tracks internally)
+					w.Line($"if ({prop.InterceptorName}.HasOnSet) {{ {prop.InterceptorName}.InvokeSetCallback(value); return; }}");
+					// Record access only for user override path (to avoid double counting)
+					w.Line($"{prop.InterceptorName}.RecordSet(value);");
+					// User override (virtual property with _ suffix)
+					w.Line($"{prop.MemberName}_ = value;");
+				}
+				if (prop.SetterPragmaRestore != null)
+					w.Line(prop.SetterPragmaRestore);
 			}
 		}
 		w.Line();

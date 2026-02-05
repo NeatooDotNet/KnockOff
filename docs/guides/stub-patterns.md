@@ -93,7 +93,7 @@ stub.Save.OnCall((user) => { }).Verifiable();
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
-- **User methods**: Add custom methods directly on the stub class
+- **User methods and properties**: Add custom methods and override properties directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **Clean syntax**: Simple `new MyStub()` instantiation
@@ -104,11 +104,11 @@ stub.Save.OnCall((user) => { }).Verifiable();
 - **Partial class**: Must remember to mark the class as `partial`
 - **Manual interface**: Must manually implement the interface signature
 
-### Base Class and User Methods
+### Base Class and User Methods/Properties
 
-The Standalone pattern generates a base class (e.g., `UserRepoStandaloneStubBase`) that your stub inherits from. This base class exposes `protected virtual` methods for each interface member, allowing you to add custom stub behavior through inheritance.
+The Standalone pattern generates a base class (e.g., `UserRepoStandaloneStubBase`) that your stub inherits from. This base class exposes `protected virtual` methods and properties for each interface member, allowing you to add custom stub behavior through inheritance.
 
-Override these methods using the **underscore suffix convention** (`_`) to provide default implementations:
+Override these members using the **underscore suffix convention** (`_`) to provide default implementations:
 
 <!-- snippet: patterns-user-methods -->
 ```cs
@@ -124,7 +124,7 @@ public partial class UserRepoWithUserMethodsStub : IUserRepoStandalone
 ```
 <!-- endSnippet -->
 
-The interceptor name remains clean (`GetById`), while your implementation uses the suffix (`GetById_`). This keeps user methods separate from the generated code. See [User Methods](user-methods.md) for complete details and advanced patterns.
+The interceptor name remains clean (`GetById`), while your implementation uses the suffix (`GetById_`). This keeps user methods and properties separate from the generated code. See [User Methods](user-methods.md) for methods and [Properties Guide](properties.md#user-properties-standalone-patterns) for user properties.
 
 ---
 
@@ -175,7 +175,7 @@ productRepo.GetById.OnCall((id) => new Product { Id = id, Name = "Widget" }).Ver
 - **Reusable**: Share across multiple test files
 - **Type-safe**: Compiler enforces type constraints
 - **Clean syntax**: `new RepositoryStub<User>()` - clear and readable
-- **User methods**: Supports custom helper methods like Standalone
+- **User methods and properties**: Supports custom helper methods and property overrides like Standalone
 
 ### Trade-offs
 
@@ -190,7 +190,7 @@ productRepo.GetById.OnCall((id) => new Product { Id = id, Name = "Widget" }).Ver
 | **Syntax** | `[KnockOff] class Stub<T> : IFoo<T>` | `[KnockOff(typeof(IFoo<>))]` |
 | **Instantiation** | `new Stub<User>()` | `new Stubs.IFoo<User>()` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods** | Yes | No |
+| **User methods/properties** | Yes | No |
 | **Best for** | Shared generic stubs | One-time use |
 
 ---
@@ -210,17 +210,34 @@ The Standalone Class pattern creates a dedicated stub class for concrete or abst
 ### Basic Setup
 
 <!-- snippet: patterns-standalone-class-basic -->
+```cs
+public abstract class ServiceBaseNonGeneric
+{
+    public abstract string Name { get; }
+    public abstract void Execute(string command);
+}
+
+[KnockOffBase<ServiceBaseNonGeneric>]
+public partial class ServiceBaseStub { }
+```
 <!-- endSnippet -->
 
 ### Usage in Tests
 
 <!-- snippet: patterns-standalone-class-usage -->
+```cs
+// Standalone Class: configure stub, use .Object for the class instance
+var stub = new ServiceBaseStub();
+stub.Name.OnGet(() => "test").Verifiable();
+stub.Execute.OnCall((cmd) => { }).Verifiable();
+ServiceBaseNonGeneric service = stub.Object;
+```
 <!-- endSnippet -->
 
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
-- **User methods**: Add custom methods directly on the stub class
+- **User methods and properties**: Add custom methods and override properties directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **No interface needed**: Stub classes directly without creating interfaces
@@ -239,7 +256,7 @@ The Standalone Class pattern creates a dedicated stub class for concrete or abst
 | **Syntax** | `[KnockOffBase<Foo>] class Stub` | `[KnockOff<Foo>]` |
 | **Instantiation** | `new ServiceStub().Object` | `new Stubs.Service().Object` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods** | Yes | No |
+| **User methods/properties** | Yes | No |
 | **Best for** | Shared class stubs | One-time use |
 
 ---
@@ -259,11 +276,28 @@ The Generic Standalone Class pattern creates a reusable generic stub class for g
 ### Basic Setup
 
 <!-- snippet: patterns-generic-standalone-class-basic -->
+```cs
+public abstract class RepositoryBase<T> where T : class
+{
+    public abstract T? GetItem(int id);
+    public abstract void Save(T entity);
+}
+
+[KnockOffBase(typeof(RepositoryBase<>))]
+public partial class RepositoryBaseStub<T> where T : class { }
+```
 <!-- endSnippet -->
 
 ### Usage in Tests
 
 <!-- snippet: patterns-generic-standalone-class-usage -->
+```cs
+// Generic Standalone Class: reusable across multiple type arguments, uses .Object
+var stub = new RepositoryBaseStub<User>();
+stub.GetItem.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
+stub.Save.OnCall((entity) => { }).Verifiable();
+RepositoryBase<User> service = stub.Object;
+```
 <!-- endSnippet -->
 
 ### Benefits
@@ -272,7 +306,7 @@ The Generic Standalone Class pattern creates a reusable generic stub class for g
 - **Reusable**: Share across multiple test files
 - **Type-safe**: Compiler enforces type constraints
 - **Clean syntax**: `new RepositoryStub<User>().Object` - clear and readable
-- **User methods**: Supports custom helper methods like Standalone patterns
+- **User methods and properties**: Supports custom helper methods and property overrides like Standalone patterns
 - **No interface needed**: Stub generic classes directly
 
 ### Trade-offs
@@ -290,7 +324,7 @@ The Generic Standalone Class pattern creates a reusable generic stub class for g
 | **Syntax** | `[KnockOffBase(typeof(Foo<>))] class Stub<T>` | `[KnockOff(typeof(Foo<>))]` |
 | **Instantiation** | `new Stub<User>().Object` | `new Stubs.Foo<User>().Object` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods** | Yes | No |
+| **User methods/properties** | Yes | No |
 | **Best for** | Shared generic class stubs | One-time use |
 
 ---
@@ -590,7 +624,7 @@ userStub.Verify();
 | Feature | Standalone | Generic Standalone | Standalone Class | Generic Standalone Class | Inline Interface | Inline Class | Inline Delegate | Open Generic Interface | Open Generic Class |
 |---------|------------|-------------------|-----------------|--------------------------|------------------|--------------|-----------------|----------------------|-------------------|
 | **Reusable across test files** | Yes | Yes | Yes | Yes | No | No | No | No | No |
-| **Custom user methods** | Yes | Yes | Yes | Yes | No | No | No | No | No |
+| **Custom user methods/properties** | Yes | Yes | Yes | Yes | No | No | No | No | No |
 | **Extra file required** | Yes | Yes | Yes | Yes | No | No | No | No | No |
 | **Supports interfaces** | Yes | Yes | No | No | Yes | No | No | Yes | No |
 | **Supports classes** | No | No | Yes | Yes | No | Yes | No | No | Yes |
@@ -696,36 +730,56 @@ This example demonstrates all nine patterns working together in a realistic test
 
 <!-- snippet: patterns-complete-example-nine -->
 ```cs
-// 1. Standalone: direct instantiation
+// STANDALONE PATTERNS (file-based, reusable across tests)
+
+// 1. Standalone Interface: direct instantiation, stub IS implementation
 var emailStub = new EmailSvcPatternStub();
 emailStub.Send.OnCall((to, subject, body) => true).Verifiable();
+IEmailSvcPattern email = emailStub;
 
-// 2. Generic Standalone: reusable with type args
+// 2. Generic Standalone Interface: reusable with type args
 var notifierStub = new NotifierStub<User>();
 notifierStub.Notify.OnCall((item) => { }).Verifiable();
+INotifier<User> notifier = notifierStub;
 
-// 3. Inline Interface: via Stubs namespace
+// 3. Standalone Class: stub wraps instance, use .Object
+var serviceBaseStub = new ServiceBaseStub();
+serviceBaseStub.Name.OnGet(() => "TestService").Verifiable();
+serviceBaseStub.Execute.OnCall((cmd) => { }).Verifiable();
+ServiceBaseNonGeneric serviceBase = serviceBaseStub.Object;
+
+// 4. Generic Standalone Class: reusable class stub with type args
+var repoStub = new RepositoryBaseStub<Product>();
+repoStub.GetItem.OnCall((id) => new Product { Id = id, Name = "Widget" }).Verifiable();
+repoStub.Save.OnCall((entity) => { }).Verifiable();
+RepositoryBase<Product> repo = repoStub.Object;
+
+// INLINE PATTERNS (nested within test class)
+
+// 5. Inline Interface: via Stubs namespace
 var loggerStub = new CompleteExampleInlineHost.Stubs.ILogSvc();
 loggerStub.Log.OnCall((msg) => { }).Verifiable();
+ILogSvc logger = loggerStub;
 
-// 4. Inline Class: use .Object for class instance
+// 6. Inline Class: use .Object for class instance
 var auditStub = new CompleteExampleInlineHost.Stubs.AuditSvcBase();
 auditStub.Audit.OnCall((action) => { }).Verifiable();
 AuditSvcBase audit = auditStub.Object;
 
-// 5. Inline Delegate: implicit conversion
+// 7. Inline Delegate: implicit conversion
 var ruleStub = new InlineDelegateTests.Stubs.ValidationRule();
 ruleStub.Interceptor.OnCall((value) => true);
 ValidationRule rule = ruleStub;
 
-// 6. Open Generic Interface: inline stub with type args
+// 8. Open Generic Interface: inline stub with type args
 var processorStub = new CompleteExampleOpenGenericHost.Stubs.IProcessor<Order>();
 processorStub.Process.OnCall((item) => { }).Verifiable();
+IProcessor<Order> processor = processorStub;
 
-// 7. Open Generic Class: inline stub with type args, uses .Object
+// 9. Open Generic Class: inline stub with type args, uses .Object
 var serviceStub = new CompleteExampleOpenGenericClassHost.Stubs.ServiceBase<Order>();
 serviceStub.GetItem.OnCall((id) => new Order { Id = id }).Verifiable();
-ServiceBase<Order> service = serviceStub.Object;  // .Object required for class patterns
+ServiceBase<Order> service = serviceStub.Object;
 ```
 <!-- endSnippet -->
 

@@ -116,19 +116,23 @@ When you define a **user method** (override a virtual method with underscore suf
 - Allows `OnCall()` to supersede the user method
 - Uses the user method as fallback when no `OnCall` is configured
 
+<!-- snippet: user-method-interceptor-standalone-api-example -->
 ```cs
 [KnockOff]
-public partial class RepoStub : IRepo { }
+public partial class ApiRepoStub : IApiRepo { }
 
-public partial class RepoStub
+public partial class ApiRepoStub
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
+```
+<!-- endSnippet -->
 
-// Usage:
-var stub = new RepoStub();
-IRepo repo = stub;
+<!-- snippet: user-method-interceptor-usage-api-example -->
+```cs
+var stub = new ApiRepoStub();
+IApiRepo repo = stub;
 
 // User method provides default behavior
 var user1 = repo.GetById(1);  // Returns "Default"
@@ -144,6 +148,7 @@ stub.GetById.Returns(new User { Id = 99 });
 stub.GetById.Verify(Times.Exactly(2));
 Assert.Equal(2, stub.GetById.LastArg);
 ```
+<!-- endSnippet -->
 
 **Reset behavior for user method interceptors:** `Reset()` clears tracking state (call count, LastArg) but preserves the OnCall configuration.
 

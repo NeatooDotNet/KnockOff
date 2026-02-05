@@ -39,6 +39,12 @@ public partial class EventPatternsDemo
     //       public void RecordRemove(EventHandler? handler) { ... }
     //   }
     //
+    // DESIGN DECISION: Event interceptors use "Interceptor" suffix (StartedInterceptor,
+    // not Started) to distinguish the interceptor property from the event itself.
+    // Without the suffix, `stub.Started` would be ambiguous - is it the event or
+    // the interceptor? The suffix makes it clear: `stub.StartedInterceptor` is the
+    // interceptor you configure; the event `Started` is accessed through the interface.
+    //
     // DID NOT DO THIS: Add Raise() method to interceptors
     //
     // REJECTED PATTERN:

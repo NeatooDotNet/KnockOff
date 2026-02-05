@@ -115,7 +115,8 @@ public partial class KnockOffGenerator
 				TypeParameters: userClassTypeParameters,
 				TargetClassInfo: null,
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
-				Strict: strict);
+				Strict: strict,
+				UserOverrideProperties: default);
 		}
 
 		// For non-open-generic closed generic targets (e.g., [KnockOffBase<ServiceBase>]),
@@ -148,7 +149,8 @@ public partial class KnockOffGenerator
 					TypeParameters: userClassTypeParameters,
 					TargetClassInfo: null,
 					Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
-					Strict: strict);
+					Strict: strict,
+					UserOverrideProperties: default);
 			}
 		}
 
@@ -165,6 +167,10 @@ public partial class KnockOffGenerator
 			isOpenGeneric,
 			isOpenGeneric ? openGenericTypeParams : userClassTypeParameters);
 
+		// Detect user-defined property overrides (base class pattern)
+		var userOverrideProperties = DetectUserOverrideProperties(classSymbol);
+		var userOverridePropertiesArray = new EquatableArray<string>(userOverrideProperties.ToArray());
+
 		return new StandaloneClassStubInfo(
 			Namespace: namespaceName,
 			ClassName: classSymbol.Name,
@@ -172,7 +178,8 @@ public partial class KnockOffGenerator
 			TypeParameters: userClassTypeParameters,
 			TargetClassInfo: targetClassInfo,
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
-			Strict: strict);
+			Strict: strict,
+			UserOverrideProperties: userOverridePropertiesArray);
 	}
 
 	/// <summary>
@@ -198,7 +205,11 @@ public partial class KnockOffGenerator
 			? string.Join(".", info.ContainingTypes.Select(ct => ct.Name)) + "." + className
 			: className;
 
-		// Generate the source
+		// Generate base class file first (contains virtual protected properties for user overrides)
+		var baseClassSource = StandaloneClassRenderer.RenderBaseClass(model);
+		context.AddSource($"{hintName}.Base.g.cs", baseClassSource);
+
+		// Generate main partial class file (extends base class, provides interceptors)
 		var source = StandaloneClassRenderer.Render(model);
 		context.AddSource($"{hintName}.g.cs", source);
 	}
@@ -221,4 +232,6 @@ internal sealed record StandaloneClassStubInfo(
 	/// <summary>Diagnostics collected during transformation.</summary>
 	EquatableArray<DiagnosticInfo> Diagnostics,
 	/// <summary>Whether strict mode is enabled.</summary>
-	bool Strict) : IEquatable<StandaloneClassStubInfo>;
+	bool Strict,
+	/// <summary>Property names (with _ suffix) that have user overrides in the partial class.</summary>
+	EquatableArray<string> UserOverrideProperties = default) : IEquatable<StandaloneClassStubInfo>;

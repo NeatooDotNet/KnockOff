@@ -316,6 +316,197 @@ After reset, the property returns to unconfigured state.
 
 ---
 
+## User Properties (Stand-Alone Pattern)
+
+When you define a **user property** (override a virtual property with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `Count`, not `Count2`). These interceptors support `OnGet()` and `OnSet()` to override the user property per-test.
+
+### Why Use User Properties?
+
+User properties provide several advantages over per-test configuration:
+
+1. **Reusable defaults** - Define once, use across all tests
+2. **Computed values** - When you need logic to compute property values
+3. **State management** - When you need instance state with backing fields
+4. **IDE support** - Full IntelliSense, refactoring, debugging
+5. **Compile-time safety** - Signature errors caught by compiler
+
+### Defining User Properties
+
+Override protected virtual properties with the underscore suffix convention to provide default implementations:
+
+<!-- snippet: user-properties-interface-and-stub -->
+```cs
+public interface ISkillUserSvc
+{
+    int Count { get; }
+    string Name { get; set; }
+    string Setting { set; }
+}
+
+[KnockOff]
+public partial class SkillUserSvcStub : ISkillUserSvc { }
+
+public partial class SkillUserSvcStub
+{
+    private int _count;
+    private string _name = "";
+    private string _setting = "";
+
+    // Get-only property override
+    protected override int Count_ => _count;
+
+    // Get/set property override
+    protected override string Name_
+    {
+        get => _name;
+        set => _name = value;
+    }
+
+    // Set-only property override
+    protected override string Setting_
+    {
+        set => _setting = value;
+    }
+
+    // Public methods for test setup
+    public void SetCount(int value) => _count = value;
+}
+```
+<!-- endSnippet -->
+
+### Using Stubs with User Properties
+
+<!-- snippet: user-properties-basic-usage -->
+```cs
+var stub = new SkillUserSvcStub();
+stub.SetCount(42);
+
+ISkillUserSvc service = stub;
+
+// Get-only property uses your protected override Count_
+var count = service.Count;  // 42
+
+// Get/set property uses your protected override Name_
+service.Name = "Test";
+var name = service.Name;    // "Test"
+
+// Set-only property uses your protected override Setting_
+service.Setting = "value";
+```
+<!-- endSnippet -->
+
+### OnGet/OnSet Supersede User Properties
+
+User properties provide shareable defaults. Use `OnGet()` or `OnSet()` to override per-test:
+
+<!-- snippet: user-properties-onget-onset-override -->
+```cs
+var stub = new SkillUserSvcStub();
+stub.SetCount(42);
+
+ISkillUserSvc service = stub;
+
+// Default: user property is called
+var defaultValue = service.Count;  // 42
+
+// OnGet supersedes the user property for this test
+stub.Count.OnGet(999);
+var overrideValue = service.Count;  // 999
+
+// OnSet supersedes the user property for this test
+var capturedValue = "";
+stub.Name.OnSet(v => capturedValue = $"Captured: {v}");
+service.Name = "Test";
+// capturedValue == "Captured: Test"
+// The user override's backing field was NOT updated
+```
+<!-- endSnippet -->
+
+### Tracking Works Through User Properties
+
+User property interceptors provide full tracking even when using the user override:
+
+<!-- snippet: user-properties-tracking -->
+```cs
+var stub = new SkillUserSvcStub();
+stub.SetCount(100);
+
+ISkillUserSvc service = stub;
+
+_ = service.Count;
+_ = service.Count;
+_ = service.Count;
+
+stub.Count.VerifyGet(Times.Exactly(3));
+stub.Name.VerifySet(Times.Never);
+```
+<!-- endSnippet -->
+
+### Reset Preserves OnGet/OnSet Configuration
+
+`Reset()` clears tracking state but preserves the OnGet/OnSet configuration (matching regular interceptor semantics):
+
+<!-- snippet: user-properties-reset -->
+```cs
+var stub = new SkillUserSvcStub();
+stub.Count.OnGet(100);  // Override user property
+
+ISkillUserSvc service = stub;
+_ = service.Count;
+stub.Count.VerifyGet(Times.Once);
+
+// Reset clears tracking but preserves OnGet
+stub.Count.Reset();
+stub.Count.VerifyGet(Times.Never);
+
+var value = service.Count;  // 100 (OnGet still active)
+```
+<!-- endSnippet -->
+
+### Strict Mode Bypassed for User Properties
+
+User overrides bypass strict mode because they ARE the configuration:
+
+<!-- snippet: user-properties-strict-mode -->
+```cs
+// [KnockOff(Strict = true)]
+// public partial class StrictSkillUserSvcStub : ISkillUserSvc { }
+//
+// public partial class StrictSkillUserSvcStub
+// {
+//     protected override int Count_ => 10;  // This IS configured
+// }
+
+// Usage:
+var stub = new StrictSkillUserSvcStub();
+ISkillUserSvc service = stub;
+
+var count = service.Count;  // 10 (no exception - user override is configured)
+```
+<!-- endSnippet -->
+
+### Supported Patterns
+
+User properties apply to all four standalone patterns:
+
+| Pattern | Attribute | User Property Support |
+|---------|-----------|----------------------|
+| Standalone | `[KnockOff] class Stub : IService` | Yes |
+| Generic Standalone | `[KnockOff] class Stub<T> : IService<T>` | Yes |
+| Standalone Class | `[KnockOffBase<SomeClass>] class Stub` | Yes |
+| Generic Standalone Class | `[KnockOffBase(typeof(ClassBase<>))] class Stub<T>` | Yes |
+| Inline patterns (5-9) | `[KnockOff<...>]` | No (entire class generated) |
+
+### Priority Order
+
+When multiple configurations exist, the priority is:
+
+1. **OnGet/OnSet** - Per-test override (highest priority)
+2. **User property** - Shared default from protected override
+3. **Smart default** - Returns `default(T)` or throws in strict mode
+
+---
+
 ## Complete Example
 
 This example demonstrates all property configuration approaches in a realistic test scenario:
@@ -403,4 +594,4 @@ Choose your configuration approach based on the test scenario:
 
 ---
 
-**UPDATED:** 2026-02-02
+**UPDATED:** 2026-02-04

@@ -185,7 +185,12 @@ internal sealed record InlineClassImplPropertyModel(
     /// <summary>Whether this is an init-only setter.</summary>
     bool IsInitOnly,
     /// <summary>Whether this is an abstract property (no base call).</summary>
-    bool IsAbstract);
+    bool IsAbstract,
+    /// <summary>
+    /// True if the user has defined a 'protected override' property with the _ suffix
+    /// in their partial class (base class user property pattern).
+    /// </summary>
+    bool HasUserOverride = false);
 
 /// <summary>
 /// Model for an indexer override in the Impl class.

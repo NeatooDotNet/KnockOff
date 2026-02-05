@@ -88,6 +88,46 @@ public partial class KnockOffGenerator
 	}
 
 	/// <summary>
+	/// Detects user-defined properties in all partial class declarations that have the 'override' modifier
+	/// and end with the '_' suffix (our base class user property naming convention).
+	/// Uses syntactic detection via DeclaringSyntaxReferences - the 'override' keyword is detected
+	/// as a syntax token, which works even before the generated base class exists.
+	/// </summary>
+	/// <param name="classSymbol">The class symbol to scan for override properties</param>
+	/// <returns>A set of property names (with _ suffix) that have user overrides</returns>
+	private static HashSet<string> DetectUserOverrideProperties(INamedTypeSymbol classSymbol)
+	{
+		var overrideProperties = new HashSet<string>();
+
+		// Iterate over ALL partial class declarations
+		foreach (var syntaxRef in classSymbol.DeclaringSyntaxReferences)
+		{
+			var classSyntax = syntaxRef.GetSyntax() as ClassDeclarationSyntax;
+			if (classSyntax == null)
+				continue;
+
+			foreach (var member in classSyntax.Members)
+			{
+				if (member is PropertyDeclarationSyntax property)
+				{
+					// Check for override modifier (SYNTACTIC - works without base class!)
+					if (property.Modifiers.Any(m => m.IsKind(SyntaxKind.OverrideKeyword)))
+					{
+						var propertyName = property.Identifier.Text;
+						// Check for our naming convention: ends with _
+						if (propertyName.EndsWith("_"))
+						{
+							overrideProperties.Add(propertyName);
+						}
+					}
+				}
+			}
+		}
+
+		return overrideProperties;
+	}
+
+	/// <summary>
 	/// Normalizes type names to match what users would write in their override methods.
 	/// Handles common differences between semantic and syntax representations.
 	/// </summary>
