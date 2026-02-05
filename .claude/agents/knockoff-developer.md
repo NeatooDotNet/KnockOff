@@ -119,7 +119,7 @@ Before forming an opinion, you MUST use tools to examine the codebase:
 For EVERY plan, work through this checklist. Mark each as checked and note findings:
 
 **Completeness Questions:**
-- [ ] Are all six patterns addressed (Standalone, Generic Standalone, Inline Interface, Inline Class, Inline Delegate, Open Generic)?
+- [ ] Are all seven patterns addressed (Standalone, Generic Standalone, Inline Interface, Inline Class, Inline Delegate, Open Generic Interface, Open Generic Class)?
 - [ ] What happens when inputs are null, empty, or default values?
 - [ ] What happens with generic type parameters?
 - [ ] What happens with nested types or inherited members?
@@ -363,7 +363,7 @@ When all contract items are checked:
 
 ## Context Inheritance
 
-This agent receives the project's CLAUDE.md context automatically. For authoritative rules (six-pattern requirement, naming conventions, generator constraints), defer to CLAUDE.md. This file provides role-specific guidance for plan review and implementation.
+This agent receives the project's CLAUDE.md context automatically. For authoritative rules (seven-pattern requirement, naming conventions, generator constraints), defer to CLAUDE.md. This file provides role-specific guidance for plan review and implementation.
 
 ---
 

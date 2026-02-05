@@ -165,6 +165,29 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		defaultSeverity: DiagnosticSeverity.Error,
 		isEnabledByDefault: true);
 
+	/// <summary>
+	/// KO2007: Type parameter mismatch for standalone class stubs.
+	/// User's stub class type parameters must match the target class.
+	/// </summary>
+	private static readonly DiagnosticDescriptor KO2007_TypeParameterMismatch = new(
+		id: "KO2007",
+		title: "Type parameter count mismatch",
+		messageFormat: "Standalone class stub '{0}' has {1} type parameter(s) but target class '{2}' has {3}. Type parameter count must match exactly.",
+		category: "KnockOff",
+		defaultSeverity: DiagnosticSeverity.Error,
+		isEnabledByDefault: true);
+
+	/// <summary>
+	/// KO2008: User class must be partial for standalone class stubs.
+	/// </summary>
+	private static readonly DiagnosticDescriptor KO2008_ClassMustBePartial = new(
+		id: "KO2008",
+		title: "Class must be partial",
+		messageFormat: "Class '{0}' must be partial to use [KnockOffBase<T>]",
+		category: "KnockOff",
+		defaultSeverity: DiagnosticSeverity.Error,
+		isEnabledByDefault: true);
+
 	#endregion
 
 	#endregion
@@ -248,6 +271,50 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 				GenerateInlineStubs(spc, info);
 			}
 		});
+
+		// Pipeline 4: Standalone class stubs [KnockOffBase<T>]
+		// User's partial class is a wrapper with a nested Impl class that inherits from T
+		var standaloneClassStubs = context.SyntaxProvider.ForAttributeWithMetadataName(
+			"KnockOff.KnockOffBaseAttribute`1",
+			predicate: static (node, _) => IsStandaloneClassCandidate(node),
+			transform: static (ctx, _) => ctx)
+			.Combine(assemblyConfigProvider)
+			.Select(static (data, _) =>
+			{
+				var (ctx, assemblyConfig) = data;
+				return TransformStandaloneClassStub(ctx, assemblyConfig);
+			})
+			.Where(static info => info is not null);
+
+		context.RegisterSourceOutput(standaloneClassStubs, static (spc, info) =>
+		{
+			if (info is not null)
+			{
+				GenerateStandaloneClassStub(spc, info);
+			}
+		});
+
+		// Pipeline 5: Open generic standalone class stubs [KnockOffBase(typeof(T<>))]
+		// User's generic partial class is a wrapper with a nested Impl class that inherits from T<>
+		var openGenericStandaloneClassStubs = context.SyntaxProvider.ForAttributeWithMetadataName(
+			"KnockOff.KnockOffBaseAttribute",
+			predicate: static (node, _) => IsStandaloneClassCandidate(node) && HasKnockOffBaseTypeofArgument(node),
+			transform: static (ctx, _) => ctx)
+			.Combine(assemblyConfigProvider)
+			.Select(static (data, _) =>
+			{
+				var (ctx, assemblyConfig) = data;
+				return TransformStandaloneClassStub(ctx, assemblyConfig);
+			})
+			.Where(static info => info is not null);
+
+		context.RegisterSourceOutput(openGenericStandaloneClassStubs, static (spc, info) =>
+		{
+			if (info is not null)
+			{
+				GenerateStandaloneClassStub(spc, info);
+			}
+		});
 	}
 
 	/// <summary>
@@ -327,6 +394,61 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 				// Check if this is a KnockOff attribute (without generic args)
 				var name = attr.Name.ToString();
 				if (name != "KnockOff" && name != "KnockOffAttribute")
+					continue;
+
+				// Check if it has an argument list with at least one argument
+				if (attr.ArgumentList is { Arguments.Count: > 0 })
+				{
+					// Check if the first argument is a typeof expression
+					var firstArg = attr.ArgumentList.Arguments[0];
+					if (firstArg.Expression is TypeOfExpressionSyntax)
+						return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/// <summary>
+	/// Predicate for standalone class stubs: partial class, not abstract.
+	/// Used for [KnockOffBase&lt;T&gt;] and [KnockOffBase(typeof(T&lt;&gt;))] patterns.
+	/// </summary>
+	private static bool IsStandaloneClassCandidate(SyntaxNode node)
+	{
+		if (node is not ClassDeclarationSyntax classDecl)
+			return false;
+
+		// Must be partial
+		if (!classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.PartialKeyword)))
+			return false;
+
+		// Cannot be abstract (user's stub class must be concrete)
+		if (classDecl.Modifiers.Any(m => m.IsKind(SyntaxKind.AbstractKeyword)))
+			return false;
+
+		// Note: Sealed IS allowed for standalone class stubs - user may want to prevent further derivation
+
+		return true;
+	}
+
+	/// <summary>
+	/// Checks if any [KnockOffBase] attribute on the class has a typeof() argument.
+	/// Used to distinguish [KnockOffBase&lt;T&gt;] from [KnockOffBase(typeof(T&lt;&gt;))] patterns.
+	/// </summary>
+	private static bool HasKnockOffBaseTypeofArgument(SyntaxNode node)
+	{
+		if (node is not ClassDeclarationSyntax classDecl)
+			return false;
+
+		// Check all attribute lists on the class
+		foreach (var attrList in classDecl.AttributeLists)
+		{
+			foreach (var attr in attrList.Attributes)
+			{
+				// Check if this is a KnockOffBase attribute (without generic args)
+				var name = attr.Name.ToString();
+				if (name != "KnockOffBase" && name != "KnockOffBaseAttribute")
 					continue;
 
 				// Check if it has an argument list with at least one argument

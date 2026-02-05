@@ -12,12 +12,15 @@ This file provides guidance for Claude Code agents working with the KnockOff Des
 
 | Pattern | Attribute | Example |
 |---------|-----------|---------|
-| Standalone | `[KnockOff]` on partial class | `CalculatorStub.cs` |
+| Standalone | `[KnockOff]` on partial class | `new CalculatorStub()` |
 | Generic Standalone | `[KnockOff]` on generic class | `new RepositoryStub<T>()` |
+| Standalone Class | `[KnockOffBase<Class>]` on partial class | `new ServiceStub().Object` |
+| Generic Standalone Class | `[KnockOffBase(typeof(Class<>))]` | `new RepositoryStub<T>().Object` |
 | Inline Interface | `[KnockOff<IInterface>]` | `new Stubs.ICalculator()` |
-| Inline Class | `[KnockOff<AbstractClass>]` | `new Stubs.ServiceBase()` |
+| Inline Class | `[KnockOff<AbstractClass>]` | `new Stubs.ServiceBase().Object` |
 | Inline Delegate | `[KnockOff<DelegateType>]` | `new Stubs.ArithmeticOperation()` |
-| Open Generic | `[KnockOff(typeof(IFoo<>))]` | `new Stubs.IRepository<User>()` |
+| Open Generic Interface | `[KnockOff(typeof(IFoo<>))]` | `new Stubs.IRepository<User>()` |
+| Open Generic Class | `[KnockOff(typeof(Foo<>))]` | `new Stubs.ServiceBase<T>().Object` |
 
 ### Member Types
 

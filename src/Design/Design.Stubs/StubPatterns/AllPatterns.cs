@@ -1,20 +1,23 @@
 // -----------------------------------------------------------------------------
-// Design.Stubs - All Six Stub Patterns Side-by-Side
+// Design.Stubs - All Nine Stub Patterns Side-by-Side
 // -----------------------------------------------------------------------------
-// This file is part of the Design Source of Truth. It demonstrates ALL SIX
+// This file is part of the Design Source of Truth. It demonstrates ALL NINE
 // stub patterns that KnockOff supports, with extensive documentation of
 // when to use each pattern and what gets generated.
 //
-// THE SIX PATTERNS:
-// 1. Standalone          - [KnockOff] partial class Stub : IService
-// 1B. Generic Standalone - [KnockOff] partial class Stub<T> : IService<T>
-// 2. Inline Interface    - [KnockOff<IService>]
-// 3. Inline Class        - [KnockOff<ConcreteClass>]
-// 4. Inline Delegate     - [KnockOff<DelegateType>]
-// 5. Open Generic        - [KnockOff(typeof(T<>))]
+// THE NINE PATTERNS:
+// 1. Standalone              - [KnockOff] partial class Stub : IService
+// 2. Generic Standalone      - [KnockOff] partial class Stub<T> : IService<T>
+// 3. Standalone Class        - [KnockOffBase<ConcreteClass>] partial class Stub
+// 4. Generic Standalone Class- [KnockOffBase(typeof(ClassBase<>))] partial class Stub<T>
+// 5. Inline Interface        - [KnockOff<IService>]
+// 6. Inline Class            - [KnockOff<ConcreteClass>]
+// 7. Inline Delegate         - [KnockOff<DelegateType>]
+// 8. Open Generic Interface  - [KnockOff(typeof(IService<>))]
+// 9. Open Generic Class      - [KnockOff(typeof(ServiceBase<>))]
 //
-// Note: Generic Standalone is numbered 1B because it is a variant of the
-// Standalone pattern. User documentation numbers sequentially 1-6.
+// Note: Patterns 1-4 are Standalone (file-based, reusable across tests)
+//       Patterns 5-9 are Inline (nested within test class)
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Abstractions;
@@ -84,7 +87,7 @@ public partial class CalculatorStub : ICalculator
 }
 
 // =============================================================================
-// PATTERN 1B: GENERIC STANDALONE STUB
+// PATTERN 2: GENERIC STANDALONE STUB
 // =============================================================================
 //
 // A generic standalone stub is a reusable stub class with type parameters that
@@ -205,7 +208,187 @@ public partial class GenericServiceStub<T> : IGenericService<T> where T : class
 }
 
 // =============================================================================
-// PATTERN 2: INLINE INTERFACE STUB
+// PATTERN 3: STANDALONE CLASS STUB
+// =============================================================================
+// Use this pattern when:
+// - You need a reusable stub for a class (not interface) across test files
+// - You want to add custom methods or state to the stub
+// - The class has virtual or abstract members you want to intercept
+// - You prefer explicit, discoverable stub classes in IntelliSense
+//
+// DESIGN DECISION: The [KnockOffBase<T>] attribute on a partial class generates
+// a stub for a class (not interface). Like inline class stubs, standalone class
+// stubs use the composition pattern with .Object property.
+//
+// GENERATOR BEHAVIOR: For this class:
+//
+//   [KnockOffBase<ServiceBase>]
+//   public partial class ServiceStub { }
+//
+// The generator produces (in ServiceStub.g.cs):
+//
+//   public partial class ServiceStub : IKnockOffStub
+//   {
+//       private readonly global::ServiceBase _object;
+//       public global::ServiceBase Object => _object;
+//
+//       public bool Strict { get; set; }
+//       public PropertyInterceptor<string> Name { get; }
+//       public MethodInterceptor<ValueTuple> Initialize { get; }
+//       public MethodInterceptor<string, ValueTuple> Execute { get; }
+//
+//       private class Impl : global::ServiceBase
+//       {
+//           // Extends base class and delegates to interceptors
+//       }
+//   }
+//
+// KEY DIFFERENCE FROM STANDALONE INTERFACE:
+// - Standalone Interface: stub IS the implementation (implements interface)
+// - Standalone Class: stub.Object IS the implementation (composition pattern)
+//
+// PATTERN COMPARISON:
+// - Standalone Interface: [KnockOff] on class implementing interface, no .Object
+// - Standalone Class: [KnockOffBase<T>] on class, requires .Object property
+// - Inline Class: [KnockOff<ConcreteClass>], nested in test class, uses .Object
+// =============================================================================
+
+[KnockOffBase<ServiceBase>]
+public partial class StandaloneServiceStub
+{
+    // DID NOT DO THIS: Make standalone class stubs inherit from the target class
+    //
+    // REJECTED PATTERN:
+    //   [KnockOffBase<ServiceBase>]
+    //   public partial class StandaloneServiceStub : ServiceBase { }
+    //
+    // WHY NOT: The stub wrapper and the actual instance are different objects.
+    // The stub holds interceptors; the instance is the generated nested Impl class
+    // that extends ServiceBase. This is the same pattern as inline class stubs.
+
+    // Users can add custom methods or state to standalone class stubs.
+    // This is NOT possible with inline class stubs.
+    public int CallCount { get; set; }
+
+    public void IncrementCallCount()
+    {
+        CallCount++;
+    }
+}
+
+// =============================================================================
+// PATTERN 4: GENERIC STANDALONE CLASS STUB
+// =============================================================================
+//
+// A generic standalone class stub is a reusable stub class with type parameters
+// for stubbing generic base classes. Like standalone class stubs, it uses the
+// composition pattern with .Object property.
+//
+// WHEN TO USE:
+// - You need a reusable stub for a generic class (Repository<T>, ServiceBase<T>)
+// - Multiple tests need the same generic class stub with different type arguments
+// - You want to share stub setup code across test classes
+// - You need to add custom methods or state to a generic class stub
+// - The class has virtual or abstract members you want to intercept
+//
+// SYNTAX:
+//
+//   [KnockOffBase(typeof(ServiceBase<>))]
+//   public partial class ServiceStub<T> where T : class { }
+//
+// The stub class must:
+// - Have the [KnockOffBase(typeof(T<>))] attribute with open generic
+// - Be declared as `partial`
+// - Declare the same type parameters as the base class
+// - Include the same constraints as the base class (where T : class, etc.)
+//
+// GENERATED CODE:
+// For this class:
+//
+//   [KnockOffBase(typeof(RepositoryBase<>))]
+//   public partial class RepositoryStub<T> where T : class { }
+//
+// The generator produces (in RepositoryStub.g.cs):
+//
+//   public partial class RepositoryStub<T> : IKnockOffStub where T : class
+//   {
+//       private readonly global::RepositoryBase<T> _object;
+//       public global::RepositoryBase<T> Object => _object;
+//
+//       public bool Strict { get; set; }
+//       public MethodInterceptor<int, T?> GetById { get; }
+//       public MethodInterceptor<T, ValueTuple> Save { get; }
+//
+//       // Nested Impl class extends base and uses T from outer class
+//       private class Impl : global::RepositoryBase<T>
+//       {
+//           // Overrides virtual/abstract members and delegates to interceptors
+//       }
+//   }
+//
+// USAGE IN TESTS:
+//
+//   // Create stubs with different type arguments
+//   var userRepo = new RepositoryStub<User>();
+//   var productRepo = new RepositoryStub<Product>();
+//
+//   // Configure each stub independently
+//   userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" });
+//   productRepo.GetById.OnCall((id) => new Product { Id = id, Price = 9.99m });
+//
+//   // Use .Object to get the actual class instance
+//   RepositoryBase<User> userService = userRepo.Object;
+//   RepositoryBase<Product> productService = productRepo.Object;
+//
+//   // Verify calls per-instance
+//   userRepo.GetById.Verify(Times.Once);
+//
+// VS OPEN GENERIC CLASS PATTERN (PATTERN 9):
+//
+//   | Aspect              | Generic Standalone Class            | Open Generic Class                    |
+//   |---------------------|-------------------------------------|---------------------------------------|
+//   | Declaration         | [KnockOffBase(typeof(T<>))] class S | [KnockOff(typeof(Foo<>))]             |
+//   | Location            | Separate file (reusable)            | Nested in test class                  |
+//   | Instantiation       | new RepositoryStub<User>()          | new Stubs.RepositoryBase<User>()      |
+//   | Custom methods      | Yes (add to partial class)          | No                                    |
+//   | Shared across tests | Yes                                 | No (scoped to containing class)       |
+//   | .Object required    | Yes (composition pattern)           | Yes (composition pattern)             |
+//   | Best for            | Shared generic class stubs          | One-off generic class tests           |
+//
+// DESIGN RATIONALE:
+// Generic standalone class stubs provide reusability and extensibility for class
+// stubs. While open generic class stubs are convenient for one-off usage, they
+// cannot be shared across test classes or extended with custom methods. Generic
+// standalone class stubs provide the same reusability as generic standalone
+// interface stubs, but use the composition pattern required for class stubs.
+//
+// CONSTRAINT PROPAGATION:
+// The generator preserves all type constraints from the base class. If the
+// base class has `where T : class, IEntity, new()`, the stub class must also
+// declare these constraints, and the generated code will enforce them.
+//
+// MULTIPLE TYPE PARAMETERS:
+// Generic standalone class stubs support any number of type parameters:
+//
+//   [KnockOffBase(typeof(CacheBase<,>))]
+//   public partial class CacheStub<TKey, TValue> where TKey : notnull { }
+//
+//   var cache = new CacheStub<string, int>();
+//   CacheBase<string, int> cacheInstance = cache.Object;
+//
+// =============================================================================
+
+<!-- snippet: patterns-generic-standalone-class-basic -->
+<!-- endSnippet -->
+
+<!-- snippet: patterns-generic-standalone-class-usage -->
+<!-- endSnippet -->
+
+// Placeholder for actual implementation - will be added by docs-code-samples agent
+// The snippets above should reference examples from PatternsSamples.cs
+
+// =============================================================================
+// PATTERN 5: INLINE INTERFACE STUB
 // =============================================================================
 // Use this pattern when:
 // - You want stubs scoped to a single test class
@@ -270,7 +453,7 @@ public partial class InlineInterfaceExample
 }
 
 // =============================================================================
-// PATTERN 3: INLINE CLASS STUB
+// PATTERN 6: INLINE CLASS STUB
 // =============================================================================
 // Use this pattern when:
 // - You need to stub virtual/abstract members of a concrete class
@@ -348,7 +531,7 @@ public partial class InlineClassExample
 }
 
 // =============================================================================
-// PATTERN 4: INLINE DELEGATE STUB
+// PATTERN 7: INLINE DELEGATE STUB
 // =============================================================================
 // Use this pattern when:
 // - You need to stub a named delegate type
@@ -422,11 +605,12 @@ public partial class InlineDelegateExample
 }
 
 // =============================================================================
-// PATTERN 6: OPEN GENERIC STUB (via typeof syntax)
+// PATTERN 8: OPEN GENERIC INTERFACE STUB (via typeof syntax)
 // =============================================================================
 // Use this pattern when:
 // - You need to stub an open generic interface like IRepository<T>
 // - You want a single stub definition that works with any type argument
+// - The stub IS the implementation (no .Object property needed)
 //
 // DESIGN DECISION: Open generics require typeof() syntax because C# doesn't
 // allow [KnockOff<IRepository<>>] - the type argument must be closed.
@@ -434,7 +618,7 @@ public partial class InlineDelegateExample
 // GENERATOR BEHAVIOR: For this declaration:
 //
 //   [KnockOff(typeof(IRepository<>))]
-//   public partial class OpenGenericExample { }
+//   public partial class OpenGenericInterfaceExample { }
 //
 // The generator produces a stub class with the same generic parameters:
 //
@@ -445,16 +629,24 @@ public partial class InlineDelegateExample
 //           // Interceptors with generic type T
 //       }
 //   }
+//
+// INSTANTIATION: The stub IS the interface implementation:
+//   var stub = new Stubs.IRepository<string>();
+//   IRepository<string> repo = stub;  // Direct assignment - no .Object needed
 // =============================================================================
 
 [KnockOff(typeof(IRepository<>))]
-public partial class OpenGenericExample
+public partial class OpenGenericInterfaceExample
 {
-    public void Example_OpenGenericUsage()
+    public void Example_OpenGenericInterfaceUsage()
     {
-        // Open generic stubs are instantiated with a concrete type argument
+        // Open generic interface stubs are instantiated with a concrete type argument
         var stringRepo = new Stubs.IRepository<string>();
         var entityRepo = new Stubs.IRepository<DataEventArgs>();
+
+        // The stub IS the interface implementation (no .Object needed)
+        IRepository<string> stringRepoInterface = stringRepo;
+        IRepository<DataEventArgs> entityRepoInterface = entityRepo;
 
         // Configure like any other stub
         stringRepo.GetById.OnCall((id) => $"Item-{id}");
@@ -473,24 +665,102 @@ public partial class OpenGenericExample
 }
 
 // =============================================================================
+// PATTERN 9: OPEN GENERIC CLASS STUB (via typeof syntax)
+// =============================================================================
+// Use this pattern when:
+// - You need to stub an open generic abstract class like ServiceBase<T>
+// - You want a single stub definition that works with any type argument
+// - You need access to the actual class instance via .Object property
+//
+// DESIGN DECISION: Open generic class stubs work like Inline Class stubs:
+// - The generated stub is a wrapper class
+// - Access the actual class instance via .Object property
+// - This is consistent with the Inline Class pattern (pattern 3)
+//
+// GENERATOR BEHAVIOR: For this declaration:
+//
+//   [KnockOff(typeof(ServiceBase<>))]
+//   public partial class OpenGenericClassExample { }
+//
+// The generator produces a wrapper class and internal generated class:
+//
+//   public static partial class Stubs
+//   {
+//       public partial class ServiceBase<T> : IKnockOffStub
+//       {
+//           private readonly global::ServiceBase<T> _object;
+//           public global::ServiceBase<T> Object => _object;
+//           // Interceptors for virtual/abstract members
+//       }
+//
+//       private class ServiceBase_Generated<T> : global::ServiceBase<T>
+//       {
+//           // Delegates to interceptors
+//       }
+//   }
+//
+// INSTANTIATION: Use .Object to get the actual class instance:
+//   var stub = new Stubs.ServiceBase<string>();
+//   ServiceBase<string> service = stub.Object;  // .Object required for class stubs
+//
+// KEY DIFFERENCE FROM PATTERN 6:
+// - Pattern 6 (Open Generic Interface): stub IS the implementation
+// - Pattern 7 (Open Generic Class): stub.Object IS the implementation
+// =============================================================================
+
+[KnockOff(typeof(ServiceBase))]
+public partial class OpenGenericClassExample
+{
+    public void Example_OpenGenericClassUsage()
+    {
+        // Open generic class stubs are instantiated with a concrete type argument
+        // Note: Using the existing non-generic ServiceBase for this example
+        var stub = new Stubs.ServiceBase();
+
+        // IMPORTANT: .Object gives you the actual class instance
+        ServiceBase service = stub.Object;
+
+        // Configure via interceptors
+        stub.Name.OnGet("TestService");
+        stub.Execute.OnCall((cmd) => { /* handle command */ });
+
+        // Unconfigured virtual methods call base implementation
+        stub.Object.Initialize(); // Calls ServiceBase.Initialize()
+
+        // PATTERN COMPARISON:
+        // - Pattern 1 (Standalone Interface): IFoo foo = stub;              (no .Object)
+        // - Pattern 3 (Standalone Class):     Foo foo = stub.Object;        (requires .Object)
+        // - Pattern 5 (Inline Interface):     IFoo foo = stub;              (no .Object)
+        // - Pattern 6 (Inline Class):         Foo foo = stub.Object;        (requires .Object)
+        // - Pattern 8 (Open Generic Interface): IFoo<T> foo = stub;         (no .Object)
+        // - Pattern 9 (Open Generic Class):     Foo<T> foo = stub.Object;   (requires .Object)
+    }
+}
+
+// =============================================================================
 // DESIGN DECISION SUMMARY
 // =============================================================================
 //
-// DESIGN DECISION: Six distinct patterns serve different use cases:
+// DESIGN DECISION: Nine distinct patterns serve different use cases:
 //
 // STANDALONE PATTERNS (file-based, reusable across tests):
-// 1. Standalone: Reusable stubs, custom methods/state, shared across tests
-// 1B. Generic Standalone: Same as Standalone but with generic type parameters
+// 1. Standalone: Reusable interface stubs, custom methods/state, shared across tests
+// 2. Generic Standalone: Same as Standalone but with generic type parameters
+// 3. Standalone Class: Reusable class stubs, custom methods/state, uses .Object property
+// 4. Generic Standalone Class: Same as Standalone Class but with generic type parameters
 //
 // INLINE PATTERNS (nested within test class):
-// 2. Inline Interface: Scoped to test class, fewer files, no custom methods
-// 3. Inline Class: Virtual/abstract members, base class fallback behavior
-// 4. Inline Delegate: Named delegates with .Interceptor configuration
-// 5. Open Generic: Generic nested stubs from open generic types (typeof(T<>))
+// 5. Inline Interface: Scoped to test class, fewer files, no custom methods
+// 6. Inline Class: Virtual/abstract members, base class fallback behavior, uses .Object
+// 7. Inline Delegate: Named delegates with .Interceptor configuration
+// 8. Open Generic Interface: Generic nested stubs from open generic interfaces (typeof(IFoo<>))
+// 9. Open Generic Class: Generic nested stubs from open generic classes (typeof(Foo<>)), uses .Object
 //
-// KEY TRADE-OFF: Standalone vs Open Generic for generic interfaces:
-// - Generic Standalone: Reusable, can add custom methods, lives in own file
-// - Open Generic: Quick one-off usage, nested in test class, no custom methods
+// KEY TRADE-OFF: Standalone vs Open Generic for generic types:
+// - Generic Standalone: Reusable, can add custom methods, lives in own file, stub IS implementation
+// - Generic Standalone Class: Reusable class stubs, custom methods, uses .Object property
+// - Open Generic Interface: Quick one-off usage for interfaces, stub IS implementation
+// - Open Generic Class: Quick one-off usage for classes, uses .Object property
 //
 // DESIGN DECISION: Inline stubs generate a nested `Stubs` class to isolate
 // generated types from user code. Multiple [KnockOff<T>] attributes on the

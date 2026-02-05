@@ -251,7 +251,7 @@ The generated code is readable C# that mirrors your interface structure. You can
 
 Now that you've created your first stubs, explore more features:
 
-- **[Stub Patterns](guides/stub-patterns.md)** - Learn about all six stub patterns (Standalone, Generic Standalone, Inline Interface, Inline Class, Inline Delegate, Open Generic)
+- **[Stub Patterns](guides/stub-patterns.md)** - Learn about all nine stub patterns (Standalone, Generic Standalone, Standalone Class, Generic Standalone Class, Inline Interface, Inline Class, Inline Delegate, Open Generic Interface, Open Generic Class)
 - **[Methods](guides/methods.md)** - Configure method behavior with OnCall, track arguments, handle async methods
 - **[Properties](guides/properties.md)** - Use OnGet/OnSet for properties, track access, configure backing values
 - **[Interceptor API Reference](reference/interceptor-api.md)** - Complete reference for the interceptor API
