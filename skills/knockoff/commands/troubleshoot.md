@@ -124,7 +124,7 @@ stub.GetUser.OnCall((int id, bool includeDeleted) =>
 4. Look for Generated/ folder contents
 
 **Fix:**
-1. Ensure attribute is correct (see [patterns.md](../skills/knockoff-usage/references/patterns.md) for all six patterns)
+1. Ensure attribute is correct (see [patterns.md](../skills/knockoff-usage/references/patterns.md) for all seven patterns)
 2. Clean and rebuild solution
 3. Check Error List for analyzer diagnostics
 
@@ -516,4 +516,4 @@ Run through these checks systematically:
 
 ---
 
-**UPDATED:** 2026-02-03
+**UPDATED:** 2026-02-04

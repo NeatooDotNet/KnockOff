@@ -42,7 +42,7 @@ stub.Changed.VerifyAdd();
 
 ### Accessing Interceptors Across Usage Patterns
 
-The interceptor API works identically across all six KnockOff patterns (see [patterns.md](patterns.md) for details).
+The interceptor API works identically across all seven KnockOff patterns (see [patterns.md](patterns.md) for details).
 
 **Standalone Pattern** - `[KnockOff]` on a class implementing an interface:
 
@@ -598,4 +598,4 @@ If any verification fails, `Verify()` throws an exception detailing which interc
 
 ---
 
-**UPDATED:** 2026-02-03
+**UPDATED:** 2026-02-04

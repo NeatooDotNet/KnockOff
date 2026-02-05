@@ -1,9 +1,9 @@
 # Stand-Alone Class Stubs
 
-**Status:** Analysis Needed
+**Status:** In Progress
 **Priority:** Medium
 **Created:** 2026-02-03
-**Last Updated:** 2026-02-03
+**Last Updated:** 2026-02-04
 
 ---
 
@@ -18,127 +18,38 @@ public partial class RepoStub : IRepository { }
 
 Users cannot create stand-alone stubs for classes with virtual/abstract methods. The inline pattern `[KnockOff<ConcreteClass>]` generates a nested stub, which doesn't allow user-defined methods or custom constructors.
 
-## Proposed Feature
+## Solution
 
-Allow stand-alone stubs to target classes with virtual methods using the attribute syntax:
+Introduce two new patterns for stand-alone class stubs:
 
-```csharp
-public abstract class TestSubject
-{
-    public virtual int Calculate(int x) => x * 2;
-    public abstract string GetName();
-}
+1. **Pattern 8: Standalone Class** - `[KnockOffBase<Foo>]` for closed generic or non-generic classes
+2. **Pattern 9: Generic Standalone Class** - `[KnockOffBase(typeof(Foo<>))]` for open generic classes
 
-[KnockOff<TestSubject>()]
-public partial class TestSubjectStub
-{
-    // User can add custom constructors, fields, user methods, etc.
-}
-```
-
-### Generated Code (Conceptual)
-
-```csharp
-// Generated base class inherits from target class
-public class TestSubjectStubBase : TestSubject
-{
-    // Override virtual methods to add interception
-    public override int Calculate(int x)
-    {
-        Calculate_.RecordCall(x);
-        if (Calculate_.Callback is { } callback) return callback(x);
-        // Call base implementation as fallback
-        return base.Calculate(x);
-    }
-
-    // Abstract methods must be implemented
-    public override string GetName()
-    {
-        GetName_.RecordCall();
-        if (GetName_.Callback is { } callback) return callback();
-        if (Strict) throw StubException.NotConfigured(...);
-        return default!;
-    }
-}
-
-// User's partial class inherits from generated base
-public partial class TestSubjectStub : TestSubjectStubBase, IKnockOffStub
-{
-    public bool Strict { get; set; }
-
-    // Clean interceptor names (no collision with base class methods)
-    public CalculateInterceptor Calculate_ { get; } = new();
-    public GetNameInterceptor GetName_ { get; } = new();
-}
-```
-
-### Key Differences from Interface Stand-Alone
-
-| Aspect | Interface Stand-Alone | Class Stand-Alone (Proposed) |
-|--------|----------------------|------------------------------|
-| Attribute | `[KnockOff]` | `[KnockOff<TargetClass>()]` |
-| Inheritance | Stub → Base → Interface | Stub → Base → TargetClass |
-| Members stubbed | All interface members | Virtual/abstract members only |
-| Base call | N/A | `base.Method()` available as fallback |
-| Interceptor naming | `Method` (clean) | `Method_` (underscore suffix to avoid collision) |
-
----
-
-## Analysis Questions
-
-### 1. Attribute Syntax
-- Use `[KnockOff<TestSubject>()]` to distinguish from interface stand-alone?
-- Or detect automatically based on whether target is class vs interface?
-- How does this interact with existing inline class pattern `[KnockOff<ConcreteClass>]`?
-
-### 2. Member Selection
-- Only virtual/abstract methods?
-- Virtual properties?
-- What about `new` methods that hide base methods?
-- Non-virtual methods - ignore or error?
-
-### 3. Interceptor Naming
-- Use `Method_` suffix to avoid collision with inherited `Method`?
-- Or use different naming convention?
-- How does this interact with user method overrides (which also use `_` suffix)?
-
-### 4. Constructor Handling
-- Target class may have required constructor parameters
-- Generated base class needs to call base constructor
-- How does user provide constructor arguments?
-
-### 5. Base Call Behavior
-- Virtual methods: call `base.Method()` as fallback (like source delegation)?
-- Abstract methods: no base call possible, use Strict/default pattern?
-- Should base call be configurable?
-
-### 6. Sealed Classes
-- Sealed classes cannot be inherited - emit diagnostic?
-- Sealed methods in non-sealed classes - skip or error?
-
-### 7. Pattern Conflicts
-- What if class also implements interfaces?
-- Should both class members AND interface members be stubbed?
-- How to handle diamond inheritance scenarios?
+These patterns follow the inline class stub architecture (wrapper + Impl separation) but in a standalone file context, enabling user-defined methods and custom constructors.
 
 ---
 
 ## Plans
 
-*(None yet - analysis phase)*
+- [Standalone Class Stubs Design](../plans/standalone-class-stubs-design.md)
 
 ---
 
 ## Tasks
 
-- [ ] Analyze attribute syntax options and conflicts with existing patterns
-- [ ] Analyze member selection rules (virtual, abstract, properties, etc.)
-- [ ] Analyze interceptor naming to avoid collisions
-- [ ] Analyze constructor parameter handling
-- [ ] Analyze base call behavior options
-- [ ] Determine diagnostic requirements (sealed class, etc.)
-- [ ] Prototype feasibility in generator
-- [ ] Create design plan if analysis is favorable
+- [x] Analyze attribute syntax options and conflicts with existing patterns
+- [x] Analyze member selection rules (virtual, abstract, properties, etc.)
+- [x] Analyze interceptor naming to avoid collisions
+- [x] Analyze constructor parameter handling
+- [x] Analyze base call behavior options
+- [x] Determine diagnostic requirements (sealed class, etc.)
+- [ ] Create design plan
+- [ ] Implement KnockOffBaseAttribute and KnockOffBaseAttribute<T>
+- [ ] Add predicate and pipeline for [KnockOffBase] detection
+- [ ] Create StandaloneClassModelBuilder
+- [ ] Create StandaloneClassRenderer
+- [ ] Add tests for Pattern 8 and Pattern 9
+- [ ] Update documentation (Design.Stubs, API reference, patterns guide)
 
 ---
 
@@ -156,8 +67,51 @@ This would enable stand-alone stubs for classes, giving users the ability to:
 - Have full control over stub instantiation
 - Use the same OnCall/Returns/Verify API
 
+### 2026-02-04 - Design Decisions Made
+
+User decisions for the feature:
+
+1. **Syntax**: New attributes `[KnockOffBase<T>]` and `[KnockOffBase(typeof(T<>))]`
+2. **Interfaces**: Users CAN add interfaces to their standalone class stub
+3. **Member selection**: Match inline class behavior (abstract=default/strict, virtual=base fallback)
+4. **Interceptor naming**: Clean names - use wrapper/base class separation like inline class stubs
+5. **Constructors**: Forward all accessible constructors to base
+6. **`.Object` property**: Include for API consistency (returns `this`)
+7. **Source() delegation**: Omit (match inline class behavior)
+8. **Generic support**: Yes - `[KnockOffBase(typeof(T<>))]` for generic standalone class stubs
+
+### 2026-02-04 - Design Revised (Architect)
+
+Developer review identified CRITICAL issues with initial design:
+
+1. **Name Collision**: Original design had interceptor properties and overrides in same class - C# compilation error
+2. **Private Field Access**: `private bool _strict` inaccessible from derived class
+3. **Inherited Virtual Members**: Missing guidance on base class virtual members
+
+**Solution**: Inverted wrapper/Impl pattern:
+- User's partial class = wrapper (holds interceptors with clean names)
+- Generated `*Impl` base class = inherits from target, delegates UP to wrapper
+- No name collision because interceptors and overrides on different types
+
+This follows the inline class stub pattern but inverted (wrapper above Impl, not below).
+
+---
+
+### 2026-02-04 - Developer Re-Review: Concerns Raised
+
+Developer re-reviewed the revised plan. While 3 of 4 original concerns were addressed (protected fields, diagnostic numbering, inherited members), the **name collision issue is NOT resolved**.
+
+**The Problem:**
+When `ServiceStub` inherits from `ServiceStubImpl`, it inherits `override string Name`. Then the generated partial adds `ServiceStub_NameInterceptor Name { get; }`. These are different types with the same property name - C# compilation error.
+
+**Inline stubs avoid this** because Impl is NESTED inside the wrapper, not inherited. For standalone, the inverted architecture (wrapper inherits from Impl) causes collisions.
+
+**Question for Architect:** How to give interceptor properties clean names when the wrapper inherits override properties with those same names?
+
+Sent back to architect for resolution.
+
 ---
 
 ## Results / Conclusions
 
-*(Pending analysis)*
+*(Awaiting architect response to name collision concern)*
