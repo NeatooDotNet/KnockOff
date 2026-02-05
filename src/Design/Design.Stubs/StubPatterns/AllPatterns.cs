@@ -416,6 +416,20 @@ public partial class StandaloneServiceStub
 //
 // COMMON MISTAKE: Forgetting the `partial` keyword on the containing class.
 // The attribute will be recognized but generation will fail.
+//
+// DESIGN DECISION: Closed generic interfaces (e.g., [KnockOff<ICollection<string, int>>])
+// generate stub classes with SIMPLE names, not generic names:
+//
+//   [KnockOff<ICollection<string, int>>]  // Closed generic
+//   public partial class MyTests { }
+//
+//   // Generated stub uses simple name:
+//   var stub = new Stubs.ICollection();     // CORRECT
+//   var stub = new Stubs.ICollection<string, int>();  // WRONG - won't compile
+//
+// WHY: C# nested class names cannot include angle brackets. The stub class name
+// is derived from the interface name without type arguments. If you need multiple
+// closed generics of the same interface, use Open Generic pattern (Pattern 8) instead.
 // =============================================================================
 
 [KnockOff<ICalculator>]
