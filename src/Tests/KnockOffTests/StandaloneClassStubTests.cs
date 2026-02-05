@@ -322,6 +322,85 @@ public class StandaloneClassStubTests
 	}
 
 	#endregion
+
+	#region Stub-Level Verify Tests
+
+	[Fact]
+	public void StandaloneClassStub_Verify_PassesWhenVerifiablesCalled()
+	{
+		var stub = new ServiceBaseStub();
+		stub.Execute.OnCall((cmd) => 42).Verifiable();
+
+		stub.Object.Execute("test");
+
+		stub.Verify(); // Should not throw
+	}
+
+	[Fact]
+	public void StandaloneClassStub_Verify_ThrowsWhenVerifiableNotCalled()
+	{
+		var stub = new ServiceBaseStub();
+		stub.Execute.OnCall((cmd) => 42).Verifiable();
+		// Don't call Execute
+
+		Assert.Throws<VerificationException>(() => stub.Verify());
+	}
+
+	[Fact]
+	public void StandaloneClassStub_VerifyAll_PassesWhenAllCalled()
+	{
+		var stub = new ServiceBaseStub();
+		stub.Execute.OnCall((cmd) => 42);
+
+		stub.Object.Execute("test");
+
+		stub.VerifyAll(); // Should not throw - all configured interceptors called
+	}
+
+	#endregion
+
+	#region Sequence Tests
+
+	[Fact]
+	public void StandaloneClassStub_Sequence_ReturnsValuesInOrder()
+	{
+		var stub = new ServiceBaseStub();
+		stub.Execute.OnCall((cmd) => 1).ThenCall((cmd) => 2).ThenCall((cmd) => 3);
+
+		Assert.Equal(1, stub.Object.Execute("a"));
+		Assert.Equal(2, stub.Object.Execute("b"));
+		Assert.Equal(3, stub.Object.Execute("c"));
+	}
+
+	[Fact]
+	public void StandaloneClassStub_Sequence_RepeatsLastValue()
+	{
+		var stub = new ServiceBaseStub();
+		stub.Execute.OnCall((cmd) => 1).ThenCall((cmd) => 99);
+
+		Assert.Equal(1, stub.Object.Execute("a"));
+		Assert.Equal(99, stub.Object.Execute("b"));
+		Assert.Equal(99, stub.Object.Execute("c")); // Repeats last
+	}
+
+	#endregion
+
+	#region Verifiable Marking Tests
+
+	[Fact]
+	public void StandaloneClassStub_Verifiable_MarksForVerification()
+	{
+		var stub = new ServiceBaseStub();
+		stub.Name.OnGet(() => "test").Verifiable();
+		stub.Execute.OnCall((cmd) => 42).Verifiable();
+
+		_ = stub.Object.Name;
+		stub.Object.Execute("cmd");
+
+		stub.Verify(); // Both verifiables satisfied
+	}
+
+	#endregion
 }
 
 #region Abstract Service Tests
