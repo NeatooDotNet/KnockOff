@@ -36,7 +36,7 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
 - **`[KnockOff]` + `partial class`** — KnockOff generates a base class that implements every member of `IMyRepo`. Your stub is a real class — define it once, reuse it across your entire test project. Pass it around, register it in DI, share it between test fixtures.
 - **Constructor parameters** — `List<User> Users` is a primary constructor. Test data flows in naturally, just like any other C# class.
 - **Overrides are optional** — `GetUser_` and `Update_` override the generated defaults. Only override what you need — everything else still works with [OnCall](docs/guides/methods.md), [Returns](docs/reference/interceptor-api.md), or [When chains](docs/guides/parameter-matching.md).
-- **Compile-time safety** — If `IMyRepo` adds a method, the generated base class updates automatically. If a signature changes, your overrides produce compile errors — not silent runtime failures.
+- **Fully typed** — Every OnCall, Returns, and When lambda is generated from the actual method signature. No manual `<T1, T2>` type parameters that can silently drift. [Details →](docs/type-safety.md)
 
 This stub is also a full mock. It has [Verify](docs/guides/verification.md), [Strict mode](docs/guides/strict-mode.md), [Async](docs/guides/async-patterns.md), and [Source Delegation](docs/guides/source-delegation.md) — all on the same reusable class.
 
@@ -137,7 +137,7 @@ myRepoKO.Verify();
 |---------|-----------------|
 | **Reusable stub classes** | Define once, customize per-test. No more copying mock setups or shared factory methods. |
 | **Source delegation** | Delegate to a real implementation, override only specific methods. [No equivalent in Moq or NSubstitute.](docs/guides/source-delegation.md) |
-| **Compile-time safety** | Interface changes break your stubs at compile time, not at runtime 10 minutes into a test run. |
+| **Fully typed callbacks** | OnCall, Returns, and When parameters are generated from method signatures — [no manual type parameters that break at runtime](docs/type-safety.md). |
 | **Parameter matching** | `OnCall((a, b) => a > 0 ? 100 : 0)` — standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter. |
 | **Built-in capture** | `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` — no manual `Arg.Do<>` or `Callback<>` setup. |
 | **Event verification** | `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute. |
