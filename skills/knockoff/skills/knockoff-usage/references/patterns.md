@@ -490,7 +490,7 @@ ruleStub.Interceptor.Verify(Times.Once);
 ### Benefits
 
 - **Implicit conversion**: Stub converts to delegate type automatically
-- **Invocation tracking**: Use `Verify()`, `LastCallArg`, `LastCallArgs`
+- **Invocation tracking**: Use `Verify()`, `LastArg`, `LastArgs`
 - **Behavior configuration**: Use `OnCall`, `Returns`, When chains
 - **Verification**: Use `Verify()`, `Times` constraints, and `.Verifiable()` chaining
 - **Sequences**: `Returns(first, params rest)`, `ThenCall`, `ThenReturns`

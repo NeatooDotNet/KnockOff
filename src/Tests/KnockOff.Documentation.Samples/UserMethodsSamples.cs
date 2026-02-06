@@ -392,6 +392,78 @@ public class UserMethodStandalonePatternTests
 }
 
 // =============================================================================
+// Generated Base Class Pattern
+// =============================================================================
+
+public class GeneratedBaseClassTests
+{
+    [Fact]
+    public void GeneratedBaseClass_ShowsPattern()
+    {
+        #region user-methods-generated-base
+        // Generated base class (you don't write this -- KnockOff generates it):
+        //
+        //   public partial class UserMethodsRepoStubBase
+        //   {
+        //       protected virtual User? GetUserById_(int id) => default!;
+        //       protected virtual bool IsActive_(int userId) => default!;
+        //       protected virtual decimal GetBalance_(int userId) => default!;
+        //   }
+        //
+        // Your override in the partial class:
+        //   protected override User? GetUserById_(int id) => new User { Id = id };
+        #endregion
+
+        var stub = new UserMethodsRepoStub();
+        IUserMethodsRepo repo = stub;
+        var user = repo.GetUserById(1);
+        Assert.NotNull(user);
+        Assert.Equal("Default User", user.Name);
+    }
+}
+
+// =============================================================================
+// Overloads Support
+// =============================================================================
+
+public interface IFormatter
+{
+    string Format(string input);
+    string Format(string input, bool uppercase);
+}
+
+[KnockOff]
+public partial class UserMethodsFormatterStub : IFormatter { }
+
+#region user-methods-overloads
+public partial class UserMethodsFormatterStub
+{
+    // Override only the overloads you need
+    protected override string Format_(string input) => input.ToUpperInvariant();
+
+    // Override other overloads with custom logic
+    protected override string Format_(string input, bool uppercase)
+        => uppercase ? input.ToUpperInvariant() : input.ToLowerInvariant();
+}
+#endregion
+
+public class OverloadUserMethodTests
+{
+    [Fact]
+    public void Overloads_SelectiveOverride()
+    {
+        var stub = new UserMethodsFormatterStub();
+        IFormatter formatter = stub;
+
+        var result1 = formatter.Format("hello");
+        Assert.Equal("HELLO", result1);
+
+        var result2 = formatter.Format("Hello", false);
+        Assert.Equal("hello", result2);
+    }
+}
+
+// =============================================================================
 // Complete Example
 // =============================================================================
 

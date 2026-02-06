@@ -988,3 +988,332 @@ public class WhenValuesKnockOffTests
         Assert.Null(repository.GetUser(1)); // No match
     }
 }
+
+// =============================================================================
+// Interfaces and Types for Gotcha/Feature Samples
+// =============================================================================
+
+public class Customer
+{
+    public string Name { get; set; } = "";
+}
+
+public interface ICustomer
+{
+    string Name { get; set; }
+}
+
+public interface IOrder
+{
+    ICustomer Customer { get; set; }
+}
+
+public interface IOrderService
+{
+    Task<User?> GetUserAsync(int id);
+}
+
+[KnockOff]
+public partial class NSubCustomerStub : ICustomer { }
+
+[KnockOff]
+public partial class NSubOrderStub : IOrder { }
+
+[KnockOff]
+public partial class NSubOrderServiceStub : IOrderService { }
+
+// =============================================================================
+// Common Gotchas - Async Configuration Options
+// =============================================================================
+
+public class GotchaAsyncOptionsTests
+{
+    [Fact]
+    public async Task AsyncOptions_ThreeTiers()
+    {
+        var stub = new NSubOrderServiceStub();
+        var testUser = new User { Id = 42, Name = "Alice" };
+
+        #region nsub-gotcha-async-options
+        // 1. Returns() -- auto-wraps in Task.FromResult (recommended for fixed values)
+        stub.GetUserAsync.Returns(testUser);
+
+        // 2. OnCall() simplified -- callback returns unwrapped type, auto-wrapped
+        stub.GetUserAsync.OnCall((id) => new User { Id = id });
+
+        // 3. OnCall() full -- callback returns Task<T> directly
+        stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+        #endregion
+
+        IOrderService service = stub;
+        var user = await service.GetUserAsync(42);
+
+        Assert.NotNull(user);
+    }
+}
+
+// =============================================================================
+// Common Gotchas - Missing Verifiable
+// =============================================================================
+
+public class GotchaVerifiableTests
+{
+    [Fact]
+    public void Verifiable_Required()
+    {
+        var stub = new NSubUserRepoStub();
+
+        #region nsub-gotcha-verifiable
+        // Wrong: OnCall without Verifiable -- Verify() won't check this
+        stub.GetUser.OnCall((id) => new User { Id = id });
+
+        // Correct: Mark as Verifiable
+        stub.GetUser.OnCall((id) => new User { Id = id }).Verifiable();
+        #endregion
+
+        INSubUserRepo repository = stub;
+        repository.GetUser(1);
+
+        stub.Verify();
+    }
+}
+
+// =============================================================================
+// Common Gotchas - Async Simple
+// =============================================================================
+
+public class GotchaAsyncSimpleTests
+{
+    [Fact]
+    public async Task AsyncSimple_UseReturns()
+    {
+        var stub = new NSubOrderServiceStub();
+        var testUser = new User { Id = 42, Name = "Alice" };
+
+        #region nsub-gotcha-async-simple
+        // Verbose: full OnCall with Task.FromResult
+        stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+
+        // Simpler: Returns() auto-wraps for you
+        stub.GetUserAsync.Returns(testUser);
+        #endregion
+
+        IOrderService service = stub;
+        var user = await service.GetUserAsync(42);
+
+        Assert.NotNull(user);
+    }
+}
+
+// =============================================================================
+// Common Gotchas - Received Syntax
+// =============================================================================
+
+public class GotchaReceivedSyntaxTests
+{
+    [Fact]
+    public void ReceivedSyntax_NotAvailable()
+    {
+        var stub = new NSubUserRepoStub();
+        stub.GetUser.OnCall((id) => null);
+
+        INSubUserRepo repository = stub;
+        repository.GetUser(42);
+
+        #region nsub-gotcha-received-syntax
+        // Wrong: NSubstitute syntax doesn't exist in KnockOff
+        // stub.Received().GetUser(42);          // Compile error
+        // stub.DidNotReceive().DeleteUser(1);    // Compile error
+
+        // Correct: Use Verify with Times
+        stub.GetUser.Verify(Times.Once);
+        stub.DeleteUser.Verify(Times.Never);
+        #endregion
+    }
+}
+
+// =============================================================================
+// Common Gotchas - Partial Keyword
+// =============================================================================
+
+#region nsub-gotcha-partial-keyword
+// Wrong: missing partial keyword
+// [KnockOff]
+// public class MyStub : INSubUserRepo { }  // won't generate interceptors
+
+// Correct: always use partial
+[KnockOff]
+public partial class NSubGotchaPartialStub : INSubUserRepo { }
+#endregion
+
+// =============================================================================
+// Common Gotchas - OnCall Signature
+// =============================================================================
+
+public class GotchaOnCallSignatureTests
+{
+    [Fact]
+    public void OnCallSignature_MustMatch()
+    {
+        var stub = new NSubUserRepoStub();
+
+        #region nsub-gotcha-oncall-signature
+        // Wrong: GetUser(int id) expects (int) callback
+        // stub.GetUser.OnCall(() => user);  // Compile error
+
+        // Correct: match the method signature
+        stub.GetUser.OnCall((id) => new User { Id = id });
+        #endregion
+
+        INSubUserRepo repository = stub;
+        var user = repository.GetUser(1);
+
+        Assert.NotNull(user);
+    }
+}
+
+// =============================================================================
+// Features Not Supported - Recursive Mocks
+// =============================================================================
+
+public class RecursiveMocksTests
+{
+    [Fact]
+    public void RecursiveMocks_NSubstitute()
+    {
+        #region nsub-no-recursive-nsub
+        // NSubstitute: auto-creates substitutes for return types
+        var order = Substitute.For<IOrder>();
+        // order.Customer automatically returns a substitute
+        order.Customer.Name.Returns("Alice");
+        #endregion
+
+        Assert.Equal("Alice", order.Customer.Name);
+    }
+
+    [Fact]
+    public void RecursiveMocks_KnockOff()
+    {
+        #region nsub-no-recursive-knockoff
+        // KnockOff: Create each stub explicitly
+        var customerStub = new NSubCustomerStub();
+        customerStub.Name.OnGet("Alice");
+
+        var orderStub = new NSubOrderStub();
+        orderStub.Customer.OnGet(customerStub);
+        #endregion
+
+        IOrder order = orderStub;
+        Assert.Equal("Alice", order.Customer.Name);
+    }
+}
+
+// =============================================================================
+// Features Not Supported - Arg.Do
+// =============================================================================
+
+public class ArgDoTests
+{
+    [Fact]
+    public void ArgDo_NSubstitute()
+    {
+        var substitute = Substitute.For<INSubUserRepo>();
+        var capturedIds = new List<int>();
+
+        #region nsub-no-argdo-nsub
+        // NSubstitute: Arg.Do<T>() captures arguments during setup
+        substitute.GetUser(Arg.Do<int>(id => capturedIds.Add(id))).Returns((User?)null);
+        #endregion
+
+        INSubUserRepo repository = substitute;
+        repository.GetUser(1);
+        repository.GetUser(2);
+
+        Assert.Equal(new[] { 1, 2 }, capturedIds);
+    }
+
+    [Fact]
+    public void ArgDo_KnockOff()
+    {
+        var stub = new NSubUserRepoStub();
+        var capturedIds = new List<int>();
+
+        #region nsub-no-argdo-knockoff
+        // KnockOff: Capture in the callback
+        stub.GetUser.OnCall((id) => { capturedIds.Add(id); return null; });
+        #endregion
+
+        INSubUserRepo repository = stub;
+        repository.GetUser(1);
+        repository.GetUser(2);
+
+        Assert.Equal(new[] { 1, 2 }, capturedIds);
+    }
+}
+
+// =============================================================================
+// Features - Sequences
+// =============================================================================
+
+public class SequenceTests
+{
+    [Fact]
+    public void Sequence_NSubstitute()
+    {
+        var substitute = Substitute.For<INSubUserRepo>();
+        var user1 = new User { Id = 1, Name = "First" };
+        var user2 = new User { Id = 2, Name = "Second" };
+        var user3 = new User { Id = 3, Name = "Third" };
+
+        #region nsub-sequence-nsub
+        // NSubstitute: multiple values in Returns()
+        substitute.GetUser(Arg.Any<int>()).Returns(user1, user2, user3);
+        #endregion
+
+        INSubUserRepo repository = substitute;
+
+        Assert.Equal("First", repository.GetUser(1)?.Name);
+        Assert.Equal("Second", repository.GetUser(2)?.Name);
+        Assert.Equal("Third", repository.GetUser(3)?.Name);
+    }
+
+    [Fact]
+    public void Sequence_KnockOff()
+    {
+        var stub = new NSubUserRepoStub();
+        var user1 = new User { Id = 1, Name = "First" };
+        var user2 = new User { Id = 2, Name = "Second" };
+        var user3 = new User { Id = 3, Name = "Third" };
+
+        #region nsub-sequence-knockoff
+        // KnockOff: identical syntax -- multiple values in Returns()
+        stub.GetUser.Returns(user1, user2, user3);
+        #endregion
+
+        INSubUserRepo repository = stub;
+
+        Assert.Equal("First", repository.GetUser(1)?.Name);
+        Assert.Equal("Second", repository.GetUser(2)?.Name);
+        Assert.Equal("Third", repository.GetUser(3)?.Name);
+    }
+
+    [Fact]
+    public void Sequence_Advanced_KnockOff()
+    {
+        var stub = new NSubUserRepoStub();
+        var user1 = new User { Id = 1, Name = "First" };
+
+        #region nsub-sequence-advanced
+        // KnockOff extension: OnCall/ThenCall for computed sequences
+        stub.GetUser
+            .OnCall((id) => user1)
+            .ThenCall((id) => new User { Id = id, Name = "Subsequent" });
+        #endregion
+
+        INSubUserRepo repository = stub;
+
+        Assert.Equal("First", repository.GetUser(1)?.Name);
+        Assert.Equal("Subsequent", repository.GetUser(2)?.Name);
+        Assert.Equal("Subsequent", repository.GetUser(3)?.Name);
+    }
+}

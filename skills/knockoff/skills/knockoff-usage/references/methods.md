@@ -123,8 +123,11 @@ tracking.Verify(Times.Exactly(2));
 |------------|-------------|
 | `Times.Never` | Method must not be called |
 | `Times.Once` | Method must be called exactly once |
+| `Times.Twice` | Method must be called exactly twice |
 | `Times.AtLeastOnce` | Method must be called one or more times |
 | `Times.Exactly(n)` | Method must be called exactly n times |
+| `Times.AtLeast(n)` | Method must be called n or more times |
+| `Times.AtMost(n)` | Method must be called n or fewer times |
 
 ### Using Verifiable() for Batch Verification
 

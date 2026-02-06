@@ -123,8 +123,8 @@ It also uses source generation so:
 **Now I have my stubs and mocks in one!**
 
 Plus this is just the start. With source generation I think many more ideas are possible.
-I've added a number of patterns (create a link).
-And new features like Source (create a link).
+I've added a number of [patterns](docs/guides/stub-patterns.md).
+And new features like [Source delegation](docs/guides/source-delegation.md).
 
 **What other ideas do you have?**
 
@@ -132,7 +132,7 @@ And new features like Source (create a link).
 
 With my ideas and guidance Claude Code has written the entirety of this library. 
 What started as a curiosity has shown me the value of AI.
-These are ideas I've had for years. I would not have been able to actually execute with AI.
+These are ideas I've had for years. I would not have been able to actually execute without AI.
 Even more so in about a month!
 
 
@@ -380,7 +380,7 @@ var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
 | **Match values** | *(per-parameter Arg.Is)* | `stub.Interceptor.When(42).Returns("found");` |
 | **Verify** | `factory.Received()(42);` | `stub.Interceptor.Verify();` |
 | **Verify count** | `factory.Received(3)(Arg.Any<int>());` | `stub.Interceptor.Verify(Times.Exactly(3));` |
-| **Capture** | *(manual with Arg.Do)* | `stub.Interceptor.LastCallArg` (built-in) |
+| **Capture** | *(manual with Arg.Do)* | `stub.Interceptor.LastArg` (built-in) |
 
 ### Indexers
 

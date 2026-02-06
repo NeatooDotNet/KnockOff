@@ -112,13 +112,13 @@ service.Name = "test";
 
 | Interceptor | Reset Clears | Reset Preserves |
 |-------------|--------------|-----------------|
-| Method | Tracking, callbacks | Nothing |
-| User Method | Tracking (call count, LastArg) | **OnCall configuration** |
-| Property | Tracking, LastSetValue, callbacks | Verifiable flag |
-| User Property | Tracking (get/set counts, LastSetValue) | **OnGet/OnSet configuration** |
-| Indexer | Tracking, LastGetKey, LastSetEntry | **Backing dictionary** |
-| Delegate | Tracking, LastCallArg, LastCallArgs, callbacks | Verifiable flag |
-| Event | Tracking counts | **Active subscribers** |
+| Method | Counts, LastArg/LastArgs, sequence index, When chain position | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
+| User Method | Counts, LastArg | **OnCall configuration**, verifiable flag |
+| Property | Get/set counts, LastSetValue, sequence index | **OnGet/OnSet callbacks**, verifiable flag |
+| User Property | Get/set counts, LastSetValue | **OnGet/OnSet configuration**, verifiable flag |
+| Indexer | Get/set counts, LastGetKey, LastSetEntry | **Backing dictionary**, OnGet/OnSet callbacks |
+| Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
+| Event | Tracking counts | **Active subscribers**, verifiable flag |
 
 **Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve OnCall/OnGet/OnSet configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
 

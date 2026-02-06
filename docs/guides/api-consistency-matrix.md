@@ -34,32 +34,23 @@ This document maps KnockOff's API across the 8 interface/class stub patterns (2�
 
 All 8 patterns use identical API:
 
-```csharp
+<!-- snippet: matrix-method-interception -->
+```cs
 // Configure behavior
-stub.MethodName.Returns(value);
-stub.MethodName.OnCall((arg1, arg2) => result);
+stub.GetData.Returns("test-value");
+stub.GetData.OnCall((id) => $"Data-{id}");
 
 // Verify calls
-stub.MethodName.Verify();
-stub.MethodName.Verify(Times.Once);
-stub.MethodName.Verify(Times.Exactly(3));
-stub.MethodName.Verify(Times.AtLeast(1));
-stub.MethodName.Verify(Times.AtMost(5));
-stub.MethodName.Verify(Times.Never);
-
-// Access call history
-var lastArg = stub.MethodName.LastCallArg;      // Single parameter
-var args = stub.MethodName.LastArgs;            // Tuple for multiple
-var count = stub.MethodName.CallCount;
+stub.GetData.Verify(Times.Never);
 ```
+<!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
 | `Returns(value)` | ✓ |
 | `OnCall((args) => result)` | ✓ |
 | `Verify(Times.X)` | ✓ |
-| `LastCallArg` / `LastArgs` | ✓ |
-| `CallCount` | ✓ |
+| `LastArg` / `LastArgs` | ✓ |
 
 ---
 
@@ -67,27 +58,26 @@ var count = stub.MethodName.CallCount;
 
 All 8 patterns use identical API:
 
-```csharp
+<!-- snippet: matrix-property-interception -->
+```cs
 // Configure getter
-stub.PropertyName.OnGet(() => value);
-stub.PropertyName.OnGet(value);  // Shorthand
+stub.Name.OnGet("test-name");
 
 // Configure setter
-stub.PropertyName.OnSet((value) => { /* capture or validate */ });
+stub.Name.OnSet((value) => { /* capture or validate */ });
 
 // Verify
-stub.PropertyName.VerifyGet();
-stub.PropertyName.VerifyGet(Times.Exactly(2));
-stub.PropertyName.VerifySet();
-stub.PropertyName.VerifySet(Times.Once);
+stub.Name.VerifyGet(Times.Never);
+stub.Name.VerifySet(Times.Never);
 
 // Access history
-var lastSet = stub.PropertyName.LastSetValue;
+// var lastSet = stub.Name.LastSetValue;
 ```
+<!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
-| `OnGet(() => value)` | ✓ |
+| `OnGet(value)` | ✓ |
 | `OnSet((v) => { })` | ✓ |
 | `VerifyGet(Times.X)` | ✓ |
 | `VerifySet(Times.X)` | ✓ |
@@ -99,24 +89,26 @@ var lastSet = stub.PropertyName.LastSetValue;
 
 All 8 patterns use identical API:
 
-```csharp
+<!-- snippet: matrix-indexer-interception -->
+```cs
 // Configure getter
-stub.Indexer.OnGet((key) => value);
+stub.Indexer.OnGet((key) => $"value-{key}");
 
 // Configure setter
 stub.Indexer.OnSet((key, value) => { });
 
 // Use backing dictionary
-stub.Indexer.Backing[key] = value;
+stub.Indexer.Backing["preloaded"] = "data";
 
 // Verify
-stub.Indexer.VerifyGet();
-stub.Indexer.VerifySet();
+stub.Indexer.VerifyGet(Times.Never);
+stub.Indexer.VerifySet(Times.Never);
 
 // Access history
-var lastKey = stub.Indexer.LastGetKey;
-var lastSetKey = stub.Indexer.LastSetKey;
+// var lastKey = stub.Indexer.LastGetKey;
+// var lastEntry = stub.Indexer.LastSetEntry;
 ```
+<!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
@@ -124,6 +116,7 @@ var lastSetKey = stub.Indexer.LastSetKey;
 | `OnSet((key, value) => { })` | ✓ |
 | `Backing` dictionary | ✓ |
 | `VerifyGet()` / `VerifySet()` | ✓ |
+| `LastGetKey` / `LastSetEntry` | ✓ |
 
 ---
 
@@ -131,31 +124,28 @@ var lastSetKey = stub.Indexer.LastSetKey;
 
 All 8 patterns use identical API:
 
-```csharp
-// Access handler to raise event
-stub.EventNameInterceptor.Handler?.Invoke(sender, args);
-
-// Or use Raise helper
-stub.EventNameInterceptor.Raise(sender, args);
+<!-- snippet: matrix-event-interception -->
+```cs
+// Raise event
+stub.DataReceived.Raise(stub, new DataEventArgs { Data = "test" });
 
 // Check subscription
-bool hasSubscribers = stub.EventNameInterceptor.HasSubscribers;
+bool hasSubscribers = stub.DataReceived.HasSubscribers;
 
 // Verify add/remove
-stub.EventNameInterceptor.VerifyAdd();
-stub.EventNameInterceptor.VerifyAdd(Times.Once);
-stub.EventNameInterceptor.VerifyRemove();
+stub.DataReceived.VerifyAdd(Times.Never);
+stub.DataReceived.VerifyRemove(Times.Never);
 ```
+<!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
-| `Handler` property | ✓ |
 | `Raise(sender, args)` | ✓ |
 | `HasSubscribers` | ✓ |
 | `VerifyAdd(Times.X)` | ✓ |
 | `VerifyRemove(Times.X)` | ✓ |
 
-**Note:** Event interceptors have `Interceptor` suffix (e.g., `CompletedInterceptor` not `Completed`).
+**Note:** Standalone stubs use clean names (e.g., `stub.DataReceived`). Inline stubs use the `Interceptor` suffix (e.g., `stub.DataReceivedInterceptor`).
 
 ---
 
@@ -163,33 +153,27 @@ stub.EventNameInterceptor.VerifyRemove();
 
 All 8 patterns use identical API:
 
-```csharp
+<!-- snippet: matrix-sequences -->
+```cs
 // Return different values on successive calls
-stub.Method
-    .OnCall((x) => 1)
-    .ThenCall((x) => 2)
-    .ThenCall((x) => 3);
-// Call 1: 1, Call 2: 2, Call 3+: 3 (repeats last)
-
-// Return default after sequence
-stub.Method
-    .OnCall((x) => 1)
-    .ThenCall((x) => 2)
-    .ThenDefault();
-// Call 1: 1, Call 2: 2, Call 3+: default(T)
+stub.GetStatus
+    .OnCall(() => "Pending")
+    .ThenCall(() => "Processing")
+    .ThenCall(() => "Complete");
+// Call 1: "Pending", Call 2: "Processing", Call 3+: "Complete" (repeats last)
 
 // Properties support sequences too
-stub.Property
-    .OnGet(() => "first")
-    .ThenGet(() => "second");
+configStub.Name
+    .OnGet("first")
+    .ThenGet("second");
 ```
+<!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
 | `OnCall().ThenCall()` | ✓ |
-| `ThenDefault()` | ✓ |
 | Repeats last value | ✓ |
-| Property sequences | ✓ |
+| Property sequences (`OnGet().ThenGet()`) | ✓ |
 
 ---
 
@@ -197,23 +181,18 @@ stub.Property
 
 All 8 patterns use identical API:
 
-```csharp
-// Match specific values
-stub.Add.When(1, 2).Returns(100);
-stub.Add.When(5, 5).Returns(999);
-
-// Match with predicate
-stub.Add.When((a, b) => a > 100).Returns(-1);
-
-// Chain multiple conditions
+<!-- snippet: matrix-when-chains -->
+```cs
+// Chain multiple conditions (sequential - each consumed once)
 stub.Add
     .When(1, 2).Returns(100)
     .ThenWhen(3, 4).Returns(200)
     .ThenWhen((a, b) => a < 0).Returns(0);
 
-// Fallback for non-matching calls
-stub.Add.Returns(42);  // Default if no When matches
+// Fallback for non-matching calls or after chain is consumed
+stub.Add.Returns(42);
 ```
+<!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
@@ -222,7 +201,7 @@ stub.Add.Returns(42);  // Default if no When matches
 | `ThenWhen()` chaining | ✓ |
 | Fallback behavior | ✓ |
 
-**Priority:** When > Sequence > Returns > OnCall
+**Priority:** When chains > Sequences > OnCall/Returns > User Methods > Source > Smart default
 
 ---
 
@@ -230,21 +209,21 @@ stub.Add.Returns(42);  // Default if no When matches
 
 All 8 patterns use identical API:
 
-```csharp
+<!-- snippet: matrix-verification -->
+```cs
 // Mark for verification
-stub.Method.OnCall((x) => x).Verifiable();
-stub.Property.OnGet(() => "v").Verifiable();
+stub.GetData.OnCall((id) => "data").Verifiable();
 
 // Verify only marked items
-stub.Verify();  // Throws if any Verifiable() not called
+// stub.Verify();  // Throws if any Verifiable() not called
 
 // Verify all configured items
-stub.VerifyAll();  // Throws if any configured member not called
+// stub.VerifyAll();  // Throws if any configured member not called
 
 // Individual member verification
-stub.Method.Verify(Times.Once);
-stub.Property.VerifyGet(Times.Exactly(2));
+// stub.GetData.Verify(Times.Once);
 ```
+<!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
@@ -259,15 +238,15 @@ stub.Property.VerifyGet(Times.Exactly(2));
 
 All 8 patterns use identical API:
 
-```csharp
-// Enable strict mode
+<!-- snippet: matrix-strict-mode -->
+```cs
+// Enable strict mode via property
+var stub = new MatrixServiceStub();
 stub.Strict = true;
 // Or fluently
-var stub = new FooStub().Strict();
-
-// Assembly-level strict mode
-[assembly: KnockOffStrict]
+var fluentStub = new MatrixServiceStub().Strict();
 ```
+<!-- endSnippet -->
 
 | Behavior | Interface Stubs | Class Stubs |
 |----------|-----------------|-------------|
@@ -278,7 +257,6 @@ var stub = new FooStub().Strict();
 |---------|:--------------:|
 | `stub.Strict = true` | ✓ |
 | `.Strict()` extension | ✓ |
-| `[assembly: KnockOffStrict]` | ✓ |
 | Throws `StubException` | ✓ |
 
 ---
@@ -287,25 +265,24 @@ var stub = new FooStub().Strict();
 
 All 8 patterns use identical API:
 
-```csharp
+<!-- snippet: matrix-reset -->
+```cs
 // Reset individual member
-stub.Method.Reset();
-
-// Reset all interceptors
-stub.ResetInterceptors();
+stub.GetData.Reset();
+stub.Save.Reset();
 ```
+<!-- endSnippet -->
 
 Reset clears:
 - OnCall/Returns configuration
 - When matchers
-- Call history (CallCount, LastArg)
+- Call history (LastArg, LastArgs)
 - Sequence position
 - Verifiable marking
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
 | `member.Reset()` | ✓ |
-| `stub.ResetInterceptors()` | ✓ |
 
 ---
 
@@ -315,101 +292,56 @@ This is the one feature with intentional variation:
 
 | | **Interface** | **Class** |
 |---|---|---|
-| **Standalone** | ✓ Add custom methods<br>✓ Override with `_` suffix | ✓ Add custom methods<br>✓ Override with `_` suffix |
-| **Standalone Generic** | ✓ Add custom methods<br>✓ Override with `_` suffix | ✓ Add custom methods<br>✓ Override with `_` suffix |
+| **Standalone** | ✓ Override with `_` suffix | ✓ Override with `_` suffix |
+| **Standalone Generic** | ✓ Override with `_` suffix | ✓ Override with `_` suffix |
 | **Inline** | ✗ Fully generated | ✗ Fully generated |
 | **Inline Generic** | ✗ Fully generated | ✗ Fully generated |
 
 **All four standalone patterns** allow user-defined methods in the partial class.
 
-### Interface stubs (patterns 1, 2)
+### Defining a user method (interface stubs, patterns 1, 2)
 
-```csharp
-[KnockOff]
-public partial class CalculatorStub : ICalculator
+<!-- snippet: matrix-user-methods-interface -->
+```cs
+public partial class MatrixUserMethodStub
 {
-    // Custom helper method
-    public void SetupForDivisionTests()
-    {
-        Divide.OnCall((a, b) => b == 0 ? throw new DivideByZeroException() : a / b);
-    }
-
-    // Override generated virtual method with _ suffix
     protected override int Add_(int a, int b) => a + b;
 }
 ```
+<!-- endSnippet -->
+
+### Usage and OnCall override
+
+<!-- snippet: matrix-user-methods-interface-usage -->
+```cs
+var stub = new MatrixUserMethodStub();
+IMatrixCalculator calc = stub;
+
+// User method provides default behavior
+var result = calc.Add(3, 4);
+Assert.Equal(7, result);
+
+// OnCall supersedes user method
+stub.Add.OnCall((a, b) => 999);
+var overridden = calc.Add(3, 4);
+Assert.Equal(999, overridden);
+```
+<!-- endSnippet -->
 
 ### Class stubs (patterns 3, 4)
 
-```csharp
-[KnockOffBase<ServiceBase>]
-public partial class ServiceStub
-{
-    // Override generated virtual method with _ suffix
-    // User method completely replaces base.Execute() call
-    protected override void Execute_(string command)
-    {
-        // User-defined default behavior for abstract method
-    }
-
-    // Virtual methods: user override replaces base.Initialize() fallback
-    protected override void Initialize_()
-    {
-        // User-defined default -- no base.Initialize() call occurs
-    }
-}
-```
-
-Generic class stubs support partial overload coverage:
-
-```csharp
-[KnockOffBase(typeof(RepositoryBase<>))]
-public partial class RepoStub<T> where T : class
-{
-    // Override only some overloads -- each is independent
-    protected override T? GetDefault_()
-    {
-        return default; // User-defined default for parameterless overload
-    }
-    // GetDefault_(string) is NOT overridden -- uses standard interceptor path
-}
-```
-
-### User method interceptors have full API parity
-
-User method interceptors on both interface and class stubs support the complete API:
-
-```csharp
-// Interface stub with user method
-[KnockOff]
-public partial class ProcessorStub : IProcessor { }
-public partial class ProcessorStub
-{
-    protected override string Process_(string input) => $"[Default: {input}]";
-}
-
-// .When() chains work with user methods as fallback
-var stub = new ProcessorStub();
-stub.Process.When("special").Returns("[SPECIAL]");
-
-IProcessor svc = stub;
-svc.Process("special");  // Returns "[SPECIAL]" (When match)
-svc.Process("normal");   // Returns "[Default: normal]" (user method fallback)
-```
-
-**Priority chain for user method interceptors:**
-```
-When chains > Sequences > OnCall/Returns > User Method
-```
-
-### Class stub behavior differences
-
-For class stubs with user method overrides:
+Class stubs use the same `protected override MethodName_(...)` convention. Key differences:
 - **Abstract methods**: User method IS the default behavior (no base implementation exists)
 - **Virtual methods**: User method completely replaces the `base.Method()` call -- the user override IS the fallback, not a supplement to the base call
-- **Without user override**: Virtual methods retain the standard unconfigured-count pattern with `base.Method()` fallback
+- **Without user override**: Virtual methods retain the standard interceptor path with `base.Method()` fallback
 
-**Inline patterns** are fully generated and cannot be extended.
+### Priority chain
+
+User methods sit between OnCall and Source in the priority chain:
+
+`When chains > Sequences > OnCall/Returns > User Method > Source > Smart default`
+
+**Inline patterns** are fully generated and cannot be extended. See the [User Methods Guide](user-methods.md) for detailed examples.
 
 ---
 
@@ -417,27 +349,20 @@ For class stubs with user method overrides:
 
 For async methods (`Task<T>`, `ValueTask<T>`), KnockOff provides three configuration tiers that auto-wrap return values. All 8 interface/class patterns use identical APIs:
 
-```csharp
+<!-- snippet: matrix-async-autowrap -->
+```cs
 // Given: Task<string> GetDataAsync(int id)
 
-// Tier 1: Returns(unwrappedValue) — auto-wraps in Task.FromResult
+// Tier 1: Returns(unwrappedValue) - auto-wraps in Task.FromResult
 stub.GetDataAsync.Returns("hello");
 
-// Tier 2: OnCall(simplified callback) — returns T, auto-wrapped
+// Tier 2: OnCall(simplified callback) - returns T, auto-wrapped
 stub.GetDataAsync.OnCall((id) => $"Data-{id}");
 
-// Tier 3: OnCall(full delegate) — returns Task<T> directly
-stub.GetDataAsync.OnCall((int id) => Task.FromResult<string?>($"Full-{id}"));
+// Tier 3: OnCall(full delegate) - returns Task<T> directly
+stub.GetDataAsync.OnCall((int id) => Task.FromResult($"Full-{id}"));
 ```
-
-For void async methods (`Task` return, no value):
-
-```csharp
-// Given: Task SaveAsync(string data)
-
-// OnCall with Action — returns Task.CompletedTask automatically
-stub.SaveAsync.OnCall((data) => savedData = data);
-```
+<!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
@@ -446,25 +371,6 @@ stub.SaveAsync.OnCall((data) => savedData = data);
 | `OnCall(Func<..., Task<T>>)` full delegate | ✓ |
 | Void async `OnCall(Action<...>)` | ✓ |
 | `ValueTask<T>` auto-wrap | ✓ |
-
-### Pattern 7 (Delegate) — Full Parity
-
-After MethodInterceptorRenderer reuse, delegate stubs (Pattern 7) support the same three-tier async API as all other patterns:
-
-```csharp
-// Given: delegate Task<int> AsyncOperation(int x)
-
-// Tier 1: Returns takes the inner type — auto-wraps in Task.FromResult
-stub.Interceptor.Returns(42);
-
-// Tier 2: Simplified callback — returns int, auto-wrapped
-stub.Interceptor.OnCall((int x) => x * 2);
-
-// Tier 3: Full delegate — returns Task<int> directly
-stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
-```
-
-Delegates also support sequences (`Returns(first, params rest)`, `ThenCall`, `ThenReturns`) and fluent builder chaining (`OnCall(...).Verifiable()`).
 
 **See also:** [Async Patterns Guide](async-patterns.md) for detailed examples including delays and failure simulation.
 
@@ -489,57 +395,38 @@ Delegates also support sequences (`Returns(first, params rest)`, `ThenCall`, `Th
 
 ---
 
-## Quick Reference: All Patterns Side-by-Side
+## Quick Reference: Standalone Interface Pattern
 
-```csharp
+Stub declaration:
+
+<!-- snippet: matrix-instantiation -->
+```cs
 // Pattern 1: Standalone Interface
 [KnockOff]
-public partial class CalcStub : ICalculator { }
-var stub = new CalcStub();
-ICalculator calc = stub;
-
-// Pattern 2: Generic Standalone Interface
-[KnockOff]
-public partial class RepoStub<T> : IRepository<T> { }
-var stub = new RepoStub<User>();
-IRepository<User> repo = stub;
-
-// Pattern 3: Standalone Class
-[KnockOffBase<ServiceBase>]
-public partial class ServiceStub { }
-var stub = new ServiceStub();
-ServiceBase svc = stub.Object;
-
-// Pattern 4: Generic Standalone Class
-[KnockOffBase(typeof(ServiceBase<>))]
-public partial class ServiceStub<T> { }
-var stub = new ServiceStub<User>();
-ServiceBase<User> svc = stub.Object;
-
-// Pattern 5: Inline Interface
-[KnockOff<ICalculator>]
-public partial class MyTests { }
-var stub = new Stubs.ICalculator();
-ICalculator calc = stub;
-
-// Pattern 6: Inline Class
-[KnockOff<ServiceBase>]
-public partial class MyTests { }
-var stub = new Stubs.ServiceBase();
-ServiceBase svc = stub.Object;
-
-// Pattern 8: Open Generic Interface
-[KnockOff(typeof(IRepository<>))]
-public partial class MyTests { }
-var stub = new Stubs.IRepository<User>();
-IRepository<User> repo = stub;
-
-// Pattern 9: Open Generic Class
-[KnockOff(typeof(ServiceBase<>))]
-public partial class MyTests { }
-var stub = new Stubs.ServiceBase<User>();
-ServiceBase<User> svc = stub.Object;
+public partial class MatrixCalcStub : IMatrixCalculator { }
 ```
+<!-- endSnippet -->
+
+Configure, use, and verify:
+
+<!-- snippet: matrix-all-patterns -->
+```cs
+// Pattern 1: Standalone Interface
+var calcStub = new MatrixCalcStub();
+IMatrixCalculator calc = calcStub;
+
+// Configure and use - same API across all patterns
+calcStub.Add.OnCall((a, b) => a + b);
+var result = calc.Add(3, 4);
+Assert.Equal(7, result);
+
+// Verification - same API across all patterns
+calcStub.Add.Verify(Times.Once);
+Assert.Equal((3, 4), calcStub.Add.LastArgs);
+```
+<!-- endSnippet -->
+
+The API is identical across all 8 patterns. The only variation is instantiation (see Feature 1 table above) and `.Object` for class stubs.
 
 ---
 

@@ -17,7 +17,7 @@ Automatically activates when you ask about:
 - Verification with `Verify()`, `Verifiable()`, `VerifyAll()`, and `Times` constraints
 - Async method handling (auto-wrapping)
 - Generic method stubbing with `.Of<T>()`
-- Event subscription tracking (Handler property)
+- Event subscription tracking (`Raise()` method, `HasSubscribers` property)
 - Source delegation with `Source()`
 - Strict mode configuration
 - Common issues and best practices
@@ -132,7 +132,7 @@ tracking.Verify(Times.Once);
 ### Critical Gotchas
 
 1. **Sequences repeat last value** - `Returns(1, 2, 3)` repeats the last value after exhaustion (matching NSubstitute). Use `ThenDefault()` to return `default(T)` instead, or Strict mode to throw
-2. **Events use Handler property** - `stub.EventInterceptor.Handler?.Invoke(...)` (no Raise method)
+2. **Events use Raise()** - `stub.EventName.Raise(...)` fires all subscribed handlers
 3. **Class stubs use .Object** - `stub.Object` to get the class instance
 4. **Times.Between() doesn't exist** - Use `AtLeast` + `AtMost` instead
 

@@ -17,7 +17,7 @@ KnockOff generates six types of interceptors, each exposed through properties na
 | **Event Interceptor** | Interface events | `{Interface}.{EventName}` |
 | **Delegate Interceptor** | Delegate types | `stub.Interceptor` |
 
-All interceptors provide a `Reset()` method to clear tracking state and callbacks.
+All interceptors provide a `Reset()` method to clear tracking state (counts, captured arguments, and sequence positions) while preserving configured callbacks.
 
 ### Quick Reference Example
 
@@ -43,7 +43,7 @@ stub.Changed.VerifyAdd();
 
 ### Accessing Interceptors Across Usage Patterns
 
-The interceptor API works identically across all seven KnockOff patterns (see [patterns.md](patterns.md) for details).
+The interceptor API works identically across all nine KnockOff patterns (see [patterns.md](patterns.md) for details).
 
 **Standalone Pattern** - `[KnockOff]` on a class implementing an interface:
 
@@ -220,7 +220,7 @@ When a method returns a value, sequences can be built using these methods on `IM
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastCallArg`, `LastCallArgs`, and `OnCall`
+- `void Reset()` - Clears tracking state (call counts, `LastArg`/`LastArgs`), resets sequence index and When chain position. Preserves `OnCall`/`Returns` callbacks
 
 ### Example
 
@@ -290,7 +290,7 @@ When a property has a getter, sequences can be built using these methods on `IPr
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastSetValue`, and callbacks
+- `void Reset()` - Clears tracking state (get/set counts, `LastSetValue`), resets sequence index. Preserves `OnGet`/`OnSet` callbacks
 
 ### Example
 
@@ -347,7 +347,7 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, and `OnSet`. Does NOT clear `Backing`
+- `void Reset()` - Clears tracking state (get/set counts, `LastGetKey`, `LastSetEntry`), resets sequence index. Preserves `OnGet`/`OnSet` callbacks and `Backing` dictionary
 
 ### Example
 
@@ -546,7 +546,7 @@ All work identically to Method Interceptor. Key differences:
 - Access via `stub.Interceptor` instead of `stub.MethodName`
 - `stub.Strict = true` for strict mode
 - Implicit conversion to delegate type: `DelegateType op = stub;`
-- `LastCallArg` (single-param) or `LastCallArgs` (multi-param) on the interceptor
+- `LastArg` (single-param) or `LastArgs` (multi-param) on the interceptor
 - Zero-param delegates have neither tracking property
 
 ---
@@ -557,16 +557,16 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | Tracking state, callbacks, sequence index | N/A |
-| **User Method** | Tracking state (call count, LastArg) | OnCall configuration |
-| **Property** | Tracking state, `LastSetValue`, sequence indices | OnGet/OnSet callbacks, verifiable marking |
-| **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, sequence indices | `Backing` dictionary, OnGet/OnSet callbacks |
-| **Event** | Tracking counts | Active subscribers, verifiable marking |
-| **Delegate** | Tracking state, `LastCallArg`, `LastCallArgs`, callbacks, sequences, When chains | Verifiable marking |
-| **Generic Method (Base)** | All typed handlers cleared | N/A |
-| **Generic Method (Typed)** | Tracking and callback for specific type argument(s) only | Tracking for other type arguments |
+| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
+| **User Method** | Call counts, `LastArg` | `OnCall`/`Returns` configuration, verifiable marking |
+| **Property** | Get/set counts, `LastSetValue`, sequence index | `OnGet`/`OnSet` callbacks, sequence structure, verifiable marking |
+| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `OnGet`/`OnSet` callbacks, `Backing` dictionary, verifiable marking |
+| **Event** | Add/remove counts, active subscribers | Verifiable marking |
+| **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
+| **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
+| **Generic Method (Typed)** | Tracking for specific type argument(s) only | Tracking for other type arguments |
 
-**Key Principle**: `Reset()` clears tracking state but preserves configuration (callbacks) and state that represents "what the stub currently is" (backing dictionaries, event subscribers).
+**Key Principle**: `Reset()` clears tracking state (counts, captured arguments, positions) but preserves configured callbacks and structural state (backing dictionaries, sequence/When chain structures, verifiable marking).
 
 ---
 

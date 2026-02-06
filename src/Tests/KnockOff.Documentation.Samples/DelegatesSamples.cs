@@ -47,6 +47,26 @@ public delegate bool IsValidFormatRule(string value);
 public delegate void EventCallback(DomainEvent evt);
 
 /// <summary>
+/// Two-parameter returning delegate for sequences, When chains, strict mode samples.
+/// </summary>
+public delegate int Calculate(int a, int b);
+
+/// <summary>
+/// Two-parameter void delegate for void When chain samples.
+/// </summary>
+public delegate void ProcessValues(int a, int b);
+
+/// <summary>
+/// Single-parameter returning delegate for sequence callbacks.
+/// </summary>
+public delegate int Transform(int x);
+
+/// <summary>
+/// Async delegate for auto-wrapping samples.
+/// </summary>
+public delegate Task<int> AsyncTransform(int x);
+
+/// <summary>
 /// Domain event for event callback samples.
 /// </summary>
 public class DomainEvent
@@ -66,6 +86,21 @@ public class Product
     public string Name { get; set; } = "";
     public decimal Price { get; set; }
 }
+
+// =============================================================================
+// Named Delegate Example (for Func/Action limitation)
+// =============================================================================
+
+#region delegate-func-action-not-supported
+// Does NOT work:
+// [KnockOff<Func<int, int, int>>]  // Not supported
+
+// Define a named delegate instead:
+public delegate int NamedCalculation(int a, int b);
+
+[KnockOff<NamedCalculation>]  // Works!
+public partial class NamedDelegateExample { }
+#endregion
 
 // =============================================================================
 // Stub Definitions
@@ -92,6 +127,10 @@ public partial class BasicVoidDelegateTest
 [KnockOff<IsUniqueRule>]
 [KnockOff<IsValidFormatRule>]
 [KnockOff<EventCallback>]
+[KnockOff<Calculate>]
+[KnockOff<ProcessValues>]
+[KnockOff<Transform>]
+[KnockOff<AsyncTransform>]
 public partial class DelegateStubTests
 {
 }
@@ -598,5 +637,315 @@ public class CompleteExampleTests
 
         formatStub.Interceptor.Verify(Times.Exactly(3));
         uniqueStub.Interceptor.Verify(Times.Exactly(2));
+    }
+}
+
+// =============================================================================
+// Verifiable Pattern Sample
+// =============================================================================
+
+public class VerifiablePatternTests
+{
+    [Fact]
+    public void Verifiable_ChainingOnDelegateInterceptor()
+    {
+        var stub = new DelegateStubTests.Stubs.Transform();
+
+        #region delegate-verifiable-pattern
+        // Mark for verification with Verifiable() chaining
+        stub.Interceptor.OnCall((x) => x * 2).Verifiable();
+        stub.Interceptor.Verify(Times.Never); // Not called yet
+
+        Transform transform = stub;
+        var result = transform(21);
+
+        // Verify the delegate was called
+        stub.Interceptor.Verify(Times.Once);
+        #endregion
+
+        Assert.Equal(42, result);
+    }
+}
+
+// =============================================================================
+// Sequence Samples
+// =============================================================================
+
+public class SequenceTests
+{
+    [Fact]
+    public void Sequences_ReturnsMultipleValues()
+    {
+        var stub = new DelegateStubTests.Stubs.Calculate();
+
+        #region delegate-sequences
+        // Return different values on successive calls
+        stub.Interceptor.Returns(10, 20, 30);
+        // Call 1: 10, Call 2: 20, Call 3+: 30 (repeats last)
+        #endregion
+
+        Calculate calc = stub;
+        Assert.Equal(10, calc(0, 0));
+        Assert.Equal(20, calc(0, 0));
+        Assert.Equal(30, calc(0, 0));
+        Assert.Equal(30, calc(0, 0)); // repeats last
+    }
+
+    [Fact]
+    public void Sequences_CallbackChain()
+    {
+        var stub = new DelegateStubTests.Stubs.Transform();
+
+        #region delegate-sequences-callback
+        // Callback sequences
+        stub.Interceptor
+            .OnCall((x) => x * 1)
+            .ThenCall((x) => x * 2)
+            .ThenCall((x) => x * 3);
+        #endregion
+
+        Transform transform = stub;
+        Assert.Equal(10, transform(10)); // x * 1
+        Assert.Equal(20, transform(10)); // x * 2
+        Assert.Equal(30, transform(10)); // x * 3
+        Assert.Equal(30, transform(10)); // repeats last
+    }
+
+    [Fact]
+    public void Sequences_ThenReturns()
+    {
+        var stub = new DelegateStubTests.Stubs.Transform();
+
+        #region delegate-sequences-thenreturns
+        // ThenReturns for fixed values after callback
+        stub.Interceptor
+            .OnCall((x) => x)
+            .ThenReturns(99);
+        #endregion
+
+        Transform transform = stub;
+        Assert.Equal(5, transform(5));  // OnCall
+        Assert.Equal(99, transform(5)); // ThenReturns
+        Assert.Equal(99, transform(5)); // repeats last
+    }
+
+    [Fact]
+    public void Sequences_ThenDefault()
+    {
+        var stub = new DelegateStubTests.Stubs.Calculate();
+
+        #region delegate-sequences-thendefault
+        // ThenDefault: return default(T) after exhaustion instead of repeating
+        stub.Interceptor
+            .OnCall((a, b) => 100)
+            .ThenCall((a, b) => 200)
+            .ThenDefault();
+        // Call 1: 100, Call 2: 200, Call 3+: 0 (default(int))
+        #endregion
+
+        Calculate calc = stub;
+        Assert.Equal(100, calc(0, 0));
+        Assert.Equal(200, calc(0, 0));
+        Assert.Equal(0, calc(0, 0)); // default(int)
+    }
+}
+
+// =============================================================================
+// Async Delegate Auto-Wrapping Samples
+// =============================================================================
+
+public class AsyncAutoWrappingTests
+{
+    [Fact]
+    public async Task AsyncDelegate_ThreeTierAutoWrapping()
+    {
+        var stub = new DelegateStubTests.Stubs.AsyncTransform();
+
+        #region delegate-async-auto-wrapping
+        // Tier 1: Returns takes inner type - auto-wraps in Task.FromResult
+        stub.Interceptor.Returns(42);
+        #endregion
+
+        AsyncTransform op = stub;
+        Assert.Equal(42, await op(10));
+
+        stub.Interceptor.Reset();
+
+        // Tier 2: simplified callback
+        stub.Interceptor.OnCall((int x) => x * 2);
+        Assert.Equal(20, await op(10));
+
+        stub.Interceptor.Reset();
+
+        // Tier 3: full delegate
+        stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
+        Assert.Equal(20, await op(10));
+    }
+}
+
+// =============================================================================
+// When Chain Samples
+// =============================================================================
+
+public class WhenChainTests
+{
+    [Fact]
+    public void When_ValueMatching()
+    {
+        var stub = new DelegateStubTests.Stubs.Calculate();
+
+        #region delegate-when-value-matching
+        // Match specific argument values
+        stub.Interceptor.When(1, 2).Returns(100)
+            .ThenWhen(3, 4).Returns(200)
+            .ThenCall((a, b) => a + b);  // terminal fallback
+        #endregion
+
+        Calculate calc = stub;
+        Assert.Equal(100, calc(1, 2));
+        Assert.Equal(200, calc(3, 4));
+        Assert.Equal(11, calc(5, 6)); // fallback
+    }
+
+    [Fact]
+    public void When_PredicateMatching()
+    {
+        var stub = new DelegateStubTests.Stubs.Calculate();
+
+        #region delegate-when-predicate-matching
+        // Match via predicate
+        stub.Interceptor.When((a, b) => a > 10).Returns(999);
+        #endregion
+
+        Calculate calc = stub;
+        Assert.Equal(999, calc(20, 1));
+        Assert.Equal(0, calc(1, 2)); // no match, default
+    }
+
+    [Fact]
+    public void When_PredicateSingleParam()
+    {
+        var stub = new DelegateStubTests.Stubs.Formatter();
+
+        #region delegate-when-predicate-single-param
+        // Single-parameter delegate
+        stub.Interceptor.When(s => s.Length > 5).Returns("LONG");
+        #endregion
+
+        Formatter format = stub;
+        Assert.Equal("LONG", format("longstring"));
+        Assert.Null(format("hi")); // no match, default
+    }
+
+    [Fact]
+    public void When_Chained()
+    {
+        var stub = new DelegateStubTests.Stubs.Formatter();
+
+        #region delegate-when-chained
+        stub.Interceptor
+            .When("one").Returns("ONE")
+            .ThenWhen("two").Returns("TWO")
+            .ThenWhen(s => s.StartsWith("x")).Returns("X_PREFIX");
+        #endregion
+
+        Formatter format = stub;
+        Assert.Equal("ONE", format("one"));
+        Assert.Equal("TWO", format("two"));
+        Assert.Equal("X_PREFIX", format("xyz"));
+    }
+
+    [Fact]
+    public void When_VoidDelegateChains()
+    {
+        var stub = new DelegateStubTests.Stubs.ProcessValues();
+        var calls = new List<string>();
+
+        #region delegate-when-void-chains
+        stub.Interceptor
+            .When(1, 2).Call((a, b) => calls.Add("first"))
+            .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
+        #endregion
+
+        ProcessValues process = stub;
+        process(1, 2);
+        process(3, 4);
+
+        Assert.Equal(["first", "second"], calls);
+    }
+
+    [Fact]
+    public void When_ThenNone()
+    {
+        var stub = new DelegateStubTests.Stubs.Formatter();
+
+        #region delegate-when-thennone
+        // After "one" is matched, subsequent calls fall through to default behavior
+        stub.Interceptor.When("one").Returns("ONE").ThenNone();
+        #endregion
+
+        Formatter format = stub;
+        Assert.Equal("ONE", format("one"));
+        Assert.Null(format("one")); // ThenNone consumed the matcher
+    }
+}
+
+// =============================================================================
+// Strict Mode Samples
+// =============================================================================
+
+public class StrictModeTests
+{
+    [Fact]
+    public void StrictMode_ThrowsOnUnconfigured()
+    {
+        #region delegate-strict-mode
+        var stub = new DelegateStubTests.Stubs.Calculate();
+        stub.Strict = true;
+
+        Calculate calc = stub;
+        Assert.Throws<StubException>(() => calc(1, 2)); // Throws StubException.NotConfigured
+        #endregion
+    }
+
+    [Fact]
+    public void StrictMode_SequenceExhaustion()
+    {
+        var stub = new DelegateStubTests.Stubs.Calculate();
+
+        #region delegate-strict-mode-sequences
+        stub.Strict = true;
+        stub.Interceptor.Returns(10, 20);
+
+        Calculate op = stub;
+        Assert.Equal(10, op(0, 0)); // first value
+        Assert.Equal(20, op(0, 0)); // second value
+        Assert.Throws<StubException>(() => op(0, 0)); // Throws StubException.SequenceExhausted
+        #endregion
+    }
+}
+
+// =============================================================================
+// Configuration Mutual Exclusivity Sample
+// =============================================================================
+
+public class ConfigMutualExclusivityTests
+{
+    [Fact]
+    public void ReturnsAndOnCall_AreMutuallyExclusive()
+    {
+        var stub = new DelegateStubTests.Stubs.Calculate();
+
+        #region delegate-config-mutual-exclusivity
+        stub.Interceptor.Returns(42);
+        stub.Interceptor.OnCall((a, b) => a + b); // Clears Returns(42)
+        #endregion
+
+        Calculate calc = stub;
+        Assert.Equal(3, calc(1, 2)); // OnCall wins
+
+        stub.Interceptor.OnCall((a, b) => a + b);
+        stub.Interceptor.Returns(99);              // Clears OnCall
+        Assert.Equal(99, calc(1, 2)); // Returns wins
     }
 }

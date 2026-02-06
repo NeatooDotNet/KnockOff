@@ -478,7 +478,7 @@ ValidationRule rule = ruleStub;
 ### Benefits
 
 - **Implicit conversion**: Stub converts to delegate type automatically
-- **Invocation tracking**: Use `Verify()`, `LastCallArg`, `LastCallArgs`
+- **Invocation tracking**: Use `Verify()`, `LastArg`, `LastArgs`
 - **Behavior configuration**: Use `Returns`, `OnCall`, sequences, and When chains
 - **Async auto-wrapping**: `Returns(42)` auto-wraps for `Task<int>` delegates
 - **Verification**: Use `Verify()`, `Times` constraints, and `Verifiable()` chaining

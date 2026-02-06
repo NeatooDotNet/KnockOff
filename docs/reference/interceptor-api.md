@@ -17,7 +17,7 @@ KnockOff generates six types of interceptors, each exposed through properties on
 | **Event Interceptor** | Interface events | `stub.{Interface}.{EventName}` | `stub.IRepository.Changed` |
 | **Delegate Interceptor** | Delegate types | `stub.Interceptor` | `stub.Interceptor.Returns(42)` |
 
-All interceptors provide a `Reset()` method to clear tracking state and callbacks.
+All interceptors provide a `Reset()` method to clear tracking state (counts, captured arguments, and sequence positions) while preserving configured callbacks.
 
 **Pattern Note**: The three KnockOff patterns (Standalone, Inline Interface, Inline Class) all expose the same interceptor API. The only difference is how you declare the stub class. For Stand-Alone stubs, KnockOff also generates a base class with virtual methods that you can override to provide custom behavior. See the [User Methods Guide](../guides/user-methods.md) for details. Delegate stubs (Pattern 7) use a different access pattern — see [Delegate Interceptor](#delegate-interceptor) below.
 
@@ -31,8 +31,8 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `LastCallArg` | `T?` | The argument from the most recent call (single-parameter methods only). Nullable. Returns default if never called. |
-| `LastCallArgs` | `(T1?, T2?, ...)?` | Nullable tuple of arguments from the most recent call (multi-parameter methods). Returns default if never called. |
+| `LastArg` | `T?` | The argument from the most recent call (single-parameter methods only). Nullable. Returns default if never called. |
+| `LastArgs` | `(T1?, T2?, ...)?` | Nullable tuple of arguments from the most recent call (multi-parameter methods). Returns default if never called. |
 
 ### Configuration Methods
 
@@ -83,7 +83,7 @@ When a callback is configured, it is invoked instead of user-defined methods. Fo
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastCallArg`/`LastCallArgs`, configured callbacks, and sequence state. Does NOT reset verifiable marking.
+- `void Reset()` - Clears tracking state (`LastArg`/`LastArgs`, call counts), resets sequence index to 0, and resets When chain position. Preserves configured callbacks (`OnCall`, `Returns`), sequence structure, and verifiable marking.
 
 ### Example
 
@@ -148,7 +148,7 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (call counts), `LastSetValue`, configured callbacks (`OnGet`/`OnSet`), and sequence state. Does NOT reset verifiable marking.
+- `void Reset()` - Clears tracking state (call counts, `LastSetValue`), resets sequence index to 0. Preserves configured callbacks (`OnGet`/`OnSet`), sequence structure, and verifiable marking.
 
 ### Example
 
@@ -210,7 +210,7 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (call counts), `LastGetKey`, `LastSetEntry`, configured callbacks (`OnGet`/`OnSet`), and sequence state. Does NOT clear `Backing` dictionary or verifiable marking.
+- `void Reset()` - Clears tracking state (call counts, `LastGetKey`, `LastSetEntry`), resets sequence index to 0. Preserves configured callbacks (`OnGet`/`OnSet`), `Backing` dictionary, sequence structure, and verifiable marking.
 
 ### Example
 
@@ -313,8 +313,8 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `LastCallArg` | `TArg` | The argument from the most recent call with these type arguments (single-parameter methods) |
-| `LastCallArgs` | `(TArg1, TArg2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
+| `LastArg` | `TArg` | The argument from the most recent call with these type arguments (single-parameter methods) |
+| `LastArgs` | `(TArg1, TArg2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
 
 #### Typed Configuration Methods
 
@@ -419,8 +419,8 @@ stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
 
 | Property | Type | Condition | Description |
 |----------|------|-----------|-------------|
-| `LastCallArg` | `T?` | Single-parameter delegates | The argument from the most recent invocation |
-| `LastCallArgs` | `(T1?, T2?, ...)?` | Multi-parameter delegates | Named tuple of arguments from the most recent invocation |
+| `LastArg` | `T?` | Single-parameter delegates | The argument from the most recent invocation |
+| `LastArgs` | `(T1?, T2?, ...)?` | Multi-parameter delegates | Named tuple of arguments from the most recent invocation |
 
 Zero-parameter delegates have neither property — only call count tracking via `Verify(Times)`.
 
@@ -475,7 +475,7 @@ ProcessCalculation(stub);
 
 ### Reset
 
-`Reset()` clears tracking state (call counts, `LastCallArg`/`LastCallArgs`) but preserves configuration (`OnCall`, `Returns`). Does NOT reset verifiable marking.
+`Reset()` clears tracking state (call counts, `LastArg`/`LastArgs`) but preserves configuration (`OnCall`, `Returns`). Does NOT reset verifiable marking.
 
 ### When Chains on Delegates
 
@@ -587,17 +587,18 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | Tracking state, `LastCallArg`, `LastCallArgs`, callbacks, sequences, When chains | Verifiable marking |
-| **Property** | Tracking state, `LastSetValue`, `OnGet`, `OnSet`, sequences | Verifiable marking |
-| **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, `OnSet`, sequences | `Backing` dictionary, verifiable marking |
+| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
+| **Property** | Get/set counts, `LastSetValue`, sequence index | `OnGet`/`OnSet` callbacks, sequence structure, verifiable marking |
+| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `OnGet`/`OnSet` callbacks, `Backing` dictionary, sequence structure, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
-| **Delegate** | Tracking state, `LastCallArg`, `LastCallArgs`, callbacks, sequences, When chains | Verifiable marking |
-| **Generic Method (Base)** | All tracking, callbacks, sequences, When chains across all type arguments | Verifiable marking |
-| **Generic Method (Typed)** | Tracking, callbacks, sequences, When chains for specific type argument(s) only | Tracking for other type arguments, verifiable marking |
+| **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
+| **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
+| **Generic Method (Typed)** | Tracking for specific type argument(s) only | Tracking for other type arguments, verifiable marking |
 | **When Chain** | Chain position (HEAD), all matcher call counts | Chain structure (matchers and callbacks) |
 
 **Key Principles**:
-- `Reset()` clears tracking (counts, arguments) and runtime state (callbacks, sequences, subscribers)
+- `Reset()` clears tracking (counts, captured arguments) and resets sequence/When chain positions
+- `Reset()` preserves configured callbacks (`OnCall`, `Returns`, `OnGet`, `OnSet`) and structure
 - `Reset()` does NOT clear verifiable marking (intentional test setup)
 - `Reset()` does NOT clear backing storage (`Backing` dictionary for indexers)
 
@@ -654,7 +655,7 @@ getTracking.Verify(Times.Once);       // Tracking object verification
 **Why this matters**:
 - `LastArg`/`LastArgs` live on the tracking object, not the interceptor
 - If you configure multiple callbacks (e.g., via sequence), each gets its own tracking object
-- The interceptor's `LastCallArg`/`LastCallArgs` properties aggregate across all registrations
+- The interceptor's `LastArg`/`LastArgs` properties aggregate across all registrations
 
 ---
 
