@@ -116,7 +116,8 @@ public partial class KnockOffGenerator
 				TargetClassInfo: null,
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				Strict: strict,
-				UserOverrideProperties: default);
+				UserOverrideProperties: default,
+				UserOverrideMethods: default);
 		}
 
 		// For non-open-generic closed generic targets (e.g., [KnockOffBase<ServiceBase>]),
@@ -150,7 +151,8 @@ public partial class KnockOffGenerator
 					TargetClassInfo: null,
 					Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 					Strict: strict,
-					UserOverrideProperties: default);
+					UserOverrideProperties: default,
+					UserOverrideMethods: default);
 			}
 		}
 
@@ -171,6 +173,10 @@ public partial class KnockOffGenerator
 		var userOverrideProperties = DetectUserOverrideProperties(classSymbol);
 		var userOverridePropertiesArray = new EquatableArray<string>(userOverrideProperties.ToArray());
 
+		// Detect user-defined method overrides (base class pattern)
+		var userOverrideMethods = DetectUserOverrideMethods(classSymbol);
+		var userOverrideMethodsArray = new EquatableArray<string>(userOverrideMethods.ToArray());
+
 		return new StandaloneClassStubInfo(
 			Namespace: namespaceName,
 			ClassName: classSymbol.Name,
@@ -179,7 +185,8 @@ public partial class KnockOffGenerator
 			TargetClassInfo: targetClassInfo,
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 			Strict: strict,
-			UserOverrideProperties: userOverridePropertiesArray);
+			UserOverrideProperties: userOverridePropertiesArray,
+			UserOverrideMethods: userOverrideMethodsArray);
 	}
 
 	/// <summary>
@@ -234,4 +241,6 @@ internal sealed record StandaloneClassStubInfo(
 	/// <summary>Whether strict mode is enabled.</summary>
 	bool Strict,
 	/// <summary>Property names (with _ suffix) that have user overrides in the partial class.</summary>
-	EquatableArray<string> UserOverrideProperties = default) : IEquatable<StandaloneClassStubInfo>;
+	EquatableArray<string> UserOverrideProperties = default,
+	/// <summary>Method signature keys (format: "MethodName_(ParamType1,...)") that have user overrides in the partial class.</summary>
+	EquatableArray<string> UserOverrideMethods = default) : IEquatable<StandaloneClassStubInfo>;

@@ -484,11 +484,19 @@ These are common issues in KnockOff plans. Check for each:
 2. Read the linked todo for context
 3. Execute the full review process (Steps 1-6)
 4. Update the plan with your review
-5. Ask user: "Should I send this back to the architect?" (if concerns) or "Shall I proceed with implementation?" (if approved)
+5. If concerns: Ask user: "I have concerns about this plan. Would you like to clarify these yourself, or should I send them back to the architect?"
+6. If approved: Ask user: "Shall I proceed with implementation?"
 
-### Sending Back to Architect
+### Resolving Concerns
 
-If concerns found and user approves sending back:
+If concerns found, the user will choose how to resolve them:
+
+**Option A: User clarifies directly**
+- The user provides answers to your concerns
+- Update the plan with the user's clarifications
+- Re-review the updated plan
+
+**Option B: Send back to architect**
 - Update plan status to "Concerns Raised"
 - Invoke knockoff-architect with: "Address developer concerns in 'Developer Review' section of docs/plans/[name].md"
 

@@ -340,6 +340,66 @@ internal static class SymbolHelpers
 	}
 
 	/// <summary>
+	/// Builds a signature key from a method name and parameters for matching against user override methods.
+	/// Format: "MethodName_(ParamType1,ParamType2,...)" - matches the format from DetectUserOverrideMethods.
+	/// Includes ref/out/in modifiers as they affect the signature.
+	/// Shared by both FlatModelBuilder (InterfaceMemberInfo) and StandaloneClassModelBuilder (ClassMemberInfo).
+	/// </summary>
+	public static string BuildOverrideSignatureKey(string methodName, EquatableArray<ParameterInfo> parameters)
+	{
+		var paramArray = parameters.GetArray() ?? System.Array.Empty<ParameterInfo>();
+		var paramParts = paramArray.Select(p =>
+		{
+			var prefix = p.RefKind switch
+			{
+				RefKind.Ref => "ref ",
+				RefKind.Out => "out ",
+				RefKind.In => "in ",
+				RefKind.RefReadOnlyParameter => "ref readonly ",
+				_ => ""
+			};
+			return prefix + NormalizeTypeForOverrideMatching(p.Type);
+		});
+		// The generated base class method has underscore suffix, so signature key uses it too
+		return $"{methodName}_({string.Join(",", paramParts)})";
+	}
+
+	/// <summary>
+	/// Normalizes type names for matching user override methods.
+	/// Converts fully qualified types to C# keywords and removes global:: prefix.
+	/// This ensures semantic model types match syntax-based type names.
+	/// </summary>
+	public static string NormalizeTypeForOverrideMatching(string type)
+	{
+		// Remove global:: prefix
+		var result = type.Replace("global::", "");
+
+		// Map fully qualified System types to keywords
+		result = result switch
+		{
+			"System.String" => "string",
+			"System.Int32" => "int",
+			"System.Int64" => "long",
+			"System.Boolean" => "bool",
+			"System.Double" => "double",
+			"System.Single" => "float",
+			"System.Decimal" => "decimal",
+			"System.Char" => "char",
+			"System.Byte" => "byte",
+			"System.SByte" => "sbyte",
+			"System.Int16" => "short",
+			"System.UInt16" => "ushort",
+			"System.UInt32" => "uint",
+			"System.UInt64" => "ulong",
+			"System.Object" => "object",
+			"System.Void" => "void",
+			_ => result
+		};
+
+		return result;
+	}
+
+	/// <summary>
 	/// Extracts TypeParameterInfo from a type symbol's type parameters.
 	/// </summary>
 	public static EquatableArray<TypeParameterInfo> ExtractTypeParameters(IEnumerable<ITypeParameterSymbol> typeParams)

@@ -250,7 +250,12 @@ internal sealed record InlineClassImplMethodModel(
     /// <summary>OnCall argument list (e.g., "_stub, name, count").</summary>
     string OnCallArgumentList,
     /// <summary>Invoke suffix for multi-overload interceptors (e.g., "_NoParams_TNullable"). Empty for single-signature interceptors.</summary>
-    string InvokeSuffix);
+    string InvokeSuffix,
+    /// <summary>
+    /// True if the user has defined a 'protected override' method with the _ suffix
+    /// in their partial class (base class user method pattern).
+    /// </summary>
+    bool HasUserOverride = false);
 
 /// <summary>
 /// Model for an event override in the Impl class.

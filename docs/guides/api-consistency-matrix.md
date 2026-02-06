@@ -315,12 +315,14 @@ This is the one feature with intentional variation:
 
 | | **Interface** | **Class** |
 |---|---|---|
-| **Standalone** | ✓ Add custom methods | ✓ Add custom methods<br>✓ Override with `_` suffix |
-| **Standalone Generic** | ✓ Add custom methods | ✓ Add custom methods<br>✓ Override with `_` suffix |
+| **Standalone** | ✓ Add custom methods<br>✓ Override with `_` suffix | ✓ Add custom methods<br>✓ Override with `_` suffix |
+| **Standalone Generic** | ✓ Add custom methods<br>✓ Override with `_` suffix | ✓ Add custom methods<br>✓ Override with `_` suffix |
 | **Inline** | ✗ Fully generated | ✗ Fully generated |
 | **Inline Generic** | ✗ Fully generated | ✗ Fully generated |
 
-**Standalone patterns** allow user-defined methods in the partial class:
+**All four standalone patterns** allow user-defined methods in the partial class.
+
+### Interface stubs (patterns 1, 2)
 
 ```csharp
 [KnockOff]
@@ -331,23 +333,54 @@ public partial class CalculatorStub : ICalculator
     {
         Divide.OnCall((a, b) => b == 0 ? throw new DivideByZeroException() : a / b);
     }
-}
 
+    // Override generated virtual method with _ suffix
+    protected override int Add_(int a, int b) => a + b;
+}
+```
+
+### Class stubs (patterns 3, 4)
+
+```csharp
 [KnockOffBase<ServiceBase>]
 public partial class ServiceStub
 {
-    // Override base class virtual method
-    protected override string Execute_(string cmd)
+    // Override generated virtual method with _ suffix
+    // User method completely replaces base.Execute() call
+    protected override void Execute_(string command)
     {
-        return $"Overridden: {cmd}";
+        // User-defined default behavior for abstract method
+    }
+
+    // Virtual methods: user override replaces base.Initialize() fallback
+    protected override void Initialize_()
+    {
+        // User-defined default -- no base.Initialize() call occurs
     }
 }
 ```
 
-**User Method Interceptors have full API parity with inline stubs:**
+Generic class stubs support partial overload coverage:
 
 ```csharp
-// User method provides default behavior
+[KnockOffBase(typeof(RepositoryBase<>))]
+public partial class RepoStub<T> where T : class
+{
+    // Override only some overloads -- each is independent
+    protected override T? GetDefault_()
+    {
+        return default; // User-defined default for parameterless overload
+    }
+    // GetDefault_(string) is NOT overridden -- uses standard interceptor path
+}
+```
+
+### User method interceptors have full API parity
+
+User method interceptors on both interface and class stubs support the complete API:
+
+```csharp
+// Interface stub with user method
 [KnockOff]
 public partial class ProcessorStub : IProcessor { }
 public partial class ProcessorStub
@@ -368,6 +401,13 @@ svc.Process("normal");   // Returns "[Default: normal]" (user method fallback)
 ```
 When chains > Sequences > OnCall/Returns > User Method
 ```
+
+### Class stub behavior differences
+
+For class stubs with user method overrides:
+- **Abstract methods**: User method IS the default behavior (no base implementation exists)
+- **Virtual methods**: User method completely replaces the `base.Method()` call -- the user override IS the fallback, not a supplement to the base call
+- **Without user override**: Virtual methods retain the standard unconfigured-count pattern with `base.Method()` fallback
 
 **Inline patterns** are fully generated and cannot be extended.
 

@@ -4,7 +4,7 @@
 
 User methods let you define default stub behavior at compile time by writing protected override methods in your stub class. Tests can override these defaults using `OnCall()` when needed.
 
-**Availability**: User methods work only with the **Stand-Alone pattern** (`[KnockOff]` on a class implementing an interface). They are not available in Inline Interface or Inline Class patterns.
+**Availability**: User methods work with all four **Standalone patterns**: `[KnockOff]` on a class implementing an interface (patterns 1, 2) and `[KnockOffBase<T>]` / `[KnockOffBase(typeof(T<>))]` on class stubs (patterns 3, 4). They are not available in Inline patterns.
 
 ---
 
@@ -253,7 +253,7 @@ Overriding one overload does not affect others. The non-overridden overloads wor
 
 ## Key Takeaways
 
-- User methods only work with the Stand-Alone pattern (`[KnockOff]` on class)
+- User methods work with all four Standalone patterns (`[KnockOff]` and `[KnockOffBase<T>]`)
 - Override virtual methods with underscore suffix (e.g., `protected override string Method_(...)`)
 - Interceptor properties use clean names (`stub.Method`), not the underscore suffix
 - Compile-time safety: signature mismatches cause "no suitable method to override" errors
