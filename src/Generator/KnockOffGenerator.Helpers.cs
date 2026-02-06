@@ -17,8 +17,9 @@ public partial class KnockOffGenerator
 	/// as a syntax token, which works even before the generated base class exists.
 	/// </summary>
 	/// <param name="classSymbol">The class symbol to scan for override methods</param>
+	/// <param name="compilation">The compilation, used to obtain a SemanticModel per syntax tree for type resolution</param>
 	/// <returns>A set of method signature keys (format: "MethodName_(ParamType1,ParamType2,...)") that have user overrides</returns>
-	private static HashSet<string> DetectUserOverrideMethods(INamedTypeSymbol classSymbol)
+	private static HashSet<string> DetectUserOverrideMethods(INamedTypeSymbol classSymbol, Compilation compilation)
 	{
 		var overrideMethods = new HashSet<string>();
 
@@ -28,6 +29,11 @@ public partial class KnockOffGenerator
 			var classSyntax = syntaxRef.GetSyntax() as ClassDeclarationSyntax;
 			if (classSyntax == null)
 				continue;
+
+			// Get the SemanticModel for this specific syntax tree.
+			// Each partial declaration may be in a different file (different syntax tree),
+			// and SemanticModel.GetTypeInfo() requires the node to be in the same tree.
+			var semanticModel = compilation.GetSemanticModel(syntaxRef.SyntaxTree);
 
 			foreach (var member in classSyntax.Members)
 			{
@@ -41,7 +47,7 @@ public partial class KnockOffGenerator
 						if (methodName.EndsWith("_"))
 						{
 							// Build full signature key including parameter types
-							var signatureKey = BuildOverrideSignatureKey(method);
+							var signatureKey = BuildOverrideSignatureKey(method, semanticModel);
 							overrideMethods.Add(signatureKey);
 						}
 					}
@@ -56,8 +62,10 @@ public partial class KnockOffGenerator
 	/// Builds a signature key from a MethodDeclarationSyntax for matching user override methods.
 	/// Format: "MethodName_(ParamType1,ParamType2,...)" - NO return type since C# forbids return-type overloading.
 	/// Includes ref/out/in modifiers as they affect the signature.
+	/// Uses the semantic model to resolve parameter types to fully-qualified names,
+	/// matching the keys built by SymbolHelpers.BuildOverrideSignatureKey on the matching side.
 	/// </summary>
-	private static string BuildOverrideSignatureKey(MethodDeclarationSyntax method)
+	private static string BuildOverrideSignatureKey(MethodDeclarationSyntax method, SemanticModel semanticModel)
 	{
 		var name = method.Identifier.Text;
 		var paramParts = method.ParameterList.Parameters
@@ -79,8 +87,24 @@ public partial class KnockOffGenerator
 					prefix = "in ";
 				// Note: params not included - it doesn't affect method signature identity
 
-				// Normalize the type name
-				var typeName = NormalizeSyntaxType(p.Type?.ToString() ?? "object");
+				// Resolve the type through the semantic model to get fully-qualified names.
+				// This produces keys that match the matching side (SymbolHelpers.BuildOverrideSignatureKey)
+				// which uses ITypeSymbol.ToDisplayString(FullyQualifiedWithNullability).
+				// Fallback to syntax text if semantic resolution fails.
+				string typeName;
+				if (p.Type != null)
+				{
+					var typeInfo = semanticModel.GetTypeInfo(p.Type);
+					var typeSymbol = typeInfo.Type;
+					typeName = typeSymbol != null
+						? NormalizeSyntaxType(typeSymbol.ToDisplayString(FullyQualifiedWithNullability))
+						: NormalizeSyntaxType(p.Type.ToString());
+				}
+				else
+				{
+					typeName = "object";
+				}
+
 				return prefix + typeName;
 			})
 			.ToArray();

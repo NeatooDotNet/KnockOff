@@ -1,7 +1,9 @@
 // -----------------------------------------------------------------------------
 // Design.Tests - When Chain Verification Bug Tests
 // -----------------------------------------------------------------------------
-// BUG: When a When chain has a single non-terminal matcher (e.g.,
+// This file contains tests for TWO related When chain verification bugs:
+//
+// BUG 1 (HEAD Bug): When a When chain has a single non-terminal matcher (e.g.,
 //   .When(1, 2).Returns(100).Verifiable()),
 // calling Stub.Verify() always throws "sequence incomplete" even though
 // the matcher was successfully invoked.
@@ -24,19 +26,32 @@
 //   3. CheckVerification() in method interceptors (Stub.Verify path)
 //   4. CheckVerificationAll() in method interceptors (Stub.VerifyAll path)
 //
-// These tests are expected to FAIL until the bug is fixed.
-// Each test documents what SHOULD happen vs what DOES happen today.
+// BUG 2 (TotalCallCount Bug): When chain invocations are not counted in
+//   TotalCallCount or the per-overload local count variables.
+//
+// ROOT CAUSE: The When chain invoke path does matcher.CallCount++ then
+//   returns early, bypassing all TotalCallCount component increments.
+//   The TotalCallCount property and overload-group local counts do not
+//   sum When chain matcher CallCount values. This means:
+//   - stub.Method.Verify(Times) undercounts (missing When chain calls)
+//   - Overload CheckVerificationAll() condition guard skips When-chain-only
+//     overloads (condExpr doesn't include When chain)
+//   - Overload CheckVerificationAll() local count excludes When chain calls
+//
+// All tests in this file are expected to FAIL until the respective bugs
+// are fixed. Each test documents what SHOULD happen vs what DOES happen today.
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Services;
 using Design.Stubs.Advanced;
+using Design.Stubs.Methods;
 using KnockOff;
 
 namespace Design.Tests.AdvancedTests;
 
 /// <summary>
-/// Tests demonstrating the When chain verification bug.
-/// All tests in this class are expected to FAIL until the bug is fixed.
+/// Tests demonstrating When chain verification bugs.
+/// All tests in this class are expected to FAIL until the bugs are fixed.
 /// </summary>
 public class WhenChainVerificationBugTests
 {
@@ -237,5 +252,201 @@ public class WhenChainVerificationBugTests
         // This should pass because HEAD advanced to the terminal matcher.
         // IsTerminal=true causes the verification check to pass.
         chain.Verify();
+    }
+
+    // =========================================================================
+    // BUG 2: TotalCallCount does not include When chain invocations
+    // =========================================================================
+    // The following tests demonstrate that When chain calls are not counted in
+    // TotalCallCount or the per-overload local count variables used for
+    // verification.
+    //
+    // NOTE: These tests use Verify(Times) on the interceptor, which checks
+    // TotalCallCount. The HEAD bug (Bug 1) does NOT affect Verify(Times) --
+    // it only affects chain.Verify() and CheckVerification/CheckVerificationAll
+    // When chain HEAD checks. So these tests cleanly isolate the TotalCallCount
+    // bug without interference from the HEAD bug.
+    //
+    // Related plan: docs/plans/verifyall-totalcallcount-fix.md
+    // =========================================================================
+
+    // =========================================================================
+    // Bug 2, Scenario 1: Single-sig Verify(Times) excludes When chain calls
+    // =========================================================================
+    // ICalculator.Add is a non-overloaded method (single-signature interceptor).
+    // TotalCallCount sums _unconfiguredCallCount, _onCallTracking, _returnsValue,
+    // and _sequence counts -- but NOT When chain matcher CallCount values.
+    //
+    // WHAT SHOULD HAPPEN: After calling Add(1,2) via When chain and Add(5,6)
+    // via Returns fallback, Verify(Times.Exactly(2)) should pass (2 total calls).
+    //
+    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the Returns call counted).
+    // Verify(Times.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
+    //
+    // WHY: The When chain invoke path does matcher.CallCount++ and returns early,
+    // bypassing _returnsValueTracking.RecordCall(). The TotalCallCount getter
+    // never sums the When chain matcher CallCount values.
+    // =========================================================================
+
+    [Fact]
+    public void SingleSig_VerifyTimes_ShouldCountWhenChainCalls()
+    {
+        var stub = new VerificationDemo.Stubs.ICalculator();
+
+        // Configure When chain (non-terminal, specific value matching)
+        stub.Add.When(1, 2).Returns(100);
+        // Configure Returns as fallback for non-matching args
+        stub.Add.Returns(0);
+
+        ICalculator calc = stub;
+
+        // Call 1: When chain matches (1, 2) -> matcher.CallCount++
+        var r1 = calc.Add(1, 2);
+        Assert.Equal(100, r1);
+
+        // Call 2: When chain doesn't match (5, 6), falls through to Returns
+        // -> _returnsValueTracking._callCount++
+        var r2 = calc.Add(5, 6);
+        Assert.Equal(0, r2);
+
+        // BUG: TotalCallCount = 1 (only Returns call counted).
+        // Should be 2 (When chain + Returns).
+        stub.Add.Verify(Times.Exactly(2));
+    }
+
+    // =========================================================================
+    // Bug 2, Scenario 2: Overload Verify(Times) excludes When chain calls
+    // =========================================================================
+    // IFormatter.Format is an overloaded method (overload-group interceptor).
+    // The overload-group TotalCallCount expression sums per-overload tracking
+    // counts -- but NOT When chain matcher CallCount values.
+    //
+    // WHAT SHOULD HAPPEN: After calling Format("special") via When chain and
+    // Format("other") via OnCall, Verify(Times.Exactly(2)) should pass.
+    //
+    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the OnCall path counted).
+    // Verify(Times.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
+    //
+    // WHY: Same root cause as scenario 1, but in the overload-group code path.
+    // The overload-group TotalCallCount expression does not include
+    // (_whenChain_{suffix}?.Sum(m => m.CallCount) ?? 0).
+    // =========================================================================
+
+    [Fact]
+    public void Overload_VerifyTimes_ShouldCountWhenChainCalls()
+    {
+        var stub = new MethodOverloadsDemo.Stubs.IFormatter();
+
+        // Configure When chain (non-terminal, specific value matching)
+        stub.Format.When("special").Returns("SPECIAL");
+        // Configure OnCall on the same overload as fallback
+        stub.Format.OnCall((string input) => "default");
+
+        IFormatter formatter = stub;
+
+        // Call 1: When chain matches "special" -> matcher.CallCount++
+        var r1 = formatter.Format("special");
+        Assert.Equal("SPECIAL", r1);
+
+        // Call 2: When chain doesn't match "other", falls through to OnCall
+        // -> _onCallTracking._callCount++
+        var r2 = formatter.Format("other");
+        Assert.Equal("default", r2);
+
+        // BUG: TotalCallCount = 1 (only OnCall path counted).
+        // Should be 2 (When chain + OnCall).
+        stub.Format.Verify(Times.Exactly(2));
+    }
+
+    // =========================================================================
+    // Bug 2, Scenario 3: Overload VerifyAll local count excludes When chain
+    // =========================================================================
+    // In overload-group CheckVerificationAll(), each overload has TWO blocks:
+    //   Block 1: condExpr (is configured?) + count check (was called?)
+    //   Block 2: When chain HEAD check
+    //
+    // Block 1's condExpr checks _onCall and _sequence but NOT _whenChain.
+    // Block 1's local count sums _onCallTracking and _sequence but NOT When
+    // chain matcher CallCount values.
+    //
+    // This test configures a When chain AND an OnCall on the same overload,
+    // then invokes ONLY via the When chain path. This ensures condExpr passes
+    // (OnCall is configured) so Block 1 runs, but the count check fails
+    // because the count doesn't include When chain CallCount.
+    //
+    // WHAT SHOULD HAPPEN: VerifyAll() should pass because the overload was
+    // configured (OnCall + When chain) and was invoked (via When chain).
+    //
+    // WHAT ACTUALLY HAPPENS: VerifyAll() throws
+    //   "Format: expected AtLeastOnce, actual 0 calls"
+    // because the local count = _onCallTracking._callCount (0) + _sequence (0)
+    // and does not include When chain matcher CallCount (1).
+    //
+    // WHY: The per-overload local count in CheckVerificationAll() does not
+    // include (_whenChain_{suffix}?.Sum(m => m.CallCount) ?? 0).
+    // =========================================================================
+
+    [Fact]
+    public void Overload_VerifyAll_ShouldCountWhenChainCalls()
+    {
+        var stub = new MethodOverloadsDemo.Stubs.IFormatter();
+
+        // Configure When chain (non-terminal, specific value matching)
+        stub.Format.When("special").Returns("SPECIAL");
+        // Configure OnCall on the same overload (makes condExpr true in Block 1,
+        // isolating the count bug from the condExpr bug)
+        stub.Format.OnCall((string input) => "default");
+
+        IFormatter formatter = stub;
+
+        // Invoke ONLY via When chain (OnCall never runs because "special" matches)
+        var r = formatter.Format("special");
+        Assert.Equal("SPECIAL", r);
+
+        // BUG: VerifyAll fails with "Format: expected AtLeastOnce, actual 0"
+        // because the overload count (0) doesn't include When chain CallCount (1).
+        // Block 1 runs (condExpr true: OnCall configured), count = 0, fails.
+        // Block 2 (HEAD check) never runs because Block 1 returned early.
+        stub.VerifyAll();
+    }
+
+    // =========================================================================
+    // Bug 2, Scenario 4: Void overload Verify(Times) excludes When chain calls
+    // =========================================================================
+    // Same as scenario 2 but for void method overloads (IFormatter.Log).
+    // Void When chains use VoidWhenMatcher with matcher.CallCount++, which is
+    // equally excluded from the overload-group TotalCallCount expression.
+    //
+    // WHAT SHOULD HAPPEN: After calling Log("special") via void When chain and
+    // Log("other") via OnCall, Verify(Times.Exactly(2)) should pass.
+    //
+    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the OnCall path counted).
+    // =========================================================================
+
+    [Fact]
+    public void VoidOverload_VerifyTimes_ShouldCountWhenChainCalls()
+    {
+        var stub = new MethodOverloadsDemo.Stubs.IFormatter();
+        var callLog = new List<string>();
+
+        // Configure void When chain (non-terminal, specific value matching)
+        stub.Log.When("special").Call(msg => callLog.Add($"when:{msg}"));
+        // Configure OnCall on the same overload as fallback
+        stub.Log.OnCall((string msg) => callLog.Add($"oncall:{msg}"));
+
+        IFormatter formatter = stub;
+
+        // Call 1: Void When chain matches "special" -> matcher.CallCount++
+        formatter.Log("special");
+        Assert.Contains("when:special", callLog);
+
+        // Call 2: When chain doesn't match "other", falls through to OnCall
+        // -> _onCallTracking._callCount++
+        formatter.Log("other");
+        Assert.Contains("oncall:other", callLog);
+
+        // BUG: TotalCallCount = 1 (only OnCall path counted).
+        // Should be 2 (When chain + OnCall).
+        stub.Log.Verify(Times.Exactly(2));
     }
 }

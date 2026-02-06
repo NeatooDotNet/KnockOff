@@ -159,7 +159,8 @@ internal static class MethodInterceptorRenderer
 		// Backward compatibility: aggregate tracking properties
 		RenderBackwardCompatibleTrackingProperties(w, model.TrackableParameters, model.LastArgType, model.LastArgsType, canHaveValueOverload,
 			hasSimplifiedCallback: isAsyncWithInnerType && !hasRefOrOut,
-			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut);
+			hasSimplifiedVoidCallback: isVoidAsync && !hasRefOrOut,
+			hasWhenChain: canHaveWhenChain || canHaveVoidWhenChain);
 		w.Line();
 
 		// Verify() methods for direct interceptor verification
@@ -1241,7 +1242,7 @@ internal static class MethodInterceptorRenderer
 						w.Line("var head = _whenChainHead;");
 						w.Line("var count = _whenChain.Count;");
 						w.Line("// Chain must be fully consumed (HEAD at end or at terminal matcher)");
-						w.Line("if (head < count && !_whenChain[head].IsTerminal)");
+						w.Line("if (head < count && !_whenChain[head].IsTerminal && _whenChain[head].CallCount == 0)");
 						w.Line($"\treturn global::KnockOff.VerificationFailure.SequenceIncomplete(\"{methodName} When chain\", count, head);");
 					}
 				}
@@ -1266,7 +1267,7 @@ internal static class MethodInterceptorRenderer
 						w.Line("var head = _whenChainHead;");
 						w.Line("var count = _whenChain.Count;");
 						w.Line("// Chain must be fully consumed (HEAD at end or at terminal matcher)");
-						w.Line("if (head < count && !_whenChain[head].IsTerminal)");
+						w.Line("if (head < count && !_whenChain[head].IsTerminal && _whenChain[head].CallCount == 0)");
 						w.Line($"\treturn global::KnockOff.VerificationFailure.SequenceIncomplete(\"{methodName} When chain\", count, head);");
 					}
 				}
@@ -1334,15 +1335,20 @@ internal static class MethodInterceptorRenderer
 						var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 						if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
 							countParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
+						// When chain call counts
+						var canHaveWhenChainForOverload = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+						var canHaveVoidWhenChainForOverload = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+						if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+							countParts.Add($"(_whenChain_{overload.SignatureSuffix}?.Sum(m => m.CallCount) ?? 0)");
 						var countExpr = string.Join(" + ", countParts);
 						w.Line($"var count = {countExpr};");
 						w.Line($"if (!times.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", times, count);");
 					}
 					// Check When chain verification for this overload
 					var hasRefOrOutForWhen = HasRefOrOutParameters(overload.Parameters);
-					var canHaveWhenChainForOverload = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
-					var canHaveVoidWhenChainForOverload = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
-					if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+					var canHaveWhenChainForOverloadForWhen = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+					var canHaveVoidWhenChainForOverloadForWhen = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+					if (canHaveWhenChainForOverloadForWhen || canHaveVoidWhenChainForOverloadForWhen)
 					{
 						w.Line($"if (_whenVerifiable_{overload.SignatureSuffix} && _whenChain_{overload.SignatureSuffix} != null && _whenChain_{overload.SignatureSuffix}.Count > 0)");
 						using (w.Braces())
@@ -1350,7 +1356,7 @@ internal static class MethodInterceptorRenderer
 							w.Line($"var head = _whenChainHead_{overload.SignatureSuffix};");
 							w.Line($"var chainCount = _whenChain_{overload.SignatureSuffix}.Count;");
 							w.Line("// Chain must be fully consumed (HEAD at end or at terminal matcher)");
-							w.Line($"if (head < chainCount && !_whenChain_{overload.SignatureSuffix}[head].IsTerminal)");
+							w.Line($"if (head < chainCount && !_whenChain_{overload.SignatureSuffix}[head].IsTerminal && _whenChain_{overload.SignatureSuffix}[head].CallCount == 0)");
 							w.Line($"\treturn global::KnockOff.VerificationFailure.SequenceIncomplete(\"{methodName} When chain\", chainCount, head);");
 						}
 					}
@@ -1378,6 +1384,11 @@ internal static class MethodInterceptorRenderer
 					var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 					if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
 						condParts.Add($"_onCallSimplifiedVoid_{overload.SignatureSuffix} != null");
+					// When chain configured check (matching IsConfigured property pattern)
+					var canHaveWhenChainForOverload = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+					var canHaveVoidWhenChainForOverload = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+					if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+						condParts.Add($"(_whenChain_{overload.SignatureSuffix}?.Count ?? 0) > 0");
 					var condExpr = string.Join(" || ", condParts);
 					w.Line($"if ({condExpr})");
 					using (w.Braces())
@@ -1392,15 +1403,18 @@ internal static class MethodInterceptorRenderer
 							countParts.Add($"(_onCallSimplifiedTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
 						if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
 							countParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
+						// When chain call counts
+						if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+							countParts.Add($"(_whenChain_{overload.SignatureSuffix}?.Sum(m => m.CallCount) ?? 0)");
 						var countExpr = string.Join(" + ", countParts);
 						w.Line($"var count = {countExpr};");
 						w.Line($"if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, count);");
 					}
 					// Check When chain for this overload if configured
 					var hasRefOrOutForWhen = HasRefOrOutParameters(overload.Parameters);
-					var canHaveWhenChainForOverload = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
-					var canHaveVoidWhenChainForOverload = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
-					if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+					var canHaveWhenChainForOverloadForWhen = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+					var canHaveVoidWhenChainForOverloadForWhen = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+					if (canHaveWhenChainForOverloadForWhen || canHaveVoidWhenChainForOverloadForWhen)
 					{
 						w.Line($"if (_whenChain_{overload.SignatureSuffix} != null && _whenChain_{overload.SignatureSuffix}.Count > 0)");
 						using (w.Braces())
@@ -1408,7 +1422,7 @@ internal static class MethodInterceptorRenderer
 							w.Line($"var head = _whenChainHead_{overload.SignatureSuffix};");
 							w.Line($"var chainCount = _whenChain_{overload.SignatureSuffix}.Count;");
 							w.Line("// Chain must be fully consumed (HEAD at end or at terminal matcher)");
-							w.Line($"if (head < chainCount && !_whenChain_{overload.SignatureSuffix}[head].IsTerminal)");
+							w.Line($"if (head < chainCount && !_whenChain_{overload.SignatureSuffix}[head].IsTerminal && _whenChain_{overload.SignatureSuffix}[head].CallCount == 0)");
 							w.Line($"\treturn global::KnockOff.VerificationFailure.SequenceIncomplete(\"{methodName} When chain\", chainCount, head);");
 						}
 					}
@@ -2041,7 +2055,7 @@ internal static class MethodInterceptorRenderer
 				w.Line($"var head = _interceptor.{whenChainHeadField};");
 				w.Line($"var count = _interceptor.{whenChainField}.Count;");
 				w.Line("// Chain is complete if HEAD reached a terminal matcher or exhausted");
-				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal)");
+				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal && _interceptor." + whenChainField + "[head].CallCount == 0)");
 				using (w.Braces())
 				{
 					w.Line("throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
@@ -2496,7 +2510,7 @@ internal static class MethodInterceptorRenderer
 				w.Line($"var head = _interceptor.{whenChainHeadField};");
 				w.Line($"var count = _interceptor.{whenChainField}.Count;");
 				w.Line("// Chain is complete if HEAD reached a terminal matcher or exhausted");
-				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal)");
+				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal && _interceptor." + whenChainField + "[head].CallCount == 0)");
 				using (w.Braces())
 				{
 					w.Line("throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
@@ -2732,14 +2746,16 @@ internal static class MethodInterceptorRenderer
 		string? lastArgsType,
 		bool hasValueOverload,
 		bool hasSimplifiedCallback = false,
-		bool hasSimplifiedVoidCallback = false)
+		bool hasSimplifiedVoidCallback = false,
+		bool hasWhenChain = false)
 	{
-		// CallCount - total across OnCall + Returns(value) + simplified + sequence + unconfigured (private - use Verify() API to check call counts)
+		// CallCount - total across OnCall + Returns(value) + simplified + sequence + When chain + unconfigured (private - use Verify() API to check call counts)
 		// Include value tracking when value overload exists, and simplified callback tracking when present
 		var valueTrackingPart = hasValueOverload ? " + (_returnsValueTracking?._callCount ?? 0)" : "";
 		var simplifiedTrackingPart = hasSimplifiedCallback ? " + (_onCallSimplifiedTracking?._callCount ?? 0)" : "";
 		var simplifiedVoidTrackingPart = hasSimplifiedVoidCallback ? " + (_onCallSimplifiedVoidTracking?._callCount ?? 0)" : "";
-		w.Line($"private int TotalCallCount {{ get {{ var sum = _unconfiguredCallCount + (_onCallTracking?._callCount ?? 0){valueTrackingPart}{simplifiedTrackingPart}{simplifiedVoidTrackingPart}; if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking._callCount; return sum; }} }}");
+		var whenChainPart = hasWhenChain ? " if (_whenChain != null) foreach (var m in _whenChain) sum += m.CallCount;" : "";
+		w.Line($"private int TotalCallCount {{ get {{ var sum = _unconfiguredCallCount + (_onCallTracking?._callCount ?? 0){valueTrackingPart}{simplifiedTrackingPart}{simplifiedVoidTrackingPart}; if (_sequence != null) foreach (var s in _sequence) sum += s.Tracking._callCount;{whenChainPart} return sum; }} }}");
 		w.Line();
 
 		// LastArg - for single param methods (aggregate across all call sources)
@@ -2811,6 +2827,11 @@ internal static class MethodInterceptorRenderer
 			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 			if ((isVoidTask || isVoidValueTask) && !hasRefOrOut)
 				sumParts.Add($"(_onCallSimplifiedVoidTracking_{overload.SignatureSuffix}?._callCount ?? 0)");
+			// Add When chain call counts for eligible overloads
+			var canHaveWhenChainForOverload = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+			var canHaveVoidWhenChainForOverload = overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOut;
+			if (canHaveWhenChainForOverload || canHaveVoidWhenChainForOverload)
+				sumParts.Add($"(_whenChain_{overload.SignatureSuffix}?.Sum(m => m.CallCount) ?? 0)");
 		}
 		var sumExpr = "_unconfiguredCallCount + " + string.Join(" + ", sumParts);
 

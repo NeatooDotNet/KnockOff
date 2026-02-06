@@ -1676,7 +1676,7 @@ internal static class InlineRenderer
         w.Line("\t\t\t\t\tif (_interceptor._whenChain == null || _interceptor._whenChain.Count == 0) return;");
         w.Line("\t\t\t\t\tvar head = _interceptor._whenChainHead;");
         w.Line("\t\t\t\t\tvar count = _interceptor._whenChain.Count;");
-        w.Line("\t\t\t\t\tif (head < count && !_interceptor._whenChain[head].IsTerminal)");
+        w.Line("\t\t\t\t\tif (head < count && !_interceptor._whenChain[head].IsTerminal && _interceptor._whenChain[head].CallCount == 0)");
         w.Line("\t\t\t\t\t\tthrow new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
         w.Line("\t\t\t\t}");
         w.Line();
@@ -1931,7 +1931,7 @@ internal static class InlineRenderer
         w.Line("\t\t\t\t\tif (_interceptor._whenChain == null || _interceptor._whenChain.Count == 0) return;");
         w.Line("\t\t\t\t\tvar head = _interceptor._whenChainHead;");
         w.Line("\t\t\t\t\tvar count = _interceptor._whenChain.Count;");
-        w.Line("\t\t\t\t\tif (head < count && !_interceptor._whenChain[head].IsTerminal)");
+        w.Line("\t\t\t\t\tif (head < count && !_interceptor._whenChain[head].IsTerminal && _interceptor._whenChain[head].CallCount == 0)");
         w.Line("\t\t\t\t\t\tthrow new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
         w.Line("\t\t\t\t}");
         w.Line();

@@ -870,7 +870,7 @@ public partial class KnockOffGenerator
 		}
 
 		// Detect user override methods using syntactic detection (base class pattern)
-		var userOverrideMethods = DetectUserOverrideMethods(classSymbol);
+		var userOverrideMethods = DetectUserOverrideMethods(classSymbol, context.SemanticModel.Compilation);
 		var userOverrideMethodsArray = new EquatableArray<string>(userOverrideMethods.ToArray());
 
 		// Detect user override properties using syntactic detection (base class pattern)

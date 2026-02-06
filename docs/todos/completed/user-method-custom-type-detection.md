@@ -1,9 +1,9 @@
 # User Method Detection Fails for Custom Type Parameters
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** High
 **Created:** 2026-02-05
-**Last Updated:** 2026-02-05 (architect confirmation complete)
+**Last Updated:** 2026-02-05
 
 ---
 
@@ -45,17 +45,17 @@ Fix the type normalization in `BuildOverrideSignatureKey` (Helpers.cs) to match 
 
 ## Plans
 
-_(To be populated by architect)_
+- [Fix User Method Detection for Custom Type Parameters](../plans/user-method-type-detection-fix.md)
 
 ---
 
 ## Tasks
 
 - [x] Architect confirms bug and creates failing design tests
-- [ ] Create implementation plan
-- [ ] Fix generator type normalization
-- [ ] Verify all existing tests still pass
-- [ ] Add tests for user methods with custom type parameters
+- [x] Create implementation plan
+- [x] Fix generator type normalization
+- [x] Verify all existing tests still pass
+- [x] Add tests for user methods with custom type parameters
 
 ---
 
@@ -69,4 +69,10 @@ _(To be populated by architect)_
 
 ## Results / Conclusions
 
-_(To be filled on completion)_
+**Fixed.** Changed `BuildOverrideSignatureKey` in `KnockOffGenerator.Helpers.cs` to resolve parameter types via the semantic model (`SemanticModel.GetTypeInfo(p.Type).Type.ToDisplayString(FullyQualifiedWithNullability)`) instead of syntax text (`p.Type?.ToString()`). This produces fully-qualified type names that match the keys built by the matching side in `SymbolHelpers.cs`.
+
+`DetectUserOverrideMethods` now accepts `Compilation` and calls `compilation.GetSemanticModel(syntaxRef.SyntaxTree)` per partial declaration to handle methods in different syntax trees. Falls back to syntax text if semantic resolution fails.
+
+**3 files changed:** `KnockOffGenerator.Helpers.cs` (core fix), `KnockOffGenerator.Transform.cs` (pass compilation), `KnockOffGenerator.StandaloneClass.cs` (pass compilation). No changes to builders, renderers, or model types — the equatable model graph stores only strings.
+
+**6 previously-failing tests now pass** (3 in `UserMethodCustomTypeDetectionTests`, 3 in `VoidUserMethodFallbackTests`). Zero regressions.

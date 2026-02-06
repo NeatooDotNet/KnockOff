@@ -365,7 +365,7 @@ internal static class WhenChainRenderer
 				w.Line($"var head = _interceptor.{whenChainHeadField};");
 				w.Line($"var count = _interceptor.{whenChainField}.Count;");
 				w.Line("// Chain is complete if HEAD reached a terminal matcher or exhausted");
-				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal)");
+				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal && _interceptor." + whenChainField + "[head].CallCount == 0)");
 				using (w.Braces())
 				{
 					w.Line("throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
@@ -691,7 +691,7 @@ internal static class WhenChainRenderer
 				w.Line($"var head = _interceptor.{whenChainHeadField};");
 				w.Line($"var count = _interceptor.{whenChainField}.Count;");
 				w.Line("// Chain is complete if HEAD reached a terminal matcher or exhausted");
-				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal)");
+				w.Line("if (head < count && !_interceptor." + whenChainField + "[head].IsTerminal && _interceptor." + whenChainField + "[head].CallCount == 0)");
 				using (w.Braces())
 				{
 					w.Line("throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"When chain\", count, head));");
