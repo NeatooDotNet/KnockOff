@@ -5,17 +5,19 @@
 KnockOff supports nine distinct patterns for creating test stubs, organized into two categories:
 
 **Standalone Patterns** (file-based, reusable across tests):
-1. **Standalone** - Dedicated stub class implementing interface
-2. **Generic Standalone** - Generic stub class with type parameters
-3. **Standalone Class** - Dedicated stub class for concrete/abstract classes
-4. **Generic Standalone Class** - Generic stub class for generic base classes
+
+1. **[Standalone](#standalone-pattern)** - Dedicated stub class implementing interface
+2. **[Generic Standalone](#generic-standalone-pattern)** - Generic stub class with type parameters
+3. **[Standalone Class](#standalone-class-pattern)** - Dedicated stub class for concrete/abstract classes
+4. **[Generic Standalone Class](#generic-standalone-class-pattern)** - Generic stub class for generic base classes
 
 **Inline Patterns** (nested within test class):
-5. **Inline Interface** - Nested stub for closed generic interface
-6. **Inline Class** - Nested stub for class with virtual members
-7. **Inline Delegate** - Nested stub for delegate types
-8. **Open Generic Interface** - Nested generic stub from open generic interface
-9. **Open Generic Class** - Nested generic stub from open generic class
+
+5. **[Inline Interface](#inline-interface-pattern)** - Nested stub for closed generic interface
+6. **[Inline Class](#inline-class-pattern)** - Nested stub for class with virtual members
+7. **[Inline Delegate](#inline-delegate-pattern)** - Nested stub for delegate types
+8. **[Open Generic Interface](#open-generic-interface-pattern)** - Nested generic stub from open generic interface
+9. **[Open Generic Class](#open-generic-class-pattern)** - Nested generic stub from open generic class
 
 ## Pattern Relationships
 

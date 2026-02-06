@@ -267,6 +267,80 @@ public class PriorityOrderTests
 }
 
 // =============================================================================
+// Interface Hierarchy - Partial Source Delegation
+// =============================================================================
+
+#region source-hierarchy-interface
+public interface IStepList : IList<string>
+{
+    void AddRange(IEnumerable<string> items);
+}
+#endregion
+
+[KnockOff]
+public partial class StepListStub : IStepList { }
+
+public class HierarchyPartialSourceTests
+{
+    [Fact]
+    public void Source_PartialImplementation_DelegatesMatchingMembers()
+    {
+        var stub = new StepListStub();
+
+        #region source-hierarchy-partial
+        var realList = new List<string> { "step1", "step2", "step3" };
+
+        // List<string> doesn't implement IStepList, but it does implement IList<string>
+        // KnockOff delegates IList/ICollection/IEnumerable members to the real list
+        stub.Source(realList);
+
+        IStepList list = stub;
+
+        // These work — delegated to List<string>
+        Assert.Equal(3, list.Count);          // ICollection<T>.Count
+        Assert.Equal("step1", list[0]);       // IList<T> indexer
+        var items = new List<string>();
+        foreach (var item in list)            // IEnumerable<T>
+        {
+            items.Add(item);
+        }
+        Assert.Equal(new[] { "step1", "step2", "step3" }, items);
+
+        // AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
+        // Configure it explicitly, or it returns the smart default
+        stub.AddRange.OnCall((newItems) =>
+        {
+            foreach (var newItem in newItems)
+            {
+                list.Add(newItem);
+            }
+        });
+        #endregion
+
+        list.AddRange(new[] { "step4" });
+        Assert.Equal(4, list.Count);
+    }
+
+    [Fact]
+    public void Source_PartialImplementation_NonMatchingMembersReturnDefaults()
+    {
+        var stub = new StepListStub();
+        var realList = new List<string> { "a", "b", "c" };
+
+        stub.Source(realList);
+
+        IStepList list = stub;
+
+        // IList<T> members work
+        Assert.Equal(3, list.Count);
+
+        // AddRange is IStepList-only — not delegated, does nothing (void default)
+        list.AddRange(new[] { "d", "e" });
+        Assert.Equal(3, list.Count); // Still 3 — AddRange was a no-op
+    }
+}
+
+// =============================================================================
 // Complete Example - Decorator Pattern Testing
 // =============================================================================
 
