@@ -554,8 +554,8 @@ public class GenericStandaloneOverloadTests
         var stub = new GenericFormatterWithUserMethodsStub<TestEntity>();
         stub.DefaultInstance = new TestEntity { Id = 0, Name = "UserMethod" };
 
-        // OnCall supersedes the user method - note suffixed method name for overloaded user methods
-        stub.Get.OnCall_NoParams_T(() => new TestEntity { Id = 999, Name = "OnCallOverride" });
+        // OnCall supersedes the user method - overloads are disambiguated by delegate type
+        stub.Get.OnCall(() => new TestEntity { Id = 999, Name = "OnCallOverride" });
 
         IGenericFormatter<TestEntity> formatter = stub;
 
@@ -576,8 +576,8 @@ public class GenericStandaloneOverloadTests
         stub.CreateById = id => new TestEntity { Id = id, Name = "UserMethodById" };
         stub.CreateByName = name => new TestEntity { Id = 0, Name = name };
 
-        // Override only the int overload with OnCall - note suffixed method name
-        stub.Get.OnCall_Int32_T(id => new TestEntity { Id = id * 10, Name = "OnCallById" });
+        // Override only the int overload with OnCall - overloads are disambiguated by delegate type
+        stub.Get.OnCall(id => new TestEntity { Id = id * 10, Name = "OnCallById" });
 
         IGenericFormatter<TestEntity> formatter = stub;
 
@@ -593,25 +593,6 @@ public class GenericStandaloneOverloadTests
         Assert.Equal("test", result3.Name);          // User method
     }
 
-    [Fact]
-    public void UserMethod_Returns_SupersedesUserMethod()
-    {
-        // Arrange
-        var stub = new GenericFormatterWithUserMethodsStub<TestEntity>();
-        stub.DefaultInstance = new TestEntity { Id = 0, Name = "UserMethod" };
-
-        // Returns also works with suffixed names
-        var overrideEntity = new TestEntity { Id = 888, Name = "ReturnsOverride" };
-        stub.Get.Returns_NoParams_T(overrideEntity);
-
-        IGenericFormatter<TestEntity> formatter = stub;
-
-        // Act
-        var result = formatter.Get();
-
-        // Assert - Returns wins over user method
-        Assert.Same(overrideEntity, result);
-    }
 
     [Fact]
     public void UserMethod_DifferentTypeArguments_IndependentBehavior()

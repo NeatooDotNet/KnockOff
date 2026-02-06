@@ -130,9 +130,7 @@ public class UserDomainModelTests
         var myRepoKO = new MyRepoStub([user1, user2]);
         var userDomainModel = new UserDomainModel(myRepoKO);
 
-        // TODO: Fix .When
-        //myRepoKO.GetUser.When(1).Returns(user1).Verifiable(Times.Twice);
-        //myRepoKO.GetUser.When(2).Verifiable(Times.Never);
+        myRepoKO.GetUser.When(1).Returns(user1).Verifiable();
         myRepoKO.Update.OnCall(u => Assert.Same(u, user1)).Verifiable(Times.Once);
 
         userDomainModel.Fetch(1);
