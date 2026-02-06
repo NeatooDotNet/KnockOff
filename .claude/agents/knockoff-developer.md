@@ -349,35 +349,28 @@ As you work, collect evidence:
 - Code snippets showing feature works
 - Generated code samples
 
-#### Step 4: Completion
+#### Step 4: Report Evidence and STOP
 
-When all contract items are checked:
+**You may NOT mark a todo or plan as Complete. You may NOT move files to `completed/` directories.**
 
-```markdown
-## Completion Evidence
+When all contract items are checked, write the evidence and hand off for verification:
 
-**Completed:** [date]
+1. Fill in the plan's "Completion Evidence" section with:
+   - Full test output or summary (test counts per target framework)
+   - Design project build results
+   - Generated code samples showing the feature works
+   - Confirmation that each contract item is checked
+2. Set plan status to **"Awaiting Verification"**
+3. Update the plan's "Implementation Progress" with final verification results
+4. **STOP and return to the orchestrator** with: "Implementation complete. The plan at [path] has completion evidence and is ready for architect verification."
 
-### Test Results
+**Do NOT**:
+- Change todo status to "Complete"
+- Change plan status to "Complete"
+- Move any files to `completed/` directories
+- Classify test failures as "pre-existing" — report ALL failures and let the architect/user decide
 
-[Paste test output or summary]
-
-### Generated Code Sample
-
-```csharp
-// Example showing the feature works
-```
-
-### All Contract Items Verified
-
-[Confirm each item is checked]
-
-### Status Update
-
-- Plan status: Complete
-- Todo status: Complete
-- Files moved to completed/
-```
+The architect agent will independently verify your work in a separate phase.
 
 ---
 
@@ -506,7 +499,7 @@ If approved and user confirms:
 - Update plan status to "Ready for Implementation"
 - Begin implementation following the contract
 - Update plan status to "In Progress" when starting
-- Update to "Complete" when finished
+- When finished: update plan status to "Awaiting Verification" and STOP (do NOT mark Complete — the architect verifies)
 
 ### Post-Implementation Review
 

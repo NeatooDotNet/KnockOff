@@ -117,7 +117,7 @@ public class UserDomainModelTests
         userDomainModel.Update();
 
         // I have Verify on my Stub!
-        myRepoKO.GetUser.Verify(Times.Once);
+        myRepoKO.GetUser.Verify(Times.Exactly(2));
         myRepoKO.Update.Verify(Times.Once);
     }
 

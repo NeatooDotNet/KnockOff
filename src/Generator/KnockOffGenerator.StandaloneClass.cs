@@ -174,7 +174,7 @@ public partial class KnockOffGenerator
 		var userOverridePropertiesArray = new EquatableArray<string>(userOverrideProperties.ToArray());
 
 		// Detect user-defined method overrides (base class pattern)
-		var userOverrideMethods = DetectUserOverrideMethods(classSymbol);
+		var userOverrideMethods = DetectUserOverrideMethods(classSymbol, context.SemanticModel.Compilation);
 		var userOverrideMethodsArray = new EquatableArray<string>(userOverrideMethods.ToArray());
 
 		return new StandaloneClassStubInfo(
