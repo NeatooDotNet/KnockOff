@@ -109,7 +109,7 @@ public class VerifyTypedCallsTests
         // Verify calls for specific type using Times
         tracking.Verify(Times.Exactly(2));
         #endregion
-        Assert.Equal(2, stub.GetById.Of<User>().LastCallArg);
+        Assert.Equal(2, stub.GetById.Of<User>().LastArg);
     }
 }
 

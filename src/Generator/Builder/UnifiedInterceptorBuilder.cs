@@ -20,13 +20,21 @@ internal static class UnifiedInterceptorBuilder
 	/// <summary>
 	/// Builds a unified method interceptor model for a method group (single method or overloads).
 	/// </summary>
+	/// <param name="interceptorClassName">The name of the interceptor class (e.g., "ProcessInterceptor").</param>
+	/// <param name="methodName">The method name (e.g., "Process").</param>
+	/// <param name="declaringInterface">The declaring interface type for Source(T) feature.</param>
+	/// <param name="ownerClassName">The class name that owns this interceptor.</param>
+	/// <param name="ownerTypeParameters">Type parameters on the owner class.</param>
+	/// <param name="overloads">The method signatures (one or more for overload groups).</param>
+	/// <param name="userMethodName">Optional user method name for fallback (e.g., "Process_"). Null if no user override.</param>
 	public static UnifiedMethodInterceptorModel BuildMethodInterceptor(
 		string interceptorClassName,
 		string methodName,
 		string declaringInterface,
 		string ownerClassName,
 		string ownerTypeParameters,
-		IReadOnlyList<MethodSignatureInfo> overloads)
+		IReadOnlyList<MethodSignatureInfo> overloads,
+		string? userMethodName = null)
 	{
 		if (overloads.Count == 0)
 			throw new ArgumentException("At least one overload is required", nameof(overloads));
@@ -60,6 +68,7 @@ internal static class UnifiedInterceptorBuilder
 				BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateTypeForBuilder),
 				DefaultExpression: sig.DefaultExpression,
 				ThrowsOnDefault: sig.ThrowsOnDefault,
+				UserMethodName: userMethodName,
 				Overloads: EquatableArray<MethodOverloadSignature>.Empty);
 		}
 		else
@@ -87,8 +96,10 @@ internal static class UnifiedInterceptorBuilder
 				BuilderInterface: "global::KnockOff.IMethodTracking",
 				DefaultExpression: first.DefaultExpression,
 				ThrowsOnDefault: first.ThrowsOnDefault,
+				// For multi-overload, user method is tracked per-signature (see MethodOverloadSignature.UserMethodName)
+				UserMethodName: userMethodName,
 				Overloads: new EquatableArray<MethodOverloadSignature>(
-					uniqueSignatures.Select(sig => BuildOverloadSignature(methodName, sig, ownerClassName, ownerTypeParameters)).ToArray()));
+					uniqueSignatures.Select(sig => BuildOverloadSignature(methodName, sig, ownerClassName, ownerTypeParameters, userMethodName)).ToArray()));
 		}
 	}
 
@@ -131,7 +142,8 @@ internal static class UnifiedInterceptorBuilder
 		string methodName,
 		MethodSignatureInfo sig,
 		string ownerClassName,
-		string ownerTypeParameters)
+		string ownerTypeParameters,
+		string? userMethodName = null)
 	{
 		var suffix = GetSignatureSuffix(sig.Parameters, sig.ReturnType);
 		var delegateName = $"{methodName}Delegate_{suffix}";
@@ -154,7 +166,8 @@ internal static class UnifiedInterceptorBuilder
 			LastArgsType: GetLastArgsType(sig.TrackableParameters),
 			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateName),
 			DefaultExpression: sig.DefaultExpression,
-			ThrowsOnDefault: sig.ThrowsOnDefault);
+			ThrowsOnDefault: sig.ThrowsOnDefault,
+			UserMethodName: userMethodName);
 	}
 
 	#endregion

@@ -765,14 +765,14 @@ public class WhenChainTests
 	}
 
 	[Fact]
-	public void InlineClass_TracksLastCallArgs()
+	public void InlineClass_TracksLastArgs()
 	{
 		var classStub = new WhenChainInlineStubs.Stubs.WhenChainBaseClass();
 		WhenChainBaseClass instance = classStub.Object;
 
 		instance.ComputeVirtual(5, 7);
 
-		Assert.Equal((5, 7), classStub.ComputeVirtual.LastCallArgs);
+		Assert.Equal((5, 7), classStub.ComputeVirtual.LastArgs);
 	}
 
 	[Fact]

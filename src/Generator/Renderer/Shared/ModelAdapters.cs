@@ -84,6 +84,8 @@ internal static class ModelAdapters
 			BuilderInterface: GetBuilderInterface(first.TrackableParameters, first.LastCallType, delegateTypeForBuilder),
 			DefaultExpression: first.DefaultExpression,
 			ThrowsOnDefault: first.ThrowsOnDefault,
+			// User method name: if HasUserOverride, the user method name is MethodName + "_"
+			UserMethodName: first.HasUserOverride ? $"{first.MethodName}_" : null,
 			Overloads: EquatableArray<MethodOverloadSignature>.Empty);
 	}
 
@@ -128,8 +130,14 @@ internal static class ModelAdapters
 				LastArgsType: GetLastArgsType(method.TrackableParameters, method.LastCallType),
 				BuilderInterface: GetBuilderInterface(method.TrackableParameters, method.LastCallType, delegateName),
 				DefaultExpression: method.DefaultExpression,
-				ThrowsOnDefault: method.ThrowsOnDefault));
+				ThrowsOnDefault: method.ThrowsOnDefault,
+				// Per-signature user method name for mixed overload groups
+				UserMethodName: method.HasUserOverride ? $"{method.MethodName}_" : null));
 		}
+
+		// For overload groups, check if any method has user override (for model-level tracking)
+		// Per-signature user methods are tracked in MethodOverloadSignature.UserMethodName
+		var anyHasUserOverride = methods.Any(m => m.HasUserOverride);
 
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
@@ -151,6 +159,8 @@ internal static class ModelAdapters
 			BuilderInterface: "global::KnockOff.IMethodTracking",
 			DefaultExpression: first.DefaultExpression,
 			ThrowsOnDefault: first.ThrowsOnDefault,
+			// For overload groups, user method is tracked per-signature (see overloads below)
+			UserMethodName: anyHasUserOverride ? $"{first.MethodName}_" : null,
 			Overloads: new EquatableArray<MethodOverloadSignature>(overloads.ToArray()));
 	}
 

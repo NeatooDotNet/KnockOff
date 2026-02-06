@@ -59,7 +59,7 @@ public class InlineStubTests
 		ISimpleService service = stub;
 		service.GetValue(42);
 
-		Assert.Equal(42, stub.GetValue.LastCallArg);
+		Assert.Equal(42, stub.GetValue.LastArg);
 	}
 
 	[Fact]
@@ -102,7 +102,7 @@ public class InlineStubTests
 		stub.GetValue.Verify(Times.Never);
 		stub.GetValue.Verify(Times.Never);
 		// OnCall callback state is internal after API change to method-based
-		Assert.Null(stub.GetValue.LastCallArg);
+		Assert.Null(stub.GetValue.LastArg);
 	}
 
 	[Fact]
@@ -122,7 +122,7 @@ public class InlineStubTests
 
 		serviceStub.DoSomething.Verify();
 		loggerStub.Log.Verify();
-		Assert.Equal("test", loggerStub.Log.LastCallArg);
+		Assert.Equal("test", loggerStub.Log.LastArg);
 	}
 
 #if NET9_0_OR_GREATER
@@ -326,7 +326,7 @@ public class DelegateStubTests
 	}
 
 	[Fact]
-	public void DelegateStub_VoidOneParam_TracksLastCallArg()
+	public void DelegateStub_VoidOneParam_TracksLastArg()
 	{
 		var stub = new DelegateInlineTest.Stubs.VoidOneParamDelegate();
 		VoidOneParamDelegate del = stub;
@@ -335,7 +335,7 @@ public class DelegateStubTests
 		del("world");
 
 		stub.Interceptor.Verify(Times.Exactly(2));
-		Assert.Equal("world", stub.Interceptor.LastCallArg);
+		Assert.Equal("world", stub.Interceptor.LastArg);
 	}
 
 	[Fact]
@@ -360,7 +360,7 @@ public class DelegateStubTests
 		var result = del(42);
 
 		Assert.Equal(0, result); // default(int)
-		Assert.Equal(42, stub.Interceptor.LastCallArg);
+		Assert.Equal(42, stub.Interceptor.LastArg);
 	}
 
 	[Fact]
@@ -376,7 +376,7 @@ public class DelegateStubTests
 	}
 
 	[Fact]
-	public void DelegateStub_MultiParam_TracksLastCallArgs()
+	public void DelegateStub_MultiParam_TracksLastArgs()
 	{
 		var stub = new DelegateInlineTest.Stubs.MultiParamDelegate();
 		MultiParamDelegate del = stub;
@@ -384,9 +384,9 @@ public class DelegateStubTests
 		del("Alice", 30);
 
 		stub.Interceptor.Verify();
-		Assert.NotNull(stub.Interceptor.LastCallArgs);
-		Assert.Equal("Alice", stub.Interceptor.LastCallArgs.Value.name);
-		Assert.Equal(30, stub.Interceptor.LastCallArgs.Value.age);
+		Assert.NotNull(stub.Interceptor.LastArgs);
+		Assert.Equal("Alice", stub.Interceptor.LastArgs.Value.name);
+		Assert.Equal(30, stub.Interceptor.LastArgs.Value.age);
 	}
 
 	[Fact]
@@ -415,7 +415,7 @@ public class DelegateStubTests
 		// Tracking state is cleared
 		stub.Interceptor.Verify(Times.Never);
 		stub.Interceptor.Verify(Times.Never);
-		Assert.Null(stub.Interceptor.LastCallArg);
+		Assert.Null(stub.Interceptor.LastArg);
 
 		// Configuration is preserved (OnCall is a method now, no direct assertion needed)
 		// The fact that Reset() doesn't clear _onCall is still tested below
@@ -458,7 +458,7 @@ public class DelegateStubTests
 		var result = del(42);
 
 		Assert.Equal("Value: 42", result);
-		Assert.Equal(42, stub.Interceptor.LastCallArg);
+		Assert.Equal(42, stub.Interceptor.LastArg);
 	}
 
 	[Fact]
@@ -476,7 +476,7 @@ public class DelegateStubTests
 		// Tracking state is cleared
 		stub.Interceptor.Verify(Times.Never);
 		stub.Interceptor.Verify(Times.Never);
-		Assert.Null(stub.Interceptor.LastCallArg);
+		Assert.Null(stub.Interceptor.LastArg);
 
 		// Configuration is preserved (OnCall is a method now, no direct assertion needed)
 		// The fact that Reset() doesn't clear _onCall is still tested below
@@ -675,9 +675,9 @@ public class GenericCollisionTests
 		intList.Add(42);
 
 		stringStub.Add.Verify();
-		Assert.Equal("hello", stringStub.Add.LastCallArg);
+		Assert.Equal("hello", stringStub.Add.LastArg);
 		intStub.Add.Verify();
-		Assert.Equal(42, intStub.Add.LastCallArg);
+		Assert.Equal(42, intStub.Add.LastArg);
 	}
 
 	[Fact]
@@ -800,7 +800,7 @@ public class ClassStubTests
 
 		stub.Object.Calculate(42);
 
-		Assert.Equal(42, stub.Calculate.LastCallArg);
+		Assert.Equal(42, stub.Calculate.LastArg);
 	}
 
 	[Fact]
@@ -826,15 +826,15 @@ public class ClassStubTests
 	}
 
 	[Fact]
-	public void ClassStub_MultiParamMethod_TracksLastCallArgs()
+	public void ClassStub_MultiParamMethod_TracksLastArgs()
 	{
 		var stub = new ClassStubTestClass.Stubs.SimpleService();
 
 		stub.Object.Format("Test", 123);
 
-		Assert.NotNull(stub.Format.LastCallArgs);
-		Assert.Equal("Test", stub.Format.LastCallArgs.Value.input);
-		Assert.Equal(123, stub.Format.LastCallArgs.Value.count);
+		Assert.NotNull(stub.Format.LastArgs);
+		Assert.Equal("Test", stub.Format.LastArgs.Value.input);
+		Assert.Equal(123, stub.Format.LastArgs.Value.count);
 	}
 
 	[Fact]
@@ -851,7 +851,7 @@ public class ClassStubTests
 		stub.Calculate.Verify(Times.Never);
 		stub.Calculate.Verify(Times.Never);
 		// OnCall callback state is internal after API change to method-based
-		Assert.Null(stub.Calculate.LastCallArg);
+		Assert.Null(stub.Calculate.LastArg);
 	}
 
 	[Fact]
@@ -943,7 +943,7 @@ public class AbstractClassStubTests
 		var result = stub.Object.Execute("SELECT 1");
 
 		Assert.Equal(0, result); // default(int)
-		Assert.Equal("SELECT 1", stub.Execute.LastCallArg);
+		Assert.Equal("SELECT 1", stub.Execute.LastArg);
 	}
 
 	[Fact]

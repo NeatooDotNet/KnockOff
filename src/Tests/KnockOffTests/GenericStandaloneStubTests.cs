@@ -53,7 +53,7 @@ public class GenericStandaloneStubTests
 	}
 
 	[Fact]
-	public void GenericStandaloneStub_Method_TracksLastCallArg()
+	public void GenericStandaloneStub_Method_TracksLastArg()
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();

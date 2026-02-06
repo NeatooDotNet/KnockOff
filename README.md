@@ -1,6 +1,138 @@
 # KnockOff
 
-**No more `Arg.Any<>()`. No more `It.IsAny<>()`. Just write C#.**
+## Why I wrote KnockOff
+
+I found many times I wanted to reuse my mocks. 
+Especially in my integration test library where I may even register my mocks.
+So, I found myself either copying my mock definitions or creating shared methods like this:
+
+
+```csharp
+    public static IMyRepo NSubstituteMock(List<User> users)
+    {
+        var myRepoMock = Substitute.For<IMyRepo>();
+
+        // Setup: configure GetUser to look up from the list based on id
+        myRepoMock.GetUser(Arg.Any<int>())
+            .Returns(callInfo => users.SingleOrDefault(u => u.Id == callInfo.Arg<int>()));
+
+        // Setup: configure Update to assert user exists in list
+        myRepoMock.When(x => x.Update(Arg.Any<User>()))
+            .Do(callInfo => Assert.Contains(callInfo.Arg<User>(), users));
+
+        return myRepoMock;
+    }
+```
+
+But I found these methods quite unreadable and inflexible.
+
+What I really wanted a shared stub:
+
+```csharp
+public class MyRepoStub(List<User> Users) : IMyRepo
+{
+    public User? GetUser(int id)
+    {
+        return Users.Single(u => u.Id == id);
+    }
+
+    public void Update_(User user)
+    {
+        Assert.Contains(user, Users);
+    }
+}
+```
+
+But that meant:
+
+- Forced to implement all of the methods of the interface
+- I didn't have any nice to haves like .Verify()
+
+**So I created KnockOff**
+
+For stand alone stubs KnockOff:
+
+- Automatically implements all of the interface members
+- Provides features like Verification, Returns and When
+- Allows per-test configuration
+
+With KnockOff the stub looks like:
+
+``` csharp
+[KnockOff]
+public partial class MyRepoStub(List<User> Users) : IMyRepo
+{
+    protected override User? GetUser_(int id)
+    {
+        return Users.Single(u => u.Id == id);
+    }
+
+    protected override void Update_(User user)
+    {
+        Assert.Contains(user, Users);
+    }
+}
+```
+
+And your test looks like
+
+``` csharp
+    [Fact]
+    public void FetchTest_KnockOff()
+    {
+        var myRepoKO = new MyRepoStub([new User { Id = 1 }, new User { Id = 2 }]);
+        var userDomainModel = new UserDomainModel(myRepoKO);
+
+        Assert.True(userDomainModel.Fetch(1));
+
+        // I have Verify on my Stub!
+        myRepoKO.GetUser.Verify(Times.Once);
+    }
+```
+
+And you don't actually loose the ability to configure per-test!
+
+``` csharp
+    [Fact]
+    public void UpdateTest_KnockOff_OnCall()
+    {
+        var user = new User { Id = 1 };
+        var myRepoKO = new MyRepoStub([user]);
+        var userDomainModel = new UserDomainModel(myRepoKO);
+
+        // OnCall overrides the stub methods
+        myRepoKO.GetUser.OnCall(id => user).Verifiable();
+        myRepoKO.Update.OnCall(u => Assert.Same(u, user)).Verifiable();
+
+        userDomainModel.Fetch(1);
+        userDomainModel.Update();
+
+        myRepoKO.Verify();
+    }
+```
+
+
+It also uses source generation so:
+
+- No more `Arg.Any<>()`. No more `It.IsAny<>()`. Just write C#
+- If the method signature changes you get a compile error
+- There's a small performance gain but honestly it's negligible
+
+**Now I have my stubs and mocks in one!**
+
+Plus this is just the start. With source generation I think many more ideas are possible.
+I've added a number of patterns (create a link).
+And new features like Source (create a link).
+
+**What other ideas do you have?**
+
+## AI
+
+With my ideas and guidance Claude Code has written the entirety of this library. 
+What started as a curiosity has shown me the value of AI.
+These are ideas I've had for years. I would not have been able to actually execute with AI.
+Even more so in about a month!
+
 
 [![NuGet](https://img.shields.io/nuget/v/KnockOff.svg)](https://www.nuget.org/packages/KnockOff/)
 [![Build Status](https://github.com/NeatooDotNet/KnockOff/workflows/Build,%20Test%20&%20Publish/badge.svg)](https://github.com/NeatooDotNet/KnockOff/actions)

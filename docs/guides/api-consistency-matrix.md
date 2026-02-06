@@ -344,6 +344,31 @@ public partial class ServiceStub
 }
 ```
 
+**User Method Interceptors have full API parity with inline stubs:**
+
+```csharp
+// User method provides default behavior
+[KnockOff]
+public partial class ProcessorStub : IProcessor { }
+public partial class ProcessorStub
+{
+    protected override string Process_(string input) => $"[Default: {input}]";
+}
+
+// .When() chains work with user methods as fallback
+var stub = new ProcessorStub();
+stub.Process.When("special").Returns("[SPECIAL]");
+
+IProcessor svc = stub;
+svc.Process("special");  // Returns "[SPECIAL]" (When match)
+svc.Process("normal");   // Returns "[Default: normal]" (user method fallback)
+```
+
+**Priority chain for user method interceptors:**
+```
+When chains > Sequences > OnCall/Returns > User Method
+```
+
 **Inline patterns** are fully generated and cannot be extended.
 
 ---

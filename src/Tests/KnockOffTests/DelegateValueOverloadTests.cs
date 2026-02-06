@@ -101,7 +101,7 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void Returns_WithValue_SingleParam_TracksLastCallArg()
+	public void Returns_WithValue_SingleParam_TracksLastArg()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringTransformer();
 		StringTransformer transformer = stub;
@@ -111,8 +111,8 @@ public class DelegateValueOverloadTests
 		transformer("first");
 		transformer("second");
 
-		// LastCallArg still tracks even with value overload
-		Assert.Equal("second", stub.Interceptor.LastCallArg);
+		// LastArg still tracks even with value overload
+		Assert.Equal("second", stub.Interceptor.LastArg);
 	}
 
 	#endregion
@@ -133,7 +133,7 @@ public class DelegateValueOverloadTests
 	}
 
 	[Fact]
-	public void Returns_WithValue_MultiParam_TracksLastCallArgs()
+	public void Returns_WithValue_MultiParam_TracksLastArgs()
 	{
 		var stub = new DelegateValueOverloadTestClass.Stubs.MessageBuilder();
 		MessageBuilder builder = stub;
@@ -143,10 +143,10 @@ public class DelegateValueOverloadTests
 		builder("Alice", 30);
 		builder("Bob", 25);
 
-		// LastCallArgs still tracks even with value overload
-		Assert.NotNull(stub.Interceptor.LastCallArgs);
-		Assert.Equal("Bob", stub.Interceptor.LastCallArgs.Value.name);
-		Assert.Equal(25, stub.Interceptor.LastCallArgs.Value.age);
+		// LastArgs still tracks even with value overload
+		Assert.NotNull(stub.Interceptor.LastArgs);
+		Assert.Equal("Bob", stub.Interceptor.LastArgs.Value.name);
+		Assert.Equal(25, stub.Interceptor.LastArgs.Value.age);
 	}
 
 	#endregion
@@ -249,7 +249,7 @@ public class DelegateValueOverloadTests
 		logger("Hello");
 
 		Assert.Equal("Hello", loggedMessage);
-		Assert.Equal("Hello", stub.Interceptor.LastCallArg);
+		Assert.Equal("Hello", stub.Interceptor.LastArg);
 	}
 
 	#endregion

@@ -185,7 +185,7 @@ public partial class IEntityPropertyManagerTests
         manager.GetProperty("Name");
 
         stub.GetProperty.Verify();
-        Assert.Equal("Name", stub.GetProperty.LastCallArg);
+        Assert.Equal("Name", stub.GetProperty.LastArg);
     }
 
     [Fact]

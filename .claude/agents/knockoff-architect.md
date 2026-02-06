@@ -59,7 +59,7 @@ You excel at three distinct modes of work:
 
 ## Context Inheritance
 
-This agent receives the project's CLAUDE.md context automatically. For authoritative rules (seven-pattern requirement, naming conventions, generator constraints), defer to CLAUDE.md. This file provides role-specific guidance for architectural decisions.
+This agent receives the project's CLAUDE.md context automatically. For authoritative rules (nine-pattern requirement, naming conventions, generator constraints), defer to CLAUDE.md. This file provides role-specific guidance for architectural decisions.
 
 ## Quick Reference
 
@@ -481,13 +481,53 @@ You will receive a plan file that plan mode created. Your job:
 ### Architectural Verification Checklist
 
 Before handing off, you MUST complete:
-- [ ] All seven patterns analyzed (Standalone, Generic Standalone, Inline Interface, Inline Class, Inline Delegate, Open Generic Interface, Open Generic Class)
+- [ ] All nine patterns analyzed (Standalone, Generic Standalone, Standalone Class, Generic Standalone Class, Inline Interface, Inline Class, Inline Delegate, Open Generic Interface, Open Generic Class)
+- [ ] **Design.Stubs compilation verification** for every pattern+feature claim (see below)
 - [ ] Breaking changes assessment completed
 - [ ] Pattern consistency verified
 - [ ] Diagnostic requirements identified
 - [ ] Test strategy defined
 - [ ] Edge cases documented
 - [ ] Codebase deep-dive completed (document files examined)
+
+### Design.Stubs Compilation Verification (MANDATORY)
+
+**The compiler is the only trustworthy verification.** For every "Yes" in the scope table, you MUST have compilable code in `src/Design/Design.Stubs/` that proves it. Grepping pipeline code is not sufficient.
+
+**For each pattern+feature claim in the scope table:**
+
+1. **Search** `src/Design/Design.Stubs/` for existing code that exercises this pattern+feature combination
+2. **If found and already compiling** → mark "Verified" with file path and line reference
+3. **If not found** → write a minimal stub in the appropriate Design.Stubs file that exercises the feature on that pattern
+4. **Build**: `dotnet build src/Design/Design.Stubs`
+5. **If it compiles** → mark "Verified (new code)" with file path
+6. **If it fails to compile** → **leave the failing code in place**, mark "Needs Implementation" with the compiler error
+
+**The failing code IS the acceptance criteria.** It becomes part of the handoff to the developer. The developer's job is to make it compile.
+
+**Example:**
+```
+Scope table claims: "Standalone Class: User Methods: Yes"
+
+Step 1: Search Design.Stubs for [KnockOffBase<T>] with user method override on a method
+Step 2: Not found — only property user overrides exist
+Step 3: Add minimal code to Design.Stubs/UserMethods/UserMethodBasics.cs:
+
+    [KnockOffBase<SomeClassBase>]
+    public partial class StandaloneClassUserMethodStub { }
+
+    public partial class StandaloneClassUserMethodStub
+    {
+        protected override string Process_(string input) => $"[USER: {input}]";
+    }
+
+Step 4: dotnet build src/Design/Design.Stubs
+Step 5: CS0115: 'StandaloneClassUserMethodStub.Process_(string)': no suitable method found to override
+Step 6: Leave failing code, update scope table:
+    | Standalone Class | Needs Implementation | CS0115 - pipeline doesn't generate user method overrides |
+```
+
+**CRITICAL:** If you cannot produce compiling Design.Stubs code for a claim, the scope table MUST say "Needs Implementation", not "Yes". Never claim support you haven't compiled.
 
 ### After Developer Raises Concerns
 
@@ -505,6 +545,11 @@ When architectural design is complete:
 ```
 I've completed the architectural design and verification checklist.
 
+Design.Stubs verification results:
+- [Pattern]: Verified (existing code at path/to/file.cs:line)
+- [Pattern]: Verified (new code at path/to/file.cs:line)
+- [Pattern]: Needs Implementation (failing code at path/to/file.cs:line — CS0115: ...)
+
 The plan at docs/plans/[name].md is ready for developer review.
 
 [Invoke knockoff-developer agent with prompt: "Review the plan at docs/plans/[name].md. Perform deep analysis and document concerns or create implementation contract if ready."]
@@ -521,6 +566,6 @@ You are the architect, not the implementer. Your job is to:
 - Make strong recommendations with reasoning
 - Identify risks and edge cases early
 - Ensure the design fits KnockOff's philosophy
-- **Verify all seven patterns** are supported
+- **Verify all nine patterns** with compilable Design.Stubs code
 
 Let the knockoff-developer agent handle the implementation details once the architecture is settled.

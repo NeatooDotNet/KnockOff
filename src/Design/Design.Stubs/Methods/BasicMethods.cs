@@ -191,7 +191,7 @@ public partial class BasicMethodsDemo
     //   public int LastArg { get; private set; }  // Not LastArgs
     // =========================================================================
 
-    public void ArgumentCapture_LastCallArgs_ForMultipleParameters()
+    public void ArgumentCapture_LastArgs_ForMultipleParameters()
     {
         var stub = new Stubs.ICalculator();
         stub.Add.Returns(0);
@@ -200,9 +200,9 @@ public partial class BasicMethodsDemo
         calc.Add(3, 5);
         calc.Add(10, 20);
 
-        // LastCallArgs captures the most recent call's arguments
-        // Note: The interceptor exposes LastCallArgs, which is nullable
-        var args = stub.Add.LastCallArgs;
+        // LastArgs captures the most recent call's arguments
+        // Note: The interceptor exposes LastArgs, which is nullable
+        var args = stub.Add.LastArgs;
         // args == (10, 20)
 
         // For OnCall() return values, you get LastArgs via the builder interface:

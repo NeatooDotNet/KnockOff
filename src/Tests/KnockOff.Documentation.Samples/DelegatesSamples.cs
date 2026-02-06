@@ -145,14 +145,14 @@ public class BasicUsageTests
         var result = format("hello");
 
         #region delegate-stub-with-return
-        // Default return value is null; LastCallArg tracks the argument
+        // Default return value is null; LastArg tracks the argument
         Assert.Null(result);
-        Assert.Equal("hello", stub.Interceptor.LastCallArg);
+        Assert.Equal("hello", stub.Interceptor.LastArg);
         #endregion
     }
 
     [Fact]
-    public void MultiParam_TracksLastCallArgs()
+    public void MultiParam_TracksLastArgs()
     {
         var stub = new DelegateStubTests.Stubs.MessageBuilder();
         MessageBuilder builder = stub;
@@ -160,8 +160,8 @@ public class BasicUsageTests
 
         #region delegate-stub-multi-param
         // Access arguments via named tuple
-        Assert.Equal("Alice", stub.Interceptor.LastCallArgs!.Value.name);
-        Assert.Equal(30, stub.Interceptor.LastCallArgs!.Value.age);
+        Assert.Equal("Alice", stub.Interceptor.LastArgs!.Value.name);
+        Assert.Equal(30, stub.Interceptor.LastArgs!.Value.age);
         #endregion
     }
 }
@@ -298,7 +298,7 @@ public class VerificationTests
 public class TrackingTests
 {
     [Fact]
-    public void LastCallArg_SingleParameter()
+    public void LastArg_SingleParameter()
     {
         var stub = new DelegateStubTests.Stubs.Formatter();
         stub.Interceptor.OnCall((input) => input);
@@ -307,13 +307,13 @@ public class TrackingTests
         format("second");
 
         #region delegate-stub-lastcallarg
-        // LastCallArg captures the most recent argument
-        Assert.Equal("second", stub.Interceptor.LastCallArg);
+        // LastArg captures the most recent argument
+        Assert.Equal("second", stub.Interceptor.LastArg);
         #endregion
     }
 
     [Fact]
-    public void LastCallArgs_MultipleParameters()
+    public void LastArgs_MultipleParameters()
     {
         var stub = new DelegateStubTests.Stubs.MessageBuilder();
         stub.Interceptor.OnCall((name, age) => $"{name}: {age}");
@@ -322,9 +322,9 @@ public class TrackingTests
         builder("Bob", 25);
 
         #region delegate-stub-lastcallargs
-        // LastCallArgs provides named tuple access
-        Assert.Equal("Bob", stub.Interceptor.LastCallArgs!.Value.name);
-        Assert.Equal(25, stub.Interceptor.LastCallArgs!.Value.age);
+        // LastArgs provides named tuple access
+        Assert.Equal("Bob", stub.Interceptor.LastArgs!.Value.name);
+        Assert.Equal(25, stub.Interceptor.LastArgs!.Value.age);
         #endregion
     }
 
@@ -415,14 +415,14 @@ public class ResetTests
         format("world");
 
         stub.Interceptor.Verify(Times.Exactly(2));
-        Assert.Equal("world", stub.Interceptor.LastCallArg);
+        Assert.Equal("world", stub.Interceptor.LastArg);
 
         #region delegate-stub-reset
         // Reset clears tracking state but preserves configuration
         stub.Interceptor.Reset();
 
         stub.Interceptor.Verify(Times.Never);
-        Assert.Null(stub.Interceptor.LastCallArg);
+        Assert.Null(stub.Interceptor.LastArg);
         Assert.Equal("TEST", format("test")); // OnCall still works
         #endregion
     }

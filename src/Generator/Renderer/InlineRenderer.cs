@@ -798,18 +798,18 @@ internal static class InlineRenderer
         w.Line("\t\t\t\tint IGenericMethodCallTracker.CallCount => _callCount;");
         w.Line();
 
-        // LastCallArg/LastCallArgs
+        // LastArg/LastArgs
         if (handler.LastCallArgType != null)
         {
             var param = handler.NonGenericParameters.GetArray()![0];
             w.Line($"\t\t\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
-            w.Line($"\t\t\t\tpublic {handler.LastCallArgType} LastCallArg {{ get; private set; }}");
+            w.Line($"\t\t\t\tpublic {handler.LastCallArgType} LastArg {{ get; private set; }}");
             w.Line();
         }
         else if (handler.LastCallArgsType != null)
         {
             w.Line("\t\t\t\t/// <summary>The arguments from the most recent call.</summary>");
-            w.Line($"\t\t\t\tpublic {handler.LastCallArgsType} LastCallArgs {{ get; private set; }}");
+            w.Line($"\t\t\t\tpublic {handler.LastCallArgsType} LastArgs {{ get; private set; }}");
             w.Line();
         }
 
@@ -832,29 +832,29 @@ internal static class InlineRenderer
         else if (handler.NonGenericParameters.Count == 1)
         {
             var param = handler.NonGenericParameters.GetArray()![0];
-            w.Line($"\t\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ _callCount++; LastCallArg = {param.Name}; }}");
+            w.Line($"\t\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ _callCount++; LastArg = {param.Name}; }}");
         }
         else
         {
             var paramList = string.Join(", ", handler.NonGenericParameters.Select(p => $"{p.Type} {p.Name}"));
             var tupleConstruction = string.Join(", ", handler.NonGenericParameters.Select(p => p.Name));
-            w.Line($"\t\t\t\tpublic void RecordCall({paramList}) {{ _callCount++; LastCallArgs = ({tupleConstruction}); }}");
+            w.Line($"\t\t\t\tpublic void RecordCall({paramList}) {{ _callCount++; LastArgs = ({tupleConstruction}); }}");
         }
         w.Line();
 
         // Reset - clears tracking state but preserves configuration (OnCall callback)
-        w.Line("\t\t\t\t/// <summary>Resets tracking state (_callCount, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
+        w.Line("\t\t\t\t/// <summary>Resets tracking state (_callCount, LastArg/LastArgs) but preserves configuration (OnCall).</summary>");
         if (handler.NonGenericParameters.Count == 0)
         {
             w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; }");
         }
         else if (handler.NonGenericParameters.Count == 1)
         {
-            w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; LastCallArg = default; }");
+            w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; LastArg = default; }");
         }
         else
         {
-            w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; LastCallArgs = default; }");
+            w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; LastArgs = default; }");
         }
         w.Line();
 
@@ -1269,17 +1269,17 @@ internal static class InlineRenderer
         w.Line("\t\t\tprivate int _callCount;");
         w.Line();
 
-        // LastCallArg/LastCallArgs
+        // LastArg/LastArgs
         if (del.LastCallArgType != null)
         {
             w.Line($"\t\t\t/// <summary>The argument from the last invocation.</summary>");
-            w.Line($"\t\t\tpublic {del.LastCallArgType} LastCallArg {{ get; private set; }}");
+            w.Line($"\t\t\tpublic {del.LastCallArgType} LastArg {{ get; private set; }}");
             w.Line();
         }
         else if (del.LastCallArgsType != null)
         {
             w.Line($"\t\t\t/// <summary>The arguments from the last invocation.</summary>");
-            w.Line($"\t\t\tpublic {del.LastCallArgsType} LastCallArgs {{ get; private set; }}");
+            w.Line($"\t\t\tpublic {del.LastCallArgsType} LastArgs {{ get; private set; }}");
             w.Line();
         }
 
@@ -1329,23 +1329,23 @@ internal static class InlineRenderer
         else if (del.Parameters.Count == 1)
         {
             var param = del.Parameters.GetArray()![0];
-            w.Line($"\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ _callCount++; LastCallArg = {param.Name}; }}");
+            w.Line($"\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ _callCount++; LastArg = {param.Name}; }}");
         }
         else
         {
             var paramList = string.Join(", ", del.Parameters.Select(p => $"{p.Type} {p.Name}"));
             var argList = string.Join(", ", del.Parameters.Select(p => p.Name));
-            w.Line($"\t\t\tpublic void RecordCall({paramList}) {{ _callCount++; LastCallArgs = ({argList}); }}");
+            w.Line($"\t\t\tpublic void RecordCall({paramList}) {{ _callCount++; LastArgs = ({argList}); }}");
         }
         w.Line();
 
         // Reset method - clears tracking state but preserves configuration (OnCall)
-        w.Line("\t\t\t/// <summary>Resets tracking state (call count, LastCallArg/LastCallArgs) but preserves configuration (OnCall).</summary>");
+        w.Line("\t\t\t/// <summary>Resets tracking state (call count, LastArg/LastArgs) but preserves configuration (OnCall).</summary>");
         w.Append("\t\t\tpublic void Reset() { _callCount = 0; ");
         if (del.LastCallArgType != null)
-            w.Append("LastCallArg = default; ");
+            w.Append("LastArg = default; ");
         else if (del.LastCallArgsType != null)
-            w.Append("LastCallArgs = default; ");
+            w.Append("LastArgs = default; ");
         if (canHaveWhenChain || canHaveVoidWhenChain)
         {
             w.Append("_whenChainHead = 0; ");
