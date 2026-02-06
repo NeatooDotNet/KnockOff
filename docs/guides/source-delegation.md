@@ -2,7 +2,9 @@
 
 # Source Delegation
 
-`stub.Source(realImplementation)` tells every interceptor on the stub to forward unconfigured calls to a real implementation. Configured methods (OnCall, Returns, When) still take priority — the source is only consulted when nothing else is configured for that member.
+`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured methods (OnCall, Returns, When) still take priority — the source is only consulted when nothing else is configured for that member.
+
+KnockOff generates a separate `Source()` overload for each interface in the hierarchy. **You don't need a complete implementation** — pass an object that implements any parent interface, and only the matching methods get delegated.
 
 **Availability**: Source delegation is available for **interface stubs** only (Standalone and Inline patterns). Class stubs inherit from the base class directly and do not need `Source()`.
 
@@ -52,6 +54,71 @@ stub.Source(realStore);
 <!-- endSnippet -->
 
 One line. Every method forwards. Now override just the ones you need.
+
+---
+
+## Interface Hierarchy
+
+This is Source's most powerful feature. **You don't need a complete implementation.** KnockOff generates a separate `Source()` overload for each interface in the hierarchy. Pass an object that implements any parent interface — only the matching methods get delegated.
+
+### How It Works
+
+When your stub implements an interface that extends other interfaces, KnockOff generates one `Source()` overload per level:
+
+<!-- snippet: source-hierarchy-interface -->
+```cs
+public interface IStepList : IList<string>
+{
+    void AddRange(IEnumerable<string> items);
+}
+```
+<!-- endSnippet -->
+
+For this stub, KnockOff generates:
+- `Source(IStepList)` — delegates **all** members (IStepList + IList + ICollection + IEnumerable)
+- `Source(IList<string>)` — delegates IList, ICollection, and IEnumerable members only
+- `Source(ICollection<string>)` — delegates ICollection and IEnumerable members only
+- `Source(IEnumerable<string>)` — delegates IEnumerable members only
+
+Each overload sets `_source` on matching interceptors and **clears** `_source` on non-matching ones. This means C# overload resolution does the right thing automatically.
+
+### Example: Partial Source with `List<T>`
+
+<!-- snippet: source-hierarchy-partial -->
+```cs
+var realList = new List<string> { "step1", "step2", "step3" };
+
+// List<string> doesn't implement IStepList, but it does implement IList<string>
+// KnockOff delegates IList/ICollection/IEnumerable members to the real list
+stub.Source(realList);
+
+IStepList list = stub;
+
+// These work — delegated to List<string>
+Assert.Equal(3, list.Count);          // ICollection<T>.Count
+Assert.Equal("step1", list[0]);       // IList<T> indexer
+var items = new List<string>();
+foreach (var item in list)            // IEnumerable<T>
+{
+    items.Add(item);
+}
+Assert.Equal(new[] { "step1", "step2", "step3" }, items);
+
+// AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
+// Configure it explicitly, or it returns the smart default
+stub.AddRange.OnCall((newItems) =>
+{
+    foreach (var newItem in newItems)
+    {
+        list.Add(newItem);
+    }
+});
+```
+<!-- endSnippet -->
+
+### Why This Matters
+
+Without hierarchy-aware Source, you'd need a class that implements the **entire** interface just to get delegation on the parts you care about. With KnockOff, pass whatever you have — even a simple `List<T>` — and the matching members just work.
 
 ---
 
@@ -162,6 +229,7 @@ The first match wins. This makes Source ideal as a baseline: set it once, then s
 ## When to Use Source
 
 **Use `Source()` when:**
+- Your stub extends a large interface hierarchy and you only have a partial implementation (e.g., `List<T>` for an `ICustomList<T> : IList<T>` stub)
 - Testing decorator or wrapper patterns where you want real behavior by default
 - Integration tests that need mostly-real dependencies with a few test overrides
 - Large interfaces where manually configuring every member is impractical

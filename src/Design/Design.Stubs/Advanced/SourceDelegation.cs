@@ -223,3 +223,148 @@ public partial class SourceDelegationDemo
         public void Reset() { }
     }
 }
+
+// =============================================================================
+// SOURCE DELEGATION - INTERFACE HIERARCHY
+// =============================================================================
+// DESIGN DECISION: KnockOff generates a separate Source() overload for each
+// interface in the hierarchy. This allows partial implementations:
+//
+// For IStore : IReadableStore, the generator produces:
+//   - Source(IStore? source)         → sets _source on ALL interceptors
+//   - Source(IReadableStore? source) → sets _source on GetById, Count only;
+//                                      CLEARS _source on Save, Delete
+//
+// This means you can pass an object that only implements IReadableStore,
+// and only the matching methods get delegated. Save and Delete remain
+// unconfigured (return defaults or throw in strict mode).
+//
+// Each Source overload tracks which interceptors belong to which interface.
+// The SetSource boolean in SourceMemberMapping controls this:
+//   true  → set _source = source (member is covered by this interface)
+//   false → set _source = null (member is NOT covered, clear it)
+// =============================================================================
+
+[KnockOff<IStore>]
+public partial class SourceHierarchyDemo
+{
+    // =========================================================================
+    // Source(IStore) - Full Implementation Delegation
+    // =========================================================================
+    // When you have a complete IStore implementation, Source(IStore) delegates
+    // all members: GetById, Count, Save, Delete.
+    // =========================================================================
+
+    public void Source_FullImplementation()
+    {
+        var stub = new Stubs.IStore();
+        var realStore = new InMemoryStore();
+
+        // Delegates ALL methods (IStore covers IReadableStore too)
+        stub.Source(realStore);
+
+        IStore store = stub;
+
+        store.Save(1, "value");                // Delegates to real store
+        var result = store.GetById(1);         // Delegates to real store
+        var count = store.Count;               // Delegates to real store
+    }
+
+    // =========================================================================
+    // Source(IReadableStore) - Partial Implementation Delegation
+    // =========================================================================
+    // DESIGN DECISION: This is the key feature. When you only have an
+    // IReadableStore implementation, Source(IReadableStore) delegates ONLY
+    // the members declared on IReadableStore (GetById, Count).
+    // Save and Delete are NOT delegated — they use defaults or stub config.
+    //
+    // GENERATOR BEHAVIOR: Source(IReadableStore) generates:
+    //
+    //   public void Source(IReadableStore? source)
+    //   {
+    //       GetById._source = source;    // SetSource = true (on IReadableStore)
+    //       Count._source = source;      // SetSource = true (on IReadableStore)
+    //       Save._source = null;         // SetSource = false (NOT on IReadableStore)
+    //       Delete._source = null;       // SetSource = false (NOT on IReadableStore)
+    //   }
+    // =========================================================================
+
+    public void Source_PartialImplementation()
+    {
+        var stub = new Stubs.IStore();
+        var readOnlySource = new ReadOnlyStore();
+
+        // Only delegates GetById and Count — Save and Delete are NOT delegated
+        stub.Source(readOnlySource);
+
+        IStore store = stub;
+
+        // These delegate to the real implementation
+        var result = store.GetById(1);         // Returns "item1" from readOnlySource
+        var count = store.Count;               // Returns count from readOnlySource
+
+        // These do NOT delegate — readOnlySource doesn't implement IStore
+        // Save and Delete return defaults (or throw in strict mode)
+        store.Save(1, "value");                // No-op (void default)
+        store.Delete(1);                       // No-op (void default)
+    }
+
+    // =========================================================================
+    // Partial Source + Explicit Configuration
+    // =========================================================================
+    // You can combine partial Source delegation with explicit configuration
+    // for the non-delegated members.
+    // =========================================================================
+
+    public void Source_PartialWithConfiguration()
+    {
+        var stub = new Stubs.IStore();
+        var readOnlySource = new ReadOnlyStore();
+
+        // Delegate reads to the real implementation
+        stub.Source(readOnlySource);
+
+        // Explicitly configure write operations
+        var saved = new Dictionary<int, string>();
+        stub.Save.OnCall((id, value) => saved[id] = value);
+        stub.Delete.OnCall((id) => saved.Remove(id));
+
+        IStore store = stub;
+
+        // Reads delegate to source
+        var item = store.GetById(1);           // From readOnlySource
+
+        // Writes use explicit configuration
+        store.Save(99, "new item");            // Goes to saved dictionary
+        store.Delete(99);                      // Removes from saved dictionary
+    }
+
+    // Helper classes for demonstration
+    private sealed class InMemoryStore : IStore
+    {
+        private readonly Dictionary<int, string> _items = new();
+
+        public string? GetById(int id) => _items.GetValueOrDefault(id);
+        public int Count => _items.Count;
+        public void Save(int id, string value) => _items[id] = value;
+        public void Delete(int id) => _items.Remove(id);
+    }
+
+    /// <summary>
+    /// A read-only implementation that does NOT implement IStore.
+    /// This demonstrates that Source(IReadableStore) works even though
+    /// the stub is typed as IStore.
+    /// </summary>
+    private sealed class ReadOnlyStore : IReadableStore
+    {
+        private readonly Dictionary<int, string> _items = new()
+        {
+            [1] = "item1",
+            [2] = "item2",
+            [3] = "item3"
+        };
+
+        public string? GetById(int id) => _items.GetValueOrDefault(id);
+        public int Count => _items.Count;
+    }
+}

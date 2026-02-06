@@ -110,15 +110,17 @@ Need different behavior for a specific test? Override with OnCall:
 
 <!-- snippet: readme-knockoff-oncall-test -->
 ```cs
-var user = new User { Id = 1 };
-var myRepoKO = new MyRepoStub([user]);
+var user1 = new User { Id = 1 }; // Ignored do to per-test configuration
+var myRepoKO = new MyRepoStub([user1]);
 var userDomainModel = new UserDomainModel(myRepoKO);
 
-// OnCall overrides the stub methods
-myRepoKO.GetUser.OnCall(id => user).Verifiable();
-myRepoKO.Update.OnCall(u => Assert.Same(u, user)).Verifiable();
+var user2 = new User { Id = 2 };
 
-userDomainModel.Fetch(1);
+// When and OnCall overrides the stub methods
+myRepoKO.GetUser.When(2).Returns(user2).Verifiable();
+myRepoKO.Update.OnCall(u => Assert.Same(u, user2)).Verifiable();
+
+userDomainModel.Fetch(2);
 userDomainModel.Update();
 
 myRepoKO.Verify();
@@ -159,34 +161,56 @@ myRepoKO.Verify();
 
 ## Unique Feature: Source Delegation
 
-`stub.Source(realImplementation)` sets every method on the stub to forward to a real implementation. Unconfigured methods call through to the real object. Configured methods (OnCall, Returns, When) still take priority.
+`stub.Source(realImplementation)` delegates unconfigured method calls to a real object. Configured methods (OnCall, Returns, When) still take priority.
 
-**Without Source**, you'd manually wire up every method:
+**The key: you don't need a complete implementation.** KnockOff generates a separate `Source()` overload for each interface in the hierarchy. Pass an object that implements any parent interface — only the matching methods get delegated.
 
+For example, stub an interface that extends `IList<string>`:
+
+<!-- snippet: source-hierarchy-interface -->
 ```cs
-// Without Source — manual forwarding for every method
-stub.GetUser.OnCall((id) => realRepo.GetUser(id));
-stub.GetUserAsync.OnCall((id) => realRepo.GetUserAsync(id));
-stub.Save.OnCall((user) => realRepo.Save(user));
-// ... repeat for every method on the interface
-```
-
-**With Source**, one line does it all:
-
-<!-- snippet: readme-source-delegation -->
-```cs
-stub.Source(realRepo);  // ALL methods delegate to real implementation
-
-// Override just the method you're testing
-stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test User" });
-
-IUserRepo repo = stub;
-repo.Save(new User { Id = 1 });  // Calls real SimpleUserRepo.Save()
-var user = repo.GetUser(1);       // Returns test data
+public interface IStepList : IList<string>
+{
+    void AddRange(IEnumerable<string> items);
+}
 ```
 <!-- endSnippet -->
 
-The larger the interface, the more Source saves you. Not available in Moq or NSubstitute. See the [full Source Delegation guide](docs/guides/source-delegation.md) for priority order, clearing source, and complete examples.
+Now pass a `List<string>` — it implements `IList<string>` but not `IStepList`:
+
+<!-- snippet: source-hierarchy-partial -->
+```cs
+var realList = new List<string> { "step1", "step2", "step3" };
+
+// List<string> doesn't implement IStepList, but it does implement IList<string>
+// KnockOff delegates IList/ICollection/IEnumerable members to the real list
+stub.Source(realList);
+
+IStepList list = stub;
+
+// These work — delegated to List<string>
+Assert.Equal(3, list.Count);          // ICollection<T>.Count
+Assert.Equal("step1", list[0]);       // IList<T> indexer
+var items = new List<string>();
+foreach (var item in list)            // IEnumerable<T>
+{
+    items.Add(item);
+}
+Assert.Equal(new[] { "step1", "step2", "step3" }, items);
+
+// AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
+// Configure it explicitly, or it returns the smart default
+stub.AddRange.OnCall((newItems) =>
+{
+    foreach (var newItem in newItems)
+    {
+        list.Add(newItem);
+    }
+});
+```
+<!-- endSnippet -->
+
+Not available in Moq or NSubstitute. See the [full Source Delegation guide](docs/guides/source-delegation.md) for hierarchy details, priority order, and complete examples.
 
 ---
 
