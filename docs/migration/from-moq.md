@@ -35,7 +35,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `mock.Object` | `stub` (direct instance) |
 | `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall((args) => value)` |
 | `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
-| `.ReturnsAsync(value)` | `stub.Method.OnCall((args) => Task.FromResult(value))` |
+| `.ReturnsAsync(value)` | `stub.Method.Returns(value)` (auto-wraps) or `OnCall((args) => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
 | `.Verify(x => x.Method(), Times.Once)` | `var t = stub.Method.OnCall(...); t.Verify(Times.Once)` |
 | `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
@@ -198,7 +198,7 @@ stub.SaveUser.OnCall((user) => { }).Verifiable();
 
 ## Step 6: Async Methods
 
-Replace `.ReturnsAsync()` with `Task.FromResult()` in `OnCall`.
+Replace `.ReturnsAsync()` with `Returns()` (auto-wrapped) or `OnCall()`.
 
 **Moq:**
 
@@ -218,10 +218,25 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
+**Three async configuration options (simplest first):**
+
+```csharp
+// 1. Returns() — auto-wraps in Task.FromResult (recommended for fixed values)
+stub.GetUserAsync.Returns(testUser);
+
+// 2. OnCall() simplified — callback returns unwrapped type, auto-wrapped
+stub.GetUserAsync.OnCall((id) => new User { Id = id });
+
+// 3. OnCall() full — callback returns Task<T> directly
+stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+```
+
 **Key differences:**
 - Moq provides `.ReturnsAsync()` helper
-- KnockOff uses standard `Task.FromResult()` or `Task.CompletedTask`
-- For exceptions: return `Task.FromException<T>(exception)`
+- KnockOff auto-wraps with `Returns(value)` — identical convenience to Moq's `.ReturnsAsync()`
+- `OnCall()` also supports simplified callbacks that auto-wrap
+- For full control: `OnCall()` with explicit `Task.FromResult()`
+- For exceptions: `OnCall(() => throw new Exception())` (auto-wraps the throw too)
 
 ---
 
@@ -390,4 +405,4 @@ var service = new UserService(stub);
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-05

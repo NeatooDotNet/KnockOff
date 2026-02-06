@@ -179,6 +179,51 @@ public void ClassStub_UseObjectProperty()
 ```
 <!-- endSnippet -->
 
+### Issue: Delegate Stub - Cannot Use Func/Action
+
+**Symptoms:**
+- Compiler error when using `[KnockOff<Func<int, int>>]`
+- "The type 'Func<>' cannot be used as a type argument"
+
+**Diagnosis:**
+KnockOff only supports named delegate types, not built-in `Func<>` or `Action<>`.
+
+**Fix:**
+Define a named delegate type:
+
+```csharp
+// Does NOT work:
+// [KnockOff<Func<int, int, int>>]
+
+// Define a named delegate instead:
+public delegate int ArithmeticOperation(int a, int b);
+
+[KnockOff<ArithmeticOperation>]
+public partial class MyTests { }
+```
+
+### Issue: Delegate Stub - Using Wrong Access Pattern
+
+**Symptoms:**
+- "Stubs.MyDelegate does not contain a definition for 'MethodName'"
+- Trying to use `stub.MethodName` on a delegate stub
+
+**Diagnosis:**
+Delegate stubs use `stub.Interceptor` instead of named member properties.
+
+**Fix:**
+Use `stub.Interceptor` for all delegate configuration:
+
+```csharp
+// Wrong (interface/class pattern):
+// stub.Invoke.OnCall((a, b) => a + b);
+
+// Correct (delegate pattern):
+stub.Interceptor.OnCall((a, b) => a + b);
+stub.Interceptor.Returns(42);
+stub.Interceptor.Verify(Times.Once);
+```
+
 ### Issue: Async Method Returns Wrong Type
 
 **Symptoms:**
@@ -186,10 +231,10 @@ public void ClassStub_UseObjectProperty()
 - OnCall expects different return type
 
 **Diagnosis:**
-Check if returning raw value instead of Task.
+Check if returning raw value instead of Task, or if you could use `Returns()` which auto-wraps.
 
 **Fix:**
-Return Task-wrapped values for async methods:
+Use `Returns()` for simple values (auto-wraps), or explicit `Task.FromResult` for `OnCall`:
 
 <!-- snippet: troubleshoot-async-return-wrong -->
 ```cs
@@ -210,6 +255,16 @@ stub.GetUserAsync.OnCall((int id) =>
 stub.SaveAsync.OnCall((user) => Task.CompletedTask);
 ```
 <!-- endSnippet -->
+
+**Simpler alternatives using auto-wrapping:**
+
+```csharp
+// Returns() auto-wraps in Task.FromResult
+stub.GetUserAsync.Returns(testUser);
+
+// Simplified OnCall also auto-wraps
+stub.GetUserAsync.OnCall((id) => new User { Id = id });
+```
 
 ### Issue: Verification Fails Unexpectedly
 
@@ -516,4 +571,4 @@ Run through these checks systematically:
 
 ---
 
-**UPDATED:** 2026-02-04
+**UPDATED:** 2026-02-05

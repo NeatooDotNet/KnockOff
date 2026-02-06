@@ -100,6 +100,7 @@ service.Name = "test";
 | Property | Tracking, LastSetValue, callbacks | Verifiable flag |
 | User Property | Tracking (get/set counts, LastSetValue) | **OnGet/OnSet configuration** |
 | Indexer | Tracking, LastGetKey, LastSetEntry | **Backing dictionary** |
+| Delegate | Tracking, LastCallArg, LastCallArgs, callbacks | Verifiable flag |
 | Event | Tracking counts | **Active subscribers** |
 
 **Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve OnCall/OnGet/OnSet configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
@@ -347,6 +348,41 @@ stub.GetById.Of<Product>().OnCall((id) => new Product { Id = id });
 // Verify by type
 stub.GetById.Of<User>().Verify(Times.Exactly(2));
 stub.GetById.Of<Product>().Verify(Times.Once);
+```
+
+---
+
+## Delegate Configuration
+
+Delegates use `stub.Interceptor` instead of named member properties. All method interceptor features are available.
+
+```cs
+var stub = new Stubs.ArithmeticOperation();
+
+// Returns / OnCall
+stub.Interceptor.Returns(42);
+stub.Interceptor.OnCall((a, b) => a + b);
+
+// Sequences
+stub.Interceptor.Returns(10, 20, 30);
+
+// When chains
+stub.Interceptor.When(1, 2).Returns(100)
+    .ThenWhen(3, 4).Returns(200);
+
+// Async auto-wrapping (for delegates returning Task<T>)
+stub.Interceptor.Returns(42);                   // auto-wraps in Task.FromResult
+stub.Interceptor.OnCall((int x) => x * 2);      // simplified, auto-wrapped
+
+// Verification
+stub.Interceptor.Verify(Times.Once);
+Assert.Equal((2, 3), stub.Interceptor.LastCallArgs);
+
+// Strict mode
+stub.Strict = true;
+
+// Implicit conversion to delegate type
+ArithmeticOperation op = stub;
 ```
 
 ---
@@ -689,4 +725,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-04
+**UPDATED:** 2026-02-05

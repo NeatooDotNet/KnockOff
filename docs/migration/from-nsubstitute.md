@@ -57,7 +57,7 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 |---------|-------------|----------|---------|
 | **API elegance** | `.Returns(42)` | `.Returns(42)` or `OnCall(() => 42)` | Comparable |
 | **Verification readability** | `sub.Received().Method()` | `tracking.Verify(Times.Once)` | NSub is more intuitive |
-| **Async setup** | `.Returns(user)` auto-wraps | `.Returns(user)` auto-wraps | Comparable |
+| **Async setup** | `.Returns(user)` auto-wraps | `Returns(user)` auto-wraps; `OnCall` simplified also auto-wraps | Comparable |
 | **Learning curve** | Familiar to most C# devs | New patterns to learn | NSub wins |
 | **Recursive mocks** | Built-in support | Not supported | NSub only |
 
@@ -499,7 +499,7 @@ stub.GetUser.When(99).Returns(new User { Id = 99, Name = "Bob" });
 
 ## Step 14: Async Methods
 
-Replace seamless async `.Returns()` with explicit `Task.FromResult()`.
+Both frameworks auto-wrap async return values.
 
 **NSubstitute:**
 
@@ -519,7 +519,20 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute wins here. Its automatic `Task` wrapping is convenient and reduces ceremony. KnockOff's explicit `Task.FromResult()` is verbose but makes the async nature explicit.
+**Three async configuration options (simplest first):**
+
+```csharp
+// 1. Returns() — auto-wraps in Task.FromResult (same as NSubstitute!)
+stub.GetUserAsync.Returns(testUser);
+
+// 2. OnCall() simplified — callback returns unwrapped type, auto-wrapped
+stub.GetUserAsync.OnCall((id) => new User { Id = id });
+
+// 3. OnCall() full — callback returns Task<T> directly
+stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+```
+
+**Trade-off:** Comparable. KnockOff's `Returns(value)` auto-wraps just like NSubstitute's `.Returns()`. The `OnCall()` overload also supports simplified callbacks that auto-wrap. Only use explicit `Task.FromResult()` when you need full control.
 
 ---
 
@@ -653,16 +666,19 @@ stub.SaveUser.OnCall((user) => { }).Verifiable();
 stub.Verify(); // Now fails if SaveUser wasn't called
 ```
 
-### Forgetting `Task.FromResult` for Async Methods
+### Async Methods — Use Returns() for Simple Cases
 
-**Problem:** NSubstitute auto-wraps; KnockOff doesn't.
+**Problem:** Using the full `OnCall` delegate overload when `Returns()` would be simpler.
 
 ```csharp
-// Wrong: Compiler error - return type mismatch
-stub.GetUserAsync.OnCall((id) => user);
-
-// Correct: Explicit Task wrapping
+// Verbose: full Task wrapping in OnCall
 stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user));
+
+// Better: Returns auto-wraps in Task.FromResult
+stub.GetUserAsync.Returns(user);
+
+// Also works: simplified OnCall auto-wraps too
+stub.GetUserAsync.OnCall((id) => new User { Id = id });
 ```
 
 ### Expecting `.Received()` Syntax
@@ -821,4 +837,4 @@ KnockOff earns its place when:
 
 ---
 
-**UPDATED:** 2026-02-02
+**UPDATED:** 2026-02-05

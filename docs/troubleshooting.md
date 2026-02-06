@@ -145,6 +145,69 @@ Assert.Equal("configured-host", config.Host);  // Config preserved
 
 ---
 
+## Delegate Stubs
+
+### Cannot stub `Func<>` or `Action<>` directly
+
+**Cause:** KnockOff only supports named delegate types, not built-in `Func<>` or `Action<>`.
+
+**Solution:** Define a named delegate type and use that instead.
+
+```csharp
+// Does NOT work:
+// [KnockOff<Func<int, int, int>>]  // Compiler error
+
+// Define a named delegate:
+public delegate int ArithmeticOperation(int a, int b);
+
+// Then use it:
+[KnockOff<ArithmeticOperation>]
+public partial class MyTests { }
+```
+
+---
+
+### Delegate stub uses `Interceptor` not member name
+
+**Cause:** Unlike interface stubs where you access interceptors via member name (`stub.GetById`), delegate stubs use a single `Interceptor` property.
+
+**Solution:** Use `stub.Interceptor` for all delegate configuration.
+
+```csharp
+// Interface stub pattern:
+stub.GetById.OnCall((id) => user);
+
+// Delegate stub pattern (different!):
+stub.Interceptor.OnCall((a, b) => a + b);
+stub.Interceptor.Returns(42);
+stub.Interceptor.Verify(Times.Once);
+```
+
+---
+
+### Delegate OnCall signature mismatch
+
+**Cause:** The callback signature must match the delegate's parameters exactly.
+
+**Solution:** Ensure the callback parameters match the delegate definition.
+
+```csharp
+// Delegate: int ArithmeticOperation(int a, int b)
+
+// Wrong: missing parameter
+stub.Interceptor.OnCall((a) => a);
+
+// Wrong: wrong parameter type
+stub.Interceptor.OnCall((string a, string b) => 0);
+
+// Correct: matches delegate signature
+stub.Interceptor.OnCall((int a, int b) => a + b);
+// Or with inferred types:
+stub.Interceptor.OnCall((a, b) => a + b);
+```
+
+---
+
 ## Generator Issues
 
 ### Generated code not appearing
@@ -290,4 +353,4 @@ The more context you provide, the faster we can help resolve the issue.
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-05

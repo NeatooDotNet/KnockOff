@@ -6,7 +6,7 @@ This document provides a complete API reference for all interceptor types genera
 
 ## Overview
 
-KnockOff generates five types of interceptors, each exposed through properties named after the interface:
+KnockOff generates six types of interceptors, each exposed through properties named after the interface. Delegate stubs use a single `Interceptor` property instead.
 
 | Interceptor Type | Generated For | Container Property |
 |-----------------|---------------|-------------------|
@@ -15,6 +15,7 @@ KnockOff generates five types of interceptors, each exposed through properties n
 | **Property Interceptor** | Interface properties | `{Interface}.{PropertyName}` |
 | **Indexer Interceptor** | Interface indexers | `{Interface}.Indexer` |
 | **Event Interceptor** | Interface events | `{Interface}.{EventName}` |
+| **Delegate Interceptor** | Delegate types | `stub.Interceptor` |
 
 All interceptors provide a `Reset()` method to clear tracking state and callbacks.
 
@@ -487,6 +488,53 @@ var typeArgs = stub.GetById.CalledTypeArguments;
 
 ---
 
+## Delegate Interceptor
+
+Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a single `Interceptor` property. The interceptor reuses the same renderer as interface/class method interceptors, so delegates support: Returns, OnCall, sequences, When chains, async auto-wrapping, verification, and strict mode.
+
+**Important:** Only named delegate types are supported. `Func<>` and `Action<>` cannot be stubbed directly.
+
+### Access Pattern
+
+```csharp
+var stub = new Stubs.ArithmeticOperation();
+stub.Interceptor.Returns(42);
+stub.Interceptor.OnCall((a, b) => a + b);
+stub.Interceptor.Verify(Times.Once);
+
+ArithmeticOperation op = stub; // implicit conversion
+```
+
+### Configuration Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `Returns(TReturn value)` | `IMethodCallBuilder` | Fixed return value (not for void delegates) |
+| `Returns(TReturn first, params TReturn[] rest)` | `IMethodSequence` | Sequence of values |
+| `OnCall(callback)` | `IMethodTracking<T>` | Callback matching delegate signature |
+| `When(values)` / `When(predicate)` | `IWhenBuilder` / `IVoidWhenChain` | Parameter matching |
+
+### Async Auto-Wrapping
+
+Async delegates (`Task<T>`, `ValueTask<T>`) support three-tier auto-wrapping:
+
+```csharp
+stub.Interceptor.Returns(42);                          // Tier 1: auto-wraps
+stub.Interceptor.OnCall((int x) => x * 2);             // Tier 2: simplified, auto-wrapped
+stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2)); // Tier 3: full delegate
+```
+
+### Tracking, Verification, Sequences, When Chains, Strict Mode
+
+All work identically to Method Interceptor. Key differences:
+- Access via `stub.Interceptor` instead of `stub.MethodName`
+- `stub.Strict = true` for strict mode
+- Implicit conversion to delegate type: `DelegateType op = stub;`
+- `LastCallArg` (single-param) or `LastCallArgs` (multi-param) on the interceptor
+- Zero-param delegates have neither tracking property
+
+---
+
 ## Reset Behavior Summary
 
 All interceptors provide a `Reset()` method. This table summarizes what each reset clears and preserves:
@@ -498,6 +546,7 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 | **Property** | Tracking state, `LastSetValue`, sequence indices | OnGet/OnSet callbacks, verifiable marking |
 | **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, sequence indices | `Backing` dictionary, OnGet/OnSet callbacks |
 | **Event** | Tracking counts | Active subscribers, verifiable marking |
+| **Delegate** | Tracking state, `LastCallArg`, `LastCallArgs`, callbacks, sequences, When chains | Verifiable marking |
 | **Generic Method (Base)** | All typed handlers cleared | N/A |
 | **Generic Method (Typed)** | Tracking and callback for specific type argument(s) only | Tracking for other type arguments |
 
@@ -603,4 +652,4 @@ If any verification fails, `Verify()` throws an exception detailing which interc
 
 ---
 
-**UPDATED:** 2026-02-04
+**UPDATED:** 2026-02-05

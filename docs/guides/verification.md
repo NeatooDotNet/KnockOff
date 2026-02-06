@@ -362,6 +362,31 @@ When verification fails, KnockOff throws an exception with a clear message indic
 
 ---
 
+## Delegate Verification
+
+Delegate stubs support the same verification API via `stub.Interceptor`:
+
+```csharp
+var stub = new Stubs.ArithmeticOperation();
+stub.Interceptor.OnCall((a, b) => a + b).Verifiable();
+
+ArithmeticOperation op = stub;
+op(2, 3);
+
+// Direct verification
+stub.Interceptor.Verify(Times.Once);
+
+// Argument tracking
+Assert.Equal((2, 3), stub.Interceptor.LastCallArgs);
+
+// Verifiable pattern (when using inline stubs with multiple attributes)
+stub.Interceptor.Verify();
+```
+
+See the [Delegates Guide](delegates.md) for comprehensive delegate examples.
+
+---
+
 ## See Also
 
 - [Methods Guide](methods.md) - Configure method behavior and callbacks
@@ -372,4 +397,4 @@ When verification fails, KnockOff throws an exception with a clear message indic
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-05

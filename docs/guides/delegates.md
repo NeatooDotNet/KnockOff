@@ -2,6 +2,19 @@
 
 Delegate stubs allow you to test code that accepts delegates as parameters. Use the inline pattern `[KnockOff<TDelegate>]` to generate a delegate stub that tracks invocations and configures behavior.
 
+**Important:** Only named delegate types are supported. `Func<>` and `Action<>` cannot be stubbed directly — define a named delegate instead:
+
+```csharp
+// Does NOT work:
+// [KnockOff<Func<int, int, int>>]  // Not supported
+
+// Define a named delegate instead:
+public delegate int ArithmeticOperation(int a, int b);
+
+[KnockOff<ArithmeticOperation>]  // Works!
+public partial class MyTests { }
+```
+
 ## When to Use Delegate Stubs
 
 Use delegate stubs when testing:
@@ -268,6 +281,13 @@ stub.Interceptor
 stub.Interceptor
     .OnCall((x) => x)
     .ThenReturns(99);
+
+// ThenDefault: return default(T) after exhaustion instead of repeating
+stub.Interceptor
+    .OnCall((a, b) => 100)
+    .ThenCall((a, b) => 200)
+    .ThenDefault();
+// Call 1: 100, Call 2: 200, Call 3+: 0 (default(int))
 ```
 
 ## Async Delegate Auto-Wrapping
@@ -286,6 +306,104 @@ stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
 ```
 
 See [Async Patterns](async-patterns.md) for more details.
+
+## When Chains (Parameter Matching)
+
+Delegate interceptors support conditional parameter matching via `When()`, identical to interface and class stubs. Requires at least one parameter.
+
+### Value Matching
+
+```csharp
+// Match specific argument values
+stub.Interceptor.When(1, 2).Returns(100)
+    .ThenWhen(3, 4).Returns(200)
+    .ThenCall((a, b) => a + b);  // terminal fallback
+```
+
+### Predicate Matching
+
+```csharp
+// Match via predicate
+stub.Interceptor.When((a, b) => a > 10).Returns(999);
+
+// Single-parameter delegate
+stub.Interceptor.When(s => s.Length > 5).Returns("LONG");
+```
+
+### Chained When
+
+```csharp
+stub.Interceptor
+    .When("one").Returns("ONE")
+    .ThenWhen("two").Returns("TWO")
+    .ThenWhen(s => s.StartsWith("x")).Returns("X_PREFIX");
+```
+
+### Void Delegate When Chains
+
+Void delegates use `.Call()` instead of `.Returns()`:
+
+```csharp
+stub.Interceptor
+    .When(1, 2).Call((a, b) => calls.Add("first"))
+    .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
+```
+
+### ThenNone (Exhaust Matching)
+
+```csharp
+// After "one" is matched, subsequent calls fall through to default behavior
+stub.Interceptor.When("one").Returns("ONE").ThenNone();
+```
+
+See [Parameter Matching Guide](parameter-matching.md) for more details.
+
+## Strict Mode
+
+Delegate stubs have a `Strict` property. When `true`, unconfigured invocations throw `StubException.NotConfigured` instead of returning `default(T)`.
+
+```csharp
+var stub = new Stubs.ArithmeticOperation();
+stub.Strict = true;
+
+ArithmeticOperation op = stub;
+op(1, 2); // Throws StubException.NotConfigured
+```
+
+In strict mode, exhausted sequences throw `StubException.SequenceExhausted`:
+
+```csharp
+stub.Strict = true;
+stub.Interceptor.Returns(10, 20);
+// After ThenDefault() or all values consumed:
+op(0); // 10
+op(0); // 20
+op(0); // Throws StubException.SequenceExhausted
+```
+
+## Configuration Mutual Exclusivity
+
+`Returns()` and `OnCall()` are mutually exclusive. Configuring one clears the other:
+
+```csharp
+stub.Interceptor.Returns(42);
+stub.Interceptor.OnCall((a, b) => a + b); // Clears Returns(42)
+
+stub.Interceptor.OnCall((a, b) => a + b);
+stub.Interceptor.Returns(99);              // Clears OnCall
+```
+
+## Priority Resolution Order
+
+When a delegate is invoked, KnockOff checks configurations in this priority order:
+
+1. **When chains** (highest) — parameter-specific matching
+2. **Sequences** — `OnCall().ThenCall()` sequence callbacks
+3. **Returns value** — `Returns(value)` repeating constant
+4. **OnCall callback** — `OnCall(delegate)` repeating callback
+5. **Simplified callback** — `OnCall(simplified)` for async delegates
+6. **Strict mode check** — throws `StubException.NotConfigured` if strict
+7. **Smart default** — `default(T)` for value types, `null` for reference types
 
 ## Implicit Conversion
 
@@ -361,8 +479,11 @@ var validator = new UsernameValidator(uniqueStub, formatStub);
 
 ## Next Steps
 
-- **[Stub Patterns](stub-patterns.md)** - Learn about Stand-Alone, Inline Interface, and Inline Class patterns
+- **[Stub Patterns](stub-patterns.md)** - Learn about all nine patterns including Inline Delegate
 - **[Methods Guide](methods.md)** - Configure method behavior with OnCall
+- **[Parameter Matching](parameter-matching.md)** - When chains and conditional behavior
+- **[Async Patterns](async-patterns.md)** - Async auto-wrapping details
+- **[Verification Guide](verification.md)** - Verify delegate invocations
 - **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete API documentation
 
 ---

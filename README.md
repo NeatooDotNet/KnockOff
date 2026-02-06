@@ -339,7 +339,11 @@ var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
 |------|-------------|----------|
 | **Setup** | `factory(Arg.Any<int>()).Returns("result");` | `stub.Interceptor.Returns("result");` |
 | **With logic** | `factory(Arg.Is<int>(x => x > 0)).Returns(x => $"val: {x.Arg<int>()}");` | `stub.Interceptor.OnCall((x) => $"val: {x}");` |
+| **Sequence** | `factory(Arg.Any<int>()).Returns(1, 2, 3);` | `stub.Interceptor.Returns(1, 2, 3);` |
+| **Async** | `asyncOp(1).Returns(42);` | `stub.Interceptor.Returns(42);` (auto-wraps) |
+| **Match values** | *(per-parameter Arg.Is)* | `stub.Interceptor.When(42).Returns("found");` |
 | **Verify** | `factory.Received()(42);` | `stub.Interceptor.Verify();` |
+| **Verify count** | `factory.Received(3)(Arg.Any<int>());` | `stub.Interceptor.Verify(Times.Exactly(3));` |
 | **Capture** | *(manual with Arg.Do)* | `stub.Interceptor.LastCallArg` (built-in) |
 
 ### Indexers
@@ -370,7 +374,7 @@ KnockOff covers the features NSubstitute users expect:
 | **Properties** | `OnGet` / `OnSet` | `.Returns` / assignment |
 | **Indexers** | `Indexer.OnGet` / `OnSet` / `Backing` | Assignment |
 | **Events** | `Raise()` / `VerifyAdd` / `VerifyRemove` | `Raise.Event()` |
-| **Delegates** | `Interceptor.OnCall` | Setup on substitute |
+| **Delegates** | `Interceptor.Returns` / `OnCall` / `When` / `Verify` | Setup on substitute |
 | **Verification** | `.Verify(Times)` | `.Received(n)` |
 | **Batch verification** | `.Verifiable()` + `stub.Verify()` | Individual `.Received()` calls |
 | **Strict mode** | `[KnockOff(Strict=true)]` | Configure substitute |
