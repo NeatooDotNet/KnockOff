@@ -326,28 +326,45 @@ When using standalone patterns, you can define **user properties** by overriding
 
 Override protected virtual properties using the underscore suffix convention:
 
-```csharp
-public interface IMyRepo
+<!-- snippet: user-properties-interface-and-stub -->
+```cs
+public interface ISkillUserSvc
 {
     int Count { get; }
     string Name { get; set; }
+    string Setting { set; }
 }
 
 [KnockOff]
-public partial class MyRepoStub(List<User> users) : IMyRepo
-{
-    // Get-only property: return computed value
-    protected override int Count_ => users.Count;
+public partial class SkillUserSvcStub : ISkillUserSvc { }
 
-    // Get/set property: use backing field
+public partial class SkillUserSvcStub
+{
+    private int _count;
     private string _name = "";
+    private string _setting = "";
+
+    // Get-only property override
+    protected override int Count_ => _count;
+
+    // Get/set property override
     protected override string Name_
     {
         get => _name;
         set => _name = value;
     }
+
+    // Set-only property override
+    protected override string Setting_
+    {
+        set => _setting = value;
+    }
+
+    // Public methods for test setup
+    public void SetCount(int value) => _count = value;
 }
 ```
+<!-- endSnippet -->
 
 ### Priority Order
 
@@ -357,43 +374,70 @@ When multiple configurations exist:
 2. **User property** - Shared default from protected override
 3. **Smart default** - Returns `default(T)` or throws in strict mode
 
-```csharp
-var stub = new MyRepoStub(new List<User> { new(), new() });
-IMyRepo repo = stub;
+<!-- snippet: user-properties-onget-onset-override -->
+```cs
+var stub = new SkillUserSvcStub();
+stub.SetCount(42);
 
-// User property provides the default
-var count = repo.Count;  // 2
+ISkillUserSvc service = stub;
 
-// OnGet supersedes user property for this test
+// Default: user property is called
+var defaultValue = service.Count;  // 42
+
+// OnGet supersedes the user property for this test
 stub.Count.OnGet(999);
-count = repo.Count;  // 999
+var overrideValue = service.Count;  // 999
+
+// OnSet supersedes the user property for this test
+var capturedValue = "";
+stub.Name.OnSet(v => capturedValue = $"Captured: {v}");
+service.Name = "Test";
+// capturedValue == "Captured: Test"
+// The user override's backing field was NOT updated
 ```
+<!-- endSnippet -->
 
 ### Tracking Works
 
 User property interceptors provide full tracking even when using the user override:
 
-```csharp
-var stub = new MyRepoStub(users);
-IMyRepo repo = stub;
+<!-- snippet: user-properties-tracking -->
+```cs
+var stub = new SkillUserSvcStub();
+stub.SetCount(100);
 
-_ = repo.Count;
-_ = repo.Count;
+ISkillUserSvc service = stub;
 
-stub.Count.VerifyGet(Times.Exactly(2));
+_ = service.Count;
+_ = service.Count;
+_ = service.Count;
+
+stub.Count.VerifyGet(Times.Exactly(3));
+stub.Name.VerifySet(Times.Never);
 ```
+<!-- endSnippet -->
 
 ### Strict Mode Behavior
 
 User properties bypass strict mode because they ARE configured:
 
-```csharp
-[KnockOff(Strict = true)]
-public partial class StrictRepoStub : IMyRepo
-{
-    protected override int Count_ => 10;  // This IS configured - no exception
-}
+<!-- snippet: user-properties-strict-mode -->
+```cs
+// [KnockOff(Strict = true)]
+// public partial class StrictSkillUserSvcStub : ISkillUserSvc { }
+//
+// public partial class StrictSkillUserSvcStub
+// {
+//     protected override int Count_ => 10;  // This IS configured
+// }
+
+// Usage:
+var stub = new StrictSkillUserSvcStub();
+ISkillUserSvc service = stub;
+
+var count = service.Count;  // 10 (no exception - user override is configured)
 ```
+<!-- endSnippet -->
 
 ### Supported Patterns
 

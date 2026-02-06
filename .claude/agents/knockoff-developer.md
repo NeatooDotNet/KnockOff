@@ -372,6 +372,13 @@ When all contract items are checked, write the evidence and hand off for verific
 
 The architect agent will independently verify your work in a separate phase.
 
+**Critical:** Do NOT:
+- Set plan or todo status to "Complete"
+- Move files to `completed/` directories
+- Mark todo tasks as done beyond what you actually implemented
+
+Only the architect verification (Phase 6) may mark work as Complete after independent verification.
+
 ---
 
 ## MODE 3: POST-IMPLEMENTATION REVIEW

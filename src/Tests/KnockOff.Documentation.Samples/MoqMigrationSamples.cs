@@ -845,6 +845,36 @@ public class GotchaAsyncAutoWrapTests
 }
 
 // =============================================================================
+// Common Gotchas - Async Configuration Options
+// =============================================================================
+
+public class MoqAsyncConfigOptionsTests
+{
+    [Fact]
+    public async Task AsyncOptions_ThreeTiers()
+    {
+        var stub = new MoqUserRepoStub();
+        var testUser = new User { Id = 42, Name = "Alice" };
+
+        #region moq-gotcha-async-options
+        // 1. Returns() -- auto-wraps in Task.FromResult (recommended for fixed values)
+        stub.GetUserAsync.Returns(testUser);
+
+        // 2. OnCall() simplified -- callback returns unwrapped type, auto-wrapped
+        stub.GetUserAsync.OnCall((id) => new User { Id = id });
+
+        // 3. OnCall() full -- callback returns Task<T> directly
+        stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+        #endregion
+
+        IMoqUserRepo repository = stub;
+        var user = await repository.GetUserAsync(42);
+
+        Assert.NotNull(user);
+    }
+}
+
+// =============================================================================
 // Common Gotchas - Property Configuration
 // =============================================================================
 

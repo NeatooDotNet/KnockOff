@@ -478,15 +478,17 @@ ValidationRule rule = ruleStub;
 ### Benefits
 
 - **Implicit conversion**: Stub converts to delegate type automatically
-- **Invocation tracking**: Use `Verify()`, `LastCallArg`, `LastCallArgs`
-- **Behavior configuration**: Use `OnCall` to define custom logic
-- **Verification**: Use `Verify()` and `Times` constraints
+- **Invocation tracking**: Use `Verify()`, `LastArg`, `LastArgs`
+- **Behavior configuration**: Use `Returns`, `OnCall`, sequences, and When chains
+- **Async auto-wrapping**: `Returns(42)` auto-wraps for `Task<int>` delegates
+- **Verification**: Use `Verify()`, `Times` constraints, and `Verifiable()` chaining
+- **Strict mode**: `stub.Strict = true` throws on unconfigured invocations
 
 ### Trade-offs
 
-- **Interceptor property**: Access tracking via `stub.Interceptor` (not direct properties)
+- **Interceptor property**: Access tracking via `stub.Interceptor` (not named member properties)
 - **Test-local only**: Cannot reuse across multiple test classes
-- **Named delegates only**: Cannot stub inline `Func<T>` or `Action<T>` directly
+- **Named delegates only**: Cannot stub `Func<T>` or `Action<T>` directly — define a named delegate
 
 ---
 

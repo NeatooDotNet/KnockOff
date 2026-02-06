@@ -16,6 +16,7 @@ KnockOff is a Roslyn Source Generator that creates test stubs at compile time. S
 
 Sequences repeat the last value after exhaustion (matching NSubstitute):
 
+<!-- snippet: skill-gotcha-sequence-exhaustion -->
 ```cs
 stub.Add.Returns(1, 999);
 calc.Add(0, 0); // Returns 1
@@ -28,79 +29,96 @@ calc.Add(0, 0); // Returns 1
 calc.Add(0, 0); // Returns 999
 calc.Add(0, 0); // Returns 0 (default - ThenDefault() terminates with default)
 ```
+<!-- endSnippet -->
 
-### 2. Events Use Handler Property - No Raise() Method
+### 2. Events Use Raise() Method
 
-Events are raised via the `Handler` property with null-conditional:
+Events are raised via the `.Raise()` method on the event interceptor:
 
+<!-- snippet: skill-gotcha-event-raise -->
 ```cs
-// WRONG: stub.StartedInterceptor.Raise(sender, args)
-// RIGHT:
-stub.StartedInterceptor.Handler?.Invoke(sender, EventArgs.Empty);
+// Events use .Raise() method:
+stub.Started.Raise(stub, EventArgs.Empty);
 ```
+<!-- endSnippet -->
 
-### 3. Event Interceptors Have "Interceptor" Suffix
+### 3. Event Interceptors Use Direct Event Name
 
+<!-- snippet: skill-gotcha-event-naming -->
 ```cs
-stub.StartedInterceptor  // NOT stub.Started
-stub.DataReceivedInterceptor  // NOT stub.DataReceived
+// Event interceptors use the event name directly:
+stub.Started.VerifyAdd(Times.Never);
+stub.DataReceived.VerifyAdd(Times.Never);
 ```
+<!-- endSnippet -->
 
 ### 4. Class Stubs Use .Object Property
 
 Inline class stubs don't inherit from the base class:
 
+<!-- snippet: skill-gotcha-class-object -->
 ```cs
 // WRONG: ServiceBase service = stub;
 // RIGHT:
+var stub = new Stubs.ServiceBase();
 ServiceBase service = stub.Object;
 service.Initialize();
 ```
+<!-- endSnippet -->
 
 ### 5. Closed Generic Stubs Use Simple Names
 
+<!-- snippet: skill-gotcha-closed-generic -->
 ```cs
 // For [KnockOff<IRepository<User>>]:
-new Stubs.IRepository()  // NOT Stubs.IRepository<User>
+var stub = new Stubs.IRepository();  // NOT Stubs.IRepository<User>
 ```
+<!-- endSnippet -->
 
 ### 6. Times.Between() Does NOT Exist
 
+<!-- snippet: skill-gotcha-times-between -->
 ```cs
 // WRONG: Times.Between(1, 5)
 // RIGHT: Use separate constraints
 stub.Save.Verify(Times.AtLeast(1));
 stub.Save.Verify(Times.AtMost(5));
 ```
+<!-- endSnippet -->
 
 ### 7. Returns() vs OnCall() - Mutual Exclusivity
 
 `Returns()` and `OnCall()` are mutually exclusive. Last one wins:
 
+<!-- snippet: skill-gotcha-returns-vs-oncall -->
 ```cs
 stub.GetValue.Returns("fixed");           // Sets constant value
 stub.GetValue.OnCall((id) => $"val-{id}"); // REPLACES Returns, now dynamic
 ```
+<!-- endSnippet -->
 
 ### 8. OnSet Does NOT Auto-Update Getter
 
+<!-- snippet: skill-gotcha-onset-no-auto-update -->
 ```cs
 stub.Name.OnSet((v) => { /* tracks value */ });
 service.Name = "test";
 // Getter still returns default! OnSet doesn't update OnGet
 // To link them: stub.Name.OnSet((v) => stub.Name.OnGet(v));
 ```
+<!-- endSnippet -->
 
 ### 9. Reset() Clears Tracking BUT Preserves Some State
 
 | Interceptor | Reset Clears | Reset Preserves |
 |-------------|--------------|-----------------|
-| Method | Tracking, callbacks | Nothing |
-| User Method | Tracking (call count, LastArg) | **OnCall configuration** |
-| Property | Tracking, LastSetValue, callbacks | Verifiable flag |
-| User Property | Tracking (get/set counts, LastSetValue) | **OnGet/OnSet configuration** |
-| Indexer | Tracking, LastGetKey, LastSetEntry | **Backing dictionary** |
-| Event | Tracking counts | **Active subscribers** |
+| Method | Counts, LastArg/LastArgs, sequence index, When chain position | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
+| User Method | Counts, LastArg | **OnCall configuration**, verifiable flag |
+| Property | Get/set counts, LastSetValue, sequence index | **OnGet/OnSet callbacks**, verifiable flag |
+| User Property | Get/set counts, LastSetValue | **OnGet/OnSet configuration**, verifiable flag |
+| Indexer | Get/set counts, LastGetKey, LastSetEntry | **Backing dictionary**, OnGet/OnSet callbacks |
+| Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
+| Event | Tracking counts | **Active subscribers**, verifiable flag |
 
 **Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve OnCall/OnGet/OnSet configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
 
@@ -235,12 +253,15 @@ public partial class SkillValidationTests
 
 ### Returns() - Fixed Values
 
+<!-- snippet: skill-method-returns -->
 ```cs
 stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
 ```
+<!-- endSnippet -->
 
 ### OnCall() - Dynamic Callbacks
 
+<!-- snippet: skill-method-oncall -->
 ```cs
 // With arguments
 stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
@@ -252,24 +273,28 @@ stub.Save.OnCall((user) => { /* side effects */ });
 stub.GetUserAsync.OnCall((id) => new User { Id = id });  // Returns Task<User>
 stub.SaveAsync.OnCall((user) => { });  // Returns Task.CompletedTask
 ```
+<!-- endSnippet -->
 
 ### Sequences (NSubstitute-style)
 
+<!-- snippet: skill-method-sequences -->
 ```cs
 // Concise value sequences (preferred)
-stub.GetNext.Returns("first", "second", "third");
-// After third call, repeats "third" (NSubstitute-like behavior)
+stub.GetNext.Returns(1, 2, 3);
+// After third call, repeats 3 (NSubstitute-like behavior)
 
 // Mix callbacks with value sequences
 stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
 // First: computed, then 100, 200, 200...
 
 // Use ThenDefault() to return default(T) instead of repeating:
-stub.GetNext.Returns("first", "second").ThenDefault();
+stub.GetNext.Returns(1, 2).ThenDefault();
 ```
+<!-- endSnippet -->
 
 ### When() - Argument Matching
 
+<!-- snippet: skill-method-when -->
 ```cs
 // Value matching
 stub.GetUser.When(42).Returns(adminUser);
@@ -280,18 +305,20 @@ stub.GetUser.When(id => id < 0).Returns(null);
 
 // Chaining
 stub.GetUser
-    .When(42).Returns(admin)
-    .ThenWhen(id => id > 100).Returns(premium)
-    .ThenWhen(id => id > 0).Returns(regular);
+    .When(42).Returns(adminUser)
+    .ThenWhen(id => id > 100).Returns(premiumUser)
+    .ThenWhen(id => id > 0).Returns(regularUser);
 
-// Void methods use Callback instead of Returns
-stub.Log.When("error").Callback((msg) => errorCount++);
+// Void methods use Call instead of Returns
+stub.Log.When("error").Call((msg) => { /* handle */ });
 ```
+<!-- endSnippet -->
 
 ---
 
 ## Property Configuration
 
+<!-- snippet: skill-property-config -->
 ```cs
 // Static value
 stub.Name.OnGet("TestName");
@@ -305,49 +332,97 @@ stub.Name.OnSet((value) => capturedValues.Add(value));
 // Sequences
 stub.Counter.OnGet(() => 1).ThenGet(() => 2).ThenGet(() => 3);
 ```
+<!-- endSnippet -->
 
 ---
 
 ## Indexer Configuration
 
+<!-- snippet: skill-indexer-config -->
 ```cs
 // Use Backing dictionary for simple cases
-stub.Indexer.Backing["key1"] = value1;
-stub.Indexer.Backing["key2"] = value2;
+stub.Indexer.Backing["key1"] = "value1";
+stub.Indexer.Backing["key2"] = "value2";
 
 // Or use callbacks
-stub.Indexer.OnGet((key) => ComputeValue(key));
+stub.Indexer.OnGet((key) => $"computed-{key}");
 stub.Indexer.OnSet((key, value) => { /* handle */ });
 
 // Note: OnGet/OnSet override Backing - they don't work together
 ```
+<!-- endSnippet -->
 
 ---
 
 ## Event Configuration
 
+<!-- snippet: skill-event-config -->
 ```cs
-// Events use Handler property (NO Raise method!)
-stub.DataReceivedInterceptor.Handler?.Invoke(sender, new DataEventArgs(data));
+// Events use Raise() method
+stub.DataReceived.Raise(stub, new DataEventArgs("test-data"));
 
 // Verify subscriptions
-stub.DataReceivedInterceptor.VerifyAdd(Times.Once);
-stub.DataReceivedInterceptor.VerifyRemove(Times.Never);
+stub.DataReceived.VerifyAdd(Times.Once);
+stub.DataReceived.VerifyRemove(Times.Never);
 ```
+<!-- endSnippet -->
 
 ---
 
 ## Generic Methods
 
+<!-- snippet: skill-generic-methods -->
 ```cs
 // Use .Of<T>() for type-specific configuration
 stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
 stub.GetById.Of<Product>().OnCall((id) => new Product { Id = id });
 
 // Verify by type
-stub.GetById.Of<User>().Verify(Times.Exactly(2));
-stub.GetById.Of<Product>().Verify(Times.Once);
+stub.GetById.Of<User>().Verify(Times.Never);
+stub.GetById.Of<Product>().Verify(Times.Never);
 ```
+<!-- endSnippet -->
+
+---
+
+## Delegate Configuration
+
+Delegates use `stub.Interceptor` instead of named member properties. All method interceptor features are available.
+
+<!-- snippet: skill-delegate-config -->
+```cs
+var stub = new Stubs.SkillArithmeticOp();
+
+// Returns / OnCall
+stub.Interceptor.Returns(42);
+stub.Interceptor.OnCall((a, b) => a + b);
+
+// Sequences
+stub.Interceptor.Returns(10, 20, 30);
+
+// When chains
+stub.Interceptor.When(1, 2).Returns(100)
+    .ThenWhen(3, 4).Returns(200);
+
+// Async auto-wrapping (for delegates returning Task<T>)
+// stub.Interceptor.Returns(42);              // auto-wraps in Task.FromResult
+// stub.Interceptor.OnCall((int x) => x * 2); // simplified, auto-wrapped
+
+// Verification (fresh stub for clean tracking)
+var verifyStub = new Stubs.SkillArithmeticOp();
+verifyStub.Interceptor.OnCall((a, b) => a + b);
+SkillArithmeticOp op = verifyStub;
+op(1, 2);
+verifyStub.Interceptor.Verify(Times.Once);
+Assert.Equal((1, 2), verifyStub.Interceptor.LastArgs);
+
+// Strict mode
+stub.Strict = true;
+
+// Implicit conversion to delegate type
+SkillArithmeticOp opRef = stub;
+```
+<!-- endSnippet -->
 
 ---
 
@@ -355,20 +430,22 @@ stub.GetById.Of<Product>().Verify(Times.Once);
 
 ### Individual Verification
 
+<!-- snippet: skill-verify-individual -->
 ```cs
 var tracking = stub.Save.OnCall((user) => { });
 // ... exercise stub ...
-tracking.Verify(Times.Exactly(2));
 ```
+<!-- endSnippet -->
 
 ### Batch Verification with Verifiable()
 
+<!-- snippet: skill-verify-batch -->
 ```cs
-stub.GetUser.OnCall((id) => user).Verifiable();
+stub.GetUser.OnCall((id) => new User { Id = id }).Verifiable();
 stub.Save.OnCall((u) => { }).Verifiable(Times.Once);
 // ... exercise stub ...
-stub.Verify();  // Checks all Verifiable() members
 ```
+<!-- endSnippet -->
 
 ### Verify() vs VerifyAll()
 
@@ -390,17 +467,19 @@ stub.Verify();  // Checks all Verifiable() members
 
 ## Argument Capture
 
+<!-- snippet: skill-arg-capture -->
 ```cs
 // Single parameter - LastArg
-var tracking = stub.GetUser.OnCall((id) => user);
+var getTracking = stub.GetUser.OnCall((id) => new User { Id = id });
 service.GetUser(42);
-Assert.Equal(42, tracking.LastArg);
+Assert.Equal(42, getTracking.LastArg);
 
 // Multiple parameters - LastArgs tuple
-var tracking = stub.Update.OnCall((id, name) => { });
+var updateTracking = stub.Update.OnCall((id, name) => { });
 service.Update(1, "Alice");
-var (id, name) = tracking.LastArgs;
+var (id, name) = updateTracking.LastArgs;
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -408,17 +487,20 @@ var (id, name) = tracking.LastArgs;
 
 Throws `StubException` for unconfigured member access:
 
+<!-- snippet: skill-strict-mode -->
 ```cs
 // Per-stub
-[KnockOff(Strict = true)]
-public partial class StrictStub : IService { }
+// [KnockOff(Strict = true)]
+// public partial class StrictStub : IService { }
 
 // Or at runtime
-var stub = new ServiceStub().Strict();
+var stub = new SvcStub();
+stub.Strict();
 
 // Assembly-wide default
-[assembly: KnockOffStrict]
+// [assembly: KnockOffStrict]
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -430,16 +512,18 @@ User methods let you define default stub behavior at compile time. The user meth
 
 Override virtual methods with underscore suffix - the compiler enforces signature correctness:
 
+<!-- snippet: skill-user-method-define -->
 ```cs
 [KnockOff]
-public partial class UserRepoStub : IUserRepo { }
+public partial class SkUserMethodRepoStub : IUserRepo { }
 
-public partial class UserRepoStub
+public partial class SkUserMethodRepoStub
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 ```
+<!-- endSnippet -->
 
 The interceptor uses a clean name (e.g., `GetById`, not `GetById2`) regardless of whether you override the method.
 
@@ -447,8 +531,9 @@ The interceptor uses a clean name (e.g., `GetById`, not `GetById2`) regardless o
 
 Use `OnCall()` to override the user method for specific tests:
 
+<!-- snippet: skill-user-method-oncall -->
 ```cs
-var stub = new UserRepoStub();
+var stub = new SkUserMethodRepoStub();
 IUserRepo repo = stub;
 
 // Without OnCall: user method is called
@@ -458,26 +543,32 @@ var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
 stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
 ```
+<!-- endSnippet -->
 
 ### Returns for Constant Values
 
 Use `Returns()` for constant return values:
 
+<!-- snippet: skill-user-method-returns -->
 ```cs
 stub.GetById.Returns(new User { Id = 99, Name = "Fixed" });
 ```
+<!-- endSnippet -->
 
 For async methods (`Task<T>`, `ValueTask<T>`), `Returns()` auto-wraps the value:
 
+<!-- snippet: skill-user-method-async-returns -->
 ```cs
 // Returns auto-wraps in Task.FromResult
 stub.GetUserAsync.Returns(new User { Id = 1 });
 ```
+<!-- endSnippet -->
 
 ### Tracking Works with OnCall
 
 User method interceptors provide full tracking even when using `OnCall`:
 
+<!-- snippet: skill-user-method-tracking -->
 ```cs
 stub.GetById.OnCall(id => new User { Id = id });
 repo.GetById(42);
@@ -485,11 +576,13 @@ repo.GetById(42);
 stub.GetById.Verify(Times.Once);
 Assert.Equal(42, stub.GetById.LastArg);
 ```
+<!-- endSnippet -->
 
 ### Reset Preserves OnCall Configuration
 
 `Reset()` clears tracking state but preserves the OnCall configuration:
 
+<!-- snippet: skill-user-method-reset -->
 ```cs
 stub.GetById.OnCall(id => new User { Id = id });
 repo.GetById(1);
@@ -500,6 +593,7 @@ stub.GetById.Verify(Times.Never);  // Tracking cleared
 
 repo.GetById(2);  // Still uses OnCall callback
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -511,11 +605,12 @@ User properties let you define default property behavior at compile time. The us
 
 Override virtual properties with underscore suffix - the compiler enforces signature correctness:
 
+<!-- snippet: skill-user-property-define -->
 ```cs
 [KnockOff]
-public partial class UserServiceStub : IUserService { }
+public partial class SkUserPropServiceStub : IUserService { }
 
-public partial class UserServiceStub
+public partial class SkUserPropServiceStub
 {
     private int _count;
 
@@ -525,6 +620,7 @@ public partial class UserServiceStub
     public void SetCount(int value) => _count = value;
 }
 ```
+<!-- endSnippet -->
 
 The interceptor uses a clean name (e.g., `Count`, not `Count2`) regardless of whether you override the property.
 
@@ -532,8 +628,9 @@ The interceptor uses a clean name (e.g., `Count`, not `Count2`) regardless of wh
 
 Use `OnGet()` or `OnSet()` to override the user property for specific tests:
 
+<!-- snippet: skill-user-property-onget -->
 ```cs
-var stub = new UserServiceStub();
+var stub = new SkUserPropServiceStub();
 stub.SetCount(42);
 IUserService service = stub;
 
@@ -544,24 +641,26 @@ var count1 = service.Count;  // Returns 42 (from Count_ override)
 stub.Count.OnGet(999);
 var count2 = service.Count;  // Returns 999 (OnGet wins)
 ```
+<!-- endSnippet -->
 
 ### Tracking Works with User Properties
 
 User property interceptors provide full tracking even when using the user override:
 
+<!-- snippet: skill-user-property-tracking -->
 ```cs
-IUserService service = stub;
 _ = service.Count;
 _ = service.Count;
 
 stub.Count.VerifyGet(Times.Exactly(2));
-Assert.Equal(42, stub.Name.LastSetValue);  // If Name was set
 ```
+<!-- endSnippet -->
 
 ### Reset Preserves OnGet/OnSet Configuration
 
 `Reset()` clears tracking state but preserves the OnGet/OnSet configuration:
 
+<!-- snippet: skill-user-property-reset -->
 ```cs
 stub.Count.OnGet(100);
 _ = service.Count;
@@ -572,6 +671,7 @@ stub.Count.VerifyGet(Times.Never);  // Tracking cleared
 
 _ = service.Count;  // Still uses OnGet (returns 100)
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -579,16 +679,18 @@ _ = service.Count;  // Still uses OnGet (returns 100)
 
 Delegate unconfigured calls to a real implementation:
 
+<!-- snippet: skill-source-delegation -->
 ```cs
-var stub = new RepoStub();
+var stub = new SkSourceDelegationStub();
 stub.Source(realImplementation);
 
 // Configured members override source
 stub.GetById.OnCall((id) => testUser);  // This wins over source
 
-// Reset clears source
-stub.GetById.Reset();  // Clears source AND configuration
+// Reset clears source AND configuration
+// stub.GetById.Reset();
 ```
+<!-- endSnippet -->
 
 **Note:** Source() only works with interface stubs, not class stubs.
 
@@ -616,49 +718,60 @@ stub.GetById.Reset();  // Clears source AND configuration
 
 ### Missing `partial` Keyword
 
+<!-- snippet: skill-mistake-partial -->
 ```cs
 // WRONG: Compilation errors
-[KnockOff]
-public class FooStub : IFoo { }
+// [KnockOff]
+// public class FooStub : IFoo { }
 
 // RIGHT:
 [KnockOff]
-public partial class FooStub : IFoo { }
+public partial class SkillPartialDemoStub : ISvc { }
 ```
+<!-- endSnippet -->
 
 ### Wrong Callback Signature
 
+<!-- snippet: skill-mistake-wrong-signature -->
 ```cs
 // WRONG: Type mismatch
-stub.Process.OnCall((string id) => { });  // Method takes int
+// stub.Process.OnCall((string id) => { });  // Method takes int
 
 // RIGHT: Match signature exactly
 stub.Process.OnCall((int id) => { });
 ```
+<!-- endSnippet -->
 
 ### Forgetting .Object for Class Stubs
 
+<!-- snippet: skill-mistake-forgetting-object -->
 ```cs
 // WRONG:
-MyClass service = stub;  // Won't compile
+// MyClass service = stub;  // Won't compile
 
 // RIGHT:
-MyClass service = stub.Object;
+var stub = new Stubs.ServiceBase();
+ServiceBase service = stub.Object;
 ```
+<!-- endSnippet -->
 
 ### Using Func<>/Action<> Instead of Named Delegates
 
+<!-- snippet: skill-mistake-func-action -->
 ```cs
 // WRONG: KnockOff doesn't support generic delegates
-[KnockOff<Func<int, string>>]  // Won't work
+// [KnockOff<Func<int, string>>]  // Won't work
 
 // RIGHT: Define a named delegate
-public delegate string MyOperation(int value);
-[KnockOff<MyOperation>]
+public delegate string SkillNamedOperation(int value);
+[KnockOff<SkillNamedOperation>]
+public partial class SkillNamedDelegateHost { }
 ```
+<!-- endSnippet -->
 
 ### Expecting Sequences to Return Default After Exhaustion
 
+<!-- snippet: skill-mistake-sequence-exhaustion -->
 ```cs
 // Sequences repeat last value by default (NSubstitute-like behavior)
 stub.GetNext.Returns(1, 2);
@@ -671,8 +784,9 @@ stub.GetNext.Returns(1, 2).ThenDefault();
 // Use Strict mode to throw when sequence exhausted
 stub.Strict = true;
 stub.GetNext.Returns(1, 2);
-// Third call throws StubException.SequenceExhausted
+// Third call throws StubException
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -689,4 +803,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-04
+**UPDATED:** 2026-02-05

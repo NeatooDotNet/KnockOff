@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using KnockOff.Builder;
 using KnockOff.Model.Flat;
+using KnockOff.Model.Inline;
 using KnockOff.Model.Shared;
 
 namespace KnockOff.Renderer.Shared;
@@ -303,6 +304,54 @@ internal static class ModelAdapters
 			ParameterSignature: indexer.ParameterSignature,
 			ParameterTypes: indexer.ParameterTypes,
 			KeyExpression: indexer.KeyExpression);
+	}
+
+	#endregion
+
+	#region Delegate Adapters
+
+	/// <summary>
+	/// Converts an InlineDelegateStubModel to UnifiedMethodInterceptorModel and InterceptorRenderOptions.
+	/// A delegate maps to a single non-overloaded method with no declaring interface, no user method, no ref/out.
+	/// </summary>
+	public static (UnifiedMethodInterceptorModel Model, InterceptorRenderOptions Options) ToUnifiedModel(InlineDelegateStubModel del)
+	{
+		// Delegates have no out params, so trackable == all params
+		var onCallType = del.OnCallType;
+		var builderInterface = GetBuilderInterface(del.Parameters, null, onCallType);
+
+		var model = new UnifiedMethodInterceptorModel(
+			InterceptorClassName: del.InterceptorClassName,
+			MethodName: del.StubClassName,
+			DeclaringInterface: "",
+			OwnerClassName: del.StubClassName,
+			OwnerTypeParameters: del.TypeParameterList,
+			Parameters: del.Parameters,
+			TrackableParameters: del.Parameters,
+			ParameterDeclarations: del.InvokeParameterDeclarations,
+			ReturnType: del.ReturnType,
+			IsVoid: del.IsVoid,
+			OnCallDelegateType: del.OnCallType,
+			NeedsCustomDelegate: false,
+			CustomDelegateSignature: null,
+			LastArgType: GetLastArgType(del.Parameters),
+			LastArgsType: GetLastArgsType(del.Parameters, null),
+			BuilderInterface: builderInterface,
+			DefaultExpression: del.DefaultExpression,
+			ThrowsOnDefault: false,
+			UserMethodName: null,
+			Overloads: EquatableArray<MethodOverloadSignature>.Empty);
+
+		var options = new InterceptorRenderOptions(
+			BaseIndent: 2,
+			IncludeStrictParameter: true,
+			StrictAccessExpression: "strict",
+			InterceptorTypeParameters: del.TypeParameterList,
+			InterceptorConstraints: del.ConstraintClauses,
+			UserMethodFallback: false,
+			StubTypeName: null);
+
+		return (model, options);
 	}
 
 	#endregion

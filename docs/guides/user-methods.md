@@ -51,15 +51,21 @@ public partial class UserMethodsRepoStub
 
 KnockOff generates a base class (e.g., `UserMethodsRepoStubBase`) with virtual methods for each interface member:
 
+<!-- snippet: user-methods-generated-base -->
 ```cs
-// Generated base class
-public partial class UserMethodsRepoStubBase
-{
-    protected virtual User? GetUserById_(int id) => default!;
-    protected virtual bool IsActive_(int userId) => default!;
-    protected virtual decimal GetBalance_(int userId) => default!;
-}
+// Generated base class (you don't write this -- KnockOff generates it):
+//
+//   public partial class UserMethodsRepoStubBase
+//   {
+//       protected virtual User? GetUserById_(int id) => default!;
+//       protected virtual bool IsActive_(int userId) => default!;
+//       protected virtual decimal GetBalance_(int userId) => default!;
+//   }
+//
+// Your override in the partial class:
+//   protected override User? GetUserById_(int id) => new User { Id = id };
 ```
+<!-- endSnippet -->
 
 When you override a virtual method:
 
@@ -225,19 +231,19 @@ Assert.Equal("Custom", customUser!.Name);
 
 User methods work naturally with method overloads. Each overload gets its own virtual method in the generated base class, and you can override any subset of them.
 
+<!-- snippet: user-methods-overloads -->
 ```cs
-// Generated base class provides virtual methods for all overloads
-// protected virtual string Format_(string input) => default!;
-// protected virtual string Format_(string input, bool uppercase) => default!;
-
-public partial class FormatterStub
+public partial class UserMethodsFormatterStub
 {
     // Override only the overloads you need
     protected override string Format_(string input) => input.ToUpperInvariant();
 
-    // Other overloads use the interceptor path (OnCall, Returns, or default)
+    // Override other overloads with custom logic
+    protected override string Format_(string input, bool uppercase)
+        => uppercase ? input.ToUpperInvariant() : input.ToLowerInvariant();
 }
 ```
+<!-- endSnippet -->
 
 Overriding one overload does not affect others. The non-overridden overloads work exactly like regular methods: configure them with `OnCall()` or `Returns()`, or leave them to return defaults.
 
@@ -267,4 +273,4 @@ Next: [Source Delegation](source-delegation.md) for partial stubbing patterns wh
 
 ---
 
-**UPDATED:** 2026-02-03
+**UPDATED:** 2026-02-06

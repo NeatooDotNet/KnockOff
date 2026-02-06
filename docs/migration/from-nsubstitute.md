@@ -57,7 +57,7 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 |---------|-------------|----------|---------|
 | **API elegance** | `.Returns(42)` | `.Returns(42)` or `OnCall(() => 42)` | Comparable |
 | **Verification readability** | `sub.Received().Method()` | `tracking.Verify(Times.Once)` | NSub is more intuitive |
-| **Async setup** | `.Returns(user)` auto-wraps | `.Returns(user)` auto-wraps | Comparable |
+| **Async setup** | `.Returns(user)` auto-wraps | `Returns(user)` auto-wraps; `OnCall` simplified also auto-wraps | Comparable |
 | **Learning curve** | Familiar to most C# devs | New patterns to learn | NSub wins |
 | **Recursive mocks** | Built-in support | Not supported | NSub only |
 
@@ -223,7 +223,7 @@ stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
 
 ## Step 6: Configure Properties
 
-Replace property `.Returns()` with `.Value` assignments.
+Replace property `.Returns()` with `.OnGet()` assignments.
 
 **NSubstitute:**
 
@@ -304,7 +304,7 @@ stub.DeleteUser.Verify(Times.Never);
 
 ## Step 9: Verify with Specific Arguments
 
-Replace `.Received()` with specific arguments with argument capture or `LastCallArg`.
+Replace `.Received()` with specific arguments with argument capture or `LastArg`.
 
 **NSubstitute:**
 
@@ -321,13 +321,13 @@ substitute.DidNotReceive().GetUser(1);
 
 <!-- snippet: nsub-migration-received-args-knockoff -->
 ```cs
-// KnockOff: Inspect captured arguments or use LastCallArg
+// KnockOff: Inspect captured arguments or use LastArg
 Assert.Contains(42, calledIds);
-Assert.Equal(99, stub.GetUser.LastCallArg);
+Assert.Equal(99, stub.GetUser.LastArg);
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `.Received().GetUser(42)` is declarative and readable. KnockOff requires capturing arguments in the callback or using `LastCallArg` to inspect the most recent call. This is more manual but gives full access to call history.
+**Trade-off:** NSubstitute's `.Received().GetUser(42)` is declarative and readable. KnockOff requires capturing arguments in the callback or using `LastArg` to inspect the most recent call. This is more manual but gives full access to call history.
 
 ---
 
@@ -465,7 +465,7 @@ stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id, Name = "Valid User" } :
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `Arg.Is<T>()` matchers are permanent—they apply to all matching calls. KnockOff's `OnCall()` with conditionals achieves the same result. KnockOff's `When()` API is designed for sequential/consumable matching (first call matches X, second matches Y), which is a different use case.
+**Trade-off:** NSubstitute's `Arg.Is<T>()` matchers are permanent--they apply to all matching calls. KnockOff's `OnCall()` with conditionals achieves the same result. KnockOff's `When()` API is designed for sequential/consumable matching (first call matches X, second matches Y), which is a different use case.
 
 ---
 
@@ -499,7 +499,7 @@ stub.GetUser.When(99).Returns(new User { Id = 99, Name = "Bob" });
 
 ## Step 14: Async Methods
 
-Replace seamless async `.Returns()` with explicit `Task.FromResult()`.
+Both frameworks auto-wrap async return values.
 
 **NSubstitute:**
 
@@ -519,7 +519,22 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute wins here. Its automatic `Task` wrapping is convenient and reduces ceremony. KnockOff's explicit `Task.FromResult()` is verbose but makes the async nature explicit.
+**Three async configuration options (simplest first):**
+
+<!-- snippet: nsub-gotcha-async-options -->
+```cs
+// 1. Returns() -- auto-wraps in Task.FromResult (recommended for fixed values)
+stub.GetUserAsync.Returns(testUser);
+
+// 2. OnCall() simplified -- callback returns unwrapped type, auto-wrapped
+stub.GetUserAsync.OnCall((id) => new User { Id = id });
+
+// 3. OnCall() full -- callback returns Task<T> directly
+stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+```
+<!-- endSnippet -->
+
+**Trade-off:** Comparable. KnockOff's `Returns(value)` auto-wraps just like NSubstitute's `.Returns()`. The `OnCall()` overload also supports simplified callbacks that auto-wrap. Only use explicit `Task.FromResult()` when you need full control.
 
 ---
 
@@ -643,70 +658,75 @@ private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
 
 **Problem:** You expect `Verify()` to check a method, but forgot to mark it.
 
-```csharp
-// Wrong: Method not marked, Verify() won't check it
-stub.SaveUser.OnCall((user) => { });
-stub.Verify(); // Passes even if SaveUser wasn't called!
+<!-- snippet: nsub-gotcha-verifiable -->
+```cs
+// Wrong: OnCall without Verifiable -- Verify() won't check this
+stub.GetUser.OnCall((id) => new User { Id = id });
 
-// Correct: Mark with Verifiable()
-stub.SaveUser.OnCall((user) => { }).Verifiable();
-stub.Verify(); // Now fails if SaveUser wasn't called
+// Correct: Mark as Verifiable
+stub.GetUser.OnCall((id) => new User { Id = id }).Verifiable();
 ```
+<!-- endSnippet -->
 
-### Forgetting `Task.FromResult` for Async Methods
+### Async Methods -- Use Returns() for Simple Cases
 
-**Problem:** NSubstitute auto-wraps; KnockOff doesn't.
+**Problem:** Using the full `OnCall` delegate overload when `Returns()` would be simpler.
 
-```csharp
-// Wrong: Compiler error - return type mismatch
-stub.GetUserAsync.OnCall((id) => user);
+<!-- snippet: nsub-gotcha-async-simple -->
+```cs
+// Verbose: full OnCall with Task.FromResult
+stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 
-// Correct: Explicit Task wrapping
-stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user));
+// Simpler: Returns() auto-wraps for you
+stub.GetUserAsync.Returns(testUser);
 ```
+<!-- endSnippet -->
 
 ### Expecting `.Received()` Syntax
 
 **Problem:** Trying to use NSubstitute verification patterns.
 
-```csharp
-// Wrong: No Received() method in KnockOff
-stub.Received().SaveUser(Arg.Any<User>());
+<!-- snippet: nsub-gotcha-received-syntax -->
+```cs
+// Wrong: NSubstitute syntax doesn't exist in KnockOff
+// stub.Received().GetUser(42);          // Compile error
+// stub.DidNotReceive().DeleteUser(1);    // Compile error
 
 // Correct: Use Verify with Times
-stub.SaveUser.Verify(Times.AtLeastOnce);
-
-// Or use batch verification
-stub.SaveUser.OnCall((user) => { }).Verifiable();
-// ... call method ...
-stub.Verify();
+stub.GetUser.Verify(Times.Once);
+stub.DeleteUser.Verify(Times.Never);
 ```
+<!-- endSnippet -->
 
 ### Missing the `partial` Keyword
 
 **Problem:** Stub class isn't marked `partial`, causing duplicate member errors.
 
-```csharp
-// Wrong
-[KnockOff]
-class UserRepoStub : IUserRepo { }
+<!-- snippet: nsub-gotcha-partial-keyword -->
+```cs
+// Wrong: missing partial keyword
+// [KnockOff]
+// public class MyStub : INSubUserRepo { }  // won't generate interceptors
 
-// Correct
+// Correct: always use partial
 [KnockOff]
-partial class UserRepoStub : IUserRepo { }
+public partial class NSubGotchaPartialStub : INSubUserRepo { }
 ```
+<!-- endSnippet -->
 
 ### Wrong `OnCall` Signature
 
 **Problem:** Callback signature doesn't match the method parameters.
 
-```csharp
+<!-- snippet: nsub-gotcha-oncall-signature -->
+```cs
 // Wrong: GetUser(int id) expects (int) callback
-stub.GetUser.OnCall(() => user);
+// stub.GetUser.OnCall(() => user);  // Compile error
 
-// Correct
-stub.GetUser.OnCall((id) => user);
+// Correct: match the method signature
+stub.GetUser.OnCall((id) => new User { Id = id });
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -716,40 +736,47 @@ stub.GetUser.OnCall((id) => user);
 
 NSubstitute automatically creates substitutes for return types:
 
-```csharp
-// NSubstitute: Auto-creates nested substitute
-var sub = Substitute.For<IOrderService>();
-sub.GetOrder(1).Customer.Name.Returns("Alice");
+<!-- snippet: nsub-no-recursive-nsub -->
+```cs
+// NSubstitute: auto-creates substitutes for return types
+var order = Substitute.For<IOrder>();
+// order.Customer automatically returns a substitute
+order.Customer.Name.Returns("Alice");
 ```
+<!-- endSnippet -->
 
 KnockOff does not support this. You must create separate stubs:
 
-```csharp
+<!-- snippet: nsub-no-recursive-knockoff -->
+```cs
 // KnockOff: Create each stub explicitly
-var customerStub = new CustomerStub();
-customerStub.Name.Value = "Alice";
+var customerStub = new NSubCustomerStub();
+customerStub.Name.OnGet("Alice");
 
-var orderStub = new OrderStub();
-orderStub.Customer.Value = customerStub;
+var orderStub = new NSubOrderStub();
+orderStub.Customer.OnGet(customerStub);
 ```
+<!-- endSnippet -->
 
 ### `Arg.Do<T>()` for Argument Capture
 
 NSubstitute's `Arg.Do<T>()` captures arguments during setup:
 
-```csharp
-// NSubstitute
-User? captured = null;
-sub.SaveUser(Arg.Do<User>(u => captured = u));
+<!-- snippet: nsub-no-argdo-nsub -->
+```cs
+// NSubstitute: Arg.Do<T>() captures arguments during setup
+substitute.GetUser(Arg.Do<int>(id => capturedIds.Add(id))).Returns((User?)null);
 ```
+<!-- endSnippet -->
 
 KnockOff captures in the callback:
 
-```csharp
-// KnockOff
-User? captured = null;
-stub.SaveUser.OnCall((user) => { captured = user; });
+<!-- snippet: nsub-no-argdo-knockoff -->
+```cs
+// KnockOff: Capture in the callback
+stub.GetUser.OnCall((id) => { capturedIds.Add(id); return null; });
 ```
+<!-- endSnippet -->
 
 ### Multiple Return Values (Sequences)
 
@@ -757,23 +784,21 @@ KnockOff now supports identical syntax to NSubstitute for sequences:
 
 **NSubstitute:**
 
-```csharp
-substitute.GetUser(1).Returns(user1, user2, user3);
-substitute.GetUser(1); // user1
-substitute.GetUser(1); // user2
-substitute.GetUser(1); // user3
-substitute.GetUser(1); // user3 (repeats last)
+<!-- snippet: nsub-sequence-nsub -->
+```cs
+// NSubstitute: multiple values in Returns()
+substitute.GetUser(Arg.Any<int>()).Returns(user1, user2, user3);
 ```
+<!-- endSnippet -->
 
 **KnockOff (identical syntax):**
 
-```csharp
+<!-- snippet: nsub-sequence-knockoff -->
+```cs
+// KnockOff: identical syntax -- multiple values in Returns()
 stub.GetUser.Returns(user1, user2, user3);
-stub.GetUser(1); // user1
-stub.GetUser(1); // user2
-stub.GetUser(1); // user3
-stub.GetUser(1); // user3 (repeats last)
 ```
+<!-- endSnippet -->
 
 **Key difference:** Drop the `()` after the method name. Otherwise identical.
 
@@ -781,10 +806,14 @@ Both frameworks repeat the last value after sequence exhaustion.
 
 **Advanced capability:** KnockOff also supports adding to sequences with computed values:
 
-```csharp
-// Start with computed values, then add fixed values
-stub.GetUser.OnCall((id) => ComputeUser(id)).ThenReturns(user2, user3);
+<!-- snippet: nsub-sequence-advanced -->
+```cs
+// KnockOff extension: OnCall/ThenCall for computed sequences
+stub.GetUser
+    .OnCall((id) => user1)
+    .ThenCall((id) => new User { Id = id, Name = "Subsequent" });
 ```
+<!-- endSnippet -->
 
 **KnockOff extension:** Use `ThenDefault()` to explicitly return `default(T)` after exhaustion instead of repeating (NSubstitute has no equivalent). In strict mode, sequences throw `StubException.SequenceExhausted` on exhaustion.
 
@@ -821,4 +850,4 @@ KnockOff earns its place when:
 
 ---
 
-**UPDATED:** 2026-02-02
+**UPDATED:** 2026-02-06

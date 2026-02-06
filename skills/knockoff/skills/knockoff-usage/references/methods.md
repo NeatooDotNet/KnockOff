@@ -123,8 +123,11 @@ tracking.Verify(Times.Exactly(2));
 |------------|-------------|
 | `Times.Never` | Method must not be called |
 | `Times.Once` | Method must be called exactly once |
+| `Times.Twice` | Method must be called exactly twice |
 | `Times.AtLeastOnce` | Method must be called one or more times |
 | `Times.Exactly(n)` | Method must be called exactly n times |
+| `Times.AtLeast(n)` | Method must be called n or more times |
+| `Times.AtMost(n)` | Method must be called n or fewer times |
 
 ### Using Verifiable() for Batch Verification
 
@@ -415,10 +418,12 @@ var user2 = repo.GetById(2);  // Name = "Override"
 
 `Returns()` provides constant values. For async methods (`Task<T>`, `ValueTask<T>`), the value is auto-wrapped:
 
+<!-- snippet: methods-user-returns-constant-combined -->
 ```cs
-stub.GetById.Returns(new User { Id = 99, Name = "Fixed" });
+stub.GetUser.Returns(new User { Id = 99, Name = "Fixed" });
 stub.GetUserAsync.Returns(new User { Id = 1 });  // Auto-wrapped in Task.FromResult
 ```
+<!-- endSnippet -->
 
 ### Full Tracking Support
 

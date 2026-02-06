@@ -119,6 +119,11 @@ public class StrictModeStandaloneTests
 // in this project. The sample shows the pattern, and tests verify the behavior
 // using stubs that have Strict = true on the attribute (simulating assembly default).
 
+#region strict-assembly-declaration
+// In AssemblyInfo.cs or any file in your test project
+// [assembly: KnockOffStrict]
+#endregion
+
 #region strict-assembly-usage
 [KnockOff<IStrictUserService>]
 public partial class StrictUserTests { }

@@ -179,19 +179,25 @@ Smart defaults only apply when:
 To override smart defaults:
 
 **Option 1: OnCall**
-```csharp
-stub.GetUser.OnCall(() => new User("Test"));
+<!-- snippet: smart-defaults-override-oncall -->
+```cs
+stub.GetUser.OnCall(() => new User { Name = "Test" });
 ```
+<!-- endSnippet -->
 
 **Option 2: User method**
-```csharp
-public User GetUser() => new User("Test");
+<!-- snippet: smart-defaults-override-user-method -->
+```cs
+protected override User? GetUser_() => new User { Name = "Test" };
 ```
+<!-- endSnippet -->
 
 **Option 3: Source**
-```csharp
-stub.Source(realRepository);
+<!-- snippet: smart-defaults-override-source -->
+```cs
+stub.Source(new RealOverridableService());
 ```
+<!-- endSnippet -->
 
 ---
 

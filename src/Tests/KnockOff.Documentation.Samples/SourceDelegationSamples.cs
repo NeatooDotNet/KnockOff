@@ -212,6 +212,58 @@ public class PriorityOrderTests
         var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(42, fromOnCall);
     }
+
+    [Fact]
+    public void ValueVsCallback_OverrideOverloads()
+    {
+        var stub = new SourceRepoStub();
+        var realRepo = new SimpleRepository();
+        stub.Source(realRepo);
+        IRepository repository = stub;
+
+        #region source-oncall-value-vs-callback
+        // Value overload - simpler for fixed values
+        stub.GetPriority.Returns(99);
+
+        // Callback overload - use when you need logic or side effects
+        stub.GetPriority.OnCall((user) => user.IsActive ? 1 : 0);
+        #endregion
+
+        var result = repository.GetPriority(new User { IsActive = true });
+        Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public void OnCallCallback_OverridesSource()
+    {
+        var stub = new SourceRepoStub();
+        var realRepo = new SimpleRepository();
+        stub.Source(realRepo);
+        IRepository repository = stub;
+
+        #region source-oncall-api-callback
+        stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+        #endregion
+
+        var user = repository.GetById(1);
+        Assert.Equal("User1", user?.Name);
+    }
+
+    [Fact]
+    public void OnCallValue_OverridesSource()
+    {
+        var stub = new SourceRepoStub();
+        var realRepo = new SimpleRepository();
+        stub.Source(realRepo);
+        IRepository repository = stub;
+
+        #region source-oncall-api-value
+        stub.GetById.Returns(new User { Id = 1, Name = "Fixed User" });
+        #endregion
+
+        var user = repository.GetById(99);
+        Assert.Equal("Fixed User", user?.Name);
+    }
 }
 
 // =============================================================================

@@ -56,9 +56,10 @@ public class HeroExampleNSubTests
     [Fact]
     public void NSubstitute_ConditionalReturn()
     {
-        // NSubstitute:
+        #region readme-hero-nsub
         var repo = Substitute.For<IUserRepo>();
         repo.GetUser(Arg.Is<int>(id => id > 0)).Returns(x => new User { Id = x.Arg<int>() });
+        #endregion
 
         // Usage
         IUserRepo repository = repo;
@@ -72,9 +73,10 @@ public class HeroExampleKnockOffTests
     [Fact]
     public void KnockOff_ConditionalReturn()
     {
-        // KnockOff:
+        #region readme-hero-knockoff
         var stub = new CompareUserRepoStub();
         stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id } : null);
+        #endregion
 
         // Usage
         IUserRepo repository = stub;
@@ -153,8 +155,11 @@ public class MethodsConditionalNSubTests
     public void NSubstitute_Conditional()
     {
         var calc = Substitute.For<ICalculator>();
-        calc.Add(Arg.Is<int>(x => x > 0), Arg.Any<int>())
+        #region readme-argmatch-nsub
+        // NSubstitute - Arg.Is<T> per parameter (permanent matchers)
+        calc.Add(Arg.Is<int>(a => a > 0), Arg.Any<int>())
             .Returns(x => x.ArgAt<int>(0) + x.ArgAt<int>(1));
+        #endregion
 
         Assert.Equal(12, calc.Add(5, 7));  // 5 > 0, returns 5+7
         Assert.Equal(0, calc.Add(-1, 7));  // -1 not > 0, returns default
@@ -356,15 +361,72 @@ public class MethodsVerifyCountKnockOffTests
 public class ArgumentCaptureNSubTests
 {
     [Fact]
+    public void NSubstitute_ArgMatchComparison()
+    {
+        var calc = Substitute.For<ICalculator>();
+        var stub = new CompareCalculatorStub();
+
+        #region readme-argmatch-nsub-matchers
+        // NSubstitute - Arg.Is<T> per parameter (permanent matchers)
+        calc.Add(Arg.Is<int>(a => a > 0), Arg.Any<int>()).Returns(100);
+        #endregion
+
+        #region readme-argmatch-knockoff-oncall
+        // KnockOff - OnCall with conditional (permanent, matches all calls)
+        stub.Add.OnCall((a, b) => a > 0 ? 100 : 0);
+        #endregion
+
+        Assert.Equal(100, calc.Add(5, 7));
+        ICalculator ko = stub;
+        Assert.Equal(100, ko.Add(5, 7));
+    }
+
+    [Fact]
+    public void KnockOff_WhenComparison()
+    {
+        var stub = new CompareCalculatorStub();
+        #region readme-argmatch-knockoff-when
+        // KnockOff - When() for sequential matching (first match returns 100, then falls through)
+        stub.Add.When((a, b) => a > 0).Returns(100).ThenCall((a, b) => a + b);
+        #endregion
+
+        ICalculator calc = stub;
+        Assert.Equal(100, calc.Add(5, 7));
+    }
+
+    [Fact]
+    public void KnockOff_WhenSpecificValues()
+    {
+        var calc = Substitute.For<ICalculator>();
+        var stub = new CompareCalculatorStub();
+
+        #region readme-argmatch-nsub-specific
+        // Multiple specific values
+        calc.Add(1, 2).Returns(100);
+        calc.Add(3, 4).Returns(200);
+        #endregion
+
+        #region readme-argmatch-knockoff-specific
+        stub.Add.When(1, 2).Returns(100);
+        stub.Add.When(3, 4).Returns(200);
+        #endregion
+
+        Assert.Equal(100, calc.Add(1, 2));
+        ICalculator ko = stub;
+        Assert.Equal(100, ko.Add(1, 2));
+    }
+
+    [Fact]
     public void NSubstitute_ArgumentCapture()
     {
         var calc = Substitute.For<ICalculator>();
 
+        #region readme-argcapture-nsub
         // NSubstitute - requires Arg.Do in setup
         int capturedA = 0, capturedB = 0;
         calc.Add(Arg.Do<int>(x => capturedA = x), Arg.Do<int>(x => capturedB = x));
-
         calc.Add(1, 2);
+        #endregion
 
         Assert.Equal(1, capturedA);
         Assert.Equal(2, capturedB);
@@ -378,13 +440,14 @@ public class ArgumentCaptureKnockOffTests
     {
         var stub = new CompareCalculatorStub();
 
-        // KnockOff - built-in, no pre-setup needed
+        #region readme-argcapture-knockoff
+        // KnockOff - built-in, no pre-setup
         var tracking = stub.Add.OnCall((a, b) => a + b);
-
         ICalculator calc = stub;
         calc.Add(1, 2);
-
         var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
+        #endregion
+
         Assert.Equal(1, a);
         Assert.Equal(2, b);
     }
@@ -924,4 +987,86 @@ public class IndexersCaptureKnockOffTests
         Assert.Equal("key", stub.Indexer.LastSetEntry.Value.Key);
         Assert.Equal("42", stub.Indexer.LastSetEntry.Value.Value);
     }
+}
+
+// =============================================================================
+// SOURCE DELEGATION - README unique feature section
+// =============================================================================
+
+public class SourceDelegationReadmeTests
+{
+    [Fact]
+    public void Source_DelegateAndOverride()
+    {
+        var realRepo = new SimpleUserRepo();
+        var stub = new CompareUserRepoStub();
+
+        #region readme-source-delegation
+        stub.Source(realRepo);  // ALL methods delegate to real implementation
+
+        // Override just the method you're testing
+        stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test User" });
+
+        IUserRepo repo = stub;
+        repo.Save(new User { Id = 1 });  // Calls real SimpleUserRepo.Save()
+        var user = repo.GetUser(1);       // Returns test data
+        #endregion
+
+        Assert.Equal("Test User", user?.Name);
+    }
+}
+
+public class SimpleUserRepo : IUserRepo
+{
+    private readonly List<User> _users = [];
+
+    public User? GetUser(int id) => _users.FirstOrDefault(u => u.Id == id);
+    public Task<User?> GetUserAsync(int id) => Task.FromResult(GetUser(id));
+    public void Save(User user) => _users.Add(user);
+}
+
+// =============================================================================
+// PATTERN EXAMPLES - Three stub patterns
+// =============================================================================
+
+#region readme-pattern-standalone
+[KnockOff]
+public partial class ReadmeStandaloneStub : IUserRepo { }
+#endregion
+
+[KnockOff<IUserRepo>]
+public partial class ReadmeInlineTests
+{
+    #region readme-pattern-inline-interface
+    [Fact]
+    public void InlineInterface_Pattern()
+    {
+        var stub = new Stubs.IUserRepo();
+        stub.GetUser.OnCall((id) => new User { Id = id });
+
+        IUserRepo repo = stub;
+        Assert.NotNull(repo.GetUser(1));
+    }
+    #endregion
+}
+
+public abstract class MyService
+{
+    public abstract User? GetUser(int id);
+}
+
+[KnockOff<MyService>]
+public partial class ReadmeInlineClassTests
+{
+    #region readme-pattern-inline-class
+    [Fact]
+    public void InlineClass_Pattern()
+    {
+        var stub = new Stubs.MyService();
+        stub.GetUser.OnCall((id) => new User { Id = id });
+
+        MyService service = stub.Object;
+        Assert.NotNull(service.GetUser(1));
+    }
+    #endregion
 }

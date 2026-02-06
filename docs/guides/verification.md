@@ -150,9 +150,9 @@ stub.VerifyAll();
 
 ## Argument Verification
 
-For argument inspection, use `LastCallArg` or `LastCallArgs` from the tracking object returned by `OnCall`.
+For argument inspection, use `LastArg` or `LastArgs` from the tracking object returned by `OnCall`.
 
-### Single Parameter (LastCallArg)
+### Single Parameter (LastArg)
 
 <!-- snippet: verify-lastcallarg -->
 ```cs
@@ -161,7 +161,7 @@ Assert.Equal(42, tracking.LastArg);
 ```
 <!-- endSnippet -->
 
-### Multiple Parameters (LastCallArgs)
+### Multiple Parameters (LastArgs)
 
 <!-- snippet: verify-lastcallargs-tuple -->
 ```cs
@@ -356,9 +356,37 @@ When verification fails, KnockOff throws an exception with a clear message indic
 
 **Verify intent, not implementation details.** Test that the right methods were called with the right data, not the exact number of times internal helpers ran.
 
-**Combine with argument verification when needed.** Use `.Verify()` for call frequency, then inspect `LastCallArg` for argument values.
+**Combine with argument verification when needed.** Use `.Verify()` for call frequency, then inspect `LastArg` for argument values.
 
 **Keep assertions focused.** One logical verification per test makes failures easier to diagnose.
+
+---
+
+## Delegate Verification
+
+Delegate stubs support the same verification API via `stub.Interceptor`:
+
+<!-- snippet: verify-delegate-basic -->
+```cs
+// Create delegate stub and configure with Verifiable()
+var stub = new DelegateVerificationHost.Stubs.VerifyArithmeticOp();
+stub.Interceptor.OnCall((a, b) => a + b).Verifiable();
+
+VerifyArithmeticOp op = stub;
+op(2, 3);
+
+// Direct verification with Times
+stub.Interceptor.Verify(Times.Once);
+
+// Argument tracking via LastArgs
+Assert.Equal((2, 3), stub.Interceptor.LastArgs);
+
+// Verifiable pattern - checks all marked interceptors
+stub.Interceptor.Verify();
+```
+<!-- endSnippet -->
+
+See the [Delegates Guide](delegates.md) for comprehensive delegate examples.
 
 ---
 
@@ -372,4 +400,4 @@ When verification fails, KnockOff throws an exception with a clear message indic
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-05

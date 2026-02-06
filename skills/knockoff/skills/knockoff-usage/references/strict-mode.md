@@ -61,10 +61,12 @@ stub.Strict = true;
 
 Apply `[assembly: KnockOffStrict]` to make all stubs in an assembly default to strict mode:
 
+<!-- snippet: strict-assembly-declaration -->
 ```cs
 // In AssemblyInfo.cs or any file in your test project
-[assembly: KnockOffStrict]
+// [assembly: KnockOffStrict]
 ```
+<!-- endSnippet -->
 
 All stubs now default to strict mode:
 
@@ -90,9 +92,12 @@ Unconfigured calls throw StubException:
 
 Individual stubs can opt out when assembly-wide strict mode is enabled:
 
+<!-- snippet: strict-assembly-declaration -->
 ```cs
-[assembly: KnockOffStrict]
+// In AssemblyInfo.cs or any file in your test project
+// [assembly: KnockOffStrict]
 ```
+<!-- endSnippet -->
 
 **Opt out via attribute property**:
 

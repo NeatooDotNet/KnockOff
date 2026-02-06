@@ -144,18 +144,17 @@ stub.GetById.OnCall((id) => new User { Id = id, Name = "Dynamic" });
 
 When you need to compute values based on arguments, perform side effects, or implement conditional logic, use the callback overload:
 
+<!-- snippet: getting-started-oncall-dynamic -->
 ```cs
-// Use VALUE when returning a fixed result
-stub.GetById.OnCall(new User { Id = 1, Name = "Alice" });
+// Use Returns for fixed values
+stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
 
-// Use CALLBACK when you need:
-// - Dynamic values based on arguments
-// - Side effects
-// - Conditional logic
-stub.GetById.OnCall((id) => id > 100 ? adminUser : regularUser);
+// Use OnCall for dynamic values, side effects, or conditional logic
+stub.GetById.OnCall((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
 
 // Both return tracking objects for verification
 ```
+<!-- endSnippet -->
 
 **When to use callbacks**:
 - Computing return values based on input arguments

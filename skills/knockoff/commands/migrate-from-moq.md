@@ -232,7 +232,7 @@ Remove these - KnockOff callbacks receive all arguments naturally through typed 
 
 #### Sequence/SetupSequence
 
-KnockOff doesn't have built-in sequence support. See the sequence pattern example above - use stateful callbacks with counter variables.
+KnockOff has built-in sequence support via `Returns(first, ...rest)`, `ThenReturns()`, `ThenCall()`, and `ThenDefault()`. See the sequence pattern example above.
 
 ### Mock<T> Passed to Constructors
 

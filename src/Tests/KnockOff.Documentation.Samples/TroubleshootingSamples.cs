@@ -430,6 +430,14 @@ public class AsyncReturnTests
         stub.SaveAsync.OnCall((user) => Task.CompletedTask);
         #endregion
 
+        #region troubleshoot-async-simpler-alternatives
+        // Returns() auto-wraps in Task.FromResult
+        stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
+
+        // Simplified OnCall also auto-wraps
+        stub.GetUserAsync.OnCall((id) => new User { Id = id });
+        #endregion
+
         IUserService service = stub;
         var result = service.GetUserAsync(1).Result;
         Assert.NotNull(result);
@@ -563,4 +571,142 @@ public class PropertySetterTests
 //
 // [KnockOff]
 // public partial class InternalServiceStub : IInternalService { }
+#endregion
+
+// =============================================================================
+// Delegate Stubs: Named Type Requirement
+// =============================================================================
+
+#region troubleshoot-delegate-named-type
+// Does NOT work:
+// [KnockOff<Func<int, int, int>>]  // Compiler error
+
+// Define a named delegate:
+public delegate int CalcOperation(int a, int b);
+
+// Then use it:
+[KnockOff<CalcOperation>]
+public partial class CalcDelegateTests { }
+#endregion
+
+// =============================================================================
+// Delegate Stubs: Interceptor Pattern Comparison
+// =============================================================================
+
+public partial class CalcDelegateTests
+{
+    [Fact]
+    public void DelegateStub_UsesInterceptorProperty()
+    {
+        var interfaceStub = new TroubleshootRepoStub();
+        var delegateStub = new Stubs.CalcOperation();
+        var user = new User { Id = 1, Name = "Test" };
+
+        #region troubleshoot-delegate-interceptor-pattern
+        // Interface stub pattern:
+        interfaceStub.GetById.OnCall((id) => user);
+
+        // Delegate stub pattern (different!):
+        delegateStub.Interceptor.OnCall((a, b) => a + b);
+        delegateStub.Interceptor.Returns(42);
+        #endregion
+
+        CalcOperation op = delegateStub;
+        Assert.Equal(42, op(1, 2));
+        delegateStub.Interceptor.Verify(Times.Once);
+    }
+
+    [Fact]
+    public void DelegateOnCall_SignatureMustMatch()
+    {
+        var stub = new Stubs.CalcOperation();
+
+        #region troubleshoot-delegate-oncall-wrong
+        // Delegate: int CalcOperation(int a, int b)
+
+        // Wrong: missing parameter
+        // stub.Interceptor.OnCall((a) => a);
+
+        // Wrong: wrong parameter type
+        // stub.Interceptor.OnCall((string a, string b) => 0);
+        #endregion
+
+        #region troubleshoot-delegate-oncall-correct
+        // Correct: matches delegate signature
+        stub.Interceptor.OnCall((int a, int b) => a + b);
+        // Or with inferred types:
+        stub.Interceptor.OnCall((a, b) => a + b);
+        #endregion
+
+        CalcOperation op = stub;
+        Assert.Equal(5, op(2, 3));
+    }
+}
+
+// =============================================================================
+// KO0200: Standalone Stub Cannot Have Base Class
+// =============================================================================
+
+#region troubleshoot-ko0200-error
+// This pattern produces diagnostic KO0200:
+// public class MyBaseClass { }
+//
+// [KnockOff]
+// public partial class MyStub : MyBaseClass, IMyService { }  // ERROR: KO0200
+#endregion
+
+// =============================================================================
+// User Methods: Override Virtual Methods for Default Behavior
+// =============================================================================
+
+#region troubleshoot-user-method-definition
+public interface ITroubleshootUserRepo
+{
+    User? GetById(int id);
+}
+
+[KnockOff]
+public partial class TroubleshootUserMethodStub : ITroubleshootUserRepo
+{
+    // Override the generated virtual method with underscore suffix
+    protected override User? GetById_(int id)
+    {
+        return new User { Id = id, Name = "Default User" };
+    }
+}
+#endregion
+
+public class UserMethodExampleTests
+{
+    [Fact]
+    public void UserMethod_ProvidesDefaultBehavior()
+    {
+        #region troubleshoot-user-method-usage
+        var stub = new TroubleshootUserMethodStub();
+        // Calls your GetById_ override by default
+        ITroubleshootUserRepo repo = stub;
+        var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
+
+        // You can still override per-test with OnCall
+        stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
+        #endregion
+
+        Assert.Equal("Default User", user!.Name);
+        var overridden = repo.GetById(456);
+        Assert.Equal("Test User", overridden!.Name);
+    }
+}
+
+// =============================================================================
+// Inline Alternative for KO0200
+// =============================================================================
+
+public interface ITroubleshootMyService
+{
+    void DoSomething();
+}
+
+#region troubleshoot-inline-alternative
+[KnockOff<ITroubleshootMyService>]
+public partial class TroubleshootInlineContainer { }
 #endregion

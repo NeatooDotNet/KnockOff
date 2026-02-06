@@ -6,7 +6,7 @@ This document provides a complete API reference for all interceptor types genera
 
 ## Overview
 
-KnockOff generates five types of interceptors, each exposed through properties named after the interface:
+KnockOff generates six types of interceptors, each exposed through properties named after the interface. Delegate stubs use a single `Interceptor` property instead.
 
 | Interceptor Type | Generated For | Container Property |
 |-----------------|---------------|-------------------|
@@ -15,8 +15,9 @@ KnockOff generates five types of interceptors, each exposed through properties n
 | **Property Interceptor** | Interface properties | `{Interface}.{PropertyName}` |
 | **Indexer Interceptor** | Interface indexers | `{Interface}.Indexer` |
 | **Event Interceptor** | Interface events | `{Interface}.{EventName}` |
+| **Delegate Interceptor** | Delegate types | `stub.Interceptor` |
 
-All interceptors provide a `Reset()` method to clear tracking state and callbacks.
+All interceptors provide a `Reset()` method to clear tracking state (counts, captured arguments, and sequence positions) while preserving configured callbacks.
 
 ### Quick Reference Example
 
@@ -42,7 +43,7 @@ stub.Changed.VerifyAdd();
 
 ### Accessing Interceptors Across Usage Patterns
 
-The interceptor API works identically across all seven KnockOff patterns (see [patterns.md](patterns.md) for details).
+The interceptor API works identically across all nine KnockOff patterns (see [patterns.md](patterns.md) for details).
 
 **Standalone Pattern** - `[KnockOff]` on a class implementing an interface:
 
@@ -141,12 +142,13 @@ var user1 = repo.GetById(1);  // Returns "Default"
 stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns "Override"
 
-// Returns for constant values (auto-wraps for async)
-stub.GetById.Returns(new User { Id = 99 });
-
-// Full tracking works with OnCall
+// Full tracking works - counts all calls regardless of configuration
 stub.GetById.Verify(Times.Exactly(2));
 Assert.Equal(2, stub.GetById.LastArg);
+
+// Returns for constant values (auto-wraps for async)
+stub.GetById.Returns(new User { Id = 99 });
+var user3 = repo.GetById(3);  // Returns User { Id = 99 }
 ```
 <!-- endSnippet -->
 
@@ -218,7 +220,7 @@ When a method returns a value, sequences can be built using these methods on `IM
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastCallArg`, `LastCallArgs`, and `OnCall`
+- `void Reset()` - Clears tracking state (call counts, `LastArg`/`LastArgs`), resets sequence index and When chain position. Preserves `OnCall`/`Returns` callbacks
 
 ### Example
 
@@ -288,7 +290,7 @@ When a property has a getter, sequences can be built using these methods on `IPr
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastSetValue`, and callbacks
+- `void Reset()` - Clears tracking state (get/set counts, `LastSetValue`), resets sequence index. Preserves `OnGet`/`OnSet` callbacks
 
 ### Example
 
@@ -345,7 +347,7 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 ### Methods
 
-- `void Reset()` - Clears tracking state, `LastGetKey`, `LastSetEntry`, `OnGet`, and `OnSet`. Does NOT clear `Backing`
+- `void Reset()` - Clears tracking state (get/set counts, `LastGetKey`, `LastSetEntry`), resets sequence index. Preserves `OnGet`/`OnSet` callbacks and `Backing` dictionary
 
 ### Example
 
@@ -487,21 +489,84 @@ var typeArgs = stub.GetById.CalledTypeArguments;
 
 ---
 
+## Delegate Interceptor
+
+Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a single `Interceptor` property. The interceptor reuses the same renderer as interface/class method interceptors, so delegates support: Returns, OnCall, sequences, When chains, async auto-wrapping, verification, and strict mode.
+
+**Important:** Only named delegate types are supported. `Func<>` and `Action<>` cannot be stubbed directly.
+
+### Access Pattern
+
+<!-- snippet: delegate-api-access-pattern -->
+```cs
+var stub = new Stubs.ArithmeticOperation();
+
+// All configuration goes through stub.Interceptor
+stub.Interceptor.Returns(42);
+stub.Interceptor.OnCall((a, b) => a + b);
+
+// Implicit conversion to delegate type
+ArithmeticOperation op = stub;
+var result = op(2, 3);
+```
+<!-- endSnippet -->
+
+### Configuration Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `Returns(TReturn value)` | `IMethodCallBuilder` | Fixed return value (not for void delegates) |
+| `Returns(TReturn first, params TReturn[] rest)` | `IMethodSequence` | Sequence of values |
+| `OnCall(callback)` | `IMethodTracking<T>` | Callback matching delegate signature |
+| `When(values)` / `When(predicate)` | `IWhenBuilder` / `IVoidWhenChain` | Parameter matching |
+
+### Async Auto-Wrapping
+
+Async delegates (`Task<T>`, `ValueTask<T>`) support three-tier auto-wrapping:
+
+<!-- snippet: delegate-api-async-auto-wrapping -->
+```cs
+// delegate Task<int> AsyncOperation(int x);
+var stub = new Stubs.AsyncOperation();
+
+// Tier 1: Returns takes inner type — auto-wraps in Task.FromResult
+stub.Interceptor.Returns(42);
+
+// Tier 2: Simplified callback returns int — auto-wrapped
+stub.Interceptor.OnCall((int x) => x * 2);
+
+// Tier 3: Full delegate returns Task<int> directly
+stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
+```
+<!-- endSnippet -->
+
+### Tracking, Verification, Sequences, When Chains, Strict Mode
+
+All work identically to Method Interceptor. Key differences:
+- Access via `stub.Interceptor` instead of `stub.MethodName`
+- `stub.Strict = true` for strict mode
+- Implicit conversion to delegate type: `DelegateType op = stub;`
+- `LastArg` (single-param) or `LastArgs` (multi-param) on the interceptor
+- Zero-param delegates have neither tracking property
+
+---
+
 ## Reset Behavior Summary
 
 All interceptors provide a `Reset()` method. This table summarizes what each reset clears and preserves:
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | Tracking state, callbacks, sequence index | N/A |
-| **User Method** | Tracking state (call count, LastArg) | OnCall configuration |
-| **Property** | Tracking state, `LastSetValue`, sequence indices | OnGet/OnSet callbacks, verifiable marking |
-| **Indexer** | Tracking state, `LastGetKey`, `LastSetEntry`, sequence indices | `Backing` dictionary, OnGet/OnSet callbacks |
-| **Event** | Tracking counts | Active subscribers, verifiable marking |
-| **Generic Method (Base)** | All typed handlers cleared | N/A |
-| **Generic Method (Typed)** | Tracking and callback for specific type argument(s) only | Tracking for other type arguments |
+| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
+| **User Method** | Call counts, `LastArg` | `OnCall`/`Returns` configuration, verifiable marking |
+| **Property** | Get/set counts, `LastSetValue`, sequence index | `OnGet`/`OnSet` callbacks, sequence structure, verifiable marking |
+| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `OnGet`/`OnSet` callbacks, `Backing` dictionary, verifiable marking |
+| **Event** | Add/remove counts, active subscribers | Verifiable marking |
+| **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
+| **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
+| **Generic Method (Typed)** | Tracking for specific type argument(s) only | Tracking for other type arguments |
 
-**Key Principle**: `Reset()` clears tracking state but preserves configuration (callbacks) and state that represents "what the stub currently is" (backing dictionaries, event subscribers).
+**Key Principle**: `Reset()` clears tracking state (counts, captured arguments, positions) but preserves configured callbacks and structural state (backing dictionaries, sequence/When chain structures, verifiable marking).
 
 ---
 
@@ -603,4 +668,4 @@ If any verification fails, `Verify()` throws an exception detailing which interc
 
 ---
 
-**UPDATED:** 2026-02-04
+**UPDATED:** 2026-02-05

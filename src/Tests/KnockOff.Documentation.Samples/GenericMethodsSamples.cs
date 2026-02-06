@@ -6,10 +6,12 @@ namespace KnockOff.Documentation.Samples.GenericMethods;
 // Interfaces for Generic Method Samples
 // =============================================================================
 
+#region generic-interface-definition
 public interface IRepository
 {
     T? GetById<T>(int id) where T : class, new();
 }
+#endregion
 
 public interface IConverter
 {

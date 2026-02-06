@@ -16,12 +16,14 @@ KnockOff solves this with the `.Of<T>()` accessor pattern, giving you type-speci
 
 Consider a generic repository method:
 
-```csharp
+<!-- snippet: generic-interface-definition -->
+```cs
 public interface IRepository
 {
-    T GetById<T>(int id) where T : class;
+    T? GetById<T>(int id) where T : class, new();
 }
 ```
+<!-- endSnippet -->
 
 In tests, you might call `GetById<User>(1)` and `GetById<Order>(2)`. These are the same method but with different type arguments. You need to:
 - Configure different return values for each type

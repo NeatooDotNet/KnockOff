@@ -532,3 +532,164 @@ public class BatchVerificationTests
         #endregion
     }
 }
+
+// =============================================================================
+// Delegate Types for Interceptor API Delegate Section
+// =============================================================================
+
+public delegate int ArithmeticOperation(int a, int b);
+public delegate Task<int> AsyncOperation(int x);
+public delegate void VoidArithmeticOperation(int a, int b);
+
+[KnockOff<ArithmeticOperation>]
+[KnockOff<AsyncOperation>]
+[KnockOff<VoidArithmeticOperation>]
+public partial class DelegateApiTests { }
+
+// =============================================================================
+// Delegate Interceptor API Samples
+// =============================================================================
+
+public partial class DelegateApiTests
+{
+    [Fact]
+    public void DelegateAccessPattern()
+    {
+        #region delegate-api-access-pattern
+        var stub = new Stubs.ArithmeticOperation();
+
+        // All configuration goes through stub.Interceptor
+        stub.Interceptor.Returns(42);
+        stub.Interceptor.OnCall((a, b) => a + b);
+
+        // Implicit conversion to delegate type
+        ArithmeticOperation op = stub;
+        var result = op(2, 3);
+        #endregion
+
+        Assert.Equal(5, result);
+        stub.Interceptor.Verify(Times.Once);
+    }
+
+    [Fact]
+    public async Task DelegateAsyncAutoWrapping()
+    {
+        #region delegate-api-async-auto-wrapping
+        // delegate Task<int> AsyncOperation(int x);
+        var stub = new Stubs.AsyncOperation();
+
+        // Tier 1: Returns takes inner type — auto-wraps in Task.FromResult
+        stub.Interceptor.Returns(42);
+
+        // Tier 2: Simplified callback returns int — auto-wrapped
+        stub.Interceptor.OnCall((int x) => x * 2);
+
+        // Tier 3: Full delegate returns Task<int> directly
+        stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
+        #endregion
+
+        AsyncOperation op = stub;
+        // The last OnCall wins
+        Assert.Equal(6, await op(3));
+    }
+
+    [Fact]
+    public void DelegateStrictMode()
+    {
+        #region delegate-api-strict-mode
+        var stub = new Stubs.ArithmeticOperation();
+        stub.Strict = true;
+        ArithmeticOperation op = stub;
+        // op(1, 2); // Throws StubException
+        #endregion
+
+        Assert.Throws<StubException>(() => op(1, 2));
+    }
+
+    [Fact]
+    public void DelegateImplicitConversion()
+    {
+        #region delegate-api-implicit-conversion
+        var stub = new Stubs.ArithmeticOperation();
+        stub.Interceptor.OnCall((a, b) => a + b);
+
+        // Implicit conversion — no cast needed
+        ArithmeticOperation op = stub;
+        var result = op(2, 3); // 5
+
+        // Pass directly to methods expecting the delegate
+        ProcessCalculation(stub);
+        #endregion
+
+        Assert.Equal(5, result);
+    }
+
+    private static int ProcessCalculation(ArithmeticOperation op)
+    {
+        return op(10, 20);
+    }
+
+    [Fact]
+    public void DelegateWhenChains_Returning()
+    {
+        var stub = new Stubs.ArithmeticOperation();
+
+        #region delegate-api-when-chains-returning
+        stub.Interceptor.When(1, 2).Returns(100)
+            .ThenWhen(3, 4).Returns(200)
+            .ThenCall((a, b) => a + b);
+        #endregion
+
+        ArithmeticOperation op = stub;
+        Assert.Equal(100, op(1, 2));
+        Assert.Equal(200, op(3, 4));
+        Assert.Equal(15, op(5, 10));
+    }
+
+    [Fact]
+    public void DelegateWhenChains_Void()
+    {
+        var stub = new Stubs.VoidArithmeticOperation();
+        var calls = new List<string>();
+
+        #region delegate-api-when-chains-void
+        stub.Interceptor.When(1, 2).Call((a, b) => calls.Add("first"))
+            .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
+        #endregion
+
+        VoidArithmeticOperation op = stub;
+        op(1, 2);
+        op(3, 4);
+        Assert.Equal(["first", "second"], calls);
+    }
+}
+
+// =============================================================================
+// Tracking Objects vs Interceptors
+// =============================================================================
+
+public class TrackingObjectsTests
+{
+    [Fact]
+    public void TrackingObjectsVsInterceptors()
+    {
+        #region delegate-api-tracking-objects
+        var stub = new ApiMethodRepoStub();
+
+        // Interceptor: stub.GetById
+        // Tracking object: getTracking
+        var getTracking = stub.GetById.OnCall((id) => new User { Id = id });
+
+        // Call the method
+        IApiMethodRepo repo = stub;
+        repo.GetById(42);
+
+        // Access LastArg on the tracking object, not the interceptor
+        Assert.Equal(42, getTracking.LastArg);
+
+        // Both support verification
+        stub.GetById.Verify(Times.Once);      // Interceptor verification
+        getTracking.Verify(Times.Once);       // Tracking object verification
+        #endregion
+    }
+}

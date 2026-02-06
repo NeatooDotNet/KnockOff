@@ -27,3 +27,9 @@ public delegate void SimpleAction();
 /// Used to demonstrate closed generic delegate stubs.
 /// </summary>
 public delegate T Factory<T>();
+
+/// <summary>
+/// An async delegate returning Task&lt;int&gt;.
+/// Used to demonstrate async delegate stubs (pattern 7).
+/// </summary>
+public delegate Task<int> AsyncOperation(int x);

@@ -8,13 +8,31 @@ using System.Threading.Tasks;
 namespace KnockOff.Documentation.Samples.Readme;
 
 
+#region readme-manual-stub-interface
 public interface IMyRepo
 {
     User? GetUser(int id);
     void Update(User user);
 }
+#endregion
+
+#region readme-manual-stub-desired
+public class MyRepoManualStub(List<User> Users) : IMyRepo
+{
+    public User? GetUser(int id)
+    {
+        return Users.Single(u => u.Id == id);
+    }
+
+    public void Update(User user)
+    {
+        Assert.Contains(user, Users);
+    }
+}
+#endregion
 
 
+#region readme-knockoff-stub
 [KnockOff]
 public partial class MyRepoStub(List<User> Users) : IMyRepo
 {
@@ -28,6 +46,7 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
         Assert.Contains(user, Users);
     }
 }
+#endregion
 
 public class UserDomainModel(IMyRepo repo)
 {
@@ -68,6 +87,7 @@ public class UserDomainModel(IMyRepo repo)
 public class UserDomainModelTests
 {
 
+    #region readme-nsub-shared-mock
     public static IMyRepo NSubstituteMock(List<User> users)
     {
         var myRepoMock = Substitute.For<IMyRepo>();
@@ -82,11 +102,13 @@ public class UserDomainModelTests
 
         return myRepoMock;
     }
+    #endregion
 
 
     [Fact]
     public void FetchTest_KnockOff()
     {
+        #region readme-knockoff-fetch-test
         var myRepoKO = new MyRepoStub([new User { Id = 1 }, new User { Id = 2 }]);
         var userDomainModel = new UserDomainModel(myRepoKO);
 
@@ -94,6 +116,7 @@ public class UserDomainModelTests
 
         // I have Verify on my Stub!
         myRepoKO.GetUser.Verify(Times.Once);
+        #endregion
     }
 
     [Fact]
@@ -125,18 +148,20 @@ public class UserDomainModelTests
     [Fact]
     public void UpdateTest_KnockOff_OnCall()
     {
-        var user1 = new User { Id = 1 };
-        var user2 = new User { Id = 2 };
-        var myRepoKO = new MyRepoStub([user1, user2]);
+        #region readme-knockoff-oncall-test
+        var user = new User { Id = 1 };
+        var myRepoKO = new MyRepoStub([user]);
         var userDomainModel = new UserDomainModel(myRepoKO);
 
-        myRepoKO.GetUser.When(1).Returns(user1).Verifiable();
-        myRepoKO.Update.OnCall(u => Assert.Same(u, user1)).Verifiable(Times.Once);
+        // OnCall overrides the stub methods
+        myRepoKO.GetUser.OnCall(id => user).Verifiable();
+        myRepoKO.Update.OnCall(u => Assert.Same(u, user)).Verifiable();
 
         userDomainModel.Fetch(1);
         userDomainModel.Update();
 
         myRepoKO.Verify();
+        #endregion
     }
 
 }

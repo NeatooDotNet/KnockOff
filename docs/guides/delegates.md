@@ -2,6 +2,21 @@
 
 Delegate stubs allow you to test code that accepts delegates as parameters. Use the inline pattern `[KnockOff<TDelegate>]` to generate a delegate stub that tracks invocations and configures behavior.
 
+**Important:** Only named delegate types are supported. `Func<>` and `Action<>` cannot be stubbed directly — define a named delegate instead:
+
+<!-- snippet: delegate-func-action-not-supported -->
+```cs
+// Does NOT work:
+// [KnockOff<Func<int, int, int>>]  // Not supported
+
+// Define a named delegate instead:
+public delegate int NamedCalculation(int a, int b);
+
+[KnockOff<NamedCalculation>]  // Works!
+public partial class NamedDelegateExample { }
+```
+<!-- endSnippet -->
+
 ## When to Use Delegate Stubs
 
 Use delegate stubs when testing:
@@ -32,9 +47,9 @@ stub.Interceptor.Verify();
 
 <!-- snippet: delegate-stub-with-return -->
 ```cs
-// Default return value is null; LastCallArg tracks the argument
+// Default return value is null; LastArg tracks the argument
 Assert.Null(result);
-Assert.Equal("hello", stub.Interceptor.LastCallArg);
+Assert.Equal("hello", stub.Interceptor.LastArg);
 ```
 <!-- endSnippet -->
 
@@ -43,8 +58,8 @@ Assert.Equal("hello", stub.Interceptor.LastCallArg);
 <!-- snippet: delegate-stub-multi-param -->
 ```cs
 // Access arguments via named tuple
-Assert.Equal("Alice", stub.Interceptor.LastCallArgs!.Value.name);
-Assert.Equal(30, stub.Interceptor.LastCallArgs!.Value.age);
+Assert.Equal("Alice", stub.Interceptor.LastArgs!.Value.name);
+Assert.Equal(30, stub.Interceptor.LastArgs!.Value.age);
 ```
 <!-- endSnippet -->
 
@@ -149,10 +164,19 @@ stub.Interceptor.Verify(Times.AtMost(5));
 
 ### Verifiable Pattern
 
-<!-- snippet: delegate-stub-verifiable -->
+Delegate stubs support `.Verifiable()` chaining on `OnCall()` and `Returns()`, just like interface and class stubs:
+
+<!-- snippet: delegate-verifiable-pattern -->
 ```cs
-// Delegate interceptors use Verify() directly (no Verifiable() chaining)
-stub.Interceptor.Verify();
+// Mark for verification with Verifiable() chaining
+stub.Interceptor.OnCall((x) => x * 2).Verifiable();
+stub.Interceptor.Verify(Times.Never); // Not called yet
+
+Transform transform = stub;
+var result = transform(21);
+
+// Verify the delegate was called
+stub.Interceptor.Verify(Times.Once);
 ```
 <!-- endSnippet -->
 
@@ -164,8 +188,8 @@ Delegate stubs track every invocation, providing access to the last call's argum
 
 <!-- snippet: delegate-stub-lastcallarg -->
 ```cs
-// LastCallArg captures the most recent argument
-Assert.Equal("second", stub.Interceptor.LastCallArg);
+// LastArg captures the most recent argument
+Assert.Equal("second", stub.Interceptor.LastArg);
 ```
 <!-- endSnippet -->
 
@@ -173,9 +197,9 @@ Assert.Equal("second", stub.Interceptor.LastCallArg);
 
 <!-- snippet: delegate-stub-lastcallargs -->
 ```cs
-// LastCallArgs provides named tuple access
-Assert.Equal("Bob", stub.Interceptor.LastCallArgs!.Value.name);
-Assert.Equal(25, stub.Interceptor.LastCallArgs!.Value.age);
+// LastArgs provides named tuple access
+Assert.Equal("Bob", stub.Interceptor.LastArgs!.Value.name);
+Assert.Equal(25, stub.Interceptor.LastArgs!.Value.age);
 ```
 <!-- endSnippet -->
 
@@ -240,10 +264,189 @@ Use `stub.Interceptor.Reset()` to clear tracking state while preserving configur
 stub.Interceptor.Reset();
 
 stub.Interceptor.Verify(Times.Never);
-Assert.Null(stub.Interceptor.LastCallArg);
+Assert.Null(stub.Interceptor.LastArg);
 Assert.Equal("TEST", format("test")); // OnCall still works
 ```
 <!-- endSnippet -->
+
+## Sequences
+
+Delegate stubs support the same sequence API as interface and class stubs.
+
+### Returns Sequences
+
+<!-- snippet: delegate-sequences -->
+```cs
+// Return different values on successive calls
+stub.Interceptor.Returns(10, 20, 30);
+// Call 1: 10, Call 2: 20, Call 3+: 30 (repeats last)
+```
+<!-- endSnippet -->
+
+### Callback Sequences
+
+<!-- snippet: delegate-sequences-callback -->
+```cs
+// Callback sequences
+stub.Interceptor
+    .OnCall((x) => x * 1)
+    .ThenCall((x) => x * 2)
+    .ThenCall((x) => x * 3);
+```
+<!-- endSnippet -->
+
+### ThenReturns
+
+<!-- snippet: delegate-sequences-thenreturns -->
+```cs
+// ThenReturns for fixed values after callback
+stub.Interceptor
+    .OnCall((x) => x)
+    .ThenReturns(99);
+```
+<!-- endSnippet -->
+
+### ThenDefault
+
+<!-- snippet: delegate-sequences-thendefault -->
+```cs
+// ThenDefault: return default(T) after exhaustion instead of repeating
+stub.Interceptor
+    .OnCall((a, b) => 100)
+    .ThenCall((a, b) => 200)
+    .ThenDefault();
+// Call 1: 100, Call 2: 200, Call 3+: 0 (default(int))
+```
+<!-- endSnippet -->
+
+## Async Delegate Auto-Wrapping
+
+Async delegates (e.g., `delegate Task<int> AsyncOp(int x)`) support the same three-tier auto-wrapping as interface and class stubs:
+
+<!-- snippet: delegate-async-auto-wrapping -->
+```cs
+// Tier 1: Returns takes inner type - auto-wraps in Task.FromResult
+stub.Interceptor.Returns(42);
+```
+<!-- endSnippet -->
+
+See [Async Patterns](async-patterns.md) for more details.
+
+## When Chains (Parameter Matching)
+
+Delegate interceptors support conditional parameter matching via `When()`, identical to interface and class stubs. Requires at least one parameter.
+
+### Value Matching
+
+<!-- snippet: delegate-when-value-matching -->
+```cs
+// Match specific argument values
+stub.Interceptor.When(1, 2).Returns(100)
+    .ThenWhen(3, 4).Returns(200)
+    .ThenCall((a, b) => a + b);  // terminal fallback
+```
+<!-- endSnippet -->
+
+### Predicate Matching
+
+<!-- snippet: delegate-when-predicate-matching -->
+```cs
+// Match via predicate
+stub.Interceptor.When((a, b) => a > 10).Returns(999);
+```
+<!-- endSnippet -->
+
+<!-- snippet: delegate-when-predicate-single-param -->
+```cs
+// Single-parameter delegate
+stub.Interceptor.When(s => s.Length > 5).Returns("LONG");
+```
+<!-- endSnippet -->
+
+### Chained When
+
+<!-- snippet: delegate-when-chained -->
+```cs
+stub.Interceptor
+    .When("one").Returns("ONE")
+    .ThenWhen("two").Returns("TWO")
+    .ThenWhen(s => s.StartsWith("x")).Returns("X_PREFIX");
+```
+<!-- endSnippet -->
+
+### Void Delegate When Chains
+
+Void delegates use `.Call()` instead of `.Returns()`:
+
+<!-- snippet: delegate-when-void-chains -->
+```cs
+stub.Interceptor
+    .When(1, 2).Call((a, b) => calls.Add("first"))
+    .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
+```
+<!-- endSnippet -->
+
+### ThenNone (Exhaust Matching)
+
+<!-- snippet: delegate-when-thennone -->
+```cs
+// After "one" is matched, subsequent calls fall through to default behavior
+stub.Interceptor.When("one").Returns("ONE").ThenNone();
+```
+<!-- endSnippet -->
+
+See [Parameter Matching Guide](parameter-matching.md) for more details.
+
+## Strict Mode
+
+Delegate stubs have a `Strict` property. When `true`, unconfigured invocations throw `StubException.NotConfigured` instead of returning `default(T)`.
+
+<!-- snippet: delegate-strict-mode -->
+```cs
+var stub = new DelegateStubTests.Stubs.Calculate();
+stub.Strict = true;
+
+Calculate calc = stub;
+Assert.Throws<StubException>(() => calc(1, 2)); // Throws StubException.NotConfigured
+```
+<!-- endSnippet -->
+
+In strict mode, exhausted sequences throw `StubException.SequenceExhausted`:
+
+<!-- snippet: delegate-strict-mode-sequences -->
+```cs
+stub.Strict = true;
+stub.Interceptor.Returns(10, 20);
+
+Calculate op = stub;
+Assert.Equal(10, op(0, 0)); // first value
+Assert.Equal(20, op(0, 0)); // second value
+Assert.Throws<StubException>(() => op(0, 0)); // Throws StubException.SequenceExhausted
+```
+<!-- endSnippet -->
+
+## Configuration Mutual Exclusivity
+
+`Returns()` and `OnCall()` are mutually exclusive. Configuring one clears the other:
+
+<!-- snippet: delegate-config-mutual-exclusivity -->
+```cs
+stub.Interceptor.Returns(42);
+stub.Interceptor.OnCall((a, b) => a + b); // Clears Returns(42)
+```
+<!-- endSnippet -->
+
+## Priority Resolution Order
+
+When a delegate is invoked, KnockOff checks configurations in this priority order:
+
+1. **When chains** (highest) — parameter-specific matching
+2. **Sequences** — `OnCall().ThenCall()` sequence callbacks
+3. **Returns value** — `Returns(value)` repeating constant
+4. **OnCall callback** — `OnCall(delegate)` repeating callback
+5. **Simplified callback** — `OnCall(simplified)` for async delegates
+6. **Strict mode check** — throws `StubException.NotConfigured` if strict
+7. **Smart default** — `default(T)` for value types, `null` for reference types
 
 ## Implicit Conversion
 
@@ -319,10 +522,13 @@ var validator = new UsernameValidator(uniqueStub, formatStub);
 
 ## Next Steps
 
-- **[Stub Patterns](stub-patterns.md)** - Learn about Stand-Alone, Inline Interface, and Inline Class patterns
+- **[Stub Patterns](stub-patterns.md)** - Learn about all nine patterns including Inline Delegate
 - **[Methods Guide](methods.md)** - Configure method behavior with OnCall
+- **[Parameter Matching](parameter-matching.md)** - When chains and conditional behavior
+- **[Async Patterns](async-patterns.md)** - Async auto-wrapping details
+- **[Verification Guide](verification.md)** - Verify delegate invocations
 - **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete API documentation
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-05
