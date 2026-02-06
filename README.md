@@ -163,7 +163,7 @@ myRepoKO.Verify();
 
 `stub.Source(realImplementation)` delegates unconfigured method calls to a real object. Configured methods (OnCall, Returns, When) still take priority.
 
-**The key: you don't need a complete implementation.** KnockOff generates a separate `Source()` overload for each interface in the hierarchy. Pass an object that implements any parent interface — only the matching methods get delegated.
+**The key: you don't need a complete implementation.** KnockOff generates a separate `Source()` overload for each interface in the hierarchy. Pass an object that implements any interface in the hierarchy — only the matching methods get delegated.
 
 For example, stub an interface that extends `IList<string>`:
 

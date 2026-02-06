@@ -4,7 +4,7 @@
 
 `stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured methods (OnCall, Returns, When) still take priority — the source is only consulted when nothing else is configured for that member.
 
-KnockOff generates a separate `Source()` overload for each interface in the hierarchy. **You don't need a complete implementation** — pass an object that implements any parent interface, and only the matching methods get delegated.
+KnockOff generates a separate `Source()` overload for each interface in the hierarchy. **You don't need a complete implementation** — pass an object that implements any interface in the hierarchy, and only the matching methods get delegated.
 
 **Availability**: Source delegation is available for **interface stubs** only (Standalone and Inline patterns). Class stubs inherit from the base class directly and do not need `Source()`.
 
