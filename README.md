@@ -7,41 +7,45 @@ Especially in my integration test library where I may even register my mocks.
 So, I found myself either copying my mock definitions or creating shared methods like this:
 
 
-```csharp
-    public static IMyRepo NSubstituteMock(List<User> users)
-    {
-        var myRepoMock = Substitute.For<IMyRepo>();
+<!-- snippet: readme-nsub-shared-mock -->
+```cs
+public static IMyRepo NSubstituteMock(List<User> users)
+{
+    var myRepoMock = Substitute.For<IMyRepo>();
 
-        // Setup: configure GetUser to look up from the list based on id
-        myRepoMock.GetUser(Arg.Any<int>())
-            .Returns(callInfo => users.SingleOrDefault(u => u.Id == callInfo.Arg<int>()));
+    // Setup: configure GetUser to look up from the list based on id
+    myRepoMock.GetUser(Arg.Any<int>())
+        .Returns(callInfo => users.SingleOrDefault(u => u.Id == callInfo.Arg<int>()));
 
-        // Setup: configure Update to assert user exists in list
-        myRepoMock.When(x => x.Update(Arg.Any<User>()))
-            .Do(callInfo => Assert.Contains(callInfo.Arg<User>(), users));
+    // Setup: configure Update to assert user exists in list
+    myRepoMock.When(x => x.Update(Arg.Any<User>()))
+        .Do(callInfo => Assert.Contains(callInfo.Arg<User>(), users));
 
-        return myRepoMock;
-    }
+    return myRepoMock;
+}
 ```
+<!-- endSnippet -->
 
 But I found these methods quite unreadable and inflexible.
 
 What I really wanted a shared stub:
 
-```csharp
-public class MyRepoStub(List<User> Users) : IMyRepo
+<!-- snippet: readme-manual-stub-desired -->
+```cs
+public class MyRepoManualStub(List<User> Users) : IMyRepo
 {
     public User? GetUser(int id)
     {
         return Users.Single(u => u.Id == id);
     }
 
-    public void Update_(User user)
+    public void Update(User user)
     {
         Assert.Contains(user, Users);
     }
 }
 ```
+<!-- endSnippet -->
 
 But that meant:
 
@@ -58,7 +62,8 @@ For stand alone stubs KnockOff:
 
 With KnockOff the stub looks like:
 
-``` csharp
+<!-- snippet: readme-knockoff-stub -->
+```cs
 [KnockOff]
 public partial class MyRepoStub(List<User> Users) : IMyRepo
 {
@@ -73,43 +78,40 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
     }
 }
 ```
+<!-- endSnippet -->
 
 And your test looks like
 
-``` csharp
-    [Fact]
-    public void FetchTest_KnockOff()
-    {
-        var myRepoKO = new MyRepoStub([new User { Id = 1 }, new User { Id = 2 }]);
-        var userDomainModel = new UserDomainModel(myRepoKO);
+<!-- snippet: readme-knockoff-fetch-test -->
+```cs
+var myRepoKO = new MyRepoStub([new User { Id = 1 }, new User { Id = 2 }]);
+var userDomainModel = new UserDomainModel(myRepoKO);
 
-        Assert.True(userDomainModel.Fetch(1));
+Assert.True(userDomainModel.Fetch(1));
 
-        // I have Verify on my Stub!
-        myRepoKO.GetUser.Verify(Times.Once);
-    }
+// I have Verify on my Stub!
+myRepoKO.GetUser.Verify(Times.Once);
 ```
+<!-- endSnippet -->
 
 And you don't actually loose the ability to configure per-test!
 
-``` csharp
-    [Fact]
-    public void UpdateTest_KnockOff_OnCall()
-    {
-        var user = new User { Id = 1 };
-        var myRepoKO = new MyRepoStub([user]);
-        var userDomainModel = new UserDomainModel(myRepoKO);
+<!-- snippet: readme-knockoff-oncall-test -->
+```cs
+var user = new User { Id = 1 };
+var myRepoKO = new MyRepoStub([user]);
+var userDomainModel = new UserDomainModel(myRepoKO);
 
-        // OnCall overrides the stub methods
-        myRepoKO.GetUser.OnCall(id => user).Verifiable();
-        myRepoKO.Update.OnCall(u => Assert.Same(u, user)).Verifiable();
+// OnCall overrides the stub methods
+myRepoKO.GetUser.OnCall(id => user).Verifiable();
+myRepoKO.Update.OnCall(u => Assert.Same(u, user)).Verifiable();
 
-        userDomainModel.Fetch(1);
-        userDomainModel.Update();
+userDomainModel.Fetch(1);
+userDomainModel.Update();
 
-        myRepoKO.Verify();
-    }
+myRepoKO.Verify();
 ```
+<!-- endSnippet -->
 
 
 It also uses source generation so:
@@ -143,16 +145,20 @@ Even more so in about a month!
 ## The Difference
 
 **NSubstitute:**
-```csharp
+<!-- snippet: readme-hero-nsub -->
+```cs
 var repo = Substitute.For<IUserRepo>();
 repo.GetUser(Arg.Is<int>(id => id > 0)).Returns(x => new User { Id = x.Arg<int>() });
 ```
+<!-- endSnippet -->
 
 **KnockOff:**
-```csharp
-var stub = new UserRepoStub();
+<!-- snippet: readme-hero-knockoff -->
+```cs
+var stub = new CompareUserRepoStub();
 stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id } : null);
 ```
+<!-- endSnippet -->
 
 No `Arg.Is<>()`. No `x.Arg<int>()`. The parameter is just `id`.
 
@@ -241,19 +247,18 @@ stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper()
 
 Delegate to a real implementation, override only what you need:
 
-```csharp
-var realRepo = new SqlUserRepository(connectionString);
-var stub = new UserRepoStub();
-
+<!-- snippet: readme-source-delegation -->
+```cs
 stub.Source(realRepo);  // ALL methods delegate to real implementation
 
 // Override just the method you're testing
 stub.GetUser.OnCall((id) => new User { Id = id, Name = "Test User" });
 
 IUserRepo repo = stub;
-repo.Save(user);     // Calls real SqlUserRepository.Save()
-repo.GetUser(1);     // Returns test data
+repo.Save(new User { Id = 1 });  // Calls real SimpleUserRepo.Save()
+var user = repo.GetUser(1);       // Returns test data
 ```
+<!-- endSnippet -->
 
 No other mocking framework has this. Perfect for integration tests, decorator patterns, and partial mocking without complexity.
 
@@ -278,39 +283,70 @@ No other mocking framework has this. Perfect for integration tests, decorator pa
 
 ### Argument Matching
 
-```csharp
+**NSubstitute:**
+<!-- snippet: readme-argmatch-nsub-matchers -->
+```cs
 // NSubstitute - Arg.Is<T> per parameter (permanent matchers)
 calc.Add(Arg.Is<int>(a => a > 0), Arg.Any<int>()).Returns(100);
+```
+<!-- endSnippet -->
 
+**KnockOff:**
+<!-- snippet: readme-argmatch-knockoff-oncall -->
+```cs
 // KnockOff - OnCall with conditional (permanent, matches all calls)
 stub.Add.OnCall((a, b) => a > 0 ? 100 : 0);
+```
+<!-- endSnippet -->
 
+<!-- snippet: readme-argmatch-knockoff-when -->
+```cs
 // KnockOff - When() for sequential matching (first match returns 100, then falls through)
 stub.Add.When((a, b) => a > 0).Returns(100).ThenCall((a, b) => a + b);
+```
+<!-- endSnippet -->
 
+**Multiple specific values:**
+
+<!-- snippet: readme-argmatch-nsub-specific -->
+```cs
 // Multiple specific values
 calc.Add(1, 2).Returns(100);
 calc.Add(3, 4).Returns(200);
+```
+<!-- endSnippet -->
 
+<!-- snippet: readme-argmatch-knockoff-specific -->
+```cs
 stub.Add.When(1, 2).Returns(100);
 stub.Add.When(3, 4).Returns(200);
 ```
+<!-- endSnippet -->
 
 **Note:** NSubstitute's matchers are permanent—they match all qualifying calls. KnockOff's `When()` is sequential—matchers are consumed in order. Use `OnCall()` with conditionals for permanent matching behavior.
 
 ### Argument Capture
 
-```csharp
+**NSubstitute:**
+<!-- snippet: readme-argcapture-nsub -->
+```cs
 // NSubstitute - requires Arg.Do in setup
 int capturedA = 0, capturedB = 0;
 calc.Add(Arg.Do<int>(x => capturedA = x), Arg.Do<int>(x => capturedB = x));
 calc.Add(1, 2);
+```
+<!-- endSnippet -->
 
+**KnockOff:**
+<!-- snippet: readme-argcapture-knockoff -->
+```cs
 // KnockOff - built-in, no pre-setup
 var tracking = stub.Add.OnCall((a, b) => a + b);
+ICalculator calc = stub;
 calc.Add(1, 2);
 var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
 ```
+<!-- endSnippet -->
 
 ### Properties
 
@@ -473,37 +509,42 @@ public void VerifyCalls_WithVerifiable()
 ## Three Stub Patterns
 
 **Standalone** - Reusable across your project:
-```csharp
+<!-- snippet: readme-pattern-standalone -->
+```cs
 [KnockOff]
-public partial class UserRepoStub : IUserRepo { }
+public partial class ReadmeStandaloneStub : IUserRepo { }
 ```
+<!-- endSnippet -->
 
 **Inline Interface** - Test-local stubs:
-```csharp
-[KnockOff<IUserRepo>]
-public partial class MyTests
+<!-- snippet: readme-pattern-inline-interface -->
+```cs
+[Fact]
+public void InlineInterface_Pattern()
 {
-    [Fact]
-    public void Test()
-    {
-        var stub = new Stubs.IUserRepo();
-    }
+    var stub = new Stubs.IUserRepo();
+    stub.GetUser.OnCall((id) => new User { Id = id });
+
+    IUserRepo repo = stub;
+    Assert.NotNull(repo.GetUser(1));
 }
 ```
+<!-- endSnippet -->
 
 **Inline Class** - Stub virtual members:
-```csharp
-[KnockOff<MyService>]
-public partial class MyTests
+<!-- snippet: readme-pattern-inline-class -->
+```cs
+[Fact]
+public void InlineClass_Pattern()
 {
-    [Fact]
-    public void Test()
-    {
-        var stub = new Stubs.MyService();
-        IMyService service = stub.Object;
-    }
+    var stub = new Stubs.MyService();
+    stub.GetUser.OnCall((id) => new User { Id = id });
+
+    MyService service = stub.Object;
+    Assert.NotNull(service.GetUser(1));
 }
 ```
+<!-- endSnippet -->
 
 ---
 

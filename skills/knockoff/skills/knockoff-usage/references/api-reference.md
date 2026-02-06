@@ -142,12 +142,13 @@ var user1 = repo.GetById(1);  // Returns "Default"
 stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns "Override"
 
-// Returns for constant values (auto-wraps for async)
-stub.GetById.Returns(new User { Id = 99 });
-
-// Full tracking works with OnCall
+// Full tracking works - counts all calls regardless of configuration
 stub.GetById.Verify(Times.Exactly(2));
 Assert.Equal(2, stub.GetById.LastArg);
+
+// Returns for constant values (auto-wraps for async)
+stub.GetById.Returns(new User { Id = 99 });
+var user3 = repo.GetById(3);  // Returns User { Id = 99 }
 ```
 <!-- endSnippet -->
 
@@ -496,14 +497,19 @@ Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a s
 
 ### Access Pattern
 
-```csharp
+<!-- snippet: delegate-api-access-pattern -->
+```cs
 var stub = new Stubs.ArithmeticOperation();
+
+// All configuration goes through stub.Interceptor
 stub.Interceptor.Returns(42);
 stub.Interceptor.OnCall((a, b) => a + b);
-stub.Interceptor.Verify(Times.Once);
 
-ArithmeticOperation op = stub; // implicit conversion
+// Implicit conversion to delegate type
+ArithmeticOperation op = stub;
+var result = op(2, 3);
 ```
+<!-- endSnippet -->
 
 ### Configuration Methods
 
@@ -518,11 +524,21 @@ ArithmeticOperation op = stub; // implicit conversion
 
 Async delegates (`Task<T>`, `ValueTask<T>`) support three-tier auto-wrapping:
 
-```csharp
-stub.Interceptor.Returns(42);                          // Tier 1: auto-wraps
-stub.Interceptor.OnCall((int x) => x * 2);             // Tier 2: simplified, auto-wrapped
-stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2)); // Tier 3: full delegate
+<!-- snippet: delegate-api-async-auto-wrapping -->
+```cs
+// delegate Task<int> AsyncOperation(int x);
+var stub = new Stubs.AsyncOperation();
+
+// Tier 1: Returns takes inner type — auto-wraps in Task.FromResult
+stub.Interceptor.Returns(42);
+
+// Tier 2: Simplified callback returns int — auto-wrapped
+stub.Interceptor.OnCall((int x) => x * 2);
+
+// Tier 3: Full delegate returns Task<int> directly
+stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
 ```
+<!-- endSnippet -->
 
 ### Tracking, Verification, Sequences, When Chains, Strict Mode
 

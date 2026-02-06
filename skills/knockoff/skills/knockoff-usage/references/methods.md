@@ -415,10 +415,12 @@ var user2 = repo.GetById(2);  // Name = "Override"
 
 `Returns()` provides constant values. For async methods (`Task<T>`, `ValueTask<T>`), the value is auto-wrapped:
 
+<!-- snippet: methods-user-returns-constant-combined -->
 ```cs
-stub.GetById.Returns(new User { Id = 99, Name = "Fixed" });
+stub.GetUser.Returns(new User { Id = 99, Name = "Fixed" });
 stub.GetUserAsync.Returns(new User { Id = 1 });  // Auto-wrapped in Task.FromResult
 ```
+<!-- endSnippet -->
 
 ### Full Tracking Support
 

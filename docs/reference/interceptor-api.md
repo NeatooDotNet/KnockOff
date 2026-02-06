@@ -371,18 +371,19 @@ Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a s
 
 Unlike interface/class stubs where interceptors are accessed via named properties (`stub.GetById`), delegate stubs use a single `Interceptor` property:
 
-```csharp
+<!-- snippet: delegate-api-access-pattern -->
+```cs
 var stub = new Stubs.ArithmeticOperation();
 
 // All configuration goes through stub.Interceptor
 stub.Interceptor.Returns(42);
 stub.Interceptor.OnCall((a, b) => a + b);
-stub.Interceptor.Verify(Times.Once);
 
 // Implicit conversion to delegate type
 ArithmeticOperation op = stub;
 var result = op(2, 3);
 ```
+<!-- endSnippet -->
 
 ### Configuration Methods
 
@@ -398,7 +399,8 @@ var result = op(2, 3);
 
 Async delegates (returning `Task<T>` or `ValueTask<T>`) support the same three-tier auto-wrapping as interface and class stubs:
 
-```csharp
+<!-- snippet: delegate-api-async-auto-wrapping -->
+```cs
 // delegate Task<int> AsyncOperation(int x);
 var stub = new Stubs.AsyncOperation();
 
@@ -411,6 +413,7 @@ stub.Interceptor.OnCall((int x) => x * 2);
 // Tier 3: Full delegate returns Task<int> directly
 stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
 ```
+<!-- endSnippet -->
 
 ### Tracking Properties
 
@@ -443,18 +446,21 @@ Zero-parameter delegates have neither property — only call count tracking via 
 
 Delegate stubs have a `Strict` property. When `true`, unconfigured invocations throw `StubException.NotConfigured` instead of returning `default(T)`. Exhausted sequences throw `StubException.SequenceExhausted`.
 
-```csharp
+<!-- snippet: delegate-api-strict-mode -->
+```cs
 var stub = new Stubs.ArithmeticOperation();
 stub.Strict = true;
 ArithmeticOperation op = stub;
-op(1, 2); // Throws StubException.NotConfigured
+// op(1, 2); // Throws StubException
 ```
+<!-- endSnippet -->
 
 ### Implicit Conversion
 
 Delegate stubs implicitly convert to the delegate type:
 
-```csharp
+<!-- snippet: delegate-api-implicit-conversion -->
+```cs
 var stub = new Stubs.ArithmeticOperation();
 stub.Interceptor.OnCall((a, b) => a + b);
 
@@ -465,6 +471,7 @@ var result = op(2, 3); // 5
 // Pass directly to methods expecting the delegate
 ProcessCalculation(stub);
 ```
+<!-- endSnippet -->
 
 ### Reset
 
@@ -475,17 +482,21 @@ ProcessCalculation(stub);
 Delegate interceptors support the same When chain API as method interceptors. Requires at least one parameter.
 
 **Returning delegates:**
-```csharp
+<!-- snippet: delegate-api-when-chains-returning -->
+```cs
 stub.Interceptor.When(1, 2).Returns(100)
     .ThenWhen(3, 4).Returns(200)
     .ThenCall((a, b) => a + b);
 ```
+<!-- endSnippet -->
 
 **Void delegates:**
-```csharp
+<!-- snippet: delegate-api-when-chains-void -->
+```cs
 stub.Interceptor.When(1, 2).Call((a, b) => calls.Add("first"))
     .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
 ```
+<!-- endSnippet -->
 
 See the [Delegates Guide](../guides/delegates.md) for comprehensive examples.
 
@@ -619,12 +630,17 @@ When you call `OnCall()`, `OnGet()`, or `OnSet()`, KnockOff returns a tracking o
 - **Tracking object**: The return value from `OnCall()` (e.g., `IMethodTracking<int>`) that captures arguments and supports verification
 
 **Example**:
-```csharp
+<!-- snippet: delegate-api-tracking-objects -->
+```cs
 var stub = new ApiMethodRepoStub();
 
 // Interceptor: stub.GetById
 // Tracking object: getTracking
 var getTracking = stub.GetById.OnCall((id) => new User { Id = id });
+
+// Call the method
+IApiMethodRepo repo = stub;
+repo.GetById(42);
 
 // Access LastArg on the tracking object, not the interceptor
 Assert.Equal(42, getTracking.LastArg);
@@ -633,6 +649,7 @@ Assert.Equal(42, getTracking.LastArg);
 stub.GetById.Verify(Times.Once);      // Interceptor verification
 getTracking.Verify(Times.Once);       // Tracking object verification
 ```
+<!-- endSnippet -->
 
 **Why this matters**:
 - `LastArg`/`LastArgs` live on the tracking object, not the interceptor

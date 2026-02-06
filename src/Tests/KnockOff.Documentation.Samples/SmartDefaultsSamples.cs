@@ -260,3 +260,65 @@ public class AsyncSmartDefaultsTests
         Assert.False(await service.IsValidAsync());
     }
 }
+
+// =============================================================================
+// Override Smart Defaults
+// =============================================================================
+
+public interface IOverridableService
+{
+    User? GetUser();
+}
+
+[KnockOff]
+public partial class OverridableServiceStub : IOverridableService { }
+
+[KnockOff]
+public partial class UserMethodOverrideStub : IOverridableService
+{
+    #region smart-defaults-override-user-method
+    protected override User? GetUser_() => new User { Name = "Test" };
+    #endregion
+}
+
+public class RealOverridableService : IOverridableService
+{
+    public User? GetUser() => new User { Name = "Real" };
+}
+
+public class OverrideSmartDefaultsTests
+{
+    [Fact]
+    public void Override_WithOnCall()
+    {
+        var stub = new OverridableServiceStub();
+
+        #region smart-defaults-override-oncall
+        stub.GetUser.OnCall(() => new User { Name = "Test" });
+        #endregion
+
+        IOverridableService service = stub;
+        Assert.Equal("Test", service.GetUser()!.Name);
+    }
+
+    [Fact]
+    public void Override_WithUserMethod()
+    {
+        var stub = new UserMethodOverrideStub();
+        IOverridableService service = stub;
+        Assert.Equal("Test", service.GetUser()!.Name);
+    }
+
+    [Fact]
+    public void Override_WithSource()
+    {
+        var stub = new OverridableServiceStub();
+
+        #region smart-defaults-override-source
+        stub.Source(new RealOverridableService());
+        #endregion
+
+        IOverridableService service = stub;
+        Assert.Equal("Real", service.GetUser()!.Name);
+    }
+}

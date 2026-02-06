@@ -196,3 +196,30 @@ public class AsyncWrappingTests
         Assert.Equal("Alice", user!.Name);
     }
 }
+
+// =============================================================================
+// OnCall Dynamic Behavior
+// =============================================================================
+
+public class OnCallDynamicTests
+{
+    [Fact]
+    public void OnCall_DynamicBehavior()
+    {
+        var stub = new UserRepoStub();
+
+        #region getting-started-oncall-dynamic
+        // Use Returns for fixed values
+        stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
+
+        // Use OnCall for dynamic values, side effects, or conditional logic
+        stub.GetById.OnCall((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
+
+        // Both return tracking objects for verification
+        #endregion
+
+        IUserRepo repository = stub;
+        var user = repository.GetById(1);
+        Assert.Equal("Regular", user!.Name);
+    }
+}

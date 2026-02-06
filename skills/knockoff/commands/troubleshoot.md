@@ -191,16 +191,17 @@ KnockOff only supports named delegate types, not built-in `Func<>` or `Action<>`
 **Fix:**
 Define a named delegate type:
 
-```csharp
-// Does NOT work:
-// [KnockOff<Func<int, int, int>>]
+<!-- snippet: skill-mistake-func-action -->
+```cs
+// WRONG: KnockOff doesn't support generic delegates
+// [KnockOff<Func<int, string>>]  // Won't work
 
-// Define a named delegate instead:
-public delegate int ArithmeticOperation(int a, int b);
-
-[KnockOff<ArithmeticOperation>]
-public partial class MyTests { }
+// RIGHT: Define a named delegate
+public delegate string SkillNamedOperation(int value);
+[KnockOff<SkillNamedOperation>]
+public partial class SkillNamedDelegateHost { }
 ```
+<!-- endSnippet -->
 
 ### Issue: Delegate Stub - Using Wrong Access Pattern
 
@@ -214,15 +215,19 @@ Delegate stubs use `stub.Interceptor` instead of named member properties.
 **Fix:**
 Use `stub.Interceptor` for all delegate configuration:
 
-```csharp
-// Wrong (interface/class pattern):
-// stub.Invoke.OnCall((a, b) => a + b);
+<!-- snippet: delegate-api-access-pattern -->
+```cs
+var stub = new Stubs.ArithmeticOperation();
 
-// Correct (delegate pattern):
-stub.Interceptor.OnCall((a, b) => a + b);
+// All configuration goes through stub.Interceptor
 stub.Interceptor.Returns(42);
-stub.Interceptor.Verify(Times.Once);
+stub.Interceptor.OnCall((a, b) => a + b);
+
+// Implicit conversion to delegate type
+ArithmeticOperation op = stub;
+var result = op(2, 3);
 ```
+<!-- endSnippet -->
 
 ### Issue: Async Method Returns Wrong Type
 
@@ -258,13 +263,15 @@ stub.SaveAsync.OnCall((user) => Task.CompletedTask);
 
 **Simpler alternatives using auto-wrapping:**
 
-```csharp
+<!-- snippet: troubleshoot-async-simpler-alternatives -->
+```cs
 // Returns() auto-wraps in Task.FromResult
-stub.GetUserAsync.Returns(testUser);
+stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
 
 // Simplified OnCall also auto-wraps
 stub.GetUserAsync.OnCall((id) => new User { Id = id });
 ```
+<!-- endSnippet -->
 
 ### Issue: Verification Fails Unexpectedly
 

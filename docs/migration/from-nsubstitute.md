@@ -321,9 +321,9 @@ substitute.DidNotReceive().GetUser(1);
 
 <!-- snippet: nsub-migration-received-args-knockoff -->
 ```cs
-// KnockOff: Inspect captured arguments or use LastCallArg
+// KnockOff: Inspect captured arguments or use LastArg
 Assert.Contains(42, calledIds);
-Assert.Equal(99, stub.GetUser.LastCallArg);
+Assert.Equal(99, stub.GetUser.LastArg);
 ```
 <!-- endSnippet -->
 

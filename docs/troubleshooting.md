@@ -153,17 +153,19 @@ Assert.Equal("configured-host", config.Host);  // Config preserved
 
 **Solution:** Define a named delegate type and use that instead.
 
-```csharp
+<!-- snippet: troubleshoot-delegate-named-type -->
+```cs
 // Does NOT work:
 // [KnockOff<Func<int, int, int>>]  // Compiler error
 
 // Define a named delegate:
-public delegate int ArithmeticOperation(int a, int b);
+public delegate int CalcOperation(int a, int b);
 
 // Then use it:
-[KnockOff<ArithmeticOperation>]
-public partial class MyTests { }
+[KnockOff<CalcOperation>]
+public partial class CalcDelegateTests { }
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -173,15 +175,16 @@ public partial class MyTests { }
 
 **Solution:** Use `stub.Interceptor` for all delegate configuration.
 
-```csharp
+<!-- snippet: troubleshoot-delegate-interceptor-pattern -->
+```cs
 // Interface stub pattern:
-stub.GetById.OnCall((id) => user);
+interfaceStub.GetById.OnCall((id) => user);
 
 // Delegate stub pattern (different!):
-stub.Interceptor.OnCall((a, b) => a + b);
-stub.Interceptor.Returns(42);
-stub.Interceptor.Verify(Times.Once);
+delegateStub.Interceptor.OnCall((a, b) => a + b);
+delegateStub.Interceptor.Returns(42);
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -191,20 +194,26 @@ stub.Interceptor.Verify(Times.Once);
 
 **Solution:** Ensure the callback parameters match the delegate definition.
 
-```csharp
-// Delegate: int ArithmeticOperation(int a, int b)
+<!-- snippet: troubleshoot-delegate-oncall-wrong -->
+```cs
+// Delegate: int CalcOperation(int a, int b)
 
 // Wrong: missing parameter
-stub.Interceptor.OnCall((a) => a);
+// stub.Interceptor.OnCall((a) => a);
 
 // Wrong: wrong parameter type
-stub.Interceptor.OnCall((string a, string b) => 0);
+// stub.Interceptor.OnCall((string a, string b) => 0);
+```
+<!-- endSnippet -->
 
+<!-- snippet: troubleshoot-delegate-oncall-correct -->
+```cs
 // Correct: matches delegate signature
 stub.Interceptor.OnCall((int a, int b) => a + b);
 // Or with inferred types:
 stub.Interceptor.OnCall((a, b) => a + b);
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -261,25 +270,29 @@ Review the build output messages for specific guidance on resolving each diagnos
 
 **Cause:** KnockOff generates a base class (`YourStubBase`) containing virtual methods for user method support. C# does not allow multiple inheritance, so user-defined base classes conflict with KnockOff's generated base class.
 
-```csharp
-public class MyBaseClass { }
-
-[KnockOff]
-public partial class MyStub : MyBaseClass, IMyService { }  // ERROR: KO0200
+<!-- snippet: troubleshoot-ko0200-error -->
+```cs
+// This pattern produces diagnostic KO0200:
+// public class MyBaseClass { }
+//
+// [KnockOff]
+// public partial class MyStub : MyBaseClass, IMyService { }  // ERROR: KO0200
 ```
+<!-- endSnippet -->
 
 **Understanding user methods:**
 
 User methods let you add custom default behavior to stubs by overriding generated virtual methods with an underscore suffix. KnockOff generates a base class with these methods so you can override them in your stub class:
 
-```csharp
-public interface IUserRepository
+<!-- snippet: troubleshoot-user-method-definition -->
+```cs
+public interface ITroubleshootUserRepo
 {
     User? GetById(int id);
 }
 
 [KnockOff]
-public partial class UserRepoStub : IUserRepository
+public partial class TroubleshootUserMethodStub : ITroubleshootUserRepo
 {
     // Override the generated virtual method with underscore suffix
     protected override User? GetById_(int id)
@@ -287,15 +300,22 @@ public partial class UserRepoStub : IUserRepository
         return new User { Id = id, Name = "Default User" };
     }
 }
+```
+<!-- endSnippet -->
 
-// In tests:
-var stub = new UserRepoStub();
+In your tests, the user method provides the default behavior:
+
+<!-- snippet: troubleshoot-user-method-usage -->
+```cs
+var stub = new TroubleshootUserMethodStub();
 // Calls your GetById_ override by default
-var user = stub.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
+ITroubleshootUserRepo repo = stub;
+var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
 
 // You can still override per-test with OnCall
 stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
 ```
+<!-- endSnippet -->
 
 **Key points:**
 - Use `protected override` keyword
@@ -307,10 +327,10 @@ stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
 
 1. **Remove the base class** from the standalone stub if the base class behavior is not essential—KnockOff's generated base class provides user method support
 2. **Use inline stub pattern** if you need the stub inside a class that has a base class:
-   ```csharp
-   [KnockOff<IMyService>]
-   public partial class MyTestContainer { }
+   <!-- snippet: troubleshoot-inline-alternative -->
+   ```cs
    ```
+   <!-- endSnippet -->
 3. **Use composition instead of inheritance** if you need shared behavior across stubs—inject or delegate to the shared logic rather than inheriting from a base class
 
 ---

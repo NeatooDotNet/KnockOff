@@ -45,9 +45,9 @@ stub.Interceptor.Verify();
 
 <!-- snippet: delegate-stub-with-return -->
 ```cs
-// Default return value is null; LastCallArg tracks the argument
+// Default return value is null; LastArg tracks the argument
 Assert.Null(result);
-Assert.Equal("hello", stub.Interceptor.LastCallArg);
+Assert.Equal("hello", stub.Interceptor.LastArg);
 ```
 <!-- endSnippet -->
 
@@ -56,8 +56,8 @@ Assert.Equal("hello", stub.Interceptor.LastCallArg);
 <!-- snippet: delegate-stub-multi-param -->
 ```cs
 // Access arguments via named tuple
-Assert.Equal("Alice", stub.Interceptor.LastCallArgs!.Value.name);
-Assert.Equal(30, stub.Interceptor.LastCallArgs!.Value.age);
+Assert.Equal("Alice", stub.Interceptor.LastArgs!.Value.name);
+Assert.Equal(30, stub.Interceptor.LastArgs!.Value.age);
 ```
 <!-- endSnippet -->
 
@@ -181,8 +181,8 @@ Delegate stubs track every invocation, providing access to the last call's argum
 
 <!-- snippet: delegate-stub-lastcallarg -->
 ```cs
-// LastCallArg captures the most recent argument
-Assert.Equal("second", stub.Interceptor.LastCallArg);
+// LastArg captures the most recent argument
+Assert.Equal("second", stub.Interceptor.LastArg);
 ```
 <!-- endSnippet -->
 
@@ -190,9 +190,9 @@ Assert.Equal("second", stub.Interceptor.LastCallArg);
 
 <!-- snippet: delegate-stub-lastcallargs -->
 ```cs
-// LastCallArgs provides named tuple access
-Assert.Equal("Bob", stub.Interceptor.LastCallArgs!.Value.name);
-Assert.Equal(25, stub.Interceptor.LastCallArgs!.Value.age);
+// LastArgs provides named tuple access
+Assert.Equal("Bob", stub.Interceptor.LastArgs!.Value.name);
+Assert.Equal(25, stub.Interceptor.LastArgs!.Value.age);
 ```
 <!-- endSnippet -->
 
@@ -257,7 +257,7 @@ Use `stub.Interceptor.Reset()` to clear tracking state while preserving configur
 stub.Interceptor.Reset();
 
 stub.Interceptor.Verify(Times.Never);
-Assert.Null(stub.Interceptor.LastCallArg);
+Assert.Null(stub.Interceptor.LastArg);
 Assert.Equal("TEST", format("test")); // OnCall still works
 ```
 <!-- endSnippet -->
