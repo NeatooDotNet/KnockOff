@@ -827,7 +827,7 @@ public partial class KnockOffGenerator
 			}
 		}
 
-		// Create flat, deduplicated collections for the new v0.9+ API
+		// Create flat, deduplicated collections for the flat API
 		var (flatMembers, flatEvents) = FlattenAndDeduplicateMembers(interfaceInfos, allInterfaces);
 
 		// Detect cross-interface signature conflicts (KO0100)

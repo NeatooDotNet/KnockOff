@@ -15,12 +15,12 @@ internal sealed record KnockOffTypeInfo(
 	EquatableArray<DiagnosticInfo> Diagnostics,
 	/// <summary>
 	/// Flat collection of all members from all interfaces, deduplicated.
-	/// Used for generating interceptors directly on stub class in v0.9+ flat API.
+	/// Used for generating interceptors directly on stub class in the flat API.
 	/// </summary>
 	EquatableArray<InterfaceMemberInfo> FlatMembers,
 	/// <summary>
 	/// Flat collection of all events from all interfaces, deduplicated.
-	/// Used for generating event interceptors directly on stub class in v0.9+ flat API.
+	/// Used for generating event interceptors directly on stub class in the flat API.
 	/// </summary>
 	EquatableArray<EventMemberInfo> FlatEvents,
 	/// <summary>
