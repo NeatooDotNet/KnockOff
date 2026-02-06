@@ -236,8 +236,8 @@ stub.Interceptor.OnCall((msg) => captured = msg);
 ### Documentation Impact
 
 **Documentation files with delegate OnCall examples** (out of scope for this change, but noted):
-- `docs/release-notes/v10.8.0.md` - Line 60
-- `docs/release-notes/v10.20.0.md` - Line 25
+- `docs/release-notes/v0.8.0.md` - Line 60
+- `docs/release-notes/v0.20.0.md` - Line 25
 - `docs/todos/test-knockoff-skill.md` - Multiple references
 
 These will need updates in a follow-up documentation task.
@@ -270,7 +270,7 @@ These will need updates in a follow-up documentation task.
   - Lines 132, 145, 162, 181: Change `=` to `(...)` syntax
 
 **Out of Scope:**
-- Documentation updates (release notes v10.8.0, v10.20.0; tracked separately)
+- Documentation updates (release notes v0.8.0, v0.20.0; tracked separately)
 - Any changes to method/property/indexer interceptors
 - Changes to interface stub generation (MethodInterceptorRenderer already uses method syntax)
 - Changes to standalone stub generation

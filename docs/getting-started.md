@@ -24,7 +24,7 @@ Or add directly to your `.csproj` file:
 // dotnet add package KnockOff
 
 // Or add to your .csproj:
-// <PackageReference Include="KnockOff" Version="10.23.0" />
+// <PackageReference Include="KnockOff" Version="0.34.0" />
 ```
 <!-- endSnippet -->
 

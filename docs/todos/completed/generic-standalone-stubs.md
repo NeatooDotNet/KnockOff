@@ -85,7 +85,7 @@ All phases are done including documentation and skill updates. Generic standalon
 ### Phase 5: Interface Name Handling
 
 - [x] Interface-named properties automatically use type parameter names for open generics
-  - Uses flat API (v10.9+) where interceptors are directly on the stub class
+  - Uses flat API (v0.9+) where interceptors are directly on the stub class
   - Example: `stub.GetById.OnCall` works for `IGenericRepository<T>.GetById`
 
 ### Phase 6: Testing
@@ -156,7 +156,7 @@ All 14 new tests pass on .NET 8.0, 9.0, and 10.0.
 
 Updated files:
 - `~/.claude/skills/knockoff/SKILL.md` - Added Generic Standalone Stubs section and feature table entry
-- `~/.claude/skills/knockoff/migrations.md` - Added v10.14.0 section with feature and KO0008 diagnostic
+- `~/.claude/skills/knockoff/migrations.md` - Added v0.14.0 section with feature and KO0008 diagnostic
 
 ## Key Files Modified
 
@@ -177,7 +177,7 @@ Updated files:
    - Consistent with CLR naming, handles multiple type params well
 
 2. **Interface property naming with open generics**: Uses flat API
-   - With v10.9+ flat API, interceptors are directly on the stub
+   - With v0.9+ flat API, interceptors are directly on the stub
    - `stub.GetById` instead of `stub.IRepository_T.GetById`
 
 3. **Constraint mismatch handling**: Not implemented yet

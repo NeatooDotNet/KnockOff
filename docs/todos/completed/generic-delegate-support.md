@@ -1,7 +1,7 @@
 # Generic Delegate Support
 
 **Status:** Complete
-**Completed:** v10.20
+**Completed:** v0.20
 
 ## Problem
 
@@ -160,5 +160,5 @@ Medium - workaround exists but is verbose for multiple type arguments.
 
 ## Related
 
-- Generic standalone stubs for interfaces (implemented in v10.14)
+- Generic standalone stubs for interfaces (implemented in v0.14)
 - Closed generic delegate stubs (working)

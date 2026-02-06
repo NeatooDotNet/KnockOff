@@ -1,6 +1,6 @@
 # Generic Inline Interface Support
 
-**Status: ✅ COMPLETED (v10.18)**
+**Status: ✅ COMPLETED (v0.18)**
 
 ## Problem
 
@@ -46,7 +46,7 @@ public partial class MyTests { }
 // Use: new MyTests.Stubs.RepositoryUser(), etc.
 ```
 
-**Option 2:** Use generic standalone stub (v10.14+):
+**Option 2:** Use generic standalone stub (v0.14+):
 
 ```csharp
 [KnockOff]
@@ -172,6 +172,6 @@ Medium - workarounds exist (closed inline or generic standalone).
 
 ## Related
 
-- Generic standalone stubs for interfaces (implemented in v10.14)
+- Generic standalone stubs for interfaces (implemented in v0.14)
 - Generic delegate support (separate todo)
 - Closed generic inline stubs (working)

@@ -127,7 +127,7 @@ Same field, same runtime check. Attribute-level is free once constructor exists.
 - [x] Update moq-migration.md skill with MockBehavior.Strict mapping
 - [x] Update README: remove "strict mode" from Limitations vs Moq section
 
-### v10.17.0 - Extension Method Enhancement
+### v0.17.0 - Extension Method Enhancement
 
 - [x] Create `IKnockOffStub` interface with `Strict` property
 - [x] Create `StubExtensions.Strict<T>()` extension method for fluent API

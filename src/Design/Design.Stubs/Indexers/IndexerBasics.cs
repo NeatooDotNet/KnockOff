@@ -191,7 +191,7 @@ public partial class IndexerBasicsDemo
     // DESIGN DECISION: Multi-key indexers like this[int row, int col] use
     // tuple keys internally. The IndexerContainer uses (TKey1, TKey2) as TKey.
     //
-    // KNOWN LIMITATION: As of KnockOff v10.x, multi-key indexers have a
+    // KNOWN LIMITATION: As of KnockOff v0.x, multi-key indexers have a
     // generator bug where ThenGet/ThenSet sequence methods are not correctly
     // generated for tuple key types.
     //

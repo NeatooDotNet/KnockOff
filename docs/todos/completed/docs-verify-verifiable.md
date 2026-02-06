@@ -6,7 +6,7 @@
 
 ## Summary
 
-Update all documentation samples to prefer Verify() and Verifiable() over direct CallCount assertions. The Verifiable() API was implemented in v10.6.0 but documentation samples still use the old CallCount = 1 pattern.
+Update all documentation samples to prefer Verify() and Verifiable() over direct CallCount assertions. The Verifiable() API was implemented in v0.6.0 but documentation samples still use the old CallCount = 1 pattern.
 
 ## Problem
 

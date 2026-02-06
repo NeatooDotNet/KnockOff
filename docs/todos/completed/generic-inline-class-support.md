@@ -1,7 +1,7 @@
 # Generic Inline Class Support
 
 **Status:** Complete
-**Completed:** v10.20
+**Completed:** v0.20
 
 ## Problem
 
@@ -177,7 +177,7 @@ Low - workarounds exist (closed inline or standalone).
 
 ## Related
 
-- Generic standalone stubs for interfaces (implemented in v10.14)
+- Generic standalone stubs for interfaces (implemented in v0.14)
 - Generic inline interface support (separate todo)
 - Generic delegate support (separate todo)
 - Closed generic inline class stubs (working)

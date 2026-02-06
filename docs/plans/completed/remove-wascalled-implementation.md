@@ -228,7 +228,7 @@ public sealed class GetByIdInterceptor
    ```markdown
    ## Migration from WasCalled
 
-   **Before (v10.x):**
+   **Before (v0.x):**
    ```csharp
    Assert.True(stub.GetById.WasCalled);
    ```
@@ -509,7 +509,7 @@ Verified all WasCalled locations against codebase:
 
 ### Phase 7: Version Bump
 **File: `Directory.Build.props`**
-- [x] 7.1 Bump major version (10.24.0 -> 11.0.0)
+- [x] 7.1 Bump major version (0.24.0 -> 11.0.0)
 
 ### Phase 8: Final Generator Verification
 - [x] 8.1 Run `dotnet build` on entire solution (expect test compile errors)

@@ -9,7 +9,7 @@
 
 ## Problem
 
-Delegate stubs (`[KnockOff<DelegateType>]`) are not documented in the main documentation guides. The feature only appears in release notes (v10.8.0, v10.20.0).
+Delegate stubs (`[KnockOff<DelegateType>]`) are not documented in the main documentation guides. The feature only appears in release notes (v0.8.0, v0.20.0).
 
 Users have no way to discover or learn how to use delegate stubs from the primary documentation.
 

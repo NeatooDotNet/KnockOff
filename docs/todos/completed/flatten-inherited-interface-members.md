@@ -154,7 +154,7 @@ public partial class EntityStub : IEntityBase
 
 - [x] **`docs/getting-started.md`** - updated to flat API
 - [x] **`docs/reference/interceptor-api.md`** - updated to flat API and correct event API
-- [x] **`docs/release-notes/v10.9.0.md`** - created with migration guide
+- [x] **`docs/release-notes/v0.9.0.md`** - created with migration guide
 - [ ] **Update remaining `docs/` markdown files** - ~24 files still have old patterns
 - [ ] **Update KnockOff skill** (`~/.claude/skills/knockoff/`) - update API examples and patterns
 
@@ -165,11 +165,11 @@ public partial class EntityStub : IEntityBase
 This is a **breaking change** for standalone stub users:
 
 ```csharp
-// v10.x
+// v0.x
 stub.IEntityBase.Delete.WasCalled
 stub.IValidateMetaProperties.IsBusy.OnGet = ...
 
-// v10.9
+// v0.9
 stub.Delete.WasCalled
 stub.IsBusy.OnGet = ...
 ```

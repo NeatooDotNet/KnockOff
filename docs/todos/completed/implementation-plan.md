@@ -125,7 +125,7 @@
 - [x] Set `DevelopmentDependency=true` (compile-time only package)
 
 ### 5.3 Verification
-- [x] Create local NuGet package (`KnockOff.10.0.0.nupkg`)
+- [x] Create local NuGet package (`KnockOff.0.0.0.nupkg`)
 - [x] Create standalone test project (PackageTest)
 - [x] Verify generator runs correctly from NuGet package
 - [x] All 12 tests pass on net8.0, net9.0, net10.0
