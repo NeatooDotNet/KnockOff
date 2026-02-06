@@ -13,15 +13,15 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.35.0</FileVersion>
-		<PackageVersion>0.35.0</PackageVersion>
+		<FileVersion>0.36.0</FileVersion>
+		<PackageVersion>0.36.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/NeatooDotNet/KnockOff</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Re-versioned from 10.x to 0.x to signal pre-production status. All previous 10.x NuGet packages unlisted.</PackageReleaseNotes>
+		<PackageReleaseNotes>Delegate stub rewrite using shared interceptor infrastructure, async API consistency across all 9 patterns, 3 bug fixes (When chain verification, user method type detection, VerifyAll TotalCallCount).</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

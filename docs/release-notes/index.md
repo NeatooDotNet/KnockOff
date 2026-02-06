@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v0.36.0](v0.36.0.md) | 2026-02-06 | Delegate stub rewrite, async API consistency across all 9 patterns, 3 bug fixes |
 | [v0.35.0](v0.35.0.md) | 2026-02-05 | Re-versioned from 10.x to 0.x, all previous NuGet packages unlisted |
 | [v0.34.0](v0.34.0.md) | 2026-02-04 | **Breaking:** Sequence exhaustion repeats last value, standalone class stubs (patterns 3 & 4), params sequence overloads |
 | [v0.33.0](v0.33.0.md) | 2026-02-01 | Verifiable support for user-defined methods |
@@ -37,6 +38,7 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v0.36.0](v0.36.0.md) - 2026-02-06 - Delegate stub rewrite, async API consistency across all 9 patterns, 3 bug fixes
 - [v0.35.0](v0.35.0.md) - 2026-02-05 - Re-versioned from 10.x to 0.x, all previous NuGet packages unlisted
 - [v0.34.0](v0.34.0.md) - 2026-02-04 - **Breaking:** Sequence exhaustion repeats last value, standalone class stubs (patterns 3 & 4), params sequence overloads
 - [v0.33.0](v0.33.0.md) - 2026-02-01 - Verifiable support for user-defined methods
