@@ -280,20 +280,19 @@ public class UserMethodWhenTests
     }
 
     [Fact]
-    public void Verify_WhenChainCallsNotInTotalCount()
+    public void Verify_WhenChainCallsIncludedInTotalCount()
     {
-        // Arrange - When chains have separate tracking via matcher.CallCount
+        // Arrange - When chain calls are included in TotalCallCount
         var stub = new WhenUserMethodStub();
         stub.Process.When("special").Returns("[SPECIAL]").ThenNone();
 
         // Act
         IWhenUserMethodTest service = stub;
-        service.Process("special");  // When chain - tracked in matcher
+        service.Process("special");  // When chain - tracked in matcher.CallCount (included in TotalCallCount)
         service.Process("normal");   // User method - tracked in _unconfiguredCallCount
 
-        // Assert - Only user method calls count in TotalCallCount
-        // (When chain tracking is via Verifiable/Verify on the chain itself)
-        stub.Process.Verify(Times.Once); // Only 1 user method call
+        // Assert - Both When chain and user method calls count in TotalCallCount
+        stub.Process.Verify(Times.Exactly(2)); // 1 When chain call + 1 user method call
     }
 
     #endregion

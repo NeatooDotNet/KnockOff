@@ -1304,6 +1304,7 @@ internal static class InlineRenderer
         w.Line();
     }
 
+
     #endregion
 
     #region Class Stub Rendering
