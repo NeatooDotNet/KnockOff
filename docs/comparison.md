@@ -1,0 +1,57 @@
+# Full Comparison: KnockOff vs Moq vs NSubstitute
+
+Side-by-side comparisons for properties, events, delegates, and indexers.
+
+For methods and argument matching comparisons, see the [README](../README.md#side-by-side-comparisons).
+
+---
+
+## Properties
+
+| Task | Moq | NSubstitute | KnockOff |
+|------|-----|-------------|----------|
+| **Setup getter** | `mock.Setup(x => x.Mode).Returns("Scientific");` | `calc.Mode.Returns("Scientific");` | `stub.Mode.OnGet("Scientific");` |
+| **Setup setter** | `mock.SetupSet(x => x.Mode = It.IsAny<string>()).Callback<string>(v => captured = v);` | `calc.When(x => x.Mode = Arg.Any<string>()).Do(x => ...);` | `stub.Mode.OnSet((v) => captured = v);` |
+| **Verify getter** | `mock.VerifyGet(x => x.Mode);` | `_ = calc.Received().Mode;` | `stub.Mode.VerifyGet();` |
+| **Verify setter** | `mock.VerifySet(x => x.Mode = "Scientific");` | `calc.Received().Mode = "Scientific";` | `stub.Mode.VerifySet();` |
+| **Verify count** | `mock.VerifyGet(x => x.Mode, Times.Exactly(3));` | `_ = calc.Received(3).Mode;` | `stub.Mode.VerifyGet(Times.Exactly(3));` |
+| **Capture value** | `mock.SetupSet(x => x.Mode = It.IsAny<string>()).Callback<string>(v => captured = v);` | `calc.When(x => x.Mode = Arg.Do<string>(v => ...)).Do(...);` | `stub.Mode.LastSetValue` (built-in) |
+
+---
+
+## Events
+
+| Task | Moq | NSubstitute | KnockOff |
+|------|-----|-------------|----------|
+| **Raise event** | `mock.Raise(x => x.PoweringUp += null, EventArgs.Empty);` | `calc.PoweringUp += Raise.Event();` | `stub.PoweringUp.Raise(stub, EventArgs.Empty);` |
+| **Raise with args** | `mock.Raise(x => x.PoweringUp += null, sender, args);` | `calc.PoweringUp += Raise.EventWith(sender, args);` | `stub.PoweringUp.Raise(sender, args);` |
+| **Verify subscription** | *(not available)* | *(not available)* | `stub.PoweringUp.VerifyAdd(Times.Once);` |
+| **Verify unsubscription** | *(not available)* | *(not available)* | `stub.PoweringUp.VerifyRemove(Times.Once);` |
+| **Check subscribers** | *(not available)* | *(not available)* | `stub.PoweringUp.HasSubscribers` |
+
+---
+
+## Delegates
+
+| Task | Moq | NSubstitute | KnockOff |
+|------|-----|-------------|----------|
+| **Setup** | `mock.Setup(x => x(It.IsAny<int>())).Returns("result");` | `factory(Arg.Any<int>()).Returns("result");` | `stub.Interceptor.Returns("result");` |
+| **With logic** | `mock.Setup(x => x(It.Is<int>(v => v > 0))).Returns<int>(x => $"val: {x}");` | `factory(Arg.Is<int>(x => x > 0)).Returns(x => $"val: {x.Arg<int>()}");` | `stub.Interceptor.OnCall((x) => $"val: {x}");` |
+| **Sequence** | `mock.SetupSequence(x => x(It.IsAny<int>())).Returns(1).Returns(2).Returns(3);` | `factory(Arg.Any<int>()).Returns(1, 2, 3);` | `stub.Interceptor.Returns(1, 2, 3);` |
+| **Async** | `mock.Setup(x => x(1)).ReturnsAsync(42);` | `asyncOp(1).Returns(42);` | `stub.Interceptor.Returns(42);` (auto-wraps) |
+| **Match values** | `mock.Setup(x => x(42)).Returns("found");` | *(per-parameter Arg.Is)* | `stub.Interceptor.When(42).Returns("found");` |
+| **Verify** | `mock.Verify(x => x(42));` | `factory.Received()(42);` | `stub.Interceptor.Verify();` |
+| **Verify count** | `mock.Verify(x => x(It.IsAny<int>()), Times.Exactly(3));` | `factory.Received(3)(Arg.Any<int>());` | `stub.Interceptor.Verify(Times.Exactly(3));` |
+| **Capture** | *(manual with Callback)* | *(manual with Arg.Do)* | `stub.Interceptor.LastArg` (built-in) |
+
+---
+
+## Indexers
+
+| Task | Moq | NSubstitute | KnockOff |
+|------|-----|-------------|----------|
+| **Setup getter** | `mock.Setup(x => x["key"]).Returns(42);` | `dict["key"].Returns(42);` | `stub.Indexer.Backing["key"] = 42;` |
+| **Dynamic getter** | `mock.Setup(x => x[It.IsAny<string>()]).Returns(0);` | `dict[Arg.Any<string>()].Returns(0);` | `stub.Indexer.OnGet((key) => 0);` |
+| **Verify getter** | `mock.Verify(x => x["key"]);` | `_ = dict.Received()["key"];` | `stub.Indexer.VerifyGet();` |
+| **Verify setter** | `mock.VerifySet(x => x["key"] = 42);` | `dict.Received()["key"] = 42;` | `stub.Indexer.VerifySet();` |
+| **Capture** | *(manual with Callback)* | *(manual with When/Do)* | `stub.Indexer.LastSetEntry` (built-in) |

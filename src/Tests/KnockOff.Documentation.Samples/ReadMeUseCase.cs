@@ -149,19 +149,38 @@ public class UserDomainModelTests
     public void UpdateTest_KnockOff_OnCall()
     {
         #region readme-knockoff-oncall-test
-        var user = new User { Id = 1 };
-        var myRepoKO = new MyRepoStub([user]);
+        var user1 = new User { Id = 1 }; // Ignored do to per-test configuration
+        var myRepoKO = new MyRepoStub([user1]);
         var userDomainModel = new UserDomainModel(myRepoKO);
 
-        // OnCall overrides the stub methods
-        myRepoKO.GetUser.OnCall(id => user).Verifiable();
-        myRepoKO.Update.OnCall(u => Assert.Same(u, user)).Verifiable();
+        var user2 = new User { Id = 2 };
 
-        userDomainModel.Fetch(1);
+        // When and OnCall overrides the stub methods
+        myRepoKO.GetUser.When(2).Returns(user2).Verifiable();
+        myRepoKO.Update.OnCall(u => Assert.Same(u, user2)).Verifiable();
+
+        userDomainModel.Fetch(2);
         userDomainModel.Update();
 
         myRepoKO.Verify();
         #endregion
     }
 
+    [Fact]
+    public void UpdateTest_KnockOff_OnCall_Verify()
+    {
+        var user1 = new User { Id = 1 }; // Ignored do to per-test configuration
+        var myRepoKO = new MyRepoStub([user1]);
+        var userDomainModel = new UserDomainModel(myRepoKO);
+
+        var user2 = new User { Id = 2 };
+
+        // When and OnCall overrides the stub methods
+        myRepoKO.GetUser.When(2).Returns(user2).Verifiable();
+
+        userDomainModel.Fetch(1);
+        userDomainModel.Update();
+
+        Assert.Throws<VerificationException>(() => myRepoKO.Verify());
+    }
 }

@@ -1,66 +1,19 @@
 # KnockOff
 
-## Why I wrote KnockOff
+A .NET mocking library that lets you define reusable stub classes — with full mocking capabilities built in. Powered by Roslyn source generation.
 
-I found many times I wanted to reuse my mocks. 
-Especially in my integration test library where I may even register my mocks.
-So, I found myself either copying my mock definitions or creating shared methods like this:
+Define your test double once. Reuse it across your test project. Customize it per-test with OnCall, Returns, Verify, and When chains. No more copying mock setups between tests or maintaining shared factory methods full of `Arg.Any<>()`.
+
+Claude Code was used to write this library. Skip to more [AI discussion](#ai).
+
+[![NuGet](https://img.shields.io/nuget/v/KnockOff.svg)](https://www.nuget.org/packages/KnockOff/)
+[![Build Status](https://github.com/NeatooDotNet/KnockOff/workflows/Build,%20Test%20&%20Publish/badge.svg)](https://github.com/NeatooDotNet/KnockOff/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
-<!-- snippet: readme-nsub-shared-mock -->
-```cs
-public static IMyRepo NSubstituteMock(List<User> users)
-{
-    var myRepoMock = Substitute.For<IMyRepo>();
+## KnockOff Stub
 
-    // Setup: configure GetUser to look up from the list based on id
-    myRepoMock.GetUser(Arg.Any<int>())
-        .Returns(callInfo => users.SingleOrDefault(u => u.Id == callInfo.Arg<int>()));
-
-    // Setup: configure Update to assert user exists in list
-    myRepoMock.When(x => x.Update(Arg.Any<User>()))
-        .Do(callInfo => Assert.Contains(callInfo.Arg<User>(), users));
-
-    return myRepoMock;
-}
-```
-<!-- endSnippet -->
-
-But I found these methods quite unreadable and inflexible.
-
-What I really wanted a shared stub:
-
-<!-- snippet: readme-manual-stub-desired -->
-```cs
-public class MyRepoManualStub(List<User> Users) : IMyRepo
-{
-    public User? GetUser(int id)
-    {
-        return Users.Single(u => u.Id == id);
-    }
-
-    public void Update(User user)
-    {
-        Assert.Contains(user, Users);
-    }
-}
-```
-<!-- endSnippet -->
-
-But that meant:
-
-- Forced to implement all of the methods of the interface
-- I didn't have any nice to haves like .Verify()
-
-**So I created KnockOff**
-
-For stand alone stubs KnockOff:
-
-- Automatically implements all of the interface members
-- Provides features like Verification, Returns and When
-- Allows per-test configuration
-
-With KnockOff the stub looks like:
+Here's what a KnockOff stub looks like. There are [9 patterns](docs/guides/stub-patterns.md) total, but this is where it starts:
 
 <!-- snippet: readme-knockoff-stub -->
 ```cs
@@ -80,7 +33,66 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
 ```
 <!-- endSnippet -->
 
-And your test looks like
+- **`[KnockOff]` + `partial class`** — KnockOff generates a base class that implements every member of `IMyRepo`. Your stub is a real class — define it once, reuse it across your entire test project. Pass it around, register it in DI, share it between test fixtures.
+- **Constructor parameters** — `List<User> Users` is a primary constructor. Test data flows in naturally, just like any other C# class.
+- **Overrides are optional** — `GetUser_` and `Update_` override the generated defaults. Only override what you need — everything else still works with [OnCall](docs/guides/methods.md), [Returns](docs/reference/interceptor-api.md), or [When chains](docs/guides/parameter-matching.md).
+- **Compile-time safety** — If `IMyRepo` adds a method, the generated base class updates automatically. If a signature changes, your overrides produce compile errors — not silent runtime failures.
+
+This stub is also a full mock. It has [Verify](docs/guides/verification.md), [Strict mode](docs/reference/attribute-options.md), [Async](docs/guides/async-patterns.md), and [Source Delegation](docs/guides/source-delegation.md) — all on the same reusable class.
+
+
+## Why I Wrote KnockOff
+
+I often wanted to reuse my mocks.
+Especially in my integration test library where I may even register my mocks.
+I found myself either copying my mock definitions code or creating shared methods like this:
+
+**NSubstitute:**
+<!-- snippet: readme-nsub-shared-mock -->
+```cs
+public static IMyRepo NSubstituteMock(List<User> users)
+{
+    var myRepoMock = Substitute.For<IMyRepo>();
+
+    // Setup: configure GetUser to look up from the list based on id
+    myRepoMock.GetUser(Arg.Any<int>())
+        .Returns(callInfo => users.SingleOrDefault(u => u.Id == callInfo.Arg<int>()));
+
+    // Setup: configure Update to assert user exists in list
+    myRepoMock.When(x => x.Update(Arg.Any<User>()))
+        .Do(callInfo => Assert.Contains(callInfo.Arg<User>(), users));
+
+    return myRepoMock;
+}
+```
+<!-- endSnippet -->
+
+**Moq:**
+```cs
+public static Mock<IMyRepo> MoqMock(List<User> users)
+{
+    var mock = new Mock<IMyRepo>();
+
+    mock.Setup(x => x.GetUser(It.IsAny<int>()))
+        .Returns<int>(id => users.SingleOrDefault(u => u.Id == id));
+
+    mock.Setup(x => x.Update(It.IsAny<User>()))
+        .Callback<User>(u => Assert.Contains(u, users));
+
+    return mock;
+}
+```
+
+But I find that hard to read and unintuitive. Also, my shared methods accumulated extra parameters for variations across different tests.
+
+
+## So I Created KnockOff
+
+You can create a stub to implement [interfaces](docs/guides/stub-patterns.md) or non-sealed [classes](docs/guides/stub-patterns.md) with virtual methods.
+Yet, you can still customize the stub per test.
+All while having the features you would expect with a full mocking library.
+
+With the stub above, your tests are:
 
 <!-- snippet: readme-knockoff-fetch-test -->
 ```cs
@@ -94,7 +106,7 @@ myRepoKO.GetUser.Verify(Times.Once);
 ```
 <!-- endSnippet -->
 
-And you don't actually loose the ability to configure per-test!
+Need different behavior for a specific test? Override with OnCall:
 
 <!-- snippet: readme-knockoff-oncall-test -->
 ```cs
@@ -113,133 +125,35 @@ myRepoKO.Verify();
 ```
 <!-- endSnippet -->
 
-
-It also uses source generation so:
-
-- No more `Arg.Any<>()`. No more `It.IsAny<>()`. Just write C#
-- If the method signature changes you get a compile error
-- There's a small performance gain but honestly it's negligible
-
 **Now I have my stubs and mocks in one!**
 
-Plus this is just the start. With source generation I think many more ideas are possible.
-I've added a number of [patterns](docs/guides/stub-patterns.md).
-And new features like [Source delegation](docs/guides/source-delegation.md).
+---
 
-**What other ideas do you have?**
+## What KnockOff Does Better
 
-## AI
-
-With my ideas and guidance Claude Code has written the entirety of this library. 
-What started as a curiosity has shown me the value of AI.
-These are ideas I've had for years. I would not have been able to actually execute without AI.
-Even more so in about a month!
-
-
-[![NuGet](https://img.shields.io/nuget/v/KnockOff.svg)](https://www.nuget.org/packages/KnockOff/)
-[![Build Status](https://github.com/NeatooDotNet/KnockOff/workflows/Build,%20Test%20&%20Publish/badge.svg)](https://github.com/NeatooDotNet/KnockOff/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+| Feature | Why It's Better |
+|---------|-----------------|
+| **Reusable stub classes** | Define once, customize per-test. No more copying mock setups or shared factory methods. |
+| **Source delegation** | Delegate to a real implementation, override only specific methods. [No equivalent in Moq or NSubstitute.](docs/guides/source-delegation.md) |
+| **Compile-time safety** | Interface changes break your stubs at compile time, not at runtime 10 minutes into a test run. |
+| **Parameter matching** | `OnCall((a, b) => a > 0 ? 100 : 0)` — standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter. |
+| **Built-in capture** | `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` — no manual `Arg.Do<>` or `Callback<>` setup. |
+| **Event verification** | `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute. |
+| **Explicit Get/Set verify** | `VerifyGet(Times)` / `VerifySet(Times)` for properties and indexers. |
 
 ---
 
-## The Difference
+## When KnockOff Shines
 
-**NSubstitute:**
-<!-- snippet: readme-hero-nsub -->
-```cs
-var repo = Substitute.For<IUserRepo>();
-repo.GetUser(Arg.Is<int>(id => id > 0)).Returns(x => new User { Id = x.Arg<int>() });
-```
-<!-- endSnippet -->
+**Reusable test doubles** — Define a stub class once with constructor parameters for test data. Use it across hundreds of tests without copying setup code.
 
-**KnockOff:**
-<!-- snippet: readme-hero-knockoff -->
-```cs
-var stub = new CompareUserRepoStub();
-stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id } : null);
-```
-<!-- endSnippet -->
+**Integration tests with DI** — Your stub is a real class. Register it in a DI container, pass it through constructors, use it anywhere a real implementation would go.
 
-No `Arg.Is<>()`. No `x.Arg<int>()`. The parameter is just `id`.
+**Partial real implementations** — Use [Source Delegation](docs/guides/source-delegation.md) to delegate to a real implementation and override only the methods you're testing. Perfect for integration tests and decorator patterns.
 
----
+**Large interfaces** — Stub only the methods you care about. Everything else auto-implements with defaults. No more setting up 20 `It.IsAny<>()` calls for methods your test doesn't touch.
 
-## Method Overload Resolution
-
-**The Problem:** When an interface has overloaded methods with the same parameter count but different types:
-
-<!-- snippet: readme-method-overload-interface -->
-```cs
-public interface IFormatter
-{
-    string Format(string input, bool uppercase);
-    string Format(string input, int maxLength);
-}
-```
-<!-- endSnippet -->
-
-### Any-Value Matching
-
-**NSubstitute:**
-<!-- snippet: readme-nsubstitute-any-value -->
-```cs
-// Arg.Any<T>() required - compiler needs the types to resolve overload
-formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
-formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
-```
-<!-- endSnippet -->
-
-**KnockOff:**
-<!-- snippet: readme-knockoff-any-value -->
-```cs
-// Explicit parameter types resolve the overload - standard C# syntax
-stub.Format.OnCall((string input, bool uppercase) => "bool overload");
-stub.Format.OnCall((string input, int maxLength) => "int overload");
-```
-<!-- endSnippet -->
-
-### Specific-Value Matching
-
-**NSubstitute:**
-<!-- snippet: readme-nsubstitute-specific-value -->
-```cs
-// Specific value matching - literals work when all args are specific
-formatter.Format("test", true).Returns("UPPERCASE");
-formatter.Format("test", 10).Returns("truncated");
-```
-<!-- endSnippet -->
-
-**KnockOff:**
-<!-- snippet: readme-knockoff-specific-value -->
-```cs
-// Specific value matching - parameter types resolve the overload
-stub.Format.When("test", true).Returns("UPPERCASE");
-stub.Format.When("test", 10).Returns("truncated");
-```
-<!-- endSnippet -->
-
-### Argument Access
-
-**NSubstitute:**
-<!-- snippet: readme-nsubstitute-argument-access -->
-```cs
-// To use argument values, extract from CallInfo:
-formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
-    .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
-```
-<!-- endSnippet -->
-
-**KnockOff:**
-<!-- snippet: readme-knockoff-argument-access -->
-```cs
-// Arguments are directly available with names and types:
-stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
-```
-<!-- endSnippet -->
-
-**The Difference:**
-- NSubstitute: `Arg.Any<bool>()` + `x.ArgAt<bool>(1)` to match any value and access arguments
-- KnockOff: `(string input, bool uppercase)` - standard C# lambda with named, typed parameters
+**Stubbing concrete classes** — Override virtual methods on non-sealed classes. KnockOff generates the stub with `.Object` to access the typed instance.
 
 ---
 
@@ -260,174 +174,7 @@ var user = repo.GetUser(1);       // Returns test data
 ```
 <!-- endSnippet -->
 
-No other mocking framework has this. Perfect for integration tests, decorator patterns, and partial mocking without complexity.
-
----
-
-## Side-by-Side Comparisons
-
-### Methods
-
-| Task | NSubstitute | KnockOff |
-|------|-------------|----------|
-| **Return value** | `calc.Add(1, 2).Returns(3);` | `stub.Add.Returns(3);` |
-| **Any argument** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(10);` | `stub.Add.Returns(10);` |
-| **Match values** | `calc.Add(1, 2).Returns(100);` | `stub.Add.When(1, 2).Returns(100);` |
-| **Conditional** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(x => ...);` | `stub.Add.OnCall((a, b) => a > 0 ? a + b : 0);` |
-| **Throw** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Throws<Exception>();` | `stub.Add.OnCall((a, b) => throw new Exception());` |
-| **Callback** | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(3).AndDoes(x => ...);` | `stub.Add.OnCall((a, b) => { log.Add(a); return 3; });` |
-| **Sequence** | `calc.Add(1, 2).Returns(1, 2, 3);` | `stub.Add.Returns(1, 2, 3);` |
-| **Async** | `repo.GetUserAsync(1).Returns(user);` | `stub.GetUserAsync.Returns(user);` |
-| **Verify called** | `calc.Received().Add(1, 2);` | `stub.Add.Verify();` |
-| **Verify count** | `calc.Received(3).Add(Arg.Any<int>(), Arg.Any<int>());` | `stub.Add.Verify(Times.Exactly(3));` |
-
-### Argument Matching
-
-**NSubstitute:**
-<!-- snippet: readme-argmatch-nsub-matchers -->
-```cs
-// NSubstitute - Arg.Is<T> per parameter (permanent matchers)
-calc.Add(Arg.Is<int>(a => a > 0), Arg.Any<int>()).Returns(100);
-```
-<!-- endSnippet -->
-
-**KnockOff:**
-<!-- snippet: readme-argmatch-knockoff-oncall -->
-```cs
-// KnockOff - OnCall with conditional (permanent, matches all calls)
-stub.Add.OnCall((a, b) => a > 0 ? 100 : 0);
-```
-<!-- endSnippet -->
-
-<!-- snippet: readme-argmatch-knockoff-when -->
-```cs
-// KnockOff - When() for sequential matching (first match returns 100, then falls through)
-stub.Add.When((a, b) => a > 0).Returns(100).ThenCall((a, b) => a + b);
-```
-<!-- endSnippet -->
-
-**Multiple specific values:**
-
-<!-- snippet: readme-argmatch-nsub-specific -->
-```cs
-// Multiple specific values
-calc.Add(1, 2).Returns(100);
-calc.Add(3, 4).Returns(200);
-```
-<!-- endSnippet -->
-
-<!-- snippet: readme-argmatch-knockoff-specific -->
-```cs
-stub.Add.When(1, 2).Returns(100);
-stub.Add.When(3, 4).Returns(200);
-```
-<!-- endSnippet -->
-
-**Note:** NSubstitute's matchers are permanent—they match all qualifying calls. KnockOff's `When()` is sequential—matchers are consumed in order. Use `OnCall()` with conditionals for permanent matching behavior.
-
-### Argument Capture
-
-**NSubstitute:**
-<!-- snippet: readme-argcapture-nsub -->
-```cs
-// NSubstitute - requires Arg.Do in setup
-int capturedA = 0, capturedB = 0;
-calc.Add(Arg.Do<int>(x => capturedA = x), Arg.Do<int>(x => capturedB = x));
-calc.Add(1, 2);
-```
-<!-- endSnippet -->
-
-**KnockOff:**
-<!-- snippet: readme-argcapture-knockoff -->
-```cs
-// KnockOff - built-in, no pre-setup
-var tracking = stub.Add.OnCall((a, b) => a + b);
-ICalculator calc = stub;
-calc.Add(1, 2);
-var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
-```
-<!-- endSnippet -->
-
-### Properties
-
-| Task | NSubstitute | KnockOff |
-|------|-------------|----------|
-| **Setup getter** | `calc.Mode.Returns("Scientific");` | `stub.Mode.OnGet("Scientific");` |
-| **Setup setter** | `calc.When(x => x.Mode = Arg.Any<string>()).Do(x => ...);` | `stub.Mode.OnSet((v) => captured = v);` |
-| **Verify getter** | `_ = calc.Received().Mode;` | `stub.Mode.VerifyGet();` |
-| **Verify setter** | `calc.Received().Mode = "Scientific";` | `stub.Mode.VerifySet();` |
-| **Verify count** | `_ = calc.Received(3).Mode;` | `stub.Mode.VerifyGet(Times.Exactly(3));` |
-| **Capture value** | `calc.When(x => x.Mode = Arg.Do<string>(v => ...)).Do(...);` | `stub.Mode.LastSetValue` (built-in) |
-
-### Events
-
-| Task | NSubstitute | KnockOff |
-|------|-------------|----------|
-| **Raise event** | `calc.PoweringUp += Raise.Event();` | `stub.PoweringUp.Raise(stub, EventArgs.Empty);` |
-| **Raise with args** | `calc.PoweringUp += Raise.EventWith(sender, args);` | `stub.PoweringUp.Raise(sender, args);` |
-| **Verify subscription** | *(not available)* | `stub.PoweringUp.VerifyAdd(Times.Once);` |
-| **Verify unsubscription** | *(not available)* | `stub.PoweringUp.VerifyRemove(Times.Once);` |
-| **Check subscribers** | *(not available)* | `stub.PoweringUp.HasSubscribers` |
-
-### Delegates
-
-| Task | NSubstitute | KnockOff |
-|------|-------------|----------|
-| **Setup** | `factory(Arg.Any<int>()).Returns("result");` | `stub.Interceptor.Returns("result");` |
-| **With logic** | `factory(Arg.Is<int>(x => x > 0)).Returns(x => $"val: {x.Arg<int>()}");` | `stub.Interceptor.OnCall((x) => $"val: {x}");` |
-| **Sequence** | `factory(Arg.Any<int>()).Returns(1, 2, 3);` | `stub.Interceptor.Returns(1, 2, 3);` |
-| **Async** | `asyncOp(1).Returns(42);` | `stub.Interceptor.Returns(42);` (auto-wraps) |
-| **Match values** | *(per-parameter Arg.Is)* | `stub.Interceptor.When(42).Returns("found");` |
-| **Verify** | `factory.Received()(42);` | `stub.Interceptor.Verify();` |
-| **Verify count** | `factory.Received(3)(Arg.Any<int>());` | `stub.Interceptor.Verify(Times.Exactly(3));` |
-| **Capture** | *(manual with Arg.Do)* | `stub.Interceptor.LastArg` (built-in) |
-
-### Indexers
-
-| Task | NSubstitute | KnockOff |
-|------|-------------|----------|
-| **Setup getter** | `dict["key"].Returns(42);` | `stub.Indexer.Backing["key"] = 42;` |
-| **Dynamic getter** | `dict[Arg.Any<string>()].Returns(0);` | `stub.Indexer.OnGet((key) => 0);` |
-| **Verify getter** | `_ = dict.Received()["key"];` | `stub.Indexer.VerifyGet();` |
-| **Verify setter** | `dict.Received()["key"] = 42;` | `stub.Indexer.VerifySet();` |
-| **Capture** | *(manual with When/Do)* | `stub.Indexer.LastSetEntry` |
-
----
-
-## Feature Parity
-
-KnockOff covers the features NSubstitute users expect:
-
-| Feature | KnockOff | NSubstitute |
-|---------|----------|-------------|
-| **Returns** | `Returns(value)` | `.Returns(value)` |
-| **Returns with logic** | `OnCall((args) => value)` | `.Returns(x => value)` |
-| **Argument matching** | `When(args).Returns(value)` | `Arg.Is<T>()` per parameter |
-| **Sequences** | `Returns(v1, v2, v3)` | `.Returns(v1, v2, v3)` |
-| **Callbacks** | Built into `OnCall` | `.AndDoes(callback)` |
-| **Throws** | `OnCall(() => throw ...)` | `.Throws<T>()` |
-| **Async methods** | Auto-wrapped | Auto-wrapped |
-| **Properties** | `OnGet` / `OnSet` | `.Returns` / assignment |
-| **Indexers** | `Indexer.OnGet` / `OnSet` / `Backing` | Assignment |
-| **Events** | `Raise()` / `VerifyAdd` / `VerifyRemove` | `Raise.Event()` |
-| **Delegates** | `Interceptor.Returns` / `OnCall` / `When` / `Verify` | Setup on substitute |
-| **Verification** | `.Verify(Times)` | `.Received(n)` |
-| **Batch verification** | `.Verifiable()` + `stub.Verify()` | Individual `.Received()` calls |
-| **Strict mode** | `[KnockOff(Strict=true)]` | Configure substitute |
-
----
-
-## What KnockOff Does Better
-
-| Feature | Why It's Better |
-|---------|-----------------|
-| **Parameter matching** | `When((a, b) => a > 0)` matches all params at once vs `Arg.Is<>` per param |
-| **Named tuple capture** | `var (a, b) = tracking.LastArgs` vs manual `Arg.Do<>` setup |
-| **Source delegation** | Delegate to real implementation, override specific methods |
-| **Event verification** | `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` |
-| **Explicit Get/Set verify** | `VerifyGet(Times)` / `VerifySet(Times)` |
-| **Built-in capture** | `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` |
-| **Reusable stub classes** | Define once, customize per-test |
+This isn't available in traditional mocking frameworks. Perfect for integration tests, decorator patterns, and partial mocking without complexity.
 
 ---
 
@@ -506,7 +253,240 @@ public void VerifyCalls_WithVerifiable()
 
 ---
 
+## The Difference
+
+**Moq:**
+```cs
+mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
+    .Returns<int>(id => new User { Id = id });
+```
+
+**NSubstitute:**
+<!-- snippet: readme-hero-nsub -->
+```cs
+var repo = Substitute.For<IUserRepo>();
+repo.GetUser(Arg.Is<int>(id => id > 0)).Returns(x => new User { Id = x.Arg<int>() });
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-hero-knockoff -->
+```cs
+var stub = new CompareUserRepoStub();
+stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id } : null);
+```
+<!-- endSnippet -->
+
+No `It.Is<>()`. No `Arg.Is<>()`. No `x.Arg<int>()`. The parameter is just `id`.
+
+---
+
+## Side-by-Side Comparisons
+
+### Methods
+
+| Task | Moq | NSubstitute | KnockOff |
+|------|-----|-------------|----------|
+| **Return value** | `mock.Setup(x => x.Add(1, 2)).Returns(3);` | `calc.Add(1, 2).Returns(3);` | `stub.Add.Returns(3);` |
+| **Any argument** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(10);` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(10);` | `stub.Add.Returns(10);` |
+| **Match values** | `mock.Setup(x => x.Add(1, 2)).Returns(100);` | `calc.Add(1, 2).Returns(100);` | `stub.Add.When(1, 2).Returns(100);` |
+| **Conditional** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns<int, int>((a, b) => a > 0 ? a + b : 0);` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(x => ...);` | `stub.Add.OnCall((a, b) => a > 0 ? a + b : 0);` |
+| **Throw** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Throws<Exception>();` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Throws<Exception>();` | `stub.Add.OnCall((a, b) => throw new Exception());` |
+| **Callback** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(3).Callback<int, int>((a, b) => log.Add(a));` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(3).AndDoes(x => ...);` | `stub.Add.OnCall((a, b) => { log.Add(a); return 3; });` |
+| **Sequence** | `mock.SetupSequence(x => x.Add(1, 2)).Returns(1).Returns(2).Returns(3);` | `calc.Add(1, 2).Returns(1, 2, 3);` | `stub.Add.Returns(1, 2, 3);` |
+| **Async** | `mock.Setup(x => x.GetUserAsync(1)).ReturnsAsync(user);` | `repo.GetUserAsync(1).Returns(user);` | `stub.GetUserAsync.Returns(user);` |
+| **Verify called** | `mock.Verify(x => x.Add(1, 2));` | `calc.Received().Add(1, 2);` | `stub.Add.Verify();` |
+| **Verify count** | `mock.Verify(x => x.Add(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));` | `calc.Received(3).Add(Arg.Any<int>(), Arg.Any<int>());` | `stub.Add.Verify(Times.Exactly(3));` |
+
+### Argument Matching
+
+**Moq:**
+```cs
+// Moq - It.Is<T> per parameter
+mock.Setup(x => x.Add(It.Is<int>(a => a > 0), It.IsAny<int>())).Returns(100);
+```
+
+**NSubstitute:**
+<!-- snippet: readme-argmatch-nsub-matchers -->
+```cs
+// NSubstitute - Arg.Is<T> per parameter (permanent matchers)
+calc.Add(Arg.Is<int>(a => a > 0), Arg.Any<int>()).Returns(100);
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-argmatch-knockoff-oncall -->
+```cs
+// KnockOff - OnCall with conditional (permanent, matches all calls)
+stub.Add.OnCall((a, b) => a > 0 ? 100 : 0);
+```
+<!-- endSnippet -->
+
+<!-- snippet: readme-argmatch-knockoff-when -->
+```cs
+// KnockOff - When() for sequential matching (first match returns 100, then falls through)
+stub.Add.When((a, b) => a > 0).Returns(100).ThenCall((a, b) => a + b);
+```
+<!-- endSnippet -->
+
+**Multiple specific values:**
+
+**Moq:**
+```cs
+mock.Setup(x => x.Add(1, 2)).Returns(100);
+mock.Setup(x => x.Add(3, 4)).Returns(200);
+```
+
+<!-- snippet: readme-argmatch-nsub-specific -->
+```cs
+// Multiple specific values
+calc.Add(1, 2).Returns(100);
+calc.Add(3, 4).Returns(200);
+```
+<!-- endSnippet -->
+
+<!-- snippet: readme-argmatch-knockoff-specific -->
+```cs
+stub.Add.When(1, 2).Returns(100);
+stub.Add.When(3, 4).Returns(200);
+```
+<!-- endSnippet -->
+
+**Note:** Moq and NSubstitute matchers are permanent — they match all qualifying calls. KnockOff's `When()` is sequential — matchers are consumed in order. Use `OnCall()` with conditionals for permanent matching behavior.
+
+### Argument Capture
+
+**Moq:**
+```cs
+// Moq - requires Callback setup
+int capturedA = 0, capturedB = 0;
+mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>()))
+    .Callback<int, int>((a, b) => { capturedA = a; capturedB = b; });
+mock.Object.Add(1, 2);
+```
+
+**NSubstitute:**
+<!-- snippet: readme-argcapture-nsub -->
+```cs
+// NSubstitute - requires Arg.Do in setup
+int capturedA = 0, capturedB = 0;
+calc.Add(Arg.Do<int>(x => capturedA = x), Arg.Do<int>(x => capturedB = x));
+calc.Add(1, 2);
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-argcapture-knockoff -->
+```cs
+// KnockOff - built-in, no pre-setup
+var tracking = stub.Add.OnCall((a, b) => a + b);
+ICalculator calc = stub;
+calc.Add(1, 2);
+var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
+```
+<!-- endSnippet -->
+
+For full comparisons of properties, events, delegates, and indexers, see the [complete comparison guide](docs/comparison.md).
+
+---
+
+## Method Overload Resolution
+
+**The Problem:** When an interface has overloaded methods with the same parameter count but different types:
+
+<!-- snippet: readme-method-overload-interface -->
+```cs
+public interface IFormatter
+{
+    string Format(string input, bool uppercase);
+    string Format(string input, int maxLength);
+}
+```
+<!-- endSnippet -->
+
+### Any-Value Matching
+
+**Moq:**
+```cs
+// It.IsAny<T>() required - compiler needs the types to resolve overload
+mock.Setup(x => x.Format(It.IsAny<string>(), It.IsAny<bool>())).Returns("bool overload");
+mock.Setup(x => x.Format(It.IsAny<string>(), It.IsAny<int>())).Returns("int overload");
+```
+
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-any-value -->
+```cs
+// Arg.Any<T>() required - compiler needs the types to resolve overload
+formatter.Format(Arg.Any<string>(), Arg.Any<bool>()).Returns("bool overload");
+formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-knockoff-any-value -->
+```cs
+// Explicit parameter types resolve the overload - standard C# syntax
+stub.Format.OnCall((string input, bool uppercase) => "bool overload");
+stub.Format.OnCall((string input, int maxLength) => "int overload");
+```
+<!-- endSnippet -->
+
+### Specific-Value Matching
+
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-specific-value -->
+```cs
+// Specific value matching - literals work when all args are specific
+formatter.Format("test", true).Returns("UPPERCASE");
+formatter.Format("test", 10).Returns("truncated");
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-knockoff-specific-value -->
+```cs
+// Specific value matching - parameter types resolve the overload
+stub.Format.When("test", true).Returns("UPPERCASE");
+stub.Format.When("test", 10).Returns("truncated");
+```
+<!-- endSnippet -->
+
+### Argument Access
+
+**Moq:**
+```cs
+// To use argument values, extract via Returns<T1, T2>:
+mock.Setup(x => x.Format(It.IsAny<string>(), It.IsAny<bool>()))
+    .Returns<string, bool>((input, uppercase) => uppercase ? input.ToUpper() : input);
+```
+
+**NSubstitute:**
+<!-- snippet: readme-nsubstitute-argument-access -->
+```cs
+// To use argument values, extract from CallInfo:
+formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
+    .Returns(x => x.ArgAt<bool>(1) ? x.ArgAt<string>(0).ToUpper() : x.ArgAt<string>(0));
+```
+<!-- endSnippet -->
+
+**KnockOff:**
+<!-- snippet: readme-knockoff-argument-access -->
+```cs
+// Arguments are directly available with names and types:
+stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+```
+<!-- endSnippet -->
+
+**The Difference:**
+- Moq: `It.IsAny<bool>()` + `.Returns<string, bool>((input, uppercase) => ...)` to match any value and access arguments
+- NSubstitute: `Arg.Any<bool>()` + `x.ArgAt<bool>(1)` to match any value and access arguments
+- KnockOff: `(string input, bool uppercase)` - standard C# lambda with named, typed parameters
+
+---
+
 ## Three Stub Patterns
+
+KnockOff supports [9 patterns](docs/guides/stub-patterns.md) total. Here are the three most common:
 
 **Standalone** - Reusable across your project:
 <!-- snippet: readme-pattern-standalone -->
@@ -548,12 +528,43 @@ public void InlineClass_Pattern()
 
 ---
 
+## Roslyn Source Generation
+
+KnockOff uses Roslyn source generation, which means:
+
+- No more `Arg.Any<>()`. No more `It.IsAny<>()`. Just write C#
+- If the method signature changes you get a compile error
+- There's a small performance gain but honestly it's negligible
+
+Source generation opens doors beyond traditional mocking — I've already added [9 patterns](docs/guides/stub-patterns.md) and features like [Source Delegation](docs/guides/source-delegation.md), with more ideas to come.
+
+**What other ideas do you have?** Open a [discussion](https://github.com/NeatooDotNet/KnockOff/discussions).
+
+
+## AI
+
+This is an idea I've had for years but never took the time to implement. With my ideas and guidance, Claude Code has written the entirety of this library — the Roslyn source generator, the runtime library, the tests, and the documentation.
+
+Source generation turned out to be a great fit for AI code generation. The work is highly patterned: analyze an interface, generate code for each member, handle edge cases across 9 patterns and 4 member types. That's exactly the kind of systematic, repetitive-but-varied work where AI excels. I designed the API and patterns; Claude Code implemented them across every combination.
+
+### Claude Code Skill
+
+KnockOff includes a [Claude Code skill](skills/knockoff/) that teaches Claude how to use the library. Copy the `skills/knockoff/` directory into your project and Claude Code will know how to create stubs, configure behavior, write tests with KnockOff, and migrate from Moq — without you explaining the API.
+
+The skill includes slash commands:
+- **`/knockoff:create-stub`** — Create a new stub class with the pattern of your choice
+- **`/knockoff:migrate-from-moq`** — Convert existing Moq tests to KnockOff
+- **`/knockoff:troubleshoot`** — Diagnose and fix common KnockOff issues
+
+---
+
 ## Documentation
 
 - **[Getting Started](docs/getting-started.md)** - Installation and first stub
 - **[Stub Patterns](docs/guides/stub-patterns.md)** - Standalone, inline interface, inline class
 - **[Interceptor API](docs/reference/interceptor-api.md)** - Complete `OnCall`, `OnGet`, `OnSet` reference
 - **[Source Delegation](docs/guides/source-delegation.md)** - Delegate to real implementations
+- **[Full Comparison Guide](docs/comparison.md)** - Properties, events, delegates, indexers vs Moq and NSubstitute
 - **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step migration guide
 - **[Migration from NSubstitute](docs/migration/from-nsubstitute.md)** - Comparison and migration guide
 
