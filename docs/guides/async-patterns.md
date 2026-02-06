@@ -1,98 +1,157 @@
 # Async Patterns
 
-KnockOff fully supports async methods, allowing you to configure `Task<T>` and `ValueTask<T>` return values using the `OnCall` API. You can use either the **value overload** (recommended for simple values) or the **callback overload** (for dynamic logic). This guide shows common async patterns for unit testing.
+KnockOff provides three configuration tiers for async methods (`Task<T>`, `ValueTask<T>`), each with increasing control. The first two tiers auto-wrap return values so you never write `Task.FromResult` for simple cases.
 
 **See also:**
-- [Method Interceptors](methods.md) - Core `OnCall` callback patterns
+- [Method Interceptors](methods.md) - Core `Returns` and `OnCall` patterns
+- [API Consistency Matrix](api-consistency-matrix.md#feature-12-async-method-auto-wrapping) - Cross-pattern async support
 - [Verification Guide](verification.md) - Details on `Verifiable()` and `stub.Verify()`
+
+---
+
+## The Three-Tier Async API
+
+For an async method like `Task<string> GetDataAsync(int id)`:
+
+| Tier | API | Accepts | Auto-wraps? |
+|------|-----|---------|-------------|
+| 1 | `Returns(value)` | `string` | Yes — `Task.FromResult(value)` |
+| 2 | `OnCall((id) => value)` | `Func<int, string>` | Yes — `Task.FromResult(value)` |
+| 3 | `OnCall((id) => Task.FromResult(value))` | `Func<int, Task<string>>` | No — you provide the Task |
+
+All three tiers work identically across all 8 interface/class stub patterns (1–6, 8–9).
 
 ---
 
 ## Task<T> Methods
 
-### Value Overload (Recommended)
+### Tier 1: Returns (Recommended for Constants)
 
-For simple async values, KnockOff auto-wraps values in `Task.FromResult`:
+`Returns(unwrappedValue)` auto-wraps the value in `Task.FromResult`:
 
-<!-- snippet: async-task-value-overload -->
-```cs
-// KnockOff auto-wraps the value in Task.FromResult
-stub.GetUserAsync.Returns(new User { Id = 42, Name = "Alice" });
+```csharp
+// Given: Task<string?> GetDataAsync(int id)
+stub.GetDataAsync.Returns("hello");
+
+IDataService svc = stub;
+var result = await svc.GetDataAsync(1); // "hello"
 ```
-<!-- endSnippet -->
 
-This is the simplest syntax when you don't need dynamic logic based on parameters.
+No `Task.FromResult` needed. This is the simplest syntax when the return value is constant.
 
-### Callback Overload
+### Tier 2: Simplified Callback (Recommended for Dynamic Values)
 
-For async methods where you need dynamic logic or parameter-based values, use `Task.FromResult` in the callback:
+`OnCall(Func<..., T>)` receives typed arguments and returns the unwrapped type. KnockOff auto-wraps the result:
 
-<!-- snippet: async-task-result -->
-```cs
-// Use Task.FromResult when you need parameter-based return values
-stub.GetUserAsync.OnCall((id) =>
-    Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
+```csharp
+// Callback returns string, not Task<string> — auto-wrapped
+stub.GetDataAsync.OnCall((id) => $"Data-{id}");
+
+IDataService svc = stub;
+var result = await svc.GetDataAsync(42); // "Data-42"
 ```
-<!-- endSnippet -->
 
-For async methods with no return value (`Task` instead of `Task<T>`), use `Task.CompletedTask`:
+Use this when the return value depends on the arguments but you don't need async behavior in the callback itself.
 
-<!-- snippet: async-task-void -->
-```cs
-// Return Task.CompletedTask for async void methods
-stub.UpdateUserAsync.OnCall((user) =>
-{
-    updatedUsers.Add(user);
-    return Task.CompletedTask;
-}).Verifiable();
+### Tier 3: Full Delegate (For Async Callbacks)
+
+`OnCall(Func<..., Task<T>>)` gives full control — you construct the Task yourself:
+
+```csharp
+// Callback returns Task<string?> directly
+stub.GetDataAsync.OnCall((int id) => Task.FromResult<string?>($"Full-{id}"));
+
+IDataService svc = stub;
+var result = await svc.GetDataAsync(99); // "Full-99"
 ```
-<!-- endSnippet -->
+
+Use this when you need `async`/`await` inside the callback (e.g., simulating delays) or when returning faulted tasks.
+
+---
+
+## Void Async Methods (Task Return)
+
+For methods returning `Task` with no value, `OnCall` accepts an `Action`:
+
+```csharp
+// Given: Task SaveDataAsync(string data)
+string? savedData = null;
+stub.SaveDataAsync.OnCall((data) => savedData = data);
+
+IDataService svc = stub;
+await svc.SaveDataAsync("important data");
+// savedData == "important data"
+```
+
+The generated interceptor returns `Task.CompletedTask` automatically.
 
 ---
 
 ## ValueTask<T> Methods
 
-### Value Overload (Recommended)
+The same three tiers apply to `ValueTask<T>`:
 
-For simple ValueTask values, KnockOff auto-wraps values in `ValueTask<T>`:
+```csharp
+// Tier 1: Returns — auto-wraps in new ValueTask<T>(value)
+stub.GetCachedAsync.Returns(cachedUser);
 
-<!-- snippet: async-valuetask-value-overload -->
-```cs
-// KnockOff auto-wraps the value in new ValueTask<T>(value)
-stub.GetCachedUserAsync.Returns(new User { Id = 42, Name = "Cached" });
+// Tier 2: Simplified callback — returns T, auto-wrapped
+stub.GetCachedAsync.OnCall((id) => new User { Id = id });
+
+// Tier 3: Full delegate — returns ValueTask<T> directly
+stub.GetCachedAsync.OnCall((id) => new ValueTask<User?>(new User { Id = id }));
 ```
-<!-- endSnippet -->
 
-This is the simplest syntax when you don't need dynamic logic based on parameters.
+---
 
-### Callback Overload
+## Delegate Stubs — No Auto-Wrapping (Pattern 7)
 
-For ValueTask methods where you need dynamic logic, construct the value task in the callback:
+Delegate stubs (Pattern 7) are intentionally different. The delegate's return type IS the full contract — there is no "unwrapped type" to derive:
 
-<!-- snippet: async-valuetask -->
-```cs
-// Create ValueTask directly when you need parameter-based return values
-stub.GetCachedUserAsync.OnCall((id) =>
-    new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
+```csharp
+// Given: delegate Task<int> AsyncOperation(int x)
+
+// Returns takes the FULL return type
+stub.Interceptor.Returns(Task.FromResult(42));
+
+// OnCall takes the FULL delegate signature
+stub.Interceptor.OnCall((x) => Task.FromResult(x * 2));
 ```
-<!-- endSnippet -->
+
+**Why no auto-wrapping?** Interface/class methods have a method signature that distinguishes `Task<string>` (async wrapper) from `string` (return type). Delegates don't — `Task<int>` IS the return type. There's no inner type to unwrap to.
+
+**See also:** [Delegate Stubs Guide](delegates.md)
+
+---
+
+## Sequences with Async Methods
+
+Async methods support params-style sequences with auto-wrapping:
+
+```csharp
+// Returns multiple values — each auto-wrapped in Task.FromResult
+stub.GetDataAsync.Returns("first", "second", "third");
+// Call 1: "first", Call 2: "second", Call 3+: "third" (repeats last)
+
+// Callback sequences also work
+stub.GetDataAsync
+    .OnCall((id) => "initial")
+    .ThenCall((id) => "updated");
+```
 
 ---
 
 ## Simulating Delays
 
-Use async lambdas in `OnCall` to simulate asynchronous delays:
+Use async lambdas with the Tier 3 API to simulate asynchronous delays:
 
-<!-- snippet: async-delay -->
-```cs
-// Use async lambda to simulate network latency
-stub.GetUserAsync.OnCall(async (id) =>
+```csharp
+stub.GetDataAsync.OnCall(async (id) =>
 {
     await Task.Delay(50);
-    return new User { Id = id, Name = "Delayed" };
+    return $"Delayed-{id}";
 });
 ```
-<!-- endSnippet -->
 
 ---
 
@@ -102,74 +161,47 @@ stub.GetUserAsync.OnCall(async (id) =>
 
 Return a faulted task using `Task.FromException<T>`:
 
-<!-- snippet: async-exception -->
-```cs
-// Return a faulted task using Task.FromException
-stub.GetUserAsync.OnCall((id) =>
-    Task.FromException<User?>(new NotFoundException($"User {id} not found")));
+```csharp
+stub.GetDataAsync.OnCall((id) =>
+    Task.FromException<string?>(new NotFoundException($"Item {id} not found")));
 ```
-<!-- endSnippet -->
 
 ### Throwing Directly
 
-Alternatively, throw exceptions directly in the `OnCall` callback. Both approaches produce the same result - the exception is thrown when the method is awaited:
+Throw exceptions directly in the callback. The exception is thrown when the method is awaited:
 
-<!-- snippet: async-throw -->
-```cs
-// Throw directly - use explicit delegate type to disambiguate overloads
-stub.GetUserAsync.OnCall((AsyncUserSvcStub.GetUserAsyncInterceptor.GetUserAsyncDelegate)(id =>
-    throw new NotFoundException($"User {id} not found")));
+```csharp
+stub.GetDataAsync.OnCall((int id) =>
+    throw new NotFoundException($"Item {id} not found"));
 ```
-<!-- endSnippet -->
+
+When throwing directly in a simplified callback (Tier 2), you may need to specify the parameter type explicitly to disambiguate overloads.
 
 ---
 
-## Complete Example
+## Choosing Your Tier
 
-This example demonstrates stubbing an async repository for testing a service layer. It combines multiple async method stubs with verification:
-
-<!-- snippet: async-complete-example -->
-```cs
-// Configure multiple async methods with verification
-stub.FindAsync.OnCall((id) =>
-    Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
-stub.SaveAsync.OnCall((user) => Task.CompletedTask).Verifiable();
-```
-<!-- endSnippet -->
-
----
-
-## Choosing Your Approach
-
-**For simple, static values:**
-- Use the value overload: `stub.GetUserAsync.OnCall(someUser)`
-- KnockOff auto-wraps in `Task.FromResult` (Task) or `new ValueTask<T>(value)` (ValueTask)
-
-**For dynamic logic or parameter-based values:**
-- Task: Use callback with `Task.FromResult`: `stub.GetUserAsync.OnCall((id) => Task.FromResult(...))`
-- ValueTask: Use callback with `new ValueTask<T>(value)`: `stub.GetCachedAsync.OnCall((id) => new ValueTask<T>(...))`
-
-**For simulating async behavior:**
-- Use async lambda: `stub.GetUserAsync.OnCall(async (id) => { await Task.Delay(...); return ...; })`
-
-**For simulating failures:**
-- Use `Task.FromException<T>(exception)` or throw directly in callback
+| Scenario | Recommended Tier | Example |
+|----------|-----------------|---------|
+| Constant return value | Tier 1: `Returns` | `stub.Method.Returns("value")` |
+| Value depends on args | Tier 2: Simplified callback | `stub.Method.OnCall((id) => ...)` |
+| Need async/await in callback | Tier 3: Full delegate | `stub.Method.OnCall(async (id) => ...)` |
+| Simulating failures | Tier 3: Full delegate | `stub.Method.OnCall((id) => Task.FromException<T>(...))` |
+| Delegate stubs | Full return type only | `stub.Interceptor.Returns(Task.FromResult(...))` |
 
 ---
 
 ## Key Takeaways
 
-- **Value overload (recommended)**: Use `OnCall(value)` for simple, static async values
-  - Task<T> automatically wraps in `Task.FromResult(value)`
-  - ValueTask<T> automatically wraps in `new ValueTask<T>(value)`
-- **Callback overload**: Use when you need dynamic logic based on parameters
-  - Task<T>: Return `Task.FromResult(value)`
-  - ValueTask<T>: Return `new ValueTask<T>(value)`
-  - Task (void): Return `Task.CompletedTask`
-- **Async lambdas**: Use to simulate delays or complex async behavior
-- **Simulating failures**: Use `Task.FromException<T>` or throw directly in callback
-- **All interceptor features** (call counts, argument tracking, verification) work with async methods
+- **Three tiers** for async methods: `Returns(T)`, `OnCall(Func<..., T>)`, `OnCall(Func<..., Task<T>>)`
+- **Tiers 1 and 2 auto-wrap** — you work with the unwrapped type, KnockOff handles `Task.FromResult`
+- **Tier 3 gives full control** — use for async lambdas, delays, and faulted tasks
+- **Void async methods** use `OnCall(Action<...>)` — `Task.CompletedTask` is returned automatically
+- **ValueTask<T>** follows the same three tiers with `ValueTask` wrapping
+- **Pattern 7 (delegates)** — no auto-wrapping; the delegate's return type is the full contract
+- **All 8 interface/class patterns** support identical async APIs
+- **All interceptor features** (verification, argument capture, sequences, When chains) work with async methods
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-05

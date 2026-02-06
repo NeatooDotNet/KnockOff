@@ -413,6 +413,60 @@ For class stubs with user method overrides:
 
 ---
 
+## Feature 12: Async Method Auto-Wrapping
+
+For async methods (`Task<T>`, `ValueTask<T>`), KnockOff provides three configuration tiers that auto-wrap return values. All 8 interface/class patterns use identical APIs:
+
+```csharp
+// Given: Task<string> GetDataAsync(int id)
+
+// Tier 1: Returns(unwrappedValue) — auto-wraps in Task.FromResult
+stub.GetDataAsync.Returns("hello");
+
+// Tier 2: OnCall(simplified callback) — returns T, auto-wrapped
+stub.GetDataAsync.OnCall((id) => $"Data-{id}");
+
+// Tier 3: OnCall(full delegate) — returns Task<T> directly
+stub.GetDataAsync.OnCall((int id) => Task.FromResult<string?>($"Full-{id}"));
+```
+
+For void async methods (`Task` return, no value):
+
+```csharp
+// Given: Task SaveAsync(string data)
+
+// OnCall with Action — returns Task.CompletedTask automatically
+stub.SaveAsync.OnCall((data) => savedData = data);
+```
+
+| Feature | All 8 Patterns |
+|---------|:--------------:|
+| `Returns(unwrappedValue)` auto-wrap | ✓ |
+| `OnCall(Func<..., T>)` simplified callback | ✓ |
+| `OnCall(Func<..., Task<T>>)` full delegate | ✓ |
+| Void async `OnCall(Action<...>)` | ✓ |
+| `ValueTask<T>` auto-wrap | ✓ |
+
+### Pattern 7 (Delegate) — Intentionally Different
+
+Delegate stubs (Pattern 7) do **not** auto-wrap async return types. The delegate's return type IS the full contract:
+
+```csharp
+// Given: delegate Task<int> AsyncOperation(int x)
+
+// Returns takes the FULL return type (no auto-wrapping)
+stub.Interceptor.Returns(Task.FromResult(42));
+
+// OnCall takes the FULL delegate type (no simplified callback)
+stub.Interceptor.OnCall((x) => Task.FromResult(x * 2));
+```
+
+**Why:** Interface/class methods have a method signature to derive the unwrapped type from (`Task<string>` → `string`). Delegates don't — the delegate type IS the contract. There's no "inner type" to unwrap to.
+
+**See also:** [Async Patterns Guide](async-patterns.md) for detailed examples including delays and failure simulation.
+
+---
+
 ## Summary: Consistency Status
 
 | Feature Category | Status |
@@ -428,6 +482,7 @@ For class stubs with user method overrides:
 | Reset | ✓ **100% consistent** |
 | Target Access | ✓ **Logical split** (Interface=direct, Class=`.Object`) |
 | User Methods | ✓ **Logical split** (Standalone=yes, Inline=no) |
+| Async Auto-Wrapping | ✓ **100% consistent** (Pattern 7 intentionally different) |
 
 ---
 
