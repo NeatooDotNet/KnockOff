@@ -11,8 +11,6 @@
 		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>KnockOff</PackageId>
-		<!-- This is a compile-time only package (source generator) -->
-		<DevelopmentDependency>true</DevelopmentDependency>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
