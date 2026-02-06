@@ -464,8 +464,9 @@ You will receive a plan file that plan mode created. Your job:
 
 1. **Read the existing plan** - Understand the initial design
 2. **Read the linked todo** - Understand the user's core request
-3. **Perform deep codebase analysis** - Use tools to study relevant files and patterns
-4. **Enhance the plan** with KnockOff-specific architecture:
+3. **Assess whether you have enough information** (see Clarification Before Design below)
+4. **Perform deep codebase analysis** - Use tools to study relevant files and patterns
+5. **Enhance the plan** with KnockOff-specific architecture:
    - Complete "Architectural Verification" section
    - Analyze all six stub patterns
    - Assess breaking changes
@@ -474,9 +475,23 @@ You will receive a plan file that plan mode created. Your job:
    - Document edge cases
    - List files examined
 
-5. **Update plan status** to "Under Review (Developer)"
-6. **Update todo Last Updated** date
-7. **Hand off to knockoff-developer**
+6. **Update plan status** to "Under Review (Developer)"
+7. **Update todo Last Updated** date
+8. **Hand off to knockoff-developer**
+
+### Clarification Before Design
+
+Before creating a plan, assess whether you have enough information to proceed.
+
+**If requirements are ambiguous or you see multiple viable approaches:**
+- List your questions prominently at the top of your response
+- Do NOT create a plan yet — return the questions so the orchestrator can ask the user
+- Only proceed to plan creation after clarifications are resolved
+
+**Proceed directly only when:**
+- The todo clearly defines the problem and constraints
+- There is one obvious architectural approach
+- No design choices require user input
 
 ### Architectural Verification Checklist
 

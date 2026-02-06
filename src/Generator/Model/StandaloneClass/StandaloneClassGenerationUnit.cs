@@ -52,4 +52,6 @@ internal sealed record StandaloneClassGenerationUnit(
     /// <summary>Whether strict mode is enabled.</summary>
     bool Strict,
     /// <summary>Properties for the base class (virtual protected, user can override with '_' suffix).</summary>
-    EquatableArray<BaseClassPropertyModel> BaseClassProperties);
+    EquatableArray<BaseClassPropertyModel> BaseClassProperties,
+    /// <summary>Methods for the base class (virtual protected, user can override with '_' suffix).</summary>
+    EquatableArray<BaseClassMethodModel> BaseClassMethods);

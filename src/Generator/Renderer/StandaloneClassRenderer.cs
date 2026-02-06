@@ -85,12 +85,17 @@ internal static class StandaloneClassRenderer
         // Use shared MethodInterceptorRenderer for method interceptors
         foreach (var method in unit.Methods)
         {
+            // Check if any signature in this interceptor has a user method override
+            var hasUserMethod = !string.IsNullOrEmpty(method.UserMethodName) ||
+                method.Overloads.Any(o => !string.IsNullOrEmpty(o.UserMethodName));
             var options = new InterceptorRenderOptions(
                 BaseIndent: baseIndent,
                 IncludeStrictParameter: true,
                 StrictAccessExpression: "strict",
                 InterceptorTypeParameters: typeParamList,
-                InterceptorConstraints: constraintClauses);
+                InterceptorConstraints: constraintClauses,
+                UserMethodFallback: hasUserMethod,
+                StubTypeName: hasUserMethod ? $"{unit.ClassName}{typeParamList}" : null);
             w.SetIndent(baseIndent);
             MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
         }
@@ -144,6 +149,13 @@ internal static class StandaloneClassRenderer
 
         // Verify and VerifyAll methods
         RenderVerifyMethods(w, unit, indent1, indent2);
+
+        // Internal forwarding methods for user method overrides
+        // Interceptor classes are top-level (not nested), so they cannot access
+        // protected virtual methods on the base class. These internal forwarders
+        // bridge the gap: interceptor calls stub.__UserMethod_X() which forwards
+        // to the protected Execute_() method.
+        RenderUserMethodForwarders(w, unit, indent1);
 
         // Nested Impl class
         RenderImplClass(w, unit, indent1, indent2, indent3, indent4);
@@ -200,6 +212,12 @@ internal static class StandaloneClassRenderer
             {
                 RenderBaseClassProperty(w, property);
             }
+
+            // Generate virtual protected methods for each target class method
+            foreach (var method in unit.BaseClassMethods)
+            {
+                RenderBaseClassMethod(w, method);
+            }
         }
 
         // Close containing type wrappers for nested classes
@@ -209,6 +227,37 @@ internal static class StandaloneClassRenderer
         }
 
         return w.ToString();
+    }
+
+    /// <summary>
+    /// Renders a single virtual protected method in the base class.
+    /// Method name is suffixed with '_' to distinguish from target class method.
+    /// Void methods have empty body; non-void methods return default!.
+    /// </summary>
+    private static void RenderBaseClassMethod(CodeWriter w, BaseClassMethodModel method)
+    {
+        var methodName = $"{method.MethodName}_";
+        var returnType = method.ReturnType;
+
+        w.Line($"/// <summary>Override to provide default implementation for {method.TargetMemberDescription}.</summary>");
+
+        if (method.IsVoid)
+        {
+            // Void method - empty body
+            if (string.IsNullOrEmpty(method.ParameterDeclarations))
+                w.Line($"protected virtual void {methodName}() {{ }}");
+            else
+                w.Line($"protected virtual void {methodName}({method.ParameterDeclarations}) {{ }}");
+        }
+        else
+        {
+            // Non-void method - expression-bodied returning default!
+            if (string.IsNullOrEmpty(method.ParameterDeclarations))
+                w.Line($"protected virtual {returnType} {methodName}() => default!;");
+            else
+                w.Line($"protected virtual {returnType} {methodName}({method.ParameterDeclarations}) => default!;");
+        }
+        w.Line();
     }
 
     /// <summary>
@@ -419,6 +468,46 @@ internal static class StandaloneClassRenderer
         w.Line($"{indent1}if (failures.Count > 0)");
         w.Line($"{indent1}\tthrow new global::KnockOff.VerificationException(failures);");
         w.Line($"{indent}}}");
+        w.Line();
+    }
+
+    #endregion
+
+    #region User Method Forwarders
+
+    /// <summary>
+    /// Generates internal forwarding methods for user method overrides.
+    /// Standalone class interceptors are top-level classes (not nested inside the stub),
+    /// so they cannot access protected virtual methods on the stub's base class.
+    /// These internal forwarders bridge the gap: the interceptor calls stub.__UserMethod_X()
+    /// which has internal access, and the forwarder delegates to the protected Execute_() method.
+    /// </summary>
+    private static void RenderUserMethodForwarders(CodeWriter w, StandaloneClassGenerationUnit unit, string indent)
+    {
+        var methodsWithUserOverride = unit.ImplMethods.Where(m => m.HasUserOverride).ToList();
+        if (methodsWithUserOverride.Count == 0)
+            return;
+
+        foreach (var method in methodsWithUserOverride)
+        {
+            var forwarderName = $"__UserMethod_{method.MethodName}";
+            var targetName = $"{method.MethodName}_";
+
+            if (method.IsVoid)
+            {
+                if (string.IsNullOrEmpty(method.ParameterDeclarations))
+                    w.Line($"{indent}internal void {forwarderName}() => {targetName}();");
+                else
+                    w.Line($"{indent}internal void {forwarderName}({method.ParameterDeclarations}) => {targetName}({method.ArgumentList});");
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(method.ParameterDeclarations))
+                    w.Line($"{indent}internal {method.ReturnType} {forwarderName}() => {targetName}();");
+                else
+                    w.Line($"{indent}internal {method.ReturnType} {forwarderName}({method.ParameterDeclarations}) => {targetName}({method.ArgumentList});");
+            }
+        }
         w.Line();
     }
 
@@ -661,67 +750,93 @@ internal static class StandaloneClassRenderer
         w.Line($"{indent}{method.AccessModifier} override {method.ReturnType} {method.MethodName}({method.ParameterDeclarations})");
         w.Line($"{indent}{{");
 
-        // Null check for calls during base constructor
-        w.Line($"{indent1}if (_stub == null)");
-        w.Line($"{indent1}{{");
-        if (method.IsAbstract)
-        {
-            if (method.IsVoid)
-                w.Line($"{indent1}\treturn;");
-            else if (method.IsTask)
-                w.Line($"{indent1}\treturn global::System.Threading.Tasks.Task.CompletedTask;");
-            else if (method.IsValueTask)
-                w.Line($"{indent1}\treturn default;");
-            else
-                w.Line($"{indent1}\treturn default!;");
-        }
-        else
-        {
-            if (method.IsVoid)
-            {
-                w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
-                w.Line($"{indent1}\treturn;");
-            }
-            else
-            {
-                w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
-            }
-        }
-        w.Line($"{indent1}}}");
-        w.Line();
-
         var invokeMethodName = string.IsNullOrEmpty(method.InvokeSuffix)
             ? "Invoke"
             : $"Invoke{method.InvokeSuffix}";
 
-        var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+        if (method.HasUserOverride)
+        {
+            // User method override pattern:
+            // The interceptor handles user method fallback internally via stub.MethodName_()
+            // Pass _stub to Invoke() so the interceptor can call the user method when unconfigured
+            // No base.Method() call -- user method completely replaces base call (Design Decision 1)
 
-        if (method.IsAbstract)
-        {
-            if (method.IsVoid)
-                w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
-            else
-                w.Line($"{indent1}return _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
-        }
-        else
-        {
-            w.Line($"{indent1}var unconfiguredBefore = _stub.{method.HandlerName}.UnconfiguredCallCount;");
+            // Null check for calls during base constructor
             if (method.IsVoid)
             {
+                w.Line($"{indent1}if (_stub == null) return;");
+                var invokeArgs = "_stub.Strict, _stub" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
                 w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
-                w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
-                w.Line($"{indent1}{{");
-                w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
-                w.Line($"{indent1}}}");
             }
             else
             {
-                w.Line($"{indent1}var result = _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
-                w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
-                w.Line($"{indent1}{{");
-                w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
-                w.Line($"{indent1}}}");
-                w.Line($"{indent1}return result;");
+                w.Line($"{indent1}if (_stub == null) return default!;");
+                var invokeArgs = "_stub.Strict, _stub" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+                w.Line($"{indent1}return _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+            }
+        }
+        else
+        {
+            // Standard interceptor pattern (no user method override)
+
+            // Null check for calls during base constructor
+            w.Line($"{indent1}if (_stub == null)");
+            w.Line($"{indent1}{{");
+            if (method.IsAbstract)
+            {
+                if (method.IsVoid)
+                    w.Line($"{indent1}\treturn;");
+                else if (method.IsTask)
+                    w.Line($"{indent1}\treturn global::System.Threading.Tasks.Task.CompletedTask;");
+                else if (method.IsValueTask)
+                    w.Line($"{indent1}\treturn default;");
+                else
+                    w.Line($"{indent1}\treturn default!;");
+            }
+            else
+            {
+                if (method.IsVoid)
+                {
+                    w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
+                    w.Line($"{indent1}\treturn;");
+                }
+                else
+                {
+                    w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
+                }
+            }
+            w.Line($"{indent1}}}");
+            w.Line();
+
+            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+
+            if (method.IsAbstract)
+            {
+                if (method.IsVoid)
+                    w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+                else
+                    w.Line($"{indent1}return _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+            }
+            else
+            {
+                w.Line($"{indent1}var unconfiguredBefore = _stub.{method.HandlerName}.UnconfiguredCallCount;");
+                if (method.IsVoid)
+                {
+                    w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+                    w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
+                    w.Line($"{indent1}{{");
+                    w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
+                    w.Line($"{indent1}}}");
+                }
+                else
+                {
+                    w.Line($"{indent1}var result = _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+                    w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
+                    w.Line($"{indent1}{{");
+                    w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
+                    w.Line($"{indent1}}}");
+                    w.Line($"{indent1}return result;");
+                }
             }
         }
 

@@ -47,6 +47,10 @@ internal static class StandaloneClassModelBuilder
             Name: tp.Name,
             Constraints: string.Join(", ", tp.Constraints))).ToEquatableArray();
 
+        // Build user override lookups for base class pattern
+        var userOverrideProperties = new HashSet<string>(info.UserOverrideProperties.GetArray() ?? Array.Empty<string>());
+        var userOverrideMethods = new HashSet<string>(info.UserOverrideMethods.GetArray() ?? Array.Empty<string>());
+
         // Build models for interceptor classes
         var properties = new List<InlineClassPropertyModel>();
         var indexers = new List<InlineClassIndexerModel>();
@@ -90,9 +94,20 @@ internal static class StandaloneClassModelBuilder
             var ownerClassName = $"{stubClassName}{typeParamList}";
 
             // Convert ClassMemberInfo to MethodSignatureInfo for UnifiedInterceptorBuilder
+            // Set per-signature UserMethodName for overloads with user overrides
             var signatures = group.Members
-                .Select(m => ToMethodSignatureInfo(m))
+                .Select(m =>
+                {
+                    var sig = ToMethodSignatureInfo(m);
+                    var hasUserOverride = userOverrideMethods.Contains(
+                        SymbolHelpers.BuildOverrideSignatureKey(m.Name, m.Parameters));
+                    return hasUserOverride ? sig with { UserMethodName = $"__UserMethod_{m.Name}" } : sig;
+                })
                 .ToList();
+
+            // Pass userMethodName to the interceptor builder if ANY overload has a user override
+            var anyHasUserOverride = signatures.Any(s => s.UserMethodName != null);
+            var userMethodName = anyHasUserOverride ? $"__UserMethod_{group.MethodName}" : null;
 
             var methodModel = UnifiedInterceptorBuilder.BuildMethodInterceptor(
                 interceptorClassName: interceptorClassName,
@@ -100,7 +115,8 @@ internal static class StandaloneClassModelBuilder
                 declaringInterface: "",  // Class stubs don't have a declaring interface
                 ownerClassName: ownerClassName,
                 ownerTypeParameters: "",
-                overloads: signatures);
+                overloads: signatures,
+                userMethodName: userMethodName);
 
             methods.Add(methodModel);
 
@@ -128,9 +144,6 @@ internal static class StandaloneClassModelBuilder
 
         // Build constructor models
         var constructors = cls.Constructors.Select(ctor => BuildConstructorModel(ctor, typeParamList)).ToEquatableArray();
-
-        // Build user override properties lookup for base class pattern
-        var userOverrideProperties = new HashSet<string>(info.UserOverrideProperties.GetArray() ?? Array.Empty<string>());
 
         // Build Impl class member models
         var implProperties = new List<InlineClassImplPropertyModel>();
@@ -171,7 +184,11 @@ internal static class StandaloneClassModelBuilder
                     invokeSuffix = "_" + UnifiedInterceptorBuilder.GetSignatureSuffix(sig.Parameters, sig.ReturnType);
                 }
 
-                implMethods.Add(BuildImplMethodModel(member, group.GroupName, invokeSuffix, hasOverloads));
+                // Check if this specific method overload has a user override
+                var hasUserOverride = userOverrideMethods.Contains(
+                    SymbolHelpers.BuildOverrideSignatureKey(member.Name, member.Parameters));
+
+                implMethods.Add(BuildImplMethodModel(member, group.GroupName, invokeSuffix, hasOverloads, hasUserOverride));
             }
         }
 
@@ -200,6 +217,18 @@ internal static class StandaloneClassModelBuilder
                 TargetMemberDescription: $"{cls.FullName}.{m.Name}"))
             .ToEquatableArray();
 
+        // Build base class methods (virtual protected methods for user override pattern)
+        var baseClassMethods = cls.Members
+            .Where(m => !m.IsProperty && !m.IsIndexer)
+            .Select(m => new BaseClassMethodModel(
+                MethodName: m.Name,
+                ReturnType: m.ReturnType,
+                ParameterDeclarations: string.Join(", ", m.Parameters.Select(p => FormatParameter(p))),
+                IsVoid: m.ReturnType == "void",
+                IsAbstract: m.IsAbstract,
+                TargetMemberDescription: $"{cls.FullName}.{m.Name}"))
+            .ToEquatableArray();
+
         return new StandaloneClassGenerationUnit(
             ClassName: stubClassName,
             TargetClassName: cls.FullName,
@@ -221,7 +250,8 @@ internal static class StandaloneClassModelBuilder
             HasRequiredMembers: hasRequiredMembers,
             RequiredMemberNames: requiredMemberNames,
             Strict: info.Strict,
-            BaseClassProperties: baseClassProperties);
+            BaseClassProperties: baseClassProperties,
+            BaseClassMethods: baseClassMethods);
     }
 
     #region Method Grouping
@@ -417,7 +447,8 @@ internal static class StandaloneClassModelBuilder
         ClassMemberInfo member,
         string handlerName,
         string invokeSuffix,
-        bool hasOverloads)
+        bool hasOverloads,
+        bool hasUserOverride = false)
     {
         var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
         var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
@@ -443,7 +474,8 @@ internal static class StandaloneClassModelBuilder
             ArgumentList: argList,
             InputArgumentList: inputArgList,
             OnCallArgumentList: onCallArgs,
-            InvokeSuffix: invokeSuffix);
+            InvokeSuffix: invokeSuffix,
+            HasUserOverride: hasUserOverride);
     }
 
     #endregion

@@ -167,7 +167,7 @@ internal static class UnifiedInterceptorBuilder
 			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateName),
 			DefaultExpression: sig.DefaultExpression,
 			ThrowsOnDefault: sig.ThrowsOnDefault,
-			UserMethodName: userMethodName);
+			UserMethodName: sig.UserMethodName);
 	}
 
 	#endregion
@@ -474,4 +474,6 @@ internal sealed record MethodSignatureInfo(
 	bool IsVoid,
 	bool HasRefOrOutParams,
 	string DefaultExpression,
-	bool ThrowsOnDefault);
+	bool ThrowsOnDefault,
+	/// <summary>Per-signature user method name for partial overload coverage. Null if no user override for this signature.</summary>
+	string? UserMethodName = null);
