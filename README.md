@@ -38,7 +38,7 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
 - **Overrides are optional** — `GetUser_` and `Update_` override the generated defaults. Only override what you need — everything else still works with [OnCall](docs/guides/methods.md), [Returns](docs/reference/interceptor-api.md), or [When chains](docs/guides/parameter-matching.md).
 - **Compile-time safety** — If `IMyRepo` adds a method, the generated base class updates automatically. If a signature changes, your overrides produce compile errors — not silent runtime failures.
 
-This stub is also a full mock. It has [Verify](docs/guides/verification.md), [Strict mode](docs/reference/attribute-options.md), [Async](docs/guides/async-patterns.md), and [Source Delegation](docs/guides/source-delegation.md) — all on the same reusable class.
+This stub is also a full mock. It has [Verify](docs/guides/verification.md), [Strict mode](docs/guides/strict-mode.md), [Async](docs/guides/async-patterns.md), and [Source Delegation](docs/guides/source-delegation.md) — all on the same reusable class.
 
 
 ## Why I Wrote KnockOff
