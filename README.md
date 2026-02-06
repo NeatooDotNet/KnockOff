@@ -1,8 +1,10 @@
 # KnockOff
 
-A .NET mocking library that lets you define reusable stub classes — with full mocking capabilities built in. Powered by Roslyn source generation.
+A .NET mocking library that lets you define reusable stub classes — with full mocking capabilities built in. 
 
 Define your test double once. Reuse it across your test project. Customize it per-test with OnCall, Returns, Verify, and When chains. No more copying mock setups between tests or maintaining shared factory methods full of `Arg.Any<>()`.
+
+Powered by Roslyn source generation for [tighter type safety](docs/type-safety.md) — more issues surface as compile errors instead of runtime surprises.
 
 Claude Code was used to write this library. Skip to more [AI discussion](#ai).
 
