@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Trust the codebase, not documentation.** Always explore the actual code to understand patterns, conventions, and architecture. Do not rely on descriptions in this file or memory from previous sessions.
 
+
 ## Project Basics
 
 **KnockOff** is a Roslyn Source Generator for creating unit test stubs.
@@ -39,6 +40,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 2. **Properties** - Get-only, set-only, get/set properties
 3. **Indexers** - `this[...]` accessors (get/set with key parameters)
 4. **Events** - Event add/remove handlers
+
+
+## API Consistency Principle
+
+**All patterns should provide identical APIs except for intentional variations.** The only intentional variation is `.Object` for class stubs (patterns 3, 4, 6, 9). Everything else—methods, properties, indexers, events, sequences, verification, When chains—should work identically across all applicable patterns.
+
+**The Design projects (`src/Design/`) are the source of truth for KnockOff's API.** Before claiming a feature is complete:
+1. Verify the feature works in Design.Stubs code examples
+2. Verify Design.Tests compiles and passes
+3. If Design projects don't demonstrate the feature, the feature is incomplete
+
+**When implementing features:** If a feature works for one pattern but not others, it's a bug. Use `docs/guides/api-consistency-matrix.md` to verify that APIs match across patterns.
 
 ### Scope Checklist for Todos/Plans
 
