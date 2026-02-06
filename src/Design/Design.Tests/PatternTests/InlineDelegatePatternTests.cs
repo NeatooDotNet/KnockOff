@@ -64,7 +64,7 @@ public class InlineDelegatePatternTests
         ArithmeticOperation operation = stub;
         operation(7, 3);
 
-        var args = stub.Interceptor.LastCallArgs;
+        var args = stub.Interceptor.LastArgs;
 
         Assert.NotNull(args);
         Assert.Equal(7, args.Value.a);
@@ -92,6 +92,6 @@ public class InlineDelegatePatternTests
         LogAction logger = stub;
         logger("Test message");
 
-        Assert.Equal("Test message", stub.Interceptor.LastCallArg);
+        Assert.Equal("Test message", stub.Interceptor.LastArg);
     }
 }

@@ -57,7 +57,7 @@ public class DelegateStubTests
         ArithmeticOperation operation = stub;
         operation(5, 10);
 
-        var args = stub.Interceptor.LastCallArgs;
+        var args = stub.Interceptor.LastArgs;
 
         Assert.NotNull(args);
         Assert.Equal(5, args.Value.a);
@@ -87,7 +87,7 @@ public class DelegateStubTests
         logger("First");
         logger("Second");
 
-        Assert.Equal("Second", stub.Interceptor.LastCallArg);
+        Assert.Equal("Second", stub.Interceptor.LastArg);
     }
 
     [Fact]

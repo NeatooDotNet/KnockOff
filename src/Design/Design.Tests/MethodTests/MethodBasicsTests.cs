@@ -44,7 +44,7 @@ public class MethodBasicsTests
         Design.Domain.Services.ICalculator calc = stub;
         calc.Add(5, 10);
 
-        Assert.Equal((5, 10), stub.Add.LastCallArgs);
+        Assert.Equal((5, 10), stub.Add.LastArgs);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class MethodBasicsTests
         calc.Add(1, 2);
         calc.Add(3, 4);
 
-        Assert.Equal((3, 4), stub.Add.LastCallArgs);
+        Assert.Equal((3, 4), stub.Add.LastArgs);
     }
 
     [Fact]
