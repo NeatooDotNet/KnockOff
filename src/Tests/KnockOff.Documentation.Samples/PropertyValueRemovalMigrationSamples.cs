@@ -44,7 +44,7 @@ public partial class MigrationTimestampServiceStub : IMigrationTimestampService 
 public class OldApiTests
 {
     #region property-value-old-api
-    // OLD API (no longer compiles in 10.24.0+):
+    // OLD API (no longer compiles in 0.24.0+):
     //
     // stub.Name.Value = "Alice";           // Set property return value
     // var name = stub.Name.Value;          // Read configured value
@@ -75,7 +75,7 @@ public class NewApiTests
 public class MigrationValueToOnGetTests
 {
     #region migration-value-to-onget-before
-    // BEFORE (10.23.x and earlier):
+    // BEFORE (0.23.x and earlier):
     //
     // stub.ConnectionString.Value = "Server=localhost";
     // stub.Timeout.Value = 30;
@@ -88,7 +88,7 @@ public class MigrationValueToOnGetTests
         var stub = new MigrationConfigServiceStub();
 
         #region migration-value-to-onget-after
-        // AFTER (10.24.0+):
+        // AFTER (0.24.0+):
         stub.ConnectionString.OnGet("Server=localhost");
         stub.Timeout.OnGet(30);
         stub.IsEnabled.OnGet(true);
@@ -108,7 +108,7 @@ public class MigrationValueToOnGetTests
 public class MigrationValueReadTests
 {
     #region migration-value-read-before
-    // BEFORE (10.23.x and earlier):
+    // BEFORE (0.23.x and earlier):
     //
     // stub.Name.Value = "Expected";
     // Assert.Equal("Expected", stub.Name.Value);  // Reading .Value
@@ -136,7 +136,7 @@ public class MigrationValueReadTests
 public class MigrationDynamicValueTests
 {
     #region migration-dynamic-value-before
-    // BEFORE (10.23.x and earlier):
+    // BEFORE (0.23.x and earlier):
     // Value was captured once at assignment time
     //
     // stub.LastUpdated.Value = DateTime.UtcNow;

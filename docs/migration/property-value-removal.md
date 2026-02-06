@@ -1,11 +1,11 @@
 # Migration Guide: Property .Value Removal
 
-**Version:** 10.24.0 (Breaking Change)
+**Version:** 0.24.0 (Breaking Change)
 **Date:** 2026-01-24
 
 ## Overview
 
-KnockOff 10.24.0 removes the `.Value` property from property interceptors and replaces it with method syntax for consistency with the rest of the API. This is a breaking change that requires code updates.
+KnockOff 0.24.0 removes the `.Value` property from property interceptors and replaces it with method syntax for consistency with the rest of the API. This is a breaking change that requires code updates.
 
 ## What Changed
 
@@ -13,7 +13,7 @@ KnockOff 10.24.0 removes the `.Value` property from property interceptors and re
 
 <!-- snippet: property-value-old-api -->
 ```cs
-// OLD API (no longer compiles in 10.24.0+):
+// OLD API (no longer compiles in 0.24.0+):
 //
 // stub.Name.Value = "Alice";           // Set property return value
 // var name = stub.Name.Value;          // Read configured value
@@ -36,7 +36,7 @@ stub.Name.OnGet("Alice");
 **Before:**
 <!-- snippet: migration-value-to-onget-before -->
 ```cs
-// BEFORE (10.23.x and earlier):
+// BEFORE (0.23.x and earlier):
 //
 // stub.ConnectionString.Value = "Server=localhost";
 // stub.Timeout.Value = 30;
@@ -47,7 +47,7 @@ stub.Name.OnGet("Alice");
 **After:**
 <!-- snippet: migration-value-to-onget-after -->
 ```cs
-// AFTER (10.24.0+):
+// AFTER (0.24.0+):
 stub.ConnectionString.OnGet("Server=localhost");
 stub.Timeout.OnGet(30);
 stub.IsEnabled.OnGet(true);
@@ -61,7 +61,7 @@ If you were reading `.Value` to verify what was configured, that's no longer nee
 **Before:**
 <!-- snippet: migration-value-read-before -->
 ```cs
-// BEFORE (10.23.x and earlier):
+// BEFORE (0.23.x and earlier):
 //
 // stub.Name.Value = "Expected";
 // Assert.Equal("Expected", stub.Name.Value);  // Reading .Value
@@ -83,7 +83,7 @@ If you were using `.Value` with the expectation it would be read each time, use 
 **Before (if expecting dynamic behavior):**
 <!-- snippet: migration-dynamic-value-before -->
 ```cs
-// BEFORE (10.23.x and earlier):
+// BEFORE (0.23.x and earlier):
 // Value was captured once at assignment time
 //
 // stub.LastUpdated.Value = DateTime.UtcNow;

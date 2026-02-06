@@ -61,7 +61,7 @@ Remove `WasCalled` from all locations and add `Verify()`/`Verify(Times)` methods
 - [x] Update API examples to use `Verify()` instead of `WasCalled`
 
 ### Phase 6: Version & Release
-- [x] Bump major version in `Directory.Build.props` (10.24.0 -> 11.0.0)
+- [x] Bump major version in `Directory.Build.props` (0.24.0 -> 11.0.0)
 - [x] Create release notes
 
 ### Phase 9: Test Migration
@@ -108,7 +108,7 @@ Remove `WasCalled` from all locations and add `Verify()`/`Verify(Times)` methods
 
 **Summary:** Successfully removed `WasCalled` property from all interceptors and tracking objects, and added `Verify()` / `Verify(Times)` methods directly on method interceptors for API consistency with property interceptors.
 
-**Breaking Change:** This is a major version bump (10.24.0 -> 11.0.0). All existing code using `WasCalled` will fail to compile and must be migrated.
+**Breaking Change:** This is a major version bump (0.24.0 -> 11.0.0). All existing code using `WasCalled` will fail to compile and must be migrated.
 
 **Migration Path:**
 - `stub.Method.WasCalled` -> `stub.Method.Verify()` (throws if not called)

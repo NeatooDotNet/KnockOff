@@ -1,7 +1,7 @@
 # Bug: Generic Method Constraints Not Preserved (FIXED)
 
 **Status:** Completed
-**Fixed in:** This session (v10.11.2)
+**Fixed in:** This session (v0.11.2)
 
 ## Problem
 

@@ -644,7 +644,7 @@ Interceptors are **not thread-safe**. The `CallCount`, `GetCount`, `SetCount` pr
 
 ## Status
 
-**Status**: Implemented (v10.7.0)
+**Status**: Implemented (v0.7.0)
 
 ## Results/Conclusions
 

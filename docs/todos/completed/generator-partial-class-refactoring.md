@@ -76,7 +76,7 @@ Created `SymbolHelpers.cs` with shared utilities:
 Split by responsibility:
 - **Transform.cs**: All `Transform*` methods that extract data from Roslyn symbols
 - **Helpers.cs**: Formatting utilities, parameter handling, method grouping
-- **GenerateFlat.cs**: Flat API generation (v10.9+ interceptor pattern)
+- **GenerateFlat.cs**: Flat API generation (v0.9+ interceptor pattern)
 - **GenerateInline.cs**: Inline stubs (`[KnockOff<T>]` pattern)
 - **GenerateClass.cs**: Class stub generation via inheritance
 

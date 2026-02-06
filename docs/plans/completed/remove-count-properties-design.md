@@ -15,7 +15,7 @@ Design for removing all public count properties from KnockOff interceptors, maki
 
 ## Approach
 
-Follow the same pattern used for removing `CallCount` and `WasCalled` from method interceptors (v10.24.0 and v10.25.0):
+Follow the same pattern used for removing `CallCount` and `WasCalled` from method interceptors (v0.24.0 and v0.25.0):
 1. Change property visibility from `public` to `internal`
 2. Keep the properties for internal use by Verify methods
 3. Update all tests and documentation to use Verify API
@@ -207,7 +207,7 @@ Properties NOT affected (already internal or will remain public):
 |-------------|----------|--------|
 | Generic Method Handler | `TotalCallCount` | Already `internal` |
 | Generic Method Handler | `Of<T>().CallCount` | Already `internal` |
-| Method Interceptor | `CallCount` | Already `internal` (v10.24.0) |
+| Method Interceptor | `CallCount` | Already `internal` (v0.24.0) |
 | Delegate Stub Interceptor | `CallCount` | Already `internal` |
 | All | `Last*` properties | Remain `public` |
 | Event | `HasSubscribers` | Remains `public` |
@@ -216,8 +216,8 @@ Properties NOT affected (already internal or will remain public):
 ### Pattern Consistency
 
 Follows the precedent established in:
-- **v10.24.0**: Removed `CallCount` from method interceptors
-- **v10.25.0**: Removed `WasCalled` from method interceptors
+- **v0.24.0**: Removed `CallCount` from method interceptors
+- **v0.25.0**: Removed `WasCalled` from method interceptors
 
 All count-related properties will use the same pattern: internal backing with public `Verify()` methods.
 
@@ -318,8 +318,8 @@ Total: ~13 direct usages across test and sample files.
 - [x] PackageTest/Program.cs: Update 2 count usages to use Verify API
 
 **Phase 6: Documentation & Release**
-- [x] Release notes: Created v10.26.0.md with migration guide
-- [x] Directory.Build.props: Bumped version to 10.26.0
+- [x] Release notes: Created v0.26.0.md with migration guide
+- [x] Directory.Build.props: Bumped version to 0.26.0
 - [x] Release notes index: Updated with new version
 
 **Out of Scope:**
@@ -360,9 +360,9 @@ Total: ~13 direct usages across test and sample files.
 - Updated PackageTest/Program.cs with VerifyGet/VerifySet calls
 
 **Phase 6: Documentation & Release** - COMPLETE
-- Created docs/release-notes/v10.26.0.md
+- Created docs/release-notes/v0.26.0.md
 - Updated docs/release-notes/index.md
-- Updated Directory.Build.props version to 10.26.0
+- Updated Directory.Build.props version to 0.26.0
 
 ---
 
@@ -373,7 +373,7 @@ Total: ~13 direct usages across test and sample files.
 Build succeeded.
     0 Warning(s)
     0 Error(s)
-Successfully created package 'KnockOff.10.26.0.nupkg'
+Successfully created package 'KnockOff.0.26.0.nupkg'
 ```
 
 **Test Results (net10.0):**

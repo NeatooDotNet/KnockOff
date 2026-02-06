@@ -404,7 +404,7 @@ private static string NormalizeSyntaxType(string type)
 
 Since KnockOff's test project cannot contain code that triggers KO0200 (it would fail to build), we need a separate verification approach:
 
-**Option A: Manual Verification (Documented) - RECOMMENDED for v10.9**
+**Option A: Manual Verification (Documented) - RECOMMENDED for v0.9**
 
 Document that KO0200 is verified manually:
 1. Create a temporary test file with the offending code

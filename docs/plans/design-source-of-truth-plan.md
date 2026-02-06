@@ -352,14 +352,14 @@ When the API changes:
 1. **Update Design.* projects first** - This is the source of truth
 2. **Add "was/now" comments** for changed behavior:
    ```csharp
-   // CHANGED in v10.x: Previously sequences repeated last value.
+   // CHANGED in v0.x: Previously sequences repeated last value.
    // Now sequences exhaust and return default(T) in non-strict mode.
    //
    // OLD (v9.x):
    // stub.Method.OnCall(() => 1).ThenCall(() => 2);
    // // Third call returned 2 (repeated)
    //
-   // NEW (v10.x+):
+   // NEW (v0.x+):
    // stub.Method.OnCall(() => 1).ThenCall(() => 2);
    // // Third call returns default(int) = 0
    ```

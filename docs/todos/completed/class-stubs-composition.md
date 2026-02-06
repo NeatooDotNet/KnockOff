@@ -173,7 +173,7 @@ EmailService service = emailStub.Object;  // .Object to get the class instance
   - Class stub examples use new API
   - Document `.Object` property usage
 
-- [x] **3.3** Update `docs/release-notes/v10.8.0.md`
+- [x] **3.3** Update `docs/release-notes/v0.8.0.md`
   - Class stub section reflects composition pattern
   - Note the API change from `.Interceptor.Member` to `.Member`
 
@@ -182,7 +182,7 @@ EmailService service = emailStub.Object;  // .Object to get the class instance
   - Create new design doc or update inline
 
 - [x] **3.5** Create migration note
-  - Created `docs/release-notes/v10.9.0.md`
+  - Created `docs/release-notes/v0.9.0.md`
   - Breaking change: `stub.Interceptor.Member` → `stub.Member`
   - Breaking change: direct assignment `TargetClass x = stub` now requires `.Object`
 
@@ -196,7 +196,7 @@ EmailService service = emailStub.Object;  // .Object to get the class instance
   - Add class stub interceptor patterns (optional - interceptor API is same as interface)
 
 - [x] **4.3** Update `~/.claude/skills/knockoff/migrations.md`
-  - Add v10.9.0 migration for class stub API change
+  - Add v0.9.0 migration for class stub API change
 
 ## Breaking Changes
 
@@ -293,7 +293,7 @@ public class RepositoryStub
 ### Documentation
 - `README.md`
 - `docs/guides/inline-stubs.md`
-- `docs/release-notes/v10.8.0.md` (or create v10.9.0)
+- `docs/release-notes/v0.8.0.md` (or create v0.9.0)
 - `docs/todos/completed/class-stubs-design.md`
 
 ### Skill Files
@@ -303,7 +303,7 @@ public class RepositoryStub
 
 ## Version Considerations
 
-This is a breaking change to the class stub API. Decision: **v10.9.0** since class stubs are new in v10.8.0 and adoption is minimal.
+This is a breaking change to the class stub API. Decision: **v0.9.0** since class stubs are new in v0.8.0 and adoption is minimal.
 
 ## Success Criteria
 
