@@ -4,6 +4,87 @@ Moq and NSubstitute are *nearly* type-safe — lambda expressions and generic co
 
 ---
 
+## The Partial Setup Trap
+
+The most common trap: you set up a method but forget `.Returns()`. With Moq and NSubstitute, this compiles without complaint. With KnockOff, the mistake is impossible — there's no two-step process where you can complete step 1 and forget step 2.
+
+**Moq Strict mode — throws at runtime as if the method was never set up:**
+
+<!-- snippet: partial-setup-moq-strict -->
+```cs
+// Moq Strict — Setup without .Returns() throws at runtime
+var mock = new Mock<IPartialSetupCalc>(MockBehavior.Strict);
+
+// You set the method up...
+mock.Setup(x => x.Calculate(It.IsAny<int>(), It.IsAny<int>()));
+// ...but forgot .Returns()
+
+// MockException at RUNTIME — Moq acts as if the method was never set up
+IPartialSetupCalc calc = mock.Object;
+Assert.Throws<MockException>(() => calc.Calculate(1, 2));
+```
+<!-- endSnippet -->
+
+**Moq Loose mode — silently returns `default(T)`:**
+
+<!-- snippet: partial-setup-moq-loose -->
+```cs
+// Moq Loose — Setup without .Returns() silently returns default
+var mock = new Mock<IPartialSetupCalc>();
+
+mock.Setup(x => x.Calculate(It.IsAny<int>(), It.IsAny<int>()));
+// No .Returns() — no error, no warning
+
+IPartialSetupCalc calc = mock.Object;
+var result = calc.Calculate(1, 2);
+Assert.Equal(0, result); // silently returns 0 instead of a meaningful value
+```
+<!-- endSnippet -->
+
+**NSubstitute — same silent default, no strict mode to catch it:**
+
+<!-- snippet: partial-setup-nsub-silent -->
+```cs
+// NSubstitute — no strict mode, silently returns default
+var calc = Substitute.For<IPartialSetupCalc>();
+
+// No .Returns() configured — returns default(int) = 0
+// No error, no warning — your test may pass for the wrong reason
+var result = calc.Calculate(1, 2);
+Assert.Equal(0, result);
+```
+<!-- endSnippet -->
+
+**KnockOff — `OnCall` and `Returns` are each a single, complete call. There is no second step to forget:**
+
+<!-- snippet: partial-setup-knockoff-oncall -->
+```cs
+// KnockOff — OnCall IS the setup AND the return value
+var stub = new PartialSetupCalcStub();
+
+// One call does both: configures the method AND defines the return value
+// There is no second step to forget
+stub.Calculate.OnCall((a, b) => a + b);
+
+IPartialSetupCalc calc = stub;
+Assert.Equal(3, calc.Calculate(1, 2));
+```
+<!-- endSnippet -->
+
+<!-- snippet: partial-setup-knockoff-returns -->
+```cs
+// KnockOff — Returns is also a single complete call
+var stub = new PartialSetupCalcStub();
+
+stub.Calculate.Returns(42);
+
+IPartialSetupCalc calc = stub;
+Assert.Equal(42, calc.Calculate(1, 2));
+```
+<!-- endSnippet -->
+
+---
+
 ## The Gap: Callback Type Parameters (Moq)
 
 Moq's `.Returns<T1, T2>()` and `.Callback<T1, T2>()` accept manually specified type parameters that are not checked against the method signature at compile time. If you get them wrong, the code compiles but throws at runtime.
@@ -135,6 +216,7 @@ If you try to use the wrong types in a KnockOff lambda, you get a compile error 
 
 | | Moq | NSubstitute | KnockOff |
 |---|---|---|---|
+| **Partial setup (forgot `.Returns()`)** | Strict: runtime error. Loose: silent `default(T)` | Silent `default(T)` | Impossible — `OnCall`/`Returns` are each complete in one call |
 | **Lambda setup** | Typed (compile-time safe) | Typed (compile-time safe) | Typed (compile-time safe) |
 | **Callback/Returns type params** | Manual `<T1, T2>` — unchecked | N/A | Generated — compile-time safe |
 | **Argument access in callbacks** | Via `.Returns<T1,T2>((a,b) => ...)` — manual types | Via `callInfo[i]` (untyped) or `.Arg<T>()` (ambiguous) | Via lambda params `(a, b) => ...` — typed and named |
