@@ -151,7 +151,7 @@ myRepoKO.Verify();
 
 **Partial real implementations** — Use [Source Delegation](docs/guides/source-delegation.md) to delegate to a real implementation and override only the methods you're testing. Perfect for integration tests and decorator patterns.
 
-**Large interfaces** — Stub only the methods you care about. Everything else auto-implements with defaults. No more setting up 20 `It.IsAny<>()` calls for methods your test doesn't touch.
+**Large interfaces** — Stub only the methods you care about. Everything else auto-implements with defaults or can be configured with a single `Returns` call.
 
 **Stubbing concrete classes** — Override virtual methods on non-sealed classes. KnockOff generates the stub with `.Object` to access the typed instance.
 
@@ -159,7 +159,19 @@ myRepoKO.Verify();
 
 ## Unique Feature: Source Delegation
 
-Delegate to a real implementation, override only what you need:
+`stub.Source(realImplementation)` sets every method on the stub to forward to a real implementation. Unconfigured methods call through to the real object. Configured methods (OnCall, Returns, When) still take priority.
+
+**Without Source**, you'd manually wire up every method:
+
+```cs
+// Without Source — manual forwarding for every method
+stub.GetUser.OnCall((id) => realRepo.GetUser(id));
+stub.GetUserAsync.OnCall((id) => realRepo.GetUserAsync(id));
+stub.Save.OnCall((user) => realRepo.Save(user));
+// ... repeat for every method on the interface
+```
+
+**With Source**, one line does it all:
 
 <!-- snippet: readme-source-delegation -->
 ```cs
@@ -174,7 +186,7 @@ var user = repo.GetUser(1);       // Returns test data
 ```
 <!-- endSnippet -->
 
-This isn't available in traditional mocking frameworks. Perfect for integration tests, decorator patterns, and partial mocking without complexity.
+The larger the interface, the more Source saves you. Not available in Moq or NSubstitute. See the [full Source Delegation guide](docs/guides/source-delegation.md) for priority order, clearing source, and complete examples.
 
 ---
 
