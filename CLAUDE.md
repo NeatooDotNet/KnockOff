@@ -83,8 +83,8 @@ When reviewing completed work, follow this order. **Start with production code a
 - `src/` - Source code
 - `src/Design/` - **API design source of truth** (see below)
 - `docs/` - Documentation (markdown)
-- `docs/todos/` - Project todos (use `/project-todos` skill)
-- `docs/plans/` - Design documents (use `/project-todos` skill)
+- `docs/todos/` - Project todos
+- `docs/plans/` - Design documents
 - `docs/release-notes/` - Release notes
 - `.claude/agents/` - Agent-specific guidance files
 
@@ -95,29 +95,6 @@ When reviewing completed work, follow this order. **Start with production code a
 ## KnockOff Skill (`skills/knockoff/`)
 
 **The skill must remain stand-alone.** It is distributed to other projects where Design projects don't exist. When updating the skill, incorporate insights from Design projects but never add dependencies on Design files.
-
-## Plan Mode and Project Todos
-
-**When plan mode completes:**
-1. Plan mode creates the design document through brainstorming conversation
-2. Plan mode then uses project-todos skill to:
-   - Create a todo in docs/todos/ capturing the user request
-   - Create a plan in docs/plans/ with the design content
-   - Link them together
-   - Set todo status: "In Progress"
-   - Set plan status: "Draft (Architect)"
-
-**After plan mode creates todo+plan:**
-- Automatically invoke knockoff-architect agent to enhance the plan
-- Architect reviews, adds KnockOff-specific architecture, completes verification checklist
-- Architect hands off to knockoff-developer for review
-- Developer reviews and either raises concerns or creates implementation contract
-- After user approval, developer implements with milestone verification
-
-**The automatic pipeline:**
-```
-Plan Mode → knockoff-architect → knockoff-developer → Implementation
-```
 
 ## Code Review Checklist
 

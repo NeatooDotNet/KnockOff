@@ -9,6 +9,10 @@ paths:
 
 These files are work-in-progress artifacts, not codebase documentation.
 
+## Skill Requirement
+
+**When working with files in `docs/todos/` or `docs/plans/`, always load the `/project-todos` skill first.**
+
 ## When to Access
 
 - Actively working on a specific todo or plan
