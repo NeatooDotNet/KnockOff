@@ -7,7 +7,7 @@
 // - OnCall(Func<..., Task<T>>) — full delegate
 //
 // Pattern 1 is covered in MethodBasicsTests (IDataService).
-// Pattern 7 (delegate) is intentionally different — no auto-wrapping.
+// Pattern 7 (delegate) supports full auto-wrapping via MethodInterceptorRenderer reuse.
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Abstractions;
@@ -246,14 +246,16 @@ public class AsyncConsistencyTests
     }
 
     // =========================================================================
-    // Pattern 7: Inline Delegate (intentionally different — no auto-wrapping)
+    // Pattern 7: Inline Delegate — async auto-wrapping (same as all patterns)
+    // After MethodInterceptorRenderer reuse, delegates support auto-wrapping.
     // =========================================================================
 
     [Fact]
     public async Task Pattern7_Returns()
     {
         var stub = new AsyncClosedGenericDemo.Stubs.AsyncOperation();
-        stub.Interceptor.Returns(Task.FromResult(42));
+        // Returns takes the inner type (int) and auto-wraps in Task.FromResult
+        stub.Interceptor.Returns(42);
 
         AsyncOperation op = stub;
         var result = await op(10);

@@ -1397,10 +1397,10 @@ public class WhenChainTests
 		var stub = new WhenChainDelegateStubs.Stubs.VoidProcessor();
 		VoidProcessor processor = stub;
 
-		stub.Interceptor.When(1, 2);
+		var chain = stub.Interceptor.When(1, 2);
 		processor(1, 2);
 
-		stub.Interceptor.Verify(Times.Once);
+		chain.Verify(Times.Once);
 	}
 
 	[Fact]

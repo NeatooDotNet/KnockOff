@@ -349,9 +349,9 @@ As you work, collect evidence:
 - Code snippets showing feature works
 - Generated code samples
 
-#### Step 4: Completion
+#### Step 4: Hand Off to Verification
 
-When all contract items are checked:
+When all contract items are checked, write completion evidence and **STOP**. Do NOT mark the todo or plan as Complete — a different agent (the architect) must independently verify the work first.
 
 ```markdown
 ## Completion Evidence
@@ -362,22 +362,21 @@ When all contract items are checked:
 
 [Paste test output or summary]
 
-### Generated Code Sample
-
-```csharp
-// Example showing the feature works
-```
-
 ### All Contract Items Verified
 
 [Confirm each item is checked]
 
 ### Status Update
 
-- Plan status: Complete
-- Todo status: Complete
-- Files moved to completed/
+- Plan status: Awaiting Verification
 ```
+
+**Critical:** Do NOT:
+- Set plan or todo status to "Complete"
+- Move files to `completed/` directories
+- Mark todo tasks as done beyond what you actually implemented
+
+Only the architect verification (Phase 6) may mark work as Complete after independent verification.
 
 ---
 

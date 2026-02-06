@@ -491,8 +491,10 @@ ruleStub.Interceptor.Verify(Times.Once);
 
 - **Implicit conversion**: Stub converts to delegate type automatically
 - **Invocation tracking**: Use `Verify()`, `LastCallArg`, `LastCallArgs`
-- **Behavior configuration**: Use `OnCall` to define custom logic
-- **Verification**: Use `Verify()` and `Times` constraints
+- **Behavior configuration**: Use `OnCall`, `Returns`, When chains
+- **Verification**: Use `Verify()`, `Times` constraints, and `.Verifiable()` chaining
+- **Sequences**: `Returns(first, params rest)`, `ThenCall`, `ThenReturns`
+- **Async auto-wrapping**: `Returns(42)` for `Task<int>` delegates (auto-wraps in Task.FromResult)
 
 ### Trade-offs
 

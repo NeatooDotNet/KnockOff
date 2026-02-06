@@ -10,7 +10,7 @@
 // 3. stub.FetchAsync.OnCall((id) => Task.FromResult("value")) — full delegate
 //
 // Pattern 1 is already covered in BasicMethods.cs (IDataService).
-// Pattern 7 (delegate) is intentionally different — no auto-wrapping.
+// Pattern 7 (delegate) now supports full auto-wrapping via MethodInterceptorRenderer reuse.
 //
 // NOTE: Patterns 6/7 and 8/9 are in separate classes because the generator
 // has separate pipelines for [KnockOff<T>] (closed generic) and
@@ -91,35 +91,70 @@ public partial class AsyncClosedGenericDemo
     }
 
     // =========================================================================
-    // Pattern 7: Inline Delegate — async delegate (intentionally different)
+    // Pattern 7: Inline Delegate — async delegate with auto-wrapping
     // =========================================================================
-    // DESIGN DECISION: Async delegates do NOT auto-wrap. The delegate's return
-    // type IS the full return type (Task<int>), so:
-    // - Returns(Task.FromResult(42))  — takes the FULL return type
-    // - OnCall(Func<int, Task<int>>)  — takes the FULL delegate type
-    //
-    // This is intentional: delegates don't have a "method signature" to derive
-    // the unwrapped type from. The delegate type IS the contract.
+    // DESIGN DECISION: After MethodInterceptorRenderer reuse, async delegates
+    // support the same three-tier API as all other patterns:
+    // - Returns(42)                   — auto-wraps in Task.FromResult (Tier 1)
+    // - OnCall((x) => x * 2)          — simplified callback, auto-wrapped (Tier 2)
+    // - OnCall((x) => Task.FromResult(x * 2)) — full delegate (Tier 3)
     // =========================================================================
 
-    public async Task Pattern7_Returns()
+    public async Task Pattern7_Returns_AutoWrapped()
     {
         var stub = new Stubs.AsyncOperation();
-        stub.Interceptor.Returns(Task.FromResult(42));
+        // Tier 1: auto-wraps int -> Task<int> via Task.FromResult
+        stub.Interceptor.Returns(42);
 
         AsyncOperation op = stub;
         var result = await op(10);
         // result == 42
     }
 
-    public async Task Pattern7_OnCall()
+    public async Task Pattern7_OnCallSimplified()
     {
         var stub = new Stubs.AsyncOperation();
-        stub.Interceptor.OnCall((x) => Task.FromResult(x * 2));
+        // Tier 2: simplified callback (int -> int), auto-wrapped in Task.FromResult
+        stub.Interceptor.OnCall((int x) => x * 2);
 
         AsyncOperation op = stub;
         var result = await op(21);
         // result == 42
+    }
+
+    public async Task Pattern7_Returns_DirectValue()
+    {
+        var stub = new Stubs.AsyncOperation();
+        // Returns takes the inner type (int) and auto-wraps in Task.FromResult
+        // Same as Pattern7_Returns_AutoWrapped — confirming Returns(int) works
+        stub.Interceptor.Returns(42);
+
+        AsyncOperation op = stub;
+        var result = await op(10);
+        // result == 42
+    }
+
+    public async Task Pattern7_OnCall_FullDelegate()
+    {
+        var stub = new Stubs.AsyncOperation();
+        // Tier 3: full delegate still works
+        stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
+
+        AsyncOperation op = stub;
+        var result = await op(21);
+        // result == 42
+    }
+
+    public async Task Pattern7_Sequence()
+    {
+        var stub = new Stubs.AsyncOperation();
+        // Sequence support: first value returned once, then second repeats
+        stub.Interceptor.Returns(10, 20);
+
+        AsyncOperation op = stub;
+        var r1 = await op(0); // 10
+        var r2 = await op(0); // 20
+        var r3 = await op(0); // 20 (repeats last)
     }
 }
 

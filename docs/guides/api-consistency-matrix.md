@@ -447,21 +447,24 @@ stub.SaveAsync.OnCall((data) => savedData = data);
 | Void async `OnCall(Action<...>)` | ✓ |
 | `ValueTask<T>` auto-wrap | ✓ |
 
-### Pattern 7 (Delegate) — Intentionally Different
+### Pattern 7 (Delegate) — Full Parity
 
-Delegate stubs (Pattern 7) do **not** auto-wrap async return types. The delegate's return type IS the full contract:
+After MethodInterceptorRenderer reuse, delegate stubs (Pattern 7) support the same three-tier async API as all other patterns:
 
 ```csharp
 // Given: delegate Task<int> AsyncOperation(int x)
 
-// Returns takes the FULL return type (no auto-wrapping)
-stub.Interceptor.Returns(Task.FromResult(42));
+// Tier 1: Returns takes the inner type — auto-wraps in Task.FromResult
+stub.Interceptor.Returns(42);
 
-// OnCall takes the FULL delegate type (no simplified callback)
-stub.Interceptor.OnCall((x) => Task.FromResult(x * 2));
+// Tier 2: Simplified callback — returns int, auto-wrapped
+stub.Interceptor.OnCall((int x) => x * 2);
+
+// Tier 3: Full delegate — returns Task<int> directly
+stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
 ```
 
-**Why:** Interface/class methods have a method signature to derive the unwrapped type from (`Task<string>` → `string`). Delegates don't — the delegate type IS the contract. There's no "inner type" to unwrap to.
+Delegates also support sequences (`Returns(first, params rest)`, `ThenCall`, `ThenReturns`) and fluent builder chaining (`OnCall(...).Verifiable()`).
 
 **See also:** [Async Patterns Guide](async-patterns.md) for detailed examples including delays and failure simulation.
 
@@ -482,7 +485,7 @@ stub.Interceptor.OnCall((x) => Task.FromResult(x * 2));
 | Reset | ✓ **100% consistent** |
 | Target Access | ✓ **Logical split** (Interface=direct, Class=`.Object`) |
 | User Methods | ✓ **Logical split** (Standalone=yes, Inline=no) |
-| Async Auto-Wrapping | ✓ **100% consistent** (Pattern 7 intentionally different) |
+| Async Auto-Wrapping | ✓ **100% consistent** (all 9 patterns) |
 
 ---
 

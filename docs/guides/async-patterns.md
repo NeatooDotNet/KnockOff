@@ -19,7 +19,7 @@ For an async method like `Task<string> GetDataAsync(int id)`:
 | 2 | `OnCall((id) => value)` | `Func<int, string>` | Yes — `Task.FromResult(value)` |
 | 3 | `OnCall((id) => Task.FromResult(value))` | `Func<int, Task<string>>` | No — you provide the Task |
 
-All three tiers work identically across all 8 interface/class stub patterns (1–6, 8–9).
+All three tiers work identically across all 9 stub patterns (1–9), including delegate stubs.
 
 ---
 
@@ -104,21 +104,22 @@ stub.GetCachedAsync.OnCall((id) => new ValueTask<User?>(new User { Id = id }));
 
 ---
 
-## Delegate Stubs — No Auto-Wrapping (Pattern 7)
+## Delegate Stubs — Full Auto-Wrapping (Pattern 7)
 
-Delegate stubs (Pattern 7) are intentionally different. The delegate's return type IS the full contract — there is no "unwrapped type" to derive:
+Delegate stubs (Pattern 7) support the same three-tier async API as all other patterns. After MethodInterceptorRenderer reuse, async delegates like `delegate Task<int> AsyncOperation(int x)` get auto-wrapping:
 
 ```csharp
 // Given: delegate Task<int> AsyncOperation(int x)
 
-// Returns takes the FULL return type
-stub.Interceptor.Returns(Task.FromResult(42));
+// Tier 1: Returns takes the inner type — auto-wraps in Task.FromResult
+stub.Interceptor.Returns(42);
 
-// OnCall takes the FULL delegate signature
-stub.Interceptor.OnCall((x) => Task.FromResult(x * 2));
+// Tier 2: Simplified callback — returns int, auto-wrapped
+stub.Interceptor.OnCall((int x) => x * 2);
+
+// Tier 3: Full delegate — returns Task<int> directly
+stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
 ```
-
-**Why no auto-wrapping?** Interface/class methods have a method signature that distinguishes `Task<string>` (async wrapper) from `string` (return type). Delegates don't — `Task<int>` IS the return type. There's no inner type to unwrap to.
 
 **See also:** [Delegate Stubs Guide](delegates.md)
 
@@ -187,7 +188,7 @@ When throwing directly in a simplified callback (Tier 2), you may need to specif
 | Value depends on args | Tier 2: Simplified callback | `stub.Method.OnCall((id) => ...)` |
 | Need async/await in callback | Tier 3: Full delegate | `stub.Method.OnCall(async (id) => ...)` |
 | Simulating failures | Tier 3: Full delegate | `stub.Method.OnCall((id) => Task.FromException<T>(...))` |
-| Delegate stubs | Full return type only | `stub.Interceptor.Returns(Task.FromResult(...))` |
+| Delegate stubs | Same 3 tiers | `stub.Interceptor.Returns(42)` (auto-wraps) |
 
 ---
 
@@ -198,8 +199,7 @@ When throwing directly in a simplified callback (Tier 2), you may need to specif
 - **Tier 3 gives full control** — use for async lambdas, delays, and faulted tasks
 - **Void async methods** use `OnCall(Action<...>)` — `Task.CompletedTask` is returned automatically
 - **ValueTask<T>** follows the same three tiers with `ValueTask` wrapping
-- **Pattern 7 (delegates)** — no auto-wrapping; the delegate's return type is the full contract
-- **All 8 interface/class patterns** support identical async APIs
+- **All 9 patterns** (including Pattern 7 delegates) support identical async APIs
 - **All interceptor features** (verification, argument capture, sequences, When chains) work with async methods
 
 ---

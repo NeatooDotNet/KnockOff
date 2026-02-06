@@ -149,12 +149,16 @@ stub.Interceptor.Verify(Times.AtMost(5));
 
 ### Verifiable Pattern
 
-<!-- snippet: delegate-stub-verifiable -->
-```cs
-// Delegate interceptors use Verify() directly (no Verifiable() chaining)
-stub.Interceptor.Verify();
+Delegate stubs support `.Verifiable()` chaining on `OnCall()` and `Returns()`, just like interface and class stubs:
+
+```csharp
+// Mark for verification with Verifiable() chaining
+stub.Interceptor.OnCall((x) => x * 2).Verifiable();
+stub.Interceptor.Returns(42).Verifiable(Times.Once);
+
+// Verify all marked interceptors via stub
+// stub.Verify(); // if using inline pattern
 ```
-<!-- endSnippet -->
 
 ## Tracking Invocations
 
@@ -245,6 +249,44 @@ Assert.Equal("TEST", format("test")); // OnCall still works
 ```
 <!-- endSnippet -->
 
+## Sequences
+
+Delegate stubs support the same sequence API as interface and class stubs:
+
+```csharp
+// Return different values on successive calls
+stub.Interceptor.Returns(10, 20, 30);
+// Call 1: 10, Call 2: 20, Call 3+: 30 (repeats last)
+
+// Callback sequences
+stub.Interceptor
+    .OnCall((x) => x * 1)
+    .ThenCall((x) => x * 2)
+    .ThenCall((x) => x * 3);
+
+// ThenReturns for fixed values after callback
+stub.Interceptor
+    .OnCall((x) => x)
+    .ThenReturns(99);
+```
+
+## Async Delegate Auto-Wrapping
+
+Async delegates (e.g., `delegate Task<int> AsyncOp(int x)`) support the same three-tier auto-wrapping as interface and class stubs:
+
+```csharp
+// Tier 1: Returns takes inner type — auto-wraps in Task.FromResult
+stub.Interceptor.Returns(42);
+
+// Tier 2: Simplified callback — returns int, auto-wrapped
+stub.Interceptor.OnCall((int x) => x * 2);
+
+// Tier 3: Full delegate — returns Task<int> directly
+stub.Interceptor.OnCall((int x) => Task.FromResult(x * 2));
+```
+
+See [Async Patterns](async-patterns.md) for more details.
+
 ## Implicit Conversion
 
 Delegate stubs implicitly convert to the delegate type, allowing seamless substitution.
@@ -325,4 +367,4 @@ var validator = new UsernameValidator(uniqueStub, formatStub);
 
 ---
 
-**UPDATED:** 2026-01-25
+**UPDATED:** 2026-02-05
