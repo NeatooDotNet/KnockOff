@@ -2,7 +2,7 @@ namespace KnockOff;
 
 /// <summary>
 /// Represents a sequence of property getter callbacks.
-/// Returned by OnGetSequence() to enable ThenGet chaining.
+/// Returned by Get() and ThenGet() chaining.
 /// Each callback in the sequence is invoked exactly once.
 /// </summary>
 public interface IPropertyGetSequence<TValue>
@@ -43,7 +43,7 @@ public interface IPropertyGetSequence<TValue>
 
 /// <summary>
 /// Represents a sequence of property setter callbacks.
-/// Returned by OnSetSequence() to enable ThenSet chaining.
+/// Returned by Set() and ThenSet() chaining.
 /// Each callback in the sequence is invoked exactly once.
 /// </summary>
 public interface IPropertySetSequence<TValue>

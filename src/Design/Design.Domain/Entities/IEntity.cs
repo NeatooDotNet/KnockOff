@@ -11,26 +11,26 @@ namespace Design.Domain.Entities;
 /// - Get-only properties
 /// - Set-only properties (rare but valid)
 /// - Get/set properties
-/// - OnGet, OnSet, Value backing store
+/// - Get, Set, Value backing store
 /// - Property verification (VerifyGet, VerifySet)
 /// </summary>
 public interface IEntity
 {
     /// <summary>
     /// Get-only property for entity ID.
-    /// Used to demonstrate: OnGet(value), OnGet(callback)
+    /// Used to demonstrate: Get(value), Get(callback)
     /// </summary>
     int Id { get; }
 
     /// <summary>
     /// Get-only property for entity name.
-    /// Used to demonstrate: OnGet().ThenGet() sequences
+    /// Used to demonstrate: Get().ThenGet() sequences
     /// </summary>
     string Name { get; }
 
     /// <summary>
     /// Get/set property for description.
-    /// Used to demonstrate: Value backing store, OnSet(callback)
+    /// Used to demonstrate: Value backing store, Set(callback)
     /// </summary>
     string Description { get; set; }
 
@@ -42,7 +42,7 @@ public interface IEntity
 
     /// <summary>
     /// Get-only property indicating if entity is valid.
-    /// Used to demonstrate: dynamic OnGet callback based on other state
+    /// Used to demonstrate: dynamic Get callback based on other state
     /// </summary>
     bool IsValid { get; }
 }

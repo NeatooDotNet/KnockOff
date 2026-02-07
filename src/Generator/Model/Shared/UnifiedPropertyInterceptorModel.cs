@@ -7,7 +7,7 @@ namespace KnockOff.Model.Shared;
 /// Unified model for property interceptor generation.
 /// Used by both FlatRenderer and InlineRenderer via PropertyInterceptorRenderer.
 /// Contains all information needed to render a property interceptor class
-/// with OnGet()/OnSet() methods, tracking, sequences, and verification.
+/// with Get()/Set() methods, tracking, sequences, and verification.
 /// </summary>
 internal sealed record UnifiedPropertyInterceptorModel(
     // Identity

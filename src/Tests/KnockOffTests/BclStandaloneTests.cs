@@ -525,7 +525,7 @@ public class BclStandaloneTests
     public void CollectionStringKnockOff_Count_TracksInvocation()
     {
         var knockOff = new CollectionStringKnockOff();
-        knockOff.Count.OnGet(() => 42);
+        knockOff.Count.Get(() => 42);
         ICollection<string> collection = knockOff;
 
         var count = collection.Count;
@@ -559,7 +559,7 @@ public class BclStandaloneTests
     public void ListStringKnockOff_Indexer_TracksInvocation()
     {
         var knockOff = new ListStringKnockOff();
-        knockOff.Indexer.OnGet((index) => $"item_{index}");
+        knockOff.Indexer.Get((index) => $"item_{index}");
         IList<string> list = knockOff;
 
         var result = list[5];
@@ -585,7 +585,7 @@ public class BclStandaloneTests
     public void ListStringKnockOff_InheritedCount_Works()
     {
         var knockOff = new ListStringKnockOff();
-        knockOff.Count.OnGet(() => 10);
+        knockOff.Count.Get(() => 10);
         ICollection<string> collection = knockOff;
 
         var count = collection.Count;
@@ -616,7 +616,7 @@ public class BclStandaloneTests
     public void DictionaryStringIntKnockOff_Indexer_TracksInvocation()
     {
         var knockOff = new DictionaryStringIntKnockOff();
-        knockOff.Indexer.OnGet((key) => key.Length);
+        knockOff.Indexer.Get((key) => key.Length);
         IDictionary<string, int> dict = knockOff;
 
         var result = dict["hello"];
@@ -629,7 +629,7 @@ public class BclStandaloneTests
     {
         var knockOff = new DictionaryStringIntKnockOff();
         var keys = new List<string> { "a", "b" };
-        knockOff.Keys.OnGet(() => keys);
+        knockOff.Keys.Get(() => keys);
         IDictionary<string, int> dict = knockOff;
 
         var result = dict.Keys;
@@ -711,7 +711,7 @@ public class BclStandaloneTests
     public void ReadOnlyListStringKnockOff_Indexer_TracksInvocation()
     {
         var knockOff = new ReadOnlyListStringKnockOff();
-        knockOff.Indexer.OnGet((index) => $"item_{index}");
+        knockOff.Indexer.Get((index) => $"item_{index}");
         IReadOnlyList<string> list = knockOff;
 
         var result = list[7];
@@ -723,7 +723,7 @@ public class BclStandaloneTests
     public void ReadOnlyListStringKnockOff_Count_TracksInvocation()
     {
         var knockOff = new ReadOnlyListStringKnockOff();
-        knockOff.Count.OnGet(() => 100);
+        knockOff.Count.Get(() => 100);
         IReadOnlyCollection<string> collection = knockOff;
 
         var count = collection.Count;

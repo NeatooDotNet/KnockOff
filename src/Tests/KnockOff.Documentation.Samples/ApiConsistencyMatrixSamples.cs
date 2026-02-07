@@ -124,10 +124,10 @@ public class PropertyInterceptionTests
 
         #region matrix-property-interception
         // Configure getter
-        stub.Name.OnGet("test-name");
+        stub.Name.Get("test-name");
 
         // Configure setter
-        stub.Name.OnSet((value) => { /* capture or validate */ });
+        stub.Name.Set((value) => { /* capture or validate */ });
 
         // Verify
         stub.Name.VerifyGet(Times.Never);
@@ -160,10 +160,10 @@ public class IndexerInterceptionTests
 
         #region matrix-indexer-interception
         // Configure getter
-        stub.Indexer.OnGet((key) => $"value-{key}");
+        stub.Indexer.Get((key) => $"value-{key}");
 
         // Configure setter
-        stub.Indexer.OnSet((key, value) => { });
+        stub.Indexer.Set((key, value) => { });
 
         // Use backing dictionary
         stub.Indexer.Backing["preloaded"] = "data";
@@ -246,7 +246,7 @@ public class SequenceTests
 
         // Properties support sequences too
         configStub.Name
-            .OnGet("first")
+            .Get("first")
             .ThenGet("second");
         #endregion
 

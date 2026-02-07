@@ -49,7 +49,7 @@ public partial class IEntityPropertyManagerTests
         var stub = new Stubs.IEntityPropertyManager();
         IEntityPropertyManager manager = stub;
 
-        stub.IsModified.OnGet(true);
+        stub.IsModified.Get(true);
 
         Assert.True(manager.IsModified);
         stub.IsModified.VerifyGet(Times.Once);
@@ -61,7 +61,7 @@ public partial class IEntityPropertyManagerTests
         var stub = new Stubs.IEntityPropertyManager();
         IEntityPropertyManager manager = stub;
 
-        stub.IsSelfModified.OnGet(true);
+        stub.IsSelfModified.Get(true);
 
         Assert.True(manager.IsSelfModified);
     }
@@ -73,7 +73,7 @@ public partial class IEntityPropertyManagerTests
         IEntityPropertyManager manager = stub;
 
         var modified = new[] { "FirstName", "LastName", "Email" };
-        stub.ModifiedProperties.OnGet(modified);
+        stub.ModifiedProperties.Get(modified);
 
         Assert.Equal(modified, manager.ModifiedProperties);
     }
@@ -84,7 +84,7 @@ public partial class IEntityPropertyManagerTests
         var stub = new Stubs.IEntityPropertyManager();
         IEntityPropertyManager manager = stub;
 
-        stub.IsBusy.OnGet(true);
+        stub.IsBusy.Get(true);
 
         Assert.True(manager.IsBusy);
     }
@@ -95,7 +95,7 @@ public partial class IEntityPropertyManagerTests
         var stub = new Stubs.IEntityPropertyManager();
         IEntityPropertyManager manager = stub;
 
-        stub.IsValid.OnGet(false);
+        stub.IsValid.Get(false);
 
         Assert.False(manager.IsValid);
     }
@@ -106,7 +106,7 @@ public partial class IEntityPropertyManagerTests
         var stub = new Stubs.IEntityPropertyManager();
         IEntityPropertyManager manager = stub;
 
-        stub.IsPaused.OnGet(true);
+        stub.IsPaused.Get(true);
 
         Assert.True(manager.IsPaused);
     }
@@ -195,7 +195,7 @@ public partial class IEntityPropertyManagerTests
         IEntityPropertyManager manager = stub;
 
         var propertyStub = new EntityPropertyStubForManager();
-        stub.Indexer.OnGet((name) => propertyStub);
+        stub.Indexer.Get((name) => propertyStub);
 
         _ = manager["PropertyName"];
 
@@ -284,7 +284,7 @@ public partial class IEntityPropertyManagerTests
         var stub = new Stubs.IEntityPropertyManager();
         IEntityPropertyManager manager = stub;
 
-        stub.IsModified.OnGet(true);
+        stub.IsModified.Get(true);
         _ = manager.IsModified;
         _ = manager.IsModified;
 
@@ -349,7 +349,7 @@ public class IEntityPropertyManagerStandaloneTests
         var stub = new EntityPropertyManagerStub();
         IEntityPropertyManager manager = stub;
 
-        stub.IsModified.OnGet(true);
+        stub.IsModified.Get(true);
 
         Assert.True(manager.IsModified);
     }

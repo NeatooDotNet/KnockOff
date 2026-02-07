@@ -1,6 +1,6 @@
 ---
 name: knockoff
-description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "Returns", "Execute", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "assembly-wide strict", "[assembly: KnockOffStrict]", "ThenReturns", "ThenExecute", "ThenGet", "ThenSet", ".Of<T>()", "generic method interceptor", "Source() delegation", "When()", "argument matching", or needs guidance on creating, configuring, or verifying KnockOff test stubs. IMPORTANT: When writing tests that need stubs, this skill MUST be consulted to check for existing stubs before creating new inline stubs - prefer standalone stubs when the same type is stubbed in multiple test classes.
+description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "Returns", "Execute", "Get", "Set", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "assembly-wide strict", "[assembly: KnockOffStrict]", "ThenReturns", "ThenExecute", "ThenGet", "ThenSet", ".Of<T>()", "generic method interceptor", "Source() delegation", "When()", "argument matching", or needs guidance on creating, configuring, or verifying KnockOff test stubs. IMPORTANT: When writing tests that need stubs, this skill MUST be consulted to check for existing stubs before creating new inline stubs - prefer standalone stubs when the same type is stubbed in multiple test classes.
 version: 2.2.0
 ---
 
@@ -97,14 +97,14 @@ stub.GetValue.Returns((id) => $"val-{id}"); // REPLACES constant, now dynamic
 ```
 <!-- endSnippet -->
 
-### 8. OnSet Does NOT Auto-Update Getter
+### 8. Set Does NOT Auto-Update Getter
 
 <!-- snippet: skill-gotcha-onset-no-auto-update -->
 ```cs
-stub.Name.OnSet((v) => { /* tracks value */ });
+stub.Name.Set((v) => { /* tracks value */ });
 service.Name = "test";
-// Getter still returns default! OnSet doesn't update OnGet
-// To link them: stub.Name.OnSet((v) => stub.Name.OnGet(v));
+// Getter still returns default! Set doesn't update Get
+// To link them: stub.Name.Set((v) => stub.Name.Get(v));
 ```
 <!-- endSnippet -->
 
@@ -114,13 +114,13 @@ service.Name = "test";
 |-------------|--------------|-----------------|
 | Method | Counts, LastArg/LastArgs, sequence index, When chain position, source delegation | **Returns/Execute callbacks**, sequence structure, verifiable flag |
 | User Method | Counts, LastArg | **Returns/Execute configuration**, verifiable flag |
-| Property | Get/set counts, LastSetValue, sequence index, source delegation | **OnGet/OnSet callbacks**, verifiable flag |
-| User Property | Get/set counts, LastSetValue | **OnGet/OnSet configuration**, verifiable flag |
-| Indexer | Get/set counts, LastGetKey, LastSetEntry | **Backing dictionary**, OnGet/OnSet callbacks |
+| Property | Get/set counts, LastSetValue, sequence index, source delegation | **Get/Set callbacks**, verifiable flag |
+| User Property | Get/set counts, LastSetValue | **Get/Set configuration**, verifiable flag |
+| Indexer | Get/set counts, LastGetKey, LastSetEntry | **Backing dictionary**, Get/Set callbacks |
 | Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **Returns/Execute callbacks**, sequence structure, verifiable flag |
 | Event | Tracking counts | **Active subscribers**, verifiable flag |
 
-**Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve Returns/Execute/OnGet/OnSet configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
+**Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve Returns/Execute/Get/Set configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
 
 ---
 
@@ -321,16 +321,16 @@ stub.Log.When("error").Execute((msg) => { /* handle */ });
 <!-- snippet: skill-property-config -->
 ```cs
 // Static value
-stub.Name.OnGet("TestName");
+stub.Name.Get("TestName");
 
 // Dynamic callback
-stub.Timestamp.OnGet(() => DateTime.UtcNow);
+stub.Timestamp.Get(() => DateTime.UtcNow);
 
 // Setter interception
-stub.Name.OnSet((value) => capturedValues.Add(value));
+stub.Name.Set((value) => capturedValues.Add(value));
 
 // Sequences
-stub.Counter.OnGet(() => 1).ThenGet(() => 2).ThenGet(() => 3);
+stub.Counter.Get(() => 1).ThenGet(() => 2).ThenGet(() => 3);
 ```
 <!-- endSnippet -->
 
@@ -345,10 +345,10 @@ stub.Indexer.Backing["key1"] = "value1";
 stub.Indexer.Backing["key2"] = "value2";
 
 // Or use callbacks
-stub.Indexer.OnGet((key) => $"computed-{key}");
-stub.Indexer.OnSet((key, value) => { /* handle */ });
+stub.Indexer.Get((key) => $"computed-{key}");
+stub.Indexer.Set((key, value) => { /* handle */ });
 
-// Note: OnGet/OnSet override Backing - they don't work together
+// Note: Get/Set override Backing - they don't work together
 ```
 <!-- endSnippet -->
 
@@ -450,7 +450,7 @@ stub.Save.Execute((u) => { }).Verifiable(Times.Once);
 ### Verify() vs VerifyAll()
 
 - `stub.Verify()` - Only members marked with `.Verifiable()`
-- `stub.VerifyAll()` - ALL configured members (Returns, Execute, OnGet, etc.)
+- `stub.VerifyAll()` - ALL configured members (Returns, Execute, Get, etc.)
 
 ### Times Constraints
 
@@ -599,7 +599,7 @@ repo.GetById(2);  // Still uses Returns callback
 
 ## User Properties (Stand-Alone Only)
 
-User properties let you define default property behavior at compile time. The user property is the fallback when no `OnGet`/`OnSet` is configured.
+User properties let you define default property behavior at compile time. The user property is the fallback when no `Get`/`Set` is configured.
 
 ### Defining User Properties
 
@@ -624,9 +624,9 @@ public partial class SkUserPropServiceStub
 
 The interceptor uses a clean name (e.g., `Count`, not `Count2`) regardless of whether you override the property.
 
-### OnGet/OnSet Supersede User Property
+### Get/Set Supersede User Property
 
-Use `OnGet()` or `OnSet()` to override the user property for specific tests:
+Use `Get()` or `Set()` to override the user property for specific tests:
 
 <!-- snippet: skill-user-property-onget -->
 ```cs
@@ -634,12 +634,12 @@ var stub = new SkUserPropServiceStub();
 stub.SetCount(42);
 IUserService service = stub;
 
-// Without OnGet: user property is called
+// Without Get: user property is called
 var count1 = service.Count;  // Returns 42 (from Count_ override)
 
-// With OnGet: OnGet supersedes user property (clean interceptor name)
-stub.Count.OnGet(999);
-var count2 = service.Count;  // Returns 999 (OnGet wins)
+// With Get: Get supersedes user property (clean interceptor name)
+stub.Count.Get(999);
+var count2 = service.Count;  // Returns 999 (Get wins)
 ```
 <!-- endSnippet -->
 
@@ -656,20 +656,20 @@ stub.Count.VerifyGet(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
-### Reset Preserves OnGet/OnSet Configuration
+### Reset Preserves Get/Set Configuration
 
-`Reset()` clears tracking state but preserves the OnGet/OnSet configuration:
+`Reset()` clears tracking state but preserves the Get/Set configuration:
 
 <!-- snippet: skill-user-property-reset -->
 ```cs
-stub.Count.OnGet(100);
+stub.Count.Get(100);
 _ = service.Count;
 stub.Count.VerifyGet(Times.Once);
 
 stub.Count.Reset();
 stub.Count.VerifyGet(Times.Never);  // Tracking cleared
 
-_ = service.Count;  // Still uses OnGet (returns 100)
+_ = service.Count;  // Still uses Get (returns 100)
 ```
 <!-- endSnippet -->
 
@@ -688,7 +688,7 @@ stub.Source(realImplementation);
 stub.GetById.Returns((id) => testUser);  // This wins over source
 
 // Reset clears tracking (counts, args, sequence position) and source delegation
-// but preserves callbacks (OnCall, Returns, OnGet, OnSet)
+// but preserves callbacks (Returns, Execute, Get, Set)
 // stub.GetById.Reset();
 ```
 <!-- endSnippet -->
@@ -729,7 +729,7 @@ Remove source delegation by passing null: `stub.Source(null)`. After clearing, u
 | `mock.Object` | `stub` (interface) or `stub.Object` (class) |
 | `.Setup(x => x.Method()).Returns(val)` | `stub.Method.Returns(val)` |
 | `.Setup(x => x.Method(arg)).Returns(val)` | `stub.Method.When(arg).Returns(val)` |
-| `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.OnGet(val)` |
+| `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.Get(val)` |
 | `.ReturnsAsync(val)` | `stub.Method.Returns(val)` (auto-wraps) |
 | `.Callback(action)` | Logic inside `Returns`/`Execute` callback |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` |

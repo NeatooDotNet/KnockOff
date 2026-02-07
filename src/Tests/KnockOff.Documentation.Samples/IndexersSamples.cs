@@ -109,8 +109,8 @@ public class DynamicGetterSamples
         var stub = new ConfigStoreStub();
 
         #region indexers-onget-computed
-        // OnGet computes values based on the key
-        stub.Indexer.OnGet((key) => $"Value for {key}");
+        // Get computes values based on the key
+        stub.Indexer.Get((key) => $"Value for {key}");
         #endregion
 
         IConfigStore config = stub;
@@ -131,8 +131,8 @@ public class DynamicGetterSamples
         };
 
         #region indexers-onget-stateful
-        // OnGet checks external state to determine return value
-        stub.Indexer.OnGet((sku) => inventory.GetValueOrDefault(sku, 0));
+        // Get checks external state to determine return value
+        stub.Indexer.Get((sku) => inventory.GetValueOrDefault(sku, 0));
         #endregion
 
         IProductInventory store = stub;
@@ -160,8 +160,8 @@ public class SetterInterceptionSamples
         var writtenPairs = new List<(string key, string value)>();
 
         #region indexers-onset-tracking
-        // OnSet intercepts writes for tracking
-        stub.Indexer.OnSet((key, value) => writtenPairs.Add((key, value)));
+        // Set intercepts writes for tracking
+        stub.Indexer.Set((key, value) => writtenPairs.Add((key, value)));
         #endregion
 
         IConfigStore config = stub;
@@ -183,8 +183,8 @@ public class SetterInterceptionSamples
         var validSkus = new HashSet<string> { "SKU-001", "SKU-002", "SKU-003" };
 
         #region indexers-onset-validation
-        // OnSet validates and throws for invalid keys or values
-        stub.Indexer.OnSet((sku, quantity) =>
+        // Set validates and throws for invalid keys or values
+        stub.Indexer.Set((sku, quantity) =>
         {
             if (!validSkus.Contains(sku))
                 throw new ArgumentException($"Invalid SKU: {sku}");
@@ -266,7 +266,7 @@ public class SequenceSamples
         #region indexers-ongetsequence-basic
         // Sequence: first access returns "cached", second returns "fresh"
         stub.Indexer
-            .OnGet((key) => "cached")
+            .Get((key) => "cached")
             .ThenGet((key) => "fresh");
         #endregion
 
@@ -285,7 +285,7 @@ public class SequenceSamples
         #region indexers-onset-then-sequence
         // Sequence: first write fails, second succeeds
         stub.Indexer
-            .OnSet((sku, qty) => { attemptCount++; throw new InvalidOperationException("Service unavailable"); })
+            .Set((sku, qty) => { attemptCount++; throw new InvalidOperationException("Service unavailable"); })
             .ThenSet((sku, qty) => { attemptCount++; });
         #endregion
 
@@ -337,9 +337,9 @@ public class PrioritySamples
         var stub = new ConfigStoreStub();
 
         #region indexers-priority
-        // OnGet takes precedence over Backing dictionary
+        // Get takes precedence over Backing dictionary
         stub.Indexer.Backing["ApiKey"] = "from-backing";
-        stub.Indexer.OnGet((key) => "from-callback");
+        stub.Indexer.Get((key) => "from-callback");
         #endregion
 
         IConfigStore config = stub;
@@ -354,8 +354,8 @@ public class PrioritySamples
         var validationLog = new List<string>();
 
         #region indexers-onset-with-backing
-        // OnSet must manually update Backing if reads should reflect writes
-        stub.Indexer.OnSet((key, value) =>
+        // Set must manually update Backing if reads should reflect writes
+        stub.Indexer.Set((key, value) =>
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException("Value cannot be empty");
@@ -426,19 +426,19 @@ public class CompleteExampleTests
         // 1. Backing: Pre-populate test data
         stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice", Email = "alice@example.com" };
 
-        // 2. OnGet: Compute values dynamically
-        stub.Indexer.OnGet((id) => id == 999
+        // 2. Get: Compute values dynamically
+        stub.Indexer.Get((id) => id == 999
             ? new User { Id = 999, Name = "Dynamic User", Email = "dynamic@example.com" }
             : null);
 
-        // 3. OnSet: Track writes
-        stub.Indexer.OnSet((id, user) => cacheUpdates.Add((id, user)));
+        // 3. Set: Track writes
+        stub.Indexer.Set((id, user) => cacheUpdates.Add((id, user)));
         #endregion
 
         IUserCache cache = stub;
 
         var alice = cache[1];
-        Assert.Null(alice); // OnGet takes precedence, returns null for id=1
+        Assert.Null(alice); // Get takes precedence, returns null for id=1
 
         var dynamicUser = cache[999];
         Assert.Equal("Dynamic User", dynamicUser?.Name);

@@ -76,7 +76,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_VirtualProperty_TracksGetter()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Name.OnGet(() => "Intercepted");
+		stub.Name.Get(() => "Intercepted");
 
 		var name = stub.Object.Name;
 
@@ -222,7 +222,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_AbstractProperty_ReturnsCallback_WhenSet()
 	{
 		var stub = new AbstractServiceStub();
-		stub.ConnectionString.OnGet(() => "Server=test");
+		stub.ConnectionString.Get(() => "Server=test");
 
 		var connectionString = stub.Object.ConnectionString;
 
@@ -391,7 +391,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_Verifiable_MarksForVerification()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Name.OnGet(() => "test").Verifiable();
+		stub.Name.Get(() => "test").Verifiable();
 		stub.Execute.Returns((cmd) => 42).Verifiable();
 
 		_ = stub.Object.Name;
@@ -507,7 +507,7 @@ public class StandaloneClassIndexerTests
 	public void StandaloneClassStub_Indexer_TracksGetter()
 	{
 		var stub = new IndexerServiceStub();
-		stub.Indexer.OnGet((key) => $"value_{key}");
+		stub.Indexer.Get((key) => $"value_{key}");
 
 		var result = stub.Object["test"];
 

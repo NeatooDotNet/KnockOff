@@ -2,8 +2,8 @@
 // Design.Stubs - Indexer Sequences
 // -----------------------------------------------------------------------------
 // This file demonstrates sequence APIs for indexers:
-// - OnGet().ThenGet() for getter sequences
-// - OnSet().ThenSet() for setter sequences
+// - Get().ThenGet() for getter sequences
+// - Set().ThenSet() for setter sequences
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Entities;
@@ -19,7 +19,7 @@ namespace Design.Stubs.Indexers;
 public partial class IndexerSequencesDemo
 {
     // =========================================================================
-    // OnGet().ThenGet() - Getter Sequences
+    // Get().ThenGet() - Getter Sequences
     // =========================================================================
     // DESIGN DECISION: Indexer getters support sequences. Each access advances
     // through the sequence, regardless of which key is accessed.
@@ -37,7 +37,7 @@ public partial class IndexerSequencesDemo
         var stub = new Stubs.ICollection();
 
         // First access returns key length, second returns 100, then repeats 999
-        stub.Indexer.OnGet((k) => k.Length)
+        stub.Indexer.Get((k) => k.Length)
             .ThenGet((k) => 100)
             .ThenGet((k) => 999);
 
@@ -50,7 +50,7 @@ public partial class IndexerSequencesDemo
     }
 
     // =========================================================================
-    // OnSet().ThenSet() - Setter Sequences
+    // Set().ThenSet() - Setter Sequences
     // =========================================================================
     // DESIGN DECISION: Setter sequences work similarly. Each set advances
     // through the sequence of callbacks.
@@ -61,7 +61,7 @@ public partial class IndexerSequencesDemo
         var stub = new Stubs.ICollection();
         var log = new List<string>();
 
-        stub.Indexer.OnSet((k, v) => log.Add($"First: {k}={v}"))
+        stub.Indexer.Set((k, v) => log.Add($"First: {k}={v}"))
             .ThenSet((k, v) => log.Add($"Second: {k}={v}"))
             .ThenSet((k, v) => log.Add($"Final: {k}={v}"));
 
@@ -86,7 +86,7 @@ public partial class IndexerSequencesDemo
     {
         var stub = new Stubs.ICollection();
 
-        stub.Indexer.OnGet((k) => k.Length)
+        stub.Indexer.Get((k) => k.Length)
             .ThenGet((k) => 100)
             .ThenDefault();  // Return default after exhaustion
 
@@ -108,7 +108,7 @@ public partial class IndexerSequencesDemo
     // This matches how method sequences work - tracking the sequence of calls,
     // not the sequence of calls per argument value.
     //
-    // For per-key behavior, use OnGet with a callback that maintains its own
+    // For per-key behavior, use Get with a callback that maintains its own
     // dictionary, or use the Backing dictionary.
     // =========================================================================
 
@@ -116,7 +116,7 @@ public partial class IndexerSequencesDemo
     {
         var stub = new Stubs.ICollection();
 
-        stub.Indexer.OnGet((k) => 1)
+        stub.Indexer.Get((k) => 1)
             .ThenGet((k) => 2)
             .ThenGet((k) => 3);
 
@@ -129,7 +129,7 @@ public partial class IndexerSequencesDemo
 
         // Different keys also advance the sequence
         stub.Indexer.Reset(); // Reset to start
-        stub.Indexer.OnGet((k) => 1).ThenGet((k) => 2).ThenGet((k) => 3);
+        stub.Indexer.Get((k) => 1).ThenGet((k) => 2).ThenGet((k) => 3);
 
         r1 = collection["a"]; // 1
         r2 = collection["b"]; // 2 (sequence advanced despite different key)

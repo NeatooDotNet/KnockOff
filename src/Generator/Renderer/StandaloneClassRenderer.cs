@@ -670,19 +670,19 @@ internal static class StandaloneClassRenderer
             {
                 // User override pattern:
                 // 1. Null check for calls during base constructor (fall back to base for virtual)
-                // 2. OnGet supersedes user override (InvokeGetCallback tracks internally)
+                // 2. Get supersedes user override (InvokeGetCallback tracks internally)
                 // 3. Record access only for user override path (to avoid double counting)
                 // 4. User override (virtual property with _ suffix in stub's base class)
                 var fallback = prop.IsAbstract ? "default!" : $"base.{prop.PropertyName}";
                 w.Line($"{indent2}if (_stub == null) return {fallback};");
-                w.Line($"{indent2}if (_stub.{prop.PropertyName}.HasOnGet) return _stub.{prop.PropertyName}.InvokeGetCallback();");
+                w.Line($"{indent2}if (_stub.{prop.PropertyName}.HasGet) return _stub.{prop.PropertyName}.InvokeGetCallback();");
                 w.Line($"{indent2}_stub.{prop.PropertyName}.RecordGet();");
                 w.Line($"{indent2}return _stub.{prop.PropertyName}_;");
             }
             else
             {
                 // No user override - delegate to interceptor which handles full priority chain
-                // (sequence > OnGet > strict/default) and falls back to base for virtual properties
+                // (sequence > Get > strict/default) and falls back to base for virtual properties
                 if (prop.IsAbstract)
                 {
                     w.Line($"{indent2}if (_stub == null) return default!;");
@@ -710,7 +710,7 @@ internal static class StandaloneClassRenderer
             {
                 // User override pattern:
                 // 1. Null check for calls during base constructor (fall back to base for virtual)
-                // 2. OnSet supersedes user override (InvokeSetCallback tracks internally)
+                // 2. Set supersedes user override (InvokeSetCallback tracks internally)
                 // 3. Record access only for user override path (to avoid double counting)
                 // 4. User override (virtual property with _ suffix in stub's base class)
                 if (prop.IsAbstract)
@@ -721,14 +721,14 @@ internal static class StandaloneClassRenderer
                 {
                     w.Line($"{indent2}if (_stub == null) {{ base.{prop.PropertyName} = value; return; }}");
                 }
-                w.Line($"{indent2}if (_stub.{prop.PropertyName}.HasOnSet) {{ _stub.{prop.PropertyName}.InvokeSetCallback(value); return; }}");
+                w.Line($"{indent2}if (_stub.{prop.PropertyName}.HasSet) {{ _stub.{prop.PropertyName}.InvokeSetCallback(value); return; }}");
                 w.Line($"{indent2}_stub.{prop.PropertyName}.RecordSet(value);");
                 w.Line($"{indent2}_stub.{prop.PropertyName}_ = value;");
             }
             else
             {
                 // No user override - delegate to interceptor which handles full priority chain
-                // (sequence > OnSet > strict/default) and falls back to base for virtual properties
+                // (sequence > Set > strict/default) and falls back to base for virtual properties
                 if (prop.IsAbstract)
                 {
                     w.Line($"{indent2}if (_stub == null) return;");

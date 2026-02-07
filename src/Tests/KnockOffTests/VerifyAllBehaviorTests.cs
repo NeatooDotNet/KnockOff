@@ -17,7 +17,7 @@ public interface IVerifyAllTestService
 ///
 /// EXPECTED BEHAVIOR (from KnockOff skill documentation):
 /// - Verify()     - Checks only members marked with .Verifiable()
-/// - VerifyAll()  - Checks ALL configured members (any member with OnCall, OnGet, etc.)
+/// - VerifyAll()  - Checks ALL configured members (any member with OnCall, Get, etc.)
 ///
 /// ACTUAL TEST RESULTS:
 /// ✅ VerifyAll() DOES throw VerificationException when configured members aren't called
@@ -25,7 +25,7 @@ public interface IVerifyAllTestService
 /// ✅ Both behaviors match documentation
 ///
 /// IMPLICATION:
-/// If a test has configured stubs (OnCall, OnGet) but doesn't call them,
+/// If a test has configured stubs (OnCall, Get) but doesn't call them,
 /// calling stub.VerifyAll() will FAIL with VerificationException.
 /// This is the expected and correct behavior.
 /// </summary>
@@ -101,7 +101,7 @@ public partial class VerifyAllBehaviorTests
 	{
 		// Arrange
 		var stub = new Stubs.IVerifyAllTestService().Strict();
-		stub.Name.OnGet("TestName");
+		stub.Name.Get("TestName");
 
 		// Act - don't access the property
 

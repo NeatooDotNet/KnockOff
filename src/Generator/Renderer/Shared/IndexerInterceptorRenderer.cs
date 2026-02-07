@@ -6,8 +6,8 @@ namespace KnockOff.Renderer.Shared;
 
 /// <summary>
 /// Renders indexer interceptor classes for both inline and flat stubs.
-/// Generates OnGet() returning IIndexerGetBuilder (repeating callback, elevatable to sequence via ThenGet),
-/// OnSet() returning IIndexerSetBuilder similarly for setters,
+/// Generates Get() returning IIndexerGetBuilder (repeating callback, elevatable to sequence via ThenGet),
+/// Set() returning IIndexerSetBuilder similarly for setters,
 /// nested builder and sequence implementation classes, InvokeGet/InvokeSet methods,
 /// Backing dictionary, and verification.
 /// </summary>
@@ -32,7 +32,7 @@ internal static class IndexerInterceptorRenderer
 			// Source field for Source(T) feature
 			if (!string.IsNullOrEmpty(model.DeclaringInterface))
 			{
-				w.Line($"/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>");
+				w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
 				w.Line($"internal {model.DeclaringInterface}? _source;");
 				w.Line();
 			}
@@ -102,11 +102,11 @@ internal static class IndexerInterceptorRenderer
 				w.Line();
 			}
 
-			// OnGet() method (if has getter)
+			// Get() method (if has getter)
 			if (model.HasGetter)
 			{
 				w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-				w.Line($"public global::KnockOff.IIndexerGetBuilder<{model.KeyType}, {model.ValueType}> OnGet(global::System.Func<{model.ParameterTypes}, {model.ValueType}> callback)");
+				w.Line($"public global::KnockOff.IIndexerGetBuilder<{model.KeyType}, {model.ValueType}> Get(global::System.Func<{model.ParameterTypes}, {model.ValueType}> callback)");
 				using (w.Braces())
 				{
 					w.Line("_getSequence = null;");
@@ -121,11 +121,11 @@ internal static class IndexerInterceptorRenderer
 
 			}
 
-			// OnSet() method (if has setter)
+			// Set() method (if has setter)
 			if (model.HasSetter)
 			{
 				w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-				w.Line($"public global::KnockOff.IIndexerSetBuilder<{model.KeyType}, {model.ValueType}> OnSet(global::System.Action<{model.ParameterTypes}, {model.ValueType}> callback)");
+				w.Line($"public global::KnockOff.IIndexerSetBuilder<{model.KeyType}, {model.ValueType}> Set(global::System.Action<{model.ParameterTypes}, {model.ValueType}> callback)");
 				using (w.Braces())
 				{
 					w.Line("_setSequence = null;");
@@ -215,7 +215,7 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 2: Repeating OnGet callback
+			// Priority 2: Repeating Get callback
 			w.Line("if (_onGet != null && _onGetTracking != null)");
 			using (w.Braces())
 			{
@@ -293,7 +293,7 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 2: Repeating OnSet callback
+			// Priority 2: Repeating Set callback
 			w.Line("if (_onSet != null && _onSetTracking != null)");
 			using (w.Braces())
 			{
@@ -333,7 +333,7 @@ internal static class IndexerInterceptorRenderer
 		UnifiedIndexerInterceptorModel model,
 		bool hasSourceField)
 	{
-		w.Line("/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>");
+		w.Line("/// <summary>Resets tracking state but preserves configuration (Get, Set, Backing) and verifiable marking.</summary>");
 		w.Line("public void Reset()");
 		using (w.Braces())
 		{
@@ -482,7 +482,7 @@ internal static class IndexerInterceptorRenderer
 
 			// When BOTH get and set are verifiable (e.g., Verifiable() called on interceptor),
 			// check combined count - "indexer was used" means either get or set.
-			// When only one is verifiable (e.g., OnGet().Verifiable()), check individually.
+			// When only one is verifiable (e.g., Get().Verifiable()), check individually.
 			if (model.HasGetter && model.HasSetter)
 			{
 				w.Line("if (_isGetVerifiable && _isSetVerifiable)");

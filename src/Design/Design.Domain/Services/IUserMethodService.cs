@@ -132,10 +132,10 @@ public interface IOverloadedGenericUserMethodService
 /// </summary>
 public interface IUserMethodWithPropertiesService
 {
-    /// <summary>Property - uses OnGet/OnSet interceptor.</summary>
+    /// <summary>Property - uses Get/Set interceptor.</summary>
     string Title { get; set; }
 
-    /// <summary>Read-only property - uses OnGet interceptor.</summary>
+    /// <summary>Read-only property - uses Get interceptor.</summary>
     int Count { get; }
 
     /// <summary>Method that happens to interact with properties.</summary>

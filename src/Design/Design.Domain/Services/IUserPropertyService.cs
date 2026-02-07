@@ -53,13 +53,13 @@ public interface IMixedUserPropertyService
     /// <summary>Will have user property implementation.</summary>
     int WithUserProperty { get; }
 
-    /// <summary>Will NOT have user property - uses OnGet instead.</summary>
+    /// <summary>Will NOT have user property - uses Get instead.</summary>
     int WithoutUserProperty { get; }
 
     /// <summary>Will have user property implementation.</summary>
     string ComputedWithUserProperty { get; }
 
-    /// <summary>Will NOT have user property - uses OnGet instead.</summary>
+    /// <summary>Will NOT have user property - uses Get instead.</summary>
     string ComputedWithoutUserProperty { get; }
 }
 

@@ -278,7 +278,7 @@ public class ClassIndexerVerificationTests
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
 		stub.Indexer.Verifiable();
-		stub.Count.OnGet(() => 10); // Also mark a property as configured
+		stub.Count.Get(() => 10); // Also mark a property as configured
 		// Don't access the indexer
 
 		// Act & Assert - Should fail because verifiable indexer wasn't accessed
@@ -308,7 +308,7 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.OnGet((key) => $"value_{key}");
+		stub.Indexer.Get((key) => $"value_{key}");
 		// Don't access the indexer
 
 		// Act & Assert - Should fail because configured indexer wasn't accessed
@@ -320,7 +320,7 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.OnGet((key) => $"value_{key}");
+		stub.Indexer.Get((key) => $"value_{key}");
 
 		// Act
 		_ = stub.Object["key"];
@@ -346,10 +346,10 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.OnSet((key, value) => { });
+		stub.Indexer.Set((key, value) => { });
 		// Don't access the indexer
 
-		// Act & Assert - Should fail because OnSet makes it configured
+		// Act & Assert - Should fail because Set makes it configured
 		Assert.Throws<VerificationException>(() => stub.VerifyAll());
 	}
 
@@ -400,9 +400,9 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.OnGet((key) => "configured_value");
+		stub.Indexer.Get((key) => "configured_value");
 		var setWasCalled = false;
-		stub.Indexer.OnSet((key, value) => { setWasCalled = true; });
+		stub.Indexer.Set((key, value) => { setWasCalled = true; });
 
 		// Act
 		stub.Indexer.Reset();

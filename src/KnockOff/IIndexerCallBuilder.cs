@@ -1,7 +1,7 @@
 namespace KnockOff;
 
 /// <summary>
-/// Returned by OnGet() on indexers. Supports tracking and optional sequence chaining.
+/// Returned by Get() on indexers. Supports tracking and optional sequence chaining.
 /// </summary>
 /// <remarks>
 /// The builder IS the tracking implementation. When ThenGet is invoked,
@@ -24,7 +24,7 @@ public interface IIndexerGetBuilder<TKey, TValue> : IIndexerGetTracking<TKey>
 }
 
 /// <summary>
-/// Returned by OnSet() on indexers. Supports tracking and optional sequence chaining.
+/// Returned by Set() on indexers. Supports tracking and optional sequence chaining.
 /// </summary>
 /// <remarks>
 /// The builder IS the tracking implementation. When ThenSet is invoked,

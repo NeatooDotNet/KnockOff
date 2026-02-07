@@ -162,17 +162,17 @@ stub.GetById.Returns((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Re
 - Tracking or validating argument values
 - Performing side effects (like updating test state)
 
-### Properties - OnGet/OnSet
+### Properties - Get/Set
 
-Properties use `OnGet` for getters and `OnSet` for setters. Both support value and callback overloads:
+Properties use `Get` for getters and `Set` for setters. Both support value and callback overloads:
 
 <!-- snippet: getting-started-property-configuration -->
 ```cs
-// OnGet - configure the getter return value
-stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+// Get - configure the getter return value
+stub.CurrentUser.Get(new User { Id = 1, Name = "Alice" });
 
-// OnSet - capture or validate setter calls
-stub.CurrentUser.OnSet((user) => capturedUser = user);
+// Set - capture or validate setter calls
+stub.CurrentUser.Set((user) => capturedUser = user);
 ```
 <!-- endSnippet -->
 
@@ -252,7 +252,7 @@ Now that you've created your first stubs, explore more features:
 
 - **[Stub Patterns](guides/stub-patterns.md)** - Learn about all nine stub patterns (Standalone, Generic Standalone, Standalone Class, Generic Standalone Class, Inline Interface, Inline Class, Inline Delegate, Open Generic Interface, Open Generic Class)
 - **[Methods](guides/methods.md)** - Configure method behavior with Returns/Execute, track arguments, handle async methods
-- **[Properties](guides/properties.md)** - Use OnGet/OnSet for properties, track access, configure backing values
+- **[Properties](guides/properties.md)** - Use Get/Set for properties, track access, configure backing values
 - **[Interceptor API Reference](reference/interceptor-api.md)** - Complete reference for the interceptor API
 
 ---

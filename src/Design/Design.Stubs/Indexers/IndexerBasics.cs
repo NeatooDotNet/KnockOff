@@ -2,8 +2,8 @@
 // Design.Stubs - Basic Indexer Stubbing
 // -----------------------------------------------------------------------------
 // This file demonstrates the fundamental indexer stubbing APIs:
-// - OnGet(callback) with key access
-// - OnSet(callback) with key and value
+// - Get(callback) with key access
+// - Set(callback) with key and value
 // - Backing dictionary for storage
 // - LastGetKey and LastSetEntry tracking
 // - Multi-key indexers (tuple keys)
@@ -24,7 +24,7 @@ namespace Design.Stubs.Indexers;
 public partial class IndexerBasicsDemo
 {
     // =========================================================================
-    // OnGet(callback) - Getter with Key Access
+    // Get(callback) - Getter with Key Access
     // =========================================================================
     // DESIGN DECISION: Indexer getters receive the key as a callback parameter.
     // This differs from property getters which have no parameters.
@@ -37,7 +37,7 @@ public partial class IndexerBasicsDemo
     //
     //   public class IndexerInterceptor
     //   {
-    //       public void OnGet(Func<string, int> callback) { _getCallback = callback; }
+    //       public void Get(Func<string, int> callback) { _getCallback = callback; }
     //
     //       public int Get(string key)
     //       {
@@ -49,18 +49,18 @@ public partial class IndexerBasicsDemo
     // DID NOT DO THIS: Make indexer getters parameterless like properties
     //
     // REJECTED PATTERN:
-    //   stub.Indexer.OnGet(42);  // How would we know which key returns 42?
+    //   stub.Indexer.Get(42);  // How would we know which key returns 42?
     //
     // WHY NOT: Indexers are fundamentally key-based. The callback MUST receive
     // the key to provide meaningful behavior.
     // =========================================================================
 
-    public void OnGet_ReceivesKey()
+    public void Get_ReceivesKey()
     {
         var stub = new Stubs.ICollection();
 
         // Callback receives the key, returns value based on it
-        stub.Indexer.OnGet((key) => key.Length);
+        stub.Indexer.Get((key) => key.Length);
 
         ICollection<string, int> collection = stub;
 
@@ -69,14 +69,14 @@ public partial class IndexerBasicsDemo
     }
 
     // =========================================================================
-    // OnSet(callback) - Setter with Key and Value
+    // Set(callback) - Setter with Key and Value
     // =========================================================================
     // DESIGN DECISION: Indexer setters receive both the key AND the value.
     // This allows tracking what's being stored where.
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void OnSet(Action<string, int> callback) { _setCallback = callback; }
+    //   public void Set(Action<string, int> callback) { _setCallback = callback; }
     //
     //   public void Set(string key, int value)
     //   {
@@ -85,13 +85,13 @@ public partial class IndexerBasicsDemo
     //   }
     // =========================================================================
 
-    public void OnSet_ReceivesKeyAndValue()
+    public void Set_ReceivesKeyAndValue()
     {
         var stub = new Stubs.ICollection();
         var storage = new Dictionary<string, int>();
 
         // Callback receives key and value
-        stub.Indexer.OnSet((key, value) => storage[key] = value);
+        stub.Indexer.Set((key, value) => storage[key] = value);
 
         ICollection<string, int> collection = stub;
 
@@ -110,7 +110,7 @@ public partial class IndexerBasicsDemo
     // When Backing is used:
     // - Gets retrieve from the dictionary
     // - Sets store into the dictionary
-    // - No OnGet/OnSet callbacks needed
+    // - No Get/Set callbacks needed
     //
     // GENERATOR BEHAVIOR:
     //
@@ -199,8 +199,8 @@ public partial class IndexerBasicsDemo
     //
     //   public class IndexerInterceptor : IndexerContainer<(int row, int col), double>
     //   {
-    //       public void OnGet(Func<int, int, double> callback) { ... }
-    //       public void OnSet(Action<int, int, double> callback) { ... }
+    //       public void Get(Func<int, int, double> callback) { ... }
+    //       public void Set(Action<int, int, double> callback) { ... }
     //
     //       public (int row, int col) LastGetKey { get; }
     //       public ((int row, int col) Key, double Value) LastSetEntry { get; }
@@ -216,7 +216,7 @@ public partial class IndexerBasicsDemo
     // public void MultiKeyIndexer_TupleKeys()
     // {
     //     var stub = new Stubs.IMatrix();
-    //     stub.Indexer.OnGet((row, col) => row * 10.0 + col);
+    //     stub.Indexer.Get((row, col) => row * 10.0 + col);
     //     IMatrix matrix = stub;
     //     var val = matrix[2, 3]; // Returns 23.0 (2*10 + 3)
     // }
@@ -244,21 +244,21 @@ public partial class IndexerBasicsDemo
     }
 
     // =========================================================================
-    // COMMON MISTAKE: Using OnGet/OnSet with Backing
+    // COMMON MISTAKE: Using Get/Set with Backing
     // =========================================================================
     //
-    // COMMON MISTAKE: Expecting Backing to work when OnGet/OnSet is configured
+    // COMMON MISTAKE: Expecting Backing to work when Get/Set is configured
     //
-    // When you set OnGet or OnSet, they OVERRIDE Backing behavior:
+    // When you set Get or Set, they OVERRIDE Backing behavior:
     //
     //   stub.Indexer.Backing["key"] = 100;
-    //   stub.Indexer.OnGet((k) => 999);
+    //   stub.Indexer.Get((k) => 999);
     //   collection["key"]; // Returns 999, NOT 100!
     //
-    // Backing is for simple scenarios. OnGet/OnSet are for custom behavior.
+    // Backing is for simple scenarios. Get/Set are for custom behavior.
     // =========================================================================
 
-    public void Backing_VsOnGet()
+    public void Backing_VsGet()
     {
         var stub = new Stubs.ICollection();
 
@@ -268,8 +268,8 @@ public partial class IndexerBasicsDemo
         ICollection<string, int> collection = stub;
         var val1 = collection["key"]; // 100
 
-        // But OnGet overrides Backing behavior
-        stub.Indexer.OnGet((k) => 999);
+        // But Get overrides Backing behavior
+        stub.Indexer.Get((k) => 999);
         var val2 = collection["key"]; // 999 - Backing ignored!
     }
 }

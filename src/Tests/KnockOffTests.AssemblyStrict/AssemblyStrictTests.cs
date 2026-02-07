@@ -139,7 +139,7 @@ public class AssemblyStrictTests
 	public void StandaloneStub_WithOnGet_DoesNotThrow()
 	{
 		var stub = new DefaultStrictStub();
-		stub.Name.OnGet(() => "configured");
+		stub.Name.Get(() => "configured");
 		IDefaultStrictTest service = stub;
 
 		var result = service.Name;

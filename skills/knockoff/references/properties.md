@@ -8,23 +8,23 @@ This reference covers all aspects of property interceptors in KnockOff, includin
 
 Property interceptors are generated for every property in an interface. Each interceptor provides:
 
-- **OnGet(value)** - Set a static value to return from the getter
-- **OnGet(callback)** - Dynamic callback for computed values
-- **OnSet(callback)** - Callback for intercepting setter calls
-- **OnGet().ThenGet() / OnSet().ThenSet()** - Different behavior for successive accesses (sequences)
+- **Get(value)** - Set a static value to return from the getter
+- **Get(callback)** - Dynamic callback for computed values
+- **Set(callback)** - Callback for intercepting setter calls
+- **Get().ThenGet() / Set().ThenSet()** - Different behavior for successive accesses (sequences)
 - **Verification methods** - For asserting on property access patterns
 - **LastSetValue** - For capturing the most recent value written to a setter
 
 ---
 
-## Setting Static Values with OnGet
+## Setting Static Values with Get
 
-The `OnGet(value)` method is the simplest way to configure a property. Call it before your test runs to return a fixed value.
+The `Get(value)` method is the simplest way to configure a property. Call it before your test runs to return a fixed value.
 
 <!-- snippet: properties-value-basic -->
 ```cs
 // Set a static value for the property via the interceptor
-stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+stub.CurrentUser.Get(new User { Id = 1, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
@@ -33,13 +33,13 @@ Configure multiple properties at once for test fixtures:
 <!-- snippet: properties-value-multiple -->
 ```cs
 // Configure several properties before test execution
-stub.UserId.OnGet(42);
-stub.Email.OnGet("test@example.com");
-stub.CurrentUser.OnGet(new User { Id = 42, Name = "Test User" });
+stub.UserId.Get(42);
+stub.Email.Get("test@example.com");
+stub.CurrentUser.Get(new User { Id = 42, Name = "Test User" });
 ```
 <!-- endSnippet -->
 
-**When to use OnGet(value):**
+**When to use Get(value):**
 - Pre-populating repository stub data
 - Configuring service dependencies with fixed values
 - Setting up DTOs or configuration objects
@@ -47,41 +47,41 @@ stub.CurrentUser.OnGet(new User { Id = 42, Name = "Test User" });
 
 ---
 
-## Dynamic Getters with OnGet Callbacks
+## Dynamic Getters with Get Callbacks
 
-Use `OnGet(() => value)` when a property's value should be computed at access time. The callback is invoked on every property read.
+Use `Get(() => value)` when a property's value should be computed at access time. The callback is invoked on every property read.
 
 <!-- snippet: properties-onget-dynamic -->
 ```cs
-// OnGet callback returns dynamic value on each access
-stub.Timestamp.OnGet(() => DateTime.UtcNow);
+// Get callback returns dynamic value on each access
+stub.Timestamp.Get(() => DateTime.UtcNow);
 ```
 <!-- endSnippet -->
 
-OnGet callbacks can create state-dependent behavior:
+Get callbacks can create state-dependent behavior:
 
 <!-- snippet: properties-onget-stateful -->
 ```cs
-// OnGet checks the tracked state
-stub.IsReady.OnGet(() => isInitialized);
+// Get checks the tracked state
+stub.IsReady.Get(() => isInitialized);
 // Initialize method updates the tracked state
 stub.Initialize.Execute(() => { isInitialized = true; });
 ```
 <!-- endSnippet -->
 
-**OnGet supports both value and callback syntax:**
+**Get supports both value and callback syntax:**
 
 <!-- snippet: properties-onget-value-vs-callback -->
 ```cs
 // VALUE: Simple syntax for static values
-stub.Name.OnGet("StaticName");
+stub.Name.Get("StaticName");
 
 // CALLBACK: For computed or dynamic values
-stub.Age.OnGet(() => DateTime.Now.Year - 2000);
+stub.Age.Get(() => DateTime.Now.Year - 2000);
 ```
 <!-- endSnippet -->
 
-**When to use OnGet(callback):**
+**When to use Get(callback):**
 - Values that change over time (timestamps, random values)
 - Computed values based on other stub state
 - Simulating stateful behavior in dependencies
@@ -89,24 +89,24 @@ stub.Age.OnGet(() => DateTime.Now.Year - 2000);
 
 ---
 
-## Setter Interception with OnSet
+## Setter Interception with Set
 
-Use `OnSet(callback)` to intercept property writes. This allows tracking values or validating input during tests.
+Use `Set(callback)` to intercept property writes. This allows tracking values or validating input during tests.
 
 <!-- snippet: properties-onset-tracking -->
 ```cs
-// OnSet captures every value written to the property
+// Set captures every value written to the property
 var setValues = new List<string>();
-stub.Name.OnSet((value) => setValues.Add(value));
+stub.Name.Set((value) => setValues.Add(value));
 ```
 <!-- endSnippet -->
 
-Use `OnSet` to simulate validation logic in dependencies:
+Use `Set` to simulate validation logic in dependencies:
 
 <!-- snippet: properties-onset-validation -->
 ```cs
-// OnSet throws for invalid values
-stub.Age.OnSet((value) =>
+// Set throws for invalid values
+stub.Age.Set((value) =>
 {
     if (value < 0)
         throw new ArgumentException("Age cannot be negative");
@@ -114,7 +114,7 @@ stub.Age.OnSet((value) =>
 ```
 <!-- endSnippet -->
 
-**When to use OnSet:**
+**When to use Set:**
 - Tracking all values written to a property
 - Simulating validation failures in dependencies
 - Testing how your code handles property setter exceptions
@@ -172,7 +172,7 @@ Mark properties for batch verification using `Verifiable()`:
 <!-- snippet: properties-verifiable -->
 ```cs
 // Mark property as verifiable - requires access before Verify()
-stub.Name.OnGet("test");
+stub.Name.Get("test");
 stub.Name.Verifiable();
 stub.Age.Verifiable();
 ```
@@ -189,15 +189,15 @@ stub.Age.Verifiable();
 
 ## Property Sequences
 
-### OnGet().ThenGet() for Successive Reads
+### Get().ThenGet() for Successive Reads
 
-Use `OnGet().ThenGet()` when a property should return different values on successive reads.
+Use `Get().ThenGet()` when a property should return different values on successive reads.
 
 <!-- snippet: properties-onget-then-sequence -->
 ```cs
-// OnGet().ThenGet() configures different return values for each read
+// Get().ThenGet() configures different return values for each read
 stub.Name
-    .OnGet(() => "First")
+    .Get(() => "First")
     .ThenGet(() => "Second")
     .ThenGet(() => "Third");
 ```
@@ -207,22 +207,22 @@ The value overload simplifies static sequences:
 
 <!-- snippet: properties-ongetsequence-value -->
 ```cs
-// OnGet with value, ThenGet elevates to sequence mode
-stub.Name.OnGet("First")
+// Get with value, ThenGet elevates to sequence mode
+stub.Name.Get("First")
     .ThenGet(() => "Second")
     .ThenGet(() => "Third");
 ```
 <!-- endSnippet -->
 
-### OnSet().ThenSet() for Successive Writes
+### Set().ThenSet() for Successive Writes
 
-Use `OnSet().ThenSet()` when a property should react differently to successive writes.
+Use `Set().ThenSet()` when a property should react differently to successive writes.
 
 <!-- snippet: properties-onset-then-sequence -->
 ```cs
-// OnSet().ThenSet() configures different callbacks for each write
+// Set().ThenSet() configures different callbacks for each write
 stub.Name
-    .OnSet((value) => { firstWriteValue = $"First: {value}"; })
+    .Set((value) => { firstWriteValue = $"First: {value}"; })
     .ThenSet((value) => { secondWriteValue = $"Second: {value}"; });
 ```
 <!-- endSnippet -->
@@ -235,11 +235,11 @@ Sequences support the same verification as regular callbacks:
 ```cs
 // Sequences support verification like regular callbacks
 var getSequence = stub.Name
-    .OnGet(() => "A")
+    .Get(() => "A")
     .ThenGet(() => "B");
 
 var setSequence = stub.Age
-    .OnSet((v) => { })
+    .Set((v) => { })
     .ThenSet((v) => { });
 ```
 <!-- endSnippet -->
@@ -251,7 +251,7 @@ After a sequence returns all configured values, subsequent reads **repeat the la
 <!-- snippet: properties-sequence-exhaustion -->
 ```cs
 // Configure a sequence - after exhaustion, repeats last value
-stub.Name.OnGet("first")
+stub.Name.Get("first")
     .ThenGet("second")
     .ThenGet("third");
 ```
@@ -262,7 +262,7 @@ To return `default(T)` after exhaustion instead, chain `.ThenDefault()`:
 <!-- snippet: properties-sequence-thendefault -->
 ```cs
 // ThenDefault() returns default(T) after exhaustion instead of repeating
-stub.Name.OnGet("first")
+stub.Name.Get("first")
     .ThenGet("second")
     .ThenDefault();
 ```
@@ -272,15 +272,15 @@ stub.Name.OnGet("first")
 
 ---
 
-## OnGet Configuration Priority
+## Get Configuration Priority
 
-When you call `OnGet` multiple times, the last call wins. This applies to both value and callback syntax.
+When you call `Get` multiple times, the last call wins. This applies to both value and callback syntax.
 
 <!-- snippet: properties-priority -->
 ```cs
-// Last OnGet call wins - can upgrade from value to callback
-stub.Name.OnGet("initial");
-stub.Name.OnGet(() => "dynamic");
+// Last Get call wins - can upgrade from value to callback
+stub.Name.Get("initial");
+stub.Name.Get(() => "dynamic");
 ```
 <!-- endSnippet -->
 
@@ -311,8 +311,8 @@ Reset() clears:
 - Source delegation
 
 Reset() preserves:
-- `OnGet` callbacks (including sequence structure)
-- `OnSet` callbacks (including sequence structure)
+- `Get` callbacks (including sequence structure)
+- `Set` callbacks (including sequence structure)
 - Verifiable marking
 
 After reset, the property retains its configured behavior but tracking counts restart at zero.
@@ -321,7 +321,7 @@ After reset, the property retains its configured behavior but tracking counts re
 
 ## User Properties (Stand-Alone Pattern)
 
-When you define a **user property** (override a virtual property with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `Count`, not `Count2`). These interceptors support `OnGet()` and `OnSet()` to override the user property per-test.
+When you define a **user property** (override a virtual property with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `Count`, not `Count2`). These interceptors support `Get()` and `Set()` to override the user property per-test.
 
 ### Why Use User Properties?
 
@@ -398,9 +398,9 @@ service.Setting = "value";
 ```
 <!-- endSnippet -->
 
-### OnGet/OnSet Supersede User Properties
+### Get/Set Supersede User Properties
 
-User properties provide shareable defaults. Use `OnGet()` or `OnSet()` to override per-test:
+User properties provide shareable defaults. Use `Get()` or `Set()` to override per-test:
 
 <!-- snippet: user-properties-onget-onset-override -->
 ```cs
@@ -412,13 +412,13 @@ ISkillUserSvc service = stub;
 // Default: user property is called
 var defaultValue = service.Count;  // 42
 
-// OnGet supersedes the user property for this test
-stub.Count.OnGet(999);
+// Get supersedes the user property for this test
+stub.Count.Get(999);
 var overrideValue = service.Count;  // 999
 
-// OnSet supersedes the user property for this test
+// Set supersedes the user property for this test
 var capturedValue = "";
-stub.Name.OnSet(v => capturedValue = $"Captured: {v}");
+stub.Name.Set(v => capturedValue = $"Captured: {v}");
 service.Name = "Test";
 // capturedValue == "Captured: Test"
 // The user override's backing field was NOT updated
@@ -445,24 +445,24 @@ stub.Name.VerifySet(Times.Never);
 ```
 <!-- endSnippet -->
 
-### Reset Preserves OnGet/OnSet Configuration
+### Reset Preserves Get/Set Configuration
 
-`Reset()` clears tracking state but preserves the OnGet/OnSet configuration (matching regular interceptor semantics):
+`Reset()` clears tracking state but preserves the Get/Set configuration (matching regular interceptor semantics):
 
 <!-- snippet: user-properties-reset -->
 ```cs
 var stub = new SkillUserSvcStub();
-stub.Count.OnGet(100);  // Override user property
+stub.Count.Get(100);  // Override user property
 
 ISkillUserSvc service = stub;
 _ = service.Count;
 stub.Count.VerifyGet(Times.Once);
 
-// Reset clears tracking but preserves OnGet
+// Reset clears tracking but preserves Get
 stub.Count.Reset();
 stub.Count.VerifyGet(Times.Never);
 
-var value = service.Count;  // 100 (OnGet still active)
+var value = service.Count;  // 100 (Get still active)
 ```
 <!-- endSnippet -->
 
@@ -504,7 +504,7 @@ User properties apply to all four standalone patterns:
 
 When multiple configurations exist, the priority is:
 
-1. **OnGet/OnSet** - Per-test override (highest priority)
+1. **Get/Set** - Per-test override (highest priority)
 2. **User property** - Shared default from protected override
 3. **Smart default** - Returns `default(T)` or throws in strict mode
 
@@ -516,15 +516,15 @@ This example demonstrates all property configuration approaches in a realistic t
 
 <!-- snippet: properties-complete-example -->
 ```cs
-// OnGet with static value: Fixed test data
-stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+// Get with static value: Fixed test data
+stub.CurrentUser.Get(new User { Id = 1, Name = "Alice" });
 
-// OnGet with callback: State-dependent behavior
-stub.IsConnected.OnGet(() => isConnected);
+// Get with callback: State-dependent behavior
+stub.IsConnected.Get(() => isConnected);
 
-// OnSet: Track all values written
+// Set: Track all values written
 var connectionStrings = new List<string>();
-stub.ConnectionString.OnSet((value) => connectionStrings.Add(value));
+stub.ConnectionString.Set((value) => connectionStrings.Add(value));
 
 // Method callback updates the tracked state
 stub.Connect.Execute(() => { isConnected = true; });
@@ -539,13 +539,13 @@ Choose your configuration approach based on the test scenario:
 
 | Scenario | Use This | Example |
 |----------|----------|---------|
-| Property should return fixed test data | `OnGet(value)` | `stub.UserId.OnGet(42);` |
-| Property should return current time/random value | `OnGet(callback)` | `stub.Now.OnGet(() => DateTime.UtcNow);` |
-| Property depends on other stub state | `OnGet(callback)` | `stub.IsReady.OnGet(() => isInitialized);` |
-| Property should return different values on successive reads | `OnGet().ThenGet()` | `stub.Name.OnGet("A").ThenGet("B");` |
-| Track all values written to property | `OnSet` | `stub.Name.OnSet((v) => list.Add(v));` |
-| Simulate validation in dependency | `OnSet` | `stub.Age.OnSet((v) => Validate(v));` |
-| Property should react differently to successive writes | `OnSet().ThenSet()` | `stub.Name.OnSet(cb1).ThenSet(cb2);` |
+| Property should return fixed test data | `Get(value)` | `stub.UserId.Get(42);` |
+| Property should return current time/random value | `Get(callback)` | `stub.Now.Get(() => DateTime.UtcNow);` |
+| Property depends on other stub state | `Get(callback)` | `stub.IsReady.Get(() => isInitialized);` |
+| Property should return different values on successive reads | `Get().ThenGet()` | `stub.Name.Get("A").ThenGet("B");` |
+| Track all values written to property | `Set` | `stub.Name.Set((v) => list.Add(v));` |
+| Simulate validation in dependency | `Set` | `stub.Age.Set((v) => Validate(v));` |
+| Property should react differently to successive writes | `Set().ThenSet()` | `stub.Name.Set(cb1).ThenSet(cb2);` |
 | Verify property was accessed N times | `VerifyGet` | `stub.UserId.VerifyGet(Times.Exactly(2));` |
 | Verify last value written | `LastSetValue` | `Assert.Equal("x", stub.Name.LastSetValue);` |
 
@@ -557,9 +557,9 @@ Choose your configuration approach based on the test scenario:
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `OnGet(T value)` | `IPropertyGetSequence<T>` | Configure getter to return static value. Chain with `.ThenGet()` for sequences. |
-| `OnGet(Func<T> callback)` | `IPropertyGetSequence<T>` | Configure getter with dynamic callback. Chain with `.ThenGet()` for sequences. |
-| `OnSet(Action<T> callback)` | `IPropertySetSequence<T>` | Configure setter callback. Chain with `.ThenSet()` for sequences. |
+| `Get(T value)` | `IPropertyGetSequence<T>` | Configure getter to return static value. Chain with `.ThenGet()` for sequences. |
+| `Get(Func<T> callback)` | `IPropertyGetSequence<T>` | Configure getter with dynamic callback. Chain with `.ThenGet()` for sequences. |
+| `Set(Action<T> callback)` | `IPropertySetSequence<T>` | Configure setter callback. Chain with `.ThenSet()` for sequences. |
 
 ### Verification Methods
 
@@ -584,7 +584,7 @@ Choose your configuration approach based on the test scenario:
 
 | Method | Description |
 |--------|-------------|
-| `Reset()` | Clears tracking state (get/set counts, LastSetValue, sequence index, source delegation). Preserves OnGet/OnSet callbacks and verifiable marking. |
+| `Reset()` | Clears tracking state (get/set counts, LastSetValue, sequence index, source delegation). Preserves Get/Set callbacks and verifiable marking. |
 
 ### Sequence Methods
 

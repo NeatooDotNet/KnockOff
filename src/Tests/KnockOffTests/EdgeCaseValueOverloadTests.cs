@@ -213,7 +213,7 @@ public partial class EdgeCaseValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Count.OnGet(0);
+		knockOff.Count.Get(0);
 
 		Assert.Equal(0, service.Count);
 	}
@@ -224,7 +224,7 @@ public partial class EdgeCaseValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.IsEnabled.OnGet(false);
+		knockOff.IsEnabled.Get(false);
 
 		Assert.False(service.IsEnabled);
 	}

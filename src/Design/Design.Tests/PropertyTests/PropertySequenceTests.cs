@@ -7,7 +7,7 @@ using Design.Stubs.Properties;
 namespace Design.Tests.PropertyTests;
 
 /// <summary>
-/// Tests for property sequences: OnGet().ThenGet() and OnSet().ThenSet() chains.
+/// Tests for property sequences: Get().ThenGet() and Set().ThenSet() chains.
 /// </summary>
 public class PropertySequenceTests
 {
@@ -15,7 +15,7 @@ public class PropertySequenceTests
     public void ThenGet_CreatesGetterSequence()
     {
         var stub = new PropertySequencesDemo.Stubs.IEntity();
-        stub.Name.OnGet("First")
+        stub.Name.Get("First")
             .ThenGet("Second")
             .ThenGet("Third");
 
@@ -32,7 +32,7 @@ public class PropertySequenceTests
         // ACTUAL BEHAVIOR: Sequences repeat the last value (NSubstitute-like).
         // Use ThenDefault() to return default(T) after exhaustion instead.
         var stub = new PropertySequencesDemo.Stubs.IEntity();
-        stub.Name.OnGet("First")
+        stub.Name.Get("First")
             .ThenGet("Final");
 
         Design.Domain.Entities.IEntity entity = stub;
@@ -48,7 +48,7 @@ public class PropertySequenceTests
     {
         // ThenDefault() causes sequence to return default(T) after exhaustion
         var stub = new PropertySequencesDemo.Stubs.IEntity();
-        stub.Name.OnGet("First")
+        stub.Name.Get("First")
             .ThenGet("Final")
             .ThenDefault();
 
@@ -65,7 +65,7 @@ public class PropertySequenceTests
         var stub = new PropertySequencesDemo.Stubs.IEntity();
         var counter = 0;
 
-        stub.Name.OnGet("Static")
+        stub.Name.Get("Static")
             .ThenGet(() => $"Dynamic {++counter}")
             .ThenGet("Final");
 
@@ -82,7 +82,7 @@ public class PropertySequenceTests
         var stub = new PropertySequencesDemo.Stubs.IEntity();
         var log = new List<string>();
 
-        stub.Description.OnSet(v => log.Add($"First: {v}"))
+        stub.Description.Set(v => log.Add($"First: {v}"))
             .ThenSet(v => log.Add($"Second: {v}"))
             .ThenSet(v => log.Add($"Third: {v}"));
 
@@ -103,7 +103,7 @@ public class PropertySequenceTests
         var stub = new PropertySequencesDemo.Stubs.IEntity();
         var log = new List<string>();
 
-        stub.Description.OnSet(v => log.Add($"First: {v}"))
+        stub.Description.Set(v => log.Add($"First: {v}"))
             .ThenSet(v => log.Add($"Final: {v}"));
 
         Design.Domain.Entities.IEntity entity = stub;
@@ -123,7 +123,7 @@ public class PropertySequenceTests
         var stub = new PropertySequencesDemo.Stubs.IEntity();
         var log = new List<string>();
 
-        stub.Description.OnSet(v => log.Add($"First: {v}"))
+        stub.Description.Set(v => log.Add($"First: {v}"))
             .ThenSet(v => log.Add($"Final: {v}"))
             .ThenDefault();
 

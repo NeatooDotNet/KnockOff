@@ -1,7 +1,7 @@
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for OnGet(value) property value overloads.
+/// Tests for Get(value) property value overloads.
 /// Phase 2 of value-based overloads feature.
 /// </summary>
 public partial class PropertyValueOverloadTests
@@ -14,7 +14,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		var tracking = knockOff.Name.OnGet("configured value");
+		var tracking = knockOff.Name.Get("configured value");
 
 		var result = service.Name;
 
@@ -28,7 +28,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		var tracking = knockOff.Name.OnGet((string?)null);
+		var tracking = knockOff.Name.Get((string?)null);
 
 		var result = service.Name;
 
@@ -42,7 +42,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGet("repeated");
+		knockOff.Name.Get("repeated");
 
 		Assert.Equal("repeated", service.Name);
 		Assert.Equal("repeated", service.Name);
@@ -59,7 +59,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Count.OnGet(42);
+		knockOff.Count.Get(42);
 
 		Assert.Equal(42, service.Count);
 	}
@@ -70,7 +70,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.IsEnabled.OnGet(true);
+		knockOff.IsEnabled.Get(true);
 
 		Assert.True(service.IsEnabled);
 	}
@@ -81,7 +81,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Count.OnGet(0);
+		knockOff.Count.Get(0);
 
 		Assert.Equal(0, service.Count);
 	}
@@ -95,7 +95,7 @@ public partial class PropertyValueOverloadTests
 	{
 		var knockOff = new PropertyTestKnockOff();
 
-		var tracking = knockOff.Name.OnGet("test");
+		var tracking = knockOff.Name.Get("test");
 
 		Assert.NotNull(tracking);
 		Assert.IsAssignableFrom<IPropertyGetTracking>(tracking);
@@ -107,7 +107,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		var tracking = knockOff.Name.OnGet("test");
+		var tracking = knockOff.Name.Get("test");
 
 		_ = service.Name;
 
@@ -120,7 +120,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		var tracking = knockOff.Name.OnGet("test");
+		var tracking = knockOff.Name.Get("test");
 
 		_ = service.Name;
 		_ = service.Name;
@@ -139,11 +139,11 @@ public partial class PropertyValueOverloadTests
 		IPropertyTest service = knockOff;
 
 		// First configure with callback
-		knockOff.Name.OnGet(() => "from callback");
+		knockOff.Name.Get(() => "from callback");
 		Assert.Equal("from callback", service.Name);
 
 		// Then configure with value - should override callback
-		knockOff.Name.OnGet("from value");
+		knockOff.Name.Get("from value");
 		Assert.Equal("from value", service.Name);
 	}
 
@@ -154,11 +154,11 @@ public partial class PropertyValueOverloadTests
 		IPropertyTest service = knockOff;
 
 		// First configure with value
-		knockOff.Name.OnGet("from value");
+		knockOff.Name.Get("from value");
 		Assert.Equal("from value", service.Name);
 
 		// Then configure with callback - should override value
-		knockOff.Name.OnGet(() => "from callback");
+		knockOff.Name.Get(() => "from callback");
 		Assert.Equal("from callback", service.Name);
 	}
 
@@ -172,7 +172,7 @@ public partial class PropertyValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGet("first").ThenGet("second");
+		knockOff.Name.Get("first").ThenGet("second");
 
 		Assert.Equal("first", service.Name);
 		Assert.Equal("second", service.Name);

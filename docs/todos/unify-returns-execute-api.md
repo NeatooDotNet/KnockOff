@@ -19,7 +19,7 @@ Additionally, `.When(value)` currently chains to `.Returns()` for parameter matc
 
 The method sequence entry point `.OnCallSequence()` must also be removed. Sequences should use `.Returns(...).ThenReturns(...)` / `.Execute(...).ThenExecute(...)` chaining instead of a separate entry point. Prior work exists: `IMethodCallBuilder` interfaces are already in `src/KnockOff/` and an approved plan exists at `docs/plans/simplify-oncall-sequence-api-design.md` (from 2026-01-29) — though method names will change to match the new Returns/Execute API.
 
-**Explicitly out of scope:** Property and indexer APIs (`OnGet`, `OnSet`, `OnGetSequence`, `OnSetSequence`) stay as-is. The tension being resolved is void vs non-void *methods* only.
+**Explicitly out of scope:** Property and indexer APIs (`Get`, `Set`, sequence chaining via `Get().ThenGet()`/`Set().ThenSet()`) stay as-is. The tension being resolved is void vs non-void *methods* only.
 
 ## Solution
 

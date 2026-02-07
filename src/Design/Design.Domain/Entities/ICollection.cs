@@ -10,7 +10,7 @@ namespace Design.Domain.Entities;
 /// This interface demonstrates:
 /// - Single-key indexers
 /// - Backing dictionary pattern
-/// - OnGet/OnSet callbacks with key access
+/// - Get/Set callbacks with key access
 /// - Indexer sequences
 /// - LastGetKey, LastSetEntry tracking
 /// </summary>
@@ -18,7 +18,7 @@ public interface ICollection<TKey, TValue>
 {
     /// <summary>
     /// Indexer for accessing collection items by key.
-    /// Used to demonstrate: OnGet(callback), OnSet(callback), Backing
+    /// Used to demonstrate: Get(callback), Set(callback), Backing
     /// </summary>
     TValue this[TKey key] { get; set; }
 
@@ -49,7 +49,7 @@ public interface IReadOnlyCollection<TKey, TValue>
 {
     /// <summary>
     /// Get-only indexer for accessing collection items.
-    /// Used to demonstrate: OnGet without OnSet
+    /// Used to demonstrate: Get without Set
     /// </summary>
     TValue this[TKey key] { get; }
 

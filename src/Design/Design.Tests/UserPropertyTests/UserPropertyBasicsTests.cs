@@ -4,11 +4,11 @@
 // Tests for user-defined properties (protected override properties with _ suffix)
 // in standalone stubs. These tests cover:
 // - Get-only, set-only, and get/set property overrides
-// - OnGet/OnSet superseding user overrides
+// - Get/Set superseding user overrides
 // - Tracking via VerifyGet/VerifySet
 // - LastSetValue capture through user override
 // - Strict mode bypass for overridden properties
-// - Reset behavior preserving OnGet/OnSet configuration
+// - Reset behavior preserving Get/Set configuration
 // - Mixed scenarios (some properties overridden, some not)
 // - All four standalone patterns
 // -----------------------------------------------------------------------------
@@ -23,16 +23,16 @@ namespace Design.Tests.UserPropertyTests;
 /// <summary>
 /// Tests for user property overrides in standalone stubs.
 /// User properties are protected override properties with underscore suffix
-/// that provide default behavior, superseded by OnGet/OnSet per-test.
+/// that provide default behavior, superseded by Get/Set per-test.
 /// </summary>
 public class UserPropertyBasicsTests
 {
     // =========================================================================
-    // Test 1: Get-only property override is called when no OnGet configured
+    // Test 1: Get-only property override is called when no Get configured
     // =========================================================================
 
     [Fact]
-    public void GetOnlyProperty_Override_IsCalledWhenNoOnGetConfigured()
+    public void GetOnlyProperty_Override_IsCalledWhenNoGetConfigured()
     {
         var stub = new BasicUserPropertyStub();
         stub.SetCount(42);
@@ -70,11 +70,11 @@ public class UserPropertyBasicsTests
     }
 
     // =========================================================================
-    // Test 3: Set-only property override is called when no OnSet configured
+    // Test 3: Set-only property override is called when no Set configured
     // =========================================================================
 
     [Fact]
-    public void SetOnlyProperty_Override_IsCalledWhenNoOnSetConfigured()
+    public void SetOnlyProperty_Override_IsCalledWhenNoSetConfigured()
     {
         var stub = new BasicUserPropertyStub();
 
@@ -86,17 +86,17 @@ public class UserPropertyBasicsTests
     }
 
     // =========================================================================
-    // Test 4: OnGet supersedes property override per-test
+    // Test 4: Get supersedes property override per-test
     // =========================================================================
 
     [Fact]
-    public void OnGet_SupersedesPropertyOverride()
+    public void Get_SupersedesPropertyOverride()
     {
         var stub = new BasicUserPropertyStub();
         stub.SetCount(42);
 
-        // OnGet supersedes the user property
-        stub.Count.OnGet(999);
+        // Get supersedes the user property
+        stub.Count.Get(999);
 
         IUserPropertyService service = stub;
 
@@ -104,13 +104,13 @@ public class UserPropertyBasicsTests
     }
 
     [Fact]
-    public void OnGet_WithCallback_SupersedesPropertyOverride()
+    public void Get_WithCallback_SupersedesPropertyOverride()
     {
         var stub = new BasicUserPropertyStub();
         stub.SetCount(42);
 
         var counter = 0;
-        stub.Count.OnGet(() => ++counter);
+        stub.Count.Get(() => ++counter);
 
         IUserPropertyService service = stub;
 
@@ -120,24 +120,24 @@ public class UserPropertyBasicsTests
     }
 
     // =========================================================================
-    // Test 5: OnSet supersedes property override per-test
+    // Test 5: Set supersedes property override per-test
     // =========================================================================
 
     [Fact]
-    public void OnSet_SupersedesPropertyOverride()
+    public void Set_SupersedesPropertyOverride()
     {
         var stub = new BasicUserPropertyStub();
         var capturedValue = "";
 
-        stub.Name.OnSet(v => capturedValue = $"Captured: {v}");
+        stub.Name.Set(v => capturedValue = $"Captured: {v}");
 
         IUserPropertyService service = stub;
         service.Name = "Test";
 
-        // OnSet was invoked, NOT the user override
+        // Set was invoked, NOT the user override
         Assert.Equal("Captured: Test", capturedValue);
         // The user override's backing field was NOT updated
-        // because OnSet bypassed it
+        // because Set bypassed it
     }
 
     // =========================================================================
@@ -225,44 +225,44 @@ public class UserPropertyBasicsTests
     }
 
     // =========================================================================
-    // Test 9: Reset preserves OnGet/OnSet configuration
+    // Test 9: Reset preserves Get/Set configuration
     // =========================================================================
 
     [Fact]
-    public void Reset_PreservesOnGetConfiguration()
+    public void Reset_PreservesGetConfiguration()
     {
         var stub = new BasicUserPropertyStub();
-        stub.Count.OnGet(100);
+        stub.Count.Get(100);
 
         IUserPropertyService service = stub;
         _ = service.Count;
         stub.Count.VerifyGet(Times.Once);
 
-        // Reset clears tracking but preserves OnGet
+        // Reset clears tracking but preserves Get
         stub.Count.Reset();
         stub.Count.VerifyGet(Times.Never);
 
         var value = service.Count;
-        Assert.Equal(100, value); // OnGet still active
+        Assert.Equal(100, value); // Get still active
     }
 
     [Fact]
-    public void Reset_PreservesOnSetConfiguration()
+    public void Reset_PreservesSetConfiguration()
     {
         var stub = new BasicUserPropertyStub();
         var callCount = 0;
-        stub.Name.OnSet(v => callCount++);
+        stub.Name.Set(v => callCount++);
 
         IUserPropertyService service = stub;
         service.Name = "First";
         Assert.Equal(1, callCount);
 
-        // Reset clears tracking but preserves OnSet
+        // Reset clears tracking but preserves Set
         stub.Name.Reset();
         stub.Name.VerifySet(Times.Never);
 
         service.Name = "Second";
-        Assert.Equal(2, callCount); // OnSet still active
+        Assert.Equal(2, callCount); // Set still active
     }
 
     [Fact]
@@ -297,16 +297,16 @@ public class UserPropertyBasicsTests
         // Properties WITH user override
         stub.WithUserProperty.VerifyGet(Times.Never);
 
-        // Properties WITHOUT user override - configure via OnGet
-        stub.WithoutUserProperty.OnGet(42);
-        stub.ComputedWithoutUserProperty.OnGet("Configured value");
+        // Properties WITHOUT user override - configure via Get
+        stub.WithoutUserProperty.Get(42);
+        stub.ComputedWithoutUserProperty.Get("Configured value");
 
         IMixedUserPropertyService service = stub;
 
         var r1 = service.WithUserProperty;       // 100 (from override)
-        var r2 = service.WithoutUserProperty;    // 42 (from OnGet)
+        var r2 = service.WithoutUserProperty;    // 42 (from Get)
         var r3 = service.ComputedWithUserProperty;  // "Computed: 100" (from override)
-        var r4 = service.ComputedWithoutUserProperty; // "Configured value" (from OnGet)
+        var r4 = service.ComputedWithoutUserProperty; // "Configured value" (from Get)
 
         Assert.Equal(100, r1);
         Assert.Equal(42, r2);
@@ -433,13 +433,13 @@ public class UserPropertyBasicsTests
     }
 
     [Fact]
-    public void OnGet_SupersedesOnStandaloneClass()
+    public void Get_SupersedesOnStandaloneClass()
     {
         var stub = new ConfigUserPropertyStub();
         stub.SetConfigName("Default");
 
-        // OnGet supersedes the user property
-        stub.ConfigName.OnGet("Override Config");
+        // Get supersedes the user property
+        stub.ConfigName.Get("Override Config");
 
         ConfigBase config = stub.Object;
 
@@ -448,13 +448,13 @@ public class UserPropertyBasicsTests
     }
 
     [Fact]
-    public void OnGet_SupersedesOnGenericStandalone()
+    public void Get_SupersedesOnGenericStandalone()
     {
         var stub = new GenericUserPropertyStub<string>();
         stub.SetCurrentItem("Default");
 
-        // OnGet supersedes the user property
-        stub.CurrentItem.OnGet("Override Value");
+        // Get supersedes the user property
+        stub.CurrentItem.Get("Override Value");
 
         IGenericUserPropertyService<string> service = stub;
 
@@ -462,13 +462,13 @@ public class UserPropertyBasicsTests
     }
 
     [Fact]
-    public void OnGet_SupersedesOnGenericStandaloneClass()
+    public void Get_SupersedesOnGenericStandaloneClass()
     {
         var stub = new CacheUserPropertyStub<string>();
         stub.SetDefaultValue("Default");
 
-        // OnGet supersedes the user property
-        stub.DefaultValue.OnGet("Override Default");
+        // Get supersedes the user property
+        stub.DefaultValue.Get("Override Default");
 
         CacheBase<string> cache = stub.Object;
 

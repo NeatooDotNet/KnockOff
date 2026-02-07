@@ -1,7 +1,7 @@
 namespace KnockOff;
 
 /// <summary>
-/// Returned by OnGet(). Supports tracking and optional sequence chaining.
+/// Returned by Get(). Supports tracking and optional sequence chaining.
 /// </summary>
 /// <remarks>
 /// The builder IS the tracking implementation. When ThenGet is invoked,
@@ -30,7 +30,7 @@ public interface IPropertyGetBuilder<TValue> : IPropertyGetTracking
 }
 
 /// <summary>
-/// Returned by OnSet(). Supports tracking and optional sequence chaining.
+/// Returned by Set(). Supports tracking and optional sequence chaining.
 /// </summary>
 /// <remarks>
 /// The builder IS the tracking implementation. When ThenSet is invoked,

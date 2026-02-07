@@ -118,7 +118,7 @@ public partial class IRuleOfTTests
         var stub = new Stubs.IRule();
         IRule<IValidateBase> rule = stub;
 
-        stub.Executed.OnGet(true);
+        stub.Executed.Get(true);
 
         Assert.True(rule.Executed);
     }
@@ -129,7 +129,7 @@ public partial class IRuleOfTTests
         var stub = new Stubs.IRule();
         IRule<IValidateBase> rule = stub;
 
-        stub.RuleOrder.OnGet(10);
+        stub.RuleOrder.Get(10);
 
         Assert.Equal(10, rule.RuleOrder);
     }
@@ -141,7 +141,7 @@ public partial class IRuleOfTTests
         IRule<IValidateBase> rule = stub;
 
         var messages = new List<IRuleMessage> { new RuleMessage("Prop", "Error") };
-        stub.Messages.OnGet(messages);
+        stub.Messages.Get(messages);
 
         Assert.Same(messages, rule.Messages);
     }

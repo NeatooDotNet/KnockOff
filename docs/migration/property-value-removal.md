@@ -24,14 +24,14 @@ KnockOff 0.24.0 removes the `.Value` property from property interceptors and rep
 
 <!-- snippet: property-value-new-api -->
 ```cs
-// NEW API: Configure property return value with OnGet
-stub.Name.OnGet("Alice");
+// NEW API: Configure property return value with Get
+stub.Name.Get("Alice");
 ```
 <!-- endSnippet -->
 
 ## Migration Steps
 
-### 1. Replace `.Value = x` with `.OnGet(x)`
+### 1. Replace `.Value = x` with `.Get(x)`
 
 **Before:**
 <!-- snippet: migration-value-to-onget-before -->
@@ -48,9 +48,9 @@ stub.Name.OnGet("Alice");
 <!-- snippet: migration-value-to-onget-after -->
 ```cs
 // AFTER (0.24.0+):
-stub.ConnectionString.OnGet("Server=localhost");
-stub.Timeout.OnGet(30);
-stub.IsEnabled.OnGet(true);
+stub.ConnectionString.Get("Server=localhost");
+stub.Timeout.Get(30);
+stub.IsEnabled.Get(true);
 ```
 <!-- endSnippet -->
 
@@ -71,14 +71,14 @@ If you were reading `.Value` to verify what was configured, that's no longer nee
 **After:**
 <!-- snippet: migration-value-read-after -->
 ```cs
-// AFTER: Configure with OnGet, verify through interface
-stub.Name.OnGet("Expected");
+// AFTER: Configure with Get, verify through interface
+stub.Name.Get("Expected");
 ```
 <!-- endSnippet -->
 
-### 3. Dynamic values use OnGet with callback
+### 3. Dynamic values use Get with callback
 
-If you were using `.Value` with the expectation it would be read each time, use `OnGet` with a callback for dynamic behavior:
+If you were using `.Value` with the expectation it would be read each time, use `Get` with a callback for dynamic behavior:
 
 **Before (if expecting dynamic behavior):**
 <!-- snippet: migration-dynamic-value-before -->
@@ -94,25 +94,25 @@ If you were using `.Value` with the expectation it would be read each time, use 
 <!-- snippet: migration-dynamic-value-after -->
 ```cs
 // AFTER: Use callback for values evaluated on each access
-stub.LastUpdated.OnGet(() => DateTime.UtcNow);
+stub.LastUpdated.Get(() => DateTime.UtcNow);
 ```
 <!-- endSnippet -->
 
 ## Why This Change?
 
-1. **API Consistency**: Methods now use `OnCall(value)`, properties use `OnGet(value)`. The pattern is consistent.
+1. **API Consistency**: Methods now use `OnCall(value)`, properties use `Get(value)`. The pattern is consistent.
 
-2. **Clearer Intent**: `OnGet("value")` clearly indicates you're configuring what the getter returns. `.Value = x` was ambiguous about whether it was setting a backing store or configuring behavior.
+2. **Clearer Intent**: `Get("value")` clearly indicates you're configuring what the getter returns. `.Value = x` was ambiguous about whether it was setting a backing store or configuring behavior.
 
-3. **Tracking Support**: `OnGet()` returns a tracking interface, enabling call verification. `.Value` had no tracking.
+3. **Tracking Support**: `Get()` returns a tracking interface, enabling call verification. `.Value` had no tracking.
 
-4. **Sequence Support**: `OnGetSequence(value)` enables chained sequences. The `.Value` property couldn't support this pattern.
+4. **Sequence Support**: `Get(value).ThenGet(value)` enables chained sequences. The `.Value` property couldn't support this pattern.
 
 ## Affected APIs
 
 | Old API | New API | Returns |
 |---------|---------|---------|
-| `interceptor.Value = x` | `interceptor.OnGet(x)` | `IPropertyGetTracking` |
+| `interceptor.Value = x` | `interceptor.Get(x)` | `IPropertyGetTracking` |
 | `interceptor.Value` (get) | Not available | N/A |
 
 ## Tooling Support
@@ -131,7 +131,7 @@ error CS1061: 'NameInterceptor' does not contain a definition for 'Value'
 ```cs
 // BEFORE: stub.Name.Value = "Alice";
 // AFTER:
-stub.Name.OnGet("Alice");
+stub.Name.Get("Alice");
 ```
 <!-- endSnippet -->
 
@@ -140,8 +140,8 @@ stub.Name.OnGet("Alice");
 <!-- snippet: migration-example-nullable-property -->
 ```cs
 // BEFORE: stub.Email.Value = null;
-// AFTER: Cast null to the property type for OnGet
-stub.Email.OnGet((string?)null);
+// AFTER: Cast null to the property type for Get
+stub.Email.Get((string?)null);
 ```
 <!-- endSnippet -->
 
@@ -151,7 +151,7 @@ stub.Email.OnGet((string?)null);
 ```cs
 // BEFORE: stub.Age.Value = 42;
 // AFTER:
-stub.Age.OnGet(42);
+stub.Age.Get(42);
 ```
 <!-- endSnippet -->
 
@@ -161,7 +161,7 @@ stub.Age.OnGet(42);
 ```cs
 // BEFORE: stub.IsActive.Value = true;
 // AFTER:
-stub.IsActive.OnGet(true);
+stub.IsActive.Get(true);
 ```
 <!-- endSnippet -->
 

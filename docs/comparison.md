@@ -27,8 +27,8 @@ For argument matching, argument capture, and method overload resolution comparis
 
 | Task | Moq | NSubstitute | KnockOff |
 |------|-----|-------------|----------|
-| **Setup getter** | `mock.Setup(x => x.Mode).Returns("Scientific");` | `calc.Mode.Returns("Scientific");` | `stub.Mode.OnGet("Scientific");` |
-| **Setup setter** | `mock.SetupSet(x => x.Mode = It.IsAny<string>()).Callback<string>(v => captured = v);` | `calc.When(x => x.Mode = Arg.Any<string>()).Do(x => ...);` | `stub.Mode.OnSet((v) => captured = v);` |
+| **Setup getter** | `mock.Setup(x => x.Mode).Returns("Scientific");` | `calc.Mode.Returns("Scientific");` | `stub.Mode.Get("Scientific");` |
+| **Setup setter** | `mock.SetupSet(x => x.Mode = It.IsAny<string>()).Callback<string>(v => captured = v);` | `calc.When(x => x.Mode = Arg.Any<string>()).Do(x => ...);` | `stub.Mode.Set((v) => captured = v);` |
 | **Verify getter** | `mock.VerifyGet(x => x.Mode);` | `_ = calc.Received().Mode;` | `stub.Mode.VerifyGet();` |
 | **Verify setter** | `mock.VerifySet(x => x.Mode = "Scientific");` | `calc.Received().Mode = "Scientific";` | `stub.Mode.VerifySet();` |
 | **Verify count** | `mock.VerifyGet(x => x.Mode, Times.Exactly(3));` | `_ = calc.Received(3).Mode;` | `stub.Mode.VerifyGet(Times.Exactly(3));` |
@@ -68,7 +68,7 @@ For argument matching, argument capture, and method overload resolution comparis
 | Task | Moq | NSubstitute | KnockOff |
 |------|-----|-------------|----------|
 | **Setup getter** | `mock.Setup(x => x["key"]).Returns(42);` | `dict["key"].Returns(42);` | `stub.Indexer.Backing["key"] = 42;` |
-| **Dynamic getter** | `mock.Setup(x => x[It.IsAny<string>()]).Returns(0);` | `dict[Arg.Any<string>()].Returns(0);` | `stub.Indexer.OnGet((key) => 0);` |
+| **Dynamic getter** | `mock.Setup(x => x[It.IsAny<string>()]).Returns(0);` | `dict[Arg.Any<string>()].Returns(0);` | `stub.Indexer.Get((key) => 0);` |
 | **Verify getter** | `mock.Verify(x => x["key"]);` | `_ = dict.Received()["key"];` | `stub.Indexer.VerifyGet();` |
 | **Verify setter** | `mock.VerifySet(x => x["key"] = 42);` | `dict.Received()["key"] = 42;` | `stub.Indexer.VerifySet();` |
 | **Capture** | *(manual with Callback)* | *(manual with When/Do)* | `stub.Indexer.LastSetEntry` (built-in) |

@@ -58,14 +58,14 @@ src/Design/
 │   ├── StubPatterns/
 │   │   └── AllPatterns.cs      # Side-by-side comparison of all 4 patterns
 │   ├── Methods/
-│   │   ├── BasicMethods.cs     # Returns, OnCall, callbacks
+│   │   ├── BasicMethods.cs     # Returns, callbacks
 │   │   ├── MethodSequences.cs  # OnCall().ThenCall() chains
 │   │   └── WhenMatching.cs     # When() API comprehensive
 │   ├── Properties/
-│   │   ├── PropertyBasics.cs   # OnGet, OnSet, Value
-│   │   └── PropertySequences.cs # OnGet().ThenGet() chains
+│   │   ├── PropertyBasics.cs   # Get, Set, Value
+│   │   └── PropertySequences.cs # Get().ThenGet() chains
 │   ├── Indexers/
-│   │   ├── IndexerBasics.cs    # OnGet, OnSet, Backing
+│   │   ├── IndexerBasics.cs    # Get, Set, Backing
 │   │   └── IndexerSequences.cs # Sequences for indexers
 │   ├── Events/
 │   │   └── EventPatterns.cs    # Raise, VerifyAdd, VerifyRemove
@@ -100,7 +100,7 @@ src/Design/
 
 ```csharp
 /// <summary>
-/// Demonstrates: OnCall() for method callbacks with argument access.
+/// Demonstrates: Returns() for method callbacks with argument access.
 ///
 /// Key points:
 /// - Arguments are typed and named in the delegate signature
@@ -137,7 +137,7 @@ src/Design/
 // stub.Setup(x => x.Method(It.IsAny<int>())).Returns(42);
 //
 // ACTUAL PATTERN:
-// stub.Method.OnCall((arg) => 42);
+// stub.Method.Returns((arg) => 42);
 // // or for constant:
 // stub.Method.Returns(42);
 ```
@@ -210,7 +210,7 @@ src/Design/
 //    public partial class CalculatorTests { }
 //    var stub = new Stubs.FuncInt32Int32Int32();
 //    Func<int, int, int> func = stub;  // implicit conversion
-//    stub.Interceptor.OnCall((a, b) => a + b);  // .Interceptor for configuration
+//    stub.Interceptor.Returns((a, b) => a + b);  // .Interceptor for configuration
 ```
 
 #### Priority Order Comments
@@ -224,11 +224,9 @@ src/Design/
 // 2. Sequences - If OnCall().ThenCall() was used and not exhausted
 //    stub.Method.OnCall(() => 1).ThenCall(() => 2);
 //
-// 3. Returns - Simple constant return value
+// 3. Returns - Simple constant return value or callback
 //    stub.Method.Returns(42);
-//
-// 4. OnCall - Callback invocation (mutually exclusive with Returns)
-//    stub.Method.OnCall((a, b) => a + b);
+//    stub.Method.Returns((a, b) => a + b);
 //
 // 5. Source - Delegation to real implementation
 //    stub.Source(realImplementation);
@@ -279,11 +277,11 @@ The design projects must demonstrate ALL of these (verified against codebase 202
 - [ ] `Verify(Times)` - verify specific matcher was called
 
 **Property APIs (IPropertyGetBuilder, IPropertySetBuilder, IPropertyGetSequence, IPropertySetSequence):**
-- [ ] `OnGet(value)` - getter return value
-- [ ] `OnGet(callback)` - dynamic getter
-- [ ] `OnGet().ThenGet(callback)` / `ThenGet(value)` - getter sequences
-- [ ] `OnSet(callback)` - setter callback
-- [ ] `OnSet().ThenSet(callback)` - setter sequences
+- [ ] `Get(value)` - getter return value
+- [ ] `Get(callback)` - dynamic getter
+- [ ] `Get().ThenGet(callback)` / `ThenGet(value)` - getter sequences
+- [ ] `Set(callback)` - setter callback
+- [ ] `Set().ThenSet(callback)` - setter sequences
 - [ ] `Value` - backing store for get/set properties
 - [ ] `VerifyGet()` / `VerifyGet(Times)` - getter verification
 - [ ] `VerifySet()` / `VerifySet(Times)` - setter verification
@@ -292,10 +290,10 @@ The design projects must demonstrate ALL of these (verified against codebase 202
 - [ ] `Reset()` - clear tracking
 
 **Indexer APIs (IIndexerGetBuilder, IIndexerSetBuilder, IIndexerGetSequence, IIndexerSetSequence):**
-- [ ] `OnGet(callback)` - getter with key access (Func<TKey, TValue>)
-- [ ] `OnSet(callback)` - setter with key and value (Action<TKey, TValue>)
-- [ ] `OnGet().ThenGet(callback)` - getter sequences
-- [ ] `OnSet().ThenSet(callback)` - setter sequences
+- [ ] `Get(callback)` - getter with key access (Func<TKey, TValue>)
+- [ ] `Set(callback)` - setter with key and value (Action<TKey, TValue>)
+- [ ] `Get().ThenGet(callback)` - getter sequences
+- [ ] `Set().ThenSet(callback)` - setter sequences
 - [ ] `Backing` - Dictionary<TKey, TValue> for storage
 - [ ] `VerifyGet()` / `VerifyGet(Times)` - getter verification
 - [ ] `VerifySet()` / `VerifySet(Times)` - setter verification
@@ -436,9 +434,9 @@ Since automated comment parsing is out of scope for v1, GENERATOR BEHAVIOR comme
 
 ### Phase 4: Member Type Coverage - Properties, Indexers, Events (depends on Phase 1)
 
-16. Implement `Properties/PropertyBasics.cs` - OnGet, OnSet, Value
+16. Implement `Properties/PropertyBasics.cs` - Get, Set, Value
 17. Implement `Properties/PropertySequences.cs` - sequences
-18. Implement `Indexers/IndexerBasics.cs` - OnGet, OnSet, Backing
+18. Implement `Indexers/IndexerBasics.cs` - Get, Set, Backing
 19. Implement `Indexers/IndexerSequences.cs` - sequences
 20. Implement `Events/EventPatterns.cs` - Raise, VerifyAdd, VerifyRemove
 
@@ -581,7 +579,7 @@ The When chain architecture requires method-specific types because:
 
 Indexers use `IndexerContainer<TKey, TValue>` which holds:
 - Backing dictionary
-- OnGet/OnSet callbacks
+- Get/Set callbacks
 - Sequence state
 - Tracking (LastGetKey, LastSetEntry)
 
@@ -691,7 +689,7 @@ Public API (KnockOff library):
 - `src/KnockOff/IMethodCallBuilder.cs` - OnCall builder/tracking interfaces
 - `src/KnockOff/IMethodSequence.cs` - Sequence interfaces (ThenCall)
 - `src/KnockOff/IMethodTracking.cs` - Tracking interfaces (Verify, Verifiable, Reset, LastArg/LastArgs)
-- `src/KnockOff/IPropertyCallBuilder.cs` - Property builder interfaces (OnGet, OnSet, ThenGet, ThenSet)
+- `src/KnockOff/IPropertyCallBuilder.cs` - Property builder interfaces (Get, Set, ThenGet, ThenSet)
 - `src/KnockOff/IPropertySequence.cs` - Property sequence interfaces
 - `src/KnockOff/IPropertyTracking.cs` - Property tracking (LastValue)
 - `src/KnockOff/IIndexerCallBuilder.cs` - Indexer builder interfaces
@@ -782,7 +780,7 @@ Design.Tests will include:
 - `src/KnockOff/IMethodCallBuilder.cs` - Confirmed OnCall/ThenCall builder APIs
 - `src/KnockOff/IMethodTracking.cs` - Confirmed Verify/Verifiable/Reset/LastArg/LastArgs
 - `src/KnockOff/IWhenTracking.cs` - Confirmed IWhenBuilder/IWhenChain/IVoidWhenChain
-- `src/KnockOff/IPropertyCallBuilder.cs` - Confirmed OnGet/OnSet/ThenGet/ThenSet
+- `src/KnockOff/IPropertyCallBuilder.cs` - Confirmed Get/Set/ThenGet/ThenSet
 - `src/KnockOff/IPropertyTracking.cs` - Confirmed LastValue for setters
 - `src/KnockOff/IIndexerCallBuilder.cs` - Confirmed indexer builder APIs
 - `src/KnockOff/IIndexerTracking.cs` - Interface uses `LastKey`/`LastEntry`
@@ -928,15 +926,15 @@ All concerns have been addressed. Plan is ready for developer re-review.
 - [ ] Create `src/Design/Design.Domain/Entities/ICollection.cs` - indexers interface
 - [ ] Create `src/Design/Design.Domain/Services/IEventSource.cs` - events interface
 - [ ] Create `src/Design/Design.Stubs/Properties/PropertyBasics.cs` demonstrating:
-  - `OnGet(value)`, `OnGet(callback)`, `Value` backing store
-  - `OnSet(callback)`, `LastValue` capture
+  - `Get(value)`, `Get(callback)`, `Value` backing store
+  - `Set(callback)`, `LastValue` capture
   - Get-only, set-only, get/set, init-only variations
 - [ ] Create `src/Design/Design.Stubs/Properties/PropertySequences.cs` demonstrating:
-  - `OnGet().ThenGet()` chains
-  - `OnSet().ThenSet()` chains
+  - `Get().ThenGet()` chains
+  - `Set().ThenSet()` chains
 - [ ] Create `src/Design/Design.Stubs/Indexers/IndexerBasics.cs` demonstrating:
-  - `OnGet(callback)` with key access
-  - `OnSet(callback)` with key and value
+  - `Get(callback)` with key access
+  - `Set(callback)` with key and value
   - `Backing` dictionary
   - `LastGetKey`, `LastSetEntry` tracking (with note about interface vs generated names)
 - [ ] Create `src/Design/Design.Stubs/Indexers/IndexerSequences.cs` for sequences

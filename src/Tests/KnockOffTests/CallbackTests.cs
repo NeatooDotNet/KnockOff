@@ -1,7 +1,7 @@
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for OnCall/OnGet/OnSet callback functionality.
+/// Tests for OnCall/Get/Set callback functionality.
 /// </summary>
 public class CallbackTests
 {
@@ -84,7 +84,7 @@ public class CallbackTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.Name.OnGet(() => "FromCallback");
+		knockOff.Name.Get(() => "FromCallback");
 
 		var result = service.Name;
 
@@ -99,7 +99,7 @@ public class CallbackTests
 		ISampleService service = knockOff;
 
 		string? capturedValue = null;
-		knockOff.Name.OnSet((value) =>
+		knockOff.Name.Set((value) =>
 		{
 			capturedValue = value;
 		});
@@ -109,7 +109,7 @@ public class CallbackTests
 		Assert.Equal("TestValue", capturedValue);
 		knockOff.Name.VerifySet(Times.Once);
 
-		// Since OnSet was used (without OnGet), getter returns default
+		// Since Set was used (without Get), getter returns default
 		var storedValue = service.Name;
 		Assert.Equal(default, storedValue);
 	}
@@ -178,7 +178,7 @@ public class CallbackTests
 		var knockOff = new AuditableEntityKnockOff();
 		IBaseEntity entity = knockOff;
 
-		knockOff.Id.OnGet(() => 999);
+		knockOff.Id.Get(() => 999);
 
 		var result = entity.Id;
 
