@@ -266,9 +266,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		// Configure When and OnCall
-		// Note: Returns() and OnCall() are mutually exclusive - the last one configured wins
-		// But When() is separate and always takes priority when it matches
+		// Configure When and Return(callback)
+		// When() always takes priority when it matches; Return(callback) handles the rest
 		stub.Add.When(1, 2).Return(100);
 		stub.Add.Return((a, b) => 300);
 

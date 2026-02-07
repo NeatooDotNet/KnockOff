@@ -929,10 +929,10 @@ public class StrictModeTests
 // Configuration Mutual Exclusivity Sample
 // =============================================================================
 
-public class ConfigMutualExclusivityTests
+public class ReturnOverloadsReplaceEachOtherTests
 {
     [Fact]
-    public void ReturnsAndReturn_AreMutuallyExclusive()
+    public void ReturnValue_And_ReturnCallback_LastOneWins()
     {
         var stub = new DelegateStubTests.Stubs.Calculate();
 
@@ -945,7 +945,7 @@ public class ConfigMutualExclusivityTests
         Assert.Equal(3, calc(1, 2)); // Return(callback) wins
 
         stub.Interceptor.Return((a, b) => a + b);
-        stub.Interceptor.Return(99);              // Clears Return
-        Assert.Equal(99, calc(1, 2)); // Return wins
+        stub.Interceptor.Return(99);              // Replaces callback
+        Assert.Equal(99, calc(1, 2)); // Return(value) wins
     }
 }

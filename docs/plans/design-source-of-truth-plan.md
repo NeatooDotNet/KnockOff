@@ -748,7 +748,7 @@ Design.Tests will include:
 ### Edge Cases to Document
 
 1. **Null matching in When()**: Cannot use `When(null)` directly; must use predicate `When(s => s == null)`
-2. **Returns() vs OnCall() mutual exclusion**: Setting one clears the other
+2. **Return overloads replace each other**: Return(value) and Return(callback) — last one wins
 3. **Sequence exhaustion behavior**: Strict mode throws, non-strict returns default
 4. **Init-only properties**: Generated differently than regular setters
 5. **Generic method interceptors**: Use special handler pattern

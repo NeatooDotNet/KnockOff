@@ -281,10 +281,10 @@ public class TimesGotchaTests
 // Gotcha #7: Return(value) vs Return(callback) Mutual Exclusivity
 // =============================================================================
 
-public class ReturnsVsReturnTests
+public class ReturnOverloadsTests
 {
     [Fact]
-    public void MutualExclusivity()
+    public void ReturnOverloads_LastOneWins()
     {
         var stub = new SvcStub();
 
