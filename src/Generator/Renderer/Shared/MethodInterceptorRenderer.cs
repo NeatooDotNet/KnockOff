@@ -176,14 +176,14 @@ internal static class MethodInterceptorRenderer
 			w.Line("_sequenceIndex = 0;");
 			w.Line("_isVerifiable = false;");
 			w.Line("_verifiableTimes = null;");
-			// Clear value storage (mutual exclusivity with Returns(value))
+			// Clear value storage (Return overloads replace each other)
 			if (canHaveValueOverload)
 			{
 				w.Line("_hasReturnValue = false;");
 				w.Line("_returnValue = default!;");
 				w.Line("_returnValueTracking = null;");
 			}
-			// Clear simplified callback storage (mutual exclusivity)
+			// Clear simplified callback storage (Return overloads replace each other)
 			if (isAsyncWithInnerType && !hasRefOrOut)
 			{
 				w.Line("_callSimplified = null;");
@@ -212,10 +212,10 @@ internal static class MethodInterceptorRenderer
 				w.Line("_sequenceIndex = 0;");
 				w.Line("_isVerifiable = false;");
 				w.Line("_verifiableTimes = null;");
-				// Clear callback storage (mutual exclusivity)
+				// Clear callback storage (Return overloads replace each other)
 				w.Line("_call = null;");
 				w.Line("_callTracking = null;");
-				// Clear simplified callback storage (mutual exclusivity)
+				// Clear simplified callback storage (Return overloads replace each other)
 				if (isAsyncWithInnerType && !hasRefOrOut)
 				{
 					w.Line("_callSimplified = null;");
@@ -279,14 +279,14 @@ internal static class MethodInterceptorRenderer
 				w.Line("_sequenceIndex = 0;");
 				w.Line("_isVerifiable = false;");
 				w.Line("_verifiableTimes = null;");
-				// Clear value storage (mutual exclusivity)
+				// Clear value storage (Return overloads replace each other)
 				if (canHaveValueOverload)
 				{
 					w.Line("_hasReturnValue = false;");
 					w.Line("_returnValue = default!;");
 					w.Line("_returnValueTracking = null;");
 				}
-				// Clear async callback storage (mutual exclusivity)
+				// Clear full callback storage (Return overloads replace each other)
 				w.Line("_call = null;");
 				w.Line("_callTracking = null;");
 				// Set simplified callback storage
@@ -309,7 +309,7 @@ internal static class MethodInterceptorRenderer
 				w.Line("_sequenceIndex = 0;");
 				w.Line("_isVerifiable = false;");
 				w.Line("_verifiableTimes = null;");
-				// Clear async callback storage (mutual exclusivity)
+				// Clear full callback storage (Call overloads replace each other)
 				w.Line("_call = null;");
 				w.Line("_callTracking = null;");
 				// Set simplified void callback storage

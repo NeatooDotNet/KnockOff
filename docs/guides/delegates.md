@@ -425,9 +425,9 @@ Assert.Throws<StubException>(() => op(0, 0)); // Throws StubException.SequenceEx
 ```
 <!-- endSnippet -->
 
-## Configuration Mutual Exclusivity
+## Return Overloads Replace Each Other
 
-`Return()` and `Call()` are mutually exclusive. Configuring one clears the other:
+`Return(value)` and `Return(callback)` are different overloads — the last one configured wins:
 
 <!-- snippet: delegate-config-mutual-exclusivity -->
 ```cs
@@ -435,6 +435,9 @@ stub.Interceptor.Return(42);
 stub.Interceptor.Return((a, b) => a + b); // Clears Return(42)
 ```
 <!-- endSnippet -->
+
+> **Note:** `Return()` is for delegates with return values. `Call()` is for void delegates.
+> A delegate interceptor only has one or the other — never both.
 
 ## Priority Resolution Order
 

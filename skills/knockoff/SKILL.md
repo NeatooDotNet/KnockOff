@@ -88,7 +88,7 @@ stub.Save.Verify(Times.AtMost(5));
 
 ### 7. Return(value) vs Return(callback) - Last One Wins
 
-`Return(value)` and `Return(callback)` are mutually exclusive. Last one wins:
+`Return(value)` and `Return(callback)` are different overloads — the last one configured wins:
 
 <!-- snippet: skill-gotcha-returns-vs-oncall -->
 ```cs
