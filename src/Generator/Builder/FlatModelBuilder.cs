@@ -1297,7 +1297,18 @@ internal static class FlatModelBuilder
 	/// </summary>
 	private static string GetTypeSuffix(string type)
 	{
-		var simple = type.Replace("global::", "").Replace("System.", "");
+		// Strip trailing nullable marker for array bracket detection
+		var workingType = type.TrimEnd('?');
+
+		// Count and strip array brackets
+		int arrayDepth = 0;
+		while (workingType.EndsWith("[]"))
+		{
+			workingType = workingType.Substring(0, workingType.Length - 2);
+			arrayDepth++;
+		}
+
+		var simple = workingType.Replace("global::", "").Replace("System.", "");
 		simple = simple switch
 		{
 			"int" => "Int32",
@@ -1311,8 +1322,14 @@ internal static class FlatModelBuilder
 			"byte" => "Byte",
 			"void" => "Void",
 			_ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "").Replace(",", "_").Replace(" ", "")
+				.Replace("[", "").Replace("]", "")
 		};
-		return simple.TrimEnd('?');
+		simple = simple.TrimEnd('?');
+
+		for (int i = 0; i < arrayDepth; i++)
+			simple += "Array";
+
+		return simple;
 	}
 
 	/// <summary>
