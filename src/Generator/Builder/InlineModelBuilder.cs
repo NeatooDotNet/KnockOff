@@ -277,8 +277,8 @@ internal static class InlineModelBuilder
 
         // Compute KeyTypeFriendlyName for OfXxx pattern
         var keyTypeFriendlyName = member.IndexerParameters.Count == 1
-            ? GetTypeSuffix(member.IndexerParameters.GetArray()![0].Type)
-            : string.Join("_", member.IndexerParameters.Select(p => GetTypeSuffix(p.Type)));
+            ? UnifiedInterceptorBuilder.GetTypeSuffix(member.IndexerParameters.GetArray()![0].Type)
+            : string.Join("_", member.IndexerParameters.Select(p => UnifiedInterceptorBuilder.GetTypeSuffix(p.Type)));
 
         return new InlineIndexerModel(
             InterceptorClassName: interceptClassName,
@@ -923,7 +923,7 @@ internal static class InlineModelBuilder
             // Count unique signatures based on PARAMETERS ONLY (ignore return type).
             // Same-params-different-return (like ISet<T>.Add) count as ONE signature.
             var paramTypes = (overload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>())
-                .Select(p => GetTypeSuffix(p.Type));
+                .Select(p => UnifiedInterceptorBuilder.GetTypeSuffix(p.Type));
             var paramKey = paramTypes.Any() ? string.Join("_", paramTypes) : "NoParams";
             seen.Add(paramKey);
         }
@@ -1383,46 +1383,6 @@ internal static class InlineModelBuilder
         if (type.EndsWith("?"))
             return type;
         return type + "?";
-    }
-
-    /// <summary>
-    /// Converts a type name to a suffix-friendly format for OfXxx pattern.
-    /// </summary>
-    private static string GetTypeSuffix(string type)
-    {
-        // Strip trailing nullable marker for array bracket detection
-        var workingType = type.TrimEnd('?');
-
-        // Count and strip array brackets
-        int arrayDepth = 0;
-        while (workingType.EndsWith("[]"))
-        {
-            workingType = workingType.Substring(0, workingType.Length - 2);
-            arrayDepth++;
-        }
-
-        var simple = workingType.Replace("global::", "").Replace("System.", "");
-        simple = simple switch
-        {
-            "int" => "Int32",
-            "string" => "String",
-            "bool" => "Boolean",
-            "long" => "Int64",
-            "double" => "Double",
-            "float" => "Single",
-            "decimal" => "Decimal",
-            "char" => "Char",
-            "byte" => "Byte",
-            "void" => "Void",
-            _ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "").Replace(",", "_").Replace(" ", "")
-                .Replace("[", "").Replace("]", "")
-        };
-        simple = simple.TrimEnd('?');
-
-        for (int i = 0; i < arrayDepth; i++)
-            simple += "Array";
-
-        return simple;
     }
 
     private static string EscapeIdentifier(string name)

@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using KnockOff;
+using KnockOff.Builder;
 using KnockOff.Model.Flat;
 using KnockOff.Model.Shared;
 using KnockOff.Renderer.Shared;
@@ -1088,47 +1089,10 @@ internal static class FlatRenderer
 
 	private static string GetSignatureSuffix(FlatMethodModel method)
 	{
-		var returnSuffix = GetTypeSuffix(method.ReturnType);
+		var returnSuffix = UnifiedInterceptorBuilder.GetTypeSuffix(method.ReturnType);
 		if (method.Parameters.Count == 0)
 			return $"NoParams_{returnSuffix}";
-		return string.Join("_", method.Parameters.Select(p => GetTypeSuffix(p.Type))) + $"_{returnSuffix}";
-	}
-
-	private static string GetTypeSuffix(string type)
-	{
-		// Extract simple type name: "global::System.String" -> "String", "int" -> "Int32"
-		// Strip trailing nullable marker for array bracket detection
-		var workingType = type.TrimEnd('?');
-
-		// Count and strip array brackets
-		int arrayDepth = 0;
-		while (workingType.EndsWith("[]"))
-		{
-			workingType = workingType.Substring(0, workingType.Length - 2);
-			arrayDepth++;
-		}
-
-		var simple = workingType.Replace("global::", "").Replace("System.", "");
-		simple = simple switch
-		{
-			"int" => "Int32",
-			"string" => "String",
-			"bool" => "Boolean",
-			"long" => "Int64",
-			"double" => "Double",
-			"float" => "Single",
-			"decimal" => "Decimal",
-			"char" => "Char",
-			"byte" => "Byte",
-			_ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "").Replace(",", "_").Replace(" ", "")
-				.Replace("[", "").Replace("]", "")
-		};
-		simple = simple.TrimEnd('?');
-
-		for (int i = 0; i < arrayDepth; i++)
-			simple += "Array";
-
-		return simple;
+		return string.Join("_", method.Parameters.Select(p => UnifiedInterceptorBuilder.GetTypeSuffix(p.Type))) + $"_{returnSuffix}";
 	}
 
 	#endregion

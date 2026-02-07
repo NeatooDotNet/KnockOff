@@ -195,13 +195,31 @@ internal static class UnifiedInterceptorBuilder
 		// Strip trailing nullable marker for array bracket detection
 		var workingType = type.TrimEnd('?');
 
-		// Count and strip array brackets
-		int arrayDepth = 0;
-		while (workingType.EndsWith("[]"))
+		// Parse array suffixes (handles [], [,], [,,], etc.)
+		var arraySuffixes = new List<int>(); // rank per array dimension
+		while (true)
 		{
-			workingType = workingType.Substring(0, workingType.Length - 2);
-			arrayDepth++;
+			// Check for array brackets: [], [,], [,,], etc.
+			if (workingType.Length >= 2)
+			{
+				var lastBracket = workingType.LastIndexOf('[');
+				if (lastBracket >= 0 && workingType[workingType.Length - 1] == ']')
+				{
+					var bracketContent = workingType.Substring(lastBracket + 1, workingType.Length - lastBracket - 2);
+					if (bracketContent.Length == 0 || bracketContent.All(c => c == ','))
+					{
+						var rank = bracketContent.Length + 1; // "" = rank 1, "," = rank 2
+						arraySuffixes.Add(rank);
+						workingType = workingType.Substring(0, lastBracket);
+						continue;
+					}
+				}
+			}
+			break;
 		}
+
+		// Strip nullable after array brackets (handles string?[] -> string? -> string)
+		workingType = workingType.TrimEnd('?');
 
 		var simple = workingType.Replace("global::", "").Replace("System.", "");
 		simple = simple switch
@@ -221,14 +239,21 @@ internal static class UnifiedInterceptorBuilder
 			"ushort" => "UInt16",
 			"sbyte" => "SByte",
 			"object" => "Object",
-			"void" => "void",
-			_ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "").Replace(",", "_").Replace(" ", "")
+			"void" => "Void",
+			"nint" => "IntPtr",
+			"nuint" => "UIntPtr",
+			_ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "")
+				.Replace(",", "_").Replace(" ", "")
 				.Replace("[", "").Replace("]", "")
+				.Replace("(", "").Replace(")", "")
+				.Replace("?", "")
 		};
-		simple = simple.TrimEnd('?');
 
-		for (int i = 0; i < arrayDepth; i++)
-			simple += "Array";
+		// Append array suffixes in reverse order (outermost first)
+		for (int i = arraySuffixes.Count - 1; i >= 0; i--)
+		{
+			simple += arraySuffixes[i] == 1 ? "Array" : $"Array{arraySuffixes[i]}D";
+		}
 
 		return simple;
 	}
