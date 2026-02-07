@@ -112,9 +112,9 @@ service.Name = "test";
 
 | Interceptor | Reset Clears | Reset Preserves |
 |-------------|--------------|-----------------|
-| Method | Counts, LastArg/LastArgs, sequence index, When chain position | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
+| Method | Counts, LastArg/LastArgs, sequence index, When chain position, source delegation | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
 | User Method | Counts, LastArg | **OnCall configuration**, verifiable flag |
-| Property | Get/set counts, LastSetValue, sequence index | **OnGet/OnSet callbacks**, verifiable flag |
+| Property | Get/set counts, LastSetValue, sequence index, source delegation | **OnGet/OnSet callbacks**, verifiable flag |
 | User Property | Get/set counts, LastSetValue | **OnGet/OnSet configuration**, verifiable flag |
 | Indexer | Get/set counts, LastGetKey, LastSetEntry | **Backing dictionary**, OnGet/OnSet callbacks |
 | Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
@@ -677,7 +677,7 @@ _ = service.Count;  // Still uses OnGet (returns 100)
 
 ## Source Delegation
 
-Delegate unconfigured calls to a real implementation:
+`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured members (OnCall, Returns, When) still take priority -- Source is only consulted when nothing else handles the call.
 
 <!-- snippet: skill-source-delegation -->
 ```cs
@@ -687,12 +687,37 @@ stub.Source(realImplementation);
 // Configured members override source
 stub.GetById.OnCall((id) => testUser);  // This wins over source
 
-// Reset clears source AND configuration
+// Reset clears tracking (counts, args, sequence position) and source delegation
+// but preserves callbacks (OnCall, Returns, OnGet, OnSet)
 // stub.GetById.Reset();
 ```
 <!-- endSnippet -->
 
-**Note:** Source() only works with interface stubs, not class stubs.
+**Availability:** Source() is available for **interface stubs only** (Standalone and Inline Interface patterns). Class stubs inherit from the base class directly and do not need Source().
+
+### Priority Order
+
+KnockOff evaluates member calls in this order:
+
+1. **When chains** -- `stub.Method.When(...).Returns(...)`
+2. **OnCall / Returns** -- `stub.Method.OnCall(...)` or `stub.Method.Returns(...)`
+3. **User methods** -- `protected override` with `_` suffix (Standalone only)
+4. **Source delegation** -- `stub.Source(realImplementation)`
+5. **Smart default** -- KnockOff's built-in default value
+
+The first match wins. This makes Source ideal as a baseline: set it once, then selectively override specific members at higher priority levels.
+
+### Interface Hierarchy
+
+When your stub implements an interface that extends other interfaces, KnockOff generates one `Source()` overload per level. Each overload sets `_source` on matching interceptors and clears it on non-matching ones. This means C# overload resolution does the right thing automatically -- pass whatever you have (even a `List<T>` for an `ICustomList<T> : IList<T>` stub) and only the matching members get delegated.
+
+### Clearing Source
+
+Remove source delegation by passing null: `stub.Source(null)`. After clearing, unconfigured methods return smart defaults (or throw in strict mode).
+
+### Reset and Source
+
+`Reset()` on an individual interceptor clears its `_source` reference along with tracking state. If you reset a member and still want delegation, call `stub.Source(realImplementation)` again after the reset.
 
 ---
 
@@ -803,4 +828,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-05
+**UPDATED:** 2026-02-06

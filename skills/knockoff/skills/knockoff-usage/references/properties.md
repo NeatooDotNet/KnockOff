@@ -584,7 +584,7 @@ Choose your configuration approach based on the test scenario:
 
 | Method | Description |
 |--------|-------------|
-| `Reset()` | Clears all tracking, callbacks, sequences, and source delegation |
+| `Reset()` | Clears tracking state (get/set counts, LastSetValue, sequence index, source delegation). Preserves OnGet/OnSet callbacks and verifiable marking. |
 
 ### Sequence Methods
 
@@ -597,4 +597,4 @@ Choose your configuration approach based on the test scenario:
 
 ---
 
-**UPDATED:** 2026-02-04
+**UPDATED:** 2026-02-06
