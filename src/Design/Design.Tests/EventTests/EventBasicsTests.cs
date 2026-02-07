@@ -9,12 +9,12 @@ using KnockOff;
 namespace Design.Tests.EventTests;
 
 /// <summary>
-/// Tests for event stubbing: Handler invocation, subscription verification.
+/// Tests for event stubbing: Raise invocation, subscription verification.
 /// </summary>
 public class EventBasicsTests
 {
     [Fact]
-    public void Handler_FiresEventHandler()
+    public void EventHandler_CanBeRaisedFromStub()
     {
         var stub = new EventPatternsDemo.Stubs.IEventSource();
         var eventFired = false;
@@ -22,13 +22,13 @@ public class EventBasicsTests
         IEventSource source = stub;
         source.Started += (sender, args) => eventFired = true;
 
-        stub.StartedInterceptor.Handler?.Invoke(source, EventArgs.Empty);
+        stub.Started.Raise(source, EventArgs.Empty);
 
         Assert.True(eventFired);
     }
 
     [Fact]
-    public void Handler_FiresEventHandlerWithTypedArgs()
+    public void EventHandlerOfT_CanBeRaisedWithTypedArgs()
     {
         var stub = new EventPatternsDemo.Stubs.IEventSource();
         DataEventArgs? receivedArgs = null;
@@ -36,14 +36,14 @@ public class EventBasicsTests
         IEventSource source = stub;
         source.DataReceived += (sender, args) => receivedArgs = args;
 
-        stub.DataReceivedInterceptor.Handler?.Invoke(source, new DataEventArgs("test data"));
+        stub.DataReceived.Raise(source, new DataEventArgs("test data"));
 
         Assert.NotNull(receivedArgs);
         Assert.Equal("test data", receivedArgs.Data);
     }
 
     [Fact]
-    public void Handler_FiresActionEvent()
+    public void ActionEvent_CanBeRaisedFromStub()
     {
         var stub = new EventPatternsDemo.Stubs.IEventSource();
         var completed = false;
@@ -51,13 +51,13 @@ public class EventBasicsTests
         IEventSource source = stub;
         source.Completed += () => completed = true;
 
-        stub.CompletedInterceptor.Handler?.Invoke();
+        stub.Completed.Raise();
 
         Assert.True(completed);
     }
 
     [Fact]
-    public void Handler_FiresActionWithParameters()
+    public void ActionWithParams_CanBeRaisedFromStub()
     {
         var stub = new EventPatternsDemo.Stubs.IEventSource();
         string? message = null;
@@ -70,38 +70,38 @@ public class EventBasicsTests
             percent = pct;
         };
 
-        stub.ProgressInterceptor.Handler?.Invoke("Loading", 50);
+        stub.Progress.Raise("Loading", 50);
 
         Assert.Equal("Loading", message);
         Assert.Equal(50, percent);
     }
 
     [Fact]
-    public void Handler_IsNullWithNoSubscribers()
+    public void HasSubscribers_FalseWithNoSubscribers()
     {
         var stub = new EventPatternsDemo.Stubs.IEventSource();
 
-        Assert.Null(stub.StartedInterceptor.Handler);
+        Assert.False(stub.Started.HasSubscribers);
     }
 
     [Fact]
-    public void Handler_IsNotNullAfterSubscribe()
+    public void HasSubscribers_TrueAfterSubscribe()
     {
         var stub = new EventPatternsDemo.Stubs.IEventSource();
 
         IEventSource source = stub;
         source.Started += (s, e) => { };
 
-        Assert.NotNull(stub.StartedInterceptor.Handler);
+        Assert.True(stub.Started.HasSubscribers);
     }
 
     [Fact]
-    public void Handler_SafeToInvokeWithNoSubscribers()
+    public void Event_SafeToCallWithNoSubscribers()
     {
         var stub = new EventPatternsDemo.Stubs.IEventSource();
 
         // Should not throw
-        stub.StartedInterceptor.Handler?.Invoke(null, EventArgs.Empty);
+        stub.Started.Raise(null, EventArgs.Empty);
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public class EventBasicsTests
         source.Started += (s, e) => { };
         source.Started += (s, e) => { };
 
-        stub.StartedInterceptor.VerifyAdd(Times.Exactly(2));
+        stub.Started.VerifyAdd(Times.Exactly(2));
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class EventBasicsTests
         source.Started += Handler;
         source.Started -= Handler;
 
-        stub.StartedInterceptor.VerifyRemove(Times.Once);
+        stub.Started.VerifyRemove(Times.Once);
     }
 
     [Fact]
@@ -138,15 +138,15 @@ public class EventBasicsTests
 
         source.Started += (s, e) => { };
 
-        stub.StartedInterceptor.Reset();
+        stub.Started.Reset();
 
-        Assert.Null(stub.StartedInterceptor.Handler);
+        Assert.False(stub.Started.HasSubscribers);
         Assert.Throws<VerificationException>(() =>
-            stub.StartedInterceptor.VerifyAdd(Times.AtLeastOnce));
+            stub.Started.VerifyAdd(Times.AtLeastOnce));
     }
 
     [Fact]
-    public void Handler_IsNullAfterUnsubscribeAll()
+    public void HasSubscribers_FalseAfterUnsubscribeAll()
     {
         var stub = new EventPatternsDemo.Stubs.IEventSource();
         IEventSource source = stub;
@@ -154,9 +154,9 @@ public class EventBasicsTests
         void Handler(object? s, EventArgs e) { }
 
         source.Started += Handler;
-        Assert.NotNull(stub.StartedInterceptor.Handler);
+        Assert.True(stub.Started.HasSubscribers);
 
         source.Started -= Handler;
-        Assert.Null(stub.StartedInterceptor.Handler);
+        Assert.False(stub.Started.HasSubscribers);
     }
 }
