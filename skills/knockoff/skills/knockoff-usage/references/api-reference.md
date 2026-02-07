@@ -405,7 +405,7 @@ Calling `Raise` invokes all subscribed handlers with the provided arguments.
 
 #### Reset
 
-- `void Reset()` - Clears tracking state. Does NOT remove subscribers
+- `void Reset()` - Clears tracking state (add/remove counts) AND removes all subscribers (`HasSubscribers` becomes `false`)
 
 ### Example
 
