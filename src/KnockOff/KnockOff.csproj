@@ -17,6 +17,7 @@
 	<ItemGroup>
 		<None Include="..\..\README.md" Pack="true" PackagePath="" />
 		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+		<None Include="..\..\logo.png" Pack="true" PackagePath="" />
 		<!-- Generator targets netstandard2.0 - path is relative to this project -->
 		<None Include="..\Generator\bin\$(Configuration)\netstandard2.0\KnockOff.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>

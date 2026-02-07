@@ -436,3 +436,33 @@ public partial class ConstrainedGenericServiceKnockOff : IConstrainedGenericServ
 }
 
 #endregion
+
+#region Array Parameter Overload Test Types
+
+/// <summary>
+/// Interface with method overloads that use array parameters.
+/// Tests that GetTypeSuffix correctly handles array brackets in type names,
+/// producing valid identifiers like "StringArray" instead of "string[]".
+/// </summary>
+public interface IArrayParamOverloadService
+{
+	IReadOnlyList<string> GetItems();
+	IReadOnlyList<string> GetItems(string[] filters);
+	IReadOnlyList<string> GetItems(string[] filters, int maxCount);
+}
+
+[KnockOff]
+public partial class ArrayParamOverloadKnockOff : IArrayParamOverloadService
+{
+}
+
+/// <summary>
+/// Inline stub test class for array parameter overloads.
+/// Tests the InlineModelBuilder path.
+/// </summary>
+[KnockOff<IArrayParamOverloadService>]
+public partial class ArrayParamOverloadInlineTests
+{
+}
+
+#endregion
