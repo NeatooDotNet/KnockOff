@@ -466,3 +466,46 @@ public partial class ArrayParamOverloadInlineTests
 }
 
 #endregion
+
+#region Parameter Type Suffix Bug Fix Test Types
+
+/// <summary>
+/// Interface with method overloads that exercise GetTypeSuffix edge cases.
+/// Each overload uses a parameter type that previously produced invalid identifiers.
+/// </summary>
+public interface IParamTypeSuffixService
+{
+	// Bug 1: Nullable inside generics (embedded ? produces invalid identifier)
+	void Process(List<string?> data);
+
+	// Bug 2: Tuples (parentheses produce invalid identifier)
+	void Process((int, string) pair);
+
+	// Bug 3: Multidimensional arrays ([,] not handled)
+	void Process(int[,] matrix);
+
+	// Bug 4: Array of nullable elements (? survives to keyword switch)
+	void Process(string?[] items);
+
+	// Bug 5: nint/nuint (missing from keyword map)
+	void Process(nint value);
+	void Process(nuint value);
+
+	// Non-overloaded method for basic verification
+	string GetName();
+}
+
+[KnockOff]
+public partial class ParamTypeSuffixKnockOff : IParamTypeSuffixService
+{
+}
+
+/// <summary>
+/// Inline stub test class for parameter type suffix bug fixes.
+/// </summary>
+[KnockOff<IParamTypeSuffixService>]
+public partial class ParamTypeSuffixInlineTests
+{
+}
+
+#endregion

@@ -630,7 +630,7 @@ internal static class FlatModelBuilder
 					HasSetter: member.HasSetter,
 					SimpleInterfaceName: simpleIfaceName,
 					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
-					KeyTypeFriendlyName: GetTypeSuffix(keyType),
+					KeyTypeFriendlyName: UnifiedInterceptorBuilder.GetTypeSuffix(keyType),
 					BaseName: "Indexer"));
 			}
 		}
@@ -1154,7 +1154,7 @@ internal static class FlatModelBuilder
 			}
 			else
 			{
-				basePart = GetTypeSuffix(paramType);
+				basePart = UnifiedInterceptorBuilder.GetTypeSuffix(paramType);
 			}
 
 			suffixParts.Add(basePart);
@@ -1285,51 +1285,11 @@ internal static class FlatModelBuilder
 	/// </summary>
 	private static string GetSignatureSuffix(InterfaceMemberInfo member)
 	{
-		var returnSuffix = GetTypeSuffix(member.ReturnType);
+		var returnSuffix = UnifiedInterceptorBuilder.GetTypeSuffix(member.ReturnType);
 		if (member.Parameters.Count == 0)
 			return $"NoParams_{returnSuffix}";
 		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
-		return string.Join("_", paramArray.Select(p => GetTypeSuffix(p.Type))) + $"_{returnSuffix}";
-	}
-
-	/// <summary>
-	/// Converts a type name to a suffix-friendly format.
-	/// </summary>
-	private static string GetTypeSuffix(string type)
-	{
-		// Strip trailing nullable marker for array bracket detection
-		var workingType = type.TrimEnd('?');
-
-		// Count and strip array brackets
-		int arrayDepth = 0;
-		while (workingType.EndsWith("[]"))
-		{
-			workingType = workingType.Substring(0, workingType.Length - 2);
-			arrayDepth++;
-		}
-
-		var simple = workingType.Replace("global::", "").Replace("System.", "");
-		simple = simple switch
-		{
-			"int" => "Int32",
-			"string" => "String",
-			"bool" => "Boolean",
-			"long" => "Int64",
-			"double" => "Double",
-			"float" => "Single",
-			"decimal" => "Decimal",
-			"char" => "Char",
-			"byte" => "Byte",
-			"void" => "Void",
-			_ => simple.Replace(".", "_").Replace("<", "_").Replace(">", "").Replace(",", "_").Replace(" ", "")
-				.Replace("[", "").Replace("]", "")
-		};
-		simple = simple.TrimEnd('?');
-
-		for (int i = 0; i < arrayDepth; i++)
-			simple += "Array";
-
-		return simple;
+		return string.Join("_", paramArray.Select(p => UnifiedInterceptorBuilder.GetTypeSuffix(p.Type))) + $"_{returnSuffix}";
 	}
 
 	/// <summary>

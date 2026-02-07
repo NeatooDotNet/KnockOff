@@ -152,7 +152,7 @@ public partial class EdgeCaseValueOverloadTests
 
 	// Note: Overload groups (methods with the same name but different parameters)
 	// use delegate type disambiguation. Each overload has its own delegate type
-	// like CalculateDelegate_Int32_void, and OnCall accepts these delegates.
+	// like CalculateDelegate_Int32_Void, and OnCall accepts these delegates.
 	// Value overloads for overload groups are NOT yet implemented.
 
 	[Fact]
@@ -162,8 +162,8 @@ public partial class EdgeCaseValueOverloadTests
 		IOverloadedMethodService service = knockOff;
 
 		// Each overload is distinguished by its delegate type
-		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_void handler1 = (x) => { };
-		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Int32_void handler2 = (x, y) => { };
+		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Void handler1 = (x) => { };
+		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Int32_Void handler2 = (x, y) => { };
 
 		knockOff.Calculate.OnCall(handler1);
 		knockOff.Calculate.OnCall(handler2);

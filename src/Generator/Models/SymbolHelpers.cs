@@ -172,8 +172,10 @@ internal static class SymbolHelpers
 	{
 		return type switch
 		{
-			IArrayTypeSymbol array =>
+			IArrayTypeSymbol array when array.Rank == 1 =>
 				GetTypeSuffix(array.ElementType) + "Array",
+			IArrayTypeSymbol array =>
+				GetTypeSuffix(array.ElementType) + $"Array{array.Rank}D",
 
 			// Check for Nullable<T> using OriginalDefinition comparison
 			INamedTypeSymbol named when IsNullableValueType(named) =>
