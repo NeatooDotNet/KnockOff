@@ -32,8 +32,8 @@ internal sealed record InlineDelegateStubModel(
     string InvokeParameterDeclarations,
     /// <summary>Argument list for Invoke calls.</summary>
     string InvokeArgumentList,
-    /// <summary>OnCall delegate type.</summary>
-    string OnCallType,
+    /// <summary>Call delegate type.</summary>
+    string CallType,
     /// <summary>LastCallArg type (for single param) or null.</summary>
     string? LastCallArgType,
     /// <summary>LastCallArgs tuple type (for multiple params) or null.</summary>

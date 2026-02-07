@@ -19,9 +19,9 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        stub.Format.Returns((input) => "one-param");
-        stub.Format.Returns((input, options) => "two-params");
-        stub.Format.Returns((input, options, maxLength) => "three-params");
+        stub.Format.Return((input) => "one-param");
+        stub.Format.Return((input, options) => "two-params");
+        stub.Format.Return((input, options, maxLength) => "three-params");
 
         IFormatter formatter = stub;
 
@@ -36,8 +36,8 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         // All overloads return same constant
-        stub.Format.Returns((input) => "constant");
-        stub.Format.Returns((input, options) => "constant");
+        stub.Format.Return((input) => "constant");
+        stub.Format.Return((input, options) => "constant");
 
         IFormatter formatter = stub;
 
@@ -51,12 +51,12 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         // Defaults
-        stub.Format.Returns((input) => "default-1");
-        stub.Format.Returns((input, options) => "default-2");
+        stub.Format.Return((input) => "default-1");
+        stub.Format.Return((input, options) => "default-2");
 
         // Specific matches
-        stub.Format.When("special").Returns("SPECIAL-1");
-        stub.Format.When("special", new FormatOptions(Uppercase: true)).Returns("SPECIAL-2");
+        stub.Format.When("special").Return("SPECIAL-1");
+        stub.Format.When("special", new FormatOptions(Uppercase: true)).Return("SPECIAL-2");
 
         IFormatter formatter = stub;
 
@@ -71,8 +71,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        stub.Format.Returns((input) => "default");
-        stub.Format.When((input) => input.StartsWith("X", StringComparison.Ordinal)).Returns("X-PREFIX");
+        stub.Format.Return((input) => "default");
+        stub.Format.When((input) => input.StartsWith("X", StringComparison.Ordinal)).Return("X-PREFIX");
 
         IFormatter formatter = stub;
 
@@ -85,8 +85,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.Format.Returns((input) => input);
-        var tracking2 = stub.Format.Returns((input, options) => input);
+        var tracking1 = stub.Format.Return((input) => input);
+        var tracking2 = stub.Format.Return((input, options) => input);
 
         IFormatter formatter = stub;
 
@@ -106,8 +106,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        stub.Format.Returns((input) => input);
-        stub.Format.Returns((input, options) => input);
+        stub.Format.Return((input) => input);
+        stub.Format.Return((input, options) => input);
 
         IFormatter formatter = stub;
 
@@ -124,9 +124,9 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
         var logs = new List<string>();
 
-        stub.Log.Execute((msg) => logs.Add($"1:{msg}"));
-        stub.Log.Execute((msg, level) => logs.Add($"2:{msg}:{level}"));
-        stub.Log.Execute((msg, level, cat) => logs.Add($"3:{msg}:{level}:{cat}"));
+        stub.Log.Call((msg) => logs.Add($"1:{msg}"));
+        stub.Log.Call((msg, level) => logs.Add($"2:{msg}:{level}"));
+        stub.Log.Call((msg, level, cat) => logs.Add($"3:{msg}:{level}:{cat}"));
 
         IFormatter formatter = stub;
 
@@ -142,8 +142,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.Log.Execute((msg) => { });
-        var tracking2 = stub.Log.Execute((msg, level) => { });
+        var tracking1 = stub.Log.Call((msg) => { });
+        var tracking2 = stub.Log.Call((msg, level) => { });
 
         IFormatter formatter = stub;
 
@@ -161,8 +161,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.TransformAsync.Returns((input) => $"[{input}]");
-        var tracking2 = stub.TransformAsync.Returns((input, ct) => $"[{input}:ct]");
+        var tracking1 = stub.TransformAsync.Return((input) => $"[{input}]");
+        var tracking2 = stub.TransformAsync.Return((input, ct) => $"[{input}:ct]");
 
         IFormatter formatter = stub;
 
@@ -183,12 +183,12 @@ public class MethodOverloadTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         stub.Format
-            .Returns((input) => "first")
-            .ThenReturns("second");
+            .Return((input) => "first")
+            .ThenReturn("second");
 
         stub.Format
-            .Returns((input, options) => "A")
-            .ThenReturns("B");
+            .Return((input, options) => "A")
+            .ThenReturn("B");
 
         IFormatter formatter = stub;
 
@@ -209,8 +209,8 @@ public class MethodOverloadTests
     {
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
-        var tracking1 = stub.Format.Returns((input) => input);
-        var tracking2 = stub.Format.Returns((input, options) => input);
+        var tracking1 = stub.Format.Return((input) => input);
+        var tracking2 = stub.Format.Return((input, options) => input);
 
         IFormatter formatter = stub;
 

@@ -17,7 +17,7 @@ public class VerificationTests
     public void Verify_ThrowsWhenNotCalled()
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         Assert.Throws<VerificationException>(() => stub.Add.Verify());
     }
@@ -94,7 +94,7 @@ public class VerificationTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        stub.Add.Returns(42).Verifiable();
+        stub.Add.Return(42).Verifiable();
 
         ICalculator calc = stub;
         calc.Add(1, 2);
@@ -107,7 +107,7 @@ public class VerificationTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        stub.Add.Returns(42).Verifiable(Times.Exactly(2));
+        stub.Add.Return(42).Verifiable(Times.Exactly(2));
 
         ICalculator calc = stub;
         calc.Add(1, 2);
@@ -124,8 +124,8 @@ public class VerificationTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        stub.Add.Returns(42).Verifiable();
-        stub.Subtract.Returns(10); // Not verifiable
+        stub.Add.Return(42).Verifiable();
+        stub.Subtract.Return(10); // Not verifiable
 
         ICalculator calc = stub;
         calc.Add(1, 2);
@@ -139,8 +139,8 @@ public class VerificationTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        stub.Add.Returns(42);
-        stub.Subtract.Returns(10);
+        stub.Add.Return(42);
+        stub.Subtract.Return(10);
 
         ICalculator calc = stub;
         calc.Add(1, 2);
@@ -154,8 +154,8 @@ public class VerificationTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        stub.Add.Returns(42).Verifiable();
-        stub.Subtract.Returns(10).Verifiable();
+        stub.Add.Return(42).Verifiable();
+        stub.Subtract.Return(10).Verifiable();
 
         ICalculator calc = stub;
         // Neither called

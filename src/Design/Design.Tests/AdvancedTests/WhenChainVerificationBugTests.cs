@@ -4,7 +4,7 @@
 // This file contains tests for TWO related When chain verification bugs:
 //
 // BUG 1 (HEAD Bug): When a When chain has a single non-terminal matcher (e.g.,
-//   .When(1, 2).Returns(100).Verifiable()),
+//   .When(1, 2).Return(100).Verifiable()),
 // calling Stub.Verify() always throws "sequence incomplete" even though
 // the matcher was successfully invoked.
 //
@@ -78,7 +78,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a single When matcher and mark verifiable
-        stub.Add.When(1, 2).Returns(100).Verifiable();
+        stub.Add.When(1, 2).Return(100).Verifiable();
 
         ICalculator calc = stub;
 
@@ -110,7 +110,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a single When matcher
-        var chain = stub.Add.When(1, 2).Returns(100);
+        var chain = stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -145,8 +145,8 @@ public class WhenChainVerificationBugTests
 
         // Chain with two non-terminal matchers (no terminal at end)
         var chain = stub.Add
-            .When(1, 2).Returns(10)
-            .ThenWhen(3, 4).Returns(20);
+            .When(1, 2).Return(10)
+            .ThenWhen(3, 4).Return(20);
 
         ICalculator calc = stub;
 
@@ -178,7 +178,7 @@ public class WhenChainVerificationBugTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        var chain = stub.Add.When(1, 2).Returns(100);
+        var chain = stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -211,7 +211,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a When chain (making it "configured" for VerifyAll)
-        stub.Add.When(1, 2).Returns(100);
+        stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -240,7 +240,7 @@ public class WhenChainVerificationBugTests
 
         // Chain ending with terminal matcher (ThenCall)
         var chain = stub.Add
-            .When(1, 2).Returns(10)
+            .When(1, 2).Return(10)
             .ThenCall((a, b) => a + b);
 
         ICalculator calc = stub;
@@ -274,7 +274,7 @@ public class WhenChainVerificationBugTests
     // Bug 2, Scenario 1: Single-sig Verify(Times) excludes When chain calls
     // =========================================================================
     // ICalculator.Add is a non-overloaded method (single-signature interceptor).
-    // TotalCallCount sums _unconfiguredCallCount, _onCallTracking, _returnsValue,
+    // TotalCallCount sums _unconfiguredCallCount, _callTracking, _returnValue,
     // and _sequence counts -- but NOT When chain matcher CallCount values.
     //
     // WHAT SHOULD HAPPEN: After calling Add(1,2) via When chain and Add(5,6)
@@ -284,7 +284,7 @@ public class WhenChainVerificationBugTests
     // Verify(Times.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
     //
     // WHY: The When chain invoke path does matcher.CallCount++ and returns early,
-    // bypassing _returnsValueTracking.RecordCall(). The TotalCallCount getter
+    // bypassing _returnValueTracking.RecordCall(). The TotalCallCount getter
     // never sums the When chain matcher CallCount values.
     // =========================================================================
 
@@ -294,9 +294,9 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure When chain (non-terminal, specific value matching)
-        stub.Add.When(1, 2).Returns(100);
+        stub.Add.When(1, 2).Return(100);
         // Configure Returns as fallback for non-matching args
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         ICalculator calc = stub;
 
@@ -305,7 +305,7 @@ public class WhenChainVerificationBugTests
         Assert.Equal(100, r1);
 
         // Call 2: When chain doesn't match (5, 6), falls through to Returns
-        // -> _returnsValueTracking._callCount++
+        // -> _returnValueTracking._callCount++
         var r2 = calc.Add(5, 6);
         Assert.Equal(0, r2);
 
@@ -322,9 +322,9 @@ public class WhenChainVerificationBugTests
     // counts -- but NOT When chain matcher CallCount values.
     //
     // WHAT SHOULD HAPPEN: After calling Format("special") via When chain and
-    // Format("other") via OnCall, Verify(Times.Exactly(2)) should pass.
+    // Format("other") via Call, Verify(Times.Exactly(2)) should pass.
     //
-    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the OnCall path counted).
+    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the Call path counted).
     // Verify(Times.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
     //
     // WHY: Same root cause as scenario 1, but in the overload-group code path.
@@ -338,9 +338,9 @@ public class WhenChainVerificationBugTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         // Configure When chain (non-terminal, specific value matching)
-        stub.Format.When("special").Returns("SPECIAL");
-        // Configure OnCall on the same overload as fallback
-        stub.Format.Returns((string input) => "default");
+        stub.Format.When("special").Return("SPECIAL");
+        // Configure Call on the same overload as fallback
+        stub.Format.Return((string input) => "default");
 
         IFormatter formatter = stub;
 
@@ -348,13 +348,13 @@ public class WhenChainVerificationBugTests
         var r1 = formatter.Format("special");
         Assert.Equal("SPECIAL", r1);
 
-        // Call 2: When chain doesn't match "other", falls through to OnCall
-        // -> _onCallTracking._callCount++
+        // Call 2: When chain doesn't match "other", falls through to Call
+        // -> _callTracking._callCount++
         var r2 = formatter.Format("other");
         Assert.Equal("default", r2);
 
-        // BUG: TotalCallCount = 1 (only OnCall path counted).
-        // Should be 2 (When chain + OnCall).
+        // BUG: TotalCallCount = 1 (only Call path counted).
+        // Should be 2 (When chain + Call).
         stub.Format.Verify(Times.Exactly(2));
     }
 
@@ -365,21 +365,21 @@ public class WhenChainVerificationBugTests
     //   Block 1: condExpr (is configured?) + count check (was called?)
     //   Block 2: When chain HEAD check
     //
-    // Block 1's condExpr checks _onCall and _sequence but NOT _whenChain.
-    // Block 1's local count sums _onCallTracking and _sequence but NOT When
+    // Block 1's condExpr checks _call and _sequence but NOT _whenChain.
+    // Block 1's local count sums _callTracking and _sequence but NOT When
     // chain matcher CallCount values.
     //
-    // This test configures a When chain AND an OnCall on the same overload,
+    // This test configures a When chain AND an Call on the same overload,
     // then invokes ONLY via the When chain path. This ensures condExpr passes
-    // (OnCall is configured) so Block 1 runs, but the count check fails
+    // (Call is configured) so Block 1 runs, but the count check fails
     // because the count doesn't include When chain CallCount.
     //
     // WHAT SHOULD HAPPEN: VerifyAll() should pass because the overload was
-    // configured (OnCall + When chain) and was invoked (via When chain).
+    // configured (Call + When chain) and was invoked (via When chain).
     //
     // WHAT ACTUALLY HAPPENS: VerifyAll() throws
     //   "Format: expected AtLeastOnce, actual 0 calls"
-    // because the local count = _onCallTracking._callCount (0) + _sequence (0)
+    // because the local count = _callTracking._callCount (0) + _sequence (0)
     // and does not include When chain matcher CallCount (1).
     //
     // WHY: The per-overload local count in CheckVerificationAll() does not
@@ -392,20 +392,20 @@ public class WhenChainVerificationBugTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         // Configure When chain (non-terminal, specific value matching)
-        stub.Format.When("special").Returns("SPECIAL");
-        // Configure OnCall on the same overload (makes condExpr true in Block 1,
+        stub.Format.When("special").Return("SPECIAL");
+        // Configure Call on the same overload (makes condExpr true in Block 1,
         // isolating the count bug from the condExpr bug)
-        stub.Format.Returns((string input) => "default");
+        stub.Format.Return((string input) => "default");
 
         IFormatter formatter = stub;
 
-        // Invoke ONLY via When chain (OnCall never runs because "special" matches)
+        // Invoke ONLY via When chain (Call never runs because "special" matches)
         var r = formatter.Format("special");
         Assert.Equal("SPECIAL", r);
 
         // BUG: VerifyAll fails with "Format: expected AtLeastOnce, actual 0"
         // because the overload count (0) doesn't include When chain CallCount (1).
-        // Block 1 runs (condExpr true: OnCall configured), count = 0, fails.
+        // Block 1 runs (condExpr true: Call configured), count = 0, fails.
         // Block 2 (HEAD check) never runs because Block 1 returned early.
         stub.VerifyAll();
     }
@@ -418,9 +418,9 @@ public class WhenChainVerificationBugTests
     // equally excluded from the overload-group TotalCallCount expression.
     //
     // WHAT SHOULD HAPPEN: After calling Log("special") via void When chain and
-    // Log("other") via OnCall, Verify(Times.Exactly(2)) should pass.
+    // Log("other") via Call, Verify(Times.Exactly(2)) should pass.
     //
-    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the OnCall path counted).
+    // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the Call path counted).
     // =========================================================================
 
     [Fact]
@@ -430,9 +430,9 @@ public class WhenChainVerificationBugTests
         var callLog = new List<string>();
 
         // Configure void When chain (non-terminal, specific value matching)
-        stub.Log.When("special").Execute(msg => callLog.Add($"when:{msg}"));
-        // Configure OnCall on the same overload as fallback
-        stub.Log.Execute((string msg) => callLog.Add($"oncall:{msg}"));
+        stub.Log.When("special").Call(msg => callLog.Add($"when:{msg}"));
+        // Configure Call on the same overload as fallback
+        stub.Log.Call((string msg) => callLog.Add($"oncall:{msg}"));
 
         IFormatter formatter = stub;
 
@@ -440,13 +440,13 @@ public class WhenChainVerificationBugTests
         formatter.Log("special");
         Assert.Contains("when:special", callLog);
 
-        // Call 2: When chain doesn't match "other", falls through to OnCall
-        // -> _onCallTracking._callCount++
+        // Call 2: When chain doesn't match "other", falls through to Call
+        // -> _callTracking._callCount++
         formatter.Log("other");
         Assert.Contains("oncall:other", callLog);
 
-        // BUG: TotalCallCount = 1 (only OnCall path counted).
-        // Should be 2 (When chain + OnCall).
+        // BUG: TotalCallCount = 1 (only Call path counted).
+        // Should be 2 (When chain + Call).
         stub.Log.Verify(Times.Exactly(2));
     }
 }

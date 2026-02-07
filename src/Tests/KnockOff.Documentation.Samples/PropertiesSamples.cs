@@ -144,7 +144,7 @@ public class DynamicGetterTests
         // Get checks the tracked state
         stub.IsReady.Get(() => isInitialized);
         // Initialize method updates the tracked state
-        stub.Initialize.Execute(() => { isInitialized = true; });
+        stub.Initialize.Call(() => { isInitialized = true; });
         #endregion
 
         IServiceWithInitProps service = stub;
@@ -699,7 +699,7 @@ public class CompletePropertyExampleTests
         stub.ConnectionString.Set((value) => connectionStrings.Add(value));
 
         // Method callback updates the tracked state
-        stub.Connect.Execute(() => { isConnected = true; });
+        stub.Connect.Call(() => { isConnected = true; });
         #endregion
 
         IUserConfigComplete service = stub;

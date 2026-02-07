@@ -220,7 +220,7 @@ internal static class ClassModelBuilder
     }
 
     /// <summary>
-    /// Groups methods by name. All overloads share a single interceptor with multiple OnCall signatures.
+    /// Groups methods by name. All overloads share a single interceptor with multiple Call signatures.
     /// </summary>
     private static List<MethodGroup> GroupMethodsByName(IEnumerable<ClassMemberInfo> methods)
     {
@@ -410,7 +410,7 @@ internal static class ClassModelBuilder
         var isTask = member.ReturnType == "global::System.Threading.Tasks.Task";
         var isValueTask = member.ReturnType == "global::System.Threading.Tasks.ValueTask";
 
-        var onCallArgs = inputArgList; // No stub parameter - callbacks only get method parameters
+        var callArgs = inputArgList; // No stub parameter - callbacks only get method parameters
 
         return new InlineClassImplMethodModel(
             HandlerName: handlerName,
@@ -424,7 +424,7 @@ internal static class ClassModelBuilder
             ParameterDeclarations: paramList,
             ArgumentList: argList,
             InputArgumentList: inputArgList,
-            OnCallArgumentList: onCallArgs,
+            CallArgumentList: callArgs,
             InvokeSuffix: invokeSuffix);
     }
 

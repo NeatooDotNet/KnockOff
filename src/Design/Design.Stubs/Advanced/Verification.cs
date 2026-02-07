@@ -41,7 +41,7 @@ public partial class VerificationDemo
     public void Verify_DirectOnInterceptor()
     {
         var stub = new Stubs.ICalculator();
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
 
         ICalculator calc = stub;
 
@@ -116,8 +116,8 @@ public partial class VerificationDemo
         var stub = new Stubs.ICalculator();
 
         // Mark as verifiable during configuration
-        stub.Add.Returns(42).Verifiable();
-        stub.Subtract.Returns(10).Verifiable(Times.Exactly(2));
+        stub.Add.Return(42).Verifiable();
+        stub.Subtract.Return(10).Verifiable(Times.Exactly(2));
 
         ICalculator calc = stub;
 
@@ -156,8 +156,8 @@ public partial class VerificationDemo
         var stub = new Stubs.ICalculator();
 
         // Only Add is marked verifiable
-        stub.Add.Returns(42).Verifiable();
-        stub.Subtract.Returns(10); // NOT verifiable
+        stub.Add.Return(42).Verifiable();
+        stub.Subtract.Return(10); // NOT verifiable
 
         ICalculator calc = stub;
 
@@ -193,8 +193,8 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Returns(42); // Configured
-        stub.Subtract.Returns(10); // Configured but not verifiable
+        stub.Add.Return(42); // Configured
+        stub.Subtract.Return(10); // Configured but not verifiable
 
         ICalculator calc = stub;
 
@@ -222,9 +222,9 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Returns(42).Verifiable();
-        stub.Subtract.Returns(10).Verifiable();
-        stub.Divide.Returns(5).Verifiable();
+        stub.Add.Return(42).Verifiable();
+        stub.Subtract.Return(10).Verifiable();
+        stub.Divide.Return(5).Verifiable();
 
         ICalculator calc = stub;
 
@@ -254,9 +254,9 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        var sequence = stub.Add.Returns((a, b) => a + b)
-            .ThenReturns((a, b) => a * b)
-            .ThenReturns((a, b) => 999);
+        var sequence = stub.Add.Return((a, b) => a + b)
+            .ThenReturn((a, b) => a * b)
+            .ThenReturn((a, b) => 999);
 
         ICalculator calc = stub;
 
@@ -283,8 +283,8 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        var chain = stub.Add.When(1, 2).Returns(10)
-            .ThenWhen(3, 4).Returns(20)
+        var chain = stub.Add.When(1, 2).Return(10)
+            .ThenWhen(3, 4).Return(20)
             .ThenCall((a, b) => 999); // Terminal
 
         ICalculator calc = stub;
@@ -309,7 +309,7 @@ public partial class VerificationDemo
         var stub = new Stubs.ICalculator();
 
         // Must be called exactly twice
-        stub.Add.Returns(42).Verifiable(Times.Exactly(2));
+        stub.Add.Return(42).Verifiable(Times.Exactly(2));
 
         ICalculator calc = stub;
 
@@ -345,7 +345,7 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Returns(42).Verifiable();
+        stub.Add.Return(42).Verifiable();
 
         ICalculator calc = stub;
 

@@ -77,7 +77,7 @@ public partial class SourceDelegationDemo
         stub.Source(realCalculator);
 
         // Configure Add to return a specific value
-        stub.Add.Returns(999);
+        stub.Add.Return(999);
 
         ICalculator calc = stub;
 
@@ -111,7 +111,7 @@ public partial class SourceDelegationDemo
         stub.Source(realCalculator);
 
         // Configure Divide to handle specific case
-        stub.Divide.When(10, 2).Returns(5);
+        stub.Divide.When(10, 2).Return(5);
 
         ICalculator calc = stub;
 
@@ -326,8 +326,8 @@ public partial class SourceHierarchyDemo
 
         // Explicitly configure write operations
         var saved = new Dictionary<int, string>();
-        stub.Save.Execute((id, value) => saved[id] = value);
-        stub.Delete.Execute((id) => saved.Remove(id));
+        stub.Save.Call((id, value) => saved[id] = value);
+        stub.Delete.Call((id) => saved.Remove(id));
 
         IStore store = stub;
 

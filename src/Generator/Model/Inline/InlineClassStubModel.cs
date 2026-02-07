@@ -134,7 +134,7 @@ internal sealed record InlineClassMethodModel(
     string ArgumentList,
     /// <summary>Input parameters for tracking.</summary>
     EquatableArray<ParameterModel> InputParameters,
-    /// <summary>Delegate type for OnCall.</summary>
+    /// <summary>Delegate type for Call.</summary>
     string DelegateType,
     /// <summary>LastCallArg type or null.</summary>
     string? LastCallArgType,
@@ -257,8 +257,8 @@ internal sealed record InlineClassImplMethodModel(
     string ArgumentList,
     /// <summary>Input argument list for RecordCall (e.g., "name, count").</summary>
     string InputArgumentList,
-    /// <summary>OnCall argument list (e.g., "_stub, name, count").</summary>
-    string OnCallArgumentList,
+    /// <summary>Call argument list (e.g., "_stub, name, count").</summary>
+    string CallArgumentList,
     /// <summary>Invoke suffix for multi-overload interceptors (e.g., "_NoParams_TNullable"). Empty for single-signature interceptors.</summary>
     string InvokeSuffix,
     /// <summary>

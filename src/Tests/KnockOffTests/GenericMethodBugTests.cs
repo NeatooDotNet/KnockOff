@@ -19,7 +19,7 @@ public class GenericMethodBugTests
 		var knockOff = new GenericMethodWithUserMethodKnockOff();
 		IGenericMethodWithUserMethod service = knockOff;
 
-		knockOff.Create.Of<TestEntity>().OnCall(() => new TestEntity { Id = 999 });
+		knockOff.Create.Of<TestEntity>().Return(() => new TestEntity { Id = 999 });
 
 		var result = service.Create<TestEntity>();
 
@@ -34,8 +34,8 @@ public class GenericMethodBugTests
 		IGenericMethodWithUserMethod service = knockOff;
 
 		// OnCall doubles integers
-		knockOff.Transform.Of<int>().OnCall((value) => value * 2);
-		knockOff.Transform.Of<string>().OnCall((value) => value + "_transformed");
+		knockOff.Transform.Of<int>().Return((value) => value * 2);
+		knockOff.Transform.Of<string>().Return((value) => value + "_transformed");
 
 		var result = service.Transform(21);
 		Assert.Equal(42, result);
@@ -50,7 +50,7 @@ public class GenericMethodBugTests
 		var knockOff = new GenericMethodWithUserMethodKnockOff();
 		IGenericMethodWithUserMethod service = knockOff;
 
-		knockOff.Convert.Of<int, TestEntity>().OnCall((input) => new TestEntity { Id = input * 10 });
+		knockOff.Convert.Of<int, TestEntity>().Return((input) => new TestEntity { Id = input * 10 });
 
 		var result = service.Convert<int, TestEntity>(5);
 
@@ -69,8 +69,8 @@ public class GenericMethodBugTests
 	{
 		var knockOff = new MixedOverloadServiceKnockOff();
 		// Configure callbacks for non-generic overloads via overloaded Execute
-		var stringTracking = knockOff.Process.Execute((string value) => { });
-		var intTracking = knockOff.Process.Execute((int value) => { });
+		var stringTracking = knockOff.Process.Call((string value) => { });
+		var intTracking = knockOff.Process.Call((int value) => { });
 		IMixedOverloadService service = knockOff;
 
 		service.Process("hello");
@@ -100,8 +100,8 @@ public class GenericMethodBugTests
 	{
 		var knockOff = new MixedOverloadServiceKnockOff();
 		// Configure callbacks for non-generic overloads
-		var stringTracking = knockOff.Process.Execute((string value) => { });
-		var intTracking = knockOff.Process.Execute((int value) => { });
+		var stringTracking = knockOff.Process.Call((string value) => { });
+		var intTracking = knockOff.Process.Call((int value) => { });
 		IMixedOverloadService service = knockOff;
 
 		// Call all overloads
@@ -126,8 +126,8 @@ public class GenericMethodBugTests
 		var knockOff = new MixedOverloadServiceKnockOff();
 		IMixedOverloadService service = knockOff;
 
-		knockOff.Format.Returns((int value) => $"int:{value}");
-		knockOff.FormatGeneric.Of<double>().OnCall((value) => $"double:{value}");
+		knockOff.Format.Return((int value) => $"int:{value}");
+		knockOff.FormatGeneric.Of<double>().Return((value) => $"double:{value}");
 
 		var intResult = service.Format(42);
 		var doubleResult = service.Format(3.14);
@@ -152,7 +152,7 @@ public class GenericMethodBugTests
 
 		// Configure to return a test attribute
 		var testAttr = new TestAttribute();
-		knockOff.GetAttribute.Of<TestAttribute>().OnCall(() => testAttr);
+		knockOff.GetAttribute.Of<TestAttribute>().Return(() => testAttr);
 
 		var result = service.GetAttribute<TestAttribute>();
 
@@ -166,7 +166,7 @@ public class GenericMethodBugTests
 		var knockOff = new ConstrainedGenericMethodKnockOff();
 		IConstrainedGenericMethod service = knockOff;
 
-		knockOff.GetAttribute.Of<TestAttribute>().OnCall(() => null);
+		knockOff.GetAttribute.Of<TestAttribute>().Return(() => null);
 
 		var result = service.GetAttribute<TestAttribute>();
 
@@ -179,7 +179,7 @@ public class GenericMethodBugTests
 		var knockOff = new ConstrainedGenericMethodKnockOff();
 		IConstrainedGenericMethod service = knockOff;
 
-		knockOff.GetOrDefault.Of<string>().OnCall(() => "test");
+		knockOff.GetOrDefault.Of<string>().Return(() => "test");
 
 		var result = service.GetOrDefault<string>();
 
@@ -192,7 +192,7 @@ public class GenericMethodBugTests
 		var knockOff = new ConstrainedGenericMethodKnockOff();
 		IConstrainedGenericMethod service = knockOff;
 
-		knockOff.Transform.Of<int, string>().OnCall((input) => $"value:{input}");
+		knockOff.Transform.Of<int, string>().Return((input) => $"value:{input}");
 
 		var result = service.Transform<int, string>(42);
 
@@ -206,7 +206,7 @@ public class GenericMethodBugTests
 		IConstrainedGenericMethod service = knockOff;
 
 		var stream = new MemoryStream();
-		knockOff.FindService.Of<MemoryStream>().OnCall(() => stream);
+		knockOff.FindService.Of<MemoryStream>().Return(() => stream);
 
 		var result = service.FindService<MemoryStream>();
 

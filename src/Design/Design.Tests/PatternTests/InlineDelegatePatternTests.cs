@@ -24,7 +24,7 @@ public class InlineDelegatePatternTests
     public void InlineDelegate_ImplicitConversionToDelegate()
     {
         var stub = new InlineDelegateExample.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(42);
+        stub.Interceptor.Return(42);
 
         ArithmeticOperation operation = stub;
 
@@ -35,7 +35,7 @@ public class InlineDelegatePatternTests
     public void InlineDelegate_Returns_ConfiguresConstantReturnValue()
     {
         var stub = new InlineDelegateExample.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(100);
+        stub.Interceptor.Return(100);
 
         ArithmeticOperation operation = stub;
         var result = operation(5, 10);
@@ -47,7 +47,7 @@ public class InlineDelegatePatternTests
     public void InlineDelegate_OnCall_ConfiguresCallback()
     {
         var stub = new InlineDelegateExample.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns((a, b) => a + b);
+        stub.Interceptor.Return((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
         var result = operation(5, 10);
@@ -59,7 +59,7 @@ public class InlineDelegatePatternTests
     public void InlineDelegate_LastCallArgs_TracksArguments()
     {
         var stub = new InlineDelegateExample.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(0);
+        stub.Interceptor.Return(0);
 
         ArithmeticOperation operation = stub;
         operation(7, 3);
@@ -76,7 +76,7 @@ public class InlineDelegatePatternTests
     {
         var stub = new InlineDelegateExample.Stubs.LogAction();
         string? capturedMessage = null;
-        stub.Interceptor.Execute(msg => capturedMessage = msg);
+        stub.Interceptor.Call(msg => capturedMessage = msg);
 
         LogAction logger = stub;
         logger("Hello, World!");

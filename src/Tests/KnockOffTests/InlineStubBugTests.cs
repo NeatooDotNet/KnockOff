@@ -19,7 +19,7 @@ public class InlineStubBugTests
 		var entity = new SampleEntity { Id = 1 };
 
 		// Set up sync callback - C# overload resolution picks the right OnCall based on lambda parameter type
-		stub.Fetch.Returns((SampleEntity e) => new SampleArea { Id = e.Id });
+		stub.Fetch.Return((SampleEntity e) => new SampleArea { Id = e.Id });
 
 		// Call the sync overload
 		var result = factory.Fetch(entity);
@@ -35,7 +35,7 @@ public class InlineStubBugTests
 		IFactoryWithMixedReturnTypes factory = stub;
 
 		// Set up async callback - C# overload resolution picks the right OnCall based on lambda parameter type
-		stub.Fetch.Returns((long id) =>
+		stub.Fetch.Return((long id) =>
 			Task.FromResult<ISampleArea?>(new SampleArea { Id = (int)id }));
 
 		// Call the async overload
@@ -60,7 +60,7 @@ public class InlineStubBugTests
 		var expectedResult = new SampleResult { Success = true };
 
 		// Set up callback for typed version - Execute takes ISampleTarget
-		stub.Execute.Returns((ISampleTarget t, CancellationToken? ct) =>
+		stub.Execute.Return((ISampleTarget t, CancellationToken? ct) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via typed interface
@@ -79,7 +79,7 @@ public class InlineStubBugTests
 		var expectedResult = new SampleResult { Success = true };
 
 		// Set up callback for base version - Execute takes ISampleRuleTarget
-		stub.Execute.Returns((ISampleRuleTarget t, CancellationToken? ct) =>
+		stub.Execute.Return((ISampleRuleTarget t, CancellationToken? ct) =>
 			Task.FromResult<ISampleResult>(expectedResult));
 
 		// Call via base interface

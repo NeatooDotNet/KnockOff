@@ -15,7 +15,7 @@ KnockOff generates six types of interceptors, each exposed through properties on
 | **Property Interceptor** | Interface properties | `stub.{Interface}.{PropertyName}` | `stub.IRepository.ConnectionString` |
 | **Indexer Interceptor** | Interface indexers | `stub.{Interface}.Indexer` | `stub.IRepository.Indexer` |
 | **Event Interceptor** | Interface events | `stub.{Interface}.{EventName}` | `stub.IRepository.Changed` |
-| **Delegate Interceptor** | Delegate types | `stub.Interceptor` | `stub.Interceptor.Returns(42)` |
+| **Delegate Interceptor** | Delegate types | `stub.Interceptor` | `stub.Interceptor.Return(42)` |
 
 All interceptors provide a `Reset()` method to clear tracking state (counts, captured arguments, and sequence positions) while preserving configured callbacks.
 
@@ -38,18 +38,18 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Returns(delegate)` | `IMethodReturnsBuilder<T>` | Configure callback for non-void methods. Returns builder for chaining `.ThenReturns()` sequences. |
-| `Execute(delegate)` | `IMethodExecuteBuilder<T>` | Configure callback for void methods. Returns builder for chaining `.ThenExecute()` sequences. |
-| `Returns(TReturn value)` | `IMethodReturnsBuilder<T>` | Configure fixed return value. Returns builder interface. Available only for methods with return values. |
-| `When(T1 arg1, T2 arg2, ...)` | `IWhenBuilder<TDelegate, TReturn>` (return methods) or `IVoidWhenChain<TDelegate>` (void methods) | Match specific argument values. Chain `.Returns(value)` for return methods or `.Execute(callback)` for void methods. See [Parameter Matching Guide](../guides/parameter-matching.md). |
-| `When(Func<T1, T2, ..., bool> predicate)` | `IWhenBuilder<TDelegate, TReturn>` (return methods) or `IVoidWhenChain<TDelegate>` (void methods) | Match arguments via predicate. Chain `.Returns(value)` for return methods or `.Execute(callback)` for void methods. See [Parameter Matching Guide](../guides/parameter-matching.md). |
+| `Return(delegate)` | `IMethodReturnBuilder<T>` | Configure callback for non-void methods. Returns builder for chaining `.ThenReturn()` sequences. |
+| `Call(delegate)` | `IMethodCallBuilder<T>` | Configure callback for void methods. Returns builder for chaining `.ThenCall()` sequences. |
+| `Return(TReturn value)` | `IMethodReturnBuilder<T>` | Configure fixed return value. Returns builder interface. Available only for methods with return values. |
+| `When(T1 arg1, T2 arg2, ...)` | `IWhenBuilder<TDelegate, TReturn>` (return methods) or `IVoidWhenChain<TDelegate>` (void methods) | Match specific argument values. Chain `.Return(value)` for return methods or `.Call(callback)` for void methods. See [Parameter Matching Guide](../guides/parameter-matching.md). |
+| `When(Func<T1, T2, ..., bool> predicate)` | `IWhenBuilder<TDelegate, TReturn>` (return methods) or `IVoidWhenChain<TDelegate>` (void methods) | Match arguments via predicate. Chain `.Return(value)` for return methods or `.Call(callback)` for void methods. See [Parameter Matching Guide](../guides/parameter-matching.md). |
 
 **Return type details**:
 - Single-parameter methods return `IMethodTracking<T>` with `LastArg` property
 - Multi-parameter methods return `IMethodTrackingArgs<(T1?, T2?, ...)>` with `LastArgs` property
 - Void methods and return methods both support callbacks
 
-**Returns() benefits**:
+**Return() benefits**:
 - Simpler syntax when returning a fixed value
 - Still returns tracking object for verification
 - Not available for void methods (no return value to configure)
@@ -58,19 +58,19 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 
 The delegate type for the callback varies based on method signature:
 
-| Method Signature | Returns/Execute Callback Type |
+| Method Signature | Return/Call Callback Type |
 |-----------------|-------------|
-| `void M()` | `Action` (via `Execute`) |
-| `void M(T arg)` | `Action<T>` (via `Execute`) |
-| `void M(T1 a, T2 b)` | `Action<T1, T2>` (via `Execute`) |
-| `R M()` | `Func<R>` (via `Returns`) |
-| `R M(T arg)` | `Func<T, R>` (via `Returns`) |
-| `R M(T1 a, T2 b)` | `Func<T1, T2, R>` (via `Returns`) |
+| `void M()` | `Action` (via `Call`) |
+| `void M(T arg)` | `Action<T>` (via `Call`) |
+| `void M(T1 a, T2 b)` | `Action<T1, T2>` (via `Call`) |
+| `R M()` | `Func<R>` (via `Return`) |
+| `R M(T arg)` | `Func<T, R>` (via `Return`) |
+| `R M(T1 a, T2 b)` | `Func<T1, T2, R>` (via `Return`) |
 
 **When to use each method**:
-- **Returns(value)**: Returning a fixed value (non-void methods)
-- **Returns(callback)**: Dynamic values based on arguments or conditional logic (non-void methods)
-- **Execute(callback)**: Side effects (void methods)
+- **Return(value)**: Returning a fixed value (non-void methods)
+- **Return(callback)**: Dynamic values based on arguments or conditional logic (non-void methods)
+- **Call(callback)**: Side effects (void methods)
 
 When a callback is configured, it is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
 
@@ -85,21 +85,21 @@ When a callback is configured, it is invoked instead of user-defined methods. Fo
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (`LastArg`/`LastArgs`, call counts), resets sequence index to 0, and resets When chain position. Preserves configured callbacks (`Returns`, `Execute`), sequence structure, and verifiable marking.
+- `void Reset()` - Clears tracking state (`LastArg`/`LastArgs`, call counts), resets sequence index to 0, and resets When chain position. Preserves configured callbacks (`Return`, `Call`), sequence structure, and verifiable marking.
 
 ### Example
 
 <!-- snippet: method-interceptor-complete-api-demo -->
 ```cs
-// Configure void method with OnCall and mark verifiable
-stub.Save.Execute((user) => { }).Verifiable();
+// Configure void method with Return and mark verifiable
+stub.Save.Call((user) => { }).Verifiable();
 
 // Configure return method with Returns
-var getTracking = stub.GetById.Returns((id) =>
+var getTracking = stub.GetById.Return((id) =>
     new User { Id = id, Name = $"User{id}" }).Verifiable();
 
 // Configure multi-parameter method
-var updateTracking = stub.Update.Execute((id, name) => { }).Verifiable();
+var updateTracking = stub.Update.Call((id, name) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -322,9 +322,9 @@ Call `.Of<T>()` (or `.Of<T1, T2>()` for multiple type parameters) to get a typed
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Returns(delegate)` | `IMethodReturnsBuilder` | Configure callback invoked when non-void method is called with these type arguments. Returns builder for sequencing (`.ThenReturns()`). |
-| `Execute(delegate)` | `IMethodExecuteBuilder` | Configure callback invoked when void method is called with these type arguments. Returns builder for sequencing (`.ThenExecute()`). |
-| `Returns(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value for these type arguments. Returns tracking interface. Available only for methods with return values. |
+| `Return(delegate)` | `IMethodReturnBuilder` | Configure callback invoked when non-void method is called with these type arguments. Returns builder for sequencing (`.ThenReturn()`). |
+| `Call(delegate)` | `IMethodCallBuilder` | Configure callback invoked when void method is called with these type arguments. Returns builder for sequencing (`.ThenCall()`). |
+| `Return(TReturn value)` | `IMethodTracking<T>` | Configure fixed return value for these type arguments. Returns tracking interface. Available only for methods with return values. |
 
 The callback delegate type follows the same signature rules as non-generic method interceptors (see Method Interceptor section).
 
@@ -351,10 +351,10 @@ The callback delegate type follows the same signature rules as non-generic metho
 <!-- snippet: generic-method-interceptor-complete-api-demo -->
 ```cs
 // Of<T>(): access typed interceptor for specific type argument
-stub.GetById.Of<User>().OnCall((id) =>
+stub.GetById.Of<User>().Return((id) =>
     new User { Id = id, Name = $"User{id}" });
 
-stub.GetById.Of<Product>().OnCall((id) =>
+stub.GetById.Of<Product>().Return((id) =>
     new Product { Id = id, Name = $"Product{id}" });
 
 // CalledTypeArguments: list of all type arguments used
@@ -366,7 +366,7 @@ var typeArgs = stub.GetById.CalledTypeArguments;
 
 ## Delegate Interceptor
 
-Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a single `Interceptor` property instead of named member properties. The interceptor reuses the same `MethodInterceptorRenderer` as interface and class stubs, so delegates support the full feature set: Returns, Execute, sequences, When chains, async auto-wrapping, verification, and strict mode.
+Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a single `Interceptor` property instead of named member properties. The interceptor reuses the same `MethodInterceptorRenderer` as interface and class stubs, so delegates support the full feature set: Return, Call, sequences, When chains, async auto-wrapping, verification, and strict mode.
 
 **Important:** Only named delegate types are supported. `Func<>` and `Action<>` cannot be stubbed directly — define a named delegate instead.
 
@@ -379,8 +379,8 @@ Unlike interface/class stubs where interceptors are accessed via named propertie
 var stub = new Stubs.ArithmeticOperation();
 
 // All configuration goes through stub.Interceptor
-stub.Interceptor.Returns(42);
-stub.Interceptor.Returns((a, b) => a + b);
+stub.Interceptor.Return(42);
+stub.Interceptor.Return((a, b) => a + b);
 
 // Implicit conversion to delegate type
 ArithmeticOperation op = stub;
@@ -392,10 +392,10 @@ var result = op(2, 3);
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Returns(TReturn value)` | `IMethodCallBuilder` | Configure fixed return value. Repeats indefinitely. Not available for void delegates. |
-| `Returns(TReturn first, params TReturn[] rest)` | `IMethodSequence` | Creates sequence from multiple values. Last value repeats after exhaustion. |
-| `Returns(callback)` | `IMethodReturnsBuilder` | Configure callback matching the delegate signature (non-void delegates). Returns builder for sequencing. |
-| `Execute(callback)` | `IMethodExecuteBuilder` | Configure callback matching the delegate signature (void delegates). Returns builder for sequencing. |
+| `Return(TReturn value)` | `IMethodCallBuilder` | Configure fixed return value. Repeats indefinitely. Not available for void delegates. |
+| `Return(TReturn first, params TReturn[] rest)` | `IMethodSequence` | Creates sequence from multiple values. Last value repeats after exhaustion. |
+| `Return(callback)` | `IMethodReturnBuilder` | Configure callback matching the delegate signature (non-void delegates). Returns builder for sequencing. |
+| `Call(callback)` | `IMethodCallBuilder` | Configure callback matching the delegate signature (void delegates). Returns builder for sequencing. |
 | `When(T1 arg1, ...)` | `IWhenBuilder` / `IVoidWhenChain` | Match specific argument values. See [When Chain API](#when-chain-api). |
 | `When(predicate)` | `IWhenBuilder` / `IVoidWhenChain` | Match arguments via predicate. See [When Chain API](#when-chain-api). |
 
@@ -409,13 +409,13 @@ Async delegates (returning `Task<T>` or `ValueTask<T>`) support the same three-t
 var stub = new Stubs.AsyncOperation();
 
 // Tier 1: Returns takes inner type — auto-wraps in Task.FromResult
-stub.Interceptor.Returns(42);
+stub.Interceptor.Return(42);
 
 // Tier 2: Simplified callback returns int — auto-wrapped
-stub.Interceptor.Returns((int x) => x * 2);
+stub.Interceptor.Return((int x) => x * 2);
 
 // Tier 3: Full delegate returns Task<int> directly
-stub.Interceptor.Returns((int x) => Task.FromResult(x * 2));
+stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
 ```
 <!-- endSnippet -->
 
@@ -441,10 +441,10 @@ Zero-parameter delegates have neither property — only call count tracking via 
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `ThenReturns(T value)` | `IMethodSequence` | Adds constant value to sequence |
-| `ThenReturns(params T[] values)` | `IMethodSequence` | Adds multiple constant values |
-| `ThenReturns(callback)` | `IMethodReturnsSequence` | Adds callback to sequence (non-void delegates) |
-| `ThenExecute(callback)` | `IMethodExecuteSequence` | Adds callback to sequence (void delegates) |
+| `ThenReturn(T value)` | `IMethodSequence` | Adds constant value to sequence |
+| `ThenReturn(params T[] values)` | `IMethodSequence` | Adds multiple constant values |
+| `ThenReturn(callback)` | `IMethodReturnSequence` | Adds callback to sequence (non-void delegates) |
+| `ThenCall(callback)` | `IMethodCallSequence` | Adds callback to sequence (void delegates) |
 | `ThenDefault()` | `void` | Terminates sequence; returns `default(T)` after exhaustion instead of repeating |
 
 ### Strict Mode
@@ -467,7 +467,7 @@ Delegate stubs implicitly convert to the delegate type:
 <!-- snippet: delegate-api-implicit-conversion -->
 ```cs
 var stub = new Stubs.ArithmeticOperation();
-stub.Interceptor.Returns((a, b) => a + b);
+stub.Interceptor.Return((a, b) => a + b);
 
 // Implicit conversion — no cast needed
 ArithmeticOperation op = stub;
@@ -480,7 +480,7 @@ ProcessCalculation(stub);
 
 ### Reset
 
-`Reset()` clears tracking state (call counts, `LastArg`/`LastArgs`) but preserves configuration (`Returns`, `Execute`). Does NOT reset verifiable marking.
+`Reset()` clears tracking state (call counts, `LastArg`/`LastArgs`) but preserves configuration (`Return`, `Call`). Does NOT reset verifiable marking.
 
 ### When Chains on Delegates
 
@@ -489,8 +489,8 @@ Delegate interceptors support the same When chain API as method interceptors. Re
 **Returning delegates:**
 <!-- snippet: delegate-api-when-chains-returning -->
 ```cs
-stub.Interceptor.When(1, 2).Returns(100)
-    .ThenWhen(3, 4).Returns(200)
+stub.Interceptor.When(1, 2).Return(100)
+    .ThenWhen(3, 4).Return(200)
     .ThenCall((a, b) => a + b);
 ```
 <!-- endSnippet -->
@@ -498,8 +498,8 @@ stub.Interceptor.When(1, 2).Returns(100)
 **Void delegates:**
 <!-- snippet: delegate-api-when-chains-void -->
 ```cs
-stub.Interceptor.When(1, 2).Execute((a, b) => calls.Add("first"))
-    .ThenWhen(3, 4).Execute((a, b) => calls.Add("second"));
+stub.Interceptor.When(1, 2).Call((a, b) => calls.Add("first"))
+    .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
 ```
 <!-- endSnippet -->
 
@@ -513,15 +513,15 @@ The When() API provides parameter-specific matching. It returns different interf
 
 ### For Return Methods
 
-When() returns `IWhenBuilder<TDelegate, TReturn>` which requires calling `.Returns()` to complete the configuration:
+When() returns `IWhenBuilder<TDelegate, TReturn>` which requires calling `.Return()` to complete the configuration:
 
 <!-- snippet: when-chain-return-method-api -->
 ```cs
-// When() returns IWhenBuilder, which requires .Returns() to complete
-var chain = stub.Calculate.When(5, 10).Returns(50);
+// When() returns IWhenBuilder, which requires .Return() to complete
+var chain = stub.Calculate.When(5, 10).Return(50);
 
 // chain is IWhenChain - can continue chaining or verify
-chain.ThenWhen(1, 2).Returns(100);
+chain.ThenWhen(1, 2).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -529,14 +529,14 @@ chain.ThenWhen(1, 2).Returns(100);
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Returns(TReturn value)` | `IWhenChain<TDelegate, TReturn>` | Specifies the return value when matcher matches. For async methods, automatically wraps with `Task.FromResult()`. |
+| `Return(TReturn value)` | `IWhenChain<TDelegate, TReturn>` | Specifies the return value when matcher matches. For async methods, automatically wraps with `Task.FromResult()`. |
 
 **IWhenChain Methods:**
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `ThenWhen(T1 arg1, ...)` | `IWhenBuilder<TDelegate, TReturn>` | Add another value matcher. Must chain `.Returns()` to complete. |
-| `ThenWhen(Func<T1, ..., bool>)` | `IWhenBuilder<TDelegate, TReturn>` | Add another predicate matcher. Must chain `.Returns()` to complete. |
+| `ThenWhen(T1 arg1, ...)` | `IWhenBuilder<TDelegate, TReturn>` | Add another value matcher. Must chain `.Return()` to complete. |
+| `ThenWhen(Func<T1, ..., bool>)` | `IWhenBuilder<TDelegate, TReturn>` | Add another predicate matcher. Must chain `.Return()` to complete. |
 | `ThenCall(TDelegate callback)` | `IWhenTracking` | Add unconditional terminal matcher that repeats forever. |
 | `ThenNone()` | `IWhenTracking` | Close chain - subsequent calls fall through to next configured behavior. |
 | `Verify()` | `void` | Verify chain reached terminal state. |
@@ -553,8 +553,8 @@ When() returns `IVoidWhenChain<TDelegate>` directly - no builder step needed sin
 // Void methods: When() returns IVoidWhenChain directly
 var chain = stub.Process.When(1, 2);
 
-// .Execute() is optional - adds callback for side effects
-chain.Execute((a, b) => called = true);
+// .Call() is optional - adds callback for side effects
+chain.Call((a, b) => called = true);
 ```
 <!-- endSnippet -->
 
@@ -562,10 +562,10 @@ chain.Execute((a, b) => called = true);
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Execute(TDelegate callback)` | `IVoidWhenChain<TDelegate>` | Optional: Configure callback when matcher matches. Returns this for fluent chaining. |
-| `ThenWhen(T1 arg1, ...)` | `IVoidWhenChain<TDelegate>` | Add another value matcher. Can optionally chain `.Execute()`. |
-| `ThenWhen(Func<T1, ..., bool>)` | `IVoidWhenChain<TDelegate>` | Add another predicate matcher. Can optionally chain `.Execute()`. |
-| `ThenExecute(TDelegate callback)` | `IWhenTracking` | Add unconditional terminal matcher that repeats forever. |
+| `Call(TDelegate callback)` | `IVoidWhenChain<TDelegate>` | Optional: Configure callback when matcher matches. Returns this for fluent chaining. |
+| `ThenWhen(T1 arg1, ...)` | `IVoidWhenChain<TDelegate>` | Add another value matcher. Can optionally chain `.Call()`. |
+| `ThenWhen(Func<T1, ..., bool>)` | `IVoidWhenChain<TDelegate>` | Add another predicate matcher. Can optionally chain `.Call()`. |
+| `ThenCall(TDelegate callback)` | `IWhenTracking` | Add unconditional terminal matcher that repeats forever. |
 | `ThenNone()` | `IWhenTracking` | Close chain - subsequent calls fall through to next configured behavior. |
 | `Verify()` | `void` | Verify chain reached terminal state. |
 | `Verify(Times)` | `void` | Verify specific matcher was called according to Times constraint (parameter-specific count). |
@@ -577,9 +577,9 @@ chain.Execute((a, b) => called = true);
 When a method is called, KnockOff checks configurations in this priority order:
 
 1. **When() chain** - Checked first. If current matcher matches, its callback/value is used and chain advances.
-2. **Sequence (Returns(callback).ThenReturns(callback) / Execute(callback).ThenExecute(callback))** - If When() doesn't match or chain is exhausted.
-3. **Returns(value)** - If no sequence configured.
-4. **Returns(callback) / Execute(callback)** - If no Returns(value) configured.
+2. **Sequence (Return(callback).ThenReturn(callback) / Call(callback).ThenCall(callback))** - If When() doesn't match or chain is exhausted.
+3. **Return(value)** - If no sequence configured.
+4. **Return(callback) / Call(callback)** - If no Return(value) configured.
 5. **Default behavior** - `default(T)` in non-strict mode, exception in strict mode.
 
 See the [Parameter Matching Guide](../guides/parameter-matching.md) for detailed examples and usage patterns.
@@ -592,18 +592,18 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `Returns`/`Execute` callbacks, sequence structure, When chain structure, verifiable marking |
+| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Property** | Get/set counts, `LastSetValue`, sequence index | `Get`/`Set` callbacks, sequence structure, verifiable marking |
 | **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `Get`/`Set` callbacks, `Backing` dictionary, sequence structure, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
-| **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `Returns`/`Execute` callbacks, sequence structure, When chain structure, verifiable marking |
+| **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
 | **Generic Method (Typed)** | Tracking for specific type argument(s) only | Tracking for other type arguments, verifiable marking |
 | **When Chain** | Chain position (HEAD), all matcher call counts | Chain structure (matchers and callbacks) |
 
 **Key Principles**:
 - `Reset()` clears tracking (counts, captured arguments) and resets sequence/When chain positions
-- `Reset()` preserves configured callbacks (`Returns`, `Execute`, `Get`, `Set`) and structure
+- `Reset()` preserves configured callbacks (`Return`, `Call`, `Get`, `Set`) and structure
 - `Reset()` does NOT clear verifiable marking (intentional test setup)
 - `Reset()` does NOT clear backing storage (`Backing` dictionary for indexers)
 
@@ -629,11 +629,11 @@ See the [Verification Guide](../guides/verification.md) for detailed examples.
 
 ## Tracking Objects vs Interceptors
 
-When you call `Returns(callback)`, `Execute(callback)`, `Get()`, or `Set()`, KnockOff returns a tracking/builder object that provides access to sequencing and verification methods.
+When you call `Return(callback)`, `Call(callback)`, `Get()`, or `Set()`, KnockOff returns a tracking/builder object that provides access to sequencing and verification methods.
 
 **Key distinction**:
 - **Interceptor**: The main object (e.g., `stub.GetById`) that configures behavior
-- **Builder object**: The return value from `Returns(callback)` or `Execute(callback)` (e.g., `IMethodReturnsBuilder`) that supports sequencing and verification
+- **Builder object**: The return value from `Return(callback)` or `Call(callback)` (e.g., `IMethodReturnBuilder`) that supports sequencing and verification
 
 **Example**:
 <!-- snippet: delegate-api-tracking-objects -->
@@ -642,7 +642,7 @@ var stub = new ApiMethodRepoStub();
 
 // Interceptor: stub.GetById
 // Tracking object: getTracking
-var getTracking = stub.GetById.Returns((id) => new User { Id = id });
+var getTracking = stub.GetById.Return((id) => new User { Id = id });
 
 // Call the method
 IApiMethodRepo repo = stub;

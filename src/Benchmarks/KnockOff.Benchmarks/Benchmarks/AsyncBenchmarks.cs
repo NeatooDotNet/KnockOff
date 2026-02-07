@@ -26,9 +26,9 @@ public class AsyncInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new AsyncServiceStub();
-        stub.DoWorkAsync.Returns(() => Task.CompletedTask);
-        stub.GetValueAsync.Returns(() => Task.FromResult(42));
-        stub.GetStringValueAsync.Returns(() => new ValueTask<string>("test"));
+        stub.DoWorkAsync.Return(() => Task.CompletedTask);
+        stub.GetValueAsync.Return(() => Task.FromResult(42));
+        stub.GetStringValueAsync.Return(() => new ValueTask<string>("test"));
         _knockOff = stub;
     }
 
@@ -78,9 +78,9 @@ public class AsyncSetupBenchmarks
     public AsyncServiceStub KnockOff_SetupAsyncMethods()
     {
         var stub = new AsyncServiceStub();
-        stub.DoWorkAsync.Returns(() => Task.CompletedTask);
-        stub.GetValueAsync.Returns(() => Task.FromResult(42));
-        stub.GetStringValueAsync.Returns(() => new ValueTask<string>("test"));
+        stub.DoWorkAsync.Return(() => Task.CompletedTask);
+        stub.GetValueAsync.Return(() => Task.FromResult(42));
+        stub.GetStringValueAsync.Return(() => new ValueTask<string>("test"));
         return stub;
     }
 }

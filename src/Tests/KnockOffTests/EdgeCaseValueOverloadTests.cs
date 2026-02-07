@@ -9,7 +9,7 @@ namespace KnockOff.Tests;
 /// - Nullable async types (Task&lt;string?&gt;)
 /// - Overloaded methods (overload groups don't have value overloads yet)
 ///
-/// Note: Generic methods with Of&lt;T&gt;().Returns(value) is NOT implemented -
+/// Note: Generic methods with Of&lt;T&gt;().Return(value) is NOT implemented -
 /// generic typed handlers only support callback syntax.
 /// </summary>
 public partial class EdgeCaseValueOverloadTests
@@ -27,7 +27,7 @@ public partial class EdgeCaseValueOverloadTests
 		IDelegateReturnService service = knockOff;
 
 		Func<int> factory = () => 42;
-		knockOff.GetIntFactory.Returns(factory);
+		knockOff.GetIntFactory.Return(factory);
 
 		var result = service.GetIntFactory();
 		Assert.Same(factory, result);
@@ -41,11 +41,11 @@ public partial class EdgeCaseValueOverloadTests
 		IDelegateReturnService service = knockOff;
 
 		Func<string> factory1 = () => "first";
-		knockOff.GetStringFactory.Returns(factory1);
+		knockOff.GetStringFactory.Return(factory1);
 		var result1 = service.GetStringFactory();
 
 		Func<string> factory2 = () => "second";
-		knockOff.GetStringFactory.Returns(factory2);
+		knockOff.GetStringFactory.Return(factory2);
 		var result2 = service.GetStringFactory();
 
 		Assert.Equal("first", result1());
@@ -58,7 +58,7 @@ public partial class EdgeCaseValueOverloadTests
 		var knockOff = new DelegateReturnKnockOff();
 		IDelegateReturnService service = knockOff;
 
-		knockOff.GetNullableFactory.Returns((Func<int>?)null);
+		knockOff.GetNullableFactory.Return((Func<int>?)null);
 
 		var result = service.GetNullableFactory();
 		Assert.Null(result);
@@ -73,7 +73,7 @@ public partial class EdgeCaseValueOverloadTests
 		// OnCall with a delegate TYPE (using value overload)
 		// The delegate is returned as-is when the method is called
 		Func<int> valueToReturn = () => 99;
-		knockOff.GetIntFactory.Returns(valueToReturn);
+		knockOff.GetIntFactory.Return(valueToReturn);
 
 		var result = service.GetIntFactory();
 		Assert.Same(valueToReturn, result);
@@ -90,7 +90,7 @@ public partial class EdgeCaseValueOverloadTests
 		INullableAsyncService service = knockOff;
 
 		// Value overload with non-null string auto-wraps in Task
-		knockOff.GetNullableAsync.Returns("hello");
+		knockOff.GetNullableAsync.Return("hello");
 
 		var result = await service.GetNullableAsync();
 		Assert.Equal("hello", result);
@@ -103,7 +103,7 @@ public partial class EdgeCaseValueOverloadTests
 		INullableAsyncService service = knockOff;
 
 		// Value overload with null string auto-wraps in Task
-		knockOff.GetNullableAsync.Returns((string?)null);
+		knockOff.GetNullableAsync.Return((string?)null);
 
 		var result = await service.GetNullableAsync();
 		Assert.Null(result);
@@ -115,7 +115,7 @@ public partial class EdgeCaseValueOverloadTests
 		var knockOff = new NullableAsyncKnockOff();
 		INullableAsyncService service = knockOff;
 
-		knockOff.GetNullableAsync.Returns("repeated");
+		knockOff.GetNullableAsync.Return("repeated");
 
 		Assert.Equal("repeated", await service.GetNullableAsync());
 		Assert.Equal("repeated", await service.GetNullableAsync());
@@ -128,7 +128,7 @@ public partial class EdgeCaseValueOverloadTests
 		var knockOff = new NullableAsyncKnockOff();
 		INullableAsyncService service = knockOff;
 
-		knockOff.GetNullableValueTaskAsync.Returns(42);
+		knockOff.GetNullableValueTaskAsync.Return(42);
 
 		var result = await service.GetNullableValueTaskAsync();
 		Assert.Equal(42, result);
@@ -140,7 +140,7 @@ public partial class EdgeCaseValueOverloadTests
 		var knockOff = new NullableAsyncKnockOff();
 		INullableAsyncService service = knockOff;
 
-		knockOff.GetNullableValueTaskAsync.Returns((int?)null);
+		knockOff.GetNullableValueTaskAsync.Return((int?)null);
 
 		var result = await service.GetNullableValueTaskAsync();
 		Assert.Null(result);
@@ -165,8 +165,8 @@ public partial class EdgeCaseValueOverloadTests
 		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Void handler1 = (x) => { };
 		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Int32_Void handler2 = (x, y) => { };
 
-		knockOff.Calculate.Execute(handler1);
-		knockOff.Calculate.Execute(handler2);
+		knockOff.Calculate.Call(handler1);
+		knockOff.Calculate.Call(handler2);
 
 		service.Calculate(1);
 		service.Calculate(2, 3);
@@ -183,7 +183,7 @@ public partial class EdgeCaseValueOverloadTests
 
 		// Add is a single-signature method (not overloaded), so it uses the simple delegate name
 		OverloadedMethodKnockOff.AddInterceptor.AddDelegate addHandler = (a, b) => a + b;
-		knockOff.Add.Returns(addHandler);
+		knockOff.Add.Return(addHandler);
 
 		Assert.Equal(5, service.Add(2, 3));
 		Assert.Equal(10, service.Add(4, 6));
@@ -202,7 +202,7 @@ public partial class EdgeCaseValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.Returns("");
+		knockOff.GetOptional.Return("");
 
 		Assert.Equal("", service.GetOptional());
 	}

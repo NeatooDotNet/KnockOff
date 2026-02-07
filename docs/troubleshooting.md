@@ -46,16 +46,16 @@ EmailService service = stub.Object;
 
 ### Error: No overload matches delegate
 
-**Cause:** The Returns/Execute callback signature doesn't match the method's parameters.
+**Cause:** The Return/Call callback signature doesn't match the method's parameters.
 
-Returns/Execute callbacks receive only the method's parameters. The callback must match the parameter types exactly.
+Return/Call callbacks receive only the method's parameters. The callback must match the parameter types exactly.
 
 **Solution:** Ensure your callback signature matches the method parameters exactly.
 
 <!-- snippet: troubleshoot-oncall-signature -->
 ```cs
-// OnCall signature must match method parameters exactly
-stub.GetByIdAsync.Returns((int id) =>
+// Return signature must match method parameters exactly
+stub.GetByIdAsync.Return((int id) =>
     Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 ```
 <!-- endSnippet -->
@@ -66,26 +66,26 @@ stub.GetByIdAsync.Returns((int id) =>
 
 **When to use:** You want to return the same value for every call without writing a callback function.
 
-KnockOff provides `Returns(value)` for methods and `Get(value)` for properties, allowing you to configure a static return value directly.
+KnockOff provides `Return(value)` for methods and `Get(value)` for properties, allowing you to configure a static return value directly.
 
-**Solution:** Use `Returns(value)` instead of a callback when the return value is constant.
+**Solution:** Use `Return(value)` instead of a callback when the return value is constant.
 
 <!-- snippet: troubleshoot-oncall-value -->
 ```cs
-// Use Returns(value) when the return doesn't depend on parameters
-stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
+// Use Return(value) when the return doesn't depend on parameters
+stub.GetById.Return(new User { Id = 999, Name = "Static User" });
 ```
 <!-- endSnippet -->
 
 **Available on:**
-- **Methods**: `stub.MethodName.Returns(value)` - Returns the same value for every call
+- **Methods**: `stub.MethodName.Return(value)` - Returns the same value for every call
 - **Properties**: `stub.PropertyName.Get(value)` - Returns the same value for every get
-- **Sequences**: `stub.MethodName.Returns(callback).ThenReturns(callback)` - Each callback in sequence
+- **Sequences**: `stub.MethodName.Return(callback).ThenReturn(callback)` - Each callback in sequence
 
 **Key difference from callbacks:**
-- **Returns(value)**: Simple, concise for constant returns
-- **Returns(callback)**: Dynamic behavior based on parameters or state (non-void methods)
-- **Execute(callback)**: Side effects (void methods)
+- **Return(value)**: Simple, concise for constant returns
+- **Return(callback)**: Dynamic behavior based on parameters or state (non-void methods)
+- **Call(callback)**: Side effects (void methods)
 
 ---
 
@@ -97,12 +97,12 @@ stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
 
 KnockOff throws this exception for methods returning non-nullable reference types when no callback is configured. Properties and nullable types use default values instead.
 
-**Solution:** Configure the return value using `Returns` for methods or `Get` for properties.
+**Solution:** Configure the return value using `Return` for methods or `Get` for properties.
 
 <!-- snippet: troubleshoot-no-callback -->
 ```cs
 // Configure required (non-nullable) return values explicitly
-stub.GetName.Returns(() => "Configured Name");
+stub.GetName.Return(() => "Configured Name");
 ```
 <!-- endSnippet -->
 
@@ -179,17 +179,17 @@ public partial class CalcDelegateTests { }
 <!-- snippet: troubleshoot-delegate-interceptor-pattern -->
 ```cs
 // Interface stub pattern:
-interfaceStub.GetById.Returns((id) => user);
+interfaceStub.GetById.Return((id) => user);
 
 // Delegate stub pattern (different!):
-delegateStub.Interceptor.Returns((a, b) => a + b);
-delegateStub.Interceptor.Returns(42);
+delegateStub.Interceptor.Return((a, b) => a + b);
+delegateStub.Interceptor.Return(42);
 ```
 <!-- endSnippet -->
 
 ---
 
-### Delegate OnCall signature mismatch
+### Delegate Return/Call signature mismatch
 
 **Cause:** The callback signature must match the delegate's parameters exactly.
 
@@ -200,19 +200,19 @@ delegateStub.Interceptor.Returns(42);
 // Delegate: int CalcOperation(int a, int b)
 
 // Wrong: missing parameter
-// stub.Interceptor.Returns((a) => a);
+// stub.Interceptor.Return((a) => a);
 
 // Wrong: wrong parameter type
-// stub.Interceptor.Returns((string a, string b) => 0);
+// stub.Interceptor.Return((string a, string b) => 0);
 ```
 <!-- endSnippet -->
 
 <!-- snippet: troubleshoot-delegate-oncall-correct -->
 ```cs
 // Correct: matches delegate signature
-stub.Interceptor.Returns((int a, int b) => a + b);
+stub.Interceptor.Return((int a, int b) => a + b);
 // Or with inferred types:
-stub.Interceptor.Returns((a, b) => a + b);
+stub.Interceptor.Return((a, b) => a + b);
 ```
 <!-- endSnippet -->
 
@@ -315,8 +315,8 @@ var stub = new TroubleshootUserMethodStub();
 ITroubleshootUserRepo repo = stub;
 var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
 
-// You can still override per-test with OnCall
-stub.GetById.Returns(id => new User { Id = id, Name = "Test User" });
+// You can still override per-test with Return
+stub.GetById.Return(id => new User { Id = id, Name = "Test User" });
 ```
 <!-- endSnippet -->
 
@@ -324,7 +324,7 @@ stub.GetById.Returns(id => new User { Id = id, Name = "Test User" });
 - Use `protected override` keyword
 - Add underscore suffix to method name (e.g., `GetById_`)
 - User methods provide default behavior for all tests
-- Individual tests can still override with `Returns`/`Execute`
+- Individual tests can still override with `Return`/`Call`
 
 **Solutions:**
 

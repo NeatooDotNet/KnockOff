@@ -50,7 +50,7 @@ public class ConfigureSingleTypeTests
 
         #region generic-configure-single
         // Configure behavior for User type
-        stub.GetById.Of<User>().OnCall((id) =>
+        stub.GetById.Of<User>().Return((id) =>
             new User { Id = id, Name = "Test User" });
         #endregion
 
@@ -72,10 +72,10 @@ public class ConfigureMultipleTypesTests
 
         #region generic-configure-multiple
         // Configure different behavior for each type
-        stub.GetById.Of<User>().OnCall((id) =>
+        stub.GetById.Of<User>().Return((id) =>
             new User { Id = id, Name = "User" });
 
-        stub.GetById.Of<Order>().OnCall((id) =>
+        stub.GetById.Of<Order>().Return((id) =>
             new Order { Id = id, Amount = 99.99m });
         #endregion
 
@@ -100,7 +100,7 @@ public class VerifyTypedCallsTests
     {
         var stub = new RepositoryStub();
 
-        var tracking = stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
+        var tracking = stub.GetById.Of<User>().Return((id) => new User { Id = id });
 
         IRepository repository = stub;
 
@@ -122,8 +122,8 @@ public class VerifyAggregateCallsTests
     {
         var stub = new RepositoryStub();
 
-        var userTracking = stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-        var orderTracking = stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
+        var userTracking = stub.GetById.Of<User>().Return((id) => new User { Id = id });
+        var orderTracking = stub.GetById.Of<Order>().Return((id) => new Order { Id = id });
 
         IRepository repository = stub;
 
@@ -152,11 +152,11 @@ public class MultipleTypeParametersTests
 
         #region generic-multi-param
         // Configure for string -> int conversion
-        stub.Convert.Of<string, int>().OnCall((source) =>
+        stub.Convert.Of<string, int>().Return((source) =>
             int.Parse(source));
 
         // Configure for int -> string conversion
-        stub.Convert.Of<int, string>().OnCall((source) =>
+        stub.Convert.Of<int, string>().Return((source) =>
             source.ToString());
         #endregion
 
@@ -181,8 +181,8 @@ public class CalledTypeArgumentsTests
     {
         var stub = new RepositoryStub();
 
-        stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-        stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
+        stub.GetById.Of<User>().Return((id) => new User { Id = id });
+        stub.GetById.Of<Order>().Return((id) => new Order { Id = id });
 
         IRepository repository = stub;
 
@@ -210,8 +210,8 @@ public class ResetTypedTests
     {
         var stub = new RepositoryStub();
 
-        stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-        stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
+        stub.GetById.Of<User>().Return((id) => new User { Id = id });
+        stub.GetById.Of<Order>().Return((id) => new Order { Id = id });
 
         IRepository repository = stub;
 
@@ -235,8 +235,8 @@ public class ResetAllTests
     {
         var stub = new RepositoryStub();
 
-        stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
-        stub.GetById.Of<Order>().OnCall((id) => new Order { Id = id });
+        stub.GetById.Of<User>().Return((id) => new User { Id = id });
+        stub.GetById.Of<Order>().Return((id) => new Order { Id = id });
 
         IRepository repository = stub;
 
@@ -267,17 +267,17 @@ public class CompleteGenericExampleTests
 
         #region generic-complete-example
         // Configure Serialize for different types
-        var serializeUserTracking = stub.Serialize.Of<User>().OnCall((obj) =>
+        var serializeUserTracking = stub.Serialize.Of<User>().Return((obj) =>
             $"{{\"Id\":{obj.Id},\"Name\":\"{obj.Name}\"}}");
 
-        var serializeOrderTracking = stub.Serialize.Of<Order>().OnCall((obj) =>
+        var serializeOrderTracking = stub.Serialize.Of<Order>().Return((obj) =>
             $"{{\"Id\":{obj.Id},\"Amount\":{obj.Amount}}}");
 
         // Configure Deserialize
-        var deserializeUserTracking = stub.Deserialize.Of<User>().OnCall((data) =>
+        var deserializeUserTracking = stub.Deserialize.Of<User>().Return((data) =>
             new User { Id = 1, Name = "Deserialized User" });
 
-        var deserializeOrderTracking = stub.Deserialize.Of<Order>().OnCall((data) =>
+        var deserializeOrderTracking = stub.Deserialize.Of<Order>().Return((data) =>
             new Order { Id = 2, Amount = 50.00m });
         #endregion
 

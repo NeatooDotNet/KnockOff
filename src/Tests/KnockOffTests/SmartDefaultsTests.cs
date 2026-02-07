@@ -237,7 +237,7 @@ public class SmartDefaultsTests
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		knockOff.GetInt.Returns(() => 42);
+		knockOff.GetInt.Return(() => 42);
 
 		var result = service.GetInt();
 
@@ -250,7 +250,7 @@ public class SmartDefaultsTests
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		knockOff.GetString.Returns(() => "Hello");
+		knockOff.GetString.Return(() => "Hello");
 
 		var result = service.GetString();
 

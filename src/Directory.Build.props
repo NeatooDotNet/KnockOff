@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.38.0</FileVersion>
-		<PackageVersion>0.38.0</PackageVersion>
+		<FileVersion>0.39.0</FileVersion>
+		<PackageVersion>0.39.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Breaking: Unified method configuration API - OnCall replaced with Returns (non-void) and Execute (void), ThenCall renamed to ThenReturns/ThenExecute, simplified async ThenReturns overloads.</PackageReleaseNotes>
+		<PackageReleaseNotes>Breaking: Singular method API naming — Returns→Return, Execute→Call, ThenReturns→ThenReturn, ThenExecute→ThenCall. Generic typed handlers: OnCall→Return/Call.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

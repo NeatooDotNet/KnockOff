@@ -62,8 +62,8 @@ public class GenericStandaloneClassStubTests
 		var userRepo = new GenericClassRepoStub<ClassStubUser>();
 		var productRepo = new GenericClassRepoStub<ClassStubProduct>();
 
-		userRepo.GetById.Returns((id) => new ClassStubUser { Id = id, Name = "User" });
-		productRepo.GetById.Returns((id) => new ClassStubProduct { Id = id, Price = 9.99m });
+		userRepo.GetById.Return((id) => new ClassStubUser { Id = id, Name = "User" });
+		productRepo.GetById.Return((id) => new ClassStubProduct { Id = id, Price = 9.99m });
 
 		var user = userRepo.Object.GetById(1);
 		var product = productRepo.Object.GetById(2);
@@ -102,7 +102,7 @@ public class GenericStandaloneClassStubTests
 	{
 		var stub = new GenericClassRepoStub<ClassStubUser>();
 		var expected = new ClassStubUser { Id = 123, Name = "Test User" };
-		stub.GetById.Returns((id) => expected);
+		stub.GetById.Return((id) => expected);
 
 		var result = stub.Object.GetById(123);
 
@@ -125,7 +125,7 @@ public class GenericStandaloneClassStubTests
 	{
 		var stub = new GenericClassRepoStub<ClassStubUser>();
 		var saved = new List<ClassStubUser>();
-		stub.Save.Execute((entity) => saved.Add(entity));
+		stub.Save.Call((entity) => saved.Add(entity));
 
 		var user = new ClassStubUser { Id = 1, Name = "Saved" };
 		stub.Object.Save(user);
@@ -157,7 +157,7 @@ public class GenericStandaloneClassStubTests
 	public void GenericStandaloneClassStub_Reset_ClearsInterceptorState()
 	{
 		var stub = new GenericClassRepoStub<ClassStubUser>();
-		stub.GetById.Returns((id) => new ClassStubUser { Id = id });
+		stub.GetById.Return((id) => new ClassStubUser { Id = id });
 
 		stub.Object.GetById(1);
 		stub.Object.GetById(2);
@@ -190,7 +190,7 @@ public class GenericStandaloneClassStubTests
 	public void GenericStandaloneClassStub_Substitutability_PassToMethod()
 	{
 		var stub = new GenericClassRepoStub<ClassStubUser>();
-		stub.GetById.Returns((id) => new ClassStubUser { Id = id, Name = $"User_{id}" });
+		stub.GetById.Return((id) => new ClassStubUser { Id = id, Name = $"User_{id}" });
 
 		var result = ProcessRepository(stub.Object);
 

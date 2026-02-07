@@ -75,7 +75,7 @@ public class HeroExampleKnockOffTests
     {
         #region readme-hero-knockoff
         var stub = new CompareUserRepoStub();
-        stub.GetUser.Returns((id) => id > 0 ? new User { Id = id } : null);
+        stub.GetUser.Return((id) => id > 0 ? new User { Id = id } : null);
         #endregion
 
         // Usage
@@ -107,7 +107,7 @@ public class MethodsReturnValueKnockOffTests
     public void KnockOff_ReturnValue()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Returns(3);
+        stub.Add.Return(3);
 
         ICalculator calc = stub;
         Assert.Equal(3, calc.Add(1, 2));
@@ -137,7 +137,7 @@ public class MethodsAnyArgKnockOffTests
     public void KnockOff_AnyArgument()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Returns(10);
+        stub.Add.Return(10);
 
         ICalculator calc = stub;
         Assert.Equal(10, calc.Add(99, 88));
@@ -172,7 +172,7 @@ public class MethodsConditionalKnockOffTests
     public void KnockOff_Conditional()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Returns((a, b) => a > 0 ? a + b : 0);
+        stub.Add.Return((a, b) => a > 0 ? a + b : 0);
 
         ICalculator calc = stub;
         Assert.Equal(12, calc.Add(5, 7));  // 5 > 0, returns 5+7
@@ -203,7 +203,7 @@ public class MethodsThrowKnockOffTests
     public void KnockOff_Throw()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Returns((a, b) => throw new InvalidOperationException());
+        stub.Add.Return((a, b) => throw new InvalidOperationException());
 
         ICalculator calc = stub;
         Assert.Throws<InvalidOperationException>(() => calc.Add(1, 2));
@@ -241,7 +241,7 @@ public class MethodsCallbackKnockOffTests
         var stub = new CompareCalculatorStub();
         var log = new List<string>();
 
-        stub.Add.Returns((a, b) => { log.Add($"Add({a}, {b})"); return 3; });
+        stub.Add.Return((a, b) => { log.Add($"Add({a}, {b})"); return 3; });
 
         ICalculator calc = stub;
         var result = calc.Add(1, 2);
@@ -278,7 +278,7 @@ public class MethodsAsyncKnockOffTests
         var stub = new CompareUserRepoStub();
         var user = new User { Id = 1, Name = "Test" };
 
-        stub.GetUserAsync.Returns(user);
+        stub.GetUserAsync.Return(user);
 
         IUserRepo repo = stub;
         var result = await repo.GetUserAsync(1);
@@ -309,7 +309,7 @@ public class MethodsVerifyKnockOffTests
     public void KnockOff_VerifyCalled()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Returns((a, b) => a + b);
+        stub.Add.Return((a, b) => a + b);
 
         ICalculator calc = stub;
         calc.Add(1, 2);
@@ -343,7 +343,7 @@ public class MethodsVerifyCountKnockOffTests
     public void KnockOff_VerifyCount()
     {
         var stub = new CompareCalculatorStub();
-        stub.Add.Returns((a, b) => a + b);
+        stub.Add.Return((a, b) => a + b);
 
         ICalculator calc = stub;
         calc.Add(1, 2);
@@ -373,7 +373,7 @@ public class ArgumentCaptureNSubTests
 
         #region readme-argmatch-knockoff-oncall
         // KnockOff - Returns with conditional (permanent, matches all calls)
-        stub.Add.Returns((a, b) => a > 0 ? 100 : 0);
+        stub.Add.Return((a, b) => a > 0 ? 100 : 0);
         #endregion
 
         Assert.Equal(100, calc.Add(5, 7));
@@ -387,7 +387,7 @@ public class ArgumentCaptureNSubTests
         var stub = new CompareCalculatorStub();
         #region readme-argmatch-knockoff-when
         // KnockOff - When() for sequential matching (first match returns 100, then falls through)
-        stub.Add.When((a, b) => a > 0).Returns(100).ThenCall((a, b) => a + b);
+        stub.Add.When((a, b) => a > 0).Return(100).ThenCall((a, b) => a + b);
         #endregion
 
         ICalculator calc = stub;
@@ -407,8 +407,8 @@ public class ArgumentCaptureNSubTests
         #endregion
 
         #region readme-argmatch-knockoff-specific
-        stub.Add.When(1, 2).Returns(100);
-        stub.Add.When(3, 4).Returns(200);
+        stub.Add.When(1, 2).Return(100);
+        stub.Add.When(3, 4).Return(200);
         #endregion
 
         Assert.Equal(100, calc.Add(1, 2));
@@ -442,7 +442,7 @@ public class ArgumentCaptureKnockOffTests
 
         #region readme-argcapture-knockoff
         // KnockOff - built-in, no pre-setup
-        var tracking = stub.Add.Returns((a, b) => a + b);
+        var tracking = stub.Add.Return((a, b) => a + b);
         ICalculator calc = stub;
         calc.Add(1, 2);
         var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
@@ -758,7 +758,7 @@ public class DelegatesSetupKnockOffTests
     public void KnockOff_DelegateSetup()
     {
         var stub = new CompareDelegateStubHolder.Stubs.StringFactory();
-        stub.Interceptor.Returns("result");
+        stub.Interceptor.Return("result");
 
         StringFactory factory = stub;
         Assert.Equal("result", factory(42));
@@ -787,7 +787,7 @@ public class DelegatesLogicKnockOffTests
     public void KnockOff_DelegateWithLogic()
     {
         var stub = new CompareDelegateStubHolder.Stubs.StringFactory();
-        stub.Interceptor.Returns((x) => $"val: {x}");
+        stub.Interceptor.Return((x) => $"val: {x}");
 
         StringFactory factory = stub;
         Assert.Equal("val: 42", factory(42));
@@ -817,7 +817,7 @@ public class DelegatesVerifyKnockOffTests
     public void KnockOff_DelegateVerify()
     {
         var stub = new CompareDelegateStubHolder.Stubs.StringFactory();
-        stub.Interceptor.Returns((x) => "");
+        stub.Interceptor.Return((x) => "");
 
         StringFactory factory = stub;
         factory(42);
@@ -836,7 +836,7 @@ public class DelegatesCaptureKnockOffTests
     public void KnockOff_DelegateCapture()
     {
         var stub = new CompareDelegateStubHolder.Stubs.StringFactory();
-        stub.Interceptor.Returns((x) => "");
+        stub.Interceptor.Return((x) => "");
 
         StringFactory factory = stub;
         factory(42);
@@ -1005,7 +1005,7 @@ public class SourceDelegationReadmeTests
         stub.Source(realRepo);  // ALL methods delegate to real implementation
 
         // Override just the method you're testing
-        stub.GetUser.Returns((id) => new User { Id = id, Name = "Test User" });
+        stub.GetUser.Return((id) => new User { Id = id, Name = "Test User" });
 
         IUserRepo repo = stub;
         repo.Save(new User { Id = 1 });  // Calls real SimpleUserRepo.Save()
@@ -1042,7 +1042,7 @@ public partial class ReadmeInlineTests
     public void InlineInterface_Pattern()
     {
         var stub = new Stubs.IUserRepo();
-        stub.GetUser.Returns((id) => new User { Id = id });
+        stub.GetUser.Return((id) => new User { Id = id });
 
         IUserRepo repo = stub;
         Assert.NotNull(repo.GetUser(1));
@@ -1063,7 +1063,7 @@ public partial class ReadmeInlineClassTests
     public void InlineClass_Pattern()
     {
         var stub = new Stubs.MyService();
-        stub.GetUser.Returns((id) => new User { Id = id });
+        stub.GetUser.Return((id) => new User { Id = id });
 
         MyService service = stub.Object;
         Assert.NotNull(service.GetUser(1));

@@ -153,7 +153,7 @@ public class UserMethodCustomTypeDetectionTests
     {
         // Arrange
         var stub = new CustomTypeUserMethodStub();
-        stub.FindUser.Returns(q => $"[ONCALL: {q.Id}]");
+        stub.FindUser.Return(q => $"[ONCALL: {q.Id}]");
 
         // Act
         ICustomTypeUserMethodService service = stub;

@@ -22,7 +22,7 @@ public partial class ThreePatternValueOverloadTests
 		var knockOff = new StandaloneServiceKnockOff();
 		IThreePatternService service = knockOff;
 
-		knockOff.GetName.Returns("standalone result");
+		knockOff.GetName.Return("standalone result");
 
 		Assert.Equal("standalone result", service.GetName());
 	}
@@ -45,7 +45,7 @@ public partial class ThreePatternValueOverloadTests
 		IThreePatternService service = knockOff;
 
 		// Value auto-wrapped in Task
-		knockOff.GetNameAsync.Returns("async standalone");
+		knockOff.GetNameAsync.Return("async standalone");
 
 		Assert.Equal("async standalone", await service.GetNameAsync());
 	}
@@ -56,7 +56,7 @@ public partial class ThreePatternValueOverloadTests
 		var knockOff = new StandaloneServiceKnockOff();
 		IThreePatternService service = knockOff;
 
-		var tracking = knockOff.GetName.Returns("tracked value");
+		var tracking = knockOff.GetName.Return("tracked value");
 
 		service.GetName();
 		service.GetName();
@@ -75,7 +75,7 @@ public partial class ThreePatternValueOverloadTests
 		var serviceStub = new InlineInterfaceStubs.Stubs.IThreePatternService();
 		IThreePatternService service = serviceStub;
 
-		serviceStub.GetName.Returns("inline interface result");
+		serviceStub.GetName.Return("inline interface result");
 
 		Assert.Equal("inline interface result", service.GetName());
 	}
@@ -97,7 +97,7 @@ public partial class ThreePatternValueOverloadTests
 		var serviceStub = new InlineInterfaceStubs.Stubs.IThreePatternService();
 		IThreePatternService service = serviceStub;
 
-		serviceStub.GetNameAsync.Returns("async inline interface");
+		serviceStub.GetNameAsync.Return("async inline interface");
 
 		Assert.Equal("async inline interface", await service.GetNameAsync());
 	}
@@ -108,7 +108,7 @@ public partial class ThreePatternValueOverloadTests
 		var serviceStub = new InlineInterfaceStubs.Stubs.IThreePatternService();
 		IThreePatternService service = serviceStub;
 
-		var tracking = serviceStub.GetName.Returns("tracked value");
+		var tracking = serviceStub.GetName.Return("tracked value");
 
 		service.GetName();
 
@@ -130,7 +130,7 @@ public partial class ThreePatternValueOverloadTests
 		ThreePatternBaseClass instance = classStub.Object;
 
 		// Inline class uses callback syntax for methods
-		classStub.GetVirtualName.Returns(() => "inline class result");
+		classStub.GetVirtualName.Return(() => "inline class result");
 
 		Assert.Equal("inline class result", instance.GetVirtualName());
 	}
@@ -154,7 +154,7 @@ public partial class ThreePatternValueOverloadTests
 		ThreePatternBaseClass instance = classStub.Object;
 
 		// Inline class uses callback syntax for async methods
-		classStub.GetVirtualNameAsync.Returns(() => Task.FromResult<string?>("async inline class"));
+		classStub.GetVirtualNameAsync.Return(() => Task.FromResult<string?>("async inline class"));
 
 		Assert.Equal("async inline class", await instance.GetVirtualNameAsync());
 	}
@@ -178,12 +178,12 @@ public partial class ThreePatternValueOverloadTests
 	{
 		// Standalone - supports OnCall(null)
 		var standalone = new StandaloneServiceKnockOff();
-		standalone.GetNullable.Returns((string?)null);
+		standalone.GetNullable.Return((string?)null);
 		Assert.Null(((IThreePatternService)standalone).GetNullable());
 
 		// Inline Interface - supports OnCall(null)
 		var inlineInterface = new InlineInterfaceStubs.Stubs.IThreePatternService();
-		inlineInterface.GetNullable.Returns((string?)null);
+		inlineInterface.GetNullable.Return((string?)null);
 		Assert.Null(((IThreePatternService)inlineInterface).GetNullable());
 	}
 
@@ -192,12 +192,12 @@ public partial class ThreePatternValueOverloadTests
 	{
 		// Standalone - supports OnCall(int)
 		var standalone = new StandaloneServiceKnockOff();
-		standalone.GetCount.Returns(42);
+		standalone.GetCount.Return(42);
 		Assert.Equal(42, ((IThreePatternService)standalone).GetCount());
 
 		// Inline Interface - supports OnCall(int)
 		var inlineInterface = new InlineInterfaceStubs.Stubs.IThreePatternService();
-		inlineInterface.GetCount.Returns(99);
+		inlineInterface.GetCount.Return(99);
 		Assert.Equal(99, ((IThreePatternService)inlineInterface).GetCount());
 	}
 
@@ -206,14 +206,14 @@ public partial class ThreePatternValueOverloadTests
 	{
 		// Standalone
 		var standalone = new StandaloneServiceKnockOff();
-		standalone.GetName.Returns("first");
-		standalone.GetName.Returns("second");
+		standalone.GetName.Return("first");
+		standalone.GetName.Return("second");
 		Assert.Equal("second", ((IThreePatternService)standalone).GetName());
 
 		// Inline Interface
 		var inlineInterface = new InlineInterfaceStubs.Stubs.IThreePatternService();
-		inlineInterface.GetName.Returns("third");
-		inlineInterface.GetName.Returns("fourth");
+		inlineInterface.GetName.Return("third");
+		inlineInterface.GetName.Return("fourth");
 		Assert.Equal("fourth", ((IThreePatternService)inlineInterface).GetName());
 	}
 

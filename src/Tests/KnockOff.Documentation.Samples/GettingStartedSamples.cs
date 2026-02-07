@@ -45,7 +45,7 @@ public class StandaloneUsageTests
 
         #region getting-started-standalone-use
         // Configure behavior and mark for verification
-        stub.SaveUser.Returns((user) => true).Verifiable();
+        stub.SaveUser.Return((user) => true).Verifiable();
 
         // Call the method through the interface
         IUserRepo repository = stub;
@@ -87,8 +87,8 @@ public partial class InlineStubTests
         var stub = new Stubs.IEmailSvc();
 
         #region getting-started-inline-use
-        // OnCall returns a tracking object for argument access
-        var tracking = stub.Send.Execute((to, subject, body) => { }).Verifiable();
+        // Call returns a tracking object for argument access
+        var tracking = stub.Send.Call((to, subject, body) => { }).Verifiable();
 
         IEmailSvc emailService = stub;
         emailService.Send("user@example.com", "Welcome", "Hello!");
@@ -103,7 +103,7 @@ public partial class InlineStubTests
 }
 
 // =============================================================================
-// Configuring Return Values - Returns()
+// Configuring Return Values - Return()
 // =============================================================================
 
 public class ValueOverloadTests
@@ -114,11 +114,11 @@ public class ValueOverloadTests
         var stub = new UserRepoStub();
 
         #region getting-started-value-overloads
-        // Returns() - simple fixed value
-        stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
+        // Return() - simple fixed value
+        stub.GetById.Return(new User { Id = 1, Name = "Alice" });
 
-        // OnCall() - dynamic value based on arguments
-        stub.GetById.Returns((id) => new User { Id = id, Name = "Dynamic" });
+        // Return() - dynamic value based on arguments
+        stub.GetById.Return((id) => new User { Id = id, Name = "Dynamic" });
         #endregion
 
         IUserRepo repository = stub;
@@ -186,8 +186,8 @@ public class AsyncWrappingTests
         var stub = new AsyncUserRepoStub();
 
         #region getting-started-async-wrapping
-        // Returns() auto-wraps in Task.FromResult - no manual wrapping needed
-        stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
+        // Return() auto-wraps in Task.FromResult - no manual wrapping needed
+        stub.GetUserAsync.Return(new User { Id = 1, Name = "Alice" });
         #endregion
 
         IAsyncUserRepo repository = stub;
@@ -198,22 +198,22 @@ public class AsyncWrappingTests
 }
 
 // =============================================================================
-// OnCall Dynamic Behavior
+// Return Dynamic Behavior
 // =============================================================================
 
-public class OnCallDynamicTests
+public class ReturnDynamicTests
 {
     [Fact]
-    public void OnCall_DynamicBehavior()
+    public void Return_DynamicBehavior()
     {
         var stub = new UserRepoStub();
 
         #region getting-started-oncall-dynamic
-        // Use Returns for fixed values
-        stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
+        // Use Return for fixed values
+        stub.GetById.Return(new User { Id = 1, Name = "Alice" });
 
-        // Use OnCall for dynamic values, side effects, or conditional logic
-        stub.GetById.Returns((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
+        // Use Return for dynamic values, side effects, or conditional logic
+        stub.GetById.Return((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
 
         // Both return tracking objects for verification
         #endregion

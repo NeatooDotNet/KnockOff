@@ -45,8 +45,8 @@ internal static class IndexerInterceptorRenderer
 			// Getter storage and tracking (if has getter)
 			if (model.HasGetter)
 			{
-				w.Line($"private global::System.Func<{model.ParameterTypes}, {model.ValueType}>? _onGet;");
-				w.Line("private IndexerGetBuilderImpl? _onGetTracking;");
+				w.Line($"private global::System.Func<{model.ParameterTypes}, {model.ValueType}>? _get;");
+				w.Line("private IndexerGetBuilderImpl? _getTracking;");
 				w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerGetBuilderImpl Tracking)>? _getSequence;");
 				w.Line("private int _getSequenceIndex;");
 				w.Line("private bool _getRepeatLastValue = true;");
@@ -60,8 +60,8 @@ internal static class IndexerInterceptorRenderer
 			// Setter storage and tracking (if has setter)
 			if (model.HasSetter)
 			{
-				w.Line($"private global::System.Action<{model.ParameterTypes}, {model.ValueType}>? _onSet;");
-				w.Line("private IndexerSetBuilderImpl? _onSetTracking;");
+				w.Line($"private global::System.Action<{model.ParameterTypes}, {model.ValueType}>? _set;");
+				w.Line("private IndexerSetBuilderImpl? _setTracking;");
 				w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerSetBuilderImpl Tracking)>? _setSequence;");
 				w.Line("private int _setSequenceIndex;");
 				w.Line("private bool _setRepeatLastValue = true;");
@@ -75,11 +75,11 @@ internal static class IndexerInterceptorRenderer
 			// Aggregate counts (private - use VerifyGet/VerifySet to check)
 			if (model.HasGetter)
 			{
-				w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
+				w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_getTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
 			}
 			if (model.HasSetter)
 			{
-				w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?._callCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking._callCount; return sum; } }");
+				w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_setTracking?._callCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking._callCount; return sum; } }");
 			}
 			if (model.HasGetter || model.HasSetter)
 			{
@@ -90,7 +90,7 @@ internal static class IndexerInterceptorRenderer
 			if (model.HasGetter)
 			{
 				w.Line($"/// <summary>The key from the last getter access (from most recently called registration).</summary>");
-				w.Line($"public {model.NullableKeyType} LastGetKey {{ get {{ if ((_onGetTracking?._callCount ?? 0) > 0) return _onGetTracking!.LastKey; if (_getSequence != null) for (int i = _getSequence.Count - 1; i >= 0; i--) if (_getSequence[i].Tracking._callCount > 0) return _getSequence[i].Tracking.LastKey; return _unconfiguredGetCount > 0 ? _unconfiguredLastGetKey : default; }} }}");
+				w.Line($"public {model.NullableKeyType} LastGetKey {{ get {{ if ((_getTracking?._callCount ?? 0) > 0) return _getTracking!.LastKey; if (_getSequence != null) for (int i = _getSequence.Count - 1; i >= 0; i--) if (_getSequence[i].Tracking._callCount > 0) return _getSequence[i].Tracking.LastKey; return _unconfiguredGetCount > 0 ? _unconfiguredLastGetKey : default; }} }}");
 				w.Line();
 			}
 
@@ -98,7 +98,7 @@ internal static class IndexerInterceptorRenderer
 			if (model.HasSetter)
 			{
 				w.Line($"/// <summary>The key-value pair from the last setter access (from most recently called registration).</summary>");
-				w.Line($"public ({model.KeyType} Key, {model.ValueType} Value)? LastSetEntry {{ get {{ if ((_onSetTracking?._callCount ?? 0) > 0) return _onSetTracking!.LastEntry; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking._callCount > 0) return _setSequence[i].Tracking.LastEntry; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetEntry : default; }} }}");
+				w.Line($"public ({model.KeyType} Key, {model.ValueType} Value)? LastSetEntry {{ get {{ if ((_setTracking?._callCount ?? 0) > 0) return _setTracking!.LastEntry; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking._callCount > 0) return _setSequence[i].Tracking.LastEntry; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetEntry : default; }} }}");
 				w.Line();
 			}
 
@@ -113,9 +113,9 @@ internal static class IndexerInterceptorRenderer
 					w.Line("_getSequenceIndex = 0;");
 					w.Line("_isGetVerifiable = false;");
 					w.Line("_getVerifiableTimes = null;");
-					w.Line("_onGet = callback;");
-					w.Line("_onGetTracking = new IndexerGetBuilderImpl(this);");
-					w.Line("return _onGetTracking;");
+					w.Line("_get = callback;");
+					w.Line("_getTracking = new IndexerGetBuilderImpl(this);");
+					w.Line("return _getTracking;");
 				}
 				w.Line();
 
@@ -132,9 +132,9 @@ internal static class IndexerInterceptorRenderer
 					w.Line("_setSequenceIndex = 0;");
 					w.Line("_isSetVerifiable = false;");
 					w.Line("_setVerifiableTimes = null;");
-					w.Line("_onSet = callback;");
-					w.Line("_onSetTracking = new IndexerSetBuilderImpl(this);");
-					w.Line("return _onSetTracking;");
+					w.Line("_set = callback;");
+					w.Line("_setTracking = new IndexerSetBuilderImpl(this);");
+					w.Line("return _setTracking;");
 				}
 				w.Line();
 
@@ -216,11 +216,11 @@ internal static class IndexerInterceptorRenderer
 			w.Line();
 
 			// Priority 2: Repeating Get callback
-			w.Line("if (_onGet != null && _onGetTracking != null)");
+			w.Line("if (_get != null && _getTracking != null)");
 			using (w.Braces())
 			{
-				w.Line($"_onGetTracking.RecordCall({model.KeyExpression});");
-				w.Line($"return _onGet({model.KeyExpression});");
+				w.Line($"_getTracking.RecordCall({model.KeyExpression});");
+				w.Line($"return _get({model.KeyExpression});");
 			}
 			w.Line();
 
@@ -294,11 +294,11 @@ internal static class IndexerInterceptorRenderer
 			w.Line();
 
 			// Priority 2: Repeating Set callback
-			w.Line("if (_onSet != null && _onSetTracking != null)");
+			w.Line("if (_set != null && _setTracking != null)");
 			using (w.Braces())
 			{
-				w.Line($"_onSetTracking.RecordCall({model.KeyExpression}, value);");
-				w.Line($"_onSet({model.KeyExpression}, value);");
+				w.Line($"_setTracking.RecordCall({model.KeyExpression}, value);");
+				w.Line($"_set({model.KeyExpression}, value);");
 				w.Line("return;");
 			}
 			w.Line();
@@ -341,7 +341,7 @@ internal static class IndexerInterceptorRenderer
 			{
 				w.Line("_unconfiguredGetCount = 0;");
 				w.Line("_unconfiguredLastGetKey = default;");
-				w.Line("_onGetTracking?.Reset();");
+				w.Line("_getTracking?.Reset();");
 				w.Line("if (_getSequence != null)");
 				using (w.Braces())
 				{
@@ -354,7 +354,7 @@ internal static class IndexerInterceptorRenderer
 			{
 				w.Line("_unconfiguredSetCount = 0;");
 				w.Line("_unconfiguredLastSetEntry = default;");
-				w.Line("_onSetTracking?.Reset();");
+				w.Line("_setTracking?.Reset();");
 				w.Line("if (_setSequence != null)");
 				using (w.Braces())
 				{
@@ -458,8 +458,8 @@ internal static class IndexerInterceptorRenderer
 			: (model.HasGetter ? "_isGetVerifiable" : "_isSetVerifiable");
 
 		var isConfiguredParts = new System.Collections.Generic.List<string> { "Backing.Count > 0" };
-		if (model.HasGetter) isConfiguredParts.Add("_onGet != null || (_getSequence?.Count ?? 0) > 0");
-		if (model.HasSetter) isConfiguredParts.Add("_onSet != null || (_setSequence?.Count ?? 0) > 0");
+		if (model.HasGetter) isConfiguredParts.Add("_get != null || (_getSequence?.Count ?? 0) > 0");
+		if (model.HasSetter) isConfiguredParts.Add("_set != null || (_setSequence?.Count ?? 0) > 0");
 		var isConfiguredExpr = string.Join(" || ", isConfiguredParts);
 
 		var totalCountExpr = model.HasGetter && model.HasSetter
@@ -593,9 +593,9 @@ internal static class IndexerInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_interceptor._getSequence = new global::System.Collections.Generic.List<(global::System.Func<{parameterTypes}, {valueType}> Callback, IndexerGetBuilderImpl Tracking)>();");
-					w.Line("_interceptor._getSequence.Add((_interceptor._onGet!, this));");
-					w.Line("_interceptor._onGet = null;");
-					w.Line("_interceptor._onGetTracking = null;");  // Clear to prevent double-counting in TotalGetCount
+					w.Line("_interceptor._getSequence.Add((_interceptor._get!, this));");
+					w.Line("_interceptor._get = null;");
+					w.Line("_interceptor._getTracking = null;");  // Clear to prevent double-counting in TotalGetCount
 					w.Line("_interceptor._getSequenceIndex = 0;");
 				}
 				w.Line("var nextBuilder = new IndexerGetBuilderImpl(_interceptor);");
@@ -682,9 +682,9 @@ internal static class IndexerInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_interceptor._setSequence = new global::System.Collections.Generic.List<(global::System.Action<{parameterTypes}, {valueType}> Callback, IndexerSetBuilderImpl Tracking)>();");
-					w.Line("_interceptor._setSequence.Add((_interceptor._onSet!, this));");
-					w.Line("_interceptor._onSet = null;");
-					w.Line("_interceptor._onSetTracking = null;");  // Clear to prevent double-counting in TotalSetCount
+					w.Line("_interceptor._setSequence.Add((_interceptor._set!, this));");
+					w.Line("_interceptor._set = null;");
+					w.Line("_interceptor._setTracking = null;");  // Clear to prevent double-counting in TotalSetCount
 					w.Line("_interceptor._setSequenceIndex = 0;");
 				}
 				w.Line("var nextBuilder = new IndexerSetBuilderImpl(_interceptor);");

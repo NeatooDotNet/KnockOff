@@ -7,8 +7,8 @@ namespace KnockOff.Tests;
 /// Phase 10-12 of the Parameter-Specific Matching feature.
 ///
 /// Tests cover:
-/// - When(value).Returns(value) basic case
-/// - When(predicate).Returns(value) basic case
+/// - When(value).Return(value) basic case
+/// - When(predicate).Return(value) basic case
 /// - ThenWhen fluent chaining (Phase 12 fix)
 /// - ThenCall terminal behavior (repeats forever)
 /// - ThenNone terminal behavior (exhausts, falls through)
@@ -29,7 +29,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.When(1, 2).Return(100);
 
 		var result = service.Add(1, 2);
 
@@ -42,7 +42,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When((a, b) => a > 10).Returns(999);
+		stub.Add.When((a, b) => a > 10).Return(999);
 
 		var result = service.Add(15, 0);
 
@@ -56,11 +56,11 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		// Fluent chain: When().Returns().ThenWhen().Returns()
+		// Fluent chain: When().Return().ThenWhen().Return()
 		stub.Add
-			.When(1, 2).Returns(100)
-			.ThenWhen(3, 4).Returns(200)
-			.ThenWhen((a, b) => a > 100).Returns(999);
+			.When(1, 2).Return(100)
+			.ThenWhen(3, 4).Return(200)
+			.ThenWhen((a, b) => a > 100).Return(999);
 
 		// First matcher (1, 2)
 		Assert.Equal(100, service.Add(1, 2));
@@ -81,7 +81,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Transform.When("hello").Returns("HELLO");
+		stub.Transform.When("hello").Return("HELLO");
 
 		var result = service.Transform("hello");
 
@@ -94,7 +94,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Transform.When(s => s.StartsWith("h")).Returns("STARTS_WITH_H");
+		stub.Transform.When(s => s.StartsWith("h")).Return("STARTS_WITH_H");
 
 		Assert.Equal("STARTS_WITH_H", service.Transform("hello"));
 		Assert.Equal("STARTS_WITH_H", service.Transform("hi"));
@@ -106,7 +106,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.When(1, 2).Return(100);
 
 		// Single When repeats when matched (it's both first and last)
 		Assert.Equal(100, service.Add(1, 2));
@@ -121,9 +121,9 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		// Multiple When calls create multiple matchers in the chain
-		stub.Add.When(1, 2).Returns(100);
-		stub.Add.When(2, 3).Returns(200);  // Adds to chain
-		stub.Add.When(3, 4).Returns(300);  // Adds to chain
+		stub.Add.When(1, 2).Return(100);
+		stub.Add.When(2, 3).Return(200);  // Adds to chain
+		stub.Add.When(3, 4).Return(300);  // Adds to chain
 
 		// Each matcher is consumed in order
 		Assert.Equal(100, service.Add(1, 2));   // First matcher consumed
@@ -143,7 +143,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		stub.Add
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => a + b);
 
 		// First matcher consumed
@@ -162,7 +162,7 @@ public class WhenChainTests
 
 		var calls = new List<(int a, int b)>();
 		stub.Add
-			.When(1, 1).Returns(1)
+			.When(1, 1).Return(1)
 			.ThenCall((a, b) =>
 			{
 				calls.Add((a, b));
@@ -185,7 +185,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var chain = stub.Add
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => a + b);
 
 		service.Add(1, 2);   // Consume first
@@ -205,8 +205,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100).ThenNone();
-		stub.Add.Returns(999);  // Fallback
+		stub.Add.When(1, 2).Return(100).ThenNone();
+		stub.Add.Return(999);  // Fallback
 
 		Assert.Equal(100, service.Add(1, 2));   // First matcher consumed
 		// ThenNone reached - chain exhausted, falls through
@@ -220,8 +220,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		var chain = stub.Add.When(1, 2).Returns(100).ThenNone();
-		stub.Add.Returns(999);
+		var chain = stub.Add.When(1, 2).Return(100).ThenNone();
+		stub.Add.Return(999);
 
 		service.Add(1, 2);   // Consume first
 		service.Add(9, 9);   // Falls through (ThenNone exhausted)
@@ -240,8 +240,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
-		stub.Add.Returns(999);
+		stub.Add.When(1, 2).Return(100);
+		stub.Add.Return(999);
 
 		Assert.Equal(100, service.Add(1, 2));   // When matches
 		Assert.Equal(999, service.Add(9, 9));   // Falls through to Returns
@@ -253,8 +253,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
-		stub.Add.Returns((a, b) => a * b);
+		stub.Add.When(1, 2).Return(100);
+		stub.Add.Return((a, b) => a * b);
 
 		Assert.Equal(100, service.Add(1, 2));   // When matches
 		Assert.Equal(27, service.Add(9, 3));    // Falls through to OnCall
@@ -269,8 +269,8 @@ public class WhenChainTests
 		// Configure When and OnCall
 		// Note: Returns() and OnCall() are mutually exclusive - the last one configured wins
 		// But When() is separate and always takes priority when it matches
-		stub.Add.When(1, 2).Returns(100);
-		stub.Add.Returns((a, b) => 300);
+		stub.Add.When(1, 2).Return(100);
+		stub.Add.Return((a, b) => 300);
 
 		// When has priority when it matches
 		Assert.Equal(100, service.Add(1, 2));
@@ -286,8 +286,8 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		// Configure When and Returns (configured last)
-		stub.Add.When(1, 2).Returns(100);
-		stub.Add.Returns(200);
+		stub.Add.When(1, 2).Return(100);
+		stub.Add.Return(200);
 
 		// When has priority when it matches
 		Assert.Equal(100, service.Add(1, 2));
@@ -306,8 +306,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2);
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.Return((a, b) => 1).ThenReturn((a, b) => 2);
+		stub.Add.When(1, 2).Return(100);
 
 		// When takes priority when matching
 		Assert.Equal(100, service.Add(1, 2));
@@ -322,8 +322,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.Returns(999);
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.Return(999);
+		stub.Add.When(1, 2).Return(100);
 
 		Assert.Equal(100, service.Add(1, 2));   // When matches
 		Assert.Equal(999, service.Add(9, 9));   // Falls through to Returns
@@ -335,8 +335,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.Returns((a, b) => 999);
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.Return((a, b) => 999);
+		stub.Add.When(1, 2).Return(100);
 
 		Assert.Equal(100, service.Add(1, 2));   // When matches
 		Assert.Equal(999, service.Add(9, 9));   // Falls through to OnCall
@@ -353,7 +353,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var chain = stub.Add
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => a + b);
 
 		service.Add(1, 2);   // Consume first
@@ -369,9 +369,9 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
-		stub.Add.When(2, 3).Returns(200);
-		var chain = stub.Add.When(3, 4).Returns(300);
+		stub.Add.When(1, 2).Return(100);
+		stub.Add.When(2, 3).Return(200);
+		var chain = stub.Add.When(3, 4).Return(300);
 
 		service.Add(1, 2);   // Only consume first
 		// Second and third matchers not consumed
@@ -386,7 +386,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		stub.Add
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => 999)
 			.Verifiable();
 
@@ -403,8 +403,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
-		stub.Add.When(2, 3).Returns(200).Verifiable();
+		stub.Add.When(1, 2).Return(100);
+		stub.Add.When(2, 3).Return(200).Verifiable();
 
 		service.Add(1, 2);   // Only first matcher
 
@@ -421,7 +421,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		var chain = stub.Add.When(1, 2).Returns(100).ThenCall((a, b) => 999);
+		var chain = stub.Add.When(1, 2).Return(100).ThenCall((a, b) => 999);
 
 		service.Add(1, 2);   // Consume first
 		service.Add(9, 9);   // Terminal
@@ -439,7 +439,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var chain = stub.Add
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => a + b);
 
 		service.Add(1, 2);
@@ -458,7 +458,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100).ThenCall((a, b) => 999);
+		stub.Add.When(1, 2).Return(100).ThenCall((a, b) => 999);
 
 		service.Add(1, 2);
 		service.Add(9, 9);
@@ -473,7 +473,7 @@ public class WhenChainTests
 	#endregion
 
 	#region Async Method Tests
-	// Phase 14: For async methods, When().Returns() now auto-wraps with Task.FromResult.
+	// Phase 14: For async methods, When().Return() now auto-wraps with Task.FromResult.
 	// This matches the behavior of the regular interceptor Returns() method.
 	// Users no longer need to manually wrap with Task.FromResult().
 
@@ -484,7 +484,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		// When chain Returns() for async methods auto-wraps with Task.FromResult
-		stub.GetAsync.When("hello").Returns("HELLO");  // No Task.FromResult needed!
+		stub.GetAsync.When("hello").Return("HELLO");  // No Task.FromResult needed!
 
 		var result = await service.GetAsync("hello");
 
@@ -497,7 +497,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.GetAsync.When(s => s.Length > 5).Returns("LONG");  // Auto-wrapped
+		stub.GetAsync.When(s => s.Length > 5).Return("LONG");  // Auto-wrapped
 
 		var result = await service.GetAsync("longstring");
 
@@ -511,8 +511,8 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		// Both When chain Returns() and regular Returns() accept unwrapped type
-		stub.GetAsync.When("special").Returns("SPECIAL");
-		stub.GetAsync.Returns("default");
+		stub.GetAsync.When("special").Return("SPECIAL");
+		stub.GetAsync.Return("default");
 
 		Assert.Equal("SPECIAL", await service.GetAsync("special"));
 		Assert.Equal("default", await service.GetAsync("other"));
@@ -526,7 +526,7 @@ public class WhenChainTests
 
 		// Returns auto-wraps, but ThenCall still uses the full delegate type (returns Task<T>)
 		stub.GetAsync
-			.When("first").Returns("FIRST")  // Auto-wrapped
+			.When("first").Return("FIRST")  // Auto-wrapped
 			.ThenCall(s => Task.FromResult(s.ToUpper()));  // ThenCall uses full delegate type
 
 		Assert.Equal("FIRST", await service.GetAsync("first"));
@@ -541,9 +541,9 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		stub.GetAsync
-			.When("first").Returns("FIRST")
-			.ThenWhen("second").Returns("SECOND")
-			.ThenWhen(s => s.StartsWith("x")).Returns("X_VALUE");
+			.When("first").Return("FIRST")
+			.ThenWhen("second").Return("SECOND")
+			.ThenWhen(s => s.StartsWith("x")).Return("X_VALUE");
 
 		Assert.Equal("FIRST", await service.GetAsync("first"));
 		Assert.Equal("SECOND", await service.GetAsync("second"));
@@ -563,7 +563,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		// Match null via predicate (direct When(null) would throw)
-		stub.Transform.When(s => s == null).Returns("WAS_NULL");
+		stub.Transform.When(s => s == null).Return("WAS_NULL");
 
 		var result = service.Transform(null!);
 
@@ -576,7 +576,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Transform.When("").Returns("EMPTY");
+		stub.Transform.When("").Return("EMPTY");
 
 		Assert.Equal("EMPTY", service.Transform(""));
 	}
@@ -592,7 +592,7 @@ public class WhenChainTests
 		stub.Strict = false;
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.When(1, 2).Return(100);
 
 		Assert.Equal(100, service.Add(1, 2));
 		// No match, no fallback configured - returns default
@@ -606,7 +606,7 @@ public class WhenChainTests
 		stub.Strict = true;
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.When(1, 2).Return(100);
 
 		Assert.Equal(100, service.Add(1, 2));
 		// No match, no fallback - strict mode throws
@@ -619,8 +619,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
-		stub.Transform.When("hello").Returns("HELLO");
+		stub.Add.When(1, 2).Return(100);
+		stub.Transform.When("hello").Return("HELLO");
 
 		Assert.Equal(100, service.Add(1, 2));
 		Assert.Equal("HELLO", service.Transform("hello"));
@@ -632,8 +632,8 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.Returns(999);
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.Return(999);
+		stub.Add.When(1, 2).Return(100);
 
 		// When doesn't clear Returns
 		Assert.Equal(100, service.Add(1, 2));
@@ -650,7 +650,7 @@ public class WhenChainTests
 		var stub = new WhenChainInlineStubs.Stubs.IWhenChainTestService();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
+		stub.Add.When(1, 2).Return(100);
 
 		Assert.Equal(100, service.Add(1, 2));
 	}
@@ -661,7 +661,7 @@ public class WhenChainTests
 		var stub = new WhenChainInlineStubs.Stubs.IWhenChainTestService();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When((a, b) => a > 10).Returns(999);
+		stub.Add.When((a, b) => a > 10).Return(999);
 
 		Assert.Equal(999, service.Add(15, 0));
 	}
@@ -674,9 +674,9 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		stub.Add
-			.When(1, 2).Returns(100)
-			.ThenWhen(3, 4).Returns(200)
-			.ThenWhen((a, b) => a > 100).Returns(999);
+			.When(1, 2).Return(100)
+			.ThenWhen(3, 4).Return(200)
+			.ThenWhen((a, b) => a > 100).Return(999);
 
 		Assert.Equal(100, service.Add(1, 2));
 		Assert.Equal(200, service.Add(3, 4));
@@ -690,7 +690,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		stub.Add
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => a * b);
 
 		Assert.Equal(100, service.Add(1, 2));
@@ -703,8 +703,8 @@ public class WhenChainTests
 		var stub = new WhenChainInlineStubs.Stubs.IWhenChainTestService();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100).ThenNone();
-		stub.Add.Returns(999);
+		stub.Add.When(1, 2).Return(100).ThenNone();
+		stub.Add.Return(999);
 
 		Assert.Equal(100, service.Add(1, 2));
 		Assert.Equal(999, service.Add(1, 2));
@@ -717,7 +717,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var chain = stub.Add
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => 200);
 
 		service.Add(1, 2);
@@ -732,8 +732,8 @@ public class WhenChainTests
 		var stub = new WhenChainInlineStubs.Stubs.IWhenChainTestService();
 		IWhenChainTestService service = stub;
 
-		stub.Add.When(1, 2).Returns(100);
-		stub.Add.Returns(999);
+		stub.Add.When(1, 2).Return(100);
+		stub.Add.Return(999);
 
 		Assert.Equal(100, service.Add(1, 2));
 		Assert.Equal(999, service.Add(9, 9));
@@ -749,7 +749,7 @@ public class WhenChainTests
 		var classStub = new WhenChainInlineStubs.Stubs.WhenChainBaseClass();
 		WhenChainBaseClass instance = classStub.Object;
 
-		classStub.ComputeVirtual.Returns((a, b) => a * b);
+		classStub.ComputeVirtual.Return((a, b) => a * b);
 
 		Assert.Equal(6, instance.ComputeVirtual(2, 3));
 	}
@@ -792,7 +792,7 @@ public class WhenChainTests
 		var classStub = new WhenChainInlineStubs.Stubs.WhenChainBaseClass();
 		WhenChainBaseClass instance = classStub.Object;
 
-		classStub.ComputeVirtual.When(1, 2).Returns(100);
+		classStub.ComputeVirtual.When(1, 2).Return(100);
 
 		Assert.Equal(100, instance.ComputeVirtual(1, 2));
 	}
@@ -803,7 +803,7 @@ public class WhenChainTests
 		var classStub = new WhenChainInlineStubs.Stubs.WhenChainBaseClass();
 		WhenChainBaseClass instance = classStub.Object;
 
-		classStub.ComputeVirtual.When((a, b) => a > 10).Returns(999);
+		classStub.ComputeVirtual.When((a, b) => a > 10).Return(999);
 
 		Assert.Equal(999, instance.ComputeVirtual(15, 0));
 	}
@@ -815,9 +815,9 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		classStub.ComputeVirtual
-			.When(1, 2).Returns(100)
-			.ThenWhen(3, 4).Returns(200)
-			.ThenWhen((a, b) => a > 100).Returns(999);
+			.When(1, 2).Return(100)
+			.ThenWhen(3, 4).Return(200)
+			.ThenWhen((a, b) => a > 100).Return(999);
 
 		Assert.Equal(100, instance.ComputeVirtual(1, 2));
 		Assert.Equal(200, instance.ComputeVirtual(3, 4));
@@ -831,7 +831,7 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		classStub.ComputeVirtual
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => a * b);
 
 		Assert.Equal(100, instance.ComputeVirtual(1, 2));
@@ -844,7 +844,7 @@ public class WhenChainTests
 		var classStub = new WhenChainInlineStubs.Stubs.WhenChainBaseClass();
 		WhenChainBaseClass instance = classStub.Object;
 
-		classStub.ComputeVirtual.When(1, 2).Returns(100).ThenNone();
+		classStub.ComputeVirtual.When(1, 2).Return(100).ThenNone();
 
 		Assert.Equal(100, instance.ComputeVirtual(1, 2));
 		// After ThenNone, falls back to base class implementation (a + b)
@@ -857,7 +857,7 @@ public class WhenChainTests
 		var classStub = new WhenChainInlineStubs.Stubs.WhenChainBaseClass();
 		WhenChainBaseClass instance = classStub.Object;
 
-		classStub.ComputeVirtual.When(1, 2).Returns(100);
+		classStub.ComputeVirtual.When(1, 2).Return(100);
 
 		Assert.Equal(100, instance.ComputeVirtual(1, 2));
 		// Not matched, falls back to base class implementation (a + b)
@@ -871,7 +871,7 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		var chain = classStub.ComputeVirtual
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => 200);
 
 		instance.ComputeVirtual(1, 2);
@@ -886,7 +886,7 @@ public class WhenChainTests
 		var classStub = new WhenChainInlineStubs.Stubs.WhenChainBaseClass();
 		WhenChainBaseClass instance = classStub.Object;
 
-		classStub.ComputeVirtual.Returns(42);
+		classStub.ComputeVirtual.Return(42);
 
 		Assert.Equal(42, instance.ComputeVirtual(1, 2));
 		Assert.Equal(42, instance.ComputeVirtual(9, 9));
@@ -915,7 +915,7 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		var calls = new List<(int a, int b)>();
-		classStub.ProcessVirtual.When(1, 2).Execute((a, b) => calls.Add((a, b)));
+		classStub.ProcessVirtual.When(1, 2).Call((a, b) => calls.Add((a, b)));
 
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(1, 2);
@@ -930,7 +930,7 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		var calls = new List<(int a, int b)>();
-		classStub.ProcessVirtual.When((a, b) => a > 10).Execute((a, b) => calls.Add((a, b)));
+		classStub.ProcessVirtual.When((a, b) => a > 10).Call((a, b) => calls.Add((a, b)));
 
 		instance.ProcessVirtual(1, 2);    // Doesn't match
 		instance.ProcessVirtual(15, 20);  // Matches
@@ -962,9 +962,9 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		classStub.ProcessVirtual
-			.When(1, 2).Execute((a, b) => calls.Add("first"))
-			.ThenWhen(3, 4).Execute((a, b) => calls.Add("second"))
-			.ThenWhen((a, b) => a > 100).Execute((a, b) => calls.Add("large"));
+			.When(1, 2).Call((a, b) => calls.Add("first"))
+			.ThenWhen(3, 4).Call((a, b) => calls.Add("second"))
+			.ThenWhen((a, b) => a > 100).Call((a, b) => calls.Add("large"));
 
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(3, 4);
@@ -982,8 +982,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		classStub.ProcessVirtual
-			.When(1, 2).Execute((a, b) => calls.Add("specific"))
-			.ThenExecute((a, b) => calls.Add($"any:{a},{b}"));
+			.When(1, 2).Call((a, b) => calls.Add("specific"))
+			.ThenCall((a, b) => calls.Add($"any:{a},{b}"));
 
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(9, 9);
@@ -999,8 +999,8 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		var calls = new List<string>();
-		classStub.ProcessVirtual.When(1, 2).Execute((a, b) => calls.Add("matched")).ThenNone();
-		classStub.ProcessVirtual.Execute((a, b) => calls.Add("fallback"));
+		classStub.ProcessVirtual.When(1, 2).Call((a, b) => calls.Add("matched")).ThenNone();
+		classStub.ProcessVirtual.Call((a, b) => calls.Add("fallback"));
 
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(1, 2);  // Falls through to OnCall
@@ -1019,7 +1019,7 @@ public class WhenChainTests
 		var stub = new WhenChainDelegateStubs.Stubs.WhenFormatter();
 		WhenFormatter formatter = stub;
 
-		stub.Interceptor.When("hello").Returns("HELLO");
+		stub.Interceptor.When("hello").Return("HELLO");
 
 		Assert.Equal("HELLO", formatter("hello"));
 	}
@@ -1030,7 +1030,7 @@ public class WhenChainTests
 		var stub = new WhenChainDelegateStubs.Stubs.WhenFormatter();
 		WhenFormatter formatter = stub;
 
-		stub.Interceptor.When(s => s.Length > 5).Returns("LONG");
+		stub.Interceptor.When(s => s.Length > 5).Return("LONG");
 
 		Assert.Equal("LONG", formatter("longstring"));
 	}
@@ -1043,9 +1043,9 @@ public class WhenChainTests
 		WhenFormatter formatter = stub;
 
 		stub.Interceptor
-			.When("one").Returns("ONE")
-			.ThenWhen("two").Returns("TWO")
-			.ThenWhen(s => s.StartsWith("x")).Returns("X_PREFIX");
+			.When("one").Return("ONE")
+			.ThenWhen("two").Return("TWO")
+			.ThenWhen(s => s.StartsWith("x")).Return("X_PREFIX");
 
 		Assert.Equal("ONE", formatter("one"));
 		Assert.Equal("TWO", formatter("two"));
@@ -1059,7 +1059,7 @@ public class WhenChainTests
 		WhenFormatter formatter = stub;
 
 		stub.Interceptor
-			.When("special").Returns("SPECIAL")
+			.When("special").Return("SPECIAL")
 			.ThenCall(s => s.ToUpper());
 
 		Assert.Equal("SPECIAL", formatter("special"));
@@ -1072,8 +1072,8 @@ public class WhenChainTests
 		var stub = new WhenChainDelegateStubs.Stubs.WhenFormatter();
 		WhenFormatter formatter = stub;
 
-		stub.Interceptor.When("one").Returns("ONE").ThenNone();
-		stub.Interceptor.Returns("default");
+		stub.Interceptor.When("one").Return("ONE").ThenNone();
+		stub.Interceptor.Return("default");
 
 		Assert.Equal("ONE", formatter("one"));
 		Assert.Equal("default", formatter("one"));
@@ -1085,7 +1085,7 @@ public class WhenChainTests
 		var stub = new WhenChainDelegateStubs.Stubs.WhenCalculator();
 		WhenCalculator calculator = stub;
 
-		stub.Interceptor.When(1, 2).Returns(100);
+		stub.Interceptor.When(1, 2).Return(100);
 
 		Assert.Equal(100, calculator(1, 2));
 	}
@@ -1096,7 +1096,7 @@ public class WhenChainTests
 		var stub = new WhenChainDelegateStubs.Stubs.WhenCalculator();
 		WhenCalculator calculator = stub;
 
-		stub.Interceptor.When((a, b) => a > 10).Returns(999);
+		stub.Interceptor.When((a, b) => a > 10).Return(999);
 
 		Assert.Equal(999, calculator(20, 0));
 	}
@@ -1108,7 +1108,7 @@ public class WhenChainTests
 		WhenCalculator calculator = stub;
 
 		stub.Interceptor
-			.When(1, 2).Returns(100)
+			.When(1, 2).Return(100)
 			.ThenCall((a, b) => a * b);
 
 		Assert.Equal(100, calculator(1, 2));
@@ -1122,7 +1122,7 @@ public class WhenChainTests
 		WhenFormatter formatter = stub;
 
 		var chain = stub.Interceptor
-			.When("one").Returns("ONE")
+			.When("one").Return("ONE")
 			.ThenCall(s => s.ToUpper());
 
 		formatter("one");
@@ -1138,7 +1138,7 @@ public class WhenChainTests
 		WhenFormatter formatter = stub;
 
 		var chain = stub.Interceptor
-			.When("one").Returns("ONE")
+			.When("one").Return("ONE")
 			.ThenCall(s => "TERMINAL");
 
 		formatter("one");
@@ -1175,7 +1175,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var calls = new List<(int a, int b)>();
-		stub.Process.When(1, 2).Execute((a, b) => calls.Add((a, b)));
+		stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
 
 		service.Process(1, 2);
 		service.Process(1, 2);
@@ -1191,7 +1191,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var largeCalls = new List<(int a, int b)>();
-		stub.Process.When((a, b) => a > 10).Execute((a, b) => largeCalls.Add((a, b)));
+		stub.Process.When((a, b) => a > 10).Call((a, b) => largeCalls.Add((a, b)));
 
 		service.Process(1, 2);    // Doesn't match
 		service.Process(15, 20);  // Matches
@@ -1238,9 +1238,9 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		stub.Process
-			.When(1, 2).Execute((a, b) => calls.Add("first"))
-			.ThenWhen(3, 4).Execute((a, b) => calls.Add("second"))
-			.ThenWhen((a, b) => a > 100).Execute((a, b) => calls.Add("large"));
+			.When(1, 2).Call((a, b) => calls.Add("first"))
+			.ThenWhen(3, 4).Call((a, b) => calls.Add("second"))
+			.ThenWhen((a, b) => a > 100).Call((a, b) => calls.Add("large"));
 
 		service.Process(1, 2);    // First matcher
 		service.Process(3, 4);    // Second matcher
@@ -1258,8 +1258,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		stub.Process
-			.When(1, 2).Execute((a, b) => calls.Add("specific"))
-			.ThenExecute((a, b) => calls.Add($"any:{a},{b}"));
+			.When(1, 2).Call((a, b) => calls.Add("specific"))
+			.ThenCall((a, b) => calls.Add($"any:{a},{b}"));
 
 		service.Process(1, 2);    // First matcher
 		service.Process(9, 9);    // ThenCall
@@ -1275,8 +1275,8 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var calls = new List<string>();
-		stub.Process.When(1, 2).Execute((a, b) => calls.Add("matched")).ThenNone();
-		stub.Process.Execute((a, b) => calls.Add("fallback"));
+		stub.Process.When(1, 2).Call((a, b) => calls.Add("matched")).ThenNone();
+		stub.Process.Call((a, b) => calls.Add("fallback"));
 
 		service.Process(1, 2);    // First matcher
 		service.Process(1, 2);    // Falls through to OnCall (ThenNone exhausted)
@@ -1292,8 +1292,8 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var calls = new List<string>();
-		stub.Process.When(1, 2).Execute((a, b) => calls.Add("when"));
-		stub.Process.Execute((a, b) => calls.Add("oncall"));
+		stub.Process.When(1, 2).Call((a, b) => calls.Add("when"));
+		stub.Process.Call((a, b) => calls.Add("oncall"));
 
 		service.Process(1, 2);    // When matches
 		service.Process(9, 9);    // Falls through to OnCall
@@ -1309,7 +1309,7 @@ public class WhenChainTests
 
 		stub.Process
 			.When(1, 2)
-			.ThenExecute((a, b) => { })
+			.ThenCall((a, b) => { })
 			.Verifiable();
 
 		service.Process(1, 2);  // Consume first
@@ -1327,8 +1327,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		var chain = stub.Process
-			.When(1, 2).Execute((a, b) => calls.Add("first"))
-			.ThenExecute((a, b) => calls.Add("terminal"));
+			.When(1, 2).Call((a, b) => calls.Add("first"))
+			.ThenCall((a, b) => calls.Add("terminal"));
 
 		service.Process(1, 2);    // First
 		service.Process(9, 9);    // Terminal
@@ -1364,7 +1364,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var calls = new List<(int a, int b)>();
-		stub.Process.When(1, 2).Execute((a, b) => calls.Add((a, b)));
+		stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
 
 		service.Process(1, 2);
 
@@ -1410,7 +1410,7 @@ public class WhenChainTests
 		VoidProcessor processor = stub;
 
 		var calls = new List<(int a, int b)>();
-		stub.Interceptor.When(1, 2).Execute((a, b) => calls.Add((a, b)));
+		stub.Interceptor.When(1, 2).Call((a, b) => calls.Add((a, b)));
 
 		processor(1, 2);
 		processor(1, 2);
@@ -1425,7 +1425,7 @@ public class WhenChainTests
 		VoidProcessor processor = stub;
 
 		var calls = new List<(int a, int b)>();
-		stub.Interceptor.When((a, b) => a > 10).Execute((a, b) => calls.Add((a, b)));
+		stub.Interceptor.When((a, b) => a > 10).Call((a, b) => calls.Add((a, b)));
 
 		processor(1, 2);    // Doesn't match
 		processor(15, 20);  // Matches
@@ -1457,8 +1457,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		stub.Interceptor
-			.When(1, 2).Execute((a, b) => calls.Add("first"))
-			.ThenWhen(3, 4).Execute((a, b) => calls.Add("second"));
+			.When(1, 2).Call((a, b) => calls.Add("first"))
+			.ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
 
 		processor(1, 2);
 		processor(3, 4);
@@ -1475,8 +1475,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		stub.Interceptor
-			.When(1, 2).Execute((a, b) => calls.Add("specific"))
-			.ThenExecute((a, b) => calls.Add("any"));
+			.When(1, 2).Call((a, b) => calls.Add("specific"))
+			.ThenCall((a, b) => calls.Add("any"));
 
 		processor(1, 2);
 		processor(9, 9);
@@ -1492,8 +1492,8 @@ public class WhenChainTests
 		VoidProcessor processor = stub;
 
 		var calls = new List<string>();
-		stub.Interceptor.When(1, 2).Execute((a, b) => calls.Add("matched")).ThenNone();
-		stub.Interceptor.Execute((a, b) => calls.Add("fallback"));
+		stub.Interceptor.When(1, 2).Call((a, b) => calls.Add("matched")).ThenNone();
+		stub.Interceptor.Call((a, b) => calls.Add("fallback"));
 
 		processor(1, 2);
 		processor(1, 2);  // Falls through
@@ -1509,8 +1509,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		var chain = stub.Interceptor
-			.When(1, 2).Execute((a, b) => calls.Add("first"))
-			.ThenExecute((a, b) => calls.Add("terminal"));
+			.When(1, 2).Call((a, b) => calls.Add("first"))
+			.ThenCall((a, b) => calls.Add("terminal"));
 
 		processor(1, 2);
 		processor(9, 9);
@@ -1530,7 +1530,7 @@ public class WhenChainTests
 		VoidFormatter formatter = stub;
 
 		var calls = new List<string>();
-		stub.Interceptor.When("hello").Execute(s => calls.Add(s));
+		stub.Interceptor.When("hello").Call(s => calls.Add(s));
 
 		formatter("hello");
 		formatter("world");  // Doesn't match, falls through

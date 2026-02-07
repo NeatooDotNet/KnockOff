@@ -50,7 +50,7 @@ public partial class DelegateStubsDemo
         var stub = new Stubs.ArithmeticOperation();
 
         // Configure via interceptor
-        stub.Interceptor.Returns(42);
+        stub.Interceptor.Return(42);
 
         // Implicit conversion to delegate type
         ArithmeticOperation operation = stub;
@@ -60,21 +60,21 @@ public partial class DelegateStubsDemo
     }
 
     // =========================================================================
-    // Interceptor.Returns(value) - Constant Return Value
+    // Interceptor.Return(value) - Constant Return Value
     // =========================================================================
     // DESIGN DECISION: Returns(value) configures a constant return value.
     // The delegate always returns this value regardless of arguments.
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Returns(int value) { _onCall = (_, _) => value; }
+    //   public void Returns(int value) { _call = (_, _) => value; }
     // =========================================================================
 
     public void Returns_ConstantValue()
     {
         var stub = new Stubs.ArithmeticOperation();
 
-        stub.Interceptor.Returns(100);
+        stub.Interceptor.Return(100);
 
         ArithmeticOperation operation = stub;
 
@@ -83,14 +83,14 @@ public partial class DelegateStubsDemo
     }
 
     // =========================================================================
-    // Interceptor.Returns(callback) - Dynamic Behavior
+    // Interceptor.Return(callback) - Dynamic Behavior
     // =========================================================================
     // DESIGN DECISION: Returns(callback) allows full control over delegate
     // behavior. The callback receives the same arguments as the delegate.
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Returns(Func<int, int, int> callback) { _onCall = callback; }
+    //   public void Returns(Func<int, int, int> callback) { _call = callback; }
     // =========================================================================
 
     public void Returns_DynamicBehavior()
@@ -98,7 +98,7 @@ public partial class DelegateStubsDemo
         var stub = new Stubs.ArithmeticOperation();
 
         // Configure to actually add the numbers
-        stub.Interceptor.Returns((a, b) => a + b);
+        stub.Interceptor.Return((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
 
@@ -123,7 +123,7 @@ public partial class DelegateStubsDemo
     public void LastArgs_Tracking()
     {
         var stub = new Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(0);
+        stub.Interceptor.Return(0);
 
         ArithmeticOperation operation = stub;
 
@@ -143,7 +143,7 @@ public partial class DelegateStubsDemo
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Execute(Action<string> callback) { _onCall = callback; }
+    //   public void Execute(Action<string> callback) { _call = callback; }
     // =========================================================================
 
     public void VoidDelegate_ExecuteOnly()
@@ -152,7 +152,7 @@ public partial class DelegateStubsDemo
         var logged = new List<string>();
 
         // Configure to capture log messages
-        stub.Interceptor.Execute(msg => logged.Add(msg));
+        stub.Interceptor.Call(msg => logged.Add(msg));
 
         LogAction logger = stub;
 
@@ -196,7 +196,7 @@ public partial class DelegateStubsDemo
         var stub = new Stubs.SimpleAction();
         var callCount = 0;
 
-        stub.Interceptor.Execute(() => callCount++);
+        stub.Interceptor.Call(() => callCount++);
 
         SimpleAction action = stub;
 
@@ -223,7 +223,7 @@ public partial class DelegateStubsDemo
         // Factory<string> stub - closed generic uses simple name
         var stub = new Stubs.Factory();
 
-        stub.Interceptor.Returns("Created item");
+        stub.Interceptor.Return("Created item");
 
         Factory<string> factory = stub;
 
@@ -241,8 +241,8 @@ public partial class DelegateStubsDemo
     {
         var stub = new Stubs.ArithmeticOperation();
 
-        stub.Interceptor.When(1, 2).Returns(100)
-            .ThenWhen(3, 4).Returns(200)
+        stub.Interceptor.When(1, 2).Return(100)
+            .ThenWhen(3, 4).Return(200)
             .ThenCall((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
@@ -256,7 +256,7 @@ public partial class DelegateStubsDemo
     // When Matching for Void Delegates
     // =========================================================================
     // DESIGN DECISION: Void delegates have When() that returns a chain with
-    // .Execute() instead of .Returns().
+    // .Call() instead of .Return().
     // =========================================================================
 
     public void When_VoidDelegate()
@@ -266,9 +266,9 @@ public partial class DelegateStubsDemo
         var normal = new List<string>();
 
         stub.Interceptor.When(msg => msg.StartsWith("IMPORTANT:", StringComparison.Ordinal))
-            .Execute(msg => important.Add(msg))
+            .Call(msg => important.Add(msg))
             .ThenWhen(msg => true)
-            .Execute(msg => normal.Add(msg));
+            .Call(msg => normal.Add(msg));
 
         LogAction logger = stub;
 
@@ -289,7 +289,7 @@ public partial class DelegateStubsDemo
     public void Delegate_Verification()
     {
         var stub = new Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(0);
+        stub.Interceptor.Return(0);
 
         ArithmeticOperation operation = stub;
 
@@ -311,7 +311,7 @@ public partial class DelegateStubsDemo
     public void Delegate_Reset()
     {
         var stub = new Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(42);
+        stub.Interceptor.Return(42);
 
         ArithmeticOperation operation = stub;
 

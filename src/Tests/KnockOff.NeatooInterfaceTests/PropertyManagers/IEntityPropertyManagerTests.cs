@@ -167,7 +167,7 @@ public partial class IEntityPropertyManagerTests
         var stub = new Stubs.IEntityPropertyManager();
         IEntityPropertyManager manager = stub;
 
-        stub.HasProperty.Returns((name) => name == "ExistingProperty");
+        stub.HasProperty.Return((name) => name == "ExistingProperty");
 
         Assert.True(manager.HasProperty("ExistingProperty"));
         Assert.False(manager.HasProperty("NonExistent"));
@@ -180,7 +180,7 @@ public partial class IEntityPropertyManagerTests
         IEntityPropertyManager manager = stub;
 
         var propertyStub = new EntityPropertyStubForManager();
-        stub.GetProperty.Returns((name) => propertyStub);
+        stub.GetProperty.Return((name) => propertyStub);
 
         manager.GetProperty("Name");
 
@@ -361,7 +361,7 @@ public class IEntityPropertyManagerStandaloneTests
         IEntityPropertyManager manager = stub;
 
         // Configure callback to enable tracking
-        var tracking = stub.MarkSelfUnmodified.Execute(() => { });
+        var tracking = stub.MarkSelfUnmodified.Call(() => { });
 
         manager.MarkSelfUnmodified();
 

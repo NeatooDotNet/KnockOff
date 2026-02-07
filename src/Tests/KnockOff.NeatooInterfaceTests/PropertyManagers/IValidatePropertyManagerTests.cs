@@ -134,7 +134,7 @@ public partial class IValidatePropertyManagerTests
         var stub = new Stubs.IValidatePropertyManager();
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
-        stub.HasProperty.Returns((name) => name == "ExistingProperty");
+        stub.HasProperty.Return((name) => name == "ExistingProperty");
 
         Assert.True(manager.HasProperty("ExistingProperty"));
         Assert.False(manager.HasProperty("NonExistent"));
@@ -147,7 +147,7 @@ public partial class IValidatePropertyManagerTests
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
         var propertyStub = new ValidatePropertyStubForManager();
-        stub.GetProperty.Returns((name) => propertyStub);
+        stub.GetProperty.Return((name) => propertyStub);
 
         manager.GetProperty("Name");
 
@@ -162,7 +162,7 @@ public partial class IValidatePropertyManagerTests
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
         var propertyStub = new ValidatePropertyStubForManager();
-        stub.GetProperty.Returns((name) => propertyStub);
+        stub.GetProperty.Return((name) => propertyStub);
 
         var result = manager.GetProperty("TestProperty");
 
@@ -364,7 +364,7 @@ public class IValidatePropertyManagerStandaloneTests
         IValidatePropertyManager<IValidateProperty> manager = stub;
 
         // Configure callback to enable tracking
-        var tracking = stub.HasProperty.Returns((name) => false);
+        var tracking = stub.HasProperty.Return((name) => false);
 
         manager.HasProperty("Test");
 

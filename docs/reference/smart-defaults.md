@@ -6,12 +6,12 @@
 
 KnockOff determines what to return from a stub method using this priority:
 
-1. **Returns/Execute callback** - Explicit configuration via `MethodName.Returns(...)` or `MethodName.Execute(...)`
+1. **Return/Call callback** - Explicit configuration via `MethodName.Return(...)` or `MethodName.Call(...)`
 2. **User method** - Your implementation in the stub class
 3. **Source** - Delegation to another instance via `Source(T)`
 4. **Smart default** - Automatic default value (this document)
 
-Smart defaults apply only when none of the higher-priority options (OnCall, user method, or Source) are configured.
+Smart defaults apply only when none of the higher-priority options (Return/Call, user method, or Source) are configured.
 
 ---
 
@@ -104,13 +104,13 @@ This fail-fast behavior prevents subtle bugs from returning null where the type 
 // Types without parameterless constructor throw if not configured
 // factory.GetUser(); // throws InvalidOperationException
 
-// Fix: configure OnCall to provide the value
-stub.GetUser.Returns(() => new UserWithRequiredCtor(1, "Configured"));
+// Fix: configure Return to provide the value
+stub.GetUser.Return(() => new UserWithRequiredCtor(1, "Configured"));
 ```
 <!-- endSnippet -->
 
 **How to fix:**
-- **Configure Returns/Execute** - Provide explicit return value or callback
+- **Configure Return/Call** - Provide explicit return value or callback
 - **Implement user method** - Add your own implementation in the stub class
 - **Use Source** - Delegate to a real instance
 
@@ -181,7 +181,7 @@ To override smart defaults:
 **Option 1: Returns**
 <!-- snippet: smart-defaults-override-oncall -->
 ```cs
-stub.GetUser.Returns(() => new User { Name = "Test" });
+stub.GetUser.Return(() => new User { Name = "Test" });
 ```
 <!-- endSnippet -->
 
@@ -203,7 +203,7 @@ stub.Source(new RealOverridableService());
 
 ## See Also
 
-- [Interceptor API Reference](interceptor-api.md) - Returns/Execute and other explicit configuration
+- [Interceptor API Reference](interceptor-api.md) - Return/Call and other explicit configuration
 - [User Methods](../guides/user-methods.md) - Custom implementations
 - [Source Delegation](../guides/source-delegation.md) - Delegating to real instances
 - [Getting Started](../getting-started.md) - First steps with KnockOff

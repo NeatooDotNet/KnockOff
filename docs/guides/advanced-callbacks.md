@@ -27,7 +27,7 @@ Return different values on successive calls by maintaining a queue:
 ```cs
 // Queue of results: first succeeds, second fails
 var results = new Queue<bool>(new[] { true, false });
-stub.Send.Returns((to, message) => results.Dequeue());
+stub.Send.Return((to, message) => results.Dequeue());
 ```
 <!-- endSnippet -->
 
@@ -39,7 +39,7 @@ Control behavior based on call count using a simple counter:
 ```cs
 // Counter tracks call count for conditional behavior
 var attempts = 0;
-stub.Attempt.Returns(() =>
+stub.Attempt.Return(() =>
 {
     attempts++;
     return attempts > 3; // Succeed on 4th attempt
@@ -56,7 +56,7 @@ Return different values based on method arguments using pattern matching:
 <!-- snippet: advanced-conditional-switch -->
 ```cs
 // Pattern matching for argument-based return values
-stub.FindById.Returns((id) => id switch
+stub.FindById.Return((id) => id switch
 {
     1 => new User { Id = 1, Name = "Admin", Email = "admin@test.com" },
     2 => new User { Id = 2, Name = "User", Email = "user@test.com" },
@@ -74,7 +74,7 @@ Simulate error conditions by throwing exceptions from callbacks:
 <!-- snippet: advanced-exception -->
 ```cs
 // Throw exceptions based on argument conditions
-stub.Charge.Execute((amount) =>
+stub.Charge.Call((amount) =>
 {
     if (amount > 1000)
         throw new PaymentException("Insufficient funds");
@@ -95,7 +95,7 @@ Use interceptor state to make one member's behavior depend on another:
 // Shared state between property and method
 var isConnected = false;
 stub.IsConnected.Get(() => isConnected);
-stub.Connect.Execute(() => { isConnected = true; });
+stub.Connect.Call(() => { isConnected = true; });
 ```
 <!-- endSnippet -->
 
@@ -107,8 +107,8 @@ Enforce ordering requirements by checking state in callbacks:
 ```cs
 // Enforce method ordering with shared state
 var isInitialized = false;
-stub.Initialize.Execute(() => { isInitialized = true; });
-stub.Query.Returns((sql) =>
+stub.Initialize.Call(() => { isInitialized = true; });
+stub.Query.Return((sql) =>
 {
     if (!isInitialized)
         throw new InvalidOperationException("Must call Initialize() first");
@@ -126,7 +126,7 @@ Callbacks can perform actions beyond returning values. Use this to simulate depe
 <!-- snippet: advanced-side-effects -->
 ```cs
 // Callbacks can track state and perform side effects
-stub.PlaceOrder.Returns((order) =>
+stub.PlaceOrder.Return((order) =>
 {
     placedOrders.Add(order);
     notifications.Add($"Order {nextOrderId} placed for user {order.UserId}");
@@ -144,7 +144,7 @@ This example combines multiple patterns to create a realistic cache simulation w
 <!-- snippet: advanced-complete-example -->
 ```cs
 // Get: Check expiration, track hits/misses
-stub.Get.Returns((key) =>
+stub.Get.Return((key) =>
 {
     if (cache.TryGetValue(key, out var entry))
     {
@@ -160,7 +160,7 @@ stub.Get.Returns((key) =>
 });
 
 // Set: Enforce capacity, evict oldest if needed
-stub.Set.Execute((key, value) =>
+stub.Set.Call((key, value) =>
 {
     if (cache.Count >= maxCapacity && !cache.ContainsKey(key))
     {
@@ -171,7 +171,7 @@ stub.Set.Execute((key, value) =>
 });
 
 // Clear: Reset everything
-stub.Clear.Execute(() =>
+stub.Clear.Call(() =>
 {
     cache.Clear();
     hits = 0;

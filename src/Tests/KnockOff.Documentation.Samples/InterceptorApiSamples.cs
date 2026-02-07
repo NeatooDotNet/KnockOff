@@ -110,10 +110,10 @@ public class OverviewQuickExampleTests
 
         #region interceptor-overview-quick-example
         // Method interceptor
-        stub.Save.Execute((item) => { }).Verifiable();
+        stub.Save.Call((item) => { }).Verifiable();
 
         // Generic method interceptor
-        stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
+        stub.GetById.Of<User>().Return((id) => new User { Id = id });
 
         // Property interceptor
         stub.Name.Get("TestRepo");
@@ -150,8 +150,8 @@ public class AccessPatternsTests
         var stub = new ApiUserRepoStub();
 
         // Interceptor accessed via interface-named property
-        stub.GetById.Returns((id) => new User { Id = id });
-        stub.Save.Execute((user) => { }).Verifiable();
+        stub.GetById.Return((id) => new User { Id = id });
+        stub.Save.Call((user) => { }).Verifiable();
 
         IApiUserRepo repository = stub;
         repository.Save(new User { Id = 1 });
@@ -178,8 +178,8 @@ public partial class InlinePatternTests
         var stub = new Stubs.IApiUserRepo();
 
         // Same interceptor API as standalone
-        stub.GetById.Returns((id) => new User { Id = id });
-        stub.Save.Execute((user) => { }).Verifiable();
+        stub.GetById.Return((id) => new User { Id = id });
+        stub.Save.Call((user) => { }).Verifiable();
 
         IApiUserRepo repository = stub;
         repository.Save(new User { Id = 1 });
@@ -196,8 +196,8 @@ public partial class InlinePatternTests
         var stub = new Stubs.ApiServiceClass();
 
         // Interceptors accessed via class-named container
-        stub.GetUser.Returns((id) => new User { Id = id, Name = "FromStub" });
-        stub.SaveUser.Execute((user) => { }).Verifiable();
+        stub.GetUser.Return((id) => new User { Id = id, Name = "FromStub" });
+        stub.SaveUser.Call((user) => { }).Verifiable();
 
         // Use .Object to get the actual class instance
         ApiServiceClass service = stub.Object;
@@ -222,15 +222,15 @@ public class MethodInterceptorApiTests
         IApiMethodRepo repository = stub;
 
         #region method-interceptor-complete-api-demo
-        // Configure void method with OnCall and mark verifiable
-        stub.Save.Execute((user) => { }).Verifiable();
+        // Configure void method with Return and mark verifiable
+        stub.Save.Call((user) => { }).Verifiable();
 
         // Configure return method with Returns
-        var getTracking = stub.GetById.Returns((id) =>
+        var getTracking = stub.GetById.Return((id) =>
             new User { Id = id, Name = $"User{id}" }).Verifiable();
 
         // Configure multi-parameter method
-        var updateTracking = stub.Update.Execute((id, name) => { }).Verifiable();
+        var updateTracking = stub.Update.Call((id, name) => { }).Verifiable();
         #endregion
 
         // Exercise the stub
@@ -413,10 +413,10 @@ public class GenericMethodInterceptorApiTests
 
         #region generic-method-interceptor-complete-api-demo
         // Of<T>(): access typed interceptor for specific type argument
-        stub.GetById.Of<User>().OnCall((id) =>
+        stub.GetById.Of<User>().Return((id) =>
             new User { Id = id, Name = $"User{id}" });
 
-        stub.GetById.Of<Product>().OnCall((id) =>
+        stub.GetById.Of<Product>().Return((id) =>
             new Product { Id = id, Name = $"Product{id}" });
 
         // CalledTypeArguments: list of all type arguments used
@@ -471,9 +471,9 @@ public class TimesConstraintTests
         IApiUserRepo repository = stub;
 
         // Setup
-        stub.GetById.Returns((id) => new User { Id = id });
-        stub.Save.Execute((user) => { });
-        stub.Delete.Execute((id) => { });
+        stub.GetById.Return((id) => new User { Id = id });
+        stub.Save.Call((user) => { });
+        stub.Delete.Call((id) => { });
 
         #region times-constraint-usage-examples
         // Times.Never - Expected 0 calls
@@ -516,9 +516,9 @@ public class BatchVerificationTests
 
         #region batch-verification-workflow-example
         // Step 1: Mark interceptors with Verifiable()
-        stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
-        stub.Save.Execute((user) => { }).Verifiable(Times.Exactly(2));
-        stub.Delete.Execute((id) => { }).Verifiable(Times.Never);
+        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.Save.Call((user) => { }).Verifiable(Times.Exactly(2));
+        stub.Delete.Call((id) => { }).Verifiable(Times.Never);
 
         // Step 2: Exercise the stub through the interface
         var user = repository.GetById(1);
@@ -559,8 +559,8 @@ public partial class DelegateApiTests
         var stub = new Stubs.ArithmeticOperation();
 
         // All configuration goes through stub.Interceptor
-        stub.Interceptor.Returns(42);
-        stub.Interceptor.Returns((a, b) => a + b);
+        stub.Interceptor.Return(42);
+        stub.Interceptor.Return((a, b) => a + b);
 
         // Implicit conversion to delegate type
         ArithmeticOperation op = stub;
@@ -579,17 +579,17 @@ public partial class DelegateApiTests
         var stub = new Stubs.AsyncOperation();
 
         // Tier 1: Returns takes inner type — auto-wraps in Task.FromResult
-        stub.Interceptor.Returns(42);
+        stub.Interceptor.Return(42);
 
         // Tier 2: Simplified callback returns int — auto-wrapped
-        stub.Interceptor.Returns((int x) => x * 2);
+        stub.Interceptor.Return((int x) => x * 2);
 
         // Tier 3: Full delegate returns Task<int> directly
-        stub.Interceptor.Returns((int x) => Task.FromResult(x * 2));
+        stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
         #endregion
 
         AsyncOperation op = stub;
-        // The last OnCall wins
+        // The last Return wins
         Assert.Equal(6, await op(3));
     }
 
@@ -611,7 +611,7 @@ public partial class DelegateApiTests
     {
         #region delegate-api-implicit-conversion
         var stub = new Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns((a, b) => a + b);
+        stub.Interceptor.Return((a, b) => a + b);
 
         // Implicit conversion — no cast needed
         ArithmeticOperation op = stub;
@@ -635,8 +635,8 @@ public partial class DelegateApiTests
         var stub = new Stubs.ArithmeticOperation();
 
         #region delegate-api-when-chains-returning
-        stub.Interceptor.When(1, 2).Returns(100)
-            .ThenWhen(3, 4).Returns(200)
+        stub.Interceptor.When(1, 2).Return(100)
+            .ThenWhen(3, 4).Return(200)
             .ThenCall((a, b) => a + b);
         #endregion
 
@@ -653,8 +653,8 @@ public partial class DelegateApiTests
         var calls = new List<string>();
 
         #region delegate-api-when-chains-void
-        stub.Interceptor.When(1, 2).Execute((a, b) => calls.Add("first"))
-            .ThenWhen(3, 4).Execute((a, b) => calls.Add("second"));
+        stub.Interceptor.When(1, 2).Call((a, b) => calls.Add("first"))
+            .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
         #endregion
 
         VoidArithmeticOperation op = stub;
@@ -678,7 +678,7 @@ public class TrackingObjectsTests
 
         // Interceptor: stub.GetById
         // Tracking object: getTracking
-        var getTracking = stub.GetById.Returns((id) => new User { Id = id });
+        var getTracking = stub.GetById.Return((id) => new User { Id = id });
 
         // Call the method
         IApiMethodRepo repo = stub;

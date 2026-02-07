@@ -121,15 +121,15 @@ public class NSubstituteTypeSafetyTests
 public class KnockOffTypeSafetyTests
 {
     [Fact]
-    public void KnockOff_OnCall_ParametersAreTyped()
+    public void KnockOff_Return_ParametersAreTyped()
     {
         #region type-safety-knockoff-oncall-typed
-        // KnockOff — OnCall parameters are generated from the method signature
+        // KnockOff — Return parameters are generated from the method signature
         var stub = new TypeSafeCalcStub();
 
         // (int a, int b) — types and names come from Add(int a, int b)
         // Wrong types here cause a COMPILE error, not a runtime error
-        stub.Add.Returns((a, b) => a + b);
+        stub.Add.Return((a, b) => a + b);
 
         ITypeSafeCalc calc = stub;
         Assert.Equal(3, calc.Add(1, 2));
@@ -145,7 +145,7 @@ public class KnockOffTypeSafetyTests
 
         // (string firstName, string lastName) — both parameters are named and typed
         // No ambiguity: each parameter is a separate lambda argument
-        stub.Validate.When((firstName, lastName) => firstName.Length > 0).Returns(true);
+        stub.Validate.When((firstName, lastName) => firstName.Length > 0).Return(true);
 
         ITypeSafeValidator validator = stub;
         Assert.True(validator.Validate("Jane", "Doe"));

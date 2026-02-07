@@ -7,7 +7,7 @@ namespace KnockOff.Model.Shared;
 /// Unified model for method interceptor generation.
 /// Used by both inline and flat renderers via MethodInterceptorRenderer.
 /// Contains all information needed to render a method interceptor class
-/// with OnCall() methods, tracking, sequences, and verification.
+/// with Call() methods, tracking, sequences, and verification.
 /// </summary>
 internal sealed record UnifiedMethodInterceptorModel(
     // Identity
@@ -35,8 +35,8 @@ internal sealed record UnifiedMethodInterceptorModel(
     string ReturnType,
     /// <summary>Whether single-signature method returns void.</summary>
     bool IsVoid,
-    /// <summary>OnCall delegate type for single-signature methods.</summary>
-    string OnCallDelegateType,
+    /// <summary>Call delegate type for single-signature methods.</summary>
+    string CallDelegateType,
     /// <summary>Whether a custom delegate is needed (vs Func/Action).</summary>
     bool NeedsCustomDelegate,
     /// <summary>Custom delegate signature if needed.</summary>
@@ -45,7 +45,7 @@ internal sealed record UnifiedMethodInterceptorModel(
     string? LastArgType,
     /// <summary>LastArgs tuple type for multiple params, null otherwise.</summary>
     string? LastArgsType,
-    /// <summary>IMethodCallBuilder interface type for OnCall return type.</summary>
+    /// <summary>IMethodCallBuilder interface type for Call return type.</summary>
     string BuilderInterface,
     /// <summary>Default expression when no callback configured.</summary>
     string DefaultExpression,

@@ -28,7 +28,7 @@ internal sealed record MethodOverloadSignature(
     string? LastArgType,
     /// <summary>LastArgs tuple type for multiple params, null otherwise.</summary>
     string? LastArgsType,
-    /// <summary>IMethodCallBuilder interface type for OnCall return type.</summary>
+    /// <summary>IMethodCallBuilder interface type for Call return type.</summary>
     string BuilderInterface,
     /// <summary>Default expression when no callback configured.</summary>
     string DefaultExpression,

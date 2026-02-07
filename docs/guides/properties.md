@@ -69,7 +69,7 @@ Get callbacks can access other interceptors on the stub to create state-dependen
 // Get checks the tracked state
 stub.IsReady.Get(() => isInitialized);
 // Initialize method updates the tracked state
-stub.Initialize.Execute(() => { isInitialized = true; });
+stub.Initialize.Call(() => { isInitialized = true; });
 ```
 <!-- endSnippet -->
 
@@ -488,7 +488,7 @@ var connectionStrings = new List<string>();
 stub.ConnectionString.Set((value) => connectionStrings.Add(value));
 
 // Method callback updates the tracked state
-stub.Connect.Execute(() => { isConnected = true; });
+stub.Connect.Call(() => { isConnected = true; });
 ```
 <!-- endSnippet -->
 

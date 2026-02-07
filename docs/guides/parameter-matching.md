@@ -8,12 +8,12 @@ The `When()` API provides parameter-specific matching for method calls. Instead 
 
 ## The Problem: One Callback For All Arguments
 
-When using `Returns(callback)` or `Returns(value)`, every call to the method uses the same callback or value:
+When using `Return(callback)` or `Return(value)`, every call to the method uses the same callback or value:
 
 <!-- snippet: when-problem-one-callback-all-args -->
 ```cs
 // Without When(): callback must handle all argument combinations
-stub.Calculate.Returns((a, b) =>
+stub.Calculate.Return((a, b) =>
 {
     // Complex branching logic inside callback
     if (a == 5 && b == 10)
@@ -39,7 +39,7 @@ The callback must inspect parameters and branch on logic. When() solves this by 
 <!-- snippet: when-solution-match-then-respond -->
 ```cs
 // With When(): match arguments, then configure response
-stub.Calculate.When(5, 10).Returns(50);
+stub.Calculate.When(5, 10).Return(50);
 ```
 <!-- endSnippet -->
 
@@ -56,8 +56,8 @@ Match exact parameter values with `When()`:
 <!-- snippet: when-basic-value-matching -->
 ```cs
 // Configure different returns for different argument values
-stub.Add.When(1, 2).Returns(100);
-stub.Add.When(3, 4).Returns(200);
+stub.Add.When(1, 2).Return(100);
+stub.Add.When(3, 4).Return(200);
 ```
 <!-- endSnippet -->
 
@@ -70,7 +70,7 @@ Match based on conditions using a predicate:
 <!-- snippet: when-basic-predicate-matching -->
 ```cs
 // Match based on condition
-stub.Add.When((a, b) => a > 10).Returns(999);
+stub.Add.When((a, b) => a > 10).Return(999);
 ```
 <!-- endSnippet -->
 
@@ -83,7 +83,7 @@ When() works with any parameter count:
 <!-- snippet: when-single-parameter -->
 ```cs
 // When() works with any parameter count
-stub.Transform.When("hello").Returns("HELLO");
+stub.Transform.When("hello").Return("HELLO");
 ```
 <!-- endSnippet -->
 
@@ -113,7 +113,7 @@ Add a callback with `.Call()` if you need side effects:
 <!-- snippet: when-void-with-callback -->
 ```cs
 // Call() adds callback for side effects
-stub.Process.When(1, 2).Execute((a, b) => calls.Add((a, b)));
+stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
 ```
 <!-- endSnippet -->
 
@@ -126,7 +126,7 @@ Predicates work the same as return methods:
 <!-- snippet: when-void-predicate -->
 ```cs
 // Predicate matching works the same for void methods
-stub.Process.When((a, b) => a > 10).Execute((a, b) => matched.Add((a, b)));
+stub.Process.When((a, b) => a > 10).Call((a, b) => matched.Add((a, b)));
 ```
 <!-- endSnippet -->
 
@@ -142,9 +142,9 @@ Chain multiple matchers with `ThenWhen()`:
 ```cs
 // Chain matchers with ThenWhen()
 stub.Add
-    .When(1, 2).Returns(100)
-    .ThenWhen(3, 4).Returns(200)
-    .ThenWhen((a, b) => a > 100).Returns(999);
+    .When(1, 2).Return(100)
+    .ThenWhen(3, 4).Return(200)
+    .ThenWhen((a, b) => a > 100).Return(999);
 ```
 <!-- endSnippet -->
 
@@ -163,9 +163,9 @@ Calling `When()` multiple times adds to the same chain:
 <!-- snippet: when-multiple-calls -->
 ```cs
 // Multiple When() calls build the same chain
-stub.Add.When(1, 2).Returns(100);
-stub.Add.When(2, 3).Returns(200);
-stub.Add.When(3, 4).Returns(300);
+stub.Add.When(1, 2).Return(100);
+stub.Add.When(2, 3).Return(200);
+stub.Add.When(3, 4).Return(300);
 ```
 <!-- endSnippet -->
 
@@ -183,7 +183,7 @@ Use `ThenCall()` to add an unconditional matcher that repeats forever:
 ```cs
 // ThenCall() is an unconditional terminal matcher
 stub.Add
-    .When(1, 2).Returns(100)
+    .When(1, 2).Return(100)
     .ThenCall((a, b) => a + b);
 ```
 <!-- endSnippet -->
@@ -201,8 +201,8 @@ Use `ThenNone()` to close the chain and fall through:
 <!-- snippet: when-thennone-exhaust -->
 ```cs
 // ThenNone() closes the chain and falls through
-stub.Add.When(1, 2).Returns(100).ThenNone();
-stub.Add.Returns(999);
+stub.Add.When(1, 2).Return(100).ThenNone();
+stub.Add.Return(999);
 ```
 <!-- endSnippet -->
 
@@ -221,18 +221,18 @@ When no When() matcher matches, the call falls through to other configured behav
 ### Priority Order
 
 1. **When()** - Highest priority when matched
-2. **Sequence (Returns(callback).ThenReturns(callback))** - Next priority
-3. **Returns(value)** - Simple return value
-4. **Returns(callback) / Execute(callback)** - General callback
+2. **Sequence (Return(callback).ThenReturn(callback))** - Next priority
+3. **Return(value)** - Simple return value
+4. **Return(callback) / Call(callback)** - General callback
 5. **Default** - `default(T)` in non-strict mode, exception in strict mode
 
 ### Falling Through To Returns()
 
 <!-- snippet: when-fallback-returns -->
 ```cs
-// When() falls through to Returns() when no match
-stub.Add.When(1, 2).Returns(100);
-stub.Add.Returns(999);
+// When() falls through to Return() when no match
+stub.Add.When(1, 2).Return(100);
+stub.Add.Return(999);
 ```
 <!-- endSnippet -->
 
@@ -240,9 +240,9 @@ stub.Add.Returns(999);
 
 <!-- snippet: when-fallback-oncall -->
 ```cs
-// When() falls through to OnCall() when no match
-stub.Add.When(1, 2).Returns(100);
-stub.Add.Returns((a, b) => a * b);
+// When() falls through to Return() when no match
+stub.Add.When(1, 2).Return(100);
+stub.Add.Return((a, b) => a * b);
 ```
 <!-- endSnippet -->
 
@@ -252,7 +252,7 @@ stub.Add.Returns((a, b) => a * b);
 ```cs
 // Non-strict mode: unmatched calls return default
 stub.Strict = false;
-stub.Add.When(1, 2).Returns(100);
+stub.Add.When(1, 2).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -262,7 +262,7 @@ In strict mode, unmatched calls throw:
 ```cs
 // Strict mode: unmatched calls throw
 stub.Strict = true;
-stub.Add.When(1, 2).Returns(100);
+stub.Add.When(1, 2).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -270,15 +270,15 @@ stub.Add.When(1, 2).Returns(100);
 
 ## Combining With Sequences
 
-When() has higher priority than sequences created via `Returns(callback).ThenReturns(callback)`:
+When() has higher priority than sequences created via `Return(callback).ThenReturn(callback)`:
 
 <!-- snippet: when-priority-over-sequence -->
 ```cs
-// Sequence configured via Returns().ThenReturns()
-stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2);
+// Sequence configured via Return().ThenReturn()
+stub.Add.Return((a, b) => 1).ThenReturn((a, b) => 2);
 
 // When() has higher priority
-stub.Add.When(1, 2).Returns(100);
+stub.Add.When(1, 2).Return(100);
 ```
 <!-- endSnippet -->
 
@@ -296,7 +296,7 @@ Call `.Verify()` on the returned chain to verify it reached a terminal state:
 ```cs
 // Chain with ThenCall terminal
 var chain = stub.Add
-    .When(1, 2).Returns(100)
+    .When(1, 2).Return(100)
     .ThenCall((a, b) => 999);
 ```
 <!-- endSnippet -->
@@ -312,8 +312,8 @@ Verification passes if the chain reaches:
 ```cs
 // Chain with multiple matchers
 var chain = stub.Add
-    .When(1, 2).Returns(100)
-    .ThenWhen(2, 3).Returns(200);
+    .When(1, 2).Return(100)
+    .ThenWhen(2, 3).Return(200);
 ```
 <!-- endSnippet -->
 
@@ -325,7 +325,7 @@ Mark a chain for batch verification:
 ```cs
 // Mark chain for batch verification
 stub.Add
-    .When(1, 2).Returns(100)
+    .When(1, 2).Return(100)
     .ThenCall((a, b) => 999)
     .Verifiable();
 ```
@@ -356,7 +356,7 @@ Call `Reset()` on the returned chain to restart from the beginning:
 ```cs
 // Chain tracks position - Reset() restarts from beginning
 var chain = stub.Add
-    .When(1, 2).Returns(100)
+    .When(1, 2).Return(100)
     .ThenCall((a, b) => 999);
 ```
 <!-- endSnippet -->
@@ -373,7 +373,7 @@ Calling `Reset()` on the interceptor also resets the When chain:
 ```cs
 // Interceptor Reset() also resets When chain
 stub.Add
-    .When(1, 2).Returns(100)
+    .When(1, 2).Return(100)
     .ThenCall((a, b) => 999);
 ```
 <!-- endSnippet -->
@@ -382,12 +382,12 @@ stub.Add
 
 ## Async Methods
 
-For async methods, `Returns()` automatically wraps the value with `Task.FromResult()`:
+For async methods, `Return()` automatically wraps the value with `Task.FromResult()`:
 
 <!-- snippet: when-async-autowrap -->
 ```cs
-// Returns() auto-wraps with Task.FromResult()
-stub.GetAsync.When("hello").Returns("HELLO");
+// Return() auto-wraps with Task.FromResult()
+stub.GetAsync.When("hello").Return("HELLO");
 ```
 <!-- endSnippet -->
 
@@ -395,9 +395,9 @@ stub.GetAsync.When("hello").Returns("HELLO");
 
 <!-- snippet: when-async-thencall -->
 ```cs
-// Returns() auto-wraps, ThenCall uses full delegate
+// Return() auto-wraps, ThenCall uses full delegate
 stub.GetAsync
-    .When("first").Returns("FIRST")
+    .When("first").Return("FIRST")
     .ThenCall(s => Task.FromResult(s.ToUpper()));
 ```
 <!-- endSnippet -->
@@ -406,9 +406,9 @@ stub.GetAsync
 
 ## When To Use When()
 
-Choose `When()` over `Returns(callback)` when you have these scenarios:
+Choose `When()` over `Return(callback)` when you have these scenarios:
 
-| Use When() | Use Returns(callback) |
+| Use When() | Use Return(callback) |
 |------------|--------------|
 | Multiple specific argument combinations with different responses | Single callback handles all arguments |
 | Sequential behavior (first call does X, second call does Y) | Same behavior for every call |
@@ -421,22 +421,22 @@ Choose `When()` over `Returns(callback)` when you have these scenarios:
 ```cs
 // Simulate a service that fails once then succeeds
 stub.FetchData
-    .When("user:123").Returns((string?)null)
-    .ThenWhen("user:123").Returns("{ \"name\": \"Alice\" }");
+    .When("user:123").Return((string?)null)
+    .ThenWhen("user:123").Return("{ \"name\": \"Alice\" }");
 ```
 <!-- endSnippet -->
 
 **Example: State Transitions**
 
-For parameterless methods, use `Returns(callback).ThenReturns(callback)` sequences instead of When() (When() requires parameters):
+For parameterless methods, use `Return(callback).ThenReturn(callback)` sequences instead of When() (When() requires parameters):
 
 <!-- snippet: when-usecase-state-transitions -->
 ```cs
-// For parameterless methods, use Returns().ThenReturns() sequences
+// For parameterless methods, use Return().ThenReturn() sequences
 stub.GetStatus
-    .Returns(() => "Pending")
-    .ThenReturns(() => "Processing")
-    .ThenReturns(() => "Complete");
+    .Return(() => "Pending")
+    .ThenReturn(() => "Processing")
+    .ThenReturn(() => "Complete");
 ```
 <!-- endSnippet -->
 
@@ -450,9 +450,9 @@ This example demonstrates When() in a realistic test scenario:
 ```cs
 // Payment gateway with different responses for specific amounts
 stub.ProcessPayment
-    .When(100m).Returns(new WhenPaymentResult { Success = true, Message = "Payment processed" })
-    .ThenWhen(0m).Returns(new WhenPaymentResult { Success = false, Message = "Invalid amount" })
-    .ThenWhen((amt) => amt > 1000m).Returns(new WhenPaymentResult { RequiresApproval = true })
+    .When(100m).Return(new WhenPaymentResult { Success = true, Message = "Payment processed" })
+    .ThenWhen(0m).Return(new WhenPaymentResult { Success = false, Message = "Invalid amount" })
+    .ThenWhen((amt) => amt > 1000m).Return(new WhenPaymentResult { RequiresApproval = true })
     .ThenCall((amt) => new WhenPaymentResult { Success = true, Message = $"Processed ${amt}" })
     .Verifiable();
 ```

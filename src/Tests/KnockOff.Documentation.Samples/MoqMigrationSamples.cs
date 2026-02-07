@@ -116,8 +116,8 @@ public class SetupMethodKnockOffTests
         var testUser = new User { Id = 42, Name = "Alice" };
 
         #region moq-migration-setup-method-knockoff
-        // OnCall with typed delegate - arguments available directly
-        stub.GetUser.Returns((id) => testUser);
+        // Return with typed delegate - arguments available directly
+        stub.GetUser.Return((id) => testUser);
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -146,7 +146,7 @@ public class MethodReturnsCombinedSamples
 
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
-        stub.GetUser.Returns((id) => testUser);
+        stub.GetUser.Return((id) => testUser);
         #endregion
 
         Assert.Equal("Alice", mock.Object.GetUser(1)?.Name);
@@ -250,7 +250,7 @@ public class VerifyCallsKnockOffTests
 
         #region moq-migration-verify-knockoff
         // Mark as verifiable during setup, then verify all at once
-        stub.SaveUser.Execute((user) => { }).Verifiable();
+        stub.SaveUser.Call((user) => { }).Verifiable();
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -278,13 +278,13 @@ public class VerificationCombinedSamples
 
         // KNOCKOFF (batch verification):
         var stub = new MoqUserRepoStub();
-        stub.SaveUser.Execute((user) => { }).Verifiable();
+        stub.SaveUser.Call((user) => { }).Verifiable();
         ((IMoqUserRepo)stub).SaveUser(new User { Name = "Bob" });
         stub.Verify();
 
         // KNOCKOFF (individual verification):
         var stub2 = new MoqUserRepoStub();
-        var tracking = stub2.SaveUser.Execute((user) => { });
+        var tracking = stub2.SaveUser.Call((user) => { });
         ((IMoqUserRepo)stub2).SaveUser(new User { Name = "Bob" });
         tracking.Verify(Times.Once);
         #endregion
@@ -326,7 +326,7 @@ public class AsyncMethodKnockOffTests
 
         #region moq-migration-async-knockoff
         // Use Task.FromResult to wrap the return value
-        stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -355,7 +355,7 @@ public class AsyncMethodsCombinedSamples
 
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
-        stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(testUser));
+        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
         #endregion
 
         var moqResult = await mock.Object.GetUserAsync(42);
@@ -403,8 +403,8 @@ public class CallbackKnockOffTests
         var savedUsers = new List<User>();
 
         #region moq-migration-callback-knockoff
-        // Logic goes directly in OnCall delegate
-        stub.SaveUser.Execute((user) => savedUsers.Add(user));
+        // Logic goes directly in Return delegate
+        stub.SaveUser.Call((user) => savedUsers.Add(user));
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -437,7 +437,7 @@ public class CallbacksCombinedSamples
 
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
-        stub.SaveUser.Execute((user) => knockoffSavedUsers.Add(user));
+        stub.SaveUser.Call((user) => knockoffSavedUsers.Add(user));
         #endregion
 
         mock.Object.SaveUser(new User { Name = "Alice" });
@@ -484,7 +484,7 @@ public class ArgumentMatchingKnockOffTests
 
         #region moq-migration-arguments-knockoff
         // Arguments available directly - use standard C# conditionals
-        stub.GetUser.Returns((id) =>
+        stub.GetUser.Return((id) =>
             id > 0 ? new User { Id = id, Name = "Valid User" } : null);
         #endregion
 
@@ -515,7 +515,7 @@ public class ArgumentMatchingCombinedSamples
 
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
-        stub.GetUser.Returns((id) =>
+        stub.GetUser.Return((id) =>
             id > 0 ? new User { Id = id, Name = "Valid" } : null);
         #endregion
 
@@ -548,7 +548,7 @@ public class SequencePatternCombinedSamples
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
         int callCount = 0;
-        stub.GetUser.Returns((id) =>
+        stub.GetUser.Return((id) =>
         {
             callCount++;
             return callCount == 1 ? firstUser : secondUser;
@@ -681,8 +681,8 @@ public class CompleteKnockOffTests
         var user = new User { Id = 1, Name = "Alice" };
 
         #region moq-migration-complete-knockoff
-        // OnCall with Verifiable marks for batch verification
-        _stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(user)).Verifiable();
+        // Return with Verifiable marks for batch verification
+        _stub.GetUserAsync.Return((id) => Task.FromResult<User?>(user)).Verifiable();
 
         var result = await _service.GetUserAsync(1);
 
@@ -697,7 +697,7 @@ public class CompleteKnockOffTests
     public void SaveUser_CallsRepository()
     {
         User? savedUser = null;
-        var tracking = _stub.SaveUser.Execute((user) =>
+        var tracking = _stub.SaveUser.Call((user) =>
         {
             savedUser = user;
         }).Verifiable();
@@ -735,7 +735,7 @@ public class CompleteMigrationCombinedExample
         var stub = new MoqUserRepoStub();
         var knockoffService = new UserServiceMigration(stub);
 
-        stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(user)).Verifiable();
+        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(user)).Verifiable();
 
         var knockoffResult = await knockoffService.GetUserAsync(1);
         stub.Verify();
@@ -763,7 +763,7 @@ partial class MoqUserRepoStubCorrect { }
 #endregion
 
 // =============================================================================
-// Common Gotchas - Wrong OnCall Signature
+// Common Gotchas - Wrong Return Signature
 // =============================================================================
 
 public class GotchaSignatureTests
@@ -776,12 +776,12 @@ public class GotchaSignatureTests
 
         #region moq-migration-gotcha-signature-wrong
         // Wrong: GetUser(int id) expects (int) callback
-        // stub.GetUser.OnCall(() => user);  // Compile error
+        // stub.GetUser.Return(() => user);  // Compile error
         #endregion
 
         #region moq-migration-gotcha-signature-correct
         // Correct
-        stub.GetUser.Returns((id) => user);
+        stub.GetUser.Return((id) => user);
         #endregion
     }
 }
@@ -826,13 +826,13 @@ public class GotchaAsyncAutoWrapTests
 
         #region moq-migration-gotcha-async-autowrap
         // Returns - auto-wraps in Task.FromResult
-        stub.GetUserAsync.Returns(user);
+        stub.GetUserAsync.Return(user);
 
         // Simplified callback - also auto-wraps (return unwrapped type)
-        stub.GetUserAsync.Returns((id) => user);
+        stub.GetUserAsync.Return((id) => user);
 
         // Only use Task.FromResult when callback needs actual async operations
-        stub.GetUserAsync.Returns(async (id) =>
+        stub.GetUserAsync.Return(async (id) =>
         {
             await Task.Delay(1); // Some actual async work
             return user;
@@ -857,14 +857,14 @@ public class MoqAsyncConfigOptionsTests
         var testUser = new User { Id = 42, Name = "Alice" };
 
         #region moq-gotcha-async-options
-        // 1. Returns() -- auto-wraps in Task.FromResult (recommended for fixed values)
-        stub.GetUserAsync.Returns(testUser);
+        // 1. Return() -- auto-wraps in Task.FromResult (recommended for fixed values)
+        stub.GetUserAsync.Return(testUser);
 
-        // 2. Returns() simplified -- callback returns unwrapped type, auto-wrapped
-        stub.GetUserAsync.Returns((id) => new User { Id = id });
+        // 2. Return() simplified -- callback returns unwrapped type, auto-wrapped
+        stub.GetUserAsync.Return((id) => new User { Id = id });
 
-        // 3. OnCall() full -- callback returns Task<T> directly
-        stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(testUser));
+        // 3. Return() full -- callback returns Task<T> directly
+        stub.GetUserAsync.Return((id) => Task.FromResult<User?>(testUser));
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -886,8 +886,8 @@ public class GotchaPropertyTests
         var stub = new MoqUserRepoStub();
 
         #region moq-migration-gotcha-property-wrong
-        // Wrong: OnCall is for methods
-        // stub.ConnectionString.OnCall(() => "connection");  // Compile error
+        // Wrong: Return is for methods
+        // stub.ConnectionString.Return(() => "connection");  // Compile error
         #endregion
 
         #region moq-migration-gotcha-property-correct
@@ -915,12 +915,12 @@ public class GotchaVoidMethodTests
 
         #region moq-migration-gotcha-void-wrong
         // Wrong: no delegate body
-        // stub.SaveUser.OnCall();  // Compile error
+        // stub.SaveUser.Return();  // Compile error
         #endregion
 
         #region moq-migration-gotcha-void-correct
         // Correct
-        stub.SaveUser.Execute((user) => { });
+        stub.SaveUser.Call((user) => { });
         #endregion
     }
 }
@@ -936,7 +936,7 @@ public class TimesMatcherTests
     {
         var mock = new Mock<IMoqUserRepo>();
         var stub = new MoqUserRepoStub();
-        stub.SaveUser.Execute((user) => { });
+        stub.SaveUser.Call((user) => { });
 
         // Call 3 times
         ((IMoqUserRepo)stub).SaveUser(new User { Name = "A" });

@@ -42,8 +42,8 @@ public class GenericInterfaceInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new EntityRepositoryStub();
-        stub.GetById.Returns((id) => _testEntity);
-        stub.GetAll.Returns(() => new[] { _testEntity });
+        stub.GetById.Return((id) => _testEntity);
+        stub.GetAll.Return(() => new[] { _testEntity });
         _knockOff = stub;
     }
 
@@ -88,8 +88,8 @@ public class GenericInterfaceSetupBenchmarks
     public EntityRepositoryStub KnockOff_SetupGenericRepository()
     {
         var stub = new EntityRepositoryStub();
-        stub.GetById.Returns((id) => _testEntity);
-        stub.GetAll.Returns(() => new[] { _testEntity });
+        stub.GetById.Return((id) => _testEntity);
+        stub.GetAll.Return(() => new[] { _testEntity });
         return stub;
     }
 }

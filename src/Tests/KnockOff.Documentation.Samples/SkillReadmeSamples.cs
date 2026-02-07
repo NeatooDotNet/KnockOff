@@ -29,30 +29,30 @@ public partial class RepoStub
 public class SkillReadmeUserMethodsTests
 {
     [Fact]
-    public void UserMethods_OnCallSupersedes()
+    public void UserMethods_ReturnSupersedes()
     {
         #region skill-readme-user-methods-usage
         var stub = new RepoStub();
 
-        // User override is fallback; OnCall supersedes it
-        stub.GetById.Returns(id => new User { Id = id, Name = "Override" });
+        // User override is fallback; Return supersedes it
+        stub.GetById.Return(id => new User { Id = id, Name = "Override" });
 
         // Returns for constant values (auto-wraps for async)
-        stub.GetById.Returns(new User { Id = 99 });
+        stub.GetById.Return(new User { Id = 99 });
         #endregion
 
         IRepo repo = stub;
         var user = repo.GetById(42);
 
         Assert.NotNull(user);
-        Assert.Equal(99, user.Id); // Returns() was set last
+        Assert.Equal(99, user.Id); // Return() was set last
     }
 
     [Fact]
     public void UserMethods_FallbackToUserOverride()
     {
         var stub = new RepoStub();
-        // No OnCall configured - falls back to user override
+        // No Return configured - falls back to user override
 
         IRepo repo = stub;
         var user = repo.GetById(42);
@@ -89,25 +89,25 @@ public class SkillReadmeMethodConfigTests
 
         #region skill-readme-method-config
         // Fixed value
-        stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
+        stub.GetUser.Return(new User { Id = 1, Name = "Alice" });
 
         // Dynamic callback
-        stub.GetUser.Returns((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Return((id) => new User { Id = id, Name = $"User{id}" });
 
         // Argument matching
-        stub.GetUser.When(42).Returns(adminUser);
-        stub.GetUser.When(id => id < 0).Returns(null);
+        stub.GetUser.When(42).Return(adminUser);
+        stub.GetUser.When(id => id < 0).Return(null);
 
         // Value sequences (NSubstitute-style) - repeats last after exhaustion
-        stub.GetNext.Returns(1, 2, 3);
+        stub.GetNext.Return(1, 2, 3);
         // Returns: 1, 2, 3, 3, 3... (repeats last value)
 
         // Mix callbacks with value sequences
-        stub.Add.Returns((a, b) => a + b).ThenReturns(100, 200);
+        stub.Add.Return((a, b) => a + b).ThenReturn(100, 200);
         // First call: computed. Then: 100, 200, 200, 200...
 
         // Use ThenDefault() to return default(T) instead of repeating
-        stub.GetNext.Returns(1, 2).ThenDefault();
+        stub.GetNext.Return(1, 2).ThenDefault();
         // Returns: 1, 2, 0, 0... (default after exhaustion)
         #endregion
 
@@ -124,7 +124,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
+        stub.GetUser.Return(new User { Id = 1, Name = "Alice" });
 
         IMethodConfigService svc = stub;
         var user = svc.GetUser(999);
@@ -139,7 +139,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.GetUser.Returns((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Return((id) => new User { Id = id, Name = $"User{id}" });
 
         IMethodConfigService svc = stub;
         var user = svc.GetUser(42);
@@ -155,8 +155,8 @@ public class SkillReadmeMethodConfigTests
         var stub = new MethodConfigStub();
         var adminUser = new User { Id = 42, Name = "Admin" };
 
-        stub.GetUser.When(42).Returns(adminUser);
-        stub.GetUser.When(id => id < 0).Returns(null);
+        stub.GetUser.When(42).Return(adminUser);
+        stub.GetUser.When(id => id < 0).Return(null);
 
         IMethodConfigService svc = stub;
 
@@ -173,7 +173,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.GetNext.Returns(1, 2, 3);
+        stub.GetNext.Return(1, 2, 3);
 
         IMethodConfigService svc = stub;
 
@@ -188,13 +188,13 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.Add.Returns((a, b) => a + b).ThenReturns(100, 200);
+        stub.Add.Return((a, b) => a + b).ThenReturn(100, 200);
 
         IMethodConfigService svc = stub;
 
         Assert.Equal(3, svc.Add(1, 2)); // Computed: 1 + 2
-        Assert.Equal(100, svc.Add(1, 2)); // First ThenReturns value
-        Assert.Equal(200, svc.Add(1, 2)); // Second ThenReturns value
+        Assert.Equal(100, svc.Add(1, 2)); // First ThenReturn value
+        Assert.Equal(200, svc.Add(1, 2)); // Second ThenReturn value
         Assert.Equal(200, svc.Add(1, 2)); // Repeats last
     }
 
@@ -203,7 +203,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.GetNext.Returns(1, 2).ThenDefault();
+        stub.GetNext.Return(1, 2).ThenDefault();
 
         IMethodConfigService svc = stub;
 
@@ -236,13 +236,13 @@ public class SkillReadmeVerificationTests
 
         #region skill-readme-verification
         // Mark for batch verification
-        stub.Save.Execute((user) => { }).Verifiable();
+        stub.Save.Call((user) => { }).Verifiable();
         svc.Save(new User { Id = 1 }); // Call the method
         stub.Verify();  // Checks all Verifiable() members
 
         // Or verify individually
         stub.Save.Reset(); // Reset for second pattern demo
-        var tracking = stub.Save.Execute((user) => { });
+        var tracking = stub.Save.Call((user) => { });
         svc.Save(new User { Id = 2 }); // Call the method
         tracking.Verify(Times.Once);
         #endregion
@@ -253,7 +253,7 @@ public class SkillReadmeVerificationTests
     {
         var stub = new SaverStub();
 
-        stub.Save.Execute((user) => { }).Verifiable();
+        stub.Save.Call((user) => { }).Verifiable();
 
         ISaver svc = stub;
         svc.Save(new User { Id = 1 });
@@ -266,7 +266,7 @@ public class SkillReadmeVerificationTests
     {
         var stub = new SaverStub();
 
-        var tracking = stub.Save.Execute((user) => { });
+        var tracking = stub.Save.Call((user) => { });
 
         ISaver svc = stub;
         svc.Save(new User { Id = 1 });

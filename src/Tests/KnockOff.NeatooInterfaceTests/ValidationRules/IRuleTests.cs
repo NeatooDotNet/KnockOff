@@ -99,7 +99,7 @@ public partial class IRuleTests
         var validateStub = new ValidateBaseStubForRule();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule.Returns((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.Return((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(validateStub, null);
 
@@ -116,7 +116,7 @@ public partial class IRuleTests
         using var cts = new CancellationTokenSource();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule.Returns((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.Return((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(validateStub, cts.Token);
 
@@ -131,7 +131,7 @@ public partial class IRuleTests
         IRule rule = stub;
         IValidateBase? capturedTarget = null;
 
-        stub.RunRule.Returns((target, token) =>
+        stub.RunRule.Return((target, token) =>
         {
             capturedTarget = target;
             return Task.FromResult<IRuleMessages>(RuleMessages.None);
@@ -152,7 +152,7 @@ public partial class IRuleTests
         var expectedMessages = new RuleMessages();
         expectedMessages.Add("Property", "Error message");
 
-        stub.RunRule.Returns((target, token) => Task.FromResult<IRuleMessages>(expectedMessages));
+        stub.RunRule.Return((target, token) => Task.FromResult<IRuleMessages>(expectedMessages));
 
         var validateStub = new ValidateBaseStubForRule();
         var result = await rule.RunRule(validateStub, null);
@@ -215,7 +215,7 @@ public partial class IRuleTests
         var validateStub = new ValidateBaseStubForRule();
 
         // Must provide OnCall for methods with return types
-        stub.RunRule.Returns((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        stub.RunRule.Return((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(validateStub, null);
         await rule.RunRule(validateStub, null);
@@ -289,7 +289,7 @@ public class IRuleStandaloneTests
         var validateStub = new ValidateBaseStubForRule();
 
         // Must provide OnCall for methods with return types
-        var tracking = stub.RunRule.Returns((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
+        var tracking = stub.RunRule.Return((target, token) => Task.FromResult<IRuleMessages>(RuleMessages.None));
 
         await rule.RunRule(validateStub, null);
 

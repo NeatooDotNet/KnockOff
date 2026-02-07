@@ -101,7 +101,7 @@ public class StrictModeStandaloneTests
     public void StrictMode_ConfiguredMethod_Works()
     {
         var stub = new StrictUserRepoStub();
-        stub.GetUser.Returns(new User { Id = 1, Name = "Test" });
+        stub.GetUser.Return(new User { Id = 1, Name = "Test" });
         IStrictUserRepo repo = stub;
 
         var user = repo.GetUser(1);

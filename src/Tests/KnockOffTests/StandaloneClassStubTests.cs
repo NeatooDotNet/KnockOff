@@ -150,7 +150,7 @@ public class StandaloneClassStubTests
 	{
 		var stub = new ServiceBaseStub();
 		var wasCalled = false;
-		stub.Initialize.Execute(() => wasCalled = true);
+		stub.Initialize.Call(() => wasCalled = true);
 
 		stub.Object.Initialize();
 
@@ -187,7 +187,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_AbstractMethod_OnCall_ReturnsCustomValue()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Execute.Returns((cmd) => cmd.Length);
+		stub.Execute.Return((cmd) => cmd.Length);
 
 		var result = stub.Object.Execute("hello");
 
@@ -237,7 +237,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_Reset_ClearsInterceptorState()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Execute.Returns((cmd) => 100);
+		stub.Execute.Return((cmd) => 100);
 
 		stub.Object.Execute("test");
 		stub.Object.Execute("test");
@@ -272,7 +272,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_Substitutability_PassToMethod()
 	{
 		var stub = new ServiceBaseStub("TestService");
-		stub.Execute.Returns((cmd) => cmd.Length * 10);
+		stub.Execute.Return((cmd) => cmd.Length * 10);
 
 		// Pass stub.Object to a method expecting ServiceBase
 		var result = ProcessService(stub.Object);
@@ -329,7 +329,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_Verify_PassesWhenVerifiablesCalled()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Execute.Returns((cmd) => 42).Verifiable();
+		stub.Execute.Return((cmd) => 42).Verifiable();
 
 		stub.Object.Execute("test");
 
@@ -340,7 +340,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_Verify_ThrowsWhenVerifiableNotCalled()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Execute.Returns((cmd) => 42).Verifiable();
+		stub.Execute.Return((cmd) => 42).Verifiable();
 		// Don't call Execute
 
 		Assert.Throws<VerificationException>(() => stub.Verify());
@@ -350,7 +350,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_VerifyAll_PassesWhenAllCalled()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Execute.Returns((cmd) => 42);
+		stub.Execute.Return((cmd) => 42);
 
 		stub.Object.Execute("test");
 
@@ -365,7 +365,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_Sequence_ReturnsValuesInOrder()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Execute.Returns((cmd) => 1).ThenReturns((cmd) => 2).ThenReturns((cmd) => 3);
+		stub.Execute.Return((cmd) => 1).ThenReturn((cmd) => 2).ThenReturn((cmd) => 3);
 
 		Assert.Equal(1, stub.Object.Execute("a"));
 		Assert.Equal(2, stub.Object.Execute("b"));
@@ -376,7 +376,7 @@ public class StandaloneClassStubTests
 	public void StandaloneClassStub_Sequence_RepeatsLastValue()
 	{
 		var stub = new ServiceBaseStub();
-		stub.Execute.Returns((cmd) => 1).ThenReturns((cmd) => 99);
+		stub.Execute.Return((cmd) => 1).ThenReturn((cmd) => 99);
 
 		Assert.Equal(1, stub.Object.Execute("a"));
 		Assert.Equal(99, stub.Object.Execute("b"));
@@ -392,7 +392,7 @@ public class StandaloneClassStubTests
 	{
 		var stub = new ServiceBaseStub();
 		stub.Name.Get(() => "test").Verifiable();
-		stub.Execute.Returns((cmd) => 42).Verifiable();
+		stub.Execute.Return((cmd) => 42).Verifiable();
 
 		_ = stub.Object.Name;
 		stub.Object.Execute("cmd");
@@ -444,7 +444,7 @@ public class AbstractStandaloneClassStubTests
 	public void AbstractStub_ReturningMethod_ReturnsCallback_WhenSet()
 	{
 		var stub = new AbstractServiceStub();
-		stub.ExecuteQuery.Returns((query) => query.Length);
+		stub.ExecuteQuery.Return((query) => query.Length);
 
 		var result = stub.Object.ExecuteQuery("SELECT 1");
 

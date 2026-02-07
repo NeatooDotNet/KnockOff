@@ -68,7 +68,7 @@ Configure and verify stub behavior through the generated interceptors:
 <!-- snippet: getting-started-standalone-use -->
 ```cs
 // Configure behavior and mark for verification
-stub.SaveUser.Returns((user) => true).Verifiable();
+stub.SaveUser.Return((user) => true).Verifiable();
 
 // Call the method through the interface
 IUserRepo repository = stub;
@@ -106,8 +106,8 @@ Instantiate and configure the generated stub:
 
 <!-- snippet: getting-started-inline-use -->
 ```cs
-// OnCall returns a tracking object for argument access
-var tracking = stub.Send.Execute((to, subject, body) => { }).Verifiable();
+// Call returns a tracking object for argument access
+var tracking = stub.Send.Call((to, subject, body) => { }).Verifiable();
 
 IEmailSvc emailService = stub;
 emailService.Send("user@example.com", "Welcome", "Hello!");
@@ -119,38 +119,38 @@ var args = tracking.LastArgs;
 
 ## Understanding Method Configuration
 
-KnockOff provides two methods for configuring stub behavior: `Returns(value/callback)` for non-void methods and `Execute(callback)` for void methods.
+KnockOff provides two methods for configuring stub behavior: `Return(value/callback)` for non-void methods and `Call(callback)` for void methods.
 
-### Returns - Simple Return Values
+### Return - Simple Return Values
 
-When your method needs to return a fixed value, use `Returns()`. KnockOff generates a `Returns(TReturn value)` method for all methods that return values:
+When your method needs to return a fixed value, use `Return()`. KnockOff generates a `Return(TReturn value)` method for all methods that return values:
 
 <!-- snippet: getting-started-value-overloads -->
 ```cs
-// Returns() - simple fixed value
-stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
+// Return() - simple fixed value
+stub.GetById.Return(new User { Id = 1, Name = "Alice" });
 
-// OnCall() - dynamic value based on arguments
-stub.GetById.Returns((id) => new User { Id = id, Name = "Dynamic" });
+// Return() - dynamic value based on arguments
+stub.GetById.Return((id) => new User { Id = id, Name = "Dynamic" });
 ```
 <!-- endSnippet -->
 
-**Key benefits of Returns(value)**:
+**Key benefits of Return(value)**:
 - Simpler syntax when you don't need dynamic logic
 - Still returns a tracking object for verification
 - Works with async methods (auto-wraps in Task.FromResult)
 
-### Returns(callback) - Dynamic Behavior
+### Return(callback) - Dynamic Behavior
 
-When you need to compute values based on arguments or implement conditional logic, use the callback overload of Returns:
+When you need to compute values based on arguments or implement conditional logic, use the callback overload of Return:
 
 <!-- snippet: getting-started-oncall-dynamic -->
 ```cs
-// Use Returns for fixed values
-stub.GetById.Returns(new User { Id = 1, Name = "Alice" });
+// Use Return for fixed values
+stub.GetById.Return(new User { Id = 1, Name = "Alice" });
 
-// Use OnCall for dynamic values, side effects, or conditional logic
-stub.GetById.Returns((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
+// Use Return for dynamic values, side effects, or conditional logic
+stub.GetById.Return((id) => new User { Id = id, Name = id > 100 ? "Admin" : "Regular" });
 
 // Both return tracking objects for verification
 ```
@@ -184,8 +184,8 @@ For async methods returning `Task<T>` or `ValueTask<T>`, KnockOff automatically 
 
 <!-- snippet: getting-started-async-wrapping -->
 ```cs
-// Returns() auto-wraps in Task.FromResult - no manual wrapping needed
-stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
+// Return() auto-wraps in Task.FromResult - no manual wrapping needed
+stub.GetUserAsync.Return(new User { Id = 1, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
@@ -195,8 +195,8 @@ When you need callback logic but don't need actual async operations, return the 
 
 <!-- snippet: async-task-simplified-callback -->
 ```cs
-// OnCall() with unwrapped return type - auto-wrapped in Task.FromResult
-stub.GetUserAsync.Returns((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+// Return() with unwrapped return type - auto-wrapped in Task.FromResult
+stub.GetUserAsync.Return((id) => new User { Id = id, Name = "Alice" }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -207,20 +207,20 @@ For `Task` or `ValueTask` methods (no return value), use `Action` callbacks - Kn
 <!-- snippet: async-task-simplified-void -->
 ```cs
 // Action callback for void async - Task.CompletedTask auto-returned
-stub.UpdateUserAsync.Execute((user) => updatedUsers.Add(user)).Verifiable();
+stub.UpdateUserAsync.Call((user) => updatedUsers.Add(user)).Verifiable();
 ```
 <!-- endSnippet -->
 
 You don't need to manually wrap values in `Task.FromResult` or return `Task.CompletedTask` - KnockOff handles this for you.
 
-### Decision Guide: Returns vs Execute
+### Decision Guide: Return vs Call
 
 | Syntax | Use When | Example |
 |--------|----------|---------|
-| `.Returns(value)` | Returning a fixed value | `stub.GetStatus.Returns("OK")` |
-| `.Returns(callback)` | Computing values from arguments | `stub.GetUser.Returns((id) => users[id])` |
-| `.Returns(callback)` | Conditional logic | `stub.IsValid.Returns((x) => x > 0)` |
-| `.Execute(callback)` | Side effects or tracking (void methods) | `stub.Save.Execute((u) => saved.Add(u))` |
+| `.Return(value)` | Returning a fixed value | `stub.GetStatus.Return("OK")` |
+| `.Return(callback)` | Computing values from arguments | `stub.GetUser.Return((id) => users[id])` |
+| `.Return(callback)` | Conditional logic | `stub.IsValid.Return((x) => x > 0)` |
+| `.Call(callback)` | Side effects or tracking (void methods) | `stub.Save.Call((u) => saved.Add(u))` |
 
 **Important**: Both syntaxes return tracking objects, so you can verify calls regardless of which you use.
 
@@ -251,7 +251,7 @@ The generated code is readable C# that mirrors your interface structure. You can
 Now that you've created your first stubs, explore more features:
 
 - **[Stub Patterns](guides/stub-patterns.md)** - Learn about all nine stub patterns (Standalone, Generic Standalone, Standalone Class, Generic Standalone Class, Inline Interface, Inline Class, Inline Delegate, Open Generic Interface, Open Generic Class)
-- **[Methods](guides/methods.md)** - Configure method behavior with Returns/Execute, track arguments, handle async methods
+- **[Methods](guides/methods.md)** - Configure method behavior with Return/Call, track arguments, handle async methods
 - **[Properties](guides/properties.md)** - Use Get/Set for properties, track access, configure backing values
 - **[Interceptor API Reference](reference/interceptor-api.md)** - Complete reference for the interceptor API
 

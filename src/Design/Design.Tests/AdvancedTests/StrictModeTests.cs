@@ -53,7 +53,7 @@ public class StrictModeTests
     public void StrictMode_ConfiguredMethodWorks()
     {
         var stub = new StrictModeDemo.Stubs.ICalculator(strict: true);
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
 
         ICalculator calc = stub;
 

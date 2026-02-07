@@ -45,7 +45,7 @@ public class KOPropertyCollisionTests
 	public void Collision_MethodWorksViaInterface()
 	{
 		var knockOff = new CollisionKnockOff();
-		var tracking = knockOff.DoWork.Execute(() => { });
+		var tracking = knockOff.DoWork.Call(() => { });
 		ICollision collision = knockOff;
 
 		collision.DoWork();
@@ -60,7 +60,7 @@ public class KOPropertyCollisionTests
 		ICollision collision = knockOff;
 		var callbackInvoked = false;
 
-		knockOff.DoWork.Execute(() =>
+		knockOff.DoWork.Call(() =>
 		{
 			callbackInvoked = true;
 		});

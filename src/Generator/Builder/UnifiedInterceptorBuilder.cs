@@ -46,9 +46,9 @@ internal static class UnifiedInterceptorBuilder
 		{
 			// Single-signature case
 			var sig = uniqueSignatures[0];
-			var onCallDelegateType = BuildOnCallDelegateType(methodName, sig, ownerClassName, ownerTypeParameters);
+			var callDelegateType = BuildCallDelegateType(methodName, sig, ownerClassName, ownerTypeParameters);
 			// Get the delegate type without nullable marker for builder interface
-			var delegateTypeForBuilder = onCallDelegateType.TrimEnd('?');
+			var delegateTypeForBuilder = callDelegateType.TrimEnd('?');
 			return new UnifiedMethodInterceptorModel(
 				InterceptorClassName: interceptorClassName,
 				MethodName: methodName,
@@ -60,7 +60,7 @@ internal static class UnifiedInterceptorBuilder
 				ParameterDeclarations: sig.ParameterDeclarations,
 				ReturnType: sig.ReturnType,
 				IsVoid: sig.IsVoid,
-				OnCallDelegateType: onCallDelegateType,
+				CallDelegateType: callDelegateType,
 				NeedsCustomDelegate: NeedsCustomDelegate(sig),
 				CustomDelegateSignature: BuildCustomDelegateSignature(methodName, sig, ownerClassName, ownerTypeParameters),
 				LastArgType: GetLastArgType(sig.TrackableParameters),
@@ -87,7 +87,7 @@ internal static class UnifiedInterceptorBuilder
 				ParameterDeclarations: first.ParameterDeclarations,
 				ReturnType: first.ReturnType,
 				IsVoid: first.IsVoid,
-				OnCallDelegateType: "",
+				CallDelegateType: "",
 				NeedsCustomDelegate: false,
 				CustomDelegateSignature: null,
 				LastArgType: null,
@@ -264,33 +264,33 @@ internal static class UnifiedInterceptorBuilder
 
 	/// <summary>
 	/// Determines the builder interface type based on trackable parameter count and void/non-void.
-	/// Non-void methods use IMethodReturnsBuilder, void methods use IMethodExecuteBuilder.
+	/// Non-void methods use IMethodReturnBuilder, void methods use IMethodCallBuilder.
 	/// </summary>
 	public static string GetBuilderInterface(EquatableArray<ParameterModel> trackableParams, string delegateType, bool isVoid)
 	{
 		if (isVoid)
 		{
 			if (trackableParams.Count == 0)
-				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}>";
+				return $"global::KnockOff.IMethodCallBuilder<{delegateType}>";
 			if (trackableParams.Count == 1)
 			{
 				var param = trackableParams.GetArray()![0];
-				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}, {param.Type}>";
+				return $"global::KnockOff.IMethodCallBuilder<{delegateType}, {param.Type}>";
 			}
 			var tupleType = GetLastArgsType(trackableParams);
-			return $"global::KnockOff.IMethodExecuteBuilderArgs<{delegateType}, {tupleType}>";
+			return $"global::KnockOff.IMethodCallBuilderArgs<{delegateType}, {tupleType}>";
 		}
 		else
 		{
 			if (trackableParams.Count == 0)
-				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}>";
+				return $"global::KnockOff.IMethodReturnBuilder<{delegateType}>";
 			if (trackableParams.Count == 1)
 			{
 				var param = trackableParams.GetArray()![0];
-				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}, {param.Type}>";
+				return $"global::KnockOff.IMethodReturnBuilder<{delegateType}, {param.Type}>";
 			}
 			var tupleType = GetLastArgsType(trackableParams);
-			return $"global::KnockOff.IMethodReturnsBuilderArgs<{delegateType}, {tupleType}>";
+			return $"global::KnockOff.IMethodReturnBuilderArgs<{delegateType}, {tupleType}>";
 		}
 	}
 
@@ -360,9 +360,9 @@ internal static class UnifiedInterceptorBuilder
 	}
 
 	/// <summary>
-	/// Builds the OnCall delegate type string.
+	/// Builds the Call delegate type string.
 	/// </summary>
-	public static string BuildOnCallDelegateType(
+	public static string BuildCallDelegateType(
 		string methodName,
 		MethodSignatureInfo sig,
 		string ownerClassName,

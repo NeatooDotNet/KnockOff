@@ -18,7 +18,7 @@ internal sealed record InlineMethodModel(
     bool IsVoid,
     /// <summary>Input parameters (excluding out parameters).</summary>
     EquatableArray<ParameterModel> InputParameters,
-    /// <summary>Delegate type for OnCall callback.</summary>
+    /// <summary>Delegate type for Call callback.</summary>
     string DelegateType,
     /// <summary>Parameter declarations for RecordCall.</summary>
     string RecordCallParameters,

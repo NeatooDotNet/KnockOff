@@ -120,9 +120,9 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.Returns(() => "first")
-			.ThenReturns(() => "second")
-			.ThenReturns(() => "third");
+		knockOff.GetOptional.Return(() => "first")
+			.ThenReturn(() => "second")
+			.ThenReturn(() => "third");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -135,9 +135,9 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var sequence = knockOff.GetOptional.Returns(() => "a")
-			.ThenReturns(() => "b")
-			.ThenReturns(() => "c");
+		var sequence = knockOff.GetOptional.Return(() => "a")
+			.ThenReturn(() => "b")
+			.ThenReturn(() => "c");
 
 		service.GetOptional();
 		service.GetOptional();
@@ -153,14 +153,14 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Set up sequence that will be exhausted
-		knockOff.GetOptional.Returns(() => "seq1").ThenReturns(() => "seq2");
+		knockOff.GetOptional.Return(() => "seq1").ThenReturn(() => "seq2");
 
 		// Consume the sequence
 		Assert.Equal("seq1", service.GetOptional());
 		Assert.Equal("seq2", service.GetOptional());
 
 		// Now configure with value - clears sequence
-		knockOff.GetOptional.Returns("after sequence");
+		knockOff.GetOptional.Return("after sequence");
 
 		Assert.Equal("after sequence", service.GetOptional());
 		Assert.Equal("after sequence", service.GetOptional());
@@ -176,9 +176,9 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		knockOff.GetRequiredAsync.Returns(() => Task.FromResult("first"))
-			.ThenReturns(() => Task.FromResult("second"))
-			.ThenReturns(() => Task.FromResult("third"));
+		knockOff.GetRequiredAsync.Return(() => Task.FromResult("first"))
+			.ThenReturn(() => Task.FromResult("second"))
+			.ThenReturn(() => Task.FromResult("third"));
 
 		Assert.Equal("first", await service.GetRequiredAsync());
 		Assert.Equal("second", await service.GetRequiredAsync());
@@ -292,7 +292,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.Returns(() => "repeating");
+		knockOff.GetOptional.Return(() => "repeating");
 
 		// OnCall without ThenCall repeats the same callback forever
 		Assert.Equal("repeating", service.GetOptional());
@@ -307,7 +307,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Create sequence with ThenCall to enable exhaustion
-		knockOff.GetOptional.Returns(() => "first").ThenReturns(() => "second");
+		knockOff.GetOptional.Return(() => "first").ThenReturn(() => "second");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -323,7 +323,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Create sequence with ThenDefault() to return default after exhaustion
-		knockOff.GetOptional.Returns(() => "first").ThenReturns(() => "second").ThenDefault();
+		knockOff.GetOptional.Return(() => "first").ThenReturn(() => "second").ThenDefault();
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -339,7 +339,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Create sequence with ThenCall to enable exhaustion
-		knockOff.GetOptional.Returns(() => "first").ThenReturns(() => "second");
+		knockOff.GetOptional.Return(() => "first").ThenReturn(() => "second");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -355,7 +355,7 @@ public partial class SequenceValueOverloadTests
 	/// Tests for method sequence value overloads (ThenReturns).
 	/// Phase 2 of method-sequence-value-overloads feature.
 	///
-	/// DESIGN NOTE: Returns().ThenReturns() is NOT supported by design.
+	/// DESIGN NOTE: Returns().ThenReturn() is NOT supported by design.
 	/// ThenReturns is available on sequences started with OnCall().
 	/// Use OnCall(() => value) to start a sequence with a constant value.
 	/// </summary>
@@ -367,9 +367,9 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// OnCall starts the sequence, ThenReturns adds values to it
-		knockOff.GetOptional.Returns(() => "first")
-			.ThenReturns("second")
-			.ThenReturns("third");
+		knockOff.GetOptional.Return(() => "first")
+			.ThenReturn("second")
+			.ThenReturn("third");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -383,10 +383,10 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Mix callbacks and values in the same sequence
-		knockOff.GetOptional.Returns(() => "callback first")
-			.ThenReturns("value second")
-			.ThenReturns(() => "callback third")
-			.ThenReturns("value fourth");
+		knockOff.GetOptional.Return(() => "callback first")
+			.ThenReturn("value second")
+			.ThenReturn(() => "callback third")
+			.ThenReturn("value fourth");
 
 		Assert.Equal("callback first", service.GetOptional());
 		Assert.Equal("value second", service.GetOptional());
@@ -401,9 +401,9 @@ public partial class SequenceValueOverloadTests
 		IAsyncService service = knockOff;
 
 		// ThenReturns for Task<T> methods auto-wraps with Task.FromResult
-		knockOff.GetRequiredAsync.Returns(() => Task.FromResult("first"))
-			.ThenReturns("second")
-			.ThenReturns("third");
+		knockOff.GetRequiredAsync.Return(() => Task.FromResult("first"))
+			.ThenReturn("second")
+			.ThenReturn("third");
 
 		Assert.Equal("first", await service.GetRequiredAsync());
 		Assert.Equal("second", await service.GetRequiredAsync());
@@ -417,9 +417,9 @@ public partial class SequenceValueOverloadTests
 		IValueTaskMethodService service = knockOff;
 
 		// ThenReturns for ValueTask<T> methods auto-wraps with new ValueTask<T>(value)
-		knockOff.GetValueAsync.Returns(() => new ValueTask<string>("first"))
-			.ThenReturns("second")
-			.ThenReturns("third");
+		knockOff.GetValueAsync.Return(() => new ValueTask<string>("first"))
+			.ThenReturn("second")
+			.ThenReturn("third");
 
 		Assert.Equal("first", await service.GetValueAsync());
 		Assert.Equal("second", await service.GetValueAsync());
@@ -432,9 +432,9 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var sequence = knockOff.GetOptional.Returns(() => "a")
-			.ThenReturns("b")
-			.ThenReturns("c");
+		var sequence = knockOff.GetOptional.Return(() => "a")
+			.ThenReturn("b")
+			.ThenReturn("c");
 
 		service.GetOptional();
 		service.GetOptional();
@@ -452,7 +452,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Create sequence with ThenReturns to enable exhaustion
-		knockOff.GetOptional.Returns(() => "first").ThenReturns("second");
+		knockOff.GetOptional.Return(() => "first").ThenReturn("second");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -468,7 +468,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Create sequence with ThenDefault() to return default after exhaustion
-		knockOff.GetOptional.Returns(() => "first").ThenReturns("second").ThenDefault();
+		knockOff.GetOptional.Return(() => "first").ThenReturn("second").ThenDefault();
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -484,7 +484,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Create sequence with ThenReturns to enable exhaustion
-		knockOff.GetOptional.Returns(() => "first").ThenReturns("second");
+		knockOff.GetOptional.Return(() => "first").ThenReturn("second");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -499,9 +499,9 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// ThenReturns with null should work (may need cast for nullable types)
-		knockOff.GetOptional.Returns(() => "first")
-			.ThenReturns((string?)null)
-			.ThenReturns("third");
+		knockOff.GetOptional.Return(() => "first")
+			.ThenReturn((string?)null)
+			.ThenReturn("third");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Null(service.GetOptional());
@@ -524,7 +524,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Returns with params creates a sequence: first value, then rest values
-		knockOff.GetOptional.Returns("first", "second", "third");
+		knockOff.GetOptional.Return("first", "second", "third");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -542,7 +542,7 @@ public partial class SequenceValueOverloadTests
 
 		// Single value uses non-params overload which returns MethodCallBuilderImpl
 		// We can verify this by checking that the value repeats forever (not exhausted)
-		knockOff.GetOptional.Returns("single");
+		knockOff.GetOptional.Return("single");
 
 		Assert.Equal("single", service.GetOptional());
 		Assert.Equal("single", service.GetOptional());
@@ -558,7 +558,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Two values uses params overload, creating a sequence
-		knockOff.GetOptional.Returns("first", "second");
+		knockOff.GetOptional.Return("first", "second");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -573,7 +573,7 @@ public partial class SequenceValueOverloadTests
 		IAsyncService service = knockOff;
 
 		// For Task<T> methods, params Returns auto-wraps with Task.FromResult
-		knockOff.GetRequiredAsync.Returns("first", "second", "third");
+		knockOff.GetRequiredAsync.Return("first", "second", "third");
 
 		Assert.Equal("first", await service.GetRequiredAsync());
 		Assert.Equal("second", await service.GetRequiredAsync());
@@ -589,7 +589,7 @@ public partial class SequenceValueOverloadTests
 		IValueTaskMethodService service = knockOff;
 
 		// For ValueTask<T> methods, params Returns auto-wraps with new ValueTask<T>(value)
-		knockOff.GetValueAsync.Returns("first", "second", "third");
+		knockOff.GetValueAsync.Return("first", "second", "third");
 
 		Assert.Equal("first", await service.GetValueAsync());
 		Assert.Equal("second", await service.GetValueAsync());
@@ -605,8 +605,8 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// OnCall starts the sequence, ThenReturns(params) adds multiple values
-		knockOff.GetOptional.Returns(() => "callback first")
-			.ThenReturns("second", "third", "fourth");
+		knockOff.GetOptional.Return(() => "callback first")
+			.ThenReturn("second", "third", "fourth");
 
 		Assert.Equal("callback first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -623,8 +623,8 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Empty params array elevates to sequence mode but adds no values
-		knockOff.GetOptional.Returns(() => "only")
-			.ThenReturns(new string?[] { });
+		knockOff.GetOptional.Return(() => "only")
+			.ThenReturn(new string?[] { });
 
 		Assert.Equal("only", service.GetOptional());
 		// No additional sequence items, repeats the only value
@@ -638,9 +638,9 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Mix single value calls with params calls
-		knockOff.GetOptional.Returns(() => "first")
-			.ThenReturns("second")  // single value
-			.ThenReturns("third", "fourth", "fifth"); // params
+		knockOff.GetOptional.Return(() => "first")
+			.ThenReturn("second")  // single value
+			.ThenReturn("third", "fourth", "fifth"); // params
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -681,7 +681,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Verify NSubstitute-like behavior: after exhaustion, repeats last value
-		knockOff.GetOptional.Returns("a", "b", "c");
+		knockOff.GetOptional.Return("a", "b", "c");
 
 		Assert.Equal("a", service.GetOptional());
 		Assert.Equal("b", service.GetOptional());
@@ -700,7 +700,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// In strict mode, sequence exhaustion throws
-		knockOff.GetOptional.Returns("first", "second");
+		knockOff.GetOptional.Return("first", "second");
 
 		Assert.Equal("first", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -715,7 +715,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Returns(null, "a", null) works for nullable types
-		knockOff.GetOptional.Returns((string?)null, "middle", (string?)null);
+		knockOff.GetOptional.Return((string?)null, "middle", (string?)null);
 
 		Assert.Null(service.GetOptional());
 		Assert.Equal("middle", service.GetOptional());
@@ -736,7 +736,7 @@ public partial class SequenceValueOverloadTests
 		var enumerable2 = CreateAsyncEnumerable("b1", "b2");
 		var enumerable3 = CreateAsyncEnumerable("c1", "c2");
 
-		knockOff.GetItemsAsync.Returns(enumerable1, enumerable2, enumerable3);
+		knockOff.GetItemsAsync.Return(enumerable1, enumerable2, enumerable3);
 
 		// Each call returns a different IAsyncEnumerable<string> instance
 		Assert.Same(enumerable1, service.GetItemsAsync());
@@ -768,14 +768,14 @@ public partial class SequenceValueOverloadTests
 	[Fact]
 	public void Returns_ChainedWithThenReturns_UsesOnCall()
 	{
-		// Design note: Returns(value).ThenReturns() works when using OnCall pattern.
-		// For sequence after Returns(value), use OnCall(() => value).ThenReturns()
+		// Design note: Returns(value).ThenReturn() works when using OnCall pattern.
+		// For sequence after Returns(value), use OnCall(() => value).ThenReturn()
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
 		// Start with OnCall for the first value, then chain ThenReturns
-		knockOff.GetOptional.Returns(() => "value")
-			.ThenReturns("second", "third");
+		knockOff.GetOptional.Return(() => "value")
+			.ThenReturn("second", "third");
 
 		Assert.Equal("value", service.GetOptional());
 		Assert.Equal("second", service.GetOptional());
@@ -789,7 +789,7 @@ public partial class SequenceValueOverloadTests
 		ISampleService service = knockOff;
 
 		// Params Returns returns MethodSequenceImpl which has Verify()
-		var seq = knockOff.GetOptional.Returns("first", "second", "third");
+		var seq = knockOff.GetOptional.Return("first", "second", "third");
 
 		service.GetOptional();
 		service.GetOptional();

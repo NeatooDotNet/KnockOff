@@ -41,7 +41,7 @@ public partial class VerifyAllBehaviorTests
 	{
 		// Arrange
 		var stub = new Stubs.IVerifyAllTestService().Strict();
-		stub.GetData.Returns((id) => $"Data-{id}");
+		stub.GetData.Return((id) => $"Data-{id}");
 
 		// Act - don't call anything
 
@@ -60,7 +60,7 @@ public partial class VerifyAllBehaviorTests
 	{
 		// Arrange
 		var stub = new Stubs.IVerifyAllTestService().Strict();
-		stub.GetData.Returns((id) => $"Data-{id}");
+		stub.GetData.Return((id) => $"Data-{id}");
 
 		// Act - call the configured method
 		IVerifyAllTestService service = stub;
@@ -79,8 +79,8 @@ public partial class VerifyAllBehaviorTests
 	{
 		// Arrange
 		var stub = new Stubs.IVerifyAllTestService().Strict();
-		stub.GetData.Returns((id) => $"Data-{id}");
-		stub.SaveData.Execute((data) => { });
+		stub.GetData.Return((id) => $"Data-{id}");
+		stub.SaveData.Call((data) => { });
 
 		// Act - only call GetData, not SaveData
 		IVerifyAllTestService service = stub;
@@ -136,7 +136,7 @@ public partial class VerifyAllBehaviorTests
 	{
 		// Arrange
 		var stub = new Stubs.IVerifyAllTestService().Strict();
-		stub.GetData.Returns((id) => $"Data-{id}").Verifiable();
+		stub.GetData.Return((id) => $"Data-{id}").Verifiable();
 
 		// Act - don't call anything
 
@@ -155,7 +155,7 @@ public partial class VerifyAllBehaviorTests
 	{
 		// Arrange
 		var stub = new Stubs.IVerifyAllTestService().Strict();
-		stub.GetData.Returns((id) => $"Data-{id}"); // No .Verifiable()
+		stub.GetData.Return((id) => $"Data-{id}"); // No .Verifiable()
 
 		// Act - don't call anything
 

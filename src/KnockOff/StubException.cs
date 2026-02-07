@@ -28,7 +28,7 @@ public class StubException : Exception
     {
         return new StubException(
             $"{interfaceName}.{memberName} invocation failed with strict behavior. " +
-            "Configure OnCall before invoking.");
+            "Configure the method before invoking.");
     }
 
     /// <summary>

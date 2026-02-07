@@ -30,9 +30,9 @@ public partial class InlineClassOverloadTests
         var stub = new Stubs.ProcessorBase();
 
         // All Process overloads share one interceptor with multiple OnCall overloads
-        stub.Process.Returns(() => "no-params");
-        stub.Process.Returns((string message) => $"message: {message}");
-        stub.Process.Returns((string message, int priority) => $"message-priority: {message}, {priority}");
+        stub.Process.Return(() => "no-params");
+        stub.Process.Return((string message) => $"message: {message}");
+        stub.Process.Return((string message, int priority) => $"message-priority: {message}, {priority}");
 
         ProcessorBase processor = stub.Object;
 
@@ -48,9 +48,9 @@ public partial class InlineClassOverloadTests
         // Arrange
         var stub = new Stubs.ProcessorBase();
 
-        var tracking0 = stub.Process.Returns(() => "0");
-        var tracking1 = stub.Process.Returns((string message) => "1");
-        var tracking2 = stub.Process.Returns((string message, int priority) => "2");
+        var tracking0 = stub.Process.Return(() => "0");
+        var tracking1 = stub.Process.Return((string message) => "1");
+        var tracking2 = stub.Process.Return((string message, int priority) => "2");
 
         ProcessorBase processor = stub.Object;
 
@@ -74,9 +74,9 @@ public partial class InlineClassOverloadTests
         // Arrange
         var stub = new Stubs.ProcessorBase();
 
-        stub.Process.Returns(() => "0");
-        stub.Process.Returns((string message) => "1");
-        stub.Process.Returns((string message, int priority) => "2");
+        stub.Process.Return(() => "0");
+        stub.Process.Return((string message) => "1");
+        stub.Process.Return((string message, int priority) => "2");
 
         ProcessorBase processor = stub.Object;
 
@@ -95,8 +95,8 @@ public partial class InlineClassOverloadTests
         // Arrange
         var stub = new Stubs.ProcessorBase();
 
-        stub.Process.Returns((string message) => "default");
-        stub.Process.When("special").Returns("SPECIAL");
+        stub.Process.Return((string message) => "default");
+        stub.Process.When("special").Return("SPECIAL");
 
         ProcessorBase processor = stub.Object;
 
@@ -112,13 +112,13 @@ public partial class InlineClassOverloadTests
         var stub = new Stubs.ProcessorBase();
 
         stub.Process
-            .Returns(() => "first")
-            .ThenReturns("second")
-            .ThenReturns("third");
+            .Return(() => "first")
+            .ThenReturn("second")
+            .ThenReturn("third");
 
         stub.Process
-            .Returns((string message) => "A")
-            .ThenReturns("B");
+            .Return((string message) => "A")
+            .ThenReturn("B");
 
         ProcessorBase processor = stub.Object;
 
@@ -143,8 +143,8 @@ public partial class InlineClassOverloadTests
         // Transform(int) returns string, Transform(string) returns int
         // Different return types with different param types - C# can distinguish the delegates
         // OnCall(Func<int,string>) vs OnCall(Func<string,int>) are distinguishable
-        stub.Transform.Returns((int value) => $"int-to-string: {value}");
-        stub.Transform.Returns((string text) => text.Length * 10);
+        stub.Transform.Return((int value) => $"int-to-string: {value}");
+        stub.Transform.Return((string text) => text.Length * 10);
 
         ProcessorBase processor = stub.Object;
 
@@ -163,8 +163,8 @@ public partial class InlineClassOverloadTests
         // Arrange
         var stub = new Stubs.ProcessorBase();
 
-        var tracking1 = stub.Transform.Returns((int value) => "x");
-        var tracking2 = stub.Transform.Returns((string text) => 0);
+        var tracking1 = stub.Transform.Return((int value) => "x");
+        var tracking2 = stub.Transform.Return((string text) => 0);
 
         ProcessorBase processor = stub.Object;
 
@@ -190,8 +190,8 @@ public partial class InlineClassOverloadTests
         var stub = new Stubs.ProcessorBase();
 
         // Both return int, different param counts - compatible
-        stub.Calculate.Returns((int x) => x * 2);
-        stub.Calculate.Returns((int x, int y) => x * y);
+        stub.Calculate.Return((int x) => x * 2);
+        stub.Calculate.Return((int x, int y) => x * y);
 
         ProcessorBase processor = stub.Object;
 
@@ -211,7 +211,7 @@ public partial class InlineClassOverloadTests
         var stub = new Stubs.ProcessorBase();
 
         // Only configure one overload
-        stub.Process.Returns(() => "configured");
+        stub.Process.Return(() => "configured");
         // Other overloads are NOT configured
 
         ProcessorBase processor = stub.Object;
@@ -236,7 +236,7 @@ public partial class InlineClassOverloadTests
         var stub = new Stubs.ProcessorBase().Strict();
 
         // Configure only one overload
-        stub.Process.Returns(() => "configured");
+        stub.Process.Return(() => "configured");
 
         ProcessorBase processor = stub.Object;
 

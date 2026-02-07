@@ -73,7 +73,7 @@ public partial class CalculatorStub : ICalculator
     //   }
     //
     // WHY NOT: The whole point of KnockOff is to generate the implementation.
-    // Users configure behavior via interceptors (stub.Add.Returns(42)), not
+    // Users configure behavior via interceptors (stub.Add.Return(42)), not
     // by writing the implementation code themselves.
 
     // Users can add custom methods or state to standalone stubs.
@@ -149,8 +149,8 @@ public partial class CalculatorStub : ICalculator
 //   var orderRepo = new RepositoryStub<Order>();
 //
 //   // Configure each stub independently
-//   userRepo.GetById.Returns((id) => new User { Id = id, Name = "Test" });
-//   productRepo.GetById.Returns((id) => new Product { Id = id, Price = 9.99m });
+//   userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" });
+//   productRepo.GetById.Return((id) => new Product { Id = id, Price = 9.99m });
 //
 //   // Use as interface implementations
 //   IRepository<User> userService = userRepo;
@@ -333,8 +333,8 @@ public partial class StandaloneServiceStub
 //   var productRepo = new RepositoryStub<Product>();
 //
 //   // Configure each stub independently
-//   userRepo.GetById.Returns((id) => new User { Id = id, Name = "Test" });
-//   productRepo.GetById.Returns((id) => new Product { Id = id, Price = 9.99m });
+//   userRepo.GetById.Return((id) => new User { Id = id, Name = "Test" });
+//   productRepo.GetById.Return((id) => new Product { Id = id, Price = 9.99m });
 //
 //   // Use .Object to get the actual class instance
 //   RepositoryBase<User> userService = userRepo.Object;
@@ -458,7 +458,7 @@ public partial class InlineInterfaceExample
         ICalculator calculator = stub;
 
         // Configure via interceptors
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
     }
 }
 
@@ -523,7 +523,7 @@ public partial class InlineClassExample
 
         // Configure via interceptors
         stub.Name.Get("TestService");
-        stub.Execute.Execute((cmd) => { /* handle command */ });
+        stub.Execute.Call((cmd) => { /* handle command */ });
 
         // Unconfigured virtual methods call base implementation
         stub.Object.Initialize(); // Calls ServiceBase.Initialize()
@@ -600,13 +600,13 @@ public partial class InlineDelegateExample
         LogAction logAction = logStub;
 
         // Configure via .Interceptor property
-        addStub.Interceptor.Returns((a, b) => a + b);
-        logStub.Interceptor.Execute((msg) => Console.WriteLine(msg));
+        addStub.Interceptor.Return((a, b) => a + b);
+        logStub.Interceptor.Call((msg) => Console.WriteLine(msg));
 
         // DID NOT DO THIS: Allow direct configuration on the stub
         //
         // REJECTED PATTERN:
-        //   addStub.Returns((a, b) => a + b);
+        //   addStub.Return((a, b) => a + b);
         //
         // WHY NOT: Delegates have only one "member" (the invocation).
         // Using .Interceptor makes it explicit and consistent with the
@@ -659,8 +659,8 @@ public partial class OpenGenericInterfaceExample
         IRepository<DataEventArgs> entityRepoInterface = entityRepo;
 
         // Configure like any other stub
-        stringRepo.GetById.Returns((id) => $"Item-{id}");
-        entityRepo.GetById.Returns((id) => new DataEventArgs($"Data-{id}"));
+        stringRepo.GetById.Return((id) => $"Item-{id}");
+        entityRepo.GetById.Return((id) => new DataEventArgs($"Data-{id}"));
 
         // DID NOT DO THIS: Require separate [KnockOff<IRepository<string>>] for each type
         //
@@ -732,7 +732,7 @@ public partial class OpenGenericClassExample
 
         // Configure via interceptors
         stub.Name.Get("TestService");
-        stub.Execute.Execute((cmd) => { /* handle command */ });
+        stub.Execute.Call((cmd) => { /* handle command */ });
 
         // Unconfigured virtual methods call base implementation
         stub.Object.Initialize(); // Calls ServiceBase.Initialize()
@@ -812,16 +812,16 @@ public partial class OpenGenericClassExample
 // When a stubbed member is called, KnockOff resolves the return value in this order:
 //
 // 1. When chains - Parameter-specific matching (highest priority)
-//    stub.Add.When(1, 2).Returns(100);
+//    stub.Add.When(1, 2).Return(100);
 //
-// 2. Sequences - If Returns().ThenReturns() was used and not exhausted
-//    stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2);
+// 2. Sequences - If Returns().ThenReturn() was used and not exhausted
+//    stub.Add.Return((a, b) => 1).ThenReturn((a, b) => 2);
 //
 // 3. Returns(value) - Simple constant return value
-//    stub.Add.Returns(42);
+//    stub.Add.Return(42);
 //
 // 4. Returns(callback) - Callback invocation
-//    stub.Add.Returns((a, b) => a + b);
+//    stub.Add.Return((a, b) => a + b);
 //
 // 5. Source - Delegation to real implementation
 //    stub.Source(realCalculator);

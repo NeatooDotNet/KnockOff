@@ -8,7 +8,7 @@ KnockOff solves this with the `.Of<T>()` accessor pattern, giving you type-speci
 
 **Critical concept**: Use `.Of<T>()` to access type-specific configuration and verification for generic methods. Base properties like `CalledTypeArguments` track calls across all type arguments.
 
-**OnCall and verification**: The `.Of<T>().OnCall()` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Times)` to verify call counts. Each type argument has independent configuration—configuring `.Of<User>().OnCall(...)` does not affect `.Of<Order>().OnCall(...)`. Note: Generic method typed handlers use `OnCall` (not `Returns`/`Execute`) — this is a separate API from the main method interceptor configuration.
+**OnCall and verification**: The `.Of<T>().OnCall()` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Times)` to verify call counts. Each type argument has independent configuration—configuring `.Of<User>().OnCall(...)` does not affect `.Of<Order>().OnCall(...)`. Note: Generic method typed handlers use `Return` (not `Returns`/`Execute`) — this is a separate API from the main method interceptor configuration.
 
 ---
 
@@ -34,34 +34,34 @@ In tests, you might call `GetById<User>(1)` and `GetById<Order>(2)`. These are t
 
 ## Type-Specific Configuration
 
-Use `.Of<T>()` to access the type-specific interceptor, then call `OnCall` to configure behavior for that type argument.
+Use `.Of<T>()` to access the type-specific interceptor, then call `Return` to configure behavior for that type argument.
 
-### OnCall Signature and Return Value
+### Return Signature and Return Value
 
-The `OnCall` method accepts a callback matching the method signature and returns `IMethodTracking` for verification:
+The `Return` method accepts a callback matching the method signature and returns `IMethodTracking` for verification:
 - **Callback parameters**: Match the original method parameters
 - **Callback return type**: Matches the method's return type with the specific type argument substituted
 - **Return value**: `IMethodTracking` object providing `.Verify(Times)` (see [Verification Guide](verification.md))
 
-**Key point**: `OnCall` is type-specific—each type argument needs its own configuration. The returned `IMethodTracking` object is used to verify calls for that specific type argument.
+**Key point**: `Return` is type-specific—each type argument needs its own configuration. The returned `IMethodTracking` object is used to verify calls for that specific type argument.
 
 <!-- snippet: generic-configure-single -->
 ```cs
 // Configure behavior for User type
-stub.GetById.Of<User>().OnCall((id) =>
+stub.GetById.Of<User>().Return((id) =>
     new User { Id = id, Name = "Test User" });
 ```
 <!-- endSnippet -->
 
-You can configure multiple types independently. Each `OnCall` is specific to its type argument:
+You can configure multiple types independently. Each `Return` is specific to its type argument:
 
 <!-- snippet: generic-configure-multiple -->
 ```cs
 // Configure different behavior for each type
-stub.GetById.Of<User>().OnCall((id) =>
+stub.GetById.Of<User>().Return((id) =>
     new User { Id = id, Name = "User" });
 
-stub.GetById.Of<Order>().OnCall((id) =>
+stub.GetById.Of<Order>().Return((id) =>
     new Order { Id = id, Amount = 99.99m });
 ```
 <!-- endSnippet -->
@@ -70,7 +70,7 @@ stub.GetById.Of<Order>().OnCall((id) =>
 
 ## Type-Specific Verification
 
-After execution, verify calls per type using the same `.Of<T>()` accessor. The `OnCall` method returns an `IMethodTracking` object that provides verification capabilities.
+After execution, verify calls per type using the same `.Of<T>()` accessor. The `Return` method returns an `IMethodTracking` object that provides verification capabilities.
 
 <!-- snippet: generic-verify-typed -->
 ```cs
@@ -98,11 +98,11 @@ For methods with multiple type parameters, use `.Of<T1, T2, ...>()`:
 <!-- snippet: generic-multi-param -->
 ```cs
 // Configure for string -> int conversion
-stub.Convert.Of<string, int>().OnCall((source) =>
+stub.Convert.Of<string, int>().Return((source) =>
     int.Parse(source));
 
 // Configure for int -> string conversion
-stub.Convert.Of<int, string>().OnCall((source) =>
+stub.Convert.Of<int, string>().Return((source) =>
     source.ToString());
 ```
 <!-- endSnippet -->
@@ -159,17 +159,17 @@ Here's a full test demonstrating generic method stubbing for a serializer/deseri
 <!-- snippet: generic-complete-example -->
 ```cs
 // Configure Serialize for different types
-var serializeUserTracking = stub.Serialize.Of<User>().OnCall((obj) =>
+var serializeUserTracking = stub.Serialize.Of<User>().Return((obj) =>
     $"{{\"Id\":{obj.Id},\"Name\":\"{obj.Name}\"}}");
 
-var serializeOrderTracking = stub.Serialize.Of<Order>().OnCall((obj) =>
+var serializeOrderTracking = stub.Serialize.Of<Order>().Return((obj) =>
     $"{{\"Id\":{obj.Id},\"Amount\":{obj.Amount}}}");
 
 // Configure Deserialize
-var deserializeUserTracking = stub.Deserialize.Of<User>().OnCall((data) =>
+var deserializeUserTracking = stub.Deserialize.Of<User>().Return((data) =>
     new User { Id = 1, Name = "Deserialized User" });
 
-var deserializeOrderTracking = stub.Deserialize.Of<Order>().OnCall((data) =>
+var deserializeOrderTracking = stub.Deserialize.Of<Order>().Return((data) =>
     new Order { Id = 2, Amount = 50.00m });
 ```
 <!-- endSnippet -->
@@ -179,8 +179,8 @@ var deserializeOrderTracking = stub.Deserialize.Of<Order>().OnCall((data) =>
 ## Key Takeaways
 
 - **`.Of<T>()`** provides type-specific access to the interceptor for a specific type argument
-- **`OnCall`** configures the callback for that type—parameters match the method signature, return type matches with type arguments substituted
-- **`OnCall` returns `IMethodTracking`** enabling verification via `.Verify(Times)`
+- **`Return`** configures the callback for that type—parameters match the method signature, return type matches with type arguments substituted
+- **`Return` returns `IMethodTracking`** enabling verification via `.Verify(Times)`
 - **Base properties** (`CalledTypeArguments`, `Reset()`) track and manage calls across all types
 - **Multiple type parameters** use `.Of<T1, T2, ...>()` matching the method signature
 - **Verification** uses `tracking.Verify(Times)` for type-specific call count assertions
