@@ -2,8 +2,8 @@
 
 **Date:** 2026-02-07
 **Related Todo:** [Rename OnGet/OnSet to Get/Set](../todos/rename-onget-onset-to-get-set.md)
-**Status:** Ready for Implementation
-**Last Updated:** 2026-02-07 (developer review complete, approved)
+**Status:** Complete
+**Last Updated:** 2026-02-07
 
 ---
 

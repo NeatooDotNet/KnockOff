@@ -1,9 +1,9 @@
 # Rename OnGet/OnSet to Get/Set in Property and Indexer APIs
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** High
 **Created:** 2026-02-07
-**Last Updated:** 2026-02-07 (plan created, developer approved)
+**Last Updated:** 2026-02-07
 
 ---
 
@@ -82,14 +82,14 @@ Rename all `On`-prefixed property and indexer configuration methods:
 
 ## Tasks
 
-- [ ] Architect explores codebase, evaluates open questions, creates plan
-- [ ] Developer reviews plan and creates implementation contract
-- [ ] Implement: Rename public API methods in generator renderers
-- [ ] Implement: Update library interfaces and doc comments
-- [ ] Implement: Update Design.Stubs and Design.Tests
-- [ ] Implement: Update test projects
-- [ ] Implement: Update docs, skills, samples
-- [ ] Version bump (breaking change — minor per pre-1.0 convention)
+- [x] Architect explores codebase, evaluates open questions, creates plan
+- [x] Developer reviews plan and creates implementation contract
+- [x] Implement: Rename public API methods in generator renderers
+- [x] Implement: Update library interfaces and doc comments
+- [x] Implement: Update Design.Stubs and Design.Tests
+- [x] Implement: Update test projects
+- [x] Implement: Update docs, skills, samples
+- [ ] Version bump (breaking change — deferred to bundle with other API renames)
 
 ---
 
@@ -106,6 +106,10 @@ Rename all `On`-prefixed property and indexer configuration methods:
 - Developer reviewed and approved plan, created implementation contract
 - **API verb form decision:** All APIs should use singular imperative (`Return`/`Call`/`Get`/`Set`), not plural third-person (`Returns`/`Calls`/`Gets`/`Sets`). `Returns` → `Return` tracked as separate todo.
 - Plan status: Ready for Implementation
+- Implementation completed across 124 files in 5 parallel phases
+- All 7,699 tests pass across net8.0/net9.0/net10.0
+- Zero `.OnGet(`/`.OnSet(` references remain in active source code
+- PR #54 merged to main
 
 ---
 
@@ -113,14 +117,22 @@ Rename all `On`-prefixed property and indexer configuration methods:
 
 Before marking this todo as Complete, verify:
 
-- [ ] Design project builds successfully
-- [ ] Design project tests pass
+- [x] Design project builds successfully
+- [x] Design project tests pass
 
 **Verification results:**
-- Design build: [Pending]
-- Design tests: [Pending]
+- Design build: 0 errors, 0 warnings
+- Design tests: 259 passed, 0 failed (net8.0/net9.0/net10.0)
+- Full solution: 7,699 passed, 0 failed
 
 ---
 
 ## Results / Conclusions
 
+Successfully renamed all `OnGet`/`OnSet` property and indexer configuration methods to `Get`/`Set` across the entire codebase. Also renamed `HasOnGet`/`HasOnSet` internal properties to `HasGet`/`HasSet`. The rename was mechanical — no behavioral changes, no new functionality. All 8 applicable patterns (Inline Delegate excluded) are updated via shared renderers.
+
+Key decisions made during this work:
+- `OnGetSequence`/`OnSetSequence` don't exist as methods (only stale doc comments) — corrected comments
+- Private fields (`_onGet`, `_onSet`) left unchanged — not user-facing
+- `VerifyGet`/`VerifySet` unchanged — no "On" prefix
+- Broader API verb form decision: all verbs should be singular imperative (`Return`/`Call`/`Get`/`Set`). `Returns` → `Return` tracked as separate todo.
