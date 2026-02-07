@@ -798,12 +798,12 @@ internal static class FlatModelBuilder
 			lastCallType = $"({string.Join(", ", trackableParams.Select(p => $"{p.NullableType} {p.EscapedName}"))})";
 		}
 
-		// OnCall delegate
+		// Call delegate
 		var hasRefOrOut = paramArray.Any(p => p.RefKind == RefKind.Ref || p.RefKind == RefKind.Out);
 		var needsCustomDelegate = hasRefOrOut || !isVoid;
 		string? customDelegateName = null;
 		string? customDelegateSignature = null;
-		string onCallDelegateType;
+		string callDelegateType;
 
 		if (needsCustomDelegate)
 		{
@@ -817,16 +817,16 @@ internal static class FlatModelBuilder
 			customDelegateSignature = isVoid
 				? $"public delegate void {customDelegateName}({delegateParamList});"
 				: $"public delegate {member.ReturnType} {customDelegateName}({delegateParamList});";
-			onCallDelegateType = $"{customDelegateName}?";
+			callDelegateType = $"{customDelegateName}?";
 		}
 		else if (paramArray.Length == 0)
 		{
-			onCallDelegateType = "global::System.Action?";
+			callDelegateType = "global::System.Action?";
 		}
 		else
 		{
 			var paramTypes = string.Join(", ", paramArray.Select(p => p.Type));
-			onCallDelegateType = $"global::System.Action<{paramTypes}>?";
+			callDelegateType = $"global::System.Action<{paramTypes}>?";
 		}
 
 		// Default expression
@@ -850,7 +850,7 @@ internal static class FlatModelBuilder
 			RecordCallArgs: recordCallArgs,
 			TrackableParameters: trackableParams,
 			LastCallType: lastCallType,
-			OnCallDelegateType: onCallDelegateType,
+			CallDelegateType: callDelegateType,
 			NeedsCustomDelegate: needsCustomDelegate,
 			CustomDelegateName: customDelegateName,
 			CustomDelegateSignature: customDelegateSignature,
@@ -946,7 +946,7 @@ internal static class FlatModelBuilder
 		var delegateSignature = isVoid
 			? $"public delegate void {delegateName}({delegateParamList});"
 			: $"public delegate {member.ReturnType} {delegateName}({delegateParamList});";
-		var onCallDelegateType = $"{delegateName}?";
+		var callDelegateType = $"{delegateName}?";
 
 		// Default expression - for generic methods, use SmartDefault or default based on nullability
 		var throwsOnDefault = false; // Generic methods use SmartDefault instead of throwing
@@ -967,7 +967,7 @@ internal static class FlatModelBuilder
 			RecordCallArgs: recordCallArgs,
 			TrackableParameters: trackableParams,
 			LastCallType: lastCallType,
-			OnCallDelegateType: onCallDelegateType,
+			CallDelegateType: callDelegateType,
 			NeedsCustomDelegate: true,
 			CustomDelegateName: delegateName,
 			CustomDelegateSignature: delegateSignature,

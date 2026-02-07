@@ -301,7 +301,7 @@ internal static class InlineRenderer
             w.Line("\t\t\tprivate int _getCount;");
             w.Line();
             w.Line($"\t\t\t/// <summary>Callback for getter. If set, returns its value.</summary>");
-            w.Line($"\t\t\tpublic global::System.Func<{prop.ReturnType}>? OnGet {{ get; set; }}");
+            w.Line($"\t\t\tpublic global::System.Func<{prop.ReturnType}>? Get {{ get; set; }}");
             w.Line();
         }
 
@@ -313,13 +313,13 @@ internal static class InlineRenderer
             w.Line($"\t\t\tpublic {prop.NullableReturnType} LastSetValue {{ get; private set; }}");
             w.Line();
             w.Line($"\t\t\t/// <summary>Callback for setter.</summary>");
-            w.Line($"\t\t\tpublic global::System.Action<{prop.ReturnType}>? OnSet {{ get; set; }}");
+            w.Line($"\t\t\tpublic global::System.Action<{prop.ReturnType}>? Set {{ get; set; }}");
             w.Line();
         }
 
         // Value property with backing field - setting Value marks the property as configured
         w.Line($"\t\t\tprivate {prop.ReturnType} _value = default!;");
-        w.Line($"\t\t\t/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>");
+        w.Line($"\t\t\t/// <summary>Value returned by getter when Get is not set. Setting this marks the property as configured.</summary>");
         w.Line($"\t\t\tpublic {prop.ReturnType} Value");
         w.Line("\t\t\t{");
         w.Line("\t\t\t\tget => _value;");
@@ -330,7 +330,7 @@ internal static class InlineRenderer
         // Source field for Source(T) feature - skip for init-only properties
         if (!string.IsNullOrEmpty(prop.DeclaringInterface) && !prop.IsInitOnly)
         {
-            w.Line($"\t\t\t/// <summary>Source object for delegation when OnGet is not set.</summary>");
+            w.Line($"\t\t\t/// <summary>Source object for delegation when Get is not set.</summary>");
             w.Line($"\t\t\tinternal {prop.DeclaringInterface}? _source;");
             w.Line();
         }
@@ -349,8 +349,8 @@ internal static class InlineRenderer
             w.Line();
         }
 
-        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Value) and verifiable marking
-        w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>");
+        // Reset method - clears tracking state but preserves configuration (Get/Set/Value) and verifiable marking
+        w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (Get, Set, Value) and verifiable marking.</summary>");
         var resetParts = new List<string>();
         if (prop.HasGetter) resetParts.Add("_getCount = 0;");
         if (prop.HasSetter) resetParts.Add("_setCount = 0; LastSetValue = default;");
@@ -422,10 +422,10 @@ internal static class InlineRenderer
         w.Line("\t\t\tinternal bool IsVerifiable => _isVerifiable;");
         w.Line();
 
-        // IsConfigured - Value set OR OnGet/OnSet callback registered
+        // IsConfigured - Value set OR Get/Set callback registered
         var isConfiguredParts = new List<string> { "_valueSet" };
-        if (prop.HasGetter) isConfiguredParts.Add("OnGet != null");
-        if (prop.HasSetter) isConfiguredParts.Add("OnSet != null");
+        if (prop.HasGetter) isConfiguredParts.Add("Get != null");
+        if (prop.HasSetter) isConfiguredParts.Add("Set != null");
         w.Line("\t\t\t/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>");
         w.Line($"\t\t\tinternal bool IsConfigured => {string.Join(" || ", isConfiguredParts)};");
         w.Line();
@@ -474,12 +474,12 @@ internal static class InlineRenderer
             w.Line($"\t\t\t/// <summary>The last key used to access the getter.</summary>");
             w.Line($"\t\t\tpublic {indexer.NullableKeyType} LastGetKey {{ get; private set; }}");
             w.Line();
-            w.Line($"\t\t\tprivate global::System.Func<{indexer.ParameterTypes}, {indexer.ReturnType}>? _onGet;");
+            w.Line($"\t\t\tprivate global::System.Func<{indexer.ParameterTypes}, {indexer.ReturnType}>? _get;");
             w.Line($"\t\t\t/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>");
-            w.Line($"\t\t\tpublic global::System.Func<{indexer.ParameterTypes}, {indexer.ReturnType}>? OnGet");
+            w.Line($"\t\t\tpublic global::System.Func<{indexer.ParameterTypes}, {indexer.ReturnType}>? Get");
             w.Line("\t\t\t{");
-            w.Line("\t\t\t\tget => _onGet;");
-            w.Line("\t\t\t\tset { _onGet = value; if (value != null) _configured = true; }");
+            w.Line("\t\t\t\tget => _get;");
+            w.Line("\t\t\t\tset { _get = value; if (value != null) _configured = true; }");
             w.Line("\t\t\t}");
             w.Line();
         }
@@ -491,12 +491,12 @@ internal static class InlineRenderer
             w.Line($"\t\t\t/// <summary>The last key-value pair passed to the setter.</summary>");
             w.Line($"\t\t\tpublic ({indexer.KeyType} Key, {indexer.ReturnType} Value)? LastSetEntry {{ get; private set; }}");
             w.Line();
-            w.Line($"\t\t\tprivate global::System.Action<{indexer.ParameterTypes}, {indexer.ReturnType}>? _onSet;");
+            w.Line($"\t\t\tprivate global::System.Action<{indexer.ParameterTypes}, {indexer.ReturnType}>? _set;");
             w.Line($"\t\t\t/// <summary>Callback for setter. Setting this marks the indexer as configured.</summary>");
-            w.Line($"\t\t\tpublic global::System.Action<{indexer.ParameterTypes}, {indexer.ReturnType}>? OnSet");
+            w.Line($"\t\t\tpublic global::System.Action<{indexer.ParameterTypes}, {indexer.ReturnType}>? Set");
             w.Line("\t\t\t{");
-            w.Line("\t\t\t\tget => _onSet;");
-            w.Line("\t\t\t\tset { _onSet = value; if (value != null) _configured = true; }");
+            w.Line("\t\t\t\tget => _set;");
+            w.Line("\t\t\t\tset { _set = value; if (value != null) _configured = true; }");
             w.Line("\t\t\t}");
             w.Line();
         }
@@ -523,13 +523,13 @@ internal static class InlineRenderer
         // Source field for Source(T) feature
         if (!string.IsNullOrEmpty(indexer.DeclaringInterface))
         {
-            w.Line($"\t\t\t/// <summary>Source object for delegation when OnGet/OnSet is not set.</summary>");
+            w.Line($"\t\t\t/// <summary>Source object for delegation when Get/Set is not set.</summary>");
             w.Line($"\t\t\tinternal {indexer.DeclaringInterface}? _source;");
             w.Line();
         }
 
-        // Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing) and verifiable marking
-        w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>");
+        // Reset method - clears tracking state but preserves configuration (Get/Set/Backing) and verifiable marking
+        w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (Get, Set, Backing) and verifiable marking.</summary>");
         var resetParts = new List<string>();
         if (indexer.HasGetter) resetParts.Add("_getCount = 0; LastGetKey = default;");
         if (indexer.HasSetter) resetParts.Add("_setCount = 0; LastSetEntry = default;");
@@ -790,7 +790,7 @@ internal static class InlineRenderer
         w.Line();
 
         // Private callback field
-        w.Line($"\t\t\t\tprivate {handler.MethodName}Delegate? _onCall;");
+        w.Line($"\t\t\t\tprivate {handler.MethodName}Delegate? _call;");
         w.Line();
 
         // CallCount - private field with explicit interface implementation for aggregation
@@ -816,12 +816,12 @@ internal static class InlineRenderer
         // Return/Call method (returns IMethodTracking for consistency with regular method interceptors)
         var typedHandlerEntryPoint = handler.IsVoid ? "Call" : "Return";
         w.Line("\t\t\t\t/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
-        w.Line($"\t\t\t\tpublic global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({handler.MethodName}Delegate callback) {{ _onCall = callback; return this; }}");
+        w.Line($"\t\t\t\tpublic global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({handler.MethodName}Delegate callback) {{ _call = callback; return this; }}");
         w.Line();
 
         // Callback property for internal use by invocation logic
         w.Line("\t\t\t\t/// <summary>Gets the configured callback (internal use).</summary>");
-        w.Line($"\t\t\t\tinternal {handler.MethodName}Delegate? Callback => _onCall;");
+        w.Line($"\t\t\t\tinternal {handler.MethodName}Delegate? Callback => _call;");
         w.Line();
 
         // RecordCall
@@ -1256,14 +1256,14 @@ internal static class InlineRenderer
         }
 
         // Check for Callback
-        w.Line($"\t\t\t\tif (typedHandler.Callback is {{ }} onCallCallback)");
+        w.Line($"\t\t\t\tif (typedHandler.Callback is {{ }} callCallback)");
         if (impl.IsVoid)
         {
-            w.Line($"\t\t\t\t{{ onCallCallback({impl.OnCallArgs}); return; }}");
+            w.Line($"\t\t\t\t{{ callCallback({impl.CallArgs}); return; }}");
         }
         else
         {
-            w.Line($"\t\t\t\t\treturn onCallCallback({impl.OnCallArgs});");
+            w.Line($"\t\t\t\t\treturn callCallback({impl.CallArgs});");
         }
 
         // Strict mode check

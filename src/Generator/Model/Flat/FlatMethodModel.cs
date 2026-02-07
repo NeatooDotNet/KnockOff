@@ -21,7 +21,7 @@ internal sealed record FlatMethodModel(
     string RecordCallArgs,
     EquatableArray<ParameterModel> TrackableParameters,
     string? LastCallType,
-    string OnCallDelegateType,
+    string CallDelegateType,
     bool NeedsCustomDelegate,
     string? CustomDelegateName,
     string? CustomDelegateSignature,

@@ -652,7 +652,7 @@ internal static class FlatRenderer
 	private static void RenderRegularPropertyInterceptorContent(CodeWriter w, FlatPropertyModel prop, string className)
 	{
 		// Source field for Source(T) feature - uses declaring interface type
-		w.Line($"/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>");
+		w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
 		w.Line($"internal {prop.DeclaringInterface}? _source;");
 		w.Line();
 
@@ -668,7 +668,7 @@ internal static class FlatRenderer
 			w.Line();
 
 			w.Line("/// <summary>Callback invoked when the getter is accessed. If set, its return value is used.</summary>");
-			w.Line($"public global::System.Func<{prop.ReturnType}>? OnGet {{ get; set; }}");
+			w.Line($"public global::System.Func<{prop.ReturnType}>? Get {{ get; set; }}");
 			w.Line();
 		}
 
@@ -682,13 +682,13 @@ internal static class FlatRenderer
 			w.Line();
 
 			w.Line("/// <summary>Callback invoked when the setter is accessed.</summary>");
-			w.Line($"public global::System.Action<{prop.ReturnType}>? OnSet {{ get; set; }}");
+			w.Line($"public global::System.Action<{prop.ReturnType}>? Set {{ get; set; }}");
 			w.Line();
 		}
 
 		// Value property for backing storage - setting Value marks the property as configured
 		w.Line("private " + prop.ReturnType + " _value" + GetDefaultValueSuffix(prop.DefaultExpression));
-		w.Line("/// <summary>Value returned by getter when OnGet is not set. Setting this marks the property as configured.</summary>");
+		w.Line("/// <summary>Value returned by getter when Get is not set. Setting this marks the property as configured.</summary>");
 		w.Line($"public {prop.ReturnType} Value");
 		using (w.Braces())
 		{
@@ -711,8 +711,8 @@ internal static class FlatRenderer
 			w.Line();
 		}
 
-		// Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Value) and verifiable marking
-		w.Line("/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (OnGet, OnSet, Value) and verifiable marking.</summary>");
+		// Reset method - clears tracking state but preserves configuration (Get/Set/Value) and verifiable marking
+		w.Line("/// <summary>Resets tracking state (counts, LastSetValue) but preserves configuration (Get, Set, Value) and verifiable marking.</summary>");
 		var resetParts = new System.Collections.Generic.List<string>();
 		if (prop.HasGetter) resetParts.Add("_getCount = 0;");
 		if (prop.HasSetter) resetParts.Add("_setCount = 0; LastSetValue = default;");
@@ -787,10 +787,10 @@ internal static class FlatRenderer
 		w.Line("internal bool IsVerifiable => _isVerifiable;");
 		w.Line();
 
-		// IsConfigured - Value set OR OnGet/OnSet callback registered
+		// IsConfigured - Value set OR Get/Set callback registered
 		var isConfiguredParts = new System.Collections.Generic.List<string> { "_valueSet" };
-		if (prop.HasGetter) isConfiguredParts.Add("OnGet != null");
-		if (prop.HasSetter) isConfiguredParts.Add("OnSet != null");
+		if (prop.HasGetter) isConfiguredParts.Add("Get != null");
+		if (prop.HasSetter) isConfiguredParts.Add("Set != null");
 		w.Line("/// <summary>Whether this property has been configured (Value set or callbacks registered).</summary>");
 		w.Line($"internal bool IsConfigured => {string.Join(" || ", isConfiguredParts)};");
 		w.Line();
@@ -908,7 +908,7 @@ internal static class FlatRenderer
 		using (w.Block($"public sealed class {indexer.InterceptorClassName}"))
 		{
 			// Source field for Source(T) feature - uses declaring interface type
-			w.Line($"/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>");
+			w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
 			w.Line($"internal {indexer.DeclaringInterface}? _source;");
 			w.Line();
 
@@ -922,7 +922,7 @@ internal static class FlatRenderer
 				w.Line();
 
 				w.Line("/// <summary>Callback invoked when the getter is accessed.</summary>");
-				w.Line($"public global::System.Func<{indexer.KeyType}, {indexer.ReturnType}>? OnGet {{ get; set; }}");
+				w.Line($"public global::System.Func<{indexer.KeyType}, {indexer.ReturnType}>? Get {{ get; set; }}");
 				w.Line();
 			}
 
@@ -936,7 +936,7 @@ internal static class FlatRenderer
 				w.Line();
 
 				w.Line("/// <summary>Callback invoked when the setter is accessed.</summary>");
-				w.Line($"public global::System.Action<{indexer.KeyType}, {indexer.ReturnType}>? OnSet {{ get; set; }}");
+				w.Line($"public global::System.Action<{indexer.KeyType}, {indexer.ReturnType}>? Set {{ get; set; }}");
 				w.Line();
 			}
 
@@ -959,8 +959,8 @@ internal static class FlatRenderer
 			w.Line($"public global::System.Collections.Generic.Dictionary<{indexer.KeyType}, {indexer.ReturnType}> Backing {{ get; }} = new();");
 			w.Line();
 
-			// Reset method - clears tracking state but preserves configuration (OnGet/OnSet/Backing) and verifiable marking
-			w.Line("/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (OnGet, OnSet, Backing) and verifiable marking.</summary>");
+			// Reset method - clears tracking state but preserves configuration (Get/Set/Backing) and verifiable marking
+			w.Line("/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (Get, Set, Backing) and verifiable marking.</summary>");
 			var resetParts = new System.Collections.Generic.List<string>();
 			if (indexer.HasGetter) resetParts.Add("_getCount = 0; LastGetKey = default;");
 			if (indexer.HasSetter) resetParts.Add("_setCount = 0; LastSetEntry = null;");
@@ -1048,8 +1048,8 @@ internal static class FlatRenderer
 			// Internal verification methods for stub-level Verify()/VerifyAll()
 			// Determine if configured based on available callbacks
 			var isConfiguredExpr = indexer.HasGetter && indexer.HasSetter
-				? "OnGet != null || OnSet != null || Backing.Count > 0"
-				: (indexer.HasGetter ? "OnGet != null || Backing.Count > 0" : "OnSet != null || Backing.Count > 0");
+				? "Get != null || Set != null || Backing.Count > 0"
+				: (indexer.HasGetter ? "Get != null || Backing.Count > 0" : "Set != null || Backing.Count > 0");
 
 			w.Line($"internal bool IsVerifiable => _isVerifiable;");
 			w.Line($"internal bool IsConfigured => {isConfiguredExpr};");
@@ -1173,7 +1173,7 @@ internal static class FlatRenderer
 			w.Line();
 
 			// Private callback field
-			w.Line($"private {handler.MethodName}Delegate? _onCall;");
+			w.Line($"private {handler.MethodName}Delegate? _call;");
 			w.Line();
 
 			// CallCount - private field with explicit interface implementation for aggregation
@@ -1199,12 +1199,12 @@ internal static class FlatRenderer
 			// Return/Call method (returns IMethodTracking for consistency with regular method interceptors)
 			var typedHandlerEntryPoint = handler.IsVoid ? "Call" : "Return";
 			w.Line("/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
-			w.Line($"public global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({handler.MethodName}Delegate callback) {{ _onCall = callback; return this; }}");
+			w.Line($"public global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({handler.MethodName}Delegate callback) {{ _call = callback; return this; }}");
 			w.Line();
 
 			// Callback property for internal use by invocation logic
 			w.Line("/// <summary>Gets the configured callback (internal use).</summary>");
-			w.Line($"internal {handler.MethodName}Delegate? Callback => _onCall;");
+			w.Line($"internal {handler.MethodName}Delegate? Callback => _call;");
 			w.Line();
 
 			// RecordCall
@@ -1230,15 +1230,15 @@ internal static class FlatRenderer
 			w.Line("/// <summary>Resets all tracking state.</summary>");
 			if (handler.NonGenericParams.Count == 0)
 			{
-				w.Line("public void Reset() { _callCount = 0; _onCall = null; }");
+				w.Line("public void Reset() { _callCount = 0; _call = null; }");
 			}
 			else if (handler.NonGenericParams.Count == 1)
 			{
-				w.Line("public void Reset() { _callCount = 0; LastArg = default; _onCall = null; }");
+				w.Line("public void Reset() { _callCount = 0; LastArg = default; _call = null; }");
 			}
 			else
 			{
-				w.Line("public void Reset() { _callCount = 0; LastArgs = default; _onCall = null; }");
+				w.Line("public void Reset() { _callCount = 0; LastArgs = default; _call = null; }");
 			}
 			w.Line();
 
@@ -1380,7 +1380,7 @@ internal static class FlatRenderer
 			// Private callback fields (one per signature)
 			foreach (var sig in arity.SignatureGroups)
 			{
-				w.Line($"private {sig.DelegateName}? _onCall{sig.SignatureSuffix};");
+				w.Line($"private {sig.DelegateName}? _call{sig.SignatureSuffix};");
 			}
 			w.Line();
 
@@ -1412,7 +1412,7 @@ internal static class FlatRenderer
 			{
 				var sigEntryPoint = sig.IsVoid ? "Call" : "Return";
 				w.Line($"/// <summary>Sets the callback invoked when this signature is called. Returns this handler for tracking.</summary>");
-				w.Line($"public global::KnockOff.IMethodTracking {sigEntryPoint}{sig.SignatureSuffix}({sig.DelegateName} callback) {{ _onCall{sig.SignatureSuffix} = callback; return this; }}");
+				w.Line($"public global::KnockOff.IMethodTracking {sigEntryPoint}{sig.SignatureSuffix}({sig.DelegateName} callback) {{ _call{sig.SignatureSuffix} = callback; return this; }}");
 			}
 			w.Line();
 
@@ -1420,7 +1420,7 @@ internal static class FlatRenderer
 			foreach (var sig in arity.SignatureGroups)
 			{
 				w.Line($"/// <summary>Gets the configured callback for {methodName}{sig.SignatureSuffix} (internal use).</summary>");
-				w.Line($"internal {sig.DelegateName}? Callback{sig.SignatureSuffix} => _onCall{sig.SignatureSuffix};");
+				w.Line($"internal {sig.DelegateName}? Callback{sig.SignatureSuffix} => _call{sig.SignatureSuffix};");
 			}
 			w.Line();
 
@@ -1452,7 +1452,7 @@ internal static class FlatRenderer
 			var resetParts = new List<string> { "_callCount = 0" };
 			foreach (var sig in arity.SignatureGroups)
 			{
-				resetParts.Add($"_onCall{sig.SignatureSuffix} = null");
+				resetParts.Add($"_call{sig.SignatureSuffix} = null");
 				var paramArray = sig.AllParameters.GetArray() ?? Array.Empty<ParameterModel>();
 				if (paramArray.Length == 1)
 					resetParts.Add($"LastArg{sig.SignatureSuffix} = default");
@@ -2227,28 +2227,28 @@ internal static class FlatRenderer
 			w.Line($"{interceptorAccess}.RecordCall({recordCallArgs});");
 
 			// Build onCall args (no stub parameter)
-			var onCallArgs = method.Parameters.Count > 0
+			var callArgs = method.Parameters.Count > 0
 				? string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
 				: "";
 
 			if (method.IsVoid)
 			{
-				w.Line($"if ({interceptorAccess}.Callback is {{ }} onCallCallback)");
-				w.Line($"{{ onCallCallback({onCallArgs}); return; }}");
+				w.Line($"if ({interceptorAccess}.Callback is {{ }} callCallback)");
+				w.Line($"{{ callCallback({callArgs}); return; }}");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				// Generic methods don't support user overrides - just return for void
 			}
 			else if (method.ThrowsOnDefault)
 			{
 				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
-				w.Line($"\treturn callback({onCallArgs});");
+				w.Line($"\treturn callback({callArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Use {interceptorAccess}.{(method.IsVoid ? "Call" : "Return")}(callback).\");");
 			}
 			else
 			{
 				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
-				w.Line($"\treturn callback({onCallArgs});");
+				w.Line($"\treturn callback({callArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
 				w.Line($"return {method.DefaultExpression};");
 			}

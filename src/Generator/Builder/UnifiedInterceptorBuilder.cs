@@ -46,9 +46,9 @@ internal static class UnifiedInterceptorBuilder
 		{
 			// Single-signature case
 			var sig = uniqueSignatures[0];
-			var onCallDelegateType = BuildOnCallDelegateType(methodName, sig, ownerClassName, ownerTypeParameters);
+			var callDelegateType = BuildCallDelegateType(methodName, sig, ownerClassName, ownerTypeParameters);
 			// Get the delegate type without nullable marker for builder interface
-			var delegateTypeForBuilder = onCallDelegateType.TrimEnd('?');
+			var delegateTypeForBuilder = callDelegateType.TrimEnd('?');
 			return new UnifiedMethodInterceptorModel(
 				InterceptorClassName: interceptorClassName,
 				MethodName: methodName,
@@ -60,7 +60,7 @@ internal static class UnifiedInterceptorBuilder
 				ParameterDeclarations: sig.ParameterDeclarations,
 				ReturnType: sig.ReturnType,
 				IsVoid: sig.IsVoid,
-				OnCallDelegateType: onCallDelegateType,
+				CallDelegateType: callDelegateType,
 				NeedsCustomDelegate: NeedsCustomDelegate(sig),
 				CustomDelegateSignature: BuildCustomDelegateSignature(methodName, sig, ownerClassName, ownerTypeParameters),
 				LastArgType: GetLastArgType(sig.TrackableParameters),
@@ -87,7 +87,7 @@ internal static class UnifiedInterceptorBuilder
 				ParameterDeclarations: first.ParameterDeclarations,
 				ReturnType: first.ReturnType,
 				IsVoid: first.IsVoid,
-				OnCallDelegateType: "",
+				CallDelegateType: "",
 				NeedsCustomDelegate: false,
 				CustomDelegateSignature: null,
 				LastArgType: null,
@@ -360,9 +360,9 @@ internal static class UnifiedInterceptorBuilder
 	}
 
 	/// <summary>
-	/// Builds the OnCall delegate type string.
+	/// Builds the Call delegate type string.
 	/// </summary>
-	public static string BuildOnCallDelegateType(
+	public static string BuildCallDelegateType(
 		string methodName,
 		MethodSignatureInfo sig,
 		string ownerClassName,

@@ -7,7 +7,7 @@ namespace KnockOff.Model.Flat;
 /// <summary>
 /// Model for a group of generic method overloads that share an interceptor.
 /// Supports multiple type parameter arities (multiple Of&lt;&gt;() methods)
-/// with per-signature RecordCall/OnCall within each typed handler.
+/// with per-signature RecordCall/Call within each typed handler.
 /// </summary>
 internal sealed record FlatGenericMethodHandlerGroup(
     /// <summary>The interceptor property name (e.g., "Process2").</summary>

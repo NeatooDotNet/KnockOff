@@ -752,7 +752,7 @@ internal static class InlineModelBuilder
             ArgumentList: "",
             InvokeSuffix: "",  // Properties don't use invoke suffix
             RecordCallArgs: "",
-            OnCallArgs: "this",
+            CallArgs: "this",
             DefaultExpression: "default!",
             DefaultStrategy: member.DefaultStrategy,
             IsNullable: member.IsNullable,
@@ -808,7 +808,7 @@ internal static class InlineModelBuilder
             ArgumentList: argList,
             InvokeSuffix: "",  // Indexers don't use invoke suffix
             RecordCallArgs: argList,
-            OnCallArgs: argList,
+            CallArgs: argList,
             DefaultExpression: defaultExpr,
             DefaultStrategy: member.DefaultStrategy,
             IsNullable: member.IsNullable,
@@ -898,7 +898,7 @@ internal static class InlineModelBuilder
             ArgumentList: argList,
             InvokeSuffix: invokeSuffix,
             RecordCallArgs: "",  // No longer used with new Invoke pattern
-            OnCallArgs: "",      // No longer used with new Invoke pattern
+            CallArgs: "",      // No longer used with new Invoke pattern
             DefaultExpression: defaultExpr,
             DefaultStrategy: member.DefaultStrategy,
             IsNullable: member.IsNullable,
@@ -977,7 +977,7 @@ internal static class InlineModelBuilder
             ArgumentList: argList,
             InvokeSuffix: "",  // Generic methods use Of<T>() pattern, not invoke suffix
             RecordCallArgs: nonGenericArgList,
-            OnCallArgs: argList,
+            CallArgs: argList,
             DefaultExpression: defaultExpr,
             DefaultStrategy: member.DefaultStrategy,
             IsNullable: member.IsNullable,
@@ -1040,7 +1040,7 @@ internal static class InlineModelBuilder
             ArgumentList: "",
             InvokeSuffix: "",  // Delegation methods don't use invoke suffix
             RecordCallArgs: "",
-            OnCallArgs: "",
+            CallArgs: "",
             DefaultExpression: "",
             DefaultStrategy: DefaultValueStrategy.Default,
             IsNullable: member.IsNullable,
@@ -1078,7 +1078,7 @@ internal static class InlineModelBuilder
             ArgumentList: "",
             InvokeSuffix: "",  // Events don't use invoke suffix
             RecordCallArgs: "",
-            OnCallArgs: "",
+            CallArgs: "",
             DefaultExpression: "",
             DefaultStrategy: DefaultValueStrategy.Default,
             IsNullable: false,
@@ -1119,17 +1119,17 @@ internal static class InlineModelBuilder
         var invokeParamList = string.Join(", ", del.Parameters.Select(p => $"{p.Type} {p.Name}"));
         var invokeArgList = string.Join(", ", del.Parameters.Select(p => p.Name));
 
-        // OnCall type - no stub parameter
-        string onCallType;
+        // Call type - no stub parameter
+        string callType;
         if (del.IsVoid)
         {
-            onCallType = del.Parameters.Count == 0
+            callType = del.Parameters.Count == 0
                 ? "global::System.Action"
                 : $"global::System.Action<{string.Join(", ", del.Parameters.Select(p => p.Type))}>";
         }
         else
         {
-            onCallType = del.Parameters.Count == 0
+            callType = del.Parameters.Count == 0
                 ? $"global::System.Func<{del.ReturnType}>"
                 : $"global::System.Func<{string.Join(", ", del.Parameters.Select(p => p.Type))}, {del.ReturnType}>";
         }
@@ -1169,7 +1169,7 @@ internal static class InlineModelBuilder
             Parameters: parameters,
             InvokeParameterDeclarations: invokeParamList,
             InvokeArgumentList: invokeArgList,
-            OnCallType: onCallType,
+            CallType: callType,
             LastCallArgType: lastCallArgType,
             LastCallArgsType: lastCallArgsType,
             DefaultExpression: defaultExpr);
@@ -1199,7 +1199,7 @@ internal static class InlineModelBuilder
     }
 
     /// <summary>
-    /// Groups methods by name. All overloads share a single interceptor with multiple OnCall signatures.
+    /// Groups methods by name. All overloads share a single interceptor with multiple Call signatures.
     /// Returns both the groups dictionary (keyed by group name) and a member-to-group-name mapping.
     /// </summary>
     private static (Dictionary<string, MethodGroupInfo> Groups, Dictionary<string, string> MemberKeyToGroupName) GroupMethodsByName(IEnumerable<InterfaceMemberInfo> methods)

@@ -36,8 +36,8 @@ internal sealed record InlineInterfaceImplementation(
     string InvokeSuffix,
     /// <summary>Arguments for RecordCall.</summary>
     string RecordCallArgs,
-    /// <summary>Arguments for OnCall invocation.</summary>
-    string OnCallArgs,
+    /// <summary>Arguments for Call invocation.</summary>
+    string CallArgs,
     /// <summary>Default value expression for return.</summary>
     string DefaultExpression,
     /// <summary>Default value strategy.</summary>

@@ -64,7 +64,7 @@ internal static class ModelAdapters
 			: $"{className}{typeParameters}";
 
 		// Get delegate type without nullable marker for builder interface
-		var delegateTypeForBuilder = first.OnCallDelegateType.TrimEnd('?');
+		var delegateTypeForBuilder = first.CallDelegateType.TrimEnd('?');
 
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
@@ -77,7 +77,7 @@ internal static class ModelAdapters
 			ParameterDeclarations: first.ParameterDeclarations,
 			ReturnType: first.ReturnType,
 			IsVoid: first.IsVoid,
-			OnCallDelegateType: first.OnCallDelegateType,
+			CallDelegateType: first.CallDelegateType,
 			NeedsCustomDelegate: first.NeedsCustomDelegate,
 			CustomDelegateSignature: first.CustomDelegateSignature,
 			LastArgType: GetLastArgType(first.TrackableParameters),
@@ -151,7 +151,7 @@ internal static class ModelAdapters
 			ParameterDeclarations: first.ParameterDeclarations,
 			ReturnType: first.ReturnType,
 			IsVoid: first.IsVoid,
-			OnCallDelegateType: "",
+			CallDelegateType: "",
 			NeedsCustomDelegate: false,
 			CustomDelegateSignature: null,
 			LastArgType: null,
@@ -332,8 +332,8 @@ internal static class ModelAdapters
 	public static (UnifiedMethodInterceptorModel Model, InterceptorRenderOptions Options) ToUnifiedModel(InlineDelegateStubModel del)
 	{
 		// Delegates have no out params, so trackable == all params
-		var onCallType = del.OnCallType;
-		var builderInterface = GetBuilderInterface(del.Parameters, null, onCallType, del.IsVoid);
+		var callType = del.CallType;
+		var builderInterface = GetBuilderInterface(del.Parameters, null, callType, del.IsVoid);
 
 		var model = new UnifiedMethodInterceptorModel(
 			InterceptorClassName: del.InterceptorClassName,
@@ -346,7 +346,7 @@ internal static class ModelAdapters
 			ParameterDeclarations: del.InvokeParameterDeclarations,
 			ReturnType: del.ReturnType,
 			IsVoid: del.IsVoid,
-			OnCallDelegateType: del.OnCallType,
+			CallDelegateType: del.CallType,
 			NeedsCustomDelegate: false,
 			CustomDelegateSignature: null,
 			LastArgType: GetLastArgType(del.Parameters),

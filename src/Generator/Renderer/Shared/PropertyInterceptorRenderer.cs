@@ -57,8 +57,8 @@ internal static class PropertyInterceptorRenderer
 		w.Line();
 
 		// Getter tracking and sequence storage
-		w.Line($"private global::System.Func<{model.ValueType}>? _onGet;");
-		w.Line("private PropertyGetBuilderImpl? _onGetTracking;");
+		w.Line($"private global::System.Func<{model.ValueType}>? _get;");
+		w.Line("private PropertyGetBuilderImpl? _getTracking;");
 		w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetBuilderImpl Tracking)>? _getSequence;");
 		w.Line("private int _getSequenceIndex;");
 		w.Line("private bool _getRepeatLastValue = true;");
@@ -80,7 +80,7 @@ internal static class PropertyInterceptorRenderer
 		w.Line();
 
 		// Aggregate get count (private - use VerifyGet() to check)
-		w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
+		w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_getTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
 		w.Line();
 
 		// Get() - repeating callback, returns IPropertyGetBuilder
@@ -92,9 +92,9 @@ internal static class PropertyInterceptorRenderer
 			w.Line("_getSequenceIndex = 0;");
 			w.Line("_isGetVerifiable = false;");
 			w.Line("_getVerifiableTimes = null;");
-			w.Line("_onGet = callback;");
-			w.Line("_onGetTracking = new PropertyGetBuilderImpl(this);");
-			w.Line("return _onGetTracking;");
+			w.Line("_get = callback;");
+			w.Line("_getTracking = new PropertyGetBuilderImpl(this);");
+			w.Line("return _getTracking;");
 		}
 		w.Line();
 
@@ -119,7 +119,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line("_unconfiguredGetCount = 0;");
 			w.Line("_setCount = 0;");
 			w.Line("LastSetValue = default;");
-			w.Line("_onGetTracking?.Reset();");
+			w.Line("_getTracking?.Reset();");
 			w.Line("if (_getSequence != null)");
 			using (w.Braces())
 			{
@@ -172,8 +172,8 @@ internal static class PropertyInterceptorRenderer
 		// Getter storage and tracking (if has getter)
 		if (model.HasGetter)
 		{
-			w.Line($"private global::System.Func<{model.ValueType}>? _onGet;");
-			w.Line("private PropertyGetBuilderImpl? _onGetTracking;");
+			w.Line($"private global::System.Func<{model.ValueType}>? _get;");
+			w.Line("private PropertyGetBuilderImpl? _getTracking;");
 			w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ValueType}> Callback, PropertyGetBuilderImpl Tracking)>? _getSequence;");
 			w.Line("private int _getSequenceIndex;");
 			w.Line("private bool _getRepeatLastValue = true;");
@@ -186,8 +186,8 @@ internal static class PropertyInterceptorRenderer
 		// Setter storage and tracking (if has setter)
 		if (model.HasSetter)
 		{
-			w.Line($"private global::System.Action<{model.ValueType}>? _onSet;");
-			w.Line("private PropertySetBuilderImpl? _onSetTracking;");
+			w.Line($"private global::System.Action<{model.ValueType}>? _set;");
+			w.Line("private PropertySetBuilderImpl? _setTracking;");
 			w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ValueType}> Callback, PropertySetBuilderImpl Tracking)>? _setSequence;");
 			w.Line("private int _setSequenceIndex;");
 			w.Line("private bool _setRepeatLastValue = true;");
@@ -201,11 +201,11 @@ internal static class PropertyInterceptorRenderer
 		// Aggregate counts (private - use VerifyGet/VerifySet to check)
 		if (model.HasGetter)
 		{
-			w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
+			w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_getTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
 		}
 		if (model.HasSetter)
 		{
-			w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_onSetTracking?._callCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking._callCount; return sum; } }");
+			w.Line("private int TotalSetCount { get { var sum = _unconfiguredSetCount + (_setTracking?._callCount ?? 0); if (_setSequence != null) foreach (var s in _setSequence) sum += s.Tracking._callCount; return sum; } }");
 		}
 		if (model.HasGetter || model.HasSetter)
 		{
@@ -216,7 +216,7 @@ internal static class PropertyInterceptorRenderer
 		if (model.HasSetter)
 		{
 			w.Line($"/// <summary>The value from the last setter call (from most recently called registration).</summary>");
-			w.Line($"public {model.NullableValueType} LastSetValue {{ get {{ if ((_onSetTracking?._callCount ?? 0) > 0) return _onSetTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking._callCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; }} }}");
+			w.Line($"public {model.NullableValueType} LastSetValue {{ get {{ if ((_setTracking?._callCount ?? 0) > 0) return _setTracking!.LastValue; if (_setSequence != null) for (int i = _setSequence.Count - 1; i >= 0; i--) if (_setSequence[i].Tracking._callCount > 0) return _setSequence[i].Tracking.LastValue; return _unconfiguredSetCount > 0 ? _unconfiguredLastSetValue : default; }} }}");
 			w.Line();
 		}
 
@@ -231,9 +231,9 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_getSequenceIndex = 0;");
 				w.Line("_isGetVerifiable = false;");
 				w.Line("_getVerifiableTimes = null;");
-				w.Line("_onGet = callback;");
-				w.Line("_onGetTracking = new PropertyGetBuilderImpl(this);");
-				w.Line("return _onGetTracking;");
+				w.Line("_get = callback;");
+				w.Line("_getTracking = new PropertyGetBuilderImpl(this);");
+				w.Line("return _getTracking;");
 			}
 			w.Line();
 
@@ -254,9 +254,9 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_setSequenceIndex = 0;");
 				w.Line("_isSetVerifiable = false;");
 				w.Line("_setVerifiableTimes = null;");
-				w.Line("_onSet = callback;");
-				w.Line("_onSetTracking = new PropertySetBuilderImpl(this);");
-				w.Line("return _onSetTracking;");
+				w.Line("_set = callback;");
+				w.Line("_setTracking = new PropertySetBuilderImpl(this);");
+				w.Line("return _setTracking;");
 			}
 			w.Line();
 
@@ -319,7 +319,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 
 			w.Line("/// <summary>Returns true if Get is configured (callback or sequence). Used by user override pattern.</summary>");
-			w.Line("internal bool HasGet => _onGet != null || (_getSequence?.Count ?? 0) > 0;");
+			w.Line("internal bool HasGet => _get != null || (_getSequence?.Count ?? 0) > 0;");
 			w.Line();
 
 			w.Line("/// <summary>Invokes the configured getter callback without tracking. Used by user override pattern.</summary>");
@@ -336,11 +336,11 @@ internal static class PropertyInterceptorRenderer
 					w.Line("return callback();");
 				}
 				// Priority 2: Repeating Get callback
-				w.Line("if (_onGet != null && _onGetTracking != null)");
+				w.Line("if (_get != null && _getTracking != null)");
 				using (w.Braces())
 				{
-					w.Line("_onGetTracking.RecordCall();");
-					w.Line("return _onGet();");
+					w.Line("_getTracking.RecordCall();");
+					w.Line("return _get();");
 				}
 				w.Line("throw new global::System.InvalidOperationException(\"InvokeGetCallback called without callback configured\");");
 			}
@@ -355,7 +355,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 
 			w.Line("/// <summary>Returns true if Set is configured (callback or sequence). Used by user override pattern.</summary>");
-			w.Line("internal bool HasSet => _onSet != null || (_setSequence?.Count ?? 0) > 0;");
+			w.Line("internal bool HasSet => _set != null || (_setSequence?.Count ?? 0) > 0;");
 			w.Line();
 
 			w.Line("/// <summary>Invokes the configured setter callback without tracking. Used by user override pattern.</summary>");
@@ -373,11 +373,11 @@ internal static class PropertyInterceptorRenderer
 					w.Line("return;");
 				}
 				// Priority 2: Repeating Set callback
-				w.Line("if (_onSet != null && _onSetTracking != null)");
+				w.Line("if (_set != null && _setTracking != null)");
 				using (w.Braces())
 				{
-					w.Line("_onSetTracking.RecordCall(value);");
-					w.Line("_onSet(value);");
+					w.Line("_setTracking.RecordCall(value);");
+					w.Line("_set(value);");
 					w.Line("return;");
 				}
 				w.Line("throw new global::System.InvalidOperationException(\"InvokeSetCallback called without callback configured\");");
@@ -413,11 +413,11 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 
 			// Priority 2: Repeating Get callback
-			w.Line("if (_onGet != null && _onGetTracking != null)");
+			w.Line("if (_get != null && _getTracking != null)");
 			using (w.Braces())
 			{
-				w.Line("_onGetTracking.RecordCall();");
-				w.Line("return _onGet();");
+				w.Line("_getTracking.RecordCall();");
+				w.Line("return _get();");
 			}
 			w.Line();
 
@@ -514,11 +514,11 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 
 			// Priority 2: Repeating Set callback
-			w.Line("if (_onSet != null && _onSetTracking != null)");
+			w.Line("if (_set != null && _setTracking != null)");
 			using (w.Braces())
 			{
-				w.Line("_onSetTracking.RecordCall(value);");
-				w.Line("_onSet(value);");
+				w.Line("_setTracking.RecordCall(value);");
+				w.Line("_set(value);");
 				w.Line("return;");
 			}
 			w.Line();
@@ -584,7 +584,7 @@ internal static class PropertyInterceptorRenderer
 			if (model.HasGetter)
 			{
 				w.Line("_unconfiguredGetCount = 0;");
-				w.Line("_onGetTracking?.Reset();");
+				w.Line("_getTracking?.Reset();");
 				w.Line("if (_getSequence != null)");
 				using (w.Braces())
 				{
@@ -597,7 +597,7 @@ internal static class PropertyInterceptorRenderer
 			{
 				w.Line("_unconfiguredSetCount = 0;");
 				w.Line("_unconfiguredLastSetValue = default;");
-				w.Line("_onSetTracking?.Reset();");
+				w.Line("_setTracking?.Reset();");
 				w.Line("if (_setSequence != null)");
 				using (w.Braces())
 				{
@@ -754,7 +754,7 @@ internal static class PropertyInterceptorRenderer
 		w.Line();
 
 		w.Line("/// <summary>Whether this property has been configured (Value set or Get configured).</summary>");
-		w.Line("internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;");
+		w.Line("internal bool IsConfigured => _valueSet || _get != null || (_getSequence?.Count ?? 0) > 0;");
 		w.Line();
 
 		w.Line("/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
@@ -787,8 +787,8 @@ internal static class PropertyInterceptorRenderer
 
 		// IsConfigured checks Get/Set - no longer includes _valueSet since .Value API is removed
 		var isConfiguredParts = new System.Collections.Generic.List<string>();
-		if (model.HasGetter) isConfiguredParts.Add("_onGet != null || (_getSequence?.Count ?? 0) > 0");
-		if (model.HasSetter) isConfiguredParts.Add("_onSet != null || (_setSequence?.Count ?? 0) > 0");
+		if (model.HasGetter) isConfiguredParts.Add("_get != null || (_getSequence?.Count ?? 0) > 0");
+		if (model.HasSetter) isConfiguredParts.Add("_set != null || (_setSequence?.Count ?? 0) > 0");
 		var isConfiguredExpr = isConfiguredParts.Count > 0 ? string.Join(" || ", isConfiguredParts) : "false";
 
 		var totalCountExpr = model.HasGetter && model.HasSetter
@@ -914,9 +914,9 @@ internal static class PropertyInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_interceptor._getSequence = new global::System.Collections.Generic.List<(global::System.Func<{valueType}> Callback, PropertyGetBuilderImpl Tracking)>();");
-					w.Line("_interceptor._getSequence.Add((_interceptor._onGet!, this));");
-					w.Line("_interceptor._onGet = null;");
-					w.Line("_interceptor._onGetTracking = null;");  // Clear to prevent double-counting in TotalGetCount
+					w.Line("_interceptor._getSequence.Add((_interceptor._get!, this));");
+					w.Line("_interceptor._get = null;");
+					w.Line("_interceptor._getTracking = null;");  // Clear to prevent double-counting in TotalGetCount
 					w.Line("_interceptor._getSequenceIndex = 0;");
 				}
 				w.Line("var nextBuilder = new PropertyGetBuilderImpl(_interceptor);");
@@ -943,9 +943,9 @@ internal static class PropertyInterceptorRenderer
 					using (w.Braces())
 					{
 						w.Line($"_interceptor._getSequence = new global::System.Collections.Generic.List<(global::System.Func<{valueType}> Callback, PropertyGetBuilderImpl Tracking)>();");
-						w.Line("_interceptor._getSequence.Add((_interceptor._onGet!, this));");
-						w.Line("_interceptor._onGet = null;");
-						w.Line("_interceptor._onGetTracking = null;");
+						w.Line("_interceptor._getSequence.Add((_interceptor._get!, this));");
+						w.Line("_interceptor._get = null;");
+						w.Line("_interceptor._getTracking = null;");
 						w.Line("_interceptor._getSequenceIndex = 0;");
 					}
 					w.Line("return new PropertyGetSequenceImpl(_interceptor);");
@@ -1036,9 +1036,9 @@ internal static class PropertyInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_interceptor._setSequence = new global::System.Collections.Generic.List<(global::System.Action<{valueType}> Callback, PropertySetBuilderImpl Tracking)>();");
-					w.Line("_interceptor._setSequence.Add((_interceptor._onSet!, this));");
-					w.Line("_interceptor._onSet = null;");
-					w.Line("_interceptor._onSetTracking = null;");  // Clear to prevent double-counting in TotalSetCount
+					w.Line("_interceptor._setSequence.Add((_interceptor._set!, this));");
+					w.Line("_interceptor._set = null;");
+					w.Line("_interceptor._setTracking = null;");  // Clear to prevent double-counting in TotalSetCount
 					w.Line("_interceptor._setSequenceIndex = 0;");
 				}
 				w.Line("var nextBuilder = new PropertySetBuilderImpl(_interceptor);");

@@ -417,8 +417,8 @@ public class DelegateStubTests
 		stub.Interceptor.Verify(Times.Never);
 		Assert.Null(stub.Interceptor.LastArg);
 
-		// Configuration is preserved (OnCall is a method now, no direct assertion needed)
-		// The fact that Reset() doesn't clear _onCall is still tested below
+		// Configuration is preserved (Call is a method now, no direct assertion needed)
+		// The fact that Reset() doesn't clear _call is still tested below
 	}
 
 	[Fact]
@@ -478,8 +478,8 @@ public class DelegateStubTests
 		stub.Interceptor.Verify(Times.Never);
 		Assert.Null(stub.Interceptor.LastArg);
 
-		// Configuration is preserved (OnCall is a method now, no direct assertion needed)
-		// The fact that Reset() doesn't clear _onCall is still tested below
+		// Configuration is preserved (Call is a method now, no direct assertion needed)
+		// The fact that Reset() doesn't clear _call is still tested below
 	}
 }
 

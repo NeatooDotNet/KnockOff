@@ -1,9 +1,10 @@
 # Clean Internal Naming to Match Public API
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-02-07
 **Last Updated:** 2026-02-07
+**Plan:** [clean-internal-naming.md](../plans/clean-internal-naming.md)
 
 ---
 
@@ -34,19 +35,21 @@ Rename all internal identifiers to match the new public API conventions:
 
 ## Plans
 
-_(to be linked)_
+- [Clean Internal Naming to Match Public API](../plans/clean-internal-naming.md)
 
 ## Tasks
 
-- [ ] Rename generated interceptor properties `OnGet`→`Get`, `OnSet`→`Set` in FlatRenderer and InlineRenderer
-- [ ] Rename generated private fields (`_onCall`→`_call`, `_returnsValue`→`_returnValue`, etc.) in MethodInterceptorRenderer
-- [ ] Rename generated private fields (`_onGet`→`_get`, etc.) in PropertyInterceptorRenderer
-- [ ] Rename internal model properties (`OnCallDelegateType`→`CallDelegateType`) in models
-- [ ] Rename internal builder methods (`BuildOnCallDelegateType`→`BuildCallDelegateType`)
-- [ ] Update error messages in StubException.cs
-- [ ] Update generated comments referencing old names
-- [ ] Verify all 9 patterns compile and all tests pass
+- [x] Rename generated interceptor properties `OnGet`→`Get`, `OnSet`→`Set` in FlatRenderer and InlineRenderer
+- [x] Rename generated private fields (`_onCall`→`_call`, `_returnsValue`→`_returnValue`, etc.) in MethodInterceptorRenderer
+- [x] Rename generated private fields (`_onGet`→`_get`, etc.) in PropertyInterceptorRenderer
+- [x] Rename internal model properties (`OnCallDelegateType`→`CallDelegateType`) in models
+- [x] Rename internal builder methods (`BuildOnCallDelegateType`→`BuildCallDelegateType`)
+- [x] Update error messages in StubException.cs
+- [x] Update generated comments referencing old names
+- [x] Verify all 9 patterns compile and all tests pass
 
 ## Progress Log
 
 ## Results / Conclusions
+
+All internal naming cleaned up to match public API conventions. 22 files modified across generator models, builders, renderers, adapters, library code, and comments. Zero stale naming patterns remain in `src/Generator/` or `src/KnockOff/`. All 3,486 tests pass per framework (net8.0/net9.0/net10.0) with zero failures. Architect independently verified.

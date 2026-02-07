@@ -67,7 +67,7 @@ public partial class DelegateStubsDemo
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Returns(int value) { _onCall = (_, _) => value; }
+    //   public void Returns(int value) { _call = (_, _) => value; }
     // =========================================================================
 
     public void Returns_ConstantValue()
@@ -90,7 +90,7 @@ public partial class DelegateStubsDemo
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Returns(Func<int, int, int> callback) { _onCall = callback; }
+    //   public void Returns(Func<int, int, int> callback) { _call = callback; }
     // =========================================================================
 
     public void Returns_DynamicBehavior()
@@ -143,7 +143,7 @@ public partial class DelegateStubsDemo
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Execute(Action<string> callback) { _onCall = callback; }
+    //   public void Execute(Action<string> callback) { _call = callback; }
     // =========================================================================
 
     public void VoidDelegate_ExecuteOnly()
