@@ -86,9 +86,19 @@ stub.Save.Verify(Times.AtMost(5));
 ```
 <!-- endSnippet -->
 
-### 7. Return(value) vs Return(callback) - Last One Wins
+### 7. Configuration Methods — Last One Wins
 
-`Return(value)` and `Return(callback)` are different overloads — the last one configured wins:
+All configuration methods use direct replacement. Calling any configuration method replaces the previous configuration of the same kind:
+
+- `Return(value)` and `Return(callback)` replace each other
+- Multiple `Call(callback)` calls — last wins
+- Multiple `Get(value)` or `Get(callback)` calls — last wins
+- Multiple `Set(callback)` calls — last wins
+- Multiple `When()` calls — last wins (replaces previous When chain)
+
+Within a When chain, `.ThenWhen()` accumulates matchers. But calling `.When()` again as a new entry point replaces the entire chain.
+
+**Known bug:** `.When()` currently accumulates like `.ThenWhen()` instead of replacing. See `docs/todos/when-entry-point-should-clear-chain.md`.
 
 <!-- snippet: skill-gotcha-returns-vs-oncall -->
 ```cs
