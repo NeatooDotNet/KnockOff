@@ -522,7 +522,7 @@ public partial class InlineClassExample
         ServiceBase service = stub.Object;
 
         // Configure via interceptors
-        stub.Name.OnGet("TestService");
+        stub.Name.Get("TestService");
         stub.Execute.Execute((cmd) => { /* handle command */ });
 
         // Unconfigured virtual methods call base implementation
@@ -731,7 +731,7 @@ public partial class OpenGenericClassExample
         ServiceBase service = stub.Object;
 
         // Configure via interceptors
-        stub.Name.OnGet("TestService");
+        stub.Name.Get("TestService");
         stub.Execute.Execute((cmd) => { /* handle command */ });
 
         // Unconfigured virtual methods call base implementation

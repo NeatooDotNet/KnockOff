@@ -7,7 +7,7 @@ namespace KnockOff.Model.Shared;
 /// Unified model for indexer interceptor generation.
 /// Used by both FlatRenderer and InlineRenderer via IndexerInterceptorRenderer.
 /// Contains all information needed to render an indexer interceptor class
-/// with OnGet()/OnSet() methods, tracking, sequences, and verification.
+/// with Get()/Set() methods, tracking, sequences, and verification.
 /// </summary>
 internal sealed record UnifiedIndexerInterceptorModel(
     // Identity

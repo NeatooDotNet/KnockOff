@@ -8,15 +8,15 @@ using KnockOff;
 namespace Design.Tests.PropertyTests;
 
 /// <summary>
-/// Tests for basic property stubbing: OnGet, OnSet, LastSetValue.
+/// Tests for basic property stubbing: Get, Set, LastSetValue.
 /// </summary>
 public class PropertyBasicsTests
 {
     [Fact]
-    public void OnGet_SetsConstantGetterValue()
+    public void Get_SetsConstantGetterValue()
     {
         var stub = new PropertyBasicsDemo.Stubs.IEntity();
-        stub.Id.OnGet(42);
+        stub.Id.Get(42);
 
         Design.Domain.Entities.IEntity entity = stub;
 
@@ -24,11 +24,11 @@ public class PropertyBasicsTests
     }
 
     [Fact]
-    public void OnGet_WithCallback()
+    public void Get_WithCallback()
     {
         var stub = new PropertyBasicsDemo.Stubs.IEntity();
         var counter = 0;
-        stub.Id.OnGet(() => ++counter);
+        stub.Id.Get(() => ++counter);
 
         Design.Domain.Entities.IEntity entity = stub;
 
@@ -38,11 +38,11 @@ public class PropertyBasicsTests
     }
 
     [Fact]
-    public void OnSet_InterceptsSetter()
+    public void Set_InterceptsSetter()
     {
         var stub = new PropertyBasicsDemo.Stubs.IEntity();
         string? captured = null;
-        stub.Description.OnSet(v => captured = v);
+        stub.Description.Set(v => captured = v);
 
         Design.Domain.Entities.IEntity entity = stub;
         entity.Description = "Test value";
@@ -68,8 +68,8 @@ public class PropertyBasicsTests
         var stub = new PropertyBasicsDemo.Stubs.IEntity();
         string backingStore = "Initial";
 
-        stub.Description.OnGet(() => backingStore);
-        stub.Description.OnSet(v => backingStore = v);
+        stub.Description.Get(() => backingStore);
+        stub.Description.Set(v => backingStore = v);
 
         Design.Domain.Entities.IEntity entity = stub;
 
@@ -82,7 +82,7 @@ public class PropertyBasicsTests
     public void VerifyGet_ChecksGetterAccess()
     {
         var stub = new PropertyBasicsDemo.Stubs.IEntity();
-        stub.Id.OnGet(42);
+        stub.Id.Get(42);
 
         Design.Domain.Entities.IEntity entity = stub;
         _ = entity.Id;
@@ -118,7 +118,7 @@ public class PropertyBasicsTests
     public void Reset_ClearsTrackingPreservesConfig()
     {
         var stub = new PropertyBasicsDemo.Stubs.IEntity();
-        stub.Description.OnGet("Test");
+        stub.Description.Get("Test");
 
         Design.Domain.Entities.IEntity entity = stub;
         _ = entity.Description;

@@ -77,7 +77,7 @@ public class StrictModeTests
 	public void StandaloneStub_Strict_WithOnGet_DoesNotThrow()
 	{
 		var stub = new StrictModeTestStub().Strict();
-		stub.Name.OnGet(() => "configured");
+		stub.Name.Get(() => "configured");
 		IStrictModeTest service = stub;
 
 		var result = service.Name;

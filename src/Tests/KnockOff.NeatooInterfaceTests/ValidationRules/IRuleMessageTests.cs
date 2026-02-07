@@ -32,7 +32,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.RuleIndex.OnGet(42u);
+        stub.RuleIndex.Get(42u);
 
         Assert.Equal(42u, message.RuleIndex);
         stub.RuleIndex.VerifyGet(Times.Once);
@@ -44,7 +44,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.PropertyName.OnGet("TestProperty");
+        stub.PropertyName.Get("TestProperty");
 
         Assert.Equal("TestProperty", message.PropertyName);
     }
@@ -55,7 +55,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.Message.OnGet("Error message");
+        stub.Message.Get("Error message");
 
         Assert.Equal("Error message", message.Message);
     }
@@ -66,14 +66,14 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.Message.OnGet((string?)null);
+        stub.Message.Get((string?)null);
 
         Assert.Null(message.Message);
     }
 
     #endregion
 
-    #region OnGet Callback Tests
+    #region Get Callback Tests
 
     [Fact]
     public void RuleIndex_OnGet_ExecutesCallback()
@@ -82,7 +82,7 @@ public partial class IRuleMessageTests
         IRuleMessage message = stub;
         var callbackExecuted = false;
 
-        stub.RuleIndex.OnGet(() =>
+        stub.RuleIndex.Get(() =>
         {
             callbackExecuted = true;
             return 10u;
@@ -100,7 +100,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.PropertyName.OnGet(() => "DynamicPropertyName");
+        stub.PropertyName.Get(() => "DynamicPropertyName");
 
         Assert.Equal("DynamicPropertyName", message.PropertyName);
     }
@@ -111,7 +111,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.Message.OnGet(() => "Dynamic error message");
+        stub.Message.Get(() => "Dynamic error message");
 
         Assert.Equal("Dynamic error message", message.Message);
     }
@@ -126,7 +126,7 @@ public partial class IRuleMessageTests
         var stub = new Stubs.IRuleMessage();
         IRuleMessage message = stub;
 
-        stub.RuleIndex.OnGet(1);
+        stub.RuleIndex.Get(1);
         _ = message.RuleIndex;
         _ = message.RuleIndex;
         _ = message.RuleIndex;
@@ -170,7 +170,7 @@ public class IRuleMessageStandaloneTests
         var stub = new RuleMessageStub();
         IRuleMessage message = stub;
 
-        stub.RuleIndex.OnGet(5u);
+        stub.RuleIndex.Get(5u);
 
         Assert.Equal(5u, message.RuleIndex);
     }
@@ -181,7 +181,7 @@ public class IRuleMessageStandaloneTests
         var stub = new RuleMessageStub();
         IRuleMessage message = stub;
 
-        stub.PropertyName.OnGet("Name");
+        stub.PropertyName.Get("Name");
 
         Assert.Equal("Name", message.PropertyName);
     }
@@ -192,7 +192,7 @@ public class IRuleMessageStandaloneTests
         var stub = new RuleMessageStub();
         IRuleMessage message = stub;
 
-        stub.Message.OnGet("Validation error");
+        stub.Message.Get("Validation error");
 
         Assert.Equal("Validation error", message.Message);
     }

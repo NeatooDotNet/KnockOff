@@ -4,10 +4,10 @@ namespace KnockOff.Tests;
 /// Tests for value-based sequence overloads.
 /// Phase 5 of value-based overloads feature.
 ///
-/// Property OnGet/OnCall support both values and callbacks, with ThenGet/ThenCall for sequencing:
-/// - OnGet(value) - configures repeating value return
-/// - OnGet(callback) - configures repeating callback
-/// - OnGet(...).ThenGet(...) - elevates to sequence mode
+/// Property Get/OnCall support both values and callbacks, with ThenGet/ThenCall for sequencing:
+/// - Get(value) - configures repeating value return
+/// - Get(callback) - configures repeating callback
+/// - Get(...).ThenGet(...) - elevates to sequence mode
 /// </summary>
 public partial class SequenceValueOverloadTests
 {
@@ -19,7 +19,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGet("first");
+		knockOff.Name.Get("first");
 
 		Assert.Equal("first", service.Name);
 	}
@@ -30,8 +30,8 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		// OnGet returns builder interface, ThenGet elevates to sequence mode
-		knockOff.Name.OnGet("first")
+		// Get returns builder interface, ThenGet elevates to sequence mode
+		knockOff.Name.Get("first")
 			.ThenGet(() => "second")
 			.ThenGet(() => "third");
 
@@ -46,7 +46,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGet(() => "callback first")
+		knockOff.Name.Get(() => "callback first")
 			.ThenGet(() => "callback second")
 			.ThenGet(() => "callback third");
 
@@ -61,7 +61,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		var sequence = knockOff.Name.OnGet("a")
+		var sequence = knockOff.Name.Get("a")
 			.ThenGet(() => "b")
 			.ThenGet(() => "c");
 
@@ -80,7 +80,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGet((string?)null);
+		knockOff.Name.Get((string?)null);
 
 		Assert.Null(service.Name);
 	}
@@ -91,7 +91,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Count.OnGet(42);
+		knockOff.Count.Get(42);
 
 		Assert.Equal(42, service.Count);
 	}
@@ -102,7 +102,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.IsEnabled.OnGet(true);
+		knockOff.IsEnabled.Get(true);
 
 		Assert.True(service.IsEnabled);
 	}
@@ -195,9 +195,9 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGet("repeating");
+		knockOff.Name.Get("repeating");
 
-		// OnGet without ThenGet repeats the same value forever
+		// Get without ThenGet repeats the same value forever
 		Assert.Equal("repeating", service.Name);
 		Assert.Equal("repeating", service.Name);
 		Assert.Equal("repeating", service.Name);
@@ -210,7 +210,7 @@ public partial class SequenceValueOverloadTests
 		IPropertyTest service = knockOff;
 
 		// Create sequence with ThenGet to enable exhaustion
-		knockOff.Name.OnGet("first").ThenGet("second");
+		knockOff.Name.Get("first").ThenGet("second");
 
 		Assert.Equal("first", service.Name);
 		Assert.Equal("second", service.Name);
@@ -226,7 +226,7 @@ public partial class SequenceValueOverloadTests
 		IPropertyTest service = knockOff;
 
 		// Create sequence with ThenDefault() to return default after exhaustion
-		knockOff.Name.OnGet("first").ThenGet("second").ThenDefault();
+		knockOff.Name.Get("first").ThenGet("second").ThenDefault();
 
 		Assert.Equal("first", service.Name);
 		Assert.Equal("second", service.Name);
@@ -242,7 +242,7 @@ public partial class SequenceValueOverloadTests
 		IPropertyTest service = knockOff;
 
 		// Create sequence with ThenGet to enable exhaustion
-		knockOff.Name.OnGet("first").ThenGet("second");
+		knockOff.Name.Get("first").ThenGet("second");
 
 		Assert.Equal("first", service.Name);
 		Assert.Equal("second", service.Name);
@@ -256,7 +256,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		var sequence = knockOff.Name.OnGet("a")
+		var sequence = knockOff.Name.Get("a")
 			.ThenGet(() => "b")
 			.ThenGet(() => "c");
 
@@ -274,7 +274,7 @@ public partial class SequenceValueOverloadTests
 		var knockOff = new PropertyTestKnockOff();
 		IPropertyTest service = knockOff;
 
-		knockOff.Name.OnGet("a").ThenGet(() => "b");
+		knockOff.Name.Get("a").ThenGet(() => "b");
 
 		Assert.Equal("a", service.Name);
 		Assert.Equal("b", service.Name);
@@ -661,7 +661,7 @@ public partial class SequenceValueOverloadTests
 		// However, the generated PropertyGetSequenceImpl has the params method.
 		// This test verifies it works when chaining single-value ThenGet calls.
 		// For params access, users would need to use the direct generated type.
-		knockOff.Name.OnGet("first")
+		knockOff.Name.Get("first")
 			.ThenGet("second")
 			.ThenGet("third")
 			.ThenGet("fourth");
@@ -754,7 +754,7 @@ public partial class SequenceValueOverloadTests
 
 		// Mix callbacks and values in the same sequence
 		// (Params not accessible through interface - using single value calls)
-		knockOff.Name.OnGet(() => "callback first")
+		knockOff.Name.Get(() => "callback first")
 			.ThenGet(() => "value second")
 			.ThenGet("third")
 			.ThenGet("fourth");

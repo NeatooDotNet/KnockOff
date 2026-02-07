@@ -51,11 +51,11 @@ Methods/               # Method stubbing
   WhenMatching.cs      # When() API
 
 Properties/            # Property stubbing
-  PropertyBasics.cs    # OnGet, OnSet, LastSetValue
+  PropertyBasics.cs    # Get, Set, LastSetValue
   PropertySequences.cs # ThenGet, ThenSet
 
 Indexers/              # Indexer stubbing
-  IndexerBasics.cs     # OnGet(key), OnSet(key, value)
+  IndexerBasics.cs     # Get(key), Set(key, value)
   IndexerSequences.cs  # ThenGet, ThenSet
 
 Events/                # Event stubbing
@@ -111,7 +111,7 @@ These files serve as the authoritative reference for how KnockOff works. When as
 
 ### Sequence Behavior
 
-Sequences (Returns().ThenReturns(), OnGet().ThenGet(), etc.) **repeat the last value** after exhaustion. This matches NSubstitute's behavior for easier migration and more forgiving tests.
+Sequences (Returns().ThenReturns(), Get().ThenGet(), etc.) **repeat the last value** after exhaustion. This matches NSubstitute's behavior for easier migration and more forgiving tests.
 
 ```csharp
 // Default behavior: repeat last value after exhaustion

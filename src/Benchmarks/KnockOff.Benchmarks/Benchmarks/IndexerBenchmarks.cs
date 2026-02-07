@@ -26,8 +26,8 @@ public class IndexerInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new CacheStub();
-        stub.Indexer.OfString.OnGet((key) => "value");
-        stub.Indexer.OfInt32.OnGet((index) => 42);
+        stub.Indexer.OfString.Get((key) => "value");
+        stub.Indexer.OfInt32.Get((index) => 42);
         _knockOff = stub;
     }
 
@@ -70,8 +70,8 @@ public class IndexerSetupBenchmarks
     public CacheStub KnockOff_SetupIndexers()
     {
         var stub = new CacheStub();
-        stub.Indexer.OfString.OnGet((key) => "value");
-        stub.Indexer.OfInt32.OnGet((index) => 42);
+        stub.Indexer.OfString.Get((key) => "value");
+        stub.Indexer.OfInt32.Get((index) => 42);
         return stub;
     }
 }
@@ -95,7 +95,7 @@ public class IndexerVerificationBenchmarks
         _moq = _moqMock.Object;
 
         _knockOffStub = new CacheStub();
-        _knockOffStub.Indexer.OfString.OnGet((key) => "value");
+        _knockOffStub.Indexer.OfString.Get((key) => "value");
 
         // Trigger accesses
         _ = _moq["key"];

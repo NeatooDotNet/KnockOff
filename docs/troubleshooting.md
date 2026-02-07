@@ -66,7 +66,7 @@ stub.GetByIdAsync.Returns((int id) =>
 
 **When to use:** You want to return the same value for every call without writing a callback function.
 
-KnockOff provides `Returns(value)` for methods and `OnGet(value)` for properties, allowing you to configure a static return value directly.
+KnockOff provides `Returns(value)` for methods and `Get(value)` for properties, allowing you to configure a static return value directly.
 
 **Solution:** Use `Returns(value)` instead of a callback when the return value is constant.
 
@@ -79,7 +79,7 @@ stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
 
 **Available on:**
 - **Methods**: `stub.MethodName.Returns(value)` - Returns the same value for every call
-- **Properties**: `stub.PropertyName.OnGet(value)` - Returns the same value for every get
+- **Properties**: `stub.PropertyName.Get(value)` - Returns the same value for every get
 - **Sequences**: `stub.MethodName.Returns(callback).ThenReturns(callback)` - Each callback in sequence
 
 **Key difference from callbacks:**
@@ -97,7 +97,7 @@ stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
 
 KnockOff throws this exception for methods returning non-nullable reference types when no callback is configured. Properties and nullable types use default values instead.
 
-**Solution:** Configure the return value using `Returns` for methods or `OnGet` for properties.
+**Solution:** Configure the return value using `Returns` for methods or `Get` for properties.
 
 <!-- snippet: troubleshoot-no-callback -->
 ```cs
@@ -110,34 +110,34 @@ stub.GetName.Returns(() => "Configured Name");
 
 ## Unexpected Behavior
 
-### OnGet not being called
+### Get not being called
 
-**Cause:** OnGet was overridden or reconfigured after initial setup.
+**Cause:** Get was overridden or reconfigured after initial setup.
 
-Each call to `OnGet` replaces the previous configuration. The most recent OnGet call determines the property's behavior.
+Each call to `Get` replaces the previous configuration. The most recent Get call determines the property's behavior.
 
-**Solution:** Ensure you don't accidentally override OnGet configuration. Check that subsequent OnGet calls are intentional.
+**Solution:** Ensure you don't accidentally override Get configuration. Check that subsequent Get calls are intentional.
 
 <!-- snippet: troubleshoot-onget-priority -->
 ```cs
-// Most recent OnGet configuration wins
-stub.Host.OnGet("from-value");
+// Most recent Get configuration wins
+stub.Host.Get("from-value");
 ```
 <!-- endSnippet -->
 
 ---
 
-### Reset() doesn't clear OnGet configuration
+### Reset() doesn't clear Get configuration
 
-**Cause:** By design, Reset() clears tracking counters but preserves `OnGet` and `OnSet` configuration.
+**Cause:** By design, Reset() clears tracking counters but preserves `Get` and `Set` configuration.
 
 Reset() is intended to clear test verification state between test phases, not to reconfigure stub behavior.
 
-**Solution:** If you need to clear configured values, manually call OnGet with a default value or reconfigure the stub.
+**Solution:** If you need to clear configured values, manually call Get with a default value or reconfigure the stub.
 
 <!-- snippet: troubleshoot-reset-value -->
 ```cs
-// Reset() clears tracking but preserves OnGet configuration
+// Reset() clears tracking but preserves Get configuration
 stub.Host.Reset();
 stub.Host.VerifyGet(Times.Never);  // Tracking cleared
 Assert.Equal("configured-host", config.Host);  // Config preserved

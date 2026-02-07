@@ -5,9 +5,9 @@
 // - Base class pattern (protected override properties with _ suffix)
 // - Get-only, set-only, and get/set property overrides
 // - Tracking API on interceptors (VerifyGet, VerifySet, LastSetValue)
-// - OnGet/OnSet to supersede user properties
+// - Get/Set to supersede user properties
 // - Mixed scenarios (some with user properties, some without)
-// - Priority: OnGet/OnSet > user property
+// - Priority: Get/Set > user property
 // - Strict mode behavior
 // - All four applicable standalone patterns
 // -----------------------------------------------------------------------------
@@ -167,8 +167,8 @@ public partial class UserPropertyBasicsDemo
     // - VerifySet(Times) - verify setter call count
     // - LastSetValue - last value passed to setter
     // - Reset() - clear tracking state
-    // - OnGet() - supersede user property getter per-test
-    // - OnSet() - supersede user property setter per-test
+    // - Get() - supersede user property getter per-test
+    // - Set() - supersede user property setter per-test
     // =========================================================================
 
     public void TrackingWithVerifyGet()
@@ -231,27 +231,27 @@ public partial class UserPropertyBasicsDemo
     }
 
     // =========================================================================
-    // OnGet/OnSet Supersedes User Properties
+    // Get/Set Supersedes User Properties
     // =========================================================================
-    // User properties provide shareable defaults. OnGet/OnSet override per test.
+    // User properties provide shareable defaults. Get/Set override per test.
     //
     // RATIONALE: Stubs should be shareable yet configurable per test.
     // - User property = sensible default for most tests
-    // - OnGet/OnSet = override when a specific test needs different behavior
+    // - Get/Set = override when a specific test needs different behavior
     //
     // GENERATED CODE PATTERN:
     //   get
     //   {
     //       Count.RecordGet();
-    //       if (Count.HasOnGet) return Count.InvokeGetCallback();  // OnGet wins
+    //       if (Count.HasGet) return Count.InvokeGetCallback();  // Get wins
     //       return Count_;                                          // User override
     //   }
     //
-    // Reset() behavior: Clears tracking state but PRESERVES OnGet/OnSet configuration.
+    // Reset() behavior: Clears tracking state but PRESERVES Get/Set configuration.
     // This matches regular interceptor semantics.
     // =========================================================================
 
-    public void OnGet_SupersedesUserProperty()
+    public void Get_SupersedesUserProperty()
     {
         var stub = new BasicUserPropertyStub();
         stub.SetCount(42);
@@ -262,46 +262,46 @@ public partial class UserPropertyBasicsDemo
         var defaultValue = service.Count;
         // defaultValue == 42 (from Count_ override)
 
-        // OnGet supersedes the user property for per-test override
-        stub.Count.OnGet(999);
+        // Get supersedes the user property for per-test override
+        stub.Count.Get(999);
         var overrideValue = service.Count;
-        // overrideValue == 999 (OnGet wins)
+        // overrideValue == 999 (Get wins)
 
         stub.Count.VerifyGet(Times.Exactly(2)); // Both calls tracked
     }
 
-    public void OnSet_SupersedesUserProperty()
+    public void Set_SupersedesUserProperty()
     {
         var stub = new BasicUserPropertyStub();
         var capturedValue = "";
 
-        // OnSet supersedes the user property setter
-        stub.Name.OnSet(v => capturedValue = $"Captured: {v}");
+        // Set supersedes the user property setter
+        stub.Name.Set(v => capturedValue = $"Captured: {v}");
 
         IUserPropertyService service = stub;
         service.Name = "Test";
 
-        // capturedValue == "Captured: Test" (OnSet was invoked)
-        // stub._name is NOT set because OnSet bypassed the user override
+        // capturedValue == "Captured: Test" (Set was invoked)
+        // stub._name is NOT set because Set bypassed the user override
 
         stub.Name.VerifySet(Times.Once);
     }
 
-    public void Reset_PreservesOnGetConfiguration()
+    public void Reset_PreservesGetConfiguration()
     {
         var stub = new BasicUserPropertyStub();
-        stub.Count.OnGet(100); // Override user property
+        stub.Count.Get(100); // Override user property
 
         IUserPropertyService service = stub;
         _ = service.Count;
         stub.Count.VerifyGet(Times.Once);
 
-        // Reset clears tracking but preserves OnGet
+        // Reset clears tracking but preserves Get
         stub.Count.Reset();
         stub.Count.VerifyGet(Times.Never);
 
         var value = service.Count;
-        // value == 100 (OnGet still active)
+        // value == 100 (Get still active)
     }
 }
 
@@ -326,7 +326,7 @@ public partial class MixedUserPropertyStub
     public void SetUserPropertyValue(int value) => _userPropertyValue = value;
 
     // WithoutUserProperty_ and ComputedWithoutUserProperty_ are NOT overridden
-    // They use the regular interceptor path (OnGet or default)
+    // They use the regular interceptor path (Get or default)
 }
 
 [KnockOff<IMixedUserPropertyService>]
@@ -336,21 +336,21 @@ public partial class MixedUserPropertyDemo
     {
         var stub = new MixedUserPropertyStub();
 
-        // Properties WITH user override use the interceptor for tracking + OnGet
+        // Properties WITH user override use the interceptor for tracking + Get
         stub.WithUserProperty.VerifyGet(Times.Never);
 
         // Properties WITHOUT user override also use interceptor (same API)
-        stub.WithoutUserProperty.OnGet(42);
+        stub.WithoutUserProperty.Get(42);
         stub.WithoutUserProperty.VerifyGet(Times.Never);
 
-        stub.ComputedWithoutUserProperty.OnGet("Configured value");
+        stub.ComputedWithoutUserProperty.Get("Configured value");
 
         IMixedUserPropertyService service = stub;
 
         var r1 = service.WithUserProperty;       // 100 (from override)
-        var r2 = service.WithoutUserProperty;    // 42 (from OnGet)
+        var r2 = service.WithoutUserProperty;    // 42 (from Get)
         var r3 = service.ComputedWithUserProperty;  // "Computed: 100" (from override)
-        var r4 = service.ComputedWithoutUserProperty; // "Configured value" (from OnGet)
+        var r4 = service.ComputedWithoutUserProperty; // "Configured value" (from Get)
 
         stub.WithUserProperty.VerifyGet(Times.Once);
         stub.WithoutUserProperty.VerifyGet(Times.Once);
@@ -364,8 +364,8 @@ public partial class MixedUserPropertyDemo
     // - No user property: stub.Property (default/interceptor behavior)
     //
     // The presence or absence of a user override is detected at compile time.
-    // When override exists: OnGet > User override
-    // When no override: OnGet > Strict/Default
+    // When override exists: Get > User override
+    // When no override: Get > Strict/Default
     // =========================================================================
 }
 
@@ -417,7 +417,7 @@ public partial class StrictModeUserPropertyDemo
     // =========================================================================
     // Strict mode means "throw if unconfigured". User overrides ARE configured
     // by their very existence. This is consistent - the override IS the
-    // behavior, just defined in a different way than OnGet.
+    // behavior, just defined in a different way than Get.
     // =========================================================================
 }
 
@@ -488,17 +488,17 @@ public partial class GenericUserPropertyDemo
         stub.DefaultItem.VerifySet(Times.Once);
     }
 
-    public void GenericStandalone_OnGetSupersedes()
+    public void GenericStandalone_GetSupersedes()
     {
         var stub = new GenericUserPropertyStub<string>();
         stub.SetCurrentItem("Default");
 
-        // OnGet supersedes the user property
-        stub.CurrentItem.OnGet("Override Value");
+        // Get supersedes the user property
+        stub.CurrentItem.Get("Override Value");
 
         IGenericUserPropertyService<string> service = stub;
         var value = service.CurrentItem;
-        // value == "Override Value" (OnGet wins over user property)
+        // value == "Override Value" (Get wins over user property)
     }
 }
 
@@ -589,17 +589,17 @@ public partial class StandaloneClassUserPropertyDemo
         stub.MaxRetries.VerifySet(Times.Once);
     }
 
-    public void StandaloneClass_OnGetSupersedes()
+    public void StandaloneClass_GetSupersedes()
     {
         var stub = new ConfigUserPropertyStub();
         stub.SetConfigName("Default");
 
-        // OnGet supersedes the user property
-        stub.ConfigName.OnGet("Override Config");
+        // Get supersedes the user property
+        stub.ConfigName.Get("Override Config");
 
         ConfigBase config = stub.Object;
         var name = config.ConfigName;
-        // name == "Override Config" (OnGet wins)
+        // name == "Override Config" (Get wins)
 
         stub.ConfigName.VerifyGet(Times.Once);
     }
@@ -682,17 +682,17 @@ public partial class GenericStandaloneClassUserPropertyDemo
         stub.CurrentValue.VerifySet(Times.Once);
     }
 
-    public void GenericStandaloneClass_OnGetSupersedes()
+    public void GenericStandaloneClass_GetSupersedes()
     {
         var stub = new CacheUserPropertyStub<string>();
         stub.SetDefaultValue("Default");
 
-        // OnGet supersedes the user property
-        stub.DefaultValue.OnGet("Override Default");
+        // Get supersedes the user property
+        stub.DefaultValue.Get("Override Default");
 
         CacheBase<string> cache = stub.Object;
         var value = cache.DefaultValue;
-        // value == "Override Default" (OnGet wins)
+        // value == "Override Default" (Get wins)
     }
 }
 
@@ -729,7 +729,7 @@ public partial class GenericStandaloneClassUserPropertyDemo
 // | 5-9. Inline patterns | No - entire class generated, no partial available |
 //
 // **PRIORITY ORDER:**
-// OnGet/OnSet > User override > Smart default (or StubException in strict mode)
+// Get()/Set() > User override > Smart default (or StubException in strict mode)
 //
 // **NOT SUPPORTED (by design):**
 // - Inline stubs - only standalone patterns support user properties

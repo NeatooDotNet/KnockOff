@@ -41,7 +41,7 @@ public partial class IEntityMetaPropertiesTests
         var stub = new Stubs.IEntityMetaProperties();
         IEntityMetaProperties meta = stub;
 
-        stub.IsChild.OnGet(true);
+        stub.IsChild.Get(true);
 
         Assert.True(meta.IsChild);
         stub.IsChild.VerifyGet(Times.Once);
@@ -53,7 +53,7 @@ public partial class IEntityMetaPropertiesTests
         var stub = new Stubs.IEntityMetaProperties();
         IEntityMetaProperties meta = stub;
 
-        stub.IsModified.OnGet(true);
+        stub.IsModified.Get(true);
 
         Assert.True(meta.IsModified);
     }
@@ -64,7 +64,7 @@ public partial class IEntityMetaPropertiesTests
         var stub = new Stubs.IEntityMetaProperties();
         IEntityMetaProperties meta = stub;
 
-        stub.IsSelfModified.OnGet(true);
+        stub.IsSelfModified.Get(true);
 
         Assert.True(meta.IsSelfModified);
     }
@@ -75,7 +75,7 @@ public partial class IEntityMetaPropertiesTests
         var stub = new Stubs.IEntityMetaProperties();
         IEntityMetaProperties meta = stub;
 
-        stub.IsMarkedModified.OnGet(true);
+        stub.IsMarkedModified.Get(true);
 
         Assert.True(meta.IsMarkedModified);
     }
@@ -86,7 +86,7 @@ public partial class IEntityMetaPropertiesTests
         var stub = new Stubs.IEntityMetaProperties();
         IEntityMetaProperties meta = stub;
 
-        stub.IsSavable.OnGet(true);
+        stub.IsSavable.Get(true);
 
         Assert.True(meta.IsSavable);
     }
@@ -101,7 +101,7 @@ public partial class IEntityMetaPropertiesTests
         var stub = new Stubs.IEntityMetaProperties();
         IEntityMetaProperties meta = stub;
 
-        stub.IsDeleted.OnGet(true);
+        stub.IsDeleted.Get(true);
 
         Assert.True(meta.IsDeleted);
     }
@@ -112,7 +112,7 @@ public partial class IEntityMetaPropertiesTests
         var stub = new Stubs.IEntityMetaProperties();
         IEntityMetaProperties meta = stub;
 
-        stub.IsNew.OnGet(true);
+        stub.IsNew.Get(true);
 
         Assert.True(meta.IsNew);
     }
@@ -124,7 +124,7 @@ public partial class IEntityMetaPropertiesTests
         IEntityMetaProperties entityMeta = stub;
         IFactorySaveMeta saveMeta = stub;
 
-        stub.IsDeleted.OnGet(true);
+        stub.IsDeleted.Get(true);
 
         // Both interfaces should return the same value
         Assert.True(entityMeta.IsDeleted);
@@ -138,7 +138,7 @@ public partial class IEntityMetaPropertiesTests
         IEntityMetaProperties entityMeta = stub;
         IFactorySaveMeta saveMeta = stub;
 
-        stub.IsNew.OnGet(true);
+        stub.IsNew.Get(true);
 
         Assert.True(entityMeta.IsNew);
         Assert.True(saveMeta.IsNew);
@@ -146,7 +146,7 @@ public partial class IEntityMetaPropertiesTests
 
     #endregion
 
-    #region OnGet Callback Tests
+    #region Get Callback Tests
 
     [Fact]
     public void IsChild_OnGet_ExecutesCallback()
@@ -155,7 +155,7 @@ public partial class IEntityMetaPropertiesTests
         IEntityMetaProperties meta = stub;
         var callbackExecuted = false;
 
-        stub.IsChild.OnGet(() =>
+        stub.IsChild.Get(() =>
         {
             callbackExecuted = true;
             return true;
@@ -174,10 +174,10 @@ public partial class IEntityMetaPropertiesTests
         IEntityMetaProperties meta = stub;
 
         // Set up stub to compute IsSavable based on other properties
-        stub.IsModified.OnGet(true);
-        stub.IsChild.OnGet(false);
+        stub.IsModified.Get(true);
+        stub.IsChild.Get(false);
 
-        stub.IsSavable.OnGet(() =>
+        stub.IsSavable.Get(() =>
         {
             // Access properties through interface for computation
             return meta.IsModified && !meta.IsChild;
@@ -196,7 +196,7 @@ public partial class IEntityMetaPropertiesTests
         var stub = new Stubs.IEntityMetaProperties();
         IEntityMetaProperties meta = stub;
 
-        stub.IsChild.OnGet(true);
+        stub.IsChild.Get(true);
         _ = meta.IsChild;
         _ = meta.IsChild;
         _ = meta.IsChild;
@@ -248,7 +248,7 @@ public class IEntityMetaPropertiesStandaloneTests
         var stub = new EntityMetaPropertiesStub();
         IEntityMetaProperties meta = stub;
 
-        stub.IsChild.OnGet(true);
+        stub.IsChild.Get(true);
 
         Assert.True(meta.IsChild);
     }
@@ -259,7 +259,7 @@ public class IEntityMetaPropertiesStandaloneTests
         var stub = new EntityMetaPropertiesStub();
         IEntityMetaProperties meta = stub;
 
-        stub.IsDeleted.OnGet(true);
+        stub.IsDeleted.Get(true);
 
         Assert.True(meta.IsDeleted);
     }
@@ -270,7 +270,7 @@ public class IEntityMetaPropertiesStandaloneTests
         var stub = new EntityMetaPropertiesStub();
         IEntityMetaProperties meta = stub;
 
-        stub.IsNew.OnGet(true);
+        stub.IsNew.Get(true);
 
         Assert.True(meta.IsNew);
     }

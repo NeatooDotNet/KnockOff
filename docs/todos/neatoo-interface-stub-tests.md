@@ -308,7 +308,7 @@ For each interface:
 2. **Interceptor generation** - All members have interceptors (except marker interfaces)
 3. **Call tracking** - Verify(), WasCalled work correctly
 4. **Argument capture** - LastCallArgs captures method arguments
-5. **Callbacks** - OnCall/OnGet/OnSet delegate to custom behavior
+5. **Callbacks** - OnCall/Get/Set delegate to custom behavior
 6. **Reset** - Reset() clears tracking state
 
 ---

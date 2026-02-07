@@ -23,7 +23,7 @@ KnockOff/
     ├── guides/                         # Feature-focused tutorials
     │   ├── stub-patterns.md            # Stand-Alone, Inline Interface, Inline Class
     │   ├── methods.md                  # Method interceptors and callbacks
-    │   ├── properties.md               # Value vs OnGet/OnSet patterns
+    │   ├── properties.md               # Value vs Get/Set patterns
     │   ├── events.md                   # Raising and verifying events
     │   ├── async-patterns.md           # Task/ValueTask handling
     │   ├── verification.md             # Testing calls, arguments, and state
@@ -88,10 +88,10 @@ KnockOff/
 
 1. **Introduction** - Static vs dynamic approaches
 2. **Static Values** - Value property
-3. **Dynamic Getters** - OnGet callback
-4. **Setter Interception** - OnSet callback
+3. **Dynamic Getters** - Get callback
+4. **Setter Interception** - Set callback
 5. **Verifying Property Access** - GetCount, SetCount, LastSetValue
-6. **Value vs OnGet Priority** - OnGet replaces Value
+6. **Value vs Get Priority** - Get replaces Value
 7. **Resetting Properties** - Reset preserves Value
 8. **Decision Guide Table**
 9. **Complete Example**
@@ -205,7 +205,7 @@ KnockOff/
 
 1. **Compilation Errors** - partial, .Object, OnCall signature
 2. **Runtime Errors** - No callback configured
-3. **Unexpected Behavior** - OnGet priority, Reset behavior
+3. **Unexpected Behavior** - Get priority, Reset behavior
 4. **Generator Issues** - Build, diagnostics
 5. **Getting Help**
 

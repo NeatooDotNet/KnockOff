@@ -164,16 +164,16 @@ public class NoCallbackTests
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        stub.Host.OnGet("localhost");
+        stub.Host.Get("localhost");
         Assert.Equal("localhost", config.Host);
 
-        stub.Port.OnGet(() => 8080);
+        stub.Port.Get(() => 8080);
         Assert.Equal(8080, config.Port);
     }
 }
 
 // =============================================================================
-// Issue: OnGet Priority
+// Issue: Get Priority
 // =============================================================================
 
 public class OnGetPriorityTests
@@ -184,17 +184,17 @@ public class OnGetPriorityTests
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        stub.Host.OnGet(() => "from-callback");
+        stub.Host.Get(() => "from-callback");
         Assert.Equal("from-callback", config.Host);
 
         #region troubleshoot-onget-priority
-        // Most recent OnGet configuration wins
-        stub.Host.OnGet("from-value");
+        // Most recent Get configuration wins
+        stub.Host.Get("from-value");
         #endregion
 
         Assert.Equal("from-value", config.Host);
 
-        stub.Host.OnGet(() => "back-to-callback");
+        stub.Host.Get(() => "back-to-callback");
         Assert.Equal("back-to-callback", config.Host);
     }
 
@@ -204,13 +204,13 @@ public class OnGetPriorityTests
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        stub.Port.OnGet(80);
+        stub.Port.Get(80);
         Assert.Equal(80, config.Port);
 
-        stub.Port.OnGet(() => 443);
+        stub.Port.Get(() => 443);
         Assert.Equal(443, config.Port);
 
-        stub.Port.OnGet(8080);
+        stub.Port.Get(8080);
         Assert.Equal(8080, config.Port);
     }
 }
@@ -227,14 +227,14 @@ public class ResetBehaviorTests
         var stub = new ConfigSvcStub();
         IConfigSvc config = stub;
 
-        stub.Host.OnGet("configured-host");
+        stub.Host.Get("configured-host");
 
         _ = config.Host;
         _ = config.Host;
         stub.Host.VerifyGet(Times.Exactly(2));
 
         #region troubleshoot-reset-value
-        // Reset() clears tracking but preserves OnGet configuration
+        // Reset() clears tracking but preserves Get configuration
         stub.Host.Reset();
         stub.Host.VerifyGet(Times.Never);  // Tracking cleared
         Assert.Equal("configured-host", config.Host);  // Config preserved
@@ -246,9 +246,9 @@ public class ResetBehaviorTests
     {
         var stub = new ConfigSvcStub();
 
-        stub.Port.OnGet(8080);
+        stub.Port.Get(8080);
 
-        stub.Port.OnGet(default(int));
+        stub.Port.Get(default(int));
 
         IConfigSvc config = stub;
         Assert.Equal(0, config.Port);
@@ -528,16 +528,16 @@ public class PropertySetterTests
     [Fact]
     public void Property_ReadOnlyVsReadWrite()
     {
-        // Read-only property (get only in interface): Only OnGet available
+        // Read-only property (get only in interface): Only Get available
         var readOnlyStub = new ReadOnlyConfigStub();
-        readOnlyStub.Version.OnGet("1.0.0");
+        readOnlyStub.Version.Get("1.0.0");
 
         IReadOnlyConfig readOnlyConfig = readOnlyStub;
         Assert.Equal("1.0.0", readOnlyConfig.Version);
 
-        // Read-write property ({ get; set; } in interface): OnGet AND OnSet available
+        // Read-write property ({ get; set; } in interface): Get AND Set available
         var readWriteStub = new ReadWriteConfigStub();
-        readWriteStub.Version.OnGet("2.0.0");
+        readWriteStub.Version.Get("2.0.0");
 
         IReadWriteConfig readWriteConfig = readWriteStub;
 

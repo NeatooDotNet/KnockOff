@@ -93,7 +93,7 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 | `Arg.Is<T>(predicate)` | `stub.Method.When((args) => predicate).Returns(value)` |
 | `.Returns(v1, v2, v3)` | `stub.Method.Returns(v1, v2, v3)` (identical syntax) |
 | `.ClearReceivedCalls()` | `stub.Method.Reset()` |
-| `sub.Property.Returns(value)` | `stub.Property.OnGet(value)` |
+| `sub.Property.Returns(value)` | `stub.Property.Get(value)` |
 
 ---
 
@@ -223,7 +223,7 @@ stub.GetUser.Returns((id) => new User { Id = id, Name = $"User{id}" });
 
 ## Step 6: Configure Properties
 
-Replace property `.Returns()` with `.OnGet()` assignments.
+Replace property `.Returns()` with `.Get()` assignments.
 
 **NSubstitute:**
 
@@ -239,13 +239,13 @@ substitute.IsConnected.Returns(true);
 
 <!-- snippet: nsub-migration-property-knockoff -->
 ```cs
-// KnockOff: Use OnGet(value) for property getters
-stub.ConnectionString.OnGet("server=localhost");
-stub.IsConnected.OnGet(true);
+// KnockOff: Use Get(value) for property getters
+stub.ConnectionString.Get("server=localhost");
+stub.IsConnected.Get(true);
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `.Returns()` is consistent with methods. KnockOff's `.OnGet()` is more explicit about configuring the getter behavior.
+**Trade-off:** NSubstitute's `.Returns()` is consistent with methods. KnockOff's `.Get()` is more explicit about configuring the getter behavior.
 
 ---
 
@@ -751,10 +751,10 @@ KnockOff does not support this. You must create separate stubs:
 ```cs
 // KnockOff: Create each stub explicitly
 var customerStub = new NSubCustomerStub();
-customerStub.Name.OnGet("Alice");
+customerStub.Name.Get("Alice");
 
 var orderStub = new NSubOrderStub();
-orderStub.Customer.OnGet(customerStub);
+orderStub.Customer.Get(customerStub);
 ```
 <!-- endSnippet -->
 
@@ -841,7 +841,7 @@ KnockOff earns its place when:
 
 - **[Getting Started Guide](../getting-started.md)** - Learn KnockOff patterns from scratch
 - **[Stub Patterns](../guides/stub-patterns.md)** - Stand-alone, inline interface, and inline class patterns
-- **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete reference for `Returns`, `Execute`, `OnGet`, `OnSet`
+- **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete reference for `Returns`, `Execute`, `Get`, `Set`
 - **[Verification Guide](../guides/verification.md)** - Advanced call tracking and verification patterns
 
 ---

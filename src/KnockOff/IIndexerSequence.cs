@@ -2,7 +2,7 @@ namespace KnockOff;
 
 /// <summary>
 /// Represents a sequence of indexer getter callbacks.
-/// Returned by OnGetSequence() to enable ThenGet chaining.
+/// Returned by Get() and ThenGet() chaining.
 /// Each callback in the sequence is invoked exactly once.
 /// </summary>
 public interface IIndexerGetSequence<TKey, TValue>
@@ -37,7 +37,7 @@ public interface IIndexerGetSequence<TKey, TValue>
 
 /// <summary>
 /// Represents a sequence of indexer setter callbacks.
-/// Returned by OnSetSequence() to enable ThenSet chaining.
+/// Returned by Set() and ThenSet() chaining.
 /// Each callback in the sequence is invoked exactly once.
 /// </summary>
 public interface IIndexerSetSequence<TKey, TValue>

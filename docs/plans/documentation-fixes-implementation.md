@@ -15,7 +15,7 @@ Systematic correction of documentation inaccuracies identified in comprehensive 
 - Multiple references to removed or private APIs
 - Obsolete API patterns (Interceptors property, assignment syntax)
 
-Verified actual behavior from generated code: OnGet takes precedence over Value, Reset() preserves Value, callbacks receive only method/property parameters (no stub instance).
+Verified actual behavior from generated code: Get takes precedence over Value, Reset() preserves Value, callbacks receive only method/property parameters (no stub instance).
 
 ---
 
@@ -56,7 +56,7 @@ All are simple text edits to update API patterns.
 
 ~~Fix issues in priority order (verified behavior eliminates investigation phase):~~
 ~~1. **Critical - Code won't compile** (8 issues) - CallCount, TotalCallCount, WasCalled, GetCount/SetCount, Interceptors pattern~~
-~~2. **Critical - Misleading information** (5 issues) - OnCall/OnGet signature confusion, Value/OnGet priority, Reset behavior~~
+~~2. **Critical - Misleading information** (5 issues) - OnCall/Get signature confusion, Value/Get priority, Reset behavior~~
 ~~3. **Clarity improvements** (2 issues) - Already-correct docs with contradictory comments/sections~~
 
 **Updated approach after mdsnippets sync:**
@@ -65,8 +65,8 @@ All are simple text edits to update API patterns.
 
 **Behavior verified from generated code:**
 - Callbacks receive ONLY method/property parameters (no stub instance)
-- OnGet takes precedence over Value when both are set
-- Reset() preserves Value, OnGet, OnSet (only clears counts and LastSetValue)
+- Get takes precedence over Value when both are set
+- Reset() preserves Value, Get, Set (only clears counts and LastSetValue)
 
 ---
 
@@ -104,7 +104,7 @@ Fix: Update to direct property access (`stub.MethodName.OnCall(...)`) and correc
 
 ---
 
-**Category 3: OnCall/OnGet/OnSet Callback Signature Confusion**
+**Category 3: OnCall/Get/Set Callback Signature Confusion**
 
 **Issue 9**: methods.md contradicts itself
 - Lines 6, 16, 50, 62, 75: Claim "stub instance as first parameter"
@@ -115,7 +115,7 @@ Fix: Update to direct property access (`stub.MethodName.OnCall(...)`) and correc
 - Lines 90-113: Comments claim "ko parameter first" but code shows only method parameters
 
 **Issue 11**: interceptor-api.md
-- Line 177-178: Comment says "OnGet takes stub as first parameter" but code shows `() => 30`
+- Line 177-178: Comment says "Get takes stub as first parameter" but code shows `() => 30`
 
 **Verified truth**: Callbacks receive ONLY method/property parameters. NO stub instance.
 
@@ -123,15 +123,15 @@ Fix: Remove all references to stub/ko as first parameter in callbacks.
 
 ---
 
-**Category 4: Value vs OnGet Priority (Contradictory Documentation)**
+**Category 4: Value vs Get Priority (Contradictory Documentation)**
 
 **Issue 12**: troubleshooting.md (line 174)
-- Says "Value takes precedence over OnGet" - **WRONG**
+- Says "Value takes precedence over Get" - **WRONG**
 
 **Already correct**: properties.md (line 279)
-- Correctly states "OnGet takes precedence"
+- Correctly states "Get takes precedence"
 
-**Verified from generated code**: OnGet is checked first, takes precedence over Value.
+**Verified from generated code**: Get is checked first, takes precedence over Value.
 
 Fix: Update troubleshooting.md to match properties.md and generated code.
 
@@ -145,7 +145,7 @@ Fix: Update troubleshooting.md to match properties.md and generated code.
 **Already correct**: properties.md (lines 308, 338)
 - Prose correctly states "Reset preserves Value"
 
-**Verified from generated code**: Reset only clears counts and LastSetValue, preserves Value/OnGet/OnSet.
+**Verified from generated code**: Reset only clears counts and LastSetValue, preserves Value/Get/Set.
 
 Fix: Remove contradictory comment on line 333.
 
@@ -262,7 +262,7 @@ stub.GetUser.OnCall((id) => user);
 ~~- [ ] All obsolete `Interceptors` property pattern references updated~~
 ~~- [ ] All OnCall assignment syntax updated~~
 ~~- [ ] All callback examples show correct signatures~~
-~~- [ ] Value vs OnGet priority documented consistently~~
+~~- [ ] Value vs Get priority documented consistently~~
 ~~- [ ] Reset() behavior documented consistently~~
 
 **UPDATED after mdsnippets sync:**
@@ -272,15 +272,15 @@ stub.GetUser.OnCall((id) => user);
 - [x] Documentation.Samples project builds successfully (verified 2026-01-22)
 - [x] All code examples compile and work with current API (0 compilation failures)
 - [x] Comprehensive documentation review completed (2026-01-22)
-- [x] Additional clarity issues fixed: Reset() behavior, OnGet priority, GetById2 explanation
+- [x] Additional clarity issues fixed: Reset() behavior, Get priority, GetById2 explanation
 
 ---
 
 ## Dependencies
 
 **None** - Behavior already verified from generated code:
-- ✅ OnGet takes precedence over Value (checked generated property getter)
-- ✅ Reset() preserves Value/OnGet/OnSet (checked Reset implementation)
+- ✅ Get takes precedence over Value (checked generated property getter)
+- ✅ Reset() preserves Value/Get/Set (checked Reset implementation)
 - ✅ Callbacks receive only method/property parameters (checked OnCall signature)
 
 ---
@@ -309,16 +309,16 @@ Completed comprehensive review of all user-facing documentation in docs/ (exclud
 ### Issues Fixed
 
 1. **properties.md line 336** - Corrected misleading comment about Reset() behavior
-   - Before: "Note: Reset also clears Value, OnGet, OnSet"
-   - After: "Note: Reset clears OnGet and OnSet but preserves Value"
+   - Before: "Note: Reset also clears Value, Get, Set"
+   - After: "Note: Reset clears Get and Set but preserves Value"
 
 2. **properties.md line 341** - Clarified Reset() behavior documentation
    - Before: Contradictory "Why Value is preserved" section with wrong explanation
    - After: Clear explanation that Reset() preserves Value for test data configuration
 
-3. **troubleshooting.md lines 173-233** - Fixed incorrect OnGet priority explanation
-   - Before: "Value takes precedence over OnGet"
-   - After: "OnGet takes precedence over Value" (correctly documented)
+3. **troubleshooting.md lines 173-233** - Fixed incorrect Get priority explanation
+   - Before: "Value takes precedence over Get"
+   - After: "Get takes precedence over Value" (correctly documented)
 
 4. **stub-patterns.md line 68** - Added explanation for GetById2 interceptor naming
    - Before: Used GetById2 without explanation

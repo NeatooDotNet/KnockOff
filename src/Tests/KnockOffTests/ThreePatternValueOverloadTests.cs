@@ -10,7 +10,7 @@ namespace KnockOff.Tests;
 ///
 /// Note: Inline class stubs (Pattern 3) use a simpler interceptor pattern that
 /// does NOT include value overloads for methods. Only callback syntax is supported.
-/// Property value overloads (OnGet(value)) ARE supported for inline class stubs.
+/// Property value overloads (Get(value)) ARE supported for inline class stubs.
 /// </summary>
 public partial class ThreePatternValueOverloadTests
 {
@@ -33,7 +33,7 @@ public partial class ThreePatternValueOverloadTests
 		var knockOff = new StandaloneServiceKnockOff();
 		IThreePatternService service = knockOff;
 
-		knockOff.Status.OnGet("standalone status");
+		knockOff.Status.Get("standalone status");
 
 		Assert.Equal("standalone status", service.Status);
 	}
@@ -86,7 +86,7 @@ public partial class ThreePatternValueOverloadTests
 		var serviceStub = new InlineInterfaceStubs.Stubs.IThreePatternService();
 		IThreePatternService service = serviceStub;
 
-		serviceStub.Status.OnGet("inline interface status");
+		serviceStub.Status.Get("inline interface status");
 
 		Assert.Equal("inline interface status", service.Status);
 	}
@@ -121,7 +121,7 @@ public partial class ThreePatternValueOverloadTests
 
 	// Note: Inline class stubs use a simpler interceptor that does NOT include
 	// OnCall(value) overloads for methods - only OnCall(callback) is available.
-	// Property OnGet(value) IS available.
+	// Property Get(value) IS available.
 
 	[Fact]
 	public void InlineClass_VirtualMethodOnCallCallback_Works()
@@ -141,8 +141,8 @@ public partial class ThreePatternValueOverloadTests
 		var classStub = new InlineClassStubs.Stubs.ThreePatternBaseClass();
 		ThreePatternBaseClass instance = classStub.Object;
 
-		// Property OnGet(value) IS available for inline class stubs
-		classStub.VirtualStatus.OnGet("inline class status");
+		// Property Get(value) IS available for inline class stubs
+		classStub.VirtualStatus.Get("inline class status");
 
 		Assert.Equal("inline class status", instance.VirtualStatus);
 	}
@@ -222,17 +222,17 @@ public partial class ThreePatternValueOverloadTests
 	{
 		// Standalone
 		var standalone = new StandaloneServiceKnockOff();
-		standalone.Status.OnGet("standalone");
+		standalone.Status.Get("standalone");
 		Assert.Equal("standalone", ((IThreePatternService)standalone).Status);
 
 		// Inline Interface
 		var inlineInterface = new InlineInterfaceStubs.Stubs.IThreePatternService();
-		inlineInterface.Status.OnGet("inline interface");
+		inlineInterface.Status.Get("inline interface");
 		Assert.Equal("inline interface", ((IThreePatternService)inlineInterface).Status);
 
 		// Inline Class
 		var inlineClass = new InlineClassStubs.Stubs.ThreePatternBaseClass();
-		inlineClass.VirtualStatus.OnGet("inline class");
+		inlineClass.VirtualStatus.Get("inline class");
 		Assert.Equal("inline class", inlineClass.Object.VirtualStatus);
 	}
 

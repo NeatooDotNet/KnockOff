@@ -59,8 +59,8 @@ public class NewApiTests
         var stub = new MigrationUserServiceStub();
 
         #region property-value-new-api
-        // NEW API: Configure property return value with OnGet
-        stub.Name.OnGet("Alice");
+        // NEW API: Configure property return value with Get
+        stub.Name.Get("Alice");
         #endregion
 
         IMigrationUserService service = stub;
@@ -69,7 +69,7 @@ public class NewApiTests
 }
 
 // =============================================================================
-// Migration Step 1: Replace .Value = x with .OnGet(x)
+// Migration Step 1: Replace .Value = x with .Get(x)
 // =============================================================================
 
 public class MigrationValueToOnGetTests
@@ -89,9 +89,9 @@ public class MigrationValueToOnGetTests
 
         #region migration-value-to-onget-after
         // AFTER (0.24.0+):
-        stub.ConnectionString.OnGet("Server=localhost");
-        stub.Timeout.OnGet(30);
-        stub.IsEnabled.OnGet(true);
+        stub.ConnectionString.Get("Server=localhost");
+        stub.Timeout.Get(30);
+        stub.IsEnabled.Get(true);
         #endregion
 
         IMigrationConfigService config = stub;
@@ -120,8 +120,8 @@ public class MigrationValueReadTests
         var stub = new MigrationUserServiceStub();
 
         #region migration-value-read-after
-        // AFTER: Configure with OnGet, verify through interface
-        stub.Name.OnGet("Expected");
+        // AFTER: Configure with Get, verify through interface
+        stub.Name.Get("Expected");
         #endregion
 
         IMigrationUserService service = stub;
@@ -130,7 +130,7 @@ public class MigrationValueReadTests
 }
 
 // =============================================================================
-// Migration Step 3: Dynamic values use OnGet with callback
+// Migration Step 3: Dynamic values use Get with callback
 // =============================================================================
 
 public class MigrationDynamicValueTests
@@ -150,10 +150,10 @@ public class MigrationDynamicValueTests
 
         #region migration-dynamic-value-after
         // AFTER: Use callback for values evaluated on each access
-        stub.LastUpdated.OnGet(() => DateTime.UtcNow);
+        stub.LastUpdated.Get(() => DateTime.UtcNow);
         #endregion
 
-        stub.LastUpdated.OnGet(() =>
+        stub.LastUpdated.Get(() =>
         {
             callCount++;
             return DateTime.UtcNow;
@@ -182,7 +182,7 @@ public class MigrationExampleSimplePropertyTests
         #region migration-example-simple-property
         // BEFORE: stub.Name.Value = "Alice";
         // AFTER:
-        stub.Name.OnGet("Alice");
+        stub.Name.Get("Alice");
         #endregion
 
         IMigrationUserService service = stub;
@@ -199,8 +199,8 @@ public class MigrationExampleNullablePropertyTests
 
         #region migration-example-nullable-property
         // BEFORE: stub.Email.Value = null;
-        // AFTER: Cast null to the property type for OnGet
-        stub.Email.OnGet((string?)null);
+        // AFTER: Cast null to the property type for Get
+        stub.Email.Get((string?)null);
         #endregion
 
         IMigrationUserService service = stub;
@@ -218,7 +218,7 @@ public class MigrationExampleValueTypePropertyTests
         #region migration-example-value-type-property
         // BEFORE: stub.Age.Value = 42;
         // AFTER:
-        stub.Age.OnGet(42);
+        stub.Age.Get(42);
         #endregion
 
         IMigrationUserService service = stub;
@@ -236,7 +236,7 @@ public class MigrationExampleBooleanPropertyTests
         #region migration-example-boolean-property
         // BEFORE: stub.IsActive.Value = true;
         // AFTER:
-        stub.IsActive.OnGet(true);
+        stub.IsActive.Get(true);
         #endregion
 
         IMigrationUserService service = stub;

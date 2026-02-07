@@ -33,7 +33,7 @@ Convert inline code examples in skill files to `snippet:` references backed by c
 
 Convert the most important examples that users see first:
 - [ ] Quick Start (create stub, configure, verify)
-- [ ] Core API (OnCall, Value, OnGet patterns)
+- [ ] Core API (OnCall, Value, Get patterns)
 - [ ] Common Mistakes (the 4 anti-patterns)
 - [ ] Moq Migration Quick Reference
 

@@ -52,7 +52,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.Name.OnGet("TestProperty");
+        stub.Name.Get("TestProperty");
 
         Assert.Equal("TestProperty", property.Name);
         stub.Name.VerifyGet(Times.Once);
@@ -64,7 +64,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.Value.OnGet("TestValue");
+        stub.Value.Get("TestValue");
 
         Assert.Equal("TestValue", property.Value);
     }
@@ -87,7 +87,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.Task.OnGet(Task.CompletedTask);
+        stub.Task.Get(Task.CompletedTask);
 
         Assert.Same(Task.CompletedTask, property.Task);
     }
@@ -98,7 +98,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.IsBusy.OnGet(true);
+        stub.IsBusy.Get(true);
 
         Assert.True(property.IsBusy);
     }
@@ -109,7 +109,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.IsReadOnly.OnGet(true);
+        stub.IsReadOnly.Get(true);
 
         Assert.True(property.IsReadOnly);
     }
@@ -120,7 +120,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.Type.OnGet(typeof(string));
+        stub.Type.Get(typeof(string));
 
         Assert.Equal(typeof(string), property.Type);
     }
@@ -131,7 +131,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.IsSelfValid.OnGet(true);
+        stub.IsSelfValid.Get(true);
 
         Assert.True(property.IsSelfValid);
     }
@@ -142,7 +142,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.IsValid.OnGet(false);
+        stub.IsValid.Get(false);
 
         Assert.False(property.IsValid);
     }
@@ -154,7 +154,7 @@ public partial class IValidatePropertyTests
         IValidateProperty property = stub;
 
         var messages = new List<IPropertyMessage>();
-        stub.PropertyMessages.OnGet(messages);
+        stub.PropertyMessages.Get(messages);
 
         Assert.Same(messages, property.PropertyMessages);
     }
@@ -312,7 +312,7 @@ public partial class IValidatePropertyTests
         IValidateProperty property = stub;
 
         // Configure StringValue directly (stubs override DIMs with explicit implementations)
-        stub.StringValue.OnGet("TestValue");
+        stub.StringValue.Get("TestValue");
 
         var stringValue = property.StringValue;
 
@@ -325,7 +325,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.Value.OnGet((string?)null);
+        stub.Value.Get((string?)null);
 
         var stringValue = property.StringValue;
 
@@ -356,7 +356,7 @@ public partial class IValidatePropertyTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty property = stub;
 
-        stub.Name.OnGet("Test");
+        stub.Name.Get("Test");
         _ = property.Name;
         _ = property.Name;
 
@@ -413,7 +413,7 @@ public class IValidatePropertyStandaloneTests
         var stub = new ValidatePropertyStub();
         IValidateProperty property = stub;
 
-        stub.Name.OnGet("StandaloneName");
+        stub.Name.Get("StandaloneName");
 
         Assert.Equal("StandaloneName", property.Name);
     }
@@ -424,7 +424,7 @@ public class IValidatePropertyStandaloneTests
         var stub = new ValidatePropertyStub();
         IValidateProperty property = stub;
 
-        stub.IsBusy.OnGet(true);
+        stub.IsBusy.Get(true);
 
         Assert.True(property.IsBusy);
     }
@@ -466,7 +466,7 @@ public partial class IValidatePropertyOfTTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty<string> property = stub;
 
-        stub.Value.OnGet("TypedValue");
+        stub.Value.Get("TypedValue");
 
         Assert.Equal("TypedValue", property.Value);
     }
@@ -489,7 +489,7 @@ public partial class IValidatePropertyOfTTests
         var stub = new Stubs.IValidateProperty();
         IValidateProperty<string> property = stub;
 
-        stub.Name.OnGet("TypedPropertyName");
+        stub.Name.Get("TypedPropertyName");
 
         Assert.Equal("TypedPropertyName", property.Name);
     }

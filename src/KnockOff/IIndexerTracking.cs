@@ -2,7 +2,7 @@ namespace KnockOff;
 
 /// <summary>
 /// Tracks invocations of an indexer getter callback registration with key capture.
-/// Returned by OnGet() to enable verification, key inspection, and fluent chaining.
+/// Returned by Get() to enable verification, key inspection, and fluent chaining.
 /// </summary>
 public interface IIndexerGetTracking<TKey>
 {
@@ -42,7 +42,7 @@ public interface IIndexerGetTracking<TKey>
 
 /// <summary>
 /// Tracks invocations of an indexer setter callback registration with key and value capture.
-/// Returned by OnSet() to enable verification, entry inspection, and fluent chaining.
+/// Returned by Set() to enable verification, entry inspection, and fluent chaining.
 /// </summary>
 public interface IIndexerSetTracking<TKey, TValue>
 {

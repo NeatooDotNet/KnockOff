@@ -80,9 +80,9 @@ public class InitPropertyStandaloneTests
 	[Fact]
 	public void InitProperty_CanSetValueForTesting()
 	{
-		// Arrange - use OnGet to configure the return value
+		// Arrange - use Get to configure the return value
 		var stub = new EntityWithInitPropertyKnockOff();
-		stub.Id.OnGet("test-123");
+		stub.Id.Get("test-123");
 
 		// Assert - value is returned through interface
 		IEntityWithInitProperty entity = stub;
@@ -94,7 +94,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new EntityWithInitPropertyKnockOff();
-		stub.Id.OnGet("tracked-value");
+		stub.Id.Get("tracked-value");
 
 		// Act
 		IEntityWithInitProperty entity = stub;
@@ -110,12 +110,12 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new DocumentWithMixedPropertiesKnockOff();
-		stub.Id.OnGet("doc-1");
-		stub.Title.OnGet("Initial Title");
-		stub.Version.OnGet(1);
+		stub.Id.Get("doc-1");
+		stub.Title.Get("Initial Title");
+		stub.Version.Get(1);
 
-		// Act - change Title (set property can be modified via OnGet)
-		stub.Title.OnGet("Updated Title");
+		// Act - change Title (set property can be modified via Get)
+		stub.Title.Get("Updated Title");
 
 		// Assert
 		IDocumentWithMixedProperties doc = stub;
@@ -129,7 +129,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new NullableInitPropertyKnockOff();
-		stub.Name.OnGet((string?)null);
+		stub.Name.Get((string?)null);
 
 		// Assert
 		INullableInitProperty entity = stub;
@@ -141,7 +141,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new NullableInitPropertyKnockOff();
-		stub.Name.OnGet("Test Name");
+		stub.Name.Get("Test Name");
 
 		// Assert
 		INullableInitProperty entity = stub;
@@ -153,7 +153,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new ValueTypeInitPropertyKnockOff();
-		stub.Count.OnGet(42);
+		stub.Count.Get(42);
 
 		// Assert
 		IValueTypeInitProperty entity = stub;
@@ -165,7 +165,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new NullableValueTypeInitPropertyKnockOff();
-		stub.Revision.OnGet((int?)null);
+		stub.Revision.Get((int?)null);
 
 		// Assert
 		INullableValueTypeInitProperty entity = stub;
@@ -177,7 +177,7 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new NullableValueTypeInitPropertyKnockOff();
-		stub.Revision.OnGet(5);
+		stub.Revision.Get(5);
 
 		// Assert
 		INullableValueTypeInitProperty entity = stub;
@@ -189,9 +189,9 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new MultipleInitPropertiesKnockOff();
-		stub.Id.OnGet("multi-1");
-		stub.Name.OnGet("Test Entity");
-		stub.Version.OnGet(3);
+		stub.Id.Get("multi-1");
+		stub.Name.Get("Test Entity");
+		stub.Version.Get(3);
 
 		// Assert
 		IMultipleInitProperties entity = stub;
@@ -205,14 +205,14 @@ public class InitPropertyStandaloneTests
 	{
 		// Arrange
 		var stub = new EntityWithInitPropertyKnockOff();
-		stub.Id.OnGet("reset-test");
+		stub.Id.Get("reset-test");
 		IEntityWithInitProperty entity = stub;
 		_ = entity.Id; // trigger get
 
 		// Act
 		stub.Id.Reset();
 
-		// Assert - Reset() clears tracking but preserves configuration (OnGet callback)
+		// Assert - Reset() clears tracking but preserves configuration (Get callback)
 		stub.Id.VerifyGet(Times.Never);
 		Assert.Equal("reset-test", entity.Id); // Configuration is preserved, verify through interface
 	}
@@ -257,7 +257,7 @@ public class InitPropertyInlineStubTests
 	{
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
-		stub.Id.OnGet("inline-test-123");
+		stub.Id.Get("inline-test-123");
 
 		// Assert
 		IEntityWithInitProperty entity = stub;
@@ -269,12 +269,12 @@ public class InitPropertyInlineStubTests
 	{
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.IDocumentWithMixedProperties();
-		stub.Id.OnGet("inline-doc-1");
-		stub.Title.OnGet("Initial");
-		stub.Version.OnGet(1);
+		stub.Id.Get("inline-doc-1");
+		stub.Title.Get("Initial");
+		stub.Version.Get(1);
 
 		// Act
-		stub.Title.OnGet("Updated");
+		stub.Title.Get("Updated");
 
 		// Assert
 		IDocumentWithMixedProperties doc = stub;
@@ -287,7 +287,7 @@ public class InitPropertyInlineStubTests
 	{
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.INullableInitProperty();
-		stub.Name.OnGet("inline-name");
+		stub.Name.Get("inline-name");
 
 		// Assert
 		INullableInitProperty entity = stub;
@@ -299,7 +299,7 @@ public class InitPropertyInlineStubTests
 	{
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
-		stub.Id.OnGet("tracked");
+		stub.Id.Get("tracked");
 
 		// Act
 		IEntityWithInitProperty entity = stub;
@@ -474,8 +474,8 @@ public class ClassInitPropertyStubTests
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithVirtualInit();
 
-		// Act - set via OnGet callback
-		stub.Id.OnGet(() => "test-id");
+		// Act - set via Get callback
+		stub.Id.Get(() => "test-id");
 
 		// Assert
 		Assert.Equal("test-id", stub.Object.Id);
@@ -498,7 +498,7 @@ public class ClassInitPropertyStubTests
 	[Fact]
 	public void ClassStub_VirtualInitProperty_DelegatesToBase()
 	{
-		// Arrange - without OnGet, should use base class default
+		// Arrange - without Get, should use base class default
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithVirtualInit();
 
 		// Act
@@ -526,7 +526,7 @@ public class ClassInitPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithAbstractInit();
-		stub.Id.OnGet(() => "abstract-id");
+		stub.Id.Get(() => "abstract-id");
 
 		// Act
 		var result = stub.Object.Id;
@@ -540,9 +540,9 @@ public class ClassInitPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithMixedInit();
-		stub.Id.OnGet(() => "mixed-id");
-		stub.Name.OnGet(() => "mixed-name");
-		stub.Version.OnGet(() => 42);
+		stub.Id.Get(() => "mixed-id");
+		stub.Name.Get(() => "mixed-name");
+		stub.Version.Get(() => 42);
 
 		// Act & Assert
 		Assert.Equal("mixed-id", stub.Object.Id);
@@ -588,7 +588,7 @@ public class ClassRequiredPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithRequiredProperty();
-		stub.Id.OnGet(() => "required-id");
+		stub.Id.Get(() => "required-id");
 
 		// Act
 		var result = stub.Object.Id;
@@ -625,7 +625,7 @@ public class ClassRequiredPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithRequiredInit();
-		stub.Id.OnGet(() => "required-init-id");
+		stub.Id.Get(() => "required-init-id");
 
 		// Act
 		var result = stub.Object.Id;
@@ -639,9 +639,9 @@ public class ClassRequiredPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithMultipleRequired();
-		stub.Id.OnGet(() => "multi-req-id");
-		stub.Name.OnGet(() => "multi-req-name");
-		stub.Version.OnGet(() => 99);
+		stub.Id.Get(() => "multi-req-id");
+		stub.Name.Get(() => "multi-req-name");
+		stub.Version.Get(() => 99);
 
 		// Act & Assert
 		Assert.Equal("multi-req-id", stub.Object.Id);
@@ -674,15 +674,15 @@ public class ClassRequiredPropertyStubTests
 	{
 		// Arrange
 		var stub = new ClassInitPropertyTests.Stubs.EntityBaseWithRequiredProperty();
-		stub.Id.OnGet(() => "test");
+		stub.Id.Get(() => "test");
 		_ = stub.Object.Id;
 
 		// Act
 		stub.Id.Reset();
 
-		// Assert - Reset() clears tracking but preserves configuration (OnGet callback)
+		// Assert - Reset() clears tracking but preserves configuration (Get callback)
 		stub.Id.VerifyGet(Times.Never);
-		// OnGet callback is preserved - verify by calling getter again
+		// Get callback is preserved - verify by calling getter again
 		Assert.Equal("test", stub.Object.Id);
 	}
 }

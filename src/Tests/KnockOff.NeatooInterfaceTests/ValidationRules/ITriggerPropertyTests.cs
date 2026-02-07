@@ -32,7 +32,7 @@ public partial class ITriggerPropertyTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty trigger = stub;
 
-        stub.PropertyName.OnGet("TestProperty");
+        stub.PropertyName.Get("TestProperty");
 
         Assert.Equal("TestProperty", trigger.PropertyName);
         stub.PropertyName.VerifyGet(Times.Once);
@@ -44,7 +44,7 @@ public partial class ITriggerPropertyTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty trigger = stub;
 
-        stub.PropertyName.OnGet(() => "DynamicProperty");
+        stub.PropertyName.Get(() => "DynamicProperty");
 
         Assert.Equal("DynamicProperty", trigger.PropertyName);
     }
@@ -111,7 +111,7 @@ public partial class ITriggerPropertyTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty trigger = stub;
 
-        stub.PropertyName.OnGet("Test");
+        stub.PropertyName.Get("Test");
         _ = trigger.PropertyName;
         _ = trigger.PropertyName;
 
@@ -169,7 +169,7 @@ public class ITriggerPropertyStandaloneTests
         var stub = new TriggerPropertyStub();
         ITriggerProperty trigger = stub;
 
-        stub.PropertyName.OnGet("ConfiguredName");
+        stub.PropertyName.Get("ConfiguredName");
 
         Assert.Equal("ConfiguredName", trigger.PropertyName);
     }
@@ -273,7 +273,7 @@ public partial class ITriggerPropertyOfTTests
         var stub = new Stubs.ITriggerProperty();
         ITriggerProperty<IValidateBase> trigger = stub;
 
-        stub.PropertyName.OnGet("InheritedProperty");
+        stub.PropertyName.Get("InheritedProperty");
 
         Assert.Equal("InheritedProperty", trigger.PropertyName);
     }

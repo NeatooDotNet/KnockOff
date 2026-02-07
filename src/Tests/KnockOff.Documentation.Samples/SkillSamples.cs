@@ -154,14 +154,14 @@ public class PropertyConfigTests
     {
         var stub = new SkillAppConfigStub();
 
-        // OnGet with value - simplest syntax
-        stub.Timeout.OnGet(30);
+        // Get with value - simplest syntax
+        stub.Timeout.Get(30);
 
-        // OnGet with callback - for computed values
-        stub.ApiKey.OnGet(() => Environment.GetEnvironmentVariable("API_KEY") ?? "test-key");
+        // Get with callback - for computed values
+        stub.ApiKey.Get(() => Environment.GetEnvironmentVariable("API_KEY") ?? "test-key");
 
-        // OnSet - intercept property writes
-        stub.ApiKey.OnSet((value) => { /* validate or track */ });
+        // Set - intercept property writes
+        stub.ApiKey.Set((value) => { /* validate or track */ });
     }
 }
 

@@ -81,7 +81,7 @@ The nested `Impl` class's `override string Name` is **hidden from users** becaus
 
 This is the **only** solution that:
 - Avoids name collisions (interceptors on wrapper, overrides on nested Impl)
-- Provides clean interceptor API (`stub.Name.OnGet(...)`)
+- Provides clean interceptor API (`stub.Name.Get(...)`)
 - Is consistent with the existing inline class stub pattern
 - Compiles correctly
 
@@ -313,7 +313,7 @@ public partial class ServiceStub : global::KnockOff.IKnockOffStub
 var stub = new ServiceStub();
 
 // Configure interceptors with clean names
-stub.Name.OnGet("TestService");
+stub.Name.Get("TestService");
 stub.Execute.OnCall(cmd => Console.WriteLine($"Executed: {cmd}"));
 
 // Get the actual ServiceBase instance via .Object
@@ -624,7 +624,7 @@ Private constructors are not forwarded.
 
 The corrected architecture uses **composition** (wrapper + nested Impl) rather than **inheritance** (wrapper inherits from Impl). This is the only way to:
 1. Avoid name collisions between interceptor properties and override properties
-2. Provide clean interceptor API (`stub.Name.OnGet(...)`)
+2. Provide clean interceptor API (`stub.Name.Get(...)`)
 3. Be consistent with inline class stubs
 
 **Trade-off:** The user's stub class is NOT a `ServiceBase`. Users must use `.Object` to get the actual `ServiceBase` instance. This matches inline class stub behavior exactly.
