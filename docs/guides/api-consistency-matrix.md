@@ -145,7 +145,7 @@ stub.DataReceived.VerifyRemove(Times.Never);
 | `VerifyAdd(Times.X)` | ✓ |
 | `VerifyRemove(Times.X)` | ✓ |
 
-**Note:** Standalone stubs use clean names (e.g., `stub.DataReceived`). Inline stubs use the `Interceptor` suffix (e.g., `stub.DataReceivedInterceptor`).
+**Note:** All patterns use clean event names (e.g., `stub.DataReceived`). This is consistent across standalone, inline, and class stubs.
 
 ---
 

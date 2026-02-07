@@ -651,6 +651,7 @@ userStub.Verify();
 | **Supports delegates** | No | No | No | No | No | No | Yes | Yes* | No |
 | **Supports generics** | No | Yes | No | Yes | Closed only | Closed only | Closed only | Yes | Yes |
 | **Uses .Object property** | No | No | Yes | Yes | No | Yes | No | No | Yes |
+| **Source() delegation** | Yes | Yes | No | No | Yes | No | No | Yes | No |
 | **Instantiation syntax** | `new MyStub()` | `new MyStub<T>()` | `new MyStub().Object` | `new MyStub<T>().Object` | `new Stubs.IFoo()` | `new Stubs.Foo().Object` | `new Stubs.Del()` | `new Stubs.IFoo<T>()` | `new Stubs.Foo<T>().Object` |
 | **Best for** | Shared interface stubs | Shared generic interface stubs | Shared class stubs | Shared generic class stubs | Local interface stubs | Local class stubs | Delegate stubs | Local generic interface stubs | Local generic class stubs |
 
@@ -783,4 +784,4 @@ ServiceBaseGeneric<Order> service = serviceStub.Object;  // .Object required for
 
 ---
 
-**UPDATED:** 2026-02-04 (Nine patterns including Standalone Class stubs)
+**UPDATED:** 2026-02-06 (Nine patterns including Standalone Class stubs)

@@ -1,4 +1,4 @@
-[Guides](../docs/guides) > Method Interceptors
+[Home](../../README.md) / [Guides](../guides/) / Methods
 
 # Method Interceptors
 
@@ -131,7 +131,7 @@ var (username, password) = tracking.LastArgs;
 
 ## Overloaded Methods
 
-When an interface has overloaded methods, KnockOff generates numbered suffixes for each overload:
+When an interface has overloaded methods, KnockOff generates a single interceptor with overloaded `OnCall()` methods. The lambda's parameter types disambiguate which overload to configure:
 
 <!-- snippet: methods-overloads -->
 ```cs
@@ -142,7 +142,7 @@ stub.Find.OnCall((string name) => new User { Id = 1, Name = name });
 ```
 <!-- endSnippet -->
 
-Overloads are numbered in the order they appear in the interface definition.
+Each overload gets its own `OnCall` overload on the same interceptor property, distinguished by the delegate signature.
 
 **Stand-Alone pattern with user methods:** Each overload gets its own virtual method in the generated base class. You can selectively override specific overloads without affecting others. See the [User Methods: Overloads](user-methods.md#overloads) section for details.
 
@@ -154,7 +154,7 @@ Clear tracking state and remove callbacks using `Reset()`:
 
 <!-- snippet: methods-reset -->
 ```cs
-// Reset clears call count, captured arguments, and callbacks
+// Reset clears call count and captured arguments, but preserves callbacks
 stub.ProcessData.Reset();
 ```
 <!-- endSnippet -->
@@ -353,7 +353,7 @@ var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
 - **Sequences**: Use `Returns(1, 2, 3)` for constant value sequences (NSubstitute-style); use `ThenCall()` chaining for callback sequences
 - **Async auto-wrapping**: Async methods auto-wrap params values - no `Task.FromResult` needed
 - **ThenDefault()**: Opt-in to returning `default(T)` after sequence exhaustion instead of repeating
-- **Reset**: Clears call count, captured arguments, and removes callbacks
+- **Reset**: Clears call count, captured arguments, and sequence position, but preserves callbacks
 
 Next: [Property Interceptors](properties.md) for get/set tracking and configuration.
 

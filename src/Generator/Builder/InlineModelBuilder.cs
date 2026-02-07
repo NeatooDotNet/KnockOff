@@ -535,13 +535,20 @@ internal static class InlineModelBuilder
         var interceptClassName = $"{stubClassName}_{evt.Name}Interceptor";
         // Strip trailing ? from delegate type
         var delegateType = evt.FullDelegateTypeName.TrimEnd('?');
+        var (raiseParams, raiseArgs, raiseReturnType, raiseReturnsValue, usesDynamicInvoke) =
+            EventBuilderHelpers.GetRaiseMethodInfo(evt);
 
         return new InlineEventModel(
             InterceptorClassName: interceptClassName,
             EventName: evt.Name,
             DelegateType: delegateType,
             TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+            ConstraintClauses: constraintClause,
+            RaiseParameters: raiseParams,
+            RaiseArguments: raiseArgs,
+            RaiseReturnType: raiseReturnType,
+            RaiseReturnsValue: raiseReturnsValue,
+            UsesDynamicInvoke: usesDynamicInvoke);
     }
 
     private static EquatableArray<InlineInterceptorPropertyModel> BuildInterceptorProperties(
@@ -624,12 +631,12 @@ internal static class InlineModelBuilder
             }
         }
 
-        // Event interceptors (with Interceptor suffix)
+        // Event interceptors (bare event names)
         foreach (var evt in events)
         {
             var interceptorType = $"{stubClassName}_{evt.Name}Interceptor{typeParamList}";
             properties.Add(new InlineInterceptorPropertyModel(
-                PropertyName: $"{evt.Name}Interceptor",
+                PropertyName: evt.Name,
                 InterceptorTypeName: interceptorType,
                 NeedsNewKeyword: false,
                 Description: $"Interceptor for {evt.Name} event."));
@@ -1066,7 +1073,7 @@ internal static class InlineModelBuilder
             IsInitOnly: false,
             HasGetter: false,
             HasSetter: false,
-            InterceptorName: $"{evt.Name}Interceptor",
+            InterceptorName: evt.Name,
             ParameterDeclarations: "",
             ArgumentList: "",
             InvokeSuffix: "",  // Events don't use invoke suffix

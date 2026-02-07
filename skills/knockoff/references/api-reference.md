@@ -220,7 +220,7 @@ When a method returns a value, sequences can be built using these methods on `IM
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (call counts, `LastArg`/`LastArgs`), resets sequence index and When chain position. Preserves `OnCall`/`Returns` callbacks
+- `void Reset()` - Clears tracking state (call counts, `LastArg`/`LastArgs`), resets sequence index, When chain position, and source delegation reference. Preserves `OnCall`/`Returns` callbacks
 
 ### Example
 
@@ -290,7 +290,7 @@ When a property has a getter, sequences can be built using these methods on `IPr
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (get/set counts, `LastSetValue`), resets sequence index. Preserves `OnGet`/`OnSet` callbacks
+- `void Reset()` - Clears tracking state (get/set counts, `LastSetValue`), resets sequence index and source delegation reference. Preserves `OnGet`/`OnSet` callbacks
 
 ### Example
 
@@ -405,7 +405,7 @@ Calling `Raise` invokes all subscribed handlers with the provided arguments.
 
 #### Reset
 
-- `void Reset()` - Clears tracking state. Does NOT remove subscribers
+- `void Reset()` - Clears tracking state (add/remove counts) AND removes all subscribers (`HasSubscribers` becomes `false`)
 
 ### Example
 
@@ -557,16 +557,16 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
+| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position, source delegation | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
 | **User Method** | Call counts, `LastArg` | `OnCall`/`Returns` configuration, verifiable marking |
-| **Property** | Get/set counts, `LastSetValue`, sequence index | `OnGet`/`OnSet` callbacks, sequence structure, verifiable marking |
+| **Property** | Get/set counts, `LastSetValue`, sequence index, source delegation | `OnGet`/`OnSet` callbacks, sequence structure, verifiable marking |
 | **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `OnGet`/`OnSet` callbacks, `Backing` dictionary, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
 | **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `OnCall`/`Returns` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
 | **Generic Method (Typed)** | Tracking for specific type argument(s) only | Tracking for other type arguments |
 
-**Key Principle**: `Reset()` clears tracking state (counts, captured arguments, positions) but preserves configured callbacks and structural state (backing dictionaries, sequence/When chain structures, verifiable marking).
+**Key Principle**: `Reset()` clears tracking state (counts, captured arguments, positions, source delegation reference) but preserves configured callbacks and structural state (backing dictionaries, sequence/When chain structures, verifiable marking).
 
 ---
 
@@ -650,6 +650,36 @@ If any verification fails, `Verify()` throws an exception detailing which interc
 
 ---
 
+## Source Delegation
+
+`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Available for **interface stubs only** (Standalone, Generic Standalone, Inline Interface, Open Generic Interface patterns). Class stubs inherit from the base class directly and do not need Source().
+
+### Stub-Level API
+
+| Method | Description |
+|--------|-------------|
+| `Source(IInterface? source)` | Sets source on all interceptors. Pass `null` to clear. |
+
+For interface hierarchies, KnockOff generates one `Source()` overload per interface in the hierarchy. Each overload sets `_source` on matching interceptors and clears it on non-matching ones.
+
+### Priority Order
+
+KnockOff evaluates member calls in this order:
+
+1. **When chains** -- `stub.Method.When(...).Returns(...)`
+2. **OnCall / Returns** -- `stub.Method.OnCall(...)` or `stub.Method.Returns(...)`
+3. **User methods** -- `protected override` with `_` suffix (Standalone only)
+4. **Source delegation** -- `stub.Source(realImplementation)`
+5. **Smart default** -- KnockOff's built-in default value
+
+The first match wins. OnCall takes full control when configured -- Source is not consulted even for arguments that do not match When predicates.
+
+### Reset Interaction
+
+`Reset()` on an individual interceptor clears its `_source` reference. If you need delegation after a reset, call `stub.Source(realImplementation)` again.
+
+---
+
 ## See Also
 
 **Getting Started**:
@@ -668,4 +698,4 @@ If any verification fails, `Verify()` throws an exception detailing which interc
 
 ---
 
-**UPDATED:** 2026-02-05
+**UPDATED:** 2026-02-06

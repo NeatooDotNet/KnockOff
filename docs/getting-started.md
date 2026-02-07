@@ -24,7 +24,7 @@ Or add directly to your `.csproj` file:
 // dotnet add package KnockOff
 
 // Or add to your .csproj:
-// <PackageReference Include="KnockOff" Version="0.34.0" />
+// <PackageReference Include="KnockOff" Version="0.36.0" />
 ```
 <!-- endSnippet -->
 
@@ -234,7 +234,7 @@ KnockOff outputs generated code to your project's `Generated/` folder at the pro
 - **Rider**: Navigate to the Generated folder in the project structure
 - **File System**: Look in the `Generated/` folder within your test project directory
 
-Generated files are committed to source control so you can track changes in diffs and PRs.
+Generated files are excluded from source control by default (the `Generated/` folder is in `.gitignore`). You can inspect them locally during development to understand how KnockOff implements your stubs.
 
 ### What Gets Generated
 

@@ -32,7 +32,7 @@ public partial class INotifyNeatooPropertyChangedTests
 
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public partial class INotifyNeatooPropertyChangedTests
         notify.NeatooPropertyChanged += handler;
         notify.NeatooPropertyChanged -= handler;
 
-        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
-        stub.NeatooPropertyChangedInterceptor.VerifyRemove(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyRemove(Times.Once);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public partial class INotifyNeatooPropertyChangedTests
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Exactly(3));
+        stub.NeatooPropertyChanged.VerifyAdd(Times.Exactly(3));
     }
 }
 

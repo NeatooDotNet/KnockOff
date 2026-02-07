@@ -467,7 +467,7 @@ public class StandaloneClassEventTests
 		stub.Object.StatusChanged += (s, e) => eventFired = true;
 
 		// Raise the event via interceptor
-		stub.StatusChanged.Handler?.Invoke(stub.Object, EventArgs.Empty);
+		stub.StatusChanged.Raise(stub.Object, EventArgs.Empty);
 
 		Assert.True(eventFired);
 	}

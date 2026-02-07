@@ -9,7 +9,7 @@ namespace KnockOff.Documentation.Samples.GettingStarted;
 // dotnet add package KnockOff
 
 // Or add to your .csproj:
-// <PackageReference Include="KnockOff" Version="0.34.0" />
+// <PackageReference Include="KnockOff" Version="0.36.0" />
 #endregion
 
 // =============================================================================

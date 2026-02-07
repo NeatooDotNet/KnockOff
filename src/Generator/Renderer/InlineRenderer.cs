@@ -891,20 +891,31 @@ internal static class InlineRenderer
         w.Line($"\t\tpublic sealed class {evt.InterceptorClassName}{typeParamList}{constraintClause}");
         w.Line("\t\t{");
 
+        // Backing field
+        w.Line($"\t\t\tprivate {evt.DelegateType}? _handler;");
+        w.Line();
+
+        // Add/Remove tracking
         w.Line("\t\t\tprivate int _addCount;");
         w.Line("\t\t\tprivate int _removeCount;");
         w.Line();
-        w.Line($"\t\t\t/// <summary>The backing delegate for raising the event.</summary>");
-        w.Line($"\t\t\tpublic {evt.DelegateType}? Handler {{ get; private set; }}");
+
+        w.Line("\t\t\t/// <summary>Whether any handlers are subscribed.</summary>");
+        w.Line("\t\t\tpublic bool HasSubscribers => _handler != null;");
         w.Line();
+
         w.Line("\t\t\t/// <summary>Records an event subscription.</summary>");
-        w.Line($"\t\t\tpublic void RecordAdd({evt.DelegateType}? handler) {{ _addCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Combine(Handler, handler); }}");
+        w.Line($"\t\t\tpublic void RecordAdd({evt.DelegateType}? value) {{ _addCount++; _handler = ({evt.DelegateType}?)global::System.Delegate.Combine(_handler, value); }}");
         w.Line();
         w.Line("\t\t\t/// <summary>Records an event unsubscription.</summary>");
-        w.Line($"\t\t\tpublic void RecordRemove({evt.DelegateType}? handler) {{ _removeCount++; Handler = ({evt.DelegateType}?)global::System.Delegate.Remove(Handler, handler); }}");
+        w.Line($"\t\t\tpublic void RecordRemove({evt.DelegateType}? value) {{ _removeCount++; _handler = ({evt.DelegateType}?)global::System.Delegate.Remove(_handler, value); }}");
         w.Line();
-        w.Line("\t\t\t/// <summary>Resets tracking state (counts, Handler) but preserves verifiable marking.</summary>");
-        w.Line("\t\t\tpublic void Reset() { _addCount = 0; _removeCount = 0; Handler = null; }");
+
+        // Raise method
+        RenderEventRaiseMethod(w, evt, "\t\t\t");
+
+        w.Line("\t\t\t/// <summary>Resets tracking state (counts, handler) but preserves verifiable marking.</summary>");
+        w.Line("\t\t\tpublic void Reset() { _addCount = 0; _removeCount = 0; _handler = null; }");
         w.Line();
 
         // Verification API for events
@@ -969,7 +980,7 @@ internal static class InlineRenderer
 
         // Internal verification methods for stub-level Verify()/VerifyAll()
         w.Line("\t\t\tinternal bool IsVerifiable => _isVerifiable;");
-        w.Line("\t\t\tinternal bool IsConfigured => Handler != null;");
+        w.Line("\t\t\tinternal bool IsConfigured => _handler != null;");
         w.Line();
 
         w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>");
@@ -996,6 +1007,52 @@ internal static class InlineRenderer
         w.Line("\t\t\t}");
 
         w.Line("\t\t}");
+        w.Line();
+    }
+
+    private static void RenderEventRaiseMethod(CodeWriter w, InlineEventModel evt, string indent)
+    {
+        if (evt.RaiseReturnsValue)
+        {
+            // Func-style delegate
+            w.Line($"{indent}/// <summary>Raises the event with the specified arguments and returns the result.</summary>");
+            if (string.IsNullOrEmpty(evt.RaiseParameters))
+            {
+                w.Line($"{indent}public {evt.RaiseReturnType} Raise() => _handler != null ? _handler.Invoke() : default!;");
+            }
+            else
+            {
+                w.Line($"{indent}public {evt.RaiseReturnType} Raise({evt.RaiseParameters}) => _handler != null ? _handler.Invoke({evt.RaiseArguments}) : default!;");
+            }
+        }
+        else if (evt.UsesDynamicInvoke)
+        {
+            // Custom delegate - use DynamicInvoke
+            if (string.IsNullOrEmpty(evt.RaiseParameters))
+            {
+                w.Line($"{indent}/// <summary>Raises the event.</summary>");
+                w.Line($"{indent}public void Raise() => (_handler as global::System.Action)?.Invoke();");
+            }
+            else
+            {
+                w.Line($"{indent}/// <summary>Invokes the handler if subscribed.</summary>");
+                w.Line($"{indent}public void Raise({evt.RaiseParameters}) => _handler?.DynamicInvoke({evt.RaiseArguments});");
+            }
+        }
+        else
+        {
+            // Standard Action/EventHandler
+            if (string.IsNullOrEmpty(evt.RaiseParameters))
+            {
+                w.Line($"{indent}/// <summary>Raises the event.</summary>");
+                w.Line($"{indent}public void Raise() => _handler?.Invoke();");
+            }
+            else
+            {
+                w.Line($"{indent}/// <summary>Raises the event with the specified arguments.</summary>");
+                w.Line($"{indent}public void Raise({evt.RaiseParameters}) => _handler?.Invoke({evt.RaiseArguments});");
+            }
+        }
         w.Line();
     }
 

@@ -165,7 +165,7 @@ public partial class IValidateListBaseTests
 
         list.PropertyChanged += (s, e) => { };
 
-        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
+        stub.PropertyChanged.VerifyAdd(Times.Once);
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public partial class IValidateListBaseTests
 
         list.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
     }
 
     #endregion

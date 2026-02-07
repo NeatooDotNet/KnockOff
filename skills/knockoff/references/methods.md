@@ -362,11 +362,11 @@ stub.Find.OnCall((string name) => new User { Id = 1, Name = name });
 
 ## Resetting Interceptors
 
-Clear tracking state and remove callbacks using `Reset()`:
+Clear tracking state while preserving configured callbacks using `Reset()`:
 
 <!-- snippet: methods-reset -->
 ```cs
-// Reset clears call count, captured arguments, and callbacks
+// Reset clears call count and captured arguments, but preserves callbacks
 stub.ProcessData.Reset();
 ```
 <!-- endSnippet -->
@@ -441,7 +441,7 @@ Assert.Equal(42, stub.GetById.LastArg);
 
 ### Reset Preserves OnCall Configuration
 
-Unlike regular method interceptors, user method interceptors preserve `OnCall` configuration across `Reset()`:
+Like regular method interceptors, user method interceptors preserve `OnCall` configuration across `Reset()`:
 
 <!-- snippet: user-methods-reset-preserves-oncall -->
 ```cs
@@ -507,10 +507,10 @@ var saveTracking = stub.SaveUser.OnCall((user) => { }).Verifiable();
 - **Verification**: Use `tracking.Verify(Times)` for single methods or `.Verifiable()` + `stub.Verify()` for batch
 - **Arguments**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Distinguished by callback parameter types - use explicit types in lambdas
-- **Reset**: Clears call counts and tracking state
+- **Reset**: Clears call counts and tracking state, preserves OnCall/Returns callbacks
 - **User methods**: Override virtual methods (with underscore suffix) in Stand-Alone stubs for default behavior
 - **User method override**: Use `stub.Method.OnCall()` or `stub.Method.Returns()` to supersede user method
-- **User method reset**: `Reset()` preserves OnCall configuration (different from regular interceptors)
+- **User method reset**: `Reset()` preserves OnCall configuration (same semantics as regular interceptors)
 
 ---
 

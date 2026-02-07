@@ -2,9 +2,9 @@
 // Design.Stubs - Event Stubbing
 // -----------------------------------------------------------------------------
 // This file demonstrates the event stubbing APIs:
-// - Handler property to raise events
+// - Raise() method to fire events with correct parameters
+// - HasSubscribers property to check for active handlers
 // - VerifyAdd() and VerifyRemove() for subscription verification
-// - Handler != null to check for active handlers
 // - Different event types: EventHandler, EventHandler<T>, Action<T...>
 // -----------------------------------------------------------------------------
 
@@ -21,44 +21,34 @@ namespace Design.Stubs.Events;
 public partial class EventPatternsDemo
 {
     // =========================================================================
-    // Handler.Invoke(sender, args) - Fire EventHandler Events
+    // Raise(sender, args) - Fire EventHandler Events
     // =========================================================================
-    // DESIGN DECISION: Event interceptors expose a Handler property that holds
-    // the backing delegate. To raise an event, invoke the Handler directly.
+    // DESIGN DECISION: Event interceptors expose a Raise() method with
+    // parameters matching the delegate signature. This provides a type-safe
+    // way to fire events from test code.
     //
     // GENERATOR BEHAVIOR: For EventHandler event:
     //
     //   public event EventHandler? Started;
     //
-    // The generator produces:
+    // The generator produces an interceptor class with bare name:
     //
     //   public class StartedInterceptor
     //   {
-    //       public EventHandler? Handler { get; private set; }
+    //       private EventHandler? _handler;
+    //       public bool HasSubscribers => _handler != null;
+    //       public void Raise(object? sender, EventArgs e) => _handler?.Invoke(sender, e);
     //       public void RecordAdd(EventHandler? handler) { ... }
     //       public void RecordRemove(EventHandler? handler) { ... }
     //   }
     //
-    // DESIGN DECISION: Event interceptors use "Interceptor" suffix (StartedInterceptor,
-    // not Started) to distinguish the interceptor property from the event itself.
-    // Without the suffix, `stub.Started` would be ambiguous - is it the event or
-    // the interceptor? The suffix makes it clear: `stub.StartedInterceptor` is the
-    // interceptor you configure; the event `Started` is accessed through the interface.
-    //
-    // DID NOT DO THIS: Add Raise() method to interceptors
-    //
-    // REJECTED PATTERN:
-    //   stub.StartedInterceptor.Raise(source, EventArgs.Empty);
-    //
-    // WHY NOT: Keeping interceptors simple - they expose the Handler directly.
-    // Use Handler?.Invoke() to fire events. This is consistent with standard
-    // C# event invocation patterns.
-    //
-    // ACTUAL PATTERN:
-    //   stub.StartedInterceptor.Handler?.Invoke(source, EventArgs.Empty);
+    // DESIGN DECISION: Event interceptors use bare names matching the event
+    // (stub.Started, not stub.StartedInterceptor). The interceptor property
+    // and the event live in separate scopes: the event is accessed through
+    // the interface cast, while the interceptor is accessed on the stub.
     // =========================================================================
 
-    public void Handler_FiresEventHandler()
+    public void Raise_FiresEventHandler()
     {
         var stub = new Stubs.IEventSource();
         var eventFired = false;
@@ -71,24 +61,24 @@ public partial class EventPatternsDemo
             eventFired = true;
         };
 
-        // Fire the event from test code via Handler
-        stub.StartedInterceptor.Handler?.Invoke(source, EventArgs.Empty);
+        // Fire the event from test code via Raise
+        stub.Started.Raise(source, EventArgs.Empty);
 
         // eventFired is now true
     }
 
     // =========================================================================
-    // Handler.Invoke(sender, args) - Fire EventHandler<T> Events
+    // Raise(sender, args) - Fire EventHandler<T> Events
     // =========================================================================
     // DESIGN DECISION: EventHandler<T> events use typed EventArgs.
-    // The Handler property has the correct delegate type.
+    // The Raise() method has the correct parameter types.
     //
     // GENERATOR BEHAVIOR: For EventHandler<DataEventArgs>:
     //
-    //   public EventHandler<DataEventArgs>? Handler { get; private set; }
+    //   public void Raise(object? sender, DataEventArgs e) => _handler?.Invoke(sender, e);
     // =========================================================================
 
-    public void Handler_FiresEventHandlerWithTypedArgs()
+    public void Raise_FiresEventHandlerWithTypedArgs()
     {
         var stub = new Stubs.IEventSource();
         DataEventArgs? receivedArgs = null;
@@ -101,15 +91,15 @@ public partial class EventPatternsDemo
         };
 
         // Fire with typed args
-        stub.DataReceivedInterceptor.Handler?.Invoke(source, new DataEventArgs("test data"));
+        stub.DataReceived.Raise(source, new DataEventArgs("test data"));
 
         // receivedArgs.Data == "test data"
     }
 
     // =========================================================================
-    // Handler.Invoke() - Fire Action Events (No Parameters)
+    // Raise() - Fire Action Events (No Parameters)
     // =========================================================================
-    // DESIGN DECISION: Action events (no sender/args) use Handler.Invoke()
+    // DESIGN DECISION: Action events (no sender/args) use Raise()
     // with no parameters.
     //
     // GENERATOR BEHAVIOR: For Action event:
@@ -117,10 +107,10 @@ public partial class EventPatternsDemo
     //   public event Action? Completed;
     //
     // Generates:
-    //   public Action? Handler { get; private set; }
+    //   public void Raise() => _handler?.Invoke();
     // =========================================================================
 
-    public void Handler_FiresActionEvent()
+    public void Raise_FiresActionEvent()
     {
         var stub = new Stubs.IEventSource();
         var completed = false;
@@ -133,26 +123,26 @@ public partial class EventPatternsDemo
         };
 
         // Fire with no parameters
-        stub.CompletedInterceptor.Handler?.Invoke();
+        stub.Completed.Raise();
 
         // completed is now true
     }
 
     // =========================================================================
-    // Handler.Invoke(arg1, arg2, ...) - Fire Action<T...> Events
+    // Raise(arg1, arg2, ...) - Fire Action<T...> Events
     // =========================================================================
     // DESIGN DECISION: Action<T1, T2, ...> events take the typed parameters
-    // directly when invoking Handler.
+    // directly when calling Raise().
     //
     // GENERATOR BEHAVIOR: For Action<string, int>:
     //
     //   public event Action<string, int>? Progress;
     //
     // Generates:
-    //   public Action<string, int>? Handler { get; private set; }
+    //   public void Raise(string arg0, int arg1) => _handler?.Invoke(arg0, arg1);
     // =========================================================================
 
-    public void Handler_FiresActionWithParameters()
+    public void Raise_FiresActionWithParameters()
     {
         var stub = new Stubs.IEventSource();
         string? message = null;
@@ -167,7 +157,7 @@ public partial class EventPatternsDemo
         };
 
         // Fire with typed parameters
-        stub.ProgressInterceptor.Handler?.Invoke("Loading", 50);
+        stub.Progress.Raise("Loading", 50);
 
         // message == "Loading", percent == 50
     }
@@ -202,54 +192,41 @@ public partial class EventPatternsDemo
         source.Started -= Handler1;
 
         // Verify add/remove counts
-        stub.StartedInterceptor.VerifyAdd(Times.Exactly(2));
-        stub.StartedInterceptor.VerifyRemove(Times.Once);
+        stub.Started.VerifyAdd(Times.Exactly(2));
+        stub.Started.VerifyRemove(Times.Once);
     }
 
     // =========================================================================
-    // Handler != null - Check for Active Handlers
+    // HasSubscribers - Check for Active Handlers
     // =========================================================================
-    // DESIGN DECISION: Check Handler != null to determine if at least one
-    // handler is currently subscribed. This is useful for conditional event
-    // firing.
-    //
-    // DID NOT DO THIS: Add HasSubscribers property to interceptors
-    //
-    // REJECTED PATTERN:
-    //   var hasSubscribers = stub.StartedInterceptor.HasSubscribers;
-    //
-    // WHY NOT: The Handler property already provides this information.
-    // Checking Handler != null is the standard .NET pattern for determining
-    // if an event has subscribers.
-    //
-    // ACTUAL PATTERN:
-    //   var hasSubscribers = stub.StartedInterceptor.Handler != null;
+    // DESIGN DECISION: Use HasSubscribers to determine if at least one handler
+    // is currently subscribed. This is useful for conditional event firing.
     // =========================================================================
 
-    public void Handler_ChecksForActiveHandlers()
+    public void HasSubscribers_ChecksForActiveHandlers()
     {
         var stub = new Stubs.IEventSource();
         IEventSource source = stub;
 
         // Initially no subscribers
-        var has1 = stub.StartedInterceptor.Handler != null; // false
+        var has1 = stub.Started.HasSubscribers; // false
 
         void Handler(object? s, EventArgs e) { }
 
         // Subscribe
         source.Started += Handler;
-        var has2 = stub.StartedInterceptor.Handler != null; // true
+        var has2 = stub.Started.HasSubscribers; // true
 
         // Unsubscribe
         source.Started -= Handler;
-        var has3 = stub.StartedInterceptor.Handler != null; // false
+        var has3 = stub.Started.HasSubscribers; // false
     }
 
     // =========================================================================
     // Reset() - Clear Handlers and Tracking
     // =========================================================================
     // DESIGN DECISION: Reset() on events:
-    // - Clears all subscribed handlers (Handler = null)
+    // - Clears all subscribed handlers (HasSubscribers becomes false)
     // - Resets add/remove counts to 0
     //
     // This is useful for test isolation.
@@ -264,31 +241,25 @@ public partial class EventPatternsDemo
         source.Started += (s, e) => { };
 
         // Reset clears everything
-        stub.StartedInterceptor.Reset();
+        stub.Started.Reset();
 
-        var hasHandlers = stub.StartedInterceptor.Handler != null; // false
+        var hasHandlers = stub.Started.HasSubscribers; // false
         // VerifyAdd(Times.AtLeastOnce) would fail now
     }
 
     // =========================================================================
-    // COMMON MISTAKE: Raising Events Without Subscribers
+    // Raise() - Safe With No Subscribers
     // =========================================================================
-    //
-    // COMMON MISTAKE: Forgetting null-conditional when raising events
-    //
-    // Always use Handler?.Invoke() with the null-conditional operator.
-    // If no handlers are subscribed, Handler is null.
-    //
-    // WRONG: stub.StartedInterceptor.Handler.Invoke(source, EventArgs.Empty);
-    // RIGHT: stub.StartedInterceptor.Handler?.Invoke(source, EventArgs.Empty);
+    // DESIGN DECISION: Raise() is safe to call even when no subscribers exist.
+    // Internally it uses null-conditional invocation on the backing delegate.
     // =========================================================================
 
     public void Raise_SafeWithNoSubscribers()
     {
         var stub = new Stubs.IEventSource();
 
-        // No subscribers - safe with null-conditional
-        stub.StartedInterceptor.Handler?.Invoke(null, EventArgs.Empty);
+        // No subscribers - Raise is a no-op
+        stub.Started.Raise(null, EventArgs.Empty);
 
         // No exception thrown
     }
@@ -298,20 +269,15 @@ public partial class EventPatternsDemo
     // =========================================================================
     // KnockOff supports these event delegate types:
     //
-    // 1. EventHandler - Handler?.Invoke(object? sender, EventArgs e)
-    // 2. EventHandler<T> - Handler?.Invoke(object? sender, T e) where T : EventArgs
-    // 3. Action - Handler?.Invoke()
-    // 4. Action<T1> - Handler?.Invoke(T1 arg1)
-    // 5. Action<T1, T2> - Handler?.Invoke(T1 arg1, T2 arg2)
-    // 6. Action<T1, T2, T3, ...> - Handler?.Invoke(T1 arg1, T2 arg2, T3 arg3, ...)
+    // 1. EventHandler       - Raise(object? sender, EventArgs e)
+    // 2. EventHandler<T>    - Raise(object? sender, T e) where T : EventArgs
+    // 3. Action             - Raise()
+    // 4. Action<T1>         - Raise(T1 arg1)
+    // 5. Action<T1, T2>     - Raise(T1 arg1, T2 arg2)
+    // 6. Action<T1, ...>    - Raise(T1 arg1, T2 arg2, T3 arg3, ...)
+    // 7. Custom delegates   - Raise() uses DynamicInvoke
     //
-    // DID NOT DO THIS: Support custom delegate types for events
-    //
-    // REJECTED PATTERN:
-    //   public delegate void MyCustomEventHandler(int code, string message);
-    //   event MyCustomEventHandler? CustomEvent;
-    //
-    // Custom delegate events may work but are not explicitly tested.
-    // Prefer standard EventHandler<T> or Action<T...> patterns.
+    // Custom delegate events use DynamicInvoke internally. Prefer standard
+    // EventHandler<T> or Action<T...> patterns for best type safety.
     // =========================================================================
 }

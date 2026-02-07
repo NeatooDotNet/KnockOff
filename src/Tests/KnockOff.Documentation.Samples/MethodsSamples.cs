@@ -280,7 +280,7 @@ public class MethodResetTests
         tracking.Verify(Times.Once);
 
         #region methods-reset
-        // Reset clears call count, captured arguments, and callbacks
+        // Reset clears call count and captured arguments, but preserves callbacks
         stub.ProcessData.Reset();
         #endregion
 

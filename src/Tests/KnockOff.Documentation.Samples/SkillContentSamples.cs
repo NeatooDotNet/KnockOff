@@ -859,7 +859,8 @@ public class SourceDelegationTests
         // Configured members override source
         stub.GetById.OnCall((id) => testUser);  // This wins over source
 
-        // Reset clears source AND configuration
+        // Reset clears tracking (counts, args, sequence position) and source delegation
+        // but preserves callbacks (OnCall, Returns, OnGet, OnSet)
         // stub.GetById.Reset();
         #endregion
 
