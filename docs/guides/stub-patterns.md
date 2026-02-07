@@ -230,7 +230,7 @@ public partial class ServiceBaseStub { }
 ```cs
 // Standalone Class: configure stub, use .Object for the class instance
 var stub = new ServiceBaseStub();
-stub.Name.OnGet(() => "test").Verifiable();
+stub.Name.Get(() => "test").Verifiable();
 stub.Execute.Call((cmd) => { }).Verifiable();
 ServiceBaseNonGeneric service = stub.Object;
 ```
@@ -748,7 +748,7 @@ INotifier<User> notifier = notifierStub;
 
 // 3. Standalone Class: stub wraps instance, use .Object
 var serviceBaseStub = new ServiceBaseStub();
-serviceBaseStub.Name.OnGet(() => "TestService").Verifiable();
+serviceBaseStub.Name.Get(() => "TestService").Verifiable();
 serviceBaseStub.Execute.Call((cmd) => { }).Verifiable();
 ServiceBaseNonGeneric serviceBase = serviceBaseStub.Object;
 

@@ -49,7 +49,7 @@ stub.Method.OnCall(() => compute()).ThenReturns(2).ThenReturns(3).ThenReturns(4)
 **Properties - ThenGet with params:**
 ```csharp
 // User writes:
-stub.Name.OnGet("first").ThenGet("second", "third", "fourth");
+stub.Name.Get("first").ThenGet("second", "third", "fourth");
 
 // Behavior: Returns "first", then "second", then "third", then "fourth", then repeats "fourth"
 ```
@@ -176,12 +176,12 @@ public MethodSequenceImpl Returns(User first, params User[] rest)
 
 Indexers have callbacks that receive the key parameter:
 ```csharp
-stub[int key].OnGet(key => "value" + key);
+stub[int key].Get(key => "value" + key);
 ```
 
 Params sequences for indexers would be:
 ```csharp
-stub[int key].OnGet("first", "second", "third");  // Ignores key parameter
+stub[int key].Get("first", "second", "third");  // Ignores key parameter
 ```
 
 This is valid but potentially confusing - the key parameter is ignored.
@@ -191,7 +191,7 @@ This is valid but potentially confusing - the key parameter is ignored.
 Rationale:
 1. Indexer callbacks typically use the key parameter for lookup
 2. Ignoring the key in a sequence is unusual
-3. Users can still use `OnGet(key => value).ThenGet(key => value2)` if needed
+3. Users can still use `Get(key => value).ThenGet(key => value2)` if needed
 4. Lower priority - can be added later if requested
 
 ### Scope Summary
@@ -280,7 +280,7 @@ Rationale:
 - [ ] `stub.Method.Returns(1)` still calls single-value overload (C# resolution)
 - [ ] `stub.Method.OnCall(cb).ThenReturns(2, 3)` adds multiple values to sequence
 - [ ] `stub.AsyncMethod.Returns(v1, v2)` auto-wraps with Task.FromResult
-- [ ] `stub.Name.OnGet("a").ThenGet("b", "c")` works for properties
+- [ ] `stub.Name.Get("a").ThenGet("b", "c")` works for properties
 - [ ] Sequence exhaustion repeats last value (NSubstitute behavior)
 - [ ] Strict mode throws on sequence exhaustion
 - [ ] All four patterns supported (Standalone, Inline Interface, Inline Class, Delegate)
@@ -433,7 +433,7 @@ No new diagnostics needed. Invalid cases (void methods, ref/out) don't get param
 **User-Facing API:**
 - `stub.Method.Returns(first, params rest)` - Creates implicit sequence from multiple values
 - `stub.Method.OnCall(cb).ThenReturns(params values)` - Adds multiple values to explicit sequence
-- `stub.Name.OnGet(v).ThenGet(params values)` - Adds multiple values to property getter sequence
+- `stub.Name.Get(v).ThenGet(params values)` - Adds multiple values to property getter sequence
 
 **Internal Changes:** Generator changes in `MethodInterceptorRenderer.cs` and `PropertyInterceptorRenderer.cs` to emit params overload methods.
 
@@ -690,7 +690,7 @@ public MethodSequenceImpl_P1 Returns(string first, params string[] rest)
 
 2. **Consistency with IMethodSequence:** The `ThenReturns(TValue value)` method is NOT on `IMethodSequence<TCallback>`. It's a generated convenience on `MethodSequenceImpl`. The property params should follow the same pattern.
 
-3. **Discoverability is not significantly impacted:** Users interact with the concrete `PropertyGetSequenceImpl` type returned by `OnGetSequence()`. IntelliSense will show `ThenGet(params T[])` on the concrete type.
+3. **Discoverability is not significantly impacted:** Users interact with the concrete `PropertyGetSequenceImpl` type returned by `Get().ThenGet()` chaining. IntelliSense will show `ThenGet(params T[])` on the concrete type.
 
 4. **Future flexibility:** If we later want to add params to the interface, we can. Keeping it off the interface now preserves options.
 
@@ -912,7 +912,7 @@ If any of these occur, STOP and report:
   - KnockOffTests: 984-985/984-985 passed (all frameworks, +16 new tests)
 
 **Implementation Notes:**
-- Property params `ThenGet` is not accessible through fluent API because `OnGet` and `ThenGet` return interface types (`IPropertyGetBuilder<T>`, `IPropertyGetSequence<T>`), not concrete impl types
+- Property params `ThenGet` is not accessible through fluent API because `Get` and `ThenGet` return interface types (`IPropertyGetBuilder<T>`, `IPropertyGetSequence<T>`), not concrete impl types
 - Method params `ThenReturns` works because `OnCall` and `Returns` return concrete impl types (`MethodCallBuilderImpl`, `MethodSequenceImpl`)
 - This is consistent with the design decision to not modify interfaces
 

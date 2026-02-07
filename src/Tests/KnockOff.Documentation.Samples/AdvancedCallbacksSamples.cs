@@ -226,7 +226,7 @@ public class StateDependentPropertyTests
         #region advanced-state-property
         // Shared state between property and method
         var isConnected = false;
-        stub.IsConnected.OnGet(() => isConnected);
+        stub.IsConnected.Get(() => isConnected);
         stub.Connect.Call(() => { isConnected = true; });
         #endregion
 
@@ -367,7 +367,7 @@ public class CacheSimulationTests
         });
 
         // Stats: Return current counts
-        stub.Stats.OnGet(() => new CacheStats { Hits = hits, Misses = misses });
+        stub.Stats.Get(() => new CacheStats { Hits = hits, Misses = misses });
         #endregion
 
         ICache cacheService = stub;

@@ -475,7 +475,7 @@ public class PropertiesGetterKnockOffTests
     public void KnockOff_SetupGetter()
     {
         var stub = new CompareCalculatorStub();
-        stub.Mode.OnGet("Scientific");
+        stub.Mode.Get("Scientific");
 
         ICalculator calc = stub;
         Assert.Equal("Scientific", calc.Mode);
@@ -511,7 +511,7 @@ public class PropertiesSetterKnockOffTests
         var stub = new CompareCalculatorStub();
         string? captured = null;
 
-        stub.Mode.OnSet((v) => captured = v);
+        stub.Mode.Set((v) => captured = v);
 
         ICalculator calc = stub;
         calc.Mode = "Degrees";
@@ -544,7 +544,7 @@ public class PropertiesVerifyGetKnockOffTests
     public void KnockOff_VerifyGetter()
     {
         var stub = new CompareCalculatorStub();
-        stub.Mode.OnGet("test");
+        stub.Mode.Get("test");
 
         ICalculator calc = stub;
         _ = calc.Mode;
@@ -610,7 +610,7 @@ public class PropertiesVerifyCountKnockOffTests
     public void KnockOff_VerifyGetCount()
     {
         var stub = new CompareCalculatorStub();
-        stub.Mode.OnGet("test");
+        stub.Mode.Get("test");
 
         ICalculator calc = stub;
         _ = calc.Mode;
@@ -898,7 +898,7 @@ public class IndexersDynamicKnockOffTests
     public void KnockOff_IndexerDynamic()
     {
         var stub = new CompareCacheStub();
-        stub.Indexer.OnGet((key) => "default");
+        stub.Indexer.Get((key) => "default");
 
         ICache cache = stub;
         Assert.Equal("default", cache["any"]);

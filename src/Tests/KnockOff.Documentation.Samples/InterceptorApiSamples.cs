@@ -116,7 +116,7 @@ public class OverviewQuickExampleTests
         stub.GetById.Of<User>().Return((id) => new User { Id = id });
 
         // Property interceptor
-        stub.Name.OnGet("TestRepo");
+        stub.Name.Get("TestRepo");
 
         // Indexer interceptor
         stub.Indexer.Backing["key1"] = new User { Id = 1 };
@@ -268,14 +268,14 @@ public class PropertyInterceptorApiTests
         IApiPropertyRepo repository = stub;
 
         #region property-interceptor-complete-api-demo
-        // OnGet with value: configure getter return value
-        stub.ConnectionString.OnGet("Server=localhost");
+        // Get with value: configure getter return value
+        stub.ConnectionString.Get("Server=localhost");
 
-        // OnGet with callback: dynamic value
-        stub.Timeout.OnGet(() => 30);
+        // Get with callback: dynamic value
+        stub.Timeout.Get(() => 30);
 
-        // OnSet: configure setter callback
-        stub.Timeout.OnSet((val) => { /* handle set */ });
+        // Set: configure setter callback
+        stub.Timeout.Set((val) => { /* handle set */ });
         #endregion
 
         // Exercise getter
@@ -317,14 +317,14 @@ public class IndexerInterceptorApiTests
         // Backing: default dictionary storage for indexer
         stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
 
-        // OnGet: override backing lookup with callback
-        stub.Indexer.OnGet((key) => new User { Id = key, Name = "FromCallback" });
+        // Get: override backing lookup with callback
+        stub.Indexer.Get((key) => new User { Id = key, Name = "FromCallback" });
 
-        // OnSet: configure setter callback
-        stub.Indexer.OnSet((key, value) => { /* handle set */ });
+        // Set: configure setter callback
+        stub.Indexer.Set((key, value) => { /* handle set */ });
         #endregion
 
-        // OnGet configured above, so it returns FromCallback
+        // Get configured above, so it returns FromCallback
         var fromCallback = repository[1];
         Assert.Equal("FromCallback", fromCallback?.Name);
 
@@ -334,7 +334,7 @@ public class IndexerInterceptorApiTests
         // LastGetKey: Key from most recent get
         Assert.Equal(1, stub.Indexer.LastGetKey);
 
-        // OnSet configured above, callback fires (but doesn't update Backing)
+        // Set configured above, callback fires (but doesn't update Backing)
         repository[3] = new User { Id = 3, Name = "Charlie" };
 
         // VerifySet: Check write count
@@ -345,7 +345,7 @@ public class IndexerInterceptorApiTests
         Assert.Equal(3, lastEntry?.Key);
         Assert.Equal("Charlie", lastEntry?.Value?.Name);
 
-        // Backing wasn't updated by OnSet (unless callback explicitly does it)
+        // Backing wasn't updated by Set (unless callback explicitly does it)
         Assert.False(stub.Indexer.Backing.ContainsKey(3));
     }
 }

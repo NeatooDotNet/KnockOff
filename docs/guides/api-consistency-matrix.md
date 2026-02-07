@@ -61,10 +61,10 @@ All 8 patterns use identical API:
 <!-- snippet: matrix-property-interception -->
 ```cs
 // Configure getter
-stub.Name.OnGet("test-name");
+stub.Name.Get("test-name");
 
 // Configure setter
-stub.Name.OnSet((value) => { /* capture or validate */ });
+stub.Name.Set((value) => { /* capture or validate */ });
 
 // Verify
 stub.Name.VerifyGet(Times.Never);
@@ -77,8 +77,8 @@ stub.Name.VerifySet(Times.Never);
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
-| `OnGet(value)` | ✓ |
-| `OnSet((v) => { })` | ✓ |
+| `Get(value)` | ✓ |
+| `Set((v) => { })` | ✓ |
 | `VerifyGet(Times.X)` | ✓ |
 | `VerifySet(Times.X)` | ✓ |
 | `LastSetValue` | ✓ |
@@ -92,10 +92,10 @@ All 8 patterns use identical API:
 <!-- snippet: matrix-indexer-interception -->
 ```cs
 // Configure getter
-stub.Indexer.OnGet((key) => $"value-{key}");
+stub.Indexer.Get((key) => $"value-{key}");
 
 // Configure setter
-stub.Indexer.OnSet((key, value) => { });
+stub.Indexer.Set((key, value) => { });
 
 // Use backing dictionary
 stub.Indexer.Backing["preloaded"] = "data";
@@ -112,8 +112,8 @@ stub.Indexer.VerifySet(Times.Never);
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
-| `OnGet((key) => value)` | ✓ |
-| `OnSet((key, value) => { })` | ✓ |
+| `Get((key) => value)` | ✓ |
+| `Set((key, value) => { })` | ✓ |
 | `Backing` dictionary | ✓ |
 | `VerifyGet()` / `VerifySet()` | ✓ |
 | `LastGetKey` / `LastSetEntry` | ✓ |
@@ -164,7 +164,7 @@ stub.GetStatus
 
 // Properties support sequences too
 configStub.Name
-    .OnGet("first")
+    .Get("first")
     .ThenGet("second");
 ```
 <!-- endSnippet -->
@@ -173,7 +173,7 @@ configStub.Name
 |---------|:--------------:|
 | `Return(callback).ThenReturn(callback)` / `Call(callback).ThenCall(callback)` | ✓ |
 | Repeats last value | ✓ |
-| Property sequences (`OnGet().ThenGet()`) | ✓ |
+| Property sequences (`Get().ThenGet()`) | ✓ |
 
 ---
 

@@ -18,7 +18,7 @@ Replace the current three-method API (`Returns`, `OnCall`, `When`) for methods w
 - **Add simplified async callbacks to `ThenReturns`** (subsumes `sequence-callback-simplification` todo)
 - **Rename void When chain methods**: `Call()` becomes `Execute()`, `ThenCall()` becomes `ThenExecute()`
 
-Properties, indexers, and events are **explicitly out of scope** -- `OnGet`, `OnSet`, `OnGetSequence`, `OnSetSequence` stay as-is.
+Properties, indexers, and events are **explicitly out of scope** -- `Get`, `Set`, sequence chaining via `Get().ThenGet()`/`Set().ThenSet()` stay as-is.
 
 ---
 
@@ -850,8 +850,8 @@ Design.Stubs verification is deferred to Phase 4. The acceptance criterion is:
 
 ### Explicitly Out of Scope
 
-- Property interceptors (`OnGet`, `OnSet`, `OnGetSequence`, `OnSetSequence`) -- stay as-is
-- Indexer interceptors (`OnGet`, `OnSet`, `OnGetSequence`, `OnSetSequence`) -- stay as-is
+- Property interceptors (`Get`, `Set`, sequence chaining via `Get().ThenGet()`/`Set().ThenSet()`) -- stay as-is
+- Indexer interceptors (`Get`, `Set`, sequence chaining via `Get().ThenGet()`/`Set().ThenSet()`) -- stay as-is
 - Event interceptors -- stay as-is
 - Non-void When chain `ThenCall()` on `IWhenChain<TDelegate, TReturn>` -- stays as-is per user decision
 - Overload group `Returns(value)` entry point -- not currently generated for overload groups, pre-existing state, not in scope

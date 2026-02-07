@@ -34,7 +34,7 @@ public partial class IPropertyInfoTests
         IPropertyInfo propertyInfo = stub;
 
         var reflectedPropertyInfo = typeof(TestClass).GetProperty("Name")!;
-        stub.PropertyInfo.OnGet(reflectedPropertyInfo);
+        stub.PropertyInfo.Get(reflectedPropertyInfo);
 
         Assert.Same(reflectedPropertyInfo, propertyInfo.PropertyInfo);
         stub.PropertyInfo.VerifyGet(Times.Once);
@@ -46,7 +46,7 @@ public partial class IPropertyInfoTests
         var stub = new Stubs.IPropertyInfo();
         IPropertyInfo propertyInfo = stub;
 
-        stub.Name.OnGet("TestProperty");
+        stub.Name.Get("TestProperty");
 
         Assert.Equal("TestProperty", propertyInfo.Name);
     }
@@ -57,7 +57,7 @@ public partial class IPropertyInfoTests
         var stub = new Stubs.IPropertyInfo();
         IPropertyInfo propertyInfo = stub;
 
-        stub.Type.OnGet(typeof(string));
+        stub.Type.Get(typeof(string));
 
         Assert.Equal(typeof(string), propertyInfo.Type);
     }
@@ -68,7 +68,7 @@ public partial class IPropertyInfoTests
         var stub = new Stubs.IPropertyInfo();
         IPropertyInfo propertyInfo = stub;
 
-        stub.Key.OnGet("TestClass.Name");
+        stub.Key.Get("TestClass.Name");
 
         Assert.Equal("TestClass.Name", propertyInfo.Key);
     }
@@ -79,7 +79,7 @@ public partial class IPropertyInfoTests
         var stub = new Stubs.IPropertyInfo();
         IPropertyInfo propertyInfo = stub;
 
-        stub.IsPrivateSetter.OnGet(true);
+        stub.IsPrivateSetter.Get(true);
 
         Assert.True(propertyInfo.IsPrivateSetter);
     }
@@ -173,7 +173,7 @@ public partial class IPropertyInfoTests
         var stub = new Stubs.IPropertyInfo();
         IPropertyInfo propertyInfo = stub;
 
-        stub.Name.OnGet("Test");
+        stub.Name.Get("Test");
         _ = propertyInfo.Name;
         _ = propertyInfo.Name;
 
@@ -237,7 +237,7 @@ public class IPropertyInfoStandaloneTests
         var stub = new PropertyInfoStub();
         IPropertyInfo propertyInfo = stub;
 
-        stub.Name.OnGet("StandaloneName");
+        stub.Name.Get("StandaloneName");
 
         Assert.Equal("StandaloneName", propertyInfo.Name);
     }

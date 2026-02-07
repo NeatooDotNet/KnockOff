@@ -256,7 +256,7 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationStub();
         stub.Name
-            .OnGet(() => "first")
+            .Get(() => "first")
             .ThenGet(() => "second")
             .ThenGet(() => "third");
 
@@ -274,7 +274,7 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationStub();
         stub.Name
-            .OnGet("alpha")
+            .Get("alpha")
             .ThenGet("beta")
             .ThenGet("gamma");
 
@@ -294,7 +294,7 @@ public class BuilderElevationTests
         var captured = new System.Collections.Generic.List<string>();
 
         stub.Name
-            .OnSet(v => captured.Add($"first:{v}"))
+            .Set(v => captured.Add($"first:{v}"))
             .ThenSet(v => captured.Add($"second:{v}"));
 
         IBuilderElevationService svc = stub;
@@ -312,7 +312,7 @@ public class BuilderElevationTests
     {
         // Arrange
         var stub = new BuilderElevationStub();
-        stub.Name.OnGet(() => "constant");
+        stub.Name.Get(() => "constant");
 
         IBuilderElevationService svc = stub;
 
@@ -332,7 +332,7 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationIndexerStub();
         stub.Indexer
-            .OnGet(k => $"first-{k}")
+            .Get(k => $"first-{k}")
             .ThenGet(k => $"second-{k}")
             .ThenGet(k => $"third-{k}");
 
@@ -352,7 +352,7 @@ public class BuilderElevationTests
         var captured = new System.Collections.Generic.List<string>();
 
         stub.Indexer
-            .OnSet((k, v) => captured.Add($"first:{k}={v}"))
+            .Set((k, v) => captured.Add($"first:{k}={v}"))
             .ThenSet((k, v) => captured.Add($"second:{k}={v}"));
 
         IBuilderElevationIndexer svc = stub;
@@ -370,7 +370,7 @@ public class BuilderElevationTests
     {
         // Arrange
         var stub = new BuilderElevationIndexerStub();
-        stub.Indexer.OnGet(k => k.ToUpper());
+        stub.Indexer.Get(k => k.ToUpper());
 
         IBuilderElevationIndexer svc = stub;
 

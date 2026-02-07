@@ -46,7 +46,7 @@ public class IndexerTests
 		IPropertyStore store = knockOff;
 
 		var mockProperty = new PropertyInfo { Name = "FromCallback", Value = "Mocked" };
-		knockOff.Indexer.OnGet((key) =>
+		knockOff.Indexer.Get((key) =>
 		{
 			if (key == "Special") return mockProperty;
 			return null;
@@ -65,7 +65,7 @@ public class IndexerTests
 		IPropertyStore store = knockOff;
 
 		var accessCount = 0;
-		knockOff.Indexer.OnGet((key) =>
+		knockOff.Indexer.Get((key) =>
 		{
 			// Track access count via closure
 			accessCount++;
@@ -117,7 +117,7 @@ public class IndexerTests
 		IReadWriteStore store = knockOff;
 
 		(string key, PropertyInfo? value)? capturedEntry = null;
-		knockOff.Indexer.OnSet((key, value) =>
+		knockOff.Indexer.Set((key, value) =>
 		{
 			capturedEntry = (key, value);
 		});
@@ -129,7 +129,7 @@ public class IndexerTests
 		Assert.Equal("MyKey", capturedEntry.Value.key);
 		Assert.Same(prop, capturedEntry.Value.value);
 
-		// Since OnSet was used, backing was NOT updated
+		// Since Set was used, backing was NOT updated
 		Assert.False(knockOff.Indexer.Backing.ContainsKey("MyKey"));
 	}
 
@@ -141,7 +141,7 @@ public class IndexerTests
 
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
 		knockOff.Indexer.Backing["Existing"] = prop;
-		knockOff.Indexer.OnGet((key) => prop);
+		knockOff.Indexer.Get((key) => prop);
 
 		_ = store["Key1"];
 		_ = store["Key2"];
@@ -158,9 +158,9 @@ public class IndexerTests
 		knockOff.Indexer.VerifySet(Times.Never);
 		Assert.Null(knockOff.Indexer.LastSetEntry);
 
-		// Configuration is preserved - OnGet callback still works and Backing dictionary preserved
+		// Configuration is preserved - Get callback still works and Backing dictionary preserved
 		var retrieved = store["AfterReset"];
-		Assert.Same(prop, retrieved); // OnGet callback still returns our prop
+		Assert.Same(prop, retrieved); // Get callback still returns our prop
 		Assert.True(knockOff.Indexer.Backing.ContainsKey("Existing"));
 	}
 

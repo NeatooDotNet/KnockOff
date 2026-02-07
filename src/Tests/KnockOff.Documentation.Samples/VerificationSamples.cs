@@ -322,7 +322,7 @@ public class PropertyVerificationTests
     public void VerifyGet_ChecksPropertyReadCount()
     {
         var stub = new ConfigVerifyStub();
-        stub.MaxRetries.OnGet(5);
+        stub.MaxRetries.Get(5);
 
         IConfigVerify config = stub;
         _ = config.MaxRetries;
@@ -355,7 +355,7 @@ public class PropertyVerificationTests
     public void Verify_ChecksTotalPropertyAccess()
     {
         var stub = new ConfigVerifyStub();
-        stub.MaxRetries.OnGet(3);
+        stub.MaxRetries.Get(3);
 
         IConfigVerify config = stub;
         _ = config.MaxRetries;

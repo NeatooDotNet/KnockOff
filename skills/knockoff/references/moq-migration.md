@@ -37,7 +37,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `mock.Object` | `stub` (direct) or `stub.Object` (class stubs only) |
 | `.Setup(x => x.Method()).Returns(value)` | `stub.Method.Return(value)` |
 | `.Setup(x => x.Method(arg)).Returns(val)` | `stub.Method.When(arg).Return(val)` |
-| `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
+| `.Setup(x => x.Property).Returns(value)` | `stub.Property.Get(value)` |
 | `.ReturnsAsync(value)` | `stub.Method.Return(value)` (auto-wraps) |
 | `.Callback(x => ...)` | Logic in `Return`/`Call` callback |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` |
@@ -132,7 +132,7 @@ stub.GetUser.Return((id) => testUser);
 
 ## Step 4: Configure Properties
 
-Replace property `.Setup().Returns()` with `OnGet()` calls. (Note: Moq's `.Returns()` here is a Moq API -- KnockOff uses `OnGet()` for properties.)
+Replace property `.Setup().Returns()` with `Get()` calls. (Note: Moq's `.Returns()` here is a Moq API -- KnockOff uses `Get()` for properties.)
 
 **Moq:**
 
@@ -147,14 +147,14 @@ mock.Setup(x => x.ConnectionString).Returns("server=localhost");
 
 <!-- snippet: moq-migration-setup-property-knockoff -->
 ```cs
-// OnGet configures property getter return value
-stub.ConnectionString.OnGet("server=localhost");
+// Get configures property getter return value
+stub.ConnectionString.Get("server=localhost");
 ```
 <!-- endSnippet -->
 
 **Key differences:**
 - Moq treats properties like methods in setup
-- KnockOff provides `OnGet()` and `OnSet()` methods on the property interceptor
+- KnockOff provides `Get()` and `Set()` methods on the property interceptor
 - KnockOff also provides `VerifyGet()` and `VerifySet()` for separate getter/setter verification
 
 ---
@@ -412,7 +412,7 @@ stub.GetUserAsync.Return(async (id) =>
 
 ### Property Configuration
 
-**Problem:** Forgetting properties use `OnGet()` and `OnSet()`, not `Return()`/`Call()`.
+**Problem:** Forgetting properties use `Get()` and `Set()`, not `Return()`/`Call()`.
 
 <!-- snippet: moq-migration-gotcha-property-wrong -->
 ```cs
@@ -423,11 +423,11 @@ stub.GetUserAsync.Return(async (id) =>
 
 <!-- snippet: moq-migration-gotcha-property-correct -->
 ```cs
-// Correct: use OnGet for property getters
-stub.ConnectionString.OnGet("connection");
+// Correct: use Get for property getters
+stub.ConnectionString.Get("connection");
 
-// For setters, use OnSet
-stub.ConnectionString.OnSet((value) => { /* handle set */ });
+// For setters, use Set
+stub.ConnectionString.Set((value) => { /* handle set */ });
 ```
 <!-- endSnippet -->
 
@@ -495,7 +495,7 @@ Use this checklist when migrating a test file from Moq to KnockOff:
 - [ ] Replace `Mock<T>` field declarations with stub types
 - [ ] Remove `.Object` property accesses
 - [ ] Convert method `.Setup().Returns()` to `.Return(callback)` or `.Call(callback)`
-- [ ] Convert property setups to `.OnGet()` and `.OnSet()`
+- [ ] Convert property setups to `.Get()` and `.Set()`
 - [ ] Convert `.ReturnsAsync()` to `Task.FromResult()`
 - [ ] Move `.Callback()` logic into `Return`/`Call` callbacks
 - [ ] Replace `It.IsAny<T>()` with callback parameter inspection

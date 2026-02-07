@@ -148,7 +148,7 @@ public partial class OpenGenericClassOverloadTests
         // Arrange
         var stub = new Stubs.RepositoryBase<TestEntity>();
 
-        stub.Name.OnGet("TestRepository");
+        stub.Name.Get("TestRepository");
         stub.GetById.Return((id) => new TestEntity { Id = id, Name = "ById" });
 
         // Act - use .Object to get the actual instance

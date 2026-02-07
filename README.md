@@ -587,7 +587,7 @@ The skill includes slash commands:
 
 - **[Getting Started](docs/getting-started.md)** - Installation and first stub
 - **[Stub Patterns](docs/guides/stub-patterns.md)** - Standalone, inline interface, inline class
-- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete `Returns`, `Execute`, `OnGet`, `OnSet` reference
+- **[Interceptor API](docs/reference/interceptor-api.md)** - Complete `Returns`, `Execute`, `Get`, `Set` reference
 - **[Source Delegation](docs/guides/source-delegation.md)** - Delegate to real implementations
 - **[Full Comparison Guide](docs/comparison.md)** - Properties, events, delegates, indexers vs Moq and NSubstitute
 - **[Migration from Moq](docs/migration/from-moq.md)** - Step-by-step migration guide

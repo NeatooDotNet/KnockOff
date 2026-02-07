@@ -76,7 +76,7 @@ public class KOPropertyCollisionTests
 		var knockOff = new CollisionKnockOff();
 		ICollision collision = knockOff;
 
-		knockOff.ICollision.OnGet(() => "from callback");
+		knockOff.ICollision.Get(() => "from callback");
 
 		var result = collision.ICollision;
 

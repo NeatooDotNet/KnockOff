@@ -235,9 +235,9 @@ public class PropertySetupKnockOffTests
         var stub = new NSubUserRepoStub();
 
         #region nsub-migration-property-knockoff
-        // KnockOff: Use OnGet(value) for property getters
-        stub.ConnectionString.OnGet("server=localhost");
-        stub.IsConnected.OnGet(true);
+        // KnockOff: Use Get(value) for property getters
+        stub.ConnectionString.Get("server=localhost");
+        stub.IsConnected.Get(true);
         #endregion
 
         INSubUserRepo repository = stub;
@@ -1197,10 +1197,10 @@ public class RecursiveMocksTests
         #region nsub-no-recursive-knockoff
         // KnockOff: Create each stub explicitly
         var customerStub = new NSubCustomerStub();
-        customerStub.Name.OnGet("Alice");
+        customerStub.Name.Get("Alice");
 
         var orderStub = new NSubOrderStub();
-        orderStub.Customer.OnGet(customerStub);
+        orderStub.Customer.Get(customerStub);
         #endregion
 
         IOrder order = orderStub;

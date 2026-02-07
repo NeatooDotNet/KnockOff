@@ -34,7 +34,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `new Mock<IFoo>()` | `new FooStub()` with `[KnockOff] partial class FooStub : IFoo` |
 | `mock.Object` | `stub` (direct instance) |
 | `.Setup(x => x.Method()).Returns(value)` | `stub.Method.Return((args) => value)` |
-| `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
+| `.Setup(x => x.Property).Returns(value)` | `stub.Property.Get(value)` |
 | `.ReturnsAsync(value)` | `stub.Method.Return(value)` (auto-wraps) or `Return((args) => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `Return` delegate |
 | `.Verify(x => x.Method(), Times.Once)` | `var t = stub.Method.Return(...); t.Verify(Times.Once)` |
@@ -139,7 +139,7 @@ stub.GetUser.Return((id) => testUser);
 
 ## Step 4: Configure Properties
 
-Replace property `.Setup().Returns()` with `.OnGet()` calls.
+Replace property `.Setup().Returns()` with `.Get()` calls.
 
 **Moq:**
 
@@ -154,14 +154,14 @@ mock.Setup(x => x.ConnectionString).Returns("server=localhost");
 
 <!-- snippet: moq-migration-setup-property-knockoff -->
 ```cs
-// OnGet configures property getter return value
-stub.ConnectionString.OnGet("server=localhost");
+// Get configures property getter return value
+stub.ConnectionString.Get("server=localhost");
 ```
 <!-- endSnippet -->
 
 **Key differences:**
 - Moq treats properties like methods in setup
-- KnockOff provides `.OnGet()` and `.OnSet()` methods on the property interceptor
+- KnockOff provides `.Get()` and `.Set()` methods on the property interceptor
 - KnockOff also provides `.VerifyGet()` and `.VerifySet()` for granular verification
 
 ---
@@ -416,7 +416,7 @@ var knockoffService = new UserServiceMigration(stub);
 ## Next Steps
 
 - **[Getting Started Guide](../getting-started.md)** - Learn KnockOff patterns from scratch
-- **[Interceptor API Reference](../reference/interceptor-api.md)** - Deep dive into `Return`, `Call`, `OnGet`, `OnSet`
+- **[Interceptor API Reference](../reference/interceptor-api.md)** - Deep dive into `Return`, `Call`, `Get`, `Set`
 - **[Verification Guide](../guides/verification.md)** - Advanced call tracking and verification patterns
 - **[Methods Guide](../guides/methods.md)** - Configure method behavior and callbacks
 - **[Properties Guide](../guides/properties.md)** - Work with property interceptors

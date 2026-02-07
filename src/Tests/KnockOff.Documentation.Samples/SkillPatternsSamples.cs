@@ -140,7 +140,7 @@ public class StandaloneClassPatternTests
         // Standalone Class: instantiate like any class, use .Object
         var stub = new PtServiceStub();
         stub.Initialize.Call(() => { }).Verifiable();
-        stub.Name.OnGet(() => "TestService");
+        stub.Name.Get(() => "TestService");
 
         ServiceBase service = stub.Object;  // Use .Object!
         service.Initialize();
@@ -462,7 +462,7 @@ public class AllNinePatternsTests
         // 3. Standalone Class: reusable class stub, uses .Object
         var cacheStub = new PtServiceStub();
         cacheStub.Initialize.Call(() => { }).Verifiable();
-        cacheStub.Name.OnGet(() => "TestService");
+        cacheStub.Name.Get(() => "TestService");
         ServiceBase cache = cacheStub.Object;
 
         // 4. Generic Standalone Class: reusable generic class stub, uses .Object

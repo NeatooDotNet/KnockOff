@@ -7,7 +7,7 @@ The generator appears to support set-only properties (has `HasGetter`/`HasSetter
 ## Task List
 
 - [ ] Add test interface with set-only property
-- [ ] Verify generator produces correct interceptor (only `OnSet`, `SetCount`, `LastSetValue`)
+- [ ] Verify generator produces correct interceptor (only `Set`, `SetCount`, `LastSetValue`)
 - [ ] Verify no `Value` backing field is generated (nothing to get)
 - [ ] Add to properties.md documentation with real snippet (currently uses `pseudo:` marker)
 
@@ -27,9 +27,9 @@ public partial class SetOnlyServiceKnockOff : ISetOnlyService { }
 
 - `knockOff.Output.SetCount` - tracks setter calls
 - `knockOff.Output.LastSetValue` - last value set
-- `knockOff.Output.OnSet` - setter callback
+- `knockOff.Output.Set` - setter callback
 - NO `knockOff.Output.Value` (no backing field)
-- NO `knockOff.Output.OnGet` (no getter)
+- NO `knockOff.Output.Get` (no getter)
 
 ## Priority
 

@@ -185,8 +185,8 @@ public class SetupPropertyKnockOffTests
         var stub = new MoqUserRepoStub();
 
         #region moq-migration-setup-property-knockoff
-        // OnGet configures property getter return value
-        stub.ConnectionString.OnGet("server=localhost");
+        // Get configures property getter return value
+        stub.ConnectionString.Get("server=localhost");
         #endregion
 
         IMoqUserRepo repository = stub;
@@ -212,7 +212,7 @@ public class PropertySetupCombinedSamples
 
         // KNOCKOFF:
         var stub = new MoqUserRepoStub();
-        stub.ConnectionString.OnGet("server=localhost");
+        stub.ConnectionString.Get("server=localhost");
         #endregion
 
         Assert.Equal("server=localhost", mock.Object.ConnectionString);
@@ -891,11 +891,11 @@ public class GotchaPropertyTests
         #endregion
 
         #region moq-migration-gotcha-property-correct
-        // Correct: use OnGet for property getters
-        stub.ConnectionString.OnGet("connection");
+        // Correct: use Get for property getters
+        stub.ConnectionString.Get("connection");
 
-        // For setters, use OnSet
-        stub.ConnectionString.OnSet((value) => { /* handle set */ });
+        // For setters, use Set
+        stub.ConnectionString.Set((value) => { /* handle set */ });
         #endregion
 
         Assert.Equal("connection", ((IMoqUserRepo)stub).ConnectionString);

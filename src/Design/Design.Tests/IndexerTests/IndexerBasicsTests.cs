@@ -8,15 +8,15 @@ using KnockOff;
 namespace Design.Tests.IndexerTests;
 
 /// <summary>
-/// Tests for basic indexer stubbing: OnGet, OnSet, Backing dictionary.
+/// Tests for basic indexer stubbing: Get, Set, Backing dictionary.
 /// </summary>
 public class IndexerBasicsTests
 {
     [Fact]
-    public void OnGet_WithCallback_ReceivesKey()
+    public void Get_WithCallback_ReceivesKey()
     {
         var stub = new IndexerBasicsDemo.Stubs.ICollection();
-        stub.Indexer.OnGet(key => key.Length);
+        stub.Indexer.Get(key => key.Length);
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
 
@@ -25,13 +25,13 @@ public class IndexerBasicsTests
     }
 
     [Fact]
-    public void OnSet_WithCallback_ReceivesKeyAndValue()
+    public void Set_WithCallback_ReceivesKeyAndValue()
     {
         var stub = new IndexerBasicsDemo.Stubs.ICollection();
         string? capturedKey = null;
         int capturedValue = 0;
 
-        stub.Indexer.OnSet((k, v) =>
+        stub.Indexer.Set((k, v) =>
         {
             capturedKey = k;
             capturedValue = v;
@@ -50,8 +50,8 @@ public class IndexerBasicsTests
         var stub = new IndexerBasicsDemo.Stubs.ICollection();
         var dict = new Dictionary<string, int>();
 
-        stub.Indexer.OnGet(k => dict.TryGetValue(k, out var v) ? v : -1);
-        stub.Indexer.OnSet((k, v) => dict[k] = v);
+        stub.Indexer.Get(k => dict.TryGetValue(k, out var v) ? v : -1);
+        stub.Indexer.Set((k, v) => dict[k] = v);
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
 
@@ -67,7 +67,7 @@ public class IndexerBasicsTests
     public void LastGetKey_CapturesLastKeyAccessed()
     {
         var stub = new IndexerBasicsDemo.Stubs.ICollection();
-        stub.Indexer.OnGet(_ => 0);
+        stub.Indexer.Get(_ => 0);
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
         _ = collection["first"];
@@ -95,7 +95,7 @@ public class IndexerBasicsTests
     public void VerifyGet_ChecksGetterAccess()
     {
         var stub = new IndexerBasicsDemo.Stubs.ICollection();
-        stub.Indexer.OnGet(_ => 0);
+        stub.Indexer.Get(_ => 0);
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
         _ = collection["a"];

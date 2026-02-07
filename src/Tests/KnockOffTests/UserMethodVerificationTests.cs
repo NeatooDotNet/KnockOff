@@ -141,7 +141,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.Name.OnGet("test"); // Configure the property
+        stub.Name.Get("test"); // Configure the property
         // Don't access the property
 
         // Assert - VerifyAll should fail because configured property not accessed
@@ -153,7 +153,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.Name.OnGet("test"); // Configure the property
+        stub.Name.Get("test"); // Configure the property
 
         // Act - Access the property but not the user method
         IStrictModeUserMethodTest service = stub;

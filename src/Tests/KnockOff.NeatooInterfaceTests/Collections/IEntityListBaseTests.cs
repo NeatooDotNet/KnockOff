@@ -43,7 +43,7 @@ public partial class IEntityListBaseTests
         IEntityListBase list = stub;
 
         var rootStub = new ValidateBaseStubForEntityList();
-        stub.Root.OnGet(rootStub);
+        stub.Root.Get(rootStub);
 
         Assert.Same(rootStub, list.Root);
         stub.Root.VerifyGet(Times.Once);
@@ -55,7 +55,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.Root.OnGet((IValidateBase?)null);
+        stub.Root.Get((IValidateBase?)null);
 
         Assert.Null(list.Root);
     }
@@ -66,7 +66,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsModified.OnGet(true);
+        stub.IsModified.Get(true);
 
         Assert.True(list.IsModified);
     }
@@ -77,7 +77,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsSelfModified.OnGet(true);
+        stub.IsSelfModified.Get(true);
 
         Assert.True(list.IsSelfModified);
     }
@@ -88,7 +88,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsChild.OnGet(true);
+        stub.IsChild.Get(true);
 
         Assert.True(list.IsChild);
     }
@@ -99,7 +99,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsSavable.OnGet(true);
+        stub.IsSavable.Get(true);
 
         Assert.True(list.IsSavable);
     }
@@ -113,7 +113,7 @@ public partial class IEntityListBaseTests
         IEntityListBase list = stub;
 
         var parentStub = new ValidateBaseStubForEntityList();
-        stub.Parent.OnGet(parentStub);
+        stub.Parent.Get(parentStub);
 
         Assert.Same(parentStub, list.Parent);
     }
@@ -124,7 +124,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsBusy.OnGet(true);
+        stub.IsBusy.Get(true);
 
         Assert.True(list.IsBusy);
     }
@@ -135,7 +135,7 @@ public partial class IEntityListBaseTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase list = stub;
 
-        stub.IsValid.OnGet(false);
+        stub.IsValid.Get(false);
 
         Assert.False(list.IsValid);
     }
@@ -214,7 +214,7 @@ public partial class IEntityListBaseTests
         IEntityListBase list = stub;
 
         var rootStub = new ValidateBaseStubForEntityList();
-        stub.Root.OnGet(rootStub);
+        stub.Root.Get(rootStub);
         _ = list.Root;
         _ = list.Root;
 
@@ -274,7 +274,7 @@ public class IEntityListBaseStandaloneTests
         IEntityListBase list = stub;
 
         var rootStub = new ValidateBaseStubForEntityList();
-        stub.Root.OnGet(() => rootStub);
+        stub.Root.Get(() => rootStub);
 
         Assert.Same(rootStub, list.Root);
     }
@@ -285,7 +285,7 @@ public class IEntityListBaseStandaloneTests
         var stub = new EntityListBaseStub();
         IEntityListBase list = stub;
 
-        stub.IsModified.OnGet(true);
+        stub.IsModified.Get(true);
 
         Assert.True(list.IsModified);
     }
@@ -328,7 +328,7 @@ public partial class IEntityListBaseOfTTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase<IEntityBase> list = stub;
 
-        stub.IsModified.OnGet(true);
+        stub.IsModified.Get(true);
 
         Assert.True(list.IsModified);
     }
@@ -341,7 +341,7 @@ public partial class IEntityListBaseOfTTests
         var stub = new Stubs.IEntityListBase();
         IEntityListBase<IEntityBase> list = stub;
 
-        stub.Count.OnGet(10);
+        stub.Count.Get(10);
 
         Assert.Equal(10, list.Count);
     }
@@ -353,7 +353,7 @@ public partial class IEntityListBaseOfTTests
         IEntityListBase<IEntityBase> list = stub;
 
         var itemStub = new EntityBaseStubForListT();
-        stub.Indexer.OnGet((index) => itemStub);
+        stub.Indexer.Get((index) => itemStub);
 
         _ = list[0];
 

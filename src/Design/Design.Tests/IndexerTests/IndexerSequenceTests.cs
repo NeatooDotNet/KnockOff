@@ -7,7 +7,7 @@ using Design.Stubs.Indexers;
 namespace Design.Tests.IndexerTests;
 
 /// <summary>
-/// Tests for indexer sequences: OnGet().ThenGet() and OnSet().ThenSet() chains.
+/// Tests for indexer sequences: Get().ThenGet() and Set().ThenSet() chains.
 /// </summary>
 public class IndexerSequenceTests
 {
@@ -16,7 +16,7 @@ public class IndexerSequenceTests
     {
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
 
-        stub.Indexer.OnGet(k => 1)
+        stub.Indexer.Get(k => 1)
             .ThenGet(k => 2)
             .ThenGet(k => 3);
 
@@ -34,7 +34,7 @@ public class IndexerSequenceTests
         // Use ThenDefault() to return default(T) after exhaustion instead.
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
 
-        stub.Indexer.OnGet(k => 1)
+        stub.Indexer.Get(k => 1)
             .ThenGet(k => 999);
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
@@ -51,7 +51,7 @@ public class IndexerSequenceTests
         // ThenDefault() causes sequence to return default(T) after exhaustion
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
 
-        stub.Indexer.OnGet(k => 1)
+        stub.Indexer.Get(k => 1)
             .ThenGet(k => 999)
             .ThenDefault();
 
@@ -67,7 +67,7 @@ public class IndexerSequenceTests
     {
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
 
-        stub.Indexer.OnGet(k => 1)
+        stub.Indexer.Get(k => 1)
             .ThenGet(k => 2);
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
@@ -83,7 +83,7 @@ public class IndexerSequenceTests
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
         var log = new List<string>();
 
-        stub.Indexer.OnSet((k, v) => log.Add($"First: {k}={v}"))
+        stub.Indexer.Set((k, v) => log.Add($"First: {k}={v}"))
             .ThenSet((k, v) => log.Add($"Second: {k}={v}"))
             .ThenSet((k, v) => log.Add($"Third: {k}={v}"));
 
@@ -104,7 +104,7 @@ public class IndexerSequenceTests
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
         var log = new List<string>();
 
-        stub.Indexer.OnSet((k, v) => log.Add($"First: {k}={v}"))
+        stub.Indexer.Set((k, v) => log.Add($"First: {k}={v}"))
             .ThenSet((k, v) => log.Add($"Final: {k}={v}"));
 
         Design.Domain.Entities.ICollection<string, int> collection = stub;
@@ -123,7 +123,7 @@ public class IndexerSequenceTests
         var stub = new IndexerSequencesDemo.Stubs.ICollection();
         var log = new List<string>();
 
-        stub.Indexer.OnSet((k, v) => log.Add($"First: {k}={v}"))
+        stub.Indexer.Set((k, v) => log.Add($"First: {k}={v}"))
             .ThenSet((k, v) => log.Add($"Final: {k}={v}"))
             .ThenDefault();
 

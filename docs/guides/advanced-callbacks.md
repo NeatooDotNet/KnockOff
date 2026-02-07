@@ -94,7 +94,7 @@ Use interceptor state to make one member's behavior depend on another:
 ```cs
 // Shared state between property and method
 var isConnected = false;
-stub.IsConnected.OnGet(() => isConnected);
+stub.IsConnected.Get(() => isConnected);
 stub.Connect.Call(() => { isConnected = true; });
 ```
 <!-- endSnippet -->
@@ -179,7 +179,7 @@ stub.Clear.Call(() =>
 });
 
 // Stats: Return current counts
-stub.Stats.OnGet(() => new CacheStats { Hits = hits, Misses = misses });
+stub.Stats.Get(() => new CacheStats { Hits = hits, Misses = misses });
 ```
 <!-- endSnippet -->
 

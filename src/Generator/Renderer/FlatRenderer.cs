@@ -1988,7 +1988,7 @@ internal static class FlatRenderer
 			return;
 		}
 
-		// User-defined properties with base class pattern: record access, check OnGet/OnSet, then delegate to virtual property
+		// User-defined properties with base class pattern: record access, check Get/Set, then delegate to virtual property
 		if (prop.HasUserOverride)
 		{
 			RenderPropertyUserOverrideImplementation(w, prop);
@@ -2027,7 +2027,7 @@ internal static class FlatRenderer
 
 	/// <summary>
 	/// Renders the explicit interface implementation for a property with user override (base class pattern).
-	/// Priority chain: OnGet/OnSet > User Override (virtual property with _ suffix).
+	/// Priority chain: Get/Set > User Override (virtual property with _ suffix).
 	/// Unlike properties without user override, this does NOT fall through to Strict/Default.
 	/// </summary>
 	private static void RenderPropertyUserOverrideImplementation(CodeWriter w, FlatPropertyModel prop)
@@ -2040,8 +2040,8 @@ internal static class FlatRenderer
 				w.Line("get");
 				using (w.Braces())
 				{
-					// OnGet supersedes user override (InvokeGetCallback tracks internally)
-					w.Line($"if ({prop.InterceptorName}.HasOnGet) return {prop.InterceptorName}.InvokeGetCallback();");
+					// Get supersedes user override (InvokeGetCallback tracks internally)
+					w.Line($"if ({prop.InterceptorName}.HasGet) return {prop.InterceptorName}.InvokeGetCallback();");
 					// Record access only for user override path (to avoid double counting)
 					w.Line($"{prop.InterceptorName}.RecordGet();");
 					// User override (virtual property with _ suffix)
@@ -2056,8 +2056,8 @@ internal static class FlatRenderer
 				w.Line("set");
 				using (w.Braces())
 				{
-					// OnSet supersedes user override (InvokeSetCallback tracks internally)
-					w.Line($"if ({prop.InterceptorName}.HasOnSet) {{ {prop.InterceptorName}.InvokeSetCallback(value); return; }}");
+					// Set supersedes user override (InvokeSetCallback tracks internally)
+					w.Line($"if ({prop.InterceptorName}.HasSet) {{ {prop.InterceptorName}.InvokeSetCallback(value); return; }}");
 					// Record access only for user override path (to avoid double counting)
 					w.Line($"{prop.InterceptorName}.RecordSet(value);");
 					// User override (virtual property with _ suffix)

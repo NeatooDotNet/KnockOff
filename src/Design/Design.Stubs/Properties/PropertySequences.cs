@@ -2,8 +2,8 @@
 // Design.Stubs - Property Sequences
 // -----------------------------------------------------------------------------
 // This file demonstrates sequence APIs for properties:
-// - OnGet().ThenGet() for getter sequences
-// - OnSet().ThenSet() for setter sequences
+// - Get().ThenGet() for getter sequences
+// - Set().ThenSet() for setter sequences
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Entities;
@@ -19,7 +19,7 @@ namespace Design.Stubs.Properties;
 public partial class PropertySequencesDemo
 {
     // =========================================================================
-    // OnGet().ThenGet() - Getter Sequences
+    // Get().ThenGet() - Getter Sequences
     // =========================================================================
     // DESIGN DECISION: Getters support sequence behavior just like methods.
     // Each access to the property advances through the sequence.
@@ -38,7 +38,7 @@ public partial class PropertySequencesDemo
         var stub = new Stubs.IEntity();
 
         // First access returns "First", second returns "Second", then repeats "Final"
-        stub.Name.OnGet("First")
+        stub.Name.Get("First")
             .ThenGet("Second")
             .ThenGet("Final");
 
@@ -62,7 +62,7 @@ public partial class PropertySequencesDemo
         var stub = new Stubs.IEntity();
         var counter = 0;
 
-        stub.Name.OnGet("Static first")
+        stub.Name.Get("Static first")
             .ThenGet(() => $"Dynamic {++counter}")
             .ThenGet("Static final");
 
@@ -75,7 +75,7 @@ public partial class PropertySequencesDemo
     }
 
     // =========================================================================
-    // OnSet().ThenSet() - Setter Sequences
+    // Set().ThenSet() - Setter Sequences
     // =========================================================================
     // DESIGN DECISION: Setters also support sequences. Each set call advances
     // through the sequence of callbacks.
@@ -88,7 +88,7 @@ public partial class PropertySequencesDemo
         var stub = new Stubs.IEntity();
         var log = new List<string>();
 
-        stub.Description.OnSet((v) => log.Add($"First: {v}"))
+        stub.Description.Set((v) => log.Add($"First: {v}"))
             .ThenSet((v) => log.Add($"Second: {v}"))
             .ThenSet((v) => log.Add($"Final: {v}"));
 
@@ -114,7 +114,7 @@ public partial class PropertySequencesDemo
     {
         var stub = new Stubs.IEntity();
 
-        stub.Name.OnGet("First")
+        stub.Name.Get("First")
             .ThenGet("Second")
             .ThenDefault();  // Return default after exhaustion
 
@@ -141,10 +141,10 @@ public partial class PropertySequencesDemo
         string stored = "Initial";
 
         // Configure getter to return from backing store
-        stub.Description.OnGet(() => stored);
+        stub.Description.Get(() => stored);
 
         // Configure setter to update backing store
-        stub.Description.OnSet((v) => stored = v);
+        stub.Description.Set((v) => stored = v);
 
         IEntity entity = stub;
 

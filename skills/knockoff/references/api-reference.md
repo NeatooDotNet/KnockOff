@@ -30,7 +30,7 @@ stub.Save.Call((item) => { }).Verifiable();
 stub.GetById.Of<User>().Return((id) => new User { Id = id });
 
 // Property interceptor
-stub.Name.OnGet("TestRepo");
+stub.Name.Get("TestRepo");
 
 // Indexer interceptor
 stub.Indexer.Backing["key1"] = new User { Id = 1 };
@@ -257,9 +257,9 @@ Generated for interface properties. Tracks get/set operations and supports get/s
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnGet(Func<T>)` | `IPropertyGetTracking` | Configures getter callback that repeats indefinitely |
-| `OnGet(T)` | `IPropertyGetTracking` | Configures getter to return specified value (convenience overload) |
-| `OnSet(Action<T>)` | `IPropertySetTracking<T>` | Configures setter callback that repeats indefinitely |
+| `Get(Func<T>)` | `IPropertyGetTracking` | Configures getter callback that repeats indefinitely |
+| `Get(T)` | `IPropertyGetTracking` | Configures getter to return specified value (convenience overload) |
+| `Set(Action<T>)` | `IPropertySetTracking<T>` | Configures setter callback that repeats indefinitely |
 
 ### Getter Sequence Building Methods
 
@@ -293,26 +293,26 @@ When a property has a getter, sequences can be built using these methods on `IPr
 
 ### Behavior Notes
 
-- **OnGet value overload**: For convenience, `OnGet(value)` is equivalent to `OnGet(() => value)`
-- **OnSet does not auto-update getter**: Setting `OnSet` does NOT automatically update what the getter returns. If you need the getter to reflect set values, configure the callback to update OnGet
+- **Get value overload**: For convenience, `Get(value)` is equivalent to `Get(() => value)`
+- **Set does not auto-update getter**: Setting `Set` does NOT automatically update what the getter returns. If you need the getter to reflect set values, configure the callback to update Get
 - **Init-only properties**: Setters for `init` properties are tracked like regular setters
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (get/set counts, `LastSetValue`), resets sequence index and source delegation reference. Preserves `OnGet`/`OnSet` callbacks
+- `void Reset()` - Clears tracking state (get/set counts, `LastSetValue`), resets sequence index and source delegation reference. Preserves `Get`/`Set` callbacks
 
 ### Example
 
 <!-- snippet: property-interceptor-complete-api-demo -->
 ```cs
-// OnGet with value: configure getter return value
-stub.ConnectionString.OnGet("Server=localhost");
+// Get with value: configure getter return value
+stub.ConnectionString.Get("Server=localhost");
 
-// OnGet with callback: dynamic value
-stub.Timeout.OnGet(() => 30);
+// Get with callback: dynamic value
+stub.Timeout.Get(() => 30);
 
-// OnSet: configure setter callback
-stub.Timeout.OnSet((val) => { /* handle set */ });
+// Set: configure setter callback
+stub.Timeout.Set((val) => { /* handle set */ });
 ```
 <!-- endSnippet -->
 
@@ -334,8 +334,8 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnGet(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey>` | Configures getter callback that repeats indefinitely |
-| `OnSet(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configures setter callback that repeats indefinitely |
+| `Get(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey>` | Configures getter callback that repeats indefinitely |
+| `Set(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configures setter callback that repeats indefinitely |
 
 ### Verification Methods
 
@@ -351,12 +351,12 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 ### Behavior Notes
 
 - **Backing dictionary**: By default, get returns `Backing[key]` and set stores to `Backing[key]`
-- **OnGet override**: When `OnGet` is set, the callback's return value is used instead of `Backing`
-- **OnSet override**: When `OnSet` is set, the callback is invoked. `Backing` is NOT updated automatically unless your callback does it
+- **Get override**: When `Get` is set, the callback's return value is used instead of `Backing`
+- **Set override**: When `Set` is set, the callback is invoked. `Backing` is NOT updated automatically unless your callback does it
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (get/set counts, `LastGetKey`, `LastSetEntry`), resets sequence index. Preserves `OnGet`/`OnSet` callbacks and `Backing` dictionary
+- `void Reset()` - Clears tracking state (get/set counts, `LastGetKey`, `LastSetEntry`), resets sequence index. Preserves `Get`/`Set` callbacks and `Backing` dictionary
 
 ### Example
 
@@ -365,11 +365,11 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 // Backing: default dictionary storage for indexer
 stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
 
-// OnGet: override backing lookup with callback
-stub.Indexer.OnGet((key) => new User { Id = key, Name = "FromCallback" });
+// Get: override backing lookup with callback
+stub.Indexer.Get((key) => new User { Id = key, Name = "FromCallback" });
 
-// OnSet: configure setter callback
-stub.Indexer.OnSet((key, value) => { /* handle set */ });
+// Set: configure setter callback
+stub.Indexer.Set((key, value) => { /* handle set */ });
 ```
 <!-- endSnippet -->
 
@@ -571,8 +571,8 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 |-----------------|--------------|-----------------|
 | **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position, source delegation | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **User Method** | Call counts, `LastArg` | `Return`/`Call` configuration, verifiable marking |
-| **Property** | Get/set counts, `LastSetValue`, sequence index, source delegation | `OnGet`/`OnSet` callbacks, sequence structure, verifiable marking |
-| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `OnGet`/`OnSet` callbacks, `Backing` dictionary, verifiable marking |
+| **Property** | Get/set counts, `LastSetValue`, sequence index, source delegation | `Get`/`Set` callbacks, sequence structure, verifiable marking |
+| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `Get`/`Set` callbacks, `Backing` dictionary, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
 | **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
@@ -706,7 +706,7 @@ The first match wins. Return/Call takes full control when configured -- Source i
 - [Verification](../../../../docs/guides/verification.md) - Advanced verification patterns and Times constraints
 
 **Advanced Topics**:
-- [Advanced Callbacks](../../../../docs/guides/advanced-callbacks.md) - Best practices for Return, Call, OnGet, OnSet callbacks
+- [Advanced Callbacks](../../../../docs/guides/advanced-callbacks.md) - Best practices for Return, Call, Get, Set callbacks
 
 ---
 

@@ -41,7 +41,7 @@ public class BclInterfaceInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new DataProviderStub();
-        stub.Count.OnGet(() => 3);
+        stub.Count.Get(() => 3);
         stub.GetEnumerator.Return(() => TestData.AsEnumerable().GetEnumerator());
         _knockOff = stub;
     }
@@ -136,7 +136,7 @@ public class BclInterfaceSetupBenchmarks
     public DataProviderStub KnockOff_SetupBclInterface()
     {
         var stub = new DataProviderStub();
-        stub.Count.OnGet(() => 3);
+        stub.Count.Get(() => 3);
         // Non-generic GetEnumerator delegates to the generic one
         stub.GetEnumerator.Return(() => TestData.AsEnumerable().GetEnumerator());
         return stub;

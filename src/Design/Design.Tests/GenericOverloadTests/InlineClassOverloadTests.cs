@@ -254,7 +254,7 @@ public partial class InlineClassOverloadTests
     {
         // Arrange
         var stub = new Stubs.ProcessorBase();
-        stub.Name.OnGet("TestProcessor");
+        stub.Name.Get("TestProcessor");
 
         ProcessorBase processor = stub.Object;
 

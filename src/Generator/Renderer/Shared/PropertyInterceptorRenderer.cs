@@ -6,15 +6,15 @@ namespace KnockOff.Renderer.Shared;
 
 /// <summary>
 /// Renders property interceptor classes for both inline and flat stubs.
-/// Generates OnGet() returning IPropertyGetBuilder (repeating callback, elevatable to sequence via ThenGet),
-/// OnSet() returning IPropertySetBuilder similarly for setters,
+/// Generates Get() returning IPropertyGetBuilder (repeating callback, elevatable to sequence via ThenGet),
+/// Set() returning IPropertySetBuilder similarly for setters,
 /// nested builder and sequence implementation classes, InvokeGet/InvokeSet methods, and verification.
 /// </summary>
 internal static class PropertyInterceptorRenderer
 {
 	/// <summary>
 	/// Renders a complete property interceptor class.
-	/// For init-only properties, generates getter-only API (no OnSet methods).
+	/// For init-only properties, generates getter-only API (no Set methods).
 	/// For regular properties, generates full getter/setter API based on accessor availability.
 	/// </summary>
 	public static void RenderInterceptorClass(
@@ -83,9 +83,9 @@ internal static class PropertyInterceptorRenderer
 		w.Line("private int TotalGetCount { get { var sum = _unconfiguredGetCount + (_onGetTracking?._callCount ?? 0); if (_getSequence != null) foreach (var s in _getSequence) sum += s.Tracking._callCount; return sum; } }");
 		w.Line();
 
-		// OnGet() - repeating callback, returns IPropertyGetBuilder
+		// Get() - repeating callback, returns IPropertyGetBuilder
 		w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-		w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> OnGet(global::System.Func<{model.ValueType}> callback)");
+		w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> Get(global::System.Func<{model.ValueType}> callback)");
 		using (w.Braces())
 		{
 			w.Line("_getSequence = null;");
@@ -98,9 +98,9 @@ internal static class PropertyInterceptorRenderer
 		}
 		w.Line();
 
-		// OnGet(value) - wrapper method for value-based configuration
+		// Get(value) - wrapper method for value-based configuration
 		w.Line($"/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>");
-		w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> OnGet({model.ValueType} value) => OnGet(() => value);");
+		w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> Get({model.ValueType} value) => Get(() => value);");
 		w.Line();
 
 		// RecordSet - tracks init setter invocation (for verification)
@@ -112,7 +112,7 @@ internal static class PropertyInterceptorRenderer
 		RenderInvokeGet(w, model, options);
 
 		// Reset method
-		w.Line("/// <summary>Resets tracking state but preserves configuration (OnGet) and verifiable marking.</summary>");
+		w.Line("/// <summary>Resets tracking state but preserves configuration (Get) and verifiable marking.</summary>");
 		w.Line("public void Reset()");
 		using (w.Braces())
 		{
@@ -155,7 +155,7 @@ internal static class PropertyInterceptorRenderer
 		// Source field for Source(T) feature
 		if (!string.IsNullOrEmpty(model.DeclaringInterface))
 		{
-			w.Line($"/// <summary>Source object to delegate to when no OnGet/OnSet is configured.</summary>");
+			w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
 			w.Line($"internal {model.DeclaringInterface}? _source;");
 			w.Line();
 		}
@@ -220,11 +220,11 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 		}
 
-		// OnGet() method (if has getter)
+		// Get() method (if has getter)
 		if (model.HasGetter)
 		{
 			w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-			w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> OnGet(global::System.Func<{model.ValueType}> callback)");
+			w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> Get(global::System.Func<{model.ValueType}> callback)");
 			using (w.Braces())
 			{
 				w.Line("_getSequence = null;");
@@ -237,17 +237,17 @@ internal static class PropertyInterceptorRenderer
 			}
 			w.Line();
 
-			// OnGet(value) - wrapper method for value-based configuration
+			// Get(value) - wrapper method for value-based configuration
 			w.Line($"/// <summary>Configures getter to return the specified value. Returns builder for tracking and sequence chaining.</summary>");
-			w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> OnGet({model.ValueType} value) => OnGet(() => value);");
+			w.Line($"public global::KnockOff.IPropertyGetBuilder<{model.ValueType}> Get({model.ValueType} value) => Get(() => value);");
 			w.Line();
 		}
 
-		// OnSet() method (if has setter)
+		// Set() method (if has setter)
 		if (model.HasSetter)
 		{
 			w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-			w.Line($"public global::KnockOff.IPropertySetBuilder<{model.ValueType}> OnSet(global::System.Action<{model.ValueType}> callback)");
+			w.Line($"public global::KnockOff.IPropertySetBuilder<{model.ValueType}> Set(global::System.Action<{model.ValueType}> callback)");
 			using (w.Braces())
 			{
 				w.Line("_setSequence = null;");
@@ -306,7 +306,7 @@ internal static class PropertyInterceptorRenderer
 	/// Renders methods for user override property support (base class pattern).
 	/// These methods separate tracking from callback invocation:
 	/// - RecordGet() / RecordSet(value) - tracking only
-	/// - HasOnGet / HasOnSet - check if callback is configured
+	/// - HasGet / HasSet - check if callback is configured
 	/// - InvokeGetCallback() / InvokeSetCallback(value) - invoke callback without tracking
 	/// </summary>
 	private static void RenderUserOverrideSupportMethods(CodeWriter w, UnifiedPropertyInterceptorModel model)
@@ -318,8 +318,8 @@ internal static class PropertyInterceptorRenderer
 			w.Line("internal void RecordGet() => _unconfiguredGetCount++;");
 			w.Line();
 
-			w.Line("/// <summary>Returns true if OnGet is configured (callback or sequence). Used by user override pattern.</summary>");
-			w.Line("internal bool HasOnGet => _onGet != null || (_getSequence?.Count ?? 0) > 0;");
+			w.Line("/// <summary>Returns true if Get is configured (callback or sequence). Used by user override pattern.</summary>");
+			w.Line("internal bool HasGet => _onGet != null || (_getSequence?.Count ?? 0) > 0;");
 			w.Line();
 
 			w.Line("/// <summary>Invokes the configured getter callback without tracking. Used by user override pattern.</summary>");
@@ -335,7 +335,7 @@ internal static class PropertyInterceptorRenderer
 					w.Line("_getSequenceIndex++;");
 					w.Line("return callback();");
 				}
-				// Priority 2: Repeating OnGet callback
+				// Priority 2: Repeating Get callback
 				w.Line("if (_onGet != null && _onGetTracking != null)");
 				using (w.Braces())
 				{
@@ -354,8 +354,8 @@ internal static class PropertyInterceptorRenderer
 			w.Line($"internal void RecordSet({model.ValueType} value) {{ _unconfiguredSetCount++; _unconfiguredLastSetValue = value; }}");
 			w.Line();
 
-			w.Line("/// <summary>Returns true if OnSet is configured (callback or sequence). Used by user override pattern.</summary>");
-			w.Line("internal bool HasOnSet => _onSet != null || (_setSequence?.Count ?? 0) > 0;");
+			w.Line("/// <summary>Returns true if Set is configured (callback or sequence). Used by user override pattern.</summary>");
+			w.Line("internal bool HasSet => _onSet != null || (_setSequence?.Count ?? 0) > 0;");
 			w.Line();
 
 			w.Line("/// <summary>Invokes the configured setter callback without tracking. Used by user override pattern.</summary>");
@@ -372,7 +372,7 @@ internal static class PropertyInterceptorRenderer
 					w.Line("callback(value);");
 					w.Line("return;");
 				}
-				// Priority 2: Repeating OnSet callback
+				// Priority 2: Repeating Set callback
 				w.Line("if (_onSet != null && _onSetTracking != null)");
 				using (w.Braces())
 				{
@@ -412,7 +412,7 @@ internal static class PropertyInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 2: Repeating OnGet callback
+			// Priority 2: Repeating Get callback
 			w.Line("if (_onGet != null && _onGetTracking != null)");
 			using (w.Braces())
 			{
@@ -513,7 +513,7 @@ internal static class PropertyInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 2: Repeating OnSet callback
+			// Priority 2: Repeating Set callback
 			w.Line("if (_onSet != null && _onSetTracking != null)");
 			using (w.Braces())
 			{
@@ -577,7 +577,7 @@ internal static class PropertyInterceptorRenderer
 		UnifiedPropertyInterceptorModel model,
 		bool hasSourceField)
 	{
-		w.Line("/// <summary>Resets tracking state but preserves configuration (OnGet, OnSet) and verifiable marking.</summary>");
+		w.Line("/// <summary>Resets tracking state but preserves configuration (Get, Set) and verifiable marking.</summary>");
 		w.Line("public void Reset()");
 		using (w.Braces())
 		{
@@ -753,7 +753,7 @@ internal static class PropertyInterceptorRenderer
 		w.Line("internal bool IsVerifiable => _isGetVerifiable;");
 		w.Line();
 
-		w.Line("/// <summary>Whether this property has been configured (Value set or OnGet configured).</summary>");
+		w.Line("/// <summary>Whether this property has been configured (Value set or Get configured).</summary>");
 		w.Line("internal bool IsConfigured => _valueSet || _onGet != null || (_getSequence?.Count ?? 0) > 0;");
 		w.Line();
 
@@ -785,7 +785,7 @@ internal static class PropertyInterceptorRenderer
 			? "_isGetVerifiable || _isSetVerifiable"
 			: (model.HasGetter ? "_isGetVerifiable" : "_isSetVerifiable");
 
-		// IsConfigured checks OnGet/OnSet - no longer includes _valueSet since .Value API is removed
+		// IsConfigured checks Get/Set - no longer includes _valueSet since .Value API is removed
 		var isConfiguredParts = new System.Collections.Generic.List<string>();
 		if (model.HasGetter) isConfiguredParts.Add("_onGet != null || (_getSequence?.Count ?? 0) > 0");
 		if (model.HasSetter) isConfiguredParts.Add("_onSet != null || (_setSequence?.Count ?? 0) > 0");
@@ -811,7 +811,7 @@ internal static class PropertyInterceptorRenderer
 
 			// When BOTH get and set are verifiable (e.g., Verifiable() called on interceptor),
 			// check combined count - "property was used" means either get or set.
-			// When only one is verifiable (e.g., OnGet().Verifiable()), check individually.
+			// When only one is verifiable (e.g., Get().Verifiable()), check individually.
 			if (model.HasGetter && model.HasSetter)
 			{
 				w.Line("if (_isGetVerifiable && _isSetVerifiable)");

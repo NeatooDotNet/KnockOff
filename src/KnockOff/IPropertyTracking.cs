@@ -2,7 +2,7 @@ namespace KnockOff;
 
 /// <summary>
 /// Tracks invocations of a property getter callback registration.
-/// Returned by OnGet() to enable verification and fluent chaining.
+/// Returned by Get() to enable verification and fluent chaining.
 /// </summary>
 /// <remarks>
 /// Unlike method tracking, property getter tracking does not capture a "LastValue"
@@ -43,7 +43,7 @@ public interface IPropertyGetTracking
 
 /// <summary>
 /// Tracks invocations of a property setter callback registration with value capture.
-/// Returned by OnSet() to enable verification, value inspection, and fluent chaining.
+/// Returned by Set() to enable verification, value inspection, and fluent chaining.
 /// </summary>
 public interface IPropertySetTracking<TValue>
 {

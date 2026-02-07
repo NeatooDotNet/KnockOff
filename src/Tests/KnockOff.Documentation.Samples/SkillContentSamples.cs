@@ -299,7 +299,7 @@ public class ReturnsVsReturnTests
 }
 
 // =============================================================================
-// Gotcha #8: OnSet Does NOT Auto-Update Getter
+// Gotcha #8: Set Does NOT Auto-Update Getter
 // =============================================================================
 
 public class OnSetGotchaTests
@@ -311,10 +311,10 @@ public class OnSetGotchaTests
         IPropSvc service = stub;
 
         #region skill-gotcha-onset-no-auto-update
-        stub.Name.OnSet((v) => { /* tracks value */ });
+        stub.Name.Set((v) => { /* tracks value */ });
         service.Name = "test";
-        // Getter still returns default! OnSet doesn't update OnGet
-        // To link them: stub.Name.OnSet((v) => stub.Name.OnGet(v));
+        // Getter still returns default! Set doesn't update Get
+        // To link them: stub.Name.Set((v) => stub.Name.Get(v));
         #endregion
     }
 }
@@ -428,16 +428,16 @@ public class PropertyConfigTests
 
         #region skill-property-config
         // Static value
-        stub.Name.OnGet("TestName");
+        stub.Name.Get("TestName");
 
         // Dynamic callback
-        stub.Timestamp.OnGet(() => DateTime.UtcNow);
+        stub.Timestamp.Get(() => DateTime.UtcNow);
 
         // Setter interception
-        stub.Name.OnSet((value) => capturedValues.Add(value));
+        stub.Name.Set((value) => capturedValues.Add(value));
 
         // Sequences
-        stub.Counter.OnGet(() => 1).ThenGet(() => 2).ThenGet(() => 3);
+        stub.Counter.Get(() => 1).ThenGet(() => 2).ThenGet(() => 3);
         #endregion
 
         IPropSvc svc = stub;
@@ -464,14 +464,14 @@ public class IndexerConfigTests
         stub.Indexer.Backing["key2"] = "value2";
 
         // Or use callbacks
-        stub.Indexer.OnGet((key) => $"computed-{key}");
-        stub.Indexer.OnSet((key, value) => { /* handle */ });
+        stub.Indexer.Get((key) => $"computed-{key}");
+        stub.Indexer.Set((key, value) => { /* handle */ });
 
-        // Note: OnGet/OnSet override Backing - they don't work together
+        // Note: Get/Set override Backing - they don't work together
         #endregion
 
         IDict dict = stub;
-        Assert.Equal("computed-key1", dict["key1"]); // OnGet overrides Backing
+        Assert.Equal("computed-key1", dict["key1"]); // Get overrides Backing
     }
 }
 
@@ -792,12 +792,12 @@ public class UserPropertyTests
         stub.SetCount(42);
         IUserService service = stub;
 
-        // Without OnGet: user property is called
+        // Without Get: user property is called
         var count1 = service.Count;  // Returns 42 (from Count_ override)
 
-        // With OnGet: OnGet supersedes user property (clean interceptor name)
-        stub.Count.OnGet(999);
-        var count2 = service.Count;  // Returns 999 (OnGet wins)
+        // With Get: Get supersedes user property (clean interceptor name)
+        stub.Count.Get(999);
+        var count2 = service.Count;  // Returns 999 (Get wins)
         #endregion
 
         Assert.Equal(42, count1);
@@ -826,14 +826,14 @@ public class UserPropertyTests
         IUserService service = stub;
 
         #region skill-user-property-reset
-        stub.Count.OnGet(100);
+        stub.Count.Get(100);
         _ = service.Count;
         stub.Count.VerifyGet(Times.Once);
 
         stub.Count.Reset();
         stub.Count.VerifyGet(Times.Never);  // Tracking cleared
 
-        _ = service.Count;  // Still uses OnGet (returns 100)
+        _ = service.Count;  // Still uses Get (returns 100)
         #endregion
 
         Assert.Equal(100, service.Count);
@@ -860,7 +860,7 @@ public class SourceDelegationTests
         stub.GetById.Return((id) => testUser);  // This wins over source
 
         // Reset clears tracking (counts, args, sequence position) and source delegation
-        // but preserves callbacks (Return, Returns, OnGet, OnSet)
+        // but preserves callbacks (Return, Returns, Get, Set)
         // stub.GetById.Reset();
         #endregion
 

@@ -78,7 +78,7 @@ public partial class CmdInlineInterfaceTests
 
         // Configure behavior
         stub.Notify.Call((msg) => { });
-        stub.IsEnabled.OnGet(true);
+        stub.IsEnabled.Get(true);
 
         // Use through interface
         INotificationService service = stub;

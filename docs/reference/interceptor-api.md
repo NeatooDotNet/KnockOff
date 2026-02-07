@@ -111,7 +111,7 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 
 ### Properties
 
-**Note**: Properties do NOT have a `Value` property. Use `OnGet()` to configure the getter return value.
+**Note**: Properties do NOT have a `Value` property. Use `Get()` to configure the getter return value.
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -121,9 +121,9 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnGet(Func<T>)` | `IPropertyGetTracking` | Configure callback invoked when property is read. Returns tracking interface for verification. Use `.ThenGet()` on the returned object to chain sequences. |
-| `OnGet(T value)` | `IPropertyGetTracking` | Configure getter to return the specified value. Convenience overload for `OnGet(() => value)`. |
-| `OnSet(Action<T>)` | `IPropertySetTracking<T>` | Configure callback invoked when property is written. Returns tracking interface for verification. Use `.ThenSet()` on the returned object to chain sequences. |
+| `Get(Func<T>)` | `IPropertyGetTracking` | Configure callback invoked when property is read. Returns tracking interface for verification. Use `.ThenGet()` on the returned object to chain sequences. |
+| `Get(T value)` | `IPropertyGetTracking` | Configure getter to return the specified value. Convenience overload for `Get(() => value)`. |
+| `Set(Action<T>)` | `IPropertySetTracking<T>` | Configure callback invoked when property is written. Returns tracking interface for verification. Use `.ThenSet()` on the returned object to chain sequences. |
 
 ### Verification Methods
 
@@ -142,28 +142,28 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 
 ### Behavior Notes
 
-- **OnGet configures the getter**: When a callback is configured via `OnGet()`, the callback's return value is used by the property getter
-- **OnSet doesn't update the getter**: Configuring `OnSet()` does NOT automatically change what the getter returns. The getter and setter are independent unless you explicitly link them in your callback
+- **Get configures the getter**: When a callback is configured via `Get()`, the callback's return value is used by the property getter
+- **Set doesn't update the getter**: Configuring `Set()` does NOT automatically change what the getter returns. The getter and setter are independent unless you explicitly link them in your callback
 - **Init-only properties**: Setters for `init` properties are tracked like regular setters
-- **Fluent returns**: Both `OnGet()` and `OnSet()` return tracking interfaces, allowing verification on the returned object
+- **Fluent returns**: Both `Get()` and `Set()` return tracking interfaces, allowing verification on the returned object
 - **No backing field**: Unlike Moq's `.Object` pattern, there is no automatic backing field. You must configure the getter to return a value
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (call counts, `LastSetValue`), resets sequence index to 0. Preserves configured callbacks (`OnGet`/`OnSet`), sequence structure, and verifiable marking.
+- `void Reset()` - Clears tracking state (call counts, `LastSetValue`), resets sequence index to 0. Preserves configured callbacks (`Get`/`Set`), sequence structure, and verifiable marking.
 
 ### Example
 
 <!-- snippet: property-interceptor-complete-api-demo -->
 ```cs
-// OnGet with value: configure getter return value
-stub.ConnectionString.OnGet("Server=localhost");
+// Get with value: configure getter return value
+stub.ConnectionString.Get("Server=localhost");
 
-// OnGet with callback: dynamic value
-stub.Timeout.OnGet(() => 30);
+// Get with callback: dynamic value
+stub.Timeout.Get(() => 30);
 
-// OnSet: configure setter callback
-stub.Timeout.OnSet((val) => { /* handle set */ });
+// Set: configure setter callback
+stub.Timeout.Set((val) => { /* handle set */ });
 ```
 <!-- endSnippet -->
 
@@ -185,8 +185,8 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `OnGet(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey, TValue>` | Configure callback invoked when indexer is read. Returns tracking interface for verification. Use `.ThenGet()` on the returned object to chain sequences. |
-| `OnSet(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configure callback invoked when indexer is written. Returns tracking interface for verification. Use `.ThenSet()` on the returned object to chain sequences. |
+| `Get(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey, TValue>` | Configure callback invoked when indexer is read. Returns tracking interface for verification. Use `.ThenGet()` on the returned object to chain sequences. |
+| `Set(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configure callback invoked when indexer is written. Returns tracking interface for verification. Use `.ThenSet()` on the returned object to chain sequences. |
 
 ### Verification Methods
 
@@ -204,15 +204,15 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 ### Behavior Notes
 
 - **Backing dictionary**: By default, getter reads from `Backing[key]` and setter stores to `Backing[key]`
-- **OnGet replaces Backing lookup**: When a callback is configured via `OnGet()`, the callback's return value is used instead of `Backing` lookup
-- **OnSet doesn't update Backing**: When a callback is configured via `OnSet()`, the callback is invoked but `Backing` is NOT updated automatically unless your callback does it explicitly
-- **Fluent returns**: Both `OnGet()` and `OnSet()` return tracking interfaces, allowing verification on the returned object
+- **Get replaces Backing lookup**: When a callback is configured via `Get()`, the callback's return value is used instead of `Backing` lookup
+- **Set doesn't update Backing**: When a callback is configured via `Set()`, the callback is invoked but `Backing` is NOT updated automatically unless your callback does it explicitly
+- **Fluent returns**: Both `Get()` and `Set()` return tracking interfaces, allowing verification on the returned object
 - **Nullable tracking**: `LastGetKey` and `LastSetEntry` are nullable to handle cases where no calls have been made yet
-- **No automatic synchronization**: `OnGet` and `OnSet` callbacks are independent. If you want them to share state, you must coordinate them explicitly
+- **No automatic synchronization**: `Get` and `Set` callbacks are independent. If you want them to share state, you must coordinate them explicitly
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (call counts, `LastGetKey`, `LastSetEntry`), resets sequence index to 0. Preserves configured callbacks (`OnGet`/`OnSet`), `Backing` dictionary, sequence structure, and verifiable marking.
+- `void Reset()` - Clears tracking state (call counts, `LastGetKey`, `LastSetEntry`), resets sequence index to 0. Preserves configured callbacks (`Get`/`Set`), `Backing` dictionary, sequence structure, and verifiable marking.
 
 ### Example
 
@@ -221,11 +221,11 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 // Backing: default dictionary storage for indexer
 stub.Indexer.Backing[1] = new User { Id = 1, Name = "Alice" };
 
-// OnGet: override backing lookup with callback
-stub.Indexer.OnGet((key) => new User { Id = key, Name = "FromCallback" });
+// Get: override backing lookup with callback
+stub.Indexer.Get((key) => new User { Id = key, Name = "FromCallback" });
 
-// OnSet: configure setter callback
-stub.Indexer.OnSet((key, value) => { /* handle set */ });
+// Set: configure setter callback
+stub.Indexer.Set((key, value) => { /* handle set */ });
 ```
 <!-- endSnippet -->
 
@@ -593,8 +593,8 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
 | **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
-| **Property** | Get/set counts, `LastSetValue`, sequence index | `OnGet`/`OnSet` callbacks, sequence structure, verifiable marking |
-| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `OnGet`/`OnSet` callbacks, `Backing` dictionary, sequence structure, verifiable marking |
+| **Property** | Get/set counts, `LastSetValue`, sequence index | `Get`/`Set` callbacks, sequence structure, verifiable marking |
+| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `Get`/`Set` callbacks, `Backing` dictionary, sequence structure, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
 | **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
@@ -603,7 +603,7 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 **Key Principles**:
 - `Reset()` clears tracking (counts, captured arguments) and resets sequence/When chain positions
-- `Reset()` preserves configured callbacks (`Return`, `Call`, `OnGet`, `OnSet`) and structure
+- `Reset()` preserves configured callbacks (`Return`, `Call`, `Get`, `Set`) and structure
 - `Reset()` does NOT clear verifiable marking (intentional test setup)
 - `Reset()` does NOT clear backing storage (`Backing` dictionary for indexers)
 
@@ -629,7 +629,7 @@ See the [Verification Guide](../guides/verification.md) for detailed examples.
 
 ## Tracking Objects vs Interceptors
 
-When you call `Return(callback)`, `Call(callback)`, `OnGet()`, or `OnSet()`, KnockOff returns a tracking/builder object that provides access to sequencing and verification methods.
+When you call `Return(callback)`, `Call(callback)`, `Get()`, or `Set()`, KnockOff returns a tracking/builder object that provides access to sequencing and verification methods.
 
 **Key distinction**:
 - **Interceptor**: The main object (e.g., `stub.GetById`) that configures behavior

@@ -1,4 +1,4 @@
-# Remove ko Parameter from OnCall/OnGet/OnSet Callbacks
+# Remove ko Parameter from OnCall/Get/Set Callbacks
 
 **Date:** 2026-01-19
 **Related Todo:** [Remove ko Parameter](../todos/remove-ko-parameter.md)
@@ -9,7 +9,7 @@
 
 ## Overview
 
-Remove the redundant `ko` parameter from all generated delegate signatures for OnCall, OnGet, and OnSet callbacks. The `ko` parameter passes a reference to the stub instance, but users already have access to the stub through local variables. Removing this parameter simplifies the API and reduces "noise" in callback signatures.
+Remove the redundant `ko` parameter from all generated delegate signatures for OnCall, Get, and Set callbacks. The `ko` parameter passes a reference to the stub instance, but users already have access to the stub through local variables. Removing this parameter simplifies the API and reduces "noise" in callback signatures.
 
 ---
 
@@ -25,15 +25,15 @@ The `ko` parameter is redundant because:
 **Before:**
 ```csharp
 stub.GetUser.OnCall((ko, id) => new User { Id = id });
-stub.IsActive.OnGet = (ko) => true;
-stub.Name.OnSet = (ko, value) => { };
+stub.IsActive.Get((ko) => true);
+stub.Name.Set((ko, value) => { });
 ```
 
 **After:**
 ```csharp
 stub.GetUser.OnCall((id) => new User { Id = id });
-stub.IsActive.OnGet(() => true);
-stub.Name.OnSet((value) => { });
+stub.IsActive.Get(() => true);
+stub.Name.Set((value) => { });
 ```
 
 ---
@@ -47,8 +47,8 @@ The change affects renderers, builders, and model builders:
 | File | What Changes |
 |------|--------------|
 | `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` | Remove `ko` from Invoke method params and callback args |
-| `src/Generator/Renderer/FlatRenderer.cs` | Remove `ko` from property/indexer OnGet/OnSet delegate types and implementation invocations; update legacy `RenderInvokeMethod` |
-| `src/Generator/Renderer/InlineRenderer.cs` | Remove `ko` from property/indexer OnGet/OnSet delegate types, implementation invocations, and delegate stub OnCall types |
+| `src/Generator/Renderer/FlatRenderer.cs` | Remove `ko` from property/indexer Get/Set delegate types and implementation invocations; update legacy `RenderInvokeMethod` |
+| `src/Generator/Renderer/InlineRenderer.cs` | Remove `ko` from property/indexer Get/Set delegate types, implementation invocations, and delegate stub OnCall types |
 | `src/Generator/Builder/UnifiedInterceptorBuilder.cs` | Remove `ko` from delegate signature construction |
 | `src/Generator/Builder/InlineModelBuilder.cs` | Remove `this,` from `OnCallArgs` construction for indexers and generic methods |
 
@@ -598,7 +598,7 @@ grep -r "(ko[,)]" src/Tests/
 
 #### Step 8.2: Update test callback signatures
 
-Update all test files that use OnCall, OnGet, OnSet callbacks to remove the `ko` parameter:
+Update all test files that use OnCall, Get, Set callbacks to remove the `ko` parameter:
 
 **Before:**
 ```csharp
@@ -657,10 +657,10 @@ Update any callback examples in the main README.
 
 - [ ] All delegate signatures no longer include `ko` parameter
 - [ ] All Invoke methods no longer take `ko` as first parameter
-- [ ] All OnGet callbacks are `Func<TReturn>` (no stub param)
-- [ ] All OnSet callbacks are `Action<TValue>` (no stub param)
-- [ ] All indexer OnGet callbacks are `Func<TKey, TReturn>` (no stub param)
-- [ ] All indexer OnSet callbacks are `Action<TKey, TValue>` (no stub param)
+- [ ] All Get callbacks are `Func<TReturn>` (no stub param)
+- [ ] All Set callbacks are `Action<TValue>` (no stub param)
+- [ ] All indexer Get callbacks are `Func<TKey, TReturn>` (no stub param)
+- [ ] All indexer Set callbacks are `Action<TKey, TValue>` (no stub param)
 - [ ] All delegate stub OnCall callbacks remove stub param
 - [ ] InlineModelBuilder `OnCallArgs` no longer includes `this,` prefix
 - [ ] Legacy FlatRenderer `RenderInvokeMethod` updated
@@ -683,7 +683,7 @@ None - this is a self-contained API simplification change.
 
 ### Breaking Change
 
-This is a **breaking change** that affects all existing KnockOff users who have written OnCall, OnGet, or OnSet callbacks. Every callback will need to have its first parameter removed.
+This is a **breaking change** that affects all existing KnockOff users who have written OnCall, Get, or Set callbacks. Every callback will need to have its first parameter removed.
 
 **Mitigation:**
 - Compile-time errors will guide users to fix callbacks (delegate signature mismatch)
@@ -709,8 +709,8 @@ This is actually **more explicit** and **clearer** since `stub` is a known local
 ### Indexer Signature Impact
 
 Indexers have more complex signatures. After the change:
-- `OnGet` becomes `Func<TKey, TReturn>`
-- `OnSet` becomes `Action<TKey, TValue>`
+- `Get` becomes `Func<TKey, TReturn>`
+- `Set` becomes `Action<TKey, TValue>`
 
 These are still standard delegate types that are easy to understand.
 
@@ -740,22 +740,22 @@ stub.GetUser.OnCall((id) => new User { Id = id });
 stub.GetUser.OnCall((id) => new User { Id = id });
 ```
 
-**OnGet for properties:**
+**Get for properties:**
 ```csharp
 // Before (v1.x)
-stub.IsActive.OnGet = (ko) => true;
+stub.IsActive.Get((ko) => true);
 
 // After (v2.0)
-stub.IsActive.OnGet(() => true);
+stub.IsActive.Get(() => true);
 ```
 
-**OnSet for properties:**
+**Set for properties:**
 ```csharp
 // Before (v1.x)
-stub.Name.OnSet = (ko, value) => Console.WriteLine(value);
+stub.Name.Set((ko, value) => Console.WriteLine(value));
 
 // After (v2.0)
-stub.Name.OnSet((value) => Console.WriteLine(value));
+stub.Name.Set((value) => Console.WriteLine(value));
 ```
 
 **Accessing stub within callbacks:**

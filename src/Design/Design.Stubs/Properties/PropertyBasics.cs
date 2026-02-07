@@ -2,9 +2,9 @@
 // Design.Stubs - Basic Property Stubbing
 // -----------------------------------------------------------------------------
 // This file demonstrates the fundamental property stubbing APIs:
-// - OnGet(value) for constant getter return
-// - OnGet(callback) for dynamic getter
-// - OnSet(callback) for setter handling
+// - Get(value) for constant getter return
+// - Get(callback) for dynamic getter
+// - Set(callback) for setter handling
 // - LastSetValue capture for setters
 // - VerifyGet() and VerifySet() for verification
 // -----------------------------------------------------------------------------
@@ -22,9 +22,9 @@ namespace Design.Stubs.Properties;
 public partial class PropertyBasicsDemo
 {
     // =========================================================================
-    // OnGet(value) - Constant Getter Return
+    // Get(value) - Constant Getter Return
     // =========================================================================
-    // DESIGN DECISION: OnGet(value) sets a constant return value for the getter.
+    // DESIGN DECISION: Get(value) sets a constant return value for the getter.
     // This is the simplest configuration for get-only or get/set properties.
     //
     // GENERATOR BEHAVIOR: For get-only property:
@@ -35,26 +35,26 @@ public partial class PropertyBasicsDemo
     //
     //   public class IdInterceptor
     //   {
-    //       public IPropertyGetBuilder<int> OnGet(int value) { ... }
-    //       public IPropertyGetBuilder<int> OnGet(Func<int> callback) { ... }
+    //       public IPropertyGetBuilder<int> Get(int value) { ... }
+    //       public IPropertyGetBuilder<int> Get(Func<int> callback) { ... }
     //   }
     // =========================================================================
 
-    public void OnGet_SetsConstantGetterValue()
+    public void Get_SetsConstantGetterValue()
     {
         var stub = new Stubs.IEntity();
 
         // Configure getter to return constant value
-        stub.Id.OnGet(42);
+        stub.Id.Get(42);
 
         IEntity entity = stub;
         var id = entity.Id; // Returns 42
     }
 
     // =========================================================================
-    // OnGet(callback) - Dynamic Getter
+    // Get(callback) - Dynamic Getter
     // =========================================================================
-    // DESIGN DECISION: OnGet(callback) allows dynamic getter behavior.
+    // DESIGN DECISION: Get(callback) allows dynamic getter behavior.
     // The callback is invoked each time the getter is accessed.
     //
     // This is useful for:
@@ -63,13 +63,13 @@ public partial class PropertyBasicsDemo
     // - Tracking access patterns
     // =========================================================================
 
-    public void OnGet_DynamicCallback()
+    public void Get_DynamicCallback()
     {
         var stub = new Stubs.IEntity();
         var accessCount = 0;
 
         // Callback invoked on each get
-        stub.Id.OnGet(() =>
+        stub.Id.Get(() =>
         {
             accessCount++;
             return accessCount * 10;
@@ -82,9 +82,9 @@ public partial class PropertyBasicsDemo
     }
 
     // =========================================================================
-    // Get/Set Properties - Combined OnGet and OnSet
+    // Get/Set Properties - Combined Get and Set
     // =========================================================================
-    // DESIGN DECISION: For get/set properties, configure both OnGet and OnSet
+    // DESIGN DECISION: For get/set properties, configure both Get and Set
     // separately. If you need a backing store pattern, implement it with
     // a closure variable.
     //
@@ -99,8 +99,8 @@ public partial class PropertyBasicsDemo
     //
     // ACTUAL PATTERN:
     //   string backingStore = "Initial";
-    //   stub.Description.OnGet(() => backingStore);
-    //   stub.Description.OnSet((v) => backingStore = v);
+    //   stub.Description.Get(() => backingStore);
+    //   stub.Description.Set((v) => backingStore = v);
     // =========================================================================
 
     public void GetSetProperty_WithBackingStore()
@@ -109,8 +109,8 @@ public partial class PropertyBasicsDemo
 
         // Implement backing store with closure
         string backingStore = "Initial";
-        stub.Description.OnGet(() => backingStore);
-        stub.Description.OnSet((v) => backingStore = v);
+        stub.Description.Get(() => backingStore);
+        stub.Description.Set((v) => backingStore = v);
 
         IEntity entity = stub;
         var desc = entity.Description; // Returns "Initial"
@@ -120,9 +120,9 @@ public partial class PropertyBasicsDemo
     }
 
     // =========================================================================
-    // OnSet(callback) - Setter Callback
+    // Set(callback) - Setter Callback
     // =========================================================================
-    // DESIGN DECISION: OnSet(callback) intercepts setter calls.
+    // DESIGN DECISION: Set(callback) intercepts setter calls.
     // The callback receives the value being set.
     //
     // Use this when you need to:
@@ -131,13 +131,13 @@ public partial class PropertyBasicsDemo
     // - Trigger side effects on set
     // =========================================================================
 
-    public void OnSet_InterceptsSetter()
+    public void Set_InterceptsSetter()
     {
         var stub = new Stubs.IEntity();
         string? lastSetValue = null;
 
         // Intercept sets
-        stub.Description.OnSet((value) =>
+        stub.Description.Set((value) =>
         {
             lastSetValue = value;
         });
@@ -154,14 +154,14 @@ public partial class PropertyBasicsDemo
     // DESIGN DECISION: The interceptor tracks the last value that was set,
     // available via LastSetValue property on the interceptor itself.
     //
-    // This is independent of OnSet configuration - it always captures.
+    // This is independent of Set configuration - it always captures.
     // =========================================================================
 
     public void LastSetValue_CapturesSetterArgument()
     {
         var stub = new Stubs.IEntity();
 
-        // No OnSet needed - LastSetValue always captures
+        // No Set needed - LastSetValue always captures
         IEntity entity = stub;
         entity.Description = "First";
         entity.Description = "Second";
@@ -185,7 +185,7 @@ public partial class PropertyBasicsDemo
     public void Verify_GetterAndSetterSeparately()
     {
         var stub = new Stubs.IEntity();
-        stub.Description.OnGet("Test");
+        stub.Description.Get("Test");
 
         IEntity entity = stub;
 
@@ -204,8 +204,8 @@ public partial class PropertyBasicsDemo
     // =========================================================================
     // Get-Only Properties
     // =========================================================================
-    // DESIGN DECISION: Get-only properties only generate OnGet and VerifyGet.
-    // There's no OnSet, VerifySet, or LastSetValue (no setter).
+    // DESIGN DECISION: Get-only properties only generate Get and VerifyGet.
+    // There's no Set, VerifySet, or LastSetValue (no setter).
     // =========================================================================
 
     public void GetOnlyProperty_NoSetterApis()
@@ -213,7 +213,7 @@ public partial class PropertyBasicsDemo
         var stub = new Stubs.IEntity();
 
         // Id is get-only
-        stub.Id.OnGet(100);
+        stub.Id.Get(100);
 
         IEntity entity = stub;
         var id = entity.Id; // 100
@@ -221,7 +221,7 @@ public partial class PropertyBasicsDemo
         stub.Id.VerifyGet(Times.Once);
 
         // These don't exist for get-only:
-        // stub.Id.OnSet(...)     // Compile error
+        // stub.Id.Set(...)     // Compile error
         // stub.Id.VerifySet(...) // Compile error
         // stub.Id.LastSetValue   // Compile error
     }
@@ -229,7 +229,7 @@ public partial class PropertyBasicsDemo
     // =========================================================================
     // Unconfigured Properties Return Default
     // =========================================================================
-    // DESIGN DECISION: Properties without OnGet configuration return default(T).
+    // DESIGN DECISION: Properties without Get configuration return default(T).
     // In strict mode, they throw StubException.NotConfigured.
     // =========================================================================
 
@@ -247,13 +247,13 @@ public partial class PropertyBasicsDemo
     // Reset() - Clear Tracking
     // =========================================================================
     // DESIGN DECISION: Reset() clears tracking state (call counts, LastSetValue)
-    // but preserves configuration (OnGet, OnSet).
+    // but preserves configuration (Get, Set).
     // =========================================================================
 
     public void Reset_ClearsTrackingPreservesConfig()
     {
         var stub = new Stubs.IEntity();
-        stub.Description.OnGet("Test");
+        stub.Description.Get("Test");
 
         IEntity entity = stub;
         _ = entity.Description;
@@ -262,7 +262,7 @@ public partial class PropertyBasicsDemo
         stub.Description.Reset();
 
         // Tracking cleared - call counts now 0
-        // But OnGet("Test") configuration preserved
+        // But Get("Test") configuration preserved
 
         var value = entity.Description; // Still returns "Test"
     }

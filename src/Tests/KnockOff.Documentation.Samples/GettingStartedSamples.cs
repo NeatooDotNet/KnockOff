@@ -129,7 +129,7 @@ public class ValueOverloadTests
 }
 
 // =============================================================================
-// Configuring Properties - OnGet/OnSet
+// Configuring Properties - Get/Set
 // =============================================================================
 
 public interface IUserConfig
@@ -149,11 +149,11 @@ public class PropertyConfigurationTests
         User? capturedUser = null;
 
         #region getting-started-property-configuration
-        // OnGet - configure the getter return value
-        stub.CurrentUser.OnGet(new User { Id = 1, Name = "Alice" });
+        // Get - configure the getter return value
+        stub.CurrentUser.Get(new User { Id = 1, Name = "Alice" });
 
-        // OnSet - capture or validate setter calls
-        stub.CurrentUser.OnSet((user) => capturedUser = user);
+        // Set - capture or validate setter calls
+        stub.CurrentUser.Set((user) => capturedUser = user);
         #endregion
 
         IUserConfig config = stub;

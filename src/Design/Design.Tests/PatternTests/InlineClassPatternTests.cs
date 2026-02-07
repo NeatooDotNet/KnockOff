@@ -32,7 +32,7 @@ public class InlineClassPatternTests
     public void InlineClass_VirtualProperty_CanBeConfigured()
     {
         var stub = new InlineClassExample.Stubs.ServiceBase();
-        stub.Name.OnGet("TestService");
+        stub.Name.Get("TestService");
 
         var name = stub.Object.Name;
 
