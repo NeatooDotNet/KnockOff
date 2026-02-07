@@ -136,7 +136,7 @@ public class UserMethodWhenTests
         // Arrange
         var stub = new WhenUserMethodStub();
         var callbackInvoked = false;
-        stub.Execute.When("trigger").Call(cmd => callbackInvoked = true);
+        stub.Execute.When("trigger").Execute(cmd => callbackInvoked = true);
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -151,7 +151,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Execute.When("trigger").Call(cmd => { });
+        stub.Execute.When("trigger").Execute(cmd => { });
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -210,7 +210,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.OnCall(s => "[FIRST]").ThenReturns("[SECOND]");
+        stub.Process.Returns(s => "[FIRST]").ThenReturns("[SECOND]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -304,7 +304,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.OnCall(s => "[ONCALL]");
+        stub.Process.Returns(s => "[ONCALL]");
         stub.Process.When("special").Returns("[WHEN]");
 
         // Act

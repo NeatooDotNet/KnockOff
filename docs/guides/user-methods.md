@@ -2,7 +2,7 @@
 
 # User Methods
 
-User methods let you define default stub behavior at compile time by writing protected override methods in your stub class. Tests can override these defaults using `OnCall()` when needed.
+User methods let you define default stub behavior at compile time by writing protected override methods in your stub class. Tests can override these defaults using `Returns(callback)` or `Execute(callback)` when needed.
 
 **Availability**: User methods work with all four **Standalone patterns**: `[KnockOff]` on a class implementing an interface (patterns 1, 2) and `[KnockOffBase<T>]` / `[KnockOffBase(typeof(T<>))]` on class stubs (patterns 3, 4). They are not available in Inline patterns.
 
@@ -69,9 +69,9 @@ KnockOff generates a base class (e.g., `UserMethodsRepoStubBase`) with virtual m
 
 When you override a virtual method:
 
-1. The generated interface implementation checks for `OnCall` configuration first
-2. If `OnCall` is configured, it supersedes the user method
-3. If no `OnCall` is configured, your override is called as the fallback
+1. The generated interface implementation checks for `Returns`/`Execute` configuration first
+2. If `Returns`/`Execute` is configured, it supersedes the user method
+3. If no `Returns`/`Execute` is configured, your override is called as the fallback
 
 This provides compile-time safety: if you typo the method name or get the signature wrong, the compiler reports "no suitable method to override" instead of silently ignoring your code.
 
@@ -89,14 +89,14 @@ stub.GetUserById.Verify(Times.Once);
 
 ---
 
-## Overriding with OnCall
+## Overriding with Returns/Execute
 
-Use `OnCall()` to override the user method for specific tests. The callback supersedes the user method.
+Use `Returns(callback)` or `Execute(callback)` to override the user method for specific tests. The callback supersedes the user method.
 
 <!-- snippet: user-methods-oncall -->
 ```cs
 // OnCall supersedes the user method
-stub.GetUserById.OnCall(id => new User { Id = id, Name = "Overridden" });
+stub.GetUserById.Returns(id => new User { Id = id, Name = "Overridden" });
 
 var user = repository.GetUserById(42);
 Assert.Equal("Overridden", user!.Name);
@@ -131,7 +131,7 @@ Assert.Equal("Test User", user!.Name);
 
 ## Tracking and Verification
 
-User method interceptors provide full tracking capabilities. Tracking works the same whether using the user method or an `OnCall` override.
+User method interceptors provide full tracking capabilities. Tracking works the same whether using the user method or a `Returns`/`Execute` override.
 
 <!-- snippet: user-methods-tracking -->
 ```cs
@@ -150,7 +150,7 @@ User method interceptors have the same tracking API as regular interceptors: `Ve
 
 ## Resetting Call Tracking
 
-Call `Reset()` to clear call count and argument tracking. The `OnCall` configuration is preserved.
+Call `Reset()` to clear call count and argument tracking. The `Returns`/`Execute` configuration is preserved.
 
 <!-- snippet: user-methods-reset -->
 ```cs
@@ -219,7 +219,7 @@ var user = repository.GetUserById(42);
 stub.GetUserById.Verify(Times.Once);
 
 // Override for next call
-stub.GetUserById.OnCall(id => new User { Id = id, Name = "Custom" });
+stub.GetUserById.Returns(id => new User { Id = id, Name = "Custom" });
 var customUser = repository.GetUserById(99);
 Assert.Equal("Custom", customUser!.Name);
 ```
@@ -245,7 +245,7 @@ public partial class UserMethodsFormatterStub
 ```
 <!-- endSnippet -->
 
-Overriding one overload does not affect others. The non-overridden overloads work exactly like regular methods: configure them with `OnCall()` or `Returns()`, or leave them to return defaults.
+Overriding one overload does not affect others. The non-overridden overloads work exactly like regular methods: configure them with `Returns(callback)` or `Returns(value)`, or leave them to return defaults.
 
 ---
 
@@ -263,10 +263,10 @@ Overriding one overload does not affect others. The non-overridden overloads wor
 - Override virtual methods with underscore suffix (e.g., `protected override string Method_(...)`)
 - Interceptor properties use clean names (`stub.Method`), not the underscore suffix
 - Compile-time safety: signature mismatches cause "no suitable method to override" errors
-- User methods are the fallback when no `OnCall` is configured
-- `OnCall()` supersedes the user method when configured
+- User methods are the fallback when no `Returns`/`Execute` is configured
+- `Returns(callback)`/`Execute(callback)` supersedes the user method when configured
 - Overloads can be selectively overridden (overriding one does not affect others)
-- `Reset()` clears tracking but preserves `OnCall` configuration
+- `Reset()` clears tracking but preserves `Returns`/`Execute` configuration
 - Ideal for the shareable stub pattern: defaults in stub, overrides in specific tests
 
 Next: [Source Delegation](source-delegation.md) for partial stubbing patterns where you want to delegate to a real implementation.

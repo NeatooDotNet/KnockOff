@@ -22,7 +22,7 @@
 // 6. .When() chains supported on user method interceptors.
 //
 // PRIORITY CHAIN (same as interface stubs):
-//   When chains > Sequences > OnCall/Returns > User Method
+//   When chains > Sequences > Returns/Execute > User Method
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Abstractions;
@@ -49,7 +49,7 @@ namespace Design.Stubs.UserMethods;
 // - Abstract methods (Execute): user method IS the default behavior
 // - Virtual methods (Initialize): user method REPLACES base.Initialize()
 //   The user override is the fallback, not a supplement to the base call.
-// - OnCall/Returns still supersede user methods per-test
+// - Returns/Execute still supersede user methods per-test
 // - .When() chains have highest priority
 // =============================================================================
 

@@ -40,7 +40,7 @@ public class DelegateStubTests
     public void OnCall_ConfiguresCallback()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.OnCall((a, b) => a + b);
+        stub.Interceptor.Returns((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
 
@@ -69,7 +69,7 @@ public class DelegateStubTests
     {
         var stub = new DelegateStubsDemo.Stubs.LogAction();
         var messages = new List<string>();
-        stub.Interceptor.OnCall(msg => messages.Add(msg));
+        stub.Interceptor.Execute(msg => messages.Add(msg));
 
         LogAction logger = stub;
         logger("Hello");
@@ -95,7 +95,7 @@ public class DelegateStubTests
     {
         var stub = new DelegateStubsDemo.Stubs.SimpleAction();
         var callCount = 0;
-        stub.Interceptor.OnCall(() => callCount++);
+        stub.Interceptor.Execute(() => callCount++);
 
         SimpleAction action = stub;
         action();

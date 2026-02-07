@@ -25,8 +25,8 @@ public class StandalonePatternTests
     public void StandaloneStub_ConfigureAndVerify()
     {
         var stub = new SkillUserRepoStub();
-        stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
-        stub.Save.OnCall((user) => { }).Verifiable();
+        stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
+        stub.Save.Execute((user) => { }).Verifiable();
         ISkillUserRepo repo = stub;
 
         var user = repo.GetById(42);
@@ -54,7 +54,7 @@ public partial class SkillEmailTests
     public void Test()
     {
         var stub = new Stubs.ISkillEmailService();
-        stub.Send.OnCall((to, subj) => true).Verifiable();
+        stub.Send.Returns((to, subj) => true).Verifiable();
         ISkillEmailService email = stub;
     }
 }
@@ -77,7 +77,7 @@ public partial class SkillDataTests
     public void Test()
     {
         var stub = new Stubs.SkillDataServiceBase();
-        stub.GetData.OnCall((id) => "test").Verifiable();
+        stub.GetData.Returns((id) => "test").Verifiable();
         SkillDataServiceBase service = stub.Object;  // Use .Object!
     }
 }
@@ -97,7 +97,7 @@ public partial class SkillValidationTests
     public void Test()
     {
         var stub = new Stubs.SkillValidationRule();
-        stub.Interceptor.OnCall((val) => val != "invalid");
+        stub.Interceptor.Returns((val) => val != "invalid");
         SkillValidationRule rule = stub;  // Implicit conversion
     }
 }
@@ -127,10 +127,10 @@ public class MethodOnCallTests
         stub.GetValue.Returns("default-value");
 
         // CALLBACK syntax - for dynamic values based on arguments
-        stub.GetValue.OnCall((key) => key == "debug" ? "true" : "false");
+        stub.GetValue.Returns((key) => key == "debug" ? "true" : "false");
 
         // Void methods use Action callback
-        stub.SetValue.OnCall((key, value) => { /* track or validate */ });
+        stub.SetValue.Execute((key, value) => { /* track or validate */ });
     }
 }
 
@@ -186,8 +186,8 @@ public class SkillVerificationTests
         var stub = new SkillLoggerStub();
 
         // Mark methods as verifiable
-        stub.Log.OnCall((msg) => { }).Verifiable();
-        stub.LogError.OnCall((msg) => { }).Verifiable();
+        stub.Log.Execute((msg) => { }).Verifiable();
+        stub.LogError.Execute((msg) => { }).Verifiable();
 
         ISkillLogger logger = stub;
         logger.Log("Starting");
@@ -203,7 +203,7 @@ public class SkillVerificationTests
         var stub = new SkillLoggerStub();
 
         // Verify specific call counts
-        var tracking = stub.Log.OnCall((msg) => { });
+        var tracking = stub.Log.Execute((msg) => { });
 
         ISkillLogger logger = stub;
         logger.Log("First");
@@ -234,7 +234,7 @@ public class ArgumentAccessTests
     {
         var stub = new SkillNotifierStub();
 
-        var tracking = stub.Notify.OnCall((userId, message) => { });
+        var tracking = stub.Notify.Execute((userId, message) => { });
 
         ISkillNotifier notifier = stub;
         notifier.Notify(42, "Hello");
@@ -279,7 +279,7 @@ public class GotchaTests
         var stub = new SkillBarStub();
 
         // CORRECT: Callback signature matches method parameters exactly
-        stub.Process.OnCall((int id, string name) => { /* ... */ });
+        stub.Process.Execute((int id, string name) => { /* ... */ });
     }
 }
 

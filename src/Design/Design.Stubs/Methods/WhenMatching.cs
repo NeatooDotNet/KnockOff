@@ -27,7 +27,7 @@ public partial class WhenMatchingDemo
     // =========================================================================
     // DESIGN DECISION: When() matches specific argument values using equality.
     // When the method is called with matching arguments, the configured return
-    // value is used instead of the default OnCall/Returns behavior.
+    // value is used instead of the default Returns behavior.
     //
     // GENERATOR BEHAVIOR: When() generates a WhenBuilder specific to the method:
     //
@@ -45,7 +45,7 @@ public partial class WhenMatchingDemo
     //   public class AddWhenBuilder : IWhenBuilder<Func<int, int, int>, int>
     //   {
     //       public AddWhenChain Returns(int value) { ... }
-    //       public AddWhenChain OnCall(Func<int, int, int> callback) { ... }
+    //       public AddWhenChain Returns(Func<int, int, int> callback) { ... }
     //   }
     //
     //   public class AddWhenChain : IWhenChain<Func<int, int, int>, int>
@@ -118,19 +118,19 @@ public partial class WhenMatchingDemo
     // =========================================================================
     // When Chain with Computed Values
     // =========================================================================
-    // DESIGN DECISION: When chains use Returns() only - no OnCall() variant.
-    // For dynamic behavior based on matched arguments, use OnCall() without When.
+    // DESIGN DECISION: When chains use Returns(value) only - no Returns(callback) variant.
+    // For dynamic behavior based on matched arguments, use Returns(callback) without When.
     //
-    // DID NOT DO THIS: Add When().OnCall() for dynamic returns on match
+    // DID NOT DO THIS: Add When().Returns(callback) for dynamic returns on match
     //
     // REJECTED PATTERN:
-    //   stub.Add.When(10, 10).OnCall((a, b) => a * b);  // Does NOT exist
+    //   stub.Add.When(10, 10).Returns((a, b) => a * b);  // Does NOT exist
     //
     // WHY NOT: When() is for simple "if args match, return value" scenarios.
-    // For dynamic behavior, use the predicate form of OnCall():
+    // For dynamic behavior, use the predicate form of Returns():
     // =========================================================================
 
-    public void When_UsesReturnsNotOnCall()
+    public void When_UsesReturnsValue()
     {
         var stub = new Stubs.ICalculator();
 
@@ -140,7 +140,7 @@ public partial class WhenMatchingDemo
         stub.Add.When(10, 10).Returns(100);
 
         // For dynamic behavior on ALL calls:
-        // stub.Add.OnCall((a, b) => a * b);
+        // stub.Add.Returns((a, b) => a * b);
 
         ICalculator calc = stub;
 
@@ -345,7 +345,7 @@ public partial class WhenMatchingDemo
     //
     // 1. ThenWhen(a, b) needs the exact parameter types (int, int) not generic T
     // 2. Returns(value) needs the exact return type
-    // 3. OnCall(callback) needs the exact delegate type Func<params, return>
+    // 3. Returns(callback) needs the exact delegate type Func<params, return>
     //
     // DID NOT DO THIS: Share generic When classes across methods
     //

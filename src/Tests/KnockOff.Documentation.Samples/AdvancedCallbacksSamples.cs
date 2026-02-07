@@ -106,7 +106,7 @@ public class SequentialQueueTests
         #region advanced-sequential-queue
         // Queue of results: first succeeds, second fails
         var results = new Queue<bool>(new[] { true, false });
-        stub.Send.OnCall((to, message) => results.Dequeue());
+        stub.Send.Returns((to, message) => results.Dequeue());
         #endregion
 
         IEmailService service = stub;
@@ -130,7 +130,7 @@ public class SequentialCounterTests
         #region advanced-sequential-counter
         // Counter tracks call count for conditional behavior
         var attempts = 0;
-        stub.Attempt.OnCall(() =>
+        stub.Attempt.Returns(() =>
         {
             attempts++;
             return attempts > 3; // Succeed on 4th attempt
@@ -159,7 +159,7 @@ public class ConditionalReturnsTests
 
         #region advanced-conditional-switch
         // Pattern matching for argument-based return values
-        stub.FindById.OnCall((id) => id switch
+        stub.FindById.Returns((id) => id switch
         {
             1 => new User { Id = 1, Name = "Admin", Email = "admin@test.com" },
             2 => new User { Id = 2, Name = "User", Email = "user@test.com" },
@@ -195,7 +195,7 @@ public class ExceptionTests
 
         #region advanced-exception
         // Throw exceptions based on argument conditions
-        stub.Charge.OnCall((amount) =>
+        stub.Charge.Execute((amount) =>
         {
             if (amount > 1000)
                 throw new PaymentException("Insufficient funds");
@@ -227,7 +227,7 @@ public class StateDependentPropertyTests
         // Shared state between property and method
         var isConnected = false;
         stub.IsConnected.OnGet(() => isConnected);
-        stub.Connect.OnCall(() => { isConnected = true; });
+        stub.Connect.Execute(() => { isConnected = true; });
         #endregion
 
         IConnection connection = stub;
@@ -255,8 +255,8 @@ public class StateDependentMethodTests
         #region advanced-state-method
         // Enforce method ordering with shared state
         var isInitialized = false;
-        stub.Initialize.OnCall(() => { isInitialized = true; });
-        stub.Query.OnCall((sql) =>
+        stub.Initialize.Execute(() => { isInitialized = true; });
+        stub.Query.Returns((sql) =>
         {
             if (!isInitialized)
                 throw new InvalidOperationException("Must call Initialize() first");
@@ -293,7 +293,7 @@ public class SideEffectsTests
 
         #region advanced-side-effects
         // Callbacks can track state and perform side effects
-        stub.PlaceOrder.OnCall((order) =>
+        stub.PlaceOrder.Returns((order) =>
         {
             placedOrders.Add(order);
             notifications.Add($"Order {nextOrderId} placed for user {order.UserId}");
@@ -332,7 +332,7 @@ public class CacheSimulationTests
 
         #region advanced-complete-example
         // Get: Check expiration, track hits/misses
-        stub.Get.OnCall((key) =>
+        stub.Get.Returns((key) =>
         {
             if (cache.TryGetValue(key, out var entry))
             {
@@ -348,7 +348,7 @@ public class CacheSimulationTests
         });
 
         // Set: Enforce capacity, evict oldest if needed
-        stub.Set.OnCall((key, value) =>
+        stub.Set.Execute((key, value) =>
         {
             if (cache.Count >= maxCapacity && !cache.ContainsKey(key))
             {
@@ -359,7 +359,7 @@ public class CacheSimulationTests
         });
 
         // Clear: Reset everything
-        stub.Clear.OnCall(() =>
+        stub.Clear.Execute(() =>
         {
             cache.Clear();
             hits = 0;

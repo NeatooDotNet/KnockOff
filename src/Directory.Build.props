@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.37.0</FileVersion>
-		<PackageVersion>0.37.0</PackageVersion>
+		<FileVersion>0.38.0</FileVersion>
+		<PackageVersion>0.38.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Unified event API (Raise, HasSubscribers) across all patterns, fix array parameter types producing invalid generated identifiers.</PackageReleaseNotes>
+		<PackageReleaseNotes>Breaking: Unified method configuration API - OnCall replaced with Returns (non-void) and Execute (void), ThenCall renamed to ThenReturns/ThenExecute, simplified async ThenReturns overloads.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>

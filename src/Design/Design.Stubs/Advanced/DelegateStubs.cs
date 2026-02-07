@@ -5,7 +5,7 @@
 // - [KnockOff<DelegateType>] for delegate stubs
 // - Implicit conversion to delegate type
 // - Interceptor for configuration and verification
-// - Returns, OnCall, When matching
+// - Returns, Execute, When matching
 // - Void vs returning delegates
 // -----------------------------------------------------------------------------
 
@@ -83,22 +83,22 @@ public partial class DelegateStubsDemo
     }
 
     // =========================================================================
-    // Interceptor.OnCall(callback) - Dynamic Behavior
+    // Interceptor.Returns(callback) - Dynamic Behavior
     // =========================================================================
-    // DESIGN DECISION: OnCall(callback) allows full control over delegate
+    // DESIGN DECISION: Returns(callback) allows full control over delegate
     // behavior. The callback receives the same arguments as the delegate.
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void OnCall(Func<int, int, int> callback) { _onCall = callback; }
+    //   public void Returns(Func<int, int, int> callback) { _onCall = callback; }
     // =========================================================================
 
-    public void OnCall_DynamicBehavior()
+    public void Returns_DynamicBehavior()
     {
         var stub = new Stubs.ArithmeticOperation();
 
         // Configure to actually add the numbers
-        stub.Interceptor.OnCall((a, b) => a + b);
+        stub.Interceptor.Returns((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
 
@@ -139,20 +139,20 @@ public partial class DelegateStubsDemo
     // Void Delegates - LogAction Example
     // =========================================================================
     // DESIGN DECISION: Void delegates don't have Returns(). They only have
-    // OnCall(callback) for configuring behavior.
+    // Execute(callback) for configuring behavior.
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void OnCall(Action<string> callback) { _onCall = callback; }
+    //   public void Execute(Action<string> callback) { _onCall = callback; }
     // =========================================================================
 
-    public void VoidDelegate_OnCallOnly()
+    public void VoidDelegate_ExecuteOnly()
     {
         var stub = new Stubs.LogAction();
         var logged = new List<string>();
 
         // Configure to capture log messages
-        stub.Interceptor.OnCall(msg => logged.Add(msg));
+        stub.Interceptor.Execute(msg => logged.Add(msg));
 
         LogAction logger = stub;
 
@@ -196,7 +196,7 @@ public partial class DelegateStubsDemo
         var stub = new Stubs.SimpleAction();
         var callCount = 0;
 
-        stub.Interceptor.OnCall(() => callCount++);
+        stub.Interceptor.Execute(() => callCount++);
 
         SimpleAction action = stub;
 
@@ -256,7 +256,7 @@ public partial class DelegateStubsDemo
     // When Matching for Void Delegates
     // =========================================================================
     // DESIGN DECISION: Void delegates have When() that returns a chain with
-    // .Call() instead of .Returns().
+    // .Execute() instead of .Returns().
     // =========================================================================
 
     public void When_VoidDelegate()
@@ -266,9 +266,9 @@ public partial class DelegateStubsDemo
         var normal = new List<string>();
 
         stub.Interceptor.When(msg => msg.StartsWith("IMPORTANT:", StringComparison.Ordinal))
-            .Call(msg => important.Add(msg))
+            .Execute(msg => important.Add(msg))
             .ThenWhen(msg => true)
-            .Call(msg => normal.Add(msg));
+            .Execute(msg => normal.Add(msg));
 
         LogAction logger = stub;
 
@@ -305,7 +305,7 @@ public partial class DelegateStubsDemo
     // Reset for Delegates
     // =========================================================================
     // DESIGN DECISION: Reset() clears tracking (call count, LastArgs)
-    // but preserves configuration (OnCall, Returns).
+    // but preserves configuration (Returns, Execute).
     // =========================================================================
 
     public void Delegate_Reset()

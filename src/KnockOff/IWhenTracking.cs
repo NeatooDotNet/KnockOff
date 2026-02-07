@@ -80,16 +80,14 @@ public interface IVoidWhenChain<TDelegate> : IWhenTracking
     /// Returns this for fluent chaining.
     /// </summary>
     /// <param name="callback">The callback to invoke when matched.</param>
-#pragma warning disable CA1716 // Identifiers should not match keywords
-    IVoidWhenChain<TDelegate> Call(TDelegate callback);
-#pragma warning restore CA1716
+    IVoidWhenChain<TDelegate> Execute(TDelegate callback);
 
     /// <summary>
     /// Adds an unconditional callback as the terminal matcher.
     /// This matcher always matches and repeats forever.
     /// </summary>
     /// <param name="callback">The callback to invoke when reached.</param>
-    IWhenTracking ThenCall(TDelegate callback);
+    IWhenTracking ThenExecute(TDelegate callback);
 
     /// <summary>
     /// Closes the chain with no matcher.

@@ -2,7 +2,7 @@
 // Design.Stubs - Method Overloads
 // -----------------------------------------------------------------------------
 // This file demonstrates how KnockOff handles method overloads:
-// - OnCall() with lambda parameter type resolution
+// - Returns()/Execute() with lambda parameter type resolution
 // - When() with parameter signature resolution
 // - Why Returns() is not available at interceptor level for overloads
 // - Tracking and verification per overload
@@ -25,39 +25,39 @@ namespace Design.Stubs.Methods;
 //
 // KEY DIFFERENCE FROM NON-OVERLOADED METHODS:
 // - Non-overloaded: stub.Method.Returns(42) is available
-// - Overloaded: stub.Method.Returns(42) does NOT exist - use OnCall instead
+// - Overloaded: stub.Method.Returns(42) does NOT exist - use Returns(callback) instead
 //
 // WHY: With overloads, Returns(value) would be ambiguous - should it
-// configure one overload or all? OnCall() makes the target explicit.
+// configure one overload or all? Returns(callback) makes the target explicit.
 // =============================================================================
 
 [KnockOff<IFormatter>]
 public partial class MethodOverloadsDemo
 {
     // =========================================================================
-    // OnCall() - Different Parameter Counts Disambiguate Automatically
+    // Returns(callback) - Different Parameter Counts Disambiguate Automatically
     // =========================================================================
     // DESIGN DECISION: When overloads have different parameter counts, the
-    // compiler resolves the correct OnCall() overload based on lambda arity.
+    // compiler resolves the correct Returns(callback) overload based on lambda arity.
     //
-    // GENERATOR BEHAVIOR: Each overload gets its own OnCall():
+    // GENERATOR BEHAVIOR: Each overload gets its own Returns():
     //
     //   public class FormatInterceptor
     //   {
-    //       public MethodCallBuilder OnCall(Func<string, string> callback) { ... }
-    //       public MethodCallBuilder OnCall(Func<string, FormatOptions, string> callback) { ... }
-    //       public MethodCallBuilder OnCall(Func<string, FormatOptions, int, string> callback) { ... }
+    //       public MethodCallBuilder Returns(Func<string, string> callback) { ... }
+    //       public MethodCallBuilder Returns(Func<string, FormatOptions, string> callback) { ... }
+    //       public MethodCallBuilder Returns(Func<string, FormatOptions, int, string> callback) { ... }
     //   }
     // =========================================================================
 
-    public void OnCall_DifferentParamCounts_AutoResolves()
+    public void Returns_DifferentParamCounts_AutoResolves()
     {
         var stub = new Stubs.IFormatter();
 
         // Compiler resolves by parameter count - no explicit types needed
-        stub.Format.OnCall((input) => input.ToUpperInvariant());
-        stub.Format.OnCall((input, options) => options.Uppercase ? input.ToUpperInvariant() : input);
-        stub.Format.OnCall((input, options, maxLength) =>
+        stub.Format.Returns((input) => input.ToUpperInvariant());
+        stub.Format.Returns((input, options) => options.Uppercase ? input.ToUpperInvariant() : input);
+        stub.Format.Returns((input, options, maxLength) =>
         {
             var result = options.Uppercase ? input.ToUpperInvariant() : input;
             return result[..Math.Min(result.Length, maxLength)];
@@ -86,9 +86,9 @@ public partial class MethodOverloadsDemo
     // - Should it configure ALL overloads to return "x"?
     // - Should it configure just ONE (which one)?
     //
-    // WORKAROUND: Use OnCall() with explicit overload targeting:
-    //   stub.Format.OnCall((input) => "constant");
-    //   stub.Format.OnCall((input, options) => "constant");
+    // WORKAROUND: Use Returns(callback) with explicit overload targeting:
+    //   stub.Format.Returns((input) => "constant");
+    //   stub.Format.Returns((input, options) => "constant");
     //
     // DID NOT DO THIS: Add ReturnsForAll(value) to configure all overloads
     //
@@ -96,14 +96,14 @@ public partial class MethodOverloadsDemo
     // Could be added if there's strong demand.
     // =========================================================================
 
-    public void Returns_NotAvailable_UseOnCallInstead()
+    public void Returns_NotAvailable_UseReturnsCallbackInstead()
     {
         var stub = new Stubs.IFormatter();
 
-        // For a constant return value, use OnCall with a constant lambda
-        stub.Format.OnCall((input) => "formatted");
-        stub.Format.OnCall((input, options) => "formatted");
-        stub.Format.OnCall((input, options, maxLength) => "formatted");
+        // For a constant return value, use Returns with a constant lambda
+        stub.Format.Returns((input) => "formatted");
+        stub.Format.Returns((input, options) => "formatted");
+        stub.Format.Returns((input, options, maxLength) => "formatted");
 
         IFormatter formatter = stub;
 
@@ -134,9 +134,9 @@ public partial class MethodOverloadsDemo
     {
         var stub = new Stubs.IFormatter();
 
-        // Default behavior via OnCall
-        stub.Format.OnCall((input) => "default-1");
-        stub.Format.OnCall((input, options) => "default-2");
+        // Default behavior via Returns
+        stub.Format.Returns((input) => "default-1");
+        stub.Format.Returns((input, options) => "default-2");
 
         // Each When targets a specific overload based on parameter signature
         stub.Format.When("special").Returns("SPECIAL-1");
@@ -174,16 +174,16 @@ public partial class MethodOverloadsDemo
     // Tracking - Each Overload Has Independent Tracking
     // =========================================================================
     // DESIGN DECISION: Each overload maintains separate tracking state.
-    // OnCall() returns a builder specific to that overload with its own
+    // Returns(callback) returns a builder specific to that overload with its own
     // LastArg/LastArgs and call count.
     //
     // GENERATOR BEHAVIOR:
     //
     //   public class FormatInterceptor
     //   {
-    //       // Each OnCall returns overload-specific builder
-    //       public MethodCallBuilderImpl_String OnCall(Func<string, string> cb);
-    //       public MethodCallBuilderImpl_String_Options OnCall(Func<string, FormatOptions, string> cb);
+    //       // Each Returns returns overload-specific builder
+    //       public MethodCallBuilderImpl_String Returns(Func<string, string> cb);
+    //       public MethodCallBuilderImpl_String_Options Returns(Func<string, FormatOptions, string> cb);
     //   }
     // =========================================================================
 
@@ -191,10 +191,10 @@ public partial class MethodOverloadsDemo
     {
         var stub = new Stubs.IFormatter();
 
-        // Each OnCall returns a separate tracking object
-        var tracking1 = stub.Format.OnCall((input) => input);
-        var tracking2 = stub.Format.OnCall((input, options) => input);
-        var tracking3 = stub.Format.OnCall((input, options, maxLength) => input);
+        // Each Returns returns a separate tracking object
+        var tracking1 = stub.Format.Returns((input) => input);
+        var tracking2 = stub.Format.Returns((input, options) => input);
+        var tracking3 = stub.Format.Returns((input, options, maxLength) => input);
 
         IFormatter formatter = stub;
 
@@ -226,8 +226,8 @@ public partial class MethodOverloadsDemo
     {
         var stub = new Stubs.IFormatter();
 
-        stub.Format.OnCall((input) => input);
-        stub.Format.OnCall((input, options) => input);
+        stub.Format.Returns((input) => input);
+        stub.Format.Returns((input, options) => input);
 
         IFormatter formatter = stub;
 
@@ -249,9 +249,9 @@ public partial class MethodOverloadsDemo
         var logs = new List<string>();
 
         // Configure each void overload
-        var tracking1 = stub.Log.OnCall((msg) => logs.Add($"[INFO] {msg}"));
-        var tracking2 = stub.Log.OnCall((msg, level) => logs.Add($"[L{level}] {msg}"));
-        var tracking3 = stub.Log.OnCall((msg, level, cat) => logs.Add($"[{cat}:L{level}] {msg}"));
+        var tracking1 = stub.Log.Execute((msg) => logs.Add($"[INFO] {msg}"));
+        var tracking2 = stub.Log.Execute((msg, level) => logs.Add($"[L{level}] {msg}"));
+        var tracking3 = stub.Log.Execute((msg, level, cat) => logs.Add($"[{cat}:L{level}] {msg}"));
 
         IFormatter formatter = stub;
 
@@ -277,10 +277,10 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         // Configure async overload without cancellation
-        var tracking1 = stub.TransformAsync.OnCall((input) => $"[{input}]");
+        var tracking1 = stub.TransformAsync.Returns((input) => $"[{input}]");
 
         // Configure async overload with cancellation
-        var tracking2 = stub.TransformAsync.OnCall((input, ct) =>
+        var tracking2 = stub.TransformAsync.Returns((input, ct) =>
         {
             ct.ThrowIfCancellationRequested();
             return $"[{input}:ct]";
@@ -301,7 +301,7 @@ public partial class MethodOverloadsDemo
     // =========================================================================
     // Sequences with Overloads
     // =========================================================================
-    // DESIGN DECISION: Sequences (ThenCall, ThenReturns) work per-overload.
+    // DESIGN DECISION: Sequences (ThenReturns, ThenCall) work per-overload.
     // Each overload has its own sequence that advances independently.
     // =========================================================================
 
@@ -311,13 +311,13 @@ public partial class MethodOverloadsDemo
 
         // Sequence for single-param overload
         stub.Format
-            .OnCall((input) => "first")
+            .Returns((input) => "first")
             .ThenReturns("second")
             .ThenReturns("third");
 
         // Sequence for two-param overload (independent)
         stub.Format
-            .OnCall((input, options) => "A")
+            .Returns((input, options) => "A")
             .ThenReturns("B");
 
         IFormatter formatter = stub;
@@ -340,7 +340,7 @@ public partial class MethodOverloadsDemo
     // =========================================================================
     //
     // AVAILABLE ON INTERCEPTOR:
-    // - OnCall(lambda)     - Configures specific overload based on lambda signature
+    // - Returns(lambda)    - Configures specific overload based on lambda signature
     // - When(params)       - Configures specific overload based on parameter signature
     // - When(predicate)    - Configures specific overload based on predicate arity
     // - Verify()           - Verifies total calls across ALL overloads
@@ -350,12 +350,12 @@ public partial class MethodOverloadsDemo
     // - Returns(value)     - Ambiguous which overload to configure
     // - Returns(v1, v2...) - Ambiguous which overload to configure
     //
-    // RETURNED FROM OnCall():
+    // RETURNED FROM Returns()/Execute():
     // - Overload-specific builder with:
     //   - LastArg / LastArgs  - Last call arguments for THIS overload
     //   - Verify()            - Verify calls to THIS overload
-    //   - ThenCall()          - Add to sequence for THIS overload
-    //   - ThenReturns()       - Add value to sequence for THIS overload
+    //   - ThenReturns()       - Add callback to sequence for THIS overload
+    //   - ThenReturns(value)  - Add value to sequence for THIS overload
     //   - Verifiable()        - Mark THIS overload for stub.Verify()
     //
     // =========================================================================

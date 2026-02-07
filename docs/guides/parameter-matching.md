@@ -8,12 +8,12 @@ The `When()` API provides parameter-specific matching for method calls. Instead 
 
 ## The Problem: One Callback For All Arguments
 
-When using `OnCall()` or `Returns()`, every call to the method uses the same callback:
+When using `Returns(callback)` or `Returns(value)`, every call to the method uses the same callback or value:
 
 <!-- snippet: when-problem-one-callback-all-args -->
 ```cs
 // Without When(): callback must handle all argument combinations
-stub.Calculate.OnCall((a, b) =>
+stub.Calculate.Returns((a, b) =>
 {
     // Complex branching logic inside callback
     if (a == 5 && b == 10)
@@ -113,7 +113,7 @@ Add a callback with `.Call()` if you need side effects:
 <!-- snippet: when-void-with-callback -->
 ```cs
 // Call() adds callback for side effects
-stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
+stub.Process.When(1, 2).Execute((a, b) => calls.Add((a, b)));
 ```
 <!-- endSnippet -->
 
@@ -126,7 +126,7 @@ Predicates work the same as return methods:
 <!-- snippet: when-void-predicate -->
 ```cs
 // Predicate matching works the same for void methods
-stub.Process.When((a, b) => a > 10).Call((a, b) => matched.Add((a, b)));
+stub.Process.When((a, b) => a > 10).Execute((a, b) => matched.Add((a, b)));
 ```
 <!-- endSnippet -->
 
@@ -206,7 +206,7 @@ stub.Add.Returns(999);
 ```
 <!-- endSnippet -->
 
-After `ThenNone()` is reached, the When chain is exhausted. Calls fall through to the next configured behavior (`Returns`, `OnCall`, or default).
+After `ThenNone()` is reached, the When chain is exhausted. Calls fall through to the next configured behavior (`Returns`, `Execute`, or default).
 
 **When to use ThenNone():**
 - Explicitly mark when specific matching stops
@@ -221,9 +221,9 @@ When no When() matcher matches, the call falls through to other configured behav
 ### Priority Order
 
 1. **When()** - Highest priority when matched
-2. **Sequence (OnCall().ThenCall())** - Next priority
+2. **Sequence (Returns(callback).ThenReturns(callback))** - Next priority
 3. **Returns(value)** - Simple return value
-4. **OnCall(callback)** - General callback
+4. **Returns(callback) / Execute(callback)** - General callback
 5. **Default** - `default(T)` in non-strict mode, exception in strict mode
 
 ### Falling Through To Returns()
@@ -236,13 +236,13 @@ stub.Add.Returns(999);
 ```
 <!-- endSnippet -->
 
-### Falling Through To OnCall()
+### Falling Through To Returns(callback)
 
 <!-- snippet: when-fallback-oncall -->
 ```cs
 // When() falls through to OnCall() when no match
 stub.Add.When(1, 2).Returns(100);
-stub.Add.OnCall((a, b) => a * b);
+stub.Add.Returns((a, b) => a * b);
 ```
 <!-- endSnippet -->
 
@@ -270,12 +270,12 @@ stub.Add.When(1, 2).Returns(100);
 
 ## Combining With Sequences
 
-When() has higher priority than sequences created via `OnCall().ThenCall()`:
+When() has higher priority than sequences created via `Returns(callback).ThenReturns(callback)`:
 
 <!-- snippet: when-priority-over-sequence -->
 ```cs
-// Sequence configured via OnCall().ThenCall()
-stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2);
+// Sequence configured via Returns().ThenReturns()
+stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2);
 
 // When() has higher priority
 stub.Add.When(1, 2).Returns(100);
@@ -406,9 +406,9 @@ stub.GetAsync
 
 ## When To Use When()
 
-Choose `When()` over `OnCall()` when you have these scenarios:
+Choose `When()` over `Returns(callback)` when you have these scenarios:
 
-| Use When() | Use OnCall() |
+| Use When() | Use Returns(callback) |
 |------------|--------------|
 | Multiple specific argument combinations with different responses | Single callback handles all arguments |
 | Sequential behavior (first call does X, second call does Y) | Same behavior for every call |
@@ -428,15 +428,15 @@ stub.FetchData
 
 **Example: State Transitions**
 
-For parameterless methods, use `OnCall().ThenCall()` sequences instead of When() (When() requires parameters):
+For parameterless methods, use `Returns(callback).ThenReturns(callback)` sequences instead of When() (When() requires parameters):
 
 <!-- snippet: when-usecase-state-transitions -->
 ```cs
-// For parameterless methods, use OnCall().ThenCall() sequences
+// For parameterless methods, use Returns().ThenReturns() sequences
 stub.GetStatus
-    .OnCall(() => "Pending")
-    .ThenCall(() => "Processing")
-    .ThenCall(() => "Complete");
+    .Returns(() => "Pending")
+    .ThenReturns(() => "Processing")
+    .ThenReturns(() => "Complete");
 ```
 <!-- endSnippet -->
 
@@ -474,7 +474,7 @@ stub.ProcessPayment
 ---
 
 **Next Steps:**
-- [Method Configuration Guide](methods.md) - OnCall() and sequences
+- [Method Configuration Guide](methods.md) - Returns, Execute, and sequences
 - [Verification Patterns](verification.md) - Assert on stub interactions
 - [Interceptor API Reference](../reference/interceptor-api.md) - Complete When() API reference
 

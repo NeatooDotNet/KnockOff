@@ -142,7 +142,7 @@ public partial class IPropertyInfoTests
     {
         var stub = new Stubs.IPropertyInfo();
         IPropertyInfo propertyInfo = stub;
-        stub.GetCustomAttributes.OnCall(() => Array.Empty<Attribute>());
+        stub.GetCustomAttributes.Returns(() => Array.Empty<Attribute>());
 
         propertyInfo.GetCustomAttributes();
 
@@ -156,7 +156,7 @@ public partial class IPropertyInfoTests
         IPropertyInfo propertyInfo = stub;
 
         var attributes = new List<Attribute> { new ObsoleteAttribute("Test") };
-        stub.GetCustomAttributes.OnCall(() => attributes);
+        stub.GetCustomAttributes.Returns(() => attributes);
 
         var result = propertyInfo.GetCustomAttributes();
 
@@ -187,7 +187,7 @@ public partial class IPropertyInfoTests
     {
         var stub = new Stubs.IPropertyInfo();
         IPropertyInfo propertyInfo = stub;
-        stub.GetCustomAttributes.OnCall(() => Array.Empty<Attribute>());
+        stub.GetCustomAttributes.Returns(() => Array.Empty<Attribute>());
 
         propertyInfo.GetCustomAttributes();
         propertyInfo.GetCustomAttributes();
@@ -306,7 +306,7 @@ public partial class IPropertyInfoListTests
         IPropertyInfoList list = stub;
 
         var propertyInfoStub = new PropertyInfoStub();
-        stub.GetPropertyInfo.OnCall((name) => propertyInfoStub);
+        stub.GetPropertyInfo.Returns((name) => propertyInfoStub);
 
         var result = list.GetPropertyInfo("Name");
 
@@ -319,7 +319,7 @@ public partial class IPropertyInfoListTests
         var stub = new Stubs.IPropertyInfoList();
         IPropertyInfoList list = stub;
 
-        stub.GetPropertyInfo.OnCall((name) => null);
+        stub.GetPropertyInfo.Returns((name) => null);
 
         var result = list.GetPropertyInfo("NonExistent");
 
@@ -331,7 +331,7 @@ public partial class IPropertyInfoListTests
     {
         var stub = new Stubs.IPropertyInfoList();
         IPropertyInfoList list = stub;
-        stub.Properties.OnCall(() => Array.Empty<IPropertyInfo>());
+        stub.Properties.Returns(() => Array.Empty<IPropertyInfo>());
 
         list.Properties();
 
@@ -345,7 +345,7 @@ public partial class IPropertyInfoListTests
         IPropertyInfoList list = stub;
 
         var properties = new List<IPropertyInfo> { new PropertyInfoStub() };
-        stub.Properties.OnCall(() => properties);
+        stub.Properties.Returns(() => properties);
 
         var result = list.Properties();
 
@@ -369,7 +369,7 @@ public partial class IPropertyInfoListTests
         var stub = new Stubs.IPropertyInfoList();
         IPropertyInfoList list = stub;
 
-        stub.HasProperty.OnCall((name) => name == "Name");
+        stub.HasProperty.Returns((name) => name == "Name");
 
         Assert.True(list.HasProperty("Name"));
         Assert.False(list.HasProperty("Other"));

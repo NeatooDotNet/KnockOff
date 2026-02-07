@@ -4,10 +4,10 @@
 // This file explores and documents user-defined method patterns:
 // - Base class pattern (protected override methods with _ suffix)
 // - Tracking API on interceptors (Verify, LastArg, Reset)
-// - OnCall/Returns to supersede user methods
+// - Returns/Execute to supersede user methods
 // - User method overloads
 // - Mixed scenarios (some with user methods, some without)
-// - Priority: OnCall > user method
+// - Priority: Returns/Execute > user method
 // - Strict mode behavior
 // -----------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ public partial class UserMethodBasicsDemo
     // - LastArg - last single argument
     // - LastArgs - last arguments as tuple
     // - Reset() - clear tracking state
-    // - OnCall() - supersede user method per-test
+    // - Returns()/Execute() - supersede user method per-test
     // - Returns() - constant value that supersedes user method
     // =========================================================================
 
@@ -197,23 +197,23 @@ public partial class UserMethodBasicsDemo
     }
 
     // =========================================================================
-    // OnCall() Supersedes User Methods
+    // Returns()/Execute() Supersedes User Methods
     // =========================================================================
-    // User methods provide shareable defaults. OnCall/Returns override per test.
+    // User methods provide shareable defaults. Returns/Execute override per test.
     //
     // RATIONALE: Stubs should be shareable yet configurable per test.
     // - User method = sensible default for most tests
-    // - OnCall/Returns = override when a specific test needs different behavior
+    // - Returns/Execute = override when a specific test needs different behavior
     //
     // GENERATED CODE PATTERN:
-    //   if (Interceptor.Callback is { } callback) return callback(args);  // OnCall wins
+    //   if (Interceptor.Callback is { } callback) return callback(args);  // Returns wins
     //   return Process_(args);                                            // User override
     //
-    // Reset() behavior: Clears tracking state but PRESERVES OnCall configuration.
+    // Reset() behavior: Clears tracking state but PRESERVES Returns/Execute configuration.
     // This matches regular interceptor semantics.
     // =========================================================================
 
-    public void OnCall_SupersedesUserMethod()
+    public void Returns_SupersedesUserMethod_Callback()
     {
         var stub = new BasicUserMethodStub();
 
@@ -222,10 +222,10 @@ public partial class UserMethodBasicsDemo
         var defaultResult = service.Process("hello");
         // defaultResult == "[Processed: hello]" (from Process_ override)
 
-        // OnCall supersedes the user method for per-test override
-        stub.Process.OnCall(input => $"[Override: {input}]");
+        // Returns supersedes the user method for per-test override
+        stub.Process.Returns(input => $"[Override: {input}]");
         var overrideResult = service.Process("hello");
-        // overrideResult == "[Override: hello]" (OnCall wins)
+        // overrideResult == "[Override: hello]" (Returns wins)
 
         stub.Process.Verify(Times.Exactly(2)); // Both calls tracked
     }
@@ -233,41 +233,41 @@ public partial class UserMethodBasicsDemo
     public void Returns_SupersedesUserMethod()
     {
         var stub = new BasicUserMethodStub();
-        stub.Process.Returns("constant"); // Returns is shorthand for OnCall(_ => value)
+        stub.Process.Returns("constant"); // Returns(value) is shorthand for Returns(_ => value)
 
         IUserMethodService service = stub;
         var result = service.Process("ignored");
         // result == "constant" (Returns wins, ignores argument)
     }
 
-    public void VoidMethod_OnCallSupersedes()
+    public void VoidMethod_ExecuteSupersedes()
     {
         var stub = new BasicUserMethodStub();
         var callbackInvoked = false;
-        stub.Execute.OnCall(cmd => callbackInvoked = true);
+        stub.Execute.Execute(cmd => callbackInvoked = true);
 
         IUserMethodService service = stub;
         service.Execute("test");
 
-        // callbackInvoked == true (OnCall was invoked, not user method)
+        // callbackInvoked == true (Execute was invoked, not user method)
         stub.Execute.Verify(Times.Once);
     }
 
-    public void Reset_PreservesOnCallConfiguration()
+    public void Reset_PreservesReturnsConfiguration()
     {
         var stub = new BasicUserMethodStub();
-        stub.Calculate.OnCall((a, b) => a * b); // Override addition with multiplication
+        stub.Calculate.Returns((a, b) => a * b); // Override addition with multiplication
 
         IUserMethodService service = stub;
         service.Calculate(3, 4);
         stub.Calculate.Verify(Times.Once);
 
-        // Reset clears tracking but preserves OnCall
+        // Reset clears tracking but preserves Returns
         stub.Calculate.Reset();
         stub.Calculate.Verify(Times.Never);
 
         var result = service.Calculate(5, 6);
-        // result == 30 (OnCall still active: 5 * 6)
+        // result == 30 (Returns still active: 5 * 6)
     }
 }
 
@@ -331,7 +331,7 @@ public partial class MixedUserMethodStub
     }
 
     // WithoutUserMethod_ and ComputeWithoutUserMethod_ are NOT overridden
-    // They use the regular interceptor path (OnCall, Returns, or default)
+    // They use the regular interceptor path (Returns, Execute, or default)
 }
 
 [KnockOff<IMixedUserMethodService>]
@@ -341,11 +341,11 @@ public partial class MixedUserMethodDemo
     {
         var stub = new MixedUserMethodStub();
 
-        // Methods WITH user override use the interceptor for tracking + OnCall
+        // Methods WITH user override use the interceptor for tracking + Returns
         stub.WithUserMethod.Verify(Times.Never);
 
         // Methods WITHOUT user override also use interceptor (same API)
-        stub.WithoutUserMethod.OnCall((input) => $"[Configured: {input}]");
+        stub.WithoutUserMethod.Returns((input) => $"[Configured: {input}]");
         stub.WithoutUserMethod.Verify(Times.Never);
 
         stub.ComputeWithoutUserMethod.Returns(42);
@@ -353,7 +353,7 @@ public partial class MixedUserMethodDemo
         IMixedUserMethodService service = stub;
 
         var r1 = service.WithUserMethod("test");       // "[User: test]" (from override)
-        var r2 = service.WithoutUserMethod("test");    // "[Configured: test]" (from OnCall)
+        var r2 = service.WithoutUserMethod("test");    // "[Configured: test]" (from Returns)
         var r3 = service.ComputeWithUserMethod(5);     // 10 (from override)
         var r4 = service.ComputeWithoutUserMethod(5);  // 42 (from Returns)
 
@@ -369,8 +369,8 @@ public partial class MixedUserMethodDemo
     // - No user method: stub.Method (default/interceptor behavior)
     //
     // The presence or absence of a user override is detected at compile time.
-    // When override exists: OnCall > User override
-    // When no override: OnCall > Strict/Default
+    // When override exists: Returns > User override
+    // When no override: Returns > Strict/Default
     // =========================================================================
 }
 
@@ -378,8 +378,8 @@ public partial class MixedUserMethodDemo
 // PARTIAL USER METHOD COVERAGE FOR OVERLOADS
 // =============================================================================
 // You can override only SOME overloads. Each overload is handled independently:
-// - Overridden: OnCall > User override
-// - Not overridden: OnCall > Strict/Default
+// - Overridden: Returns > User override
+// - Not overridden: Returns > Strict/Default
 //
 // Example: Format has 3 overloads, but only Format(string) is overridden.
 // - Format(string) calls Format_(string) (your override)
@@ -417,7 +417,7 @@ public partial class StrictUserMethodStub
     protected override string Process_(string input) => $"[Strict: {input}]";
 
     // Only Process_ is overridden
-    // Other methods will throw in strict mode if called without OnCall configuration
+    // Other methods will throw in strict mode if called without Returns/Execute configuration
 }
 
 [KnockOff<IUserMethodService>]
@@ -431,8 +431,8 @@ public partial class StrictModeUserMethodDemo
         // User override works in strict mode - it IS the configuration
         var result = service.Process("test");  // "[Strict: test]"
 
-        // Non-overridden method in strict mode would throw without OnCall
-        // service.Calculate(1, 2);  // Would throw - no override, no OnCall
+        // Non-overridden method in strict mode would throw without Returns
+        // service.Calculate(1, 2);  // Would throw - no override, no Returns
     }
 
     // =========================================================================
@@ -440,7 +440,7 @@ public partial class StrictModeUserMethodDemo
     // =========================================================================
     // Strict mode means "throw if unconfigured". User overrides ARE configured
     // by their very existence. This is consistent - the override IS the
-    // behavior, just defined in a different way than OnCall.
+    // behavior, just defined in a different way than Returns/Execute.
     // =========================================================================
 }
 
@@ -546,7 +546,7 @@ public partial class GenericUserMethodStub
     //
     // For generic methods, use the standard interceptor API:
     //   stub.Create.Of<List<int>>().Returns(new List<int>());
-    //   stub.Create.Of<User>().OnCall(() => new User { Id = 1 });
+    //   stub.Create.Of<User>().Returns(() => new User { Id = 1 });
     //
     // The Of<T>() pattern handles both behavior AND verification consistently.
     // =========================================================================
@@ -567,7 +567,7 @@ public partial class GenericUserMethodDemo
         var stub = new GenericUserMethodStub();
         IGenericUserMethodService service = stub;
 
-        // Configure via Of<T>().OnCall() - this is the ONLY way for generic methods
+        // Configure via Of<T>().Returns() - this is the ONLY way for generic methods
         stub.Create.Of<List<int>>().OnCall(() => new List<int> { 1, 2, 3 });
 
         var list = service.Create<List<int>>();
@@ -582,7 +582,7 @@ public partial class GenericUserMethodDemo
         var stub = new GenericUserMethodStub();
         IGenericUserMethodService service = stub;
 
-        // Multi-type-parameter methods also use Of<T>().OnCall()
+        // Multi-type-parameter methods also use Of<T>().Returns()
         stub.Transform.Of<string, StringBuilder>().OnCall(input => new StringBuilder($"transformed: {input}"));
 
         var result = service.Transform<string, StringBuilder>("hello");
@@ -614,8 +614,8 @@ public partial class GenericUserMethodDemo
 //
 // PRIORITY CHAIN:
 // 1. When chains (parameter-specific matching)
-// 2. Sequences (ThenCall chain)
-// 3. OnCall/Returns (explicit configuration)
+// 2. Sequences (ThenReturns/ThenExecute chain)
+// 3. Returns/Execute (explicit configuration)
 // 4. User Method (fallback - always called if nothing else matches)
 //
 // This is the same priority order as inline stubs, except user method replaces
@@ -734,7 +734,7 @@ public static class WhenChainUserMethodDemo
         var stub = new BasicUserMethodStub();
         IUserMethodService service = stub;
 
-        // Priority: When > Sequences > OnCall > User Method
+        // Priority: When > Sequences > Returns > User Method
         stub.Process.When("priority1").Returns("[FROM WHEN]");
 
         // First call matches When
@@ -743,9 +743,9 @@ public static class WhenChainUserMethodDemo
         // Subsequent calls fall to user method (When chain exhausted for non-matching)
         var from_user = service.Process("anything");   // User method result
 
-        // You can also configure OnCall which takes precedence over user method
-        stub.Process.OnCall(input => $"[ONCALL: {input}]");
-        var from_oncall = service.Process("test");     // "[ONCALL: test]"
+        // You can also configure Returns which takes precedence over user method
+        stub.Process.Returns(input => $"[RETURNS: {input}]");
+        var from_returns = service.Process("test");     // "[RETURNS: test]"
     }
 }
 
@@ -768,7 +768,7 @@ public static class WhenChainUserMethodDemo
 // - Basic user overrides (any parameter count)
 // - Clean interceptor names (stub.Process, not stub.Process2)
 // - Interceptors with Verify(), LastArg, LastArgs, Reset(), Verifiable()
-// - OnCall/Returns supersede user overrides per-test
+// - Returns/Execute supersede user overrides per-test
 // - Mixed stubs (some methods overridden, some not)
 // - Strict mode bypass for overridden methods
 // - Async user methods (Task<T>, Task, ValueTask<T>)
@@ -792,7 +792,7 @@ public static class WhenChainUserMethodDemo
 //    Q: Do async user overrides work as expected?
 //    A: YES - Task<T>, Task, and ValueTask<T> all work correctly.
 //       - Override the virtual method (ProcessAsync_)
-//       - Interceptors have OnCall/Returns with auto-wrap
+//       - Interceptors have Returns/Execute with auto-wrap
 //       - See AsyncUserMethodStub for working examples
 //
 // 3. GENERIC USER METHODS

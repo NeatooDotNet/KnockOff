@@ -403,7 +403,7 @@ public partial class IEntityListBaseOfTTests
         IEntityListBase<IEntityBase> list = stub;
 
         var itemStub = new EntityBaseStubForListT();
-        stub.Contains.OnCall((item) => true);
+        stub.Contains.Returns((item) => true);
 
         var result = list.Contains(itemStub);
 

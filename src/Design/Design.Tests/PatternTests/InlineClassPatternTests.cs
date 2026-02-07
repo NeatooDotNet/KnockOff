@@ -44,7 +44,7 @@ public class InlineClassPatternTests
     {
         var stub = new InlineClassExample.Stubs.ServiceBase();
         var initializeCalled = false;
-        stub.Initialize.OnCall(() => initializeCalled = true);
+        stub.Initialize.Execute(() => initializeCalled = true);
 
         stub.Object.Initialize();
 

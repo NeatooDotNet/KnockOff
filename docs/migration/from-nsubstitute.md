@@ -36,7 +36,7 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 
 **KnockOff's approach:**
 - Compile-time source generation with partial classes
-- `Returns()` or `OnCall()` delegates for behavior configuration
+- `Returns()` or `Execute()` delegates for behavior configuration
 - `Verifiable()` + `Verify()` for batch verification
 - `When()` API for declarative argument matching (similar to `Arg.Is<T>()`)
 - Auto-wrapped `Task.FromResult()` for async methods with `Returns()`
@@ -55,9 +55,9 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 
 | Feature | NSubstitute | KnockOff | Verdict |
 |---------|-------------|----------|---------|
-| **API elegance** | `.Returns(42)` | `.Returns(42)` or `OnCall(() => 42)` | Comparable |
+| **API elegance** | `.Returns(42)` | `.Returns(42)` or `Returns(() => 42)` | Comparable |
 | **Verification readability** | `sub.Received().Method()` | `tracking.Verify(Times.Once)` | NSub is more intuitive |
-| **Async setup** | `.Returns(user)` auto-wraps | `Returns(user)` auto-wraps; `OnCall` simplified also auto-wraps | Comparable |
+| **Async setup** | `.Returns(user)` auto-wraps | `Returns(user)` auto-wraps; `Returns(callback)` simplified also auto-wraps | Comparable |
 | **Learning curve** | Familiar to most C# devs | New patterns to learn | NSub wins |
 | **Recursive mocks** | Built-in support | Not supported | NSub only |
 
@@ -81,11 +81,11 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 | NSubstitute Pattern | KnockOff Equivalent |
 |---------------------|---------------------|
 | `Substitute.For<IFoo>()` | `new FooStub()` with `[KnockOff] partial class FooStub : IFoo` |
-| `.Returns(value)` | `stub.Method.Returns(value)` or `stub.Method.OnCall(() => value)` |
-| `.Returns(callInfo => ...)` | `stub.Method.OnCall((args) => ...)` |
+| `.Returns(value)` | `stub.Method.Returns(value)` or `stub.Method.Returns(() => value)` |
+| `.Returns(callInfo => ...)` | `stub.Method.Returns((args) => ...)` |
 | `.ReturnsForAnyArgs(value)` | `stub.Method.Returns(value)` (inherently matches any) |
-| `.When(x => x.Method()).Do(...)` | Logic in `OnCall` delegate |
-| `.Returns(...).AndDoes(...)` | Combine in single `OnCall` delegate |
+| `.When(x => x.Method()).Do(...)` | Logic in `Returns`/`Execute` delegate |
+| `.Returns(...).AndDoes(...)` | Combine in single `Returns` delegate |
 | `.Received()` | `stub.Method.Verify(Times.AtLeastOnce)` or `.Verifiable()` |
 | `.Received(n)` | `stub.Method.Verify(Times.Exactly(n))` |
 | `.DidNotReceive()` | `tracking.Verify(Times.Never)` |
@@ -144,7 +144,7 @@ var stub = new NSubUserRepoStub();
 
 ## Step 3: Configure Returns
 
-Replace `.Returns()` with `OnCall` property assignments.
+Replace `.Returns()` with `Returns`/`Execute` property assignments.
 
 **NSubstitute:**
 
@@ -160,17 +160,17 @@ substitute.GetUser(Arg.Any<int>()).Returns(testUser);
 <!-- snippet: nsub-migration-returns-knockoff -->
 ```cs
 // KnockOff uses OnCall with typed delegate
-stub.GetUser.OnCall((id) => testUser);
+stub.GetUser.Returns((id) => testUser);
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `.Returns()` reads like English. KnockOff's `OnCall` is more explicit but requires a lambda. However, KnockOff gives you typed access to arguments directly in the delegate.
+**Trade-off:** NSubstitute's `.Returns()` reads like English. KnockOff's `Returns(callback)` is explicit and requires a lambda. KnockOff gives you typed access to arguments directly in the delegate.
 
 ---
 
 ## Step 4: Configure ReturnsForAnyArgs
 
-Replace `.ReturnsForAnyArgs()` with standard `OnCall`.
+Replace `.ReturnsForAnyArgs()` with standard `Returns`.
 
 **NSubstitute:**
 
@@ -186,11 +186,11 @@ substitute.GetUser(default).ReturnsForAnyArgs(testUser);
 <!-- snippet: nsub-migration-returns-anyargs-knockoff -->
 ```cs
 // KnockOff: OnCall inherently matches any arguments (no "ForAnyArgs" needed)
-stub.GetUser.OnCall((id) => testUser);
+stub.GetUser.Returns((id) => testUser);
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute has an explicit `.ReturnsForAnyArgs()` method that makes intent clear. KnockOff's `OnCall` inherently matches any arguments, so no special method is needed. This is simpler but less declarative.
+**Trade-off:** NSubstitute has an explicit `.ReturnsForAnyArgs()` method that makes intent clear. KnockOff's `Returns` inherently matches any arguments, so no special method is needed. This is simpler but less declarative.
 
 ---
 
@@ -213,7 +213,7 @@ substitute.GetUser(Arg.Any<int>())
 <!-- snippet: nsub-migration-returns-args-knockoff -->
 ```cs
 // KnockOff: Arguments are directly available in the delegate
-stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+stub.GetUser.Returns((id) => new User { Id = id, Name = $"User{id}" });
 ```
 <!-- endSnippet -->
 
@@ -268,7 +268,7 @@ substitute.Received(1).SaveUser(Arg.Any<User>());
 <!-- snippet: nsub-migration-received-knockoff -->
 ```cs
 // KnockOff: Mark as verifiable during setup, then Verify()
-stub.SaveUser.OnCall((user) => { }).Verifiable();
+stub.SaveUser.Execute((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -350,7 +350,7 @@ substitute.FindUsers(Arg.Any<string>(), Arg.Is<int>(x => x > 0))
 <!-- snippet: nsub-migration-multiargs-knockoff -->
 ```cs
 // KnockOff: Named parameters directly in delegate
-stub.FindUsers.OnCall((name, limit) =>
+stub.FindUsers.Returns((name, limit) =>
     limit <= 0 ? Enumerable.Empty<User>() : new[] { new User { Name = name } });
 ```
 <!-- endSnippet -->
@@ -361,7 +361,7 @@ stub.FindUsers.OnCall((name, limit) =>
 
 ## Step 11: Side Effects (When...Do)
 
-Replace `.When().Do()` with logic in `OnCall`.
+Replace `.When().Do()` with logic in `Execute`.
 
 **NSubstitute:**
 
@@ -378,17 +378,17 @@ substitute.When(x => x.SaveUser(Arg.Any<User>()))
 <!-- snippet: nsub-migration-whendo-knockoff -->
 ```cs
 // KnockOff: OnCall handles side effects directly
-stub.SaveUser.OnCall((user) => { savedUsers.Add(user); });
+stub.SaveUser.Execute((user) => { savedUsers.Add(user); });
 ```
 <!-- endSnippet -->
 
-**Trade-off:** Both approaches work. NSubstitute's `.When().Do()` is more explicit about intent (side effect only). KnockOff's unified `OnCall` is simpler but doesn't distinguish between "return value" and "side effect" configurations.
+**Trade-off:** Both approaches work. NSubstitute's `.When().Do()` is more explicit about intent (side effect only). KnockOff's `Execute` is clearer about being for side effects (void methods), while `Returns` is used for methods with return values.
 
 ---
 
 ## Step 12: Returns with Side Effects
 
-Replace `.Returns().AndDoes()` with combined logic in `OnCall`.
+Replace `.Returns().AndDoes()` with combined logic in `Returns`.
 
 **NSubstitute:**
 
@@ -406,11 +406,11 @@ substitute.GetUser(Arg.Any<int>())
 <!-- snippet: nsub-migration-returnsanddoes-knockoff -->
 ```cs
 // KnockOff: Side effects and return in same delegate
-stub.GetUser.OnCall((id) => { accessLog.Add(id); return new User { Id = id, Name = "Test" }; });
+stub.GetUser.Returns((id) => { accessLog.Add(id); return new User { Id = id, Name = "Test" }; });
 ```
 <!-- endSnippet -->
 
-**Trade-off:** KnockOff is actually simpler here. NSubstitute's chained `.Returns().AndDoes()` is more verbose than KnockOff's single delegate.
+**Trade-off:** KnockOff is actually simpler here. NSubstitute's chained `.Returns().AndDoes()` is more verbose than KnockOff's single `Returns` delegate.
 
 ---
 
@@ -433,11 +433,11 @@ substitute.GetUser(Arg.Is<int>(id => id > 0))
 <!-- snippet: nsub-migration-argmatchers-knockoff -->
 ```cs
 // KnockOff: Conditional logic in the callback
-stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+stub.GetUser.Returns((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `Arg.Is<T>()` is declarative and can be combined with multiple matchers per method. KnockOff's callback approach puts the logic inside the callback, which is less elegant but more flexible.
+**Trade-off:** NSubstitute's `Arg.Is<T>()` is declarative and can be combined with multiple matchers per method. KnockOff's `Returns` callback approach puts the logic inside the callback, which is less elegant but more flexible.
 
 ---
 
@@ -461,11 +461,11 @@ substitute.GetUser(Arg.Is<int>(id => id <= 0)).Returns((User?)null);
 <!-- snippet: nsub-migration-when-predicate-knockoff -->
 ```cs
 // OnCall with conditionals for permanent predicate matching
-stub.GetUser.OnCall((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
+stub.GetUser.Returns((id) => id > 0 ? new User { Id = id, Name = "Valid User" } : null);
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `Arg.Is<T>()` matchers are permanent--they apply to all matching calls. KnockOff's `OnCall()` with conditionals achieves the same result. KnockOff's `When()` API is designed for sequential/consumable matching (first call matches X, second matches Y), which is a different use case.
+**Trade-off:** NSubstitute's `Arg.Is<T>()` matchers are permanent--they apply to all matching calls. KnockOff's `Returns()` with conditionals achieves the same result. KnockOff's `When()` API is designed for sequential/consumable matching (first call matches X, second matches Y), which is a different use case.
 
 ---
 
@@ -515,7 +515,7 @@ substitute.GetUserAsync(Arg.Any<int>()).Returns(testUser);
 <!-- snippet: nsub-migration-async-knockoff -->
 ```cs
 // KnockOff: Must wrap in Task.FromResult explicitly
-stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
@@ -526,15 +526,15 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 // 1. Returns() -- auto-wraps in Task.FromResult (recommended for fixed values)
 stub.GetUserAsync.Returns(testUser);
 
-// 2. OnCall() simplified -- callback returns unwrapped type, auto-wrapped
-stub.GetUserAsync.OnCall((id) => new User { Id = id });
+// 2. Returns() simplified -- callback returns unwrapped type, auto-wrapped
+stub.GetUserAsync.Returns((id) => new User { Id = id });
 
-// 3. OnCall() full -- callback returns Task<T> directly
-stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+// 3. Returns() full -- callback returns Task<T> directly
+stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
-**Trade-off:** Comparable. KnockOff's `Returns(value)` auto-wraps just like NSubstitute's `.Returns()`. The `OnCall()` overload also supports simplified callbacks that auto-wrap. Only use explicit `Task.FromResult()` when you need full control.
+**Trade-off:** Comparable. KnockOff's `Returns(value)` auto-wraps just like NSubstitute's `.Returns()`. The `Returns(callback)` overload also supports simplified callbacks that auto-wrap. Only use explicit `Task.FromResult()` when you need full control.
 
 ---
 
@@ -583,7 +583,7 @@ substitute.GetUser(Arg.Any<int>())
 <!-- snippet: nsub-migration-throws-knockoff -->
 ```cs
 // KnockOff: Throw directly in callback
-stub.GetUser.OnCall((id) => throw new InvalidOperationException("Database offline"));
+stub.GetUser.Returns((id) => throw new InvalidOperationException("Database offline"));
 ```
 <!-- endSnippet -->
 
@@ -623,14 +623,14 @@ private readonly INSubUserRepo _substitute = Substitute.For<INSubUserRepo>();
 // KnockOff: Instantiate stub in constructor
 private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
 
-// Setup: .OnCall() with typed delegate, .Verifiable() for verification
-// _stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
+// Setup: .Returns() with typed delegate, .Verifiable() for verification
+// _stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(user)).Verifiable();
 
 // Verification: .Verify() checks all .Verifiable() members
 // _stub.Verify();
 
 // Argument capture: capture in the callback delegate
-// _stub.SaveUser.OnCall((user) => { savedUser = user; }).Verifiable();
+// _stub.SaveUser.Execute((user) => { savedUser = user; }).Verifiable();
 
 // Negative verification: .Verify(Times.Never)
 // _stub.DeleteUser.Verify(Times.Never);
@@ -640,7 +640,7 @@ private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
 **What changed:**
 - Added stub class declaration with `[KnockOff]` attribute
 - Replaced `Substitute.For<T>()` with stub instance
-- Replaced `.Returns()` with `OnCall` delegates
+- Replaced `.Returns()` with `Returns`/`Execute` delegates
 - Replaced `.Received()` with `.Verifiable()` + `.Verify()`
 - Replaced `.DidNotReceive()` with `tracking.Verify(Times.Never)`
 - Added explicit `Task.FromResult()` for async methods
@@ -660,11 +660,11 @@ private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
 
 <!-- snippet: nsub-gotcha-verifiable -->
 ```cs
-// Wrong: OnCall without Verifiable -- Verify() won't check this
-stub.GetUser.OnCall((id) => new User { Id = id });
+// Wrong: Returns without Verifiable -- Verify() won't check this
+stub.GetUser.Returns((id) => new User { Id = id });
 
 // Correct: Mark as Verifiable
-stub.GetUser.OnCall((id) => new User { Id = id }).Verifiable();
+stub.GetUser.Returns((id) => new User { Id = id }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -675,7 +675,7 @@ stub.GetUser.OnCall((id) => new User { Id = id }).Verifiable();
 <!-- snippet: nsub-gotcha-async-simple -->
 ```cs
 // Verbose: full OnCall with Task.FromResult
-stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(testUser));
 
 // Simpler: Returns() auto-wraps for you
 stub.GetUserAsync.Returns(testUser);
@@ -714,17 +714,17 @@ public partial class NSubGotchaPartialStub : INSubUserRepo { }
 ```
 <!-- endSnippet -->
 
-### Wrong `OnCall` Signature
+### Wrong `Returns`/`Execute` Signature
 
 **Problem:** Callback signature doesn't match the method parameters.
 
 <!-- snippet: nsub-gotcha-oncall-signature -->
 ```cs
 // Wrong: GetUser(int id) expects (int) callback
-// stub.GetUser.OnCall(() => user);  // Compile error
+// stub.GetUser.Returns(() => user);  // Compile error
 
 // Correct: match the method signature
-stub.GetUser.OnCall((id) => new User { Id = id });
+stub.GetUser.Returns((id) => new User { Id = id });
 ```
 <!-- endSnippet -->
 
@@ -774,7 +774,7 @@ KnockOff captures in the callback:
 <!-- snippet: nsub-no-argdo-knockoff -->
 ```cs
 // KnockOff: Capture in the callback
-stub.GetUser.OnCall((id) => { capturedIds.Add(id); return null; });
+stub.GetUser.Returns((id) => { capturedIds.Add(id); return null; });
 ```
 <!-- endSnippet -->
 
@@ -810,8 +810,8 @@ Both frameworks repeat the last value after sequence exhaustion.
 ```cs
 // KnockOff extension: OnCall/ThenCall for computed sequences
 stub.GetUser
-    .OnCall((id) => user1)
-    .ThenCall((id) => new User { Id = id, Name = "Subsequent" });
+    .Returns((id) => user1)
+    .ThenReturns((id) => new User { Id = id, Name = "Subsequent" });
 ```
 <!-- endSnippet -->
 
@@ -841,7 +841,7 @@ KnockOff earns its place when:
 
 - **[Getting Started Guide](../getting-started.md)** - Learn KnockOff patterns from scratch
 - **[Stub Patterns](../guides/stub-patterns.md)** - Stand-alone, inline interface, and inline class patterns
-- **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete reference for `OnCall`, `OnGet`, `OnSet`
+- **[Interceptor API Reference](../reference/interceptor-api.md)** - Complete reference for `Returns`, `Execute`, `OnGet`, `OnSet`
 - **[Verification Guide](../guides/verification.md)** - Advanced call tracking and verification patterns
 
 ---

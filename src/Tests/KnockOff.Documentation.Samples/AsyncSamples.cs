@@ -59,7 +59,7 @@ public class TaskMethodTests
 
         #region async-task-simplified-callback
         // OnCall() with unwrapped return type - auto-wrapped in Task.FromResult
-        stub.GetUserAsync.OnCall((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+        stub.GetUserAsync.Returns((id) => new User { Id = id, Name = "Alice" }).Verifiable();
         #endregion
 
         IAsyncUserSvc service = stub;
@@ -77,7 +77,7 @@ public class TaskMethodTests
 
         #region async-task-result
         // Use Task.FromResult when you need parameter-based return values
-        stub.GetUserAsync.OnCall((id) =>
+        stub.GetUserAsync.Returns((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
         #endregion
 
@@ -97,7 +97,7 @@ public class TaskMethodTests
 
         #region async-task-simplified-void
         // Action callback for void async - Task.CompletedTask auto-returned
-        stub.UpdateUserAsync.OnCall((user) => updatedUsers.Add(user)).Verifiable();
+        stub.UpdateUserAsync.Execute((user) => updatedUsers.Add(user)).Verifiable();
         #endregion
 
         IAsyncUserSvc service = stub;
@@ -114,11 +114,10 @@ public class TaskMethodTests
         var updatedUsers = new List<User>();
 
         #region async-task-void
-        // Return Task.CompletedTask for async void methods
-        stub.UpdateUserAsync.OnCall((user) =>
+        // Execute() auto-returns Task.CompletedTask for async void methods
+        stub.UpdateUserAsync.Execute((user) =>
         {
             updatedUsers.Add(user);
-            return Task.CompletedTask;
         }).Verifiable();
         #endregion
 
@@ -159,7 +158,7 @@ public class ValueTaskMethodTests
         var stub = new AsyncUserSvcStub();
 
         // Return unwrapped type - auto-wrapped in new ValueTask<T>()
-        stub.GetCachedUserAsync.OnCall((id) => new User { Id = id, Name = "Cached" }).Verifiable();
+        stub.GetCachedUserAsync.Returns((id) => new User { Id = id, Name = "Cached" }).Verifiable();
 
         IAsyncUserSvc service = stub;
         var user = await service.GetCachedUserAsync(42);
@@ -176,7 +175,7 @@ public class ValueTaskMethodTests
 
         #region async-valuetask
         // Create ValueTask directly when you need parameter-based return values
-        stub.GetCachedUserAsync.OnCall((id) =>
+        stub.GetCachedUserAsync.Returns((id) =>
             new ValueTask<User?>(new User { Id = id, Name = "Cached" })).Verifiable();
         #endregion
 
@@ -202,7 +201,7 @@ public class AsyncDelayTests
 
         #region async-delay
         // Use async lambda to simulate network latency
-        stub.GetUserAsync.OnCall(async (id) =>
+        stub.GetUserAsync.Returns(async (id) =>
         {
             await Task.Delay(50);
             return new User { Id = id, Name = "Delayed" };
@@ -233,7 +232,7 @@ public class AsyncExceptionTests
 
         #region async-exception
         // Return a faulted task using Task.FromException
-        stub.GetUserAsync.OnCall((id) =>
+        stub.GetUserAsync.Returns((id) =>
             Task.FromException<User?>(new NotFoundException($"User {id} not found")));
         #endregion
 
@@ -250,7 +249,7 @@ public class AsyncExceptionTests
 
         #region async-throw
         // Throw directly - use explicit delegate type to disambiguate overloads
-        stub.GetUserAsync.OnCall((AsyncUserSvcStub.GetUserAsyncInterceptor.GetUserAsyncDelegate)(id =>
+        stub.GetUserAsync.Returns((AsyncUserSvcStub.GetUserAsyncInterceptor.GetUserAsyncDelegate)(id =>
             throw new NotFoundException($"User {id} not found")));
         #endregion
 
@@ -295,9 +294,9 @@ public class CompleteAsyncExampleTests
 
         #region async-complete-example
         // Configure multiple async methods with verification
-        stub.FindAsync.OnCall((id) =>
+        stub.FindAsync.Returns((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
-        stub.SaveAsync.OnCall((user) => Task.CompletedTask).Verifiable();
+        stub.SaveAsync.Execute((user) => { }).Verifiable();
         #endregion
 
         var manager = new UserManager(stub);

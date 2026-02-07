@@ -111,24 +111,24 @@ These files serve as the authoritative reference for how KnockOff works. When as
 
 ### Sequence Behavior
 
-Sequences (OnCall().ThenCall(), OnGet().ThenGet(), etc.) **repeat the last value** after exhaustion. This matches NSubstitute's behavior for easier migration and more forgiving tests.
+Sequences (Returns().ThenReturns(), OnGet().ThenGet(), etc.) **repeat the last value** after exhaustion. This matches NSubstitute's behavior for easier migration and more forgiving tests.
 
 ```csharp
 // Default behavior: repeat last value after exhaustion
-stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2);
+stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2);
 calc.Add(0, 0); // Returns 1
 calc.Add(0, 0); // Returns 2
 calc.Add(0, 0); // Returns 2 (repeats last value)
 
 // Use ThenDefault() to return default(T) instead of repeating
-stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2).ThenDefault();
+stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2).ThenDefault();
 calc.Add(0, 0); // Returns 1
 calc.Add(0, 0); // Returns 2
 calc.Add(0, 0); // Returns 0 (default - exhausted)
 
 // Strict mode throws StubException.SequenceExhausted (unchanged)
 stub.Strict = true;
-stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2);
+stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2);
 calc.Add(0, 0); // Returns 1
 calc.Add(0, 0); // Returns 2
 calc.Add(0, 0); // Throws StubException.SequenceExhausted

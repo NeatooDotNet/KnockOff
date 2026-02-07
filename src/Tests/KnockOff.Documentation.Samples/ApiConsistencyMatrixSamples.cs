@@ -94,7 +94,7 @@ public class MethodInterceptionTests
         #region matrix-method-interception
         // Configure behavior
         stub.GetData.Returns("test-value");
-        stub.GetData.OnCall((id) => $"Data-{id}");
+        stub.GetData.Returns((id) => $"Data-{id}");
 
         // Verify calls
         stub.GetData.Verify(Times.Never);
@@ -239,9 +239,9 @@ public class SequenceTests
         #region matrix-sequences
         // Return different values on successive calls
         stub.GetStatus
-            .OnCall(() => "Pending")
-            .ThenCall(() => "Processing")
-            .ThenCall(() => "Complete");
+            .Returns(() => "Pending")
+            .ThenReturns(() => "Processing")
+            .ThenReturns(() => "Complete");
         // Call 1: "Pending", Call 2: "Processing", Call 3+: "Complete" (repeats last)
 
         // Properties support sequences too
@@ -304,7 +304,7 @@ public class VerificationTests
 
         #region matrix-verification
         // Mark for verification
-        stub.GetData.OnCall((id) => "data").Verifiable();
+        stub.GetData.Returns((id) => "data").Verifiable();
 
         // Verify only marked items
         // stub.Verify();  // Throws if any Verifiable() not called
@@ -361,7 +361,7 @@ public class ResetTests
         var stub = new MatrixServiceStub();
         IMatrixService svc = stub;
 
-        stub.GetData.OnCall((id) => "data");
+        stub.GetData.Returns((id) => "data");
         svc.GetData(1);
         stub.GetData.Verify(Times.Once);
 
@@ -393,7 +393,7 @@ public class UserMethodsTests
         Assert.Equal(7, result);
 
         // OnCall supersedes user method
-        stub.Add.OnCall((a, b) => 999);
+        stub.Add.Returns((a, b) => 999);
         var overridden = calc.Add(3, 4);
         Assert.Equal(999, overridden);
         #endregion
@@ -419,10 +419,10 @@ public class AsyncAutoWrapTests
         stub.GetDataAsync.Returns("hello");
 
         // Tier 2: OnCall(simplified callback) - returns T, auto-wrapped
-        stub.GetDataAsync.OnCall((id) => $"Data-{id}");
+        stub.GetDataAsync.Returns((id) => $"Data-{id}");
 
         // Tier 3: OnCall(full delegate) - returns Task<T> directly
-        stub.GetDataAsync.OnCall((int id) => Task.FromResult($"Full-{id}"));
+        stub.GetDataAsync.Returns((int id) => Task.FromResult($"Full-{id}"));
         #endregion
 
         var result = await svc.GetDataAsync(42);
@@ -451,7 +451,7 @@ public class InstantiationTests
         IMatrixCalculator calc = calcStub;
 
         // Configure and use - same API across all patterns
-        calcStub.Add.OnCall((a, b) => a + b);
+        calcStub.Add.Returns((a, b) => a + b);
         var result = calc.Add(3, 4);
         Assert.Equal(7, result);
 

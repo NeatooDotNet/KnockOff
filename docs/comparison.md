@@ -13,9 +13,9 @@ For argument matching, argument capture, and method overload resolution comparis
 | **Return value** | `mock.Setup(x => x.Add(1, 2)).Returns(3);` | `calc.Add(1, 2).Returns(3);` | `stub.Add.Returns(3);` |
 | **Any argument** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(10);` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(10);` | `stub.Add.Returns(10);` |
 | **Match values** | `mock.Setup(x => x.Add(1, 2)).Returns(100);` | `calc.Add(1, 2).Returns(100);` | `stub.Add.When(1, 2).Returns(100);` |
-| **Conditional** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns<int, int>((a, b) => a > 0 ? a + b : 0);` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(x => ...);` | `stub.Add.OnCall((a, b) => a > 0 ? a + b : 0);` |
-| **Throw** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Throws<Exception>();` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Throws<Exception>();` | `stub.Add.OnCall((a, b) => throw new Exception());` |
-| **Callback** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(3).Callback<int, int>((a, b) => log.Add(a));` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(3).AndDoes(x => ...);` | `stub.Add.OnCall((a, b) => { log.Add(a); return 3; });` |
+| **Conditional** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns<int, int>((a, b) => a > 0 ? a + b : 0);` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(x => ...);` | `stub.Add.Returns((a, b) => a > 0 ? a + b : 0);` |
+| **Throw** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Throws<Exception>();` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Throws<Exception>();` | `stub.Add.Returns((a, b) => throw new Exception());` |
+| **Callback** | `mock.Setup(x => x.Add(It.IsAny<int>(), It.IsAny<int>())).Returns(3).Callback<int, int>((a, b) => log.Add(a));` | `calc.Add(Arg.Any<int>(), Arg.Any<int>()).Returns(3).AndDoes(x => ...);` | `stub.Add.Returns((a, b) => { log.Add(a); return 3; });` |
 | **Sequence** | `mock.SetupSequence(x => x.Add(1, 2)).Returns(1).Returns(2).Returns(3);` | `calc.Add(1, 2).Returns(1, 2, 3);` | `stub.Add.Returns(1, 2, 3);` |
 | **Async** | `mock.Setup(x => x.GetUserAsync(1)).ReturnsAsync(user);` | `repo.GetUserAsync(1).Returns(user);` | `stub.GetUserAsync.Returns(user);` |
 | **Verify called** | `mock.Verify(x => x.Add(1, 2));` | `calc.Received().Add(1, 2);` | `stub.Add.Verify();` |
@@ -53,7 +53,7 @@ For argument matching, argument capture, and method overload resolution comparis
 | Task | Moq | NSubstitute | KnockOff |
 |------|-----|-------------|----------|
 | **Setup** | `mock.Setup(x => x(It.IsAny<int>())).Returns("result");` | `factory(Arg.Any<int>()).Returns("result");` | `stub.Interceptor.Returns("result");` |
-| **With logic** | `mock.Setup(x => x(It.Is<int>(v => v > 0))).Returns<int>(x => $"val: {x}");` | `factory(Arg.Is<int>(x => x > 0)).Returns(x => $"val: {x.Arg<int>()}");` | `stub.Interceptor.OnCall((x) => $"val: {x}");` |
+| **With logic** | `mock.Setup(x => x(It.Is<int>(v => v > 0))).Returns<int>(x => $"val: {x}");` | `factory(Arg.Is<int>(x => x > 0)).Returns(x => $"val: {x.Arg<int>()}");` | `stub.Interceptor.Returns((x) => $"val: {x}");` |
 | **Sequence** | `mock.SetupSequence(x => x(It.IsAny<int>())).Returns(1).Returns(2).Returns(3);` | `factory(Arg.Any<int>()).Returns(1, 2, 3);` | `stub.Interceptor.Returns(1, 2, 3);` |
 | **Async** | `mock.Setup(x => x(1)).ReturnsAsync(42);` | `asyncOp(1).Returns(42);` | `stub.Interceptor.Returns(42);` (auto-wraps) |
 | **Match values** | `mock.Setup(x => x(42)).Returns("found");` | *(per-parameter Arg.Is)* | `stub.Interceptor.When(42).Returns("found");` |

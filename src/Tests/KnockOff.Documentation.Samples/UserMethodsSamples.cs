@@ -101,7 +101,7 @@ public class UserMethodOnCallTests
 
         #region user-methods-oncall
         // OnCall supersedes the user method
-        stub.GetUserById.OnCall(id => new User { Id = id, Name = "Overridden" });
+        stub.GetUserById.Returns(id => new User { Id = id, Name = "Overridden" });
 
         var user = repository.GetUserById(42);
         Assert.Equal("Overridden", user!.Name);
@@ -315,7 +315,7 @@ public class UserMethodInterceptorApiExampleTests
         var user1 = repo.GetById(1);  // Returns "Default"
 
         // OnCall supersedes user method (clean interceptor name)
-        stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
+        stub.GetById.Returns(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Returns "Override"
 
         // Full tracking works - counts all calls regardless of configuration
@@ -347,7 +347,7 @@ public class UserMethodStandalonePatternTests
         var user1 = repo.GetById(1);  // Name = "Default"
 
         // With OnCall: callback supersedes user method (clean interceptor name)
-        stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
+        stub.GetById.Returns(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Name = "Override"
         #endregion
 
@@ -362,7 +362,7 @@ public class UserMethodStandalonePatternTests
         ISkillRepo repo = stub;
 
         #region user-methods-tracking-with-oncall
-        stub.GetById.OnCall(id => new User { Id = id });
+        stub.GetById.Returns(id => new User { Id = id });
         repo.GetById(42);
 
         stub.GetById.Verify(Times.Once);
@@ -377,7 +377,7 @@ public class UserMethodStandalonePatternTests
         ISkillRepo repo = stub;
 
         #region user-methods-reset-preserves-oncall
-        stub.GetById.OnCall(id => new User { Id = id });
+        stub.GetById.Returns(id => new User { Id = id });
         repo.GetById(1);
         stub.GetById.Verify(Times.Once);
 
@@ -481,7 +481,7 @@ public class CompleteUserMethodExampleTests
         stub.GetUserById.Verify(Times.Once);
 
         // Override for next call
-        stub.GetUserById.OnCall(id => new User { Id = id, Name = "Custom" });
+        stub.GetUserById.Returns(id => new User { Id = id, Name = "Custom" });
         var customUser = repository.GetUserById(99);
         Assert.Equal("Custom", customUser!.Name);
         #endregion

@@ -65,7 +65,7 @@ internal static class UnifiedInterceptorBuilder
 				CustomDelegateSignature: BuildCustomDelegateSignature(methodName, sig, ownerClassName, ownerTypeParameters),
 				LastArgType: GetLastArgType(sig.TrackableParameters),
 				LastArgsType: GetLastArgsType(sig.TrackableParameters),
-				BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateTypeForBuilder),
+				BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateTypeForBuilder, sig.IsVoid),
 				DefaultExpression: sig.DefaultExpression,
 				ThrowsOnDefault: sig.ThrowsOnDefault,
 				UserMethodName: userMethodName,
@@ -164,7 +164,7 @@ internal static class UnifiedInterceptorBuilder
 			DelegateSignature: delegateSignature,
 			LastArgType: GetLastArgType(sig.TrackableParameters),
 			LastArgsType: GetLastArgsType(sig.TrackableParameters),
-			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateName),
+			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateName, sig.IsVoid),
 			DefaultExpression: sig.DefaultExpression,
 			ThrowsOnDefault: sig.ThrowsOnDefault,
 			UserMethodName: sig.UserMethodName);
@@ -263,21 +263,35 @@ internal static class UnifiedInterceptorBuilder
 	#region Tracking Type Determination
 
 	/// <summary>
-	/// Determines the IMethodCallBuilder interface type based on trackable parameter count.
-	/// Builder interfaces extend the tracking interfaces and add ThenCall() for sequence elevation.
+	/// Determines the builder interface type based on trackable parameter count and void/non-void.
+	/// Non-void methods use IMethodReturnsBuilder, void methods use IMethodExecuteBuilder.
 	/// </summary>
-	public static string GetBuilderInterface(EquatableArray<ParameterModel> trackableParams, string delegateType)
+	public static string GetBuilderInterface(EquatableArray<ParameterModel> trackableParams, string delegateType, bool isVoid)
 	{
-		if (trackableParams.Count == 0)
-			return $"global::KnockOff.IMethodCallBuilder<{delegateType}>";
-		if (trackableParams.Count == 1)
+		if (isVoid)
 		{
-			var param = trackableParams.GetArray()![0];
-			return $"global::KnockOff.IMethodCallBuilder<{delegateType}, {param.Type}>";
+			if (trackableParams.Count == 0)
+				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}>";
+			if (trackableParams.Count == 1)
+			{
+				var param = trackableParams.GetArray()![0];
+				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}, {param.Type}>";
+			}
+			var tupleType = GetLastArgsType(trackableParams);
+			return $"global::KnockOff.IMethodExecuteBuilderArgs<{delegateType}, {tupleType}>";
 		}
-		// Multiple params use tuple
-		var tupleType = GetLastArgsType(trackableParams);
-		return $"global::KnockOff.IMethodCallBuilderArgs<{delegateType}, {tupleType}>";
+		else
+		{
+			if (trackableParams.Count == 0)
+				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}>";
+			if (trackableParams.Count == 1)
+			{
+				var param = trackableParams.GetArray()![0];
+				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}, {param.Type}>";
+			}
+			var tupleType = GetLastArgsType(trackableParams);
+			return $"global::KnockOff.IMethodReturnsBuilderArgs<{delegateType}, {tupleType}>";
+		}
 	}
 
 	/// <summary>

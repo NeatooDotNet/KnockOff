@@ -68,9 +68,9 @@ public class GenericMethodBugTests
 	public void MixedOverloads_NonGeneric_TrackedSeparately()
 	{
 		var knockOff = new MixedOverloadServiceKnockOff();
-		// Configure callbacks for non-generic overloads via overloaded OnCall
-		var stringTracking = knockOff.Process.OnCall((string value) => { });
-		var intTracking = knockOff.Process.OnCall((int value) => { });
+		// Configure callbacks for non-generic overloads via overloaded Execute
+		var stringTracking = knockOff.Process.Execute((string value) => { });
+		var intTracking = knockOff.Process.Execute((int value) => { });
 		IMixedOverloadService service = knockOff;
 
 		service.Process("hello");
@@ -100,8 +100,8 @@ public class GenericMethodBugTests
 	{
 		var knockOff = new MixedOverloadServiceKnockOff();
 		// Configure callbacks for non-generic overloads
-		var stringTracking = knockOff.Process.OnCall((string value) => { });
-		var intTracking = knockOff.Process.OnCall((int value) => { });
+		var stringTracking = knockOff.Process.Execute((string value) => { });
+		var intTracking = knockOff.Process.Execute((int value) => { });
 		IMixedOverloadService service = knockOff;
 
 		// Call all overloads
@@ -126,7 +126,7 @@ public class GenericMethodBugTests
 		var knockOff = new MixedOverloadServiceKnockOff();
 		IMixedOverloadService service = knockOff;
 
-		knockOff.Format.OnCall((int value) => $"int:{value}");
+		knockOff.Format.Returns((int value) => $"int:{value}");
 		knockOff.FormatGeneric.Of<double>().OnCall((value) => $"double:{value}");
 
 		var intResult = service.Format(42);

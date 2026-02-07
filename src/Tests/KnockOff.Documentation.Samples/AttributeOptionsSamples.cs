@@ -50,7 +50,7 @@ public class StandAlonePatternTests
         // Stand-alone stub is created directly
         var stub = new AttrUserRepositoryStub();
 
-        stub.GetById.OnCall((id) => new User { Id = id, Name = "Test User" });
+        stub.GetById.Returns((id) => new User { Id = id, Name = "Test User" });
 
         IAttrUserRepository repository = stub;
         var user = repository.GetById(42);
@@ -78,7 +78,7 @@ public partial class InlineInterfacePatternTests
         #region attr-inline-interface-usage
         // Access the generated stub through the Stubs namespace
         var stub = new InlineInterfacePatternTests.Stubs.IAttrUserRepository();
-        stub.GetById.OnCall((id) => new User { Id = id, Name = "Inline User" });
+        stub.GetById.Returns((id) => new User { Id = id, Name = "Inline User" });
         IAttrUserRepository repository = stub;
         #endregion
 
@@ -107,7 +107,7 @@ public partial class InlineClassPatternTests
         #region attr-inline-class-usage
         // Generated stub inherits from EmailServiceBase
         var stub = new InlineClassPatternTests.Stubs.EmailServiceBase();
-        stub.Send.OnCall((to, subject, body) => { }).Verifiable();
+        stub.Send.Execute((to, subject, body) => { }).Verifiable();
 
         // Use .Object to get the base class type
         EmailServiceBase service = stub.Object;
@@ -142,9 +142,9 @@ public partial class MultipleStubsPatternTests
         var emailService = new MultipleStubsPatternTests.Stubs.IAttrEmailService();
         var logger = new MultipleStubsPatternTests.Stubs.IAttrLogger();
 
-        userRepo.GetById.OnCall((id) => new User { Id = id, Name = "Test" }).Verifiable();
-        emailService.Send.OnCall((to, subject, body) => { }).Verifiable();
-        logger.Log.OnCall((message) => { }).Verifiable();
+        userRepo.GetById.Returns((id) => new User { Id = id, Name = "Test" }).Verifiable();
+        emailService.Send.Execute((to, subject, body) => { }).Verifiable();
+        logger.Log.Execute((message) => { }).Verifiable();
         #endregion
 
         IAttrUserRepository repo = userRepo;
@@ -172,7 +172,7 @@ public class ChoosingPatternTests
     {
         // Stand-alone pattern
         var standalone = new AttrUserRepositoryStub();
-        var saveTracking = standalone.Save.OnCall((user) => { }).Verifiable();
+        var saveTracking = standalone.Save.Execute((user) => { }).Verifiable();
 
         // All patterns have the same interceptor capabilities:
         // - OnCall for behavior

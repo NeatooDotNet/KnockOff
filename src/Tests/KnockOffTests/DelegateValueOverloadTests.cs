@@ -196,7 +196,7 @@ public class DelegateValueOverloadTests
 		Assert.Equal("value", factory());
 
 		// Then configure with callback - should override
-		stub.Interceptor.OnCall(() => "callback");
+		stub.Interceptor.Returns(() => "callback");
 		Assert.Equal("callback", factory());
 	}
 
@@ -207,7 +207,7 @@ public class DelegateValueOverloadTests
 		StringFactory factory = stub;
 
 		// First configure with callback
-		stub.Interceptor.OnCall(() => "callback");
+		stub.Interceptor.Returns(() => "callback");
 		Assert.Equal("callback", factory());
 
 		// Then configure with value - should override
@@ -229,7 +229,7 @@ public class DelegateValueOverloadTests
 		VoidNotify notify = stub;
 
 		var wasNotified = false;
-		stub.Interceptor.OnCall(() => wasNotified = true);
+		stub.Interceptor.Execute(() => wasNotified = true);
 
 		notify();
 
@@ -244,7 +244,7 @@ public class DelegateValueOverloadTests
 		VoidLogger logger = stub;
 
 		string? loggedMessage = null;
-		stub.Interceptor.OnCall((msg) => loggedMessage = msg);
+		stub.Interceptor.Execute((msg) => loggedMessage = msg);
 
 		logger("Hello");
 

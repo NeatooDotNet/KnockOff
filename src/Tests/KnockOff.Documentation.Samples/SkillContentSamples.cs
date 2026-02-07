@@ -264,7 +264,7 @@ public class TimesGotchaTests
     public void TimesBetweenNotExist()
     {
         var stub = new SvcStub();
-        stub.Save.OnCall((u) => { });
+        stub.Save.Execute((u) => { });
         ISvc svc = stub;
         svc.Save(new User { Id = 1 });
 
@@ -290,7 +290,7 @@ public class ReturnsVsOnCallTests
 
         #region skill-gotcha-returns-vs-oncall
         stub.GetValue.Returns("fixed");           // Sets constant value
-        stub.GetValue.OnCall((id) => $"val-{id}"); // REPLACES Returns, now dynamic
+        stub.GetValue.Returns((id) => $"val-{id}"); // REPLACES constant, now dynamic
         #endregion
 
         ISvc svc = stub;
@@ -345,14 +345,14 @@ public class MethodConfigTests
 
         #region skill-method-oncall
         // With arguments
-        stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Returns((id) => new User { Id = id, Name = $"User{id}" });
 
         // Void methods
-        stub.Save.OnCall((user) => { /* side effects */ });
+        stub.Save.Execute((user) => { /* side effects */ });
 
         // Async methods - auto-wrapped, no Task.FromResult needed
-        stub.GetUserAsync.OnCall((id) => new User { Id = id });  // Returns Task<User>
-        stub.SaveAsync.OnCall((user) => { });  // Returns Task.CompletedTask
+        stub.GetUserAsync.Returns((id) => new User { Id = id });  // Returns Task<User>
+        stub.SaveAsync.Execute((user) => { });  // Returns Task.CompletedTask
         #endregion
 
         ISvc svc = stub;
@@ -371,7 +371,7 @@ public class MethodConfigTests
         // After third call, repeats 3 (NSubstitute-like behavior)
 
         // Mix callbacks with value sequences
-        stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
+        stub.Add.Returns((a, b) => a + b).ThenReturns(100, 200);
         // First: computed, then 100, 200, 200...
 
         // Use ThenDefault() to return default(T) instead of repeating:
@@ -406,8 +406,8 @@ public class MethodConfigTests
             .ThenWhen(id => id > 100).Returns(premiumUser)
             .ThenWhen(id => id > 0).Returns(regularUser);
 
-        // Void methods use Call instead of Returns
-        stub.Log.When("error").Call((msg) => { /* handle */ });
+        // Void methods use Execute instead of Returns
+        stub.Log.When("error").Execute((msg) => { /* handle */ });
         #endregion
 
         Assert.Equal("Admin", svc.GetUser(42)!.Name);
@@ -547,9 +547,9 @@ public partial class DelegateHost
         #region skill-delegate-config
         var stub = new Stubs.SkillArithmeticOp();
 
-        // Returns / OnCall
+        // Returns (value or callback)
         stub.Interceptor.Returns(42);
-        stub.Interceptor.OnCall((a, b) => a + b);
+        stub.Interceptor.Returns((a, b) => a + b);
 
         // Sequences
         stub.Interceptor.Returns(10, 20, 30);
@@ -560,11 +560,11 @@ public partial class DelegateHost
 
         // Async auto-wrapping (for delegates returning Task<T>)
         // stub.Interceptor.Returns(42);              // auto-wraps in Task.FromResult
-        // stub.Interceptor.OnCall((int x) => x * 2); // simplified, auto-wrapped
+        // stub.Interceptor.Returns((int x) => x * 2); // simplified, auto-wrapped
 
         // Verification (fresh stub for clean tracking)
         var verifyStub = new Stubs.SkillArithmeticOp();
-        verifyStub.Interceptor.OnCall((a, b) => a + b);
+        verifyStub.Interceptor.Returns((a, b) => a + b);
         SkillArithmeticOp op = verifyStub;
         op(1, 2);
         verifyStub.Interceptor.Verify(Times.Once);
@@ -592,7 +592,7 @@ public class VerificationTests
         ISvc svc = stub;
 
         #region skill-verify-individual
-        var tracking = stub.Save.OnCall((user) => { });
+        var tracking = stub.Save.Execute((user) => { });
         // ... exercise stub ...
         #endregion
 
@@ -608,8 +608,8 @@ public class VerificationTests
         ISvc svc = stub;
 
         #region skill-verify-batch
-        stub.GetUser.OnCall((id) => new User { Id = id }).Verifiable();
-        stub.Save.OnCall((u) => { }).Verifiable(Times.Once);
+        stub.GetUser.Returns((id) => new User { Id = id }).Verifiable();
+        stub.Save.Execute((u) => { }).Verifiable(Times.Once);
         // ... exercise stub ...
         #endregion
 
@@ -633,12 +633,12 @@ public class ArgumentCaptureTests
 
         #region skill-arg-capture
         // Single parameter - LastArg
-        var getTracking = stub.GetUser.OnCall((id) => new User { Id = id });
+        var getTracking = stub.GetUser.Returns((id) => new User { Id = id });
         service.GetUser(42);
         Assert.Equal(42, getTracking.LastArg);
 
         // Multiple parameters - LastArgs tuple
-        var updateTracking = stub.Update.OnCall((id, name) => { });
+        var updateTracking = stub.Update.Execute((id, name) => { });
         service.Update(1, "Alice");
         var (id, name) = updateTracking.LastArgs;
         #endregion
@@ -688,11 +688,11 @@ public class UserMethodTests
         var stub = new SkUserMethodRepoStub();
         IUserRepo repo = stub;
 
-        // Without OnCall: user method is called
+        // Without Returns: user method is called
         var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
 
-        // With OnCall: callback supersedes user method (clean interceptor name)
-        stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
+        // With Returns: callback supersedes user method (clean interceptor name)
+        stub.GetById.Returns(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
         #endregion
 
@@ -749,7 +749,7 @@ public class UserMethodTests
         IUserRepo repo = stub;
 
         #region skill-user-method-tracking
-        stub.GetById.OnCall(id => new User { Id = id });
+        stub.GetById.Returns(id => new User { Id = id });
         repo.GetById(42);
 
         stub.GetById.Verify(Times.Once);
@@ -764,14 +764,14 @@ public class UserMethodTests
         IUserRepo repo = stub;
 
         #region skill-user-method-reset
-        stub.GetById.OnCall(id => new User { Id = id });
+        stub.GetById.Returns(id => new User { Id = id });
         repo.GetById(1);
         stub.GetById.Verify(Times.Once);
 
         stub.GetById.Reset();
         stub.GetById.Verify(Times.Never);  // Tracking cleared
 
-        repo.GetById(2);  // Still uses OnCall callback
+        repo.GetById(2);  // Still uses Returns callback
         #endregion
 
         Assert.Equal(2, stub.GetById.LastArg);
@@ -857,7 +857,7 @@ public class SourceDelegationTests
         stub.Source(realImplementation);
 
         // Configured members override source
-        stub.GetById.OnCall((id) => testUser);  // This wins over source
+        stub.GetById.Returns((id) => testUser);  // This wins over source
 
         // Reset clears tracking (counts, args, sequence position) and source delegation
         // but preserves callbacks (OnCall, Returns, OnGet, OnSet)
@@ -895,7 +895,7 @@ public class CommonMistakeTests
         // stub.Process.OnCall((string id) => { });  // Method takes int
 
         // RIGHT: Match signature exactly
-        stub.Process.OnCall((int id) => { });
+        stub.Process.Execute((int id) => { });
         #endregion
     }
 }

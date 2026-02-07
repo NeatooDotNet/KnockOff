@@ -130,7 +130,7 @@ public partial class ThreePatternValueOverloadTests
 		ThreePatternBaseClass instance = classStub.Object;
 
 		// Inline class uses callback syntax for methods
-		classStub.GetVirtualName.OnCall(() => "inline class result");
+		classStub.GetVirtualName.Returns(() => "inline class result");
 
 		Assert.Equal("inline class result", instance.GetVirtualName());
 	}
@@ -154,7 +154,7 @@ public partial class ThreePatternValueOverloadTests
 		ThreePatternBaseClass instance = classStub.Object;
 
 		// Inline class uses callback syntax for async methods
-		classStub.GetVirtualNameAsync.OnCall(() => Task.FromResult<string?>("async inline class"));
+		classStub.GetVirtualNameAsync.Returns(() => Task.FromResult<string?>("async inline class"));
 
 		Assert.Equal("async inline class", await instance.GetVirtualNameAsync());
 	}

@@ -80,7 +80,7 @@ public class WhenMatchingTests
         var stub = new WhenMatchingDemo.Stubs.ICalculator();
         var called = false;
 
-        stub.Reset.OnCall(() => called = true);
+        stub.Reset.Execute(() => called = true);
 
         Design.Domain.Services.ICalculator calc = stub;
         calc.Reset();

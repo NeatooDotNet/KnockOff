@@ -2,7 +2,7 @@
 
 # Source Delegation
 
-`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured methods (OnCall, Returns, When) still take priority — the source is only consulted when nothing else is configured for that member.
+`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured methods (Returns, Execute, When) still take priority — the source is only consulted when nothing else is configured for that member.
 
 KnockOff generates a separate `Source()` overload for each interface in the hierarchy. **You don't need a complete implementation** — pass an object that implements any interface in the hierarchy, and only the matching methods get delegated.
 
@@ -55,7 +55,7 @@ Assert.Equal(new[] { "step1", "step2", "step3" }, items);
 
 // AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
 // Configure it explicitly, or it returns the smart default
-stub.AddRange.OnCall((newItems) =>
+stub.AddRange.Execute((newItems) =>
 {
     foreach (var newItem in newItems)
     {
@@ -91,7 +91,7 @@ Note: `Reset()` on an individual interceptor also clears its source reference. I
 KnockOff evaluates member calls in this order:
 
 1. **When chains** — `stub.Method.When(...).Returns(...)`
-2. **OnCall / Returns** — `stub.Method.OnCall(...)` or `stub.Method.Returns(...)`
+2. **Returns / Execute** — `stub.Method.Returns(...)` or `stub.Method.Execute(...)`
 3. **User methods** — `protected override` with `_` suffix (Standalone only)
 4. **Source delegation** — `stub.Source(realImplementation)`
 5. **Smart default** — KnockOff's built-in default value
@@ -116,6 +116,6 @@ The first match wins. This makes Source ideal as a baseline: set it once, then s
 ---
 
 **Next Steps:**
-- [Methods Guide](methods.md) - Complete guide to OnCall, Returns, and When chains
+- [Methods Guide](methods.md) - Complete guide to Returns, Execute, and When chains
 - [User Methods Guide](user-methods.md) - Default behavior through override methods
 - [Verification Guide](verification.md) - Assert on stub interactions

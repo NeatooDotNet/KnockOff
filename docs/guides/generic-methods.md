@@ -8,7 +8,7 @@ KnockOff solves this with the `.Of<T>()` accessor pattern, giving you type-speci
 
 **Critical concept**: Use `.Of<T>()` to access type-specific configuration and verification for generic methods. Base properties like `CalledTypeArguments` track calls across all type arguments.
 
-**OnCall and verification**: The `OnCall` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Times)` to verify call counts. Each type argument has independent OnCall configuration—configuring `.Of<User>().OnCall(...)` does not affect `.Of<Order>().OnCall(...)`.
+**OnCall and verification**: The `.Of<T>().OnCall()` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Times)` to verify call counts. Each type argument has independent configuration—configuring `.Of<User>().OnCall(...)` does not affect `.Of<Order>().OnCall(...)`. Note: Generic method typed handlers use `OnCall` (not `Returns`/`Execute`) — this is a separate API from the main method interceptor configuration.
 
 ---
 

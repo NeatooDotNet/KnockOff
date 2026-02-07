@@ -38,7 +38,7 @@ All 8 patterns use identical API:
 ```cs
 // Configure behavior
 stub.GetData.Returns("test-value");
-stub.GetData.OnCall((id) => $"Data-{id}");
+stub.GetData.Returns((id) => $"Data-{id}");
 
 // Verify calls
 stub.GetData.Verify(Times.Never);
@@ -48,7 +48,7 @@ stub.GetData.Verify(Times.Never);
 | Feature | All 8 Patterns |
 |---------|:--------------:|
 | `Returns(value)` | ✓ |
-| `OnCall((args) => result)` | ✓ |
+| `Returns((args) => result)` / `Execute((args) => { })` | ✓ |
 | `Verify(Times.X)` | ✓ |
 | `LastArg` / `LastArgs` | ✓ |
 
@@ -157,9 +157,9 @@ All 8 patterns use identical API:
 ```cs
 // Return different values on successive calls
 stub.GetStatus
-    .OnCall(() => "Pending")
-    .ThenCall(() => "Processing")
-    .ThenCall(() => "Complete");
+    .Returns(() => "Pending")
+    .ThenReturns(() => "Processing")
+    .ThenReturns(() => "Complete");
 // Call 1: "Pending", Call 2: "Processing", Call 3+: "Complete" (repeats last)
 
 // Properties support sequences too
@@ -171,7 +171,7 @@ configStub.Name
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
-| `OnCall().ThenCall()` | ✓ |
+| `Returns(callback).ThenReturns(callback)` / `Execute(callback).ThenExecute(callback)` | ✓ |
 | Repeats last value | ✓ |
 | Property sequences (`OnGet().ThenGet()`) | ✓ |
 
@@ -201,7 +201,7 @@ stub.Add.Returns(42);
 | `ThenWhen()` chaining | ✓ |
 | Fallback behavior | ✓ |
 
-**Priority:** When chains > Sequences > OnCall/Returns > User Methods > Source > Smart default
+**Priority:** When chains > Sequences > Returns/Execute > User Methods > Source > Smart default
 
 ---
 
@@ -212,7 +212,7 @@ All 8 patterns use identical API:
 <!-- snippet: matrix-verification -->
 ```cs
 // Mark for verification
-stub.GetData.OnCall((id) => "data").Verifiable();
+stub.GetData.Returns((id) => "data").Verifiable();
 
 // Verify only marked items
 // stub.Verify();  // Throws if any Verifiable() not called
@@ -274,7 +274,7 @@ stub.Save.Reset();
 <!-- endSnippet -->
 
 Reset clears:
-- OnCall/Returns configuration
+- Returns/Execute configuration
 - When matchers
 - Call history (LastArg, LastArgs)
 - Sequence position
@@ -310,7 +310,7 @@ public partial class MatrixUserMethodStub
 ```
 <!-- endSnippet -->
 
-### Usage and OnCall override
+### Usage and Returns override
 
 <!-- snippet: matrix-user-methods-interface-usage -->
 ```cs
@@ -322,7 +322,7 @@ var result = calc.Add(3, 4);
 Assert.Equal(7, result);
 
 // OnCall supersedes user method
-stub.Add.OnCall((a, b) => 999);
+stub.Add.Returns((a, b) => 999);
 var overridden = calc.Add(3, 4);
 Assert.Equal(999, overridden);
 ```
@@ -337,9 +337,9 @@ Class stubs use the same `protected override MethodName_(...)` convention. Key d
 
 ### Priority chain
 
-User methods sit between OnCall and Source in the priority chain:
+User methods sit between Returns/Execute and Source in the priority chain:
 
-`When chains > Sequences > OnCall/Returns > User Method > Source > Smart default`
+`When chains > Sequences > Returns/Execute > User Method > Source > Smart default`
 
 **Inline patterns** are fully generated and cannot be extended. See the [User Methods Guide](user-methods.md) for detailed examples.
 
@@ -357,19 +357,19 @@ For async methods (`Task<T>`, `ValueTask<T>`), KnockOff provides three configura
 stub.GetDataAsync.Returns("hello");
 
 // Tier 2: OnCall(simplified callback) - returns T, auto-wrapped
-stub.GetDataAsync.OnCall((id) => $"Data-{id}");
+stub.GetDataAsync.Returns((id) => $"Data-{id}");
 
 // Tier 3: OnCall(full delegate) - returns Task<T> directly
-stub.GetDataAsync.OnCall((int id) => Task.FromResult($"Full-{id}"));
+stub.GetDataAsync.Returns((int id) => Task.FromResult($"Full-{id}"));
 ```
 <!-- endSnippet -->
 
 | Feature | All 8 Patterns |
 |---------|:--------------:|
 | `Returns(unwrappedValue)` auto-wrap | ✓ |
-| `OnCall(Func<..., T>)` simplified callback | ✓ |
-| `OnCall(Func<..., Task<T>>)` full delegate | ✓ |
-| Void async `OnCall(Action<...>)` | ✓ |
+| `Returns(Func<..., T>)` simplified callback | ✓ |
+| `Returns(Func<..., Task<T>>)` full delegate | ✓ |
+| Void async `Execute(Action<...>)` | ✓ |
 | `ValueTask<T>` auto-wrap | ✓ |
 
 **See also:** [Async Patterns Guide](async-patterns.md) for detailed examples including delays and failure simulation.
@@ -416,7 +416,7 @@ var calcStub = new MatrixCalcStub();
 IMatrixCalculator calc = calcStub;
 
 // Configure and use - same API across all patterns
-calcStub.Add.OnCall((a, b) => a + b);
+calcStub.Add.Returns((a, b) => a + b);
 var result = calc.Add(3, 4);
 Assert.Equal(7, result);
 

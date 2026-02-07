@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 // This file demonstrates the fundamental method stubbing APIs:
 // - Returns(value) for constant return values
-// - OnCall(callback) for dynamic returns based on arguments
+// - Returns(callback) for dynamic returns based on arguments
 // - Async method handling with auto-wrapping
 // - Void method handling
 // - Argument capture (LastArg, LastArgs)
@@ -37,7 +37,7 @@ public partial class BasicMethodsDemo
     //       public AddInterceptor Returns(int value)
     //       {
     //           _returnValue = value;
-    //           _callback = null;  // Clears any OnCall callback
+    //           _callback = null;  // Clears any Returns callback
     //           return this;
     //       }
     //   }
@@ -58,9 +58,9 @@ public partial class BasicMethodsDemo
     }
 
     // =========================================================================
-    // OnCall(callback) - Dynamic Return Based on Arguments
+    // Returns(callback) - Dynamic Return Based on Arguments
     // =========================================================================
-    // DESIGN DECISION: OnCall(callback) receives typed arguments directly.
+    // DESIGN DECISION: Returns(callback) receives typed arguments directly.
     // The callback signature matches the method parameters: (a, b) => result
     //
     // This differs from NSubstitute's callInfo.Arg<T>() pattern which requires
@@ -69,29 +69,29 @@ public partial class BasicMethodsDemo
     // DID NOT DO THIS: Use untyped argument access
     //
     // REJECTED PATTERN (NSubstitute-style):
-    //   stub.Add.OnCall(callInfo => callInfo.Arg<int>(0) + callInfo.Arg<int>(1));
+    //   stub.Add.Returns(callInfo => callInfo.Arg<int>(0) + callInfo.Arg<int>(1));
     //
     // WHY NOT: Source generators can provide typed access at compile time.
     // Typed callbacks are safer and provide IntelliSense support.
     // =========================================================================
 
-    public void OnCall_ReceivesTypedArguments()
+    public void Returns_ReceivesTypedArguments()
     {
         var stub = new Stubs.ICalculator();
 
         // Callback receives actual method arguments with correct types
-        stub.Add.OnCall((a, b) => a + b);
+        stub.Add.Returns((a, b) => a + b);
 
         ICalculator calc = stub;
         var result = calc.Add(3, 5); // Returns 8 (3 + 5)
     }
 
-    public void OnCall_CanThrowExceptions()
+    public void Returns_CanThrowExceptions()
     {
         var stub = new Stubs.ICalculator();
 
         // Callbacks can throw exceptions for error testing
-        stub.Divide.OnCall((a, b) =>
+        stub.Divide.Returns((a, b) =>
         {
             if (b == 0)
                 throw new DivideByZeroException();
@@ -103,29 +103,29 @@ public partial class BasicMethodsDemo
     }
 
     // =========================================================================
-    // COMMON MISTAKE: Returns() and OnCall() are Mutually Exclusive
+    // COMMON MISTAKE: Returns(value) and Returns(callback) are Mutually Exclusive
     // =========================================================================
     //
-    // COMMON MISTAKE: Expecting Returns() and OnCall() to combine
+    // COMMON MISTAKE: Expecting Returns(value) and Returns(callback) to combine
     //
     // WRONG:
-    //   stub.Add.OnCall((a, b) => a + b);
-    //   stub.Add.Returns(42);  // This REPLACES OnCall, does not combine
+    //   stub.Add.Returns((a, b) => a + b);
+    //   stub.Add.Returns(42);  // This REPLACES the callback, does not combine
     //
-    // Calling Returns() after OnCall() (or vice versa) replaces the previous
-    // configuration. The last call wins.
+    // Calling Returns(value) after Returns(callback) (or vice versa) replaces
+    // the previous configuration. The last call wins.
     //
     // DESIGN DECISION: This mutual exclusivity is intentional:
-    // - Returns() is for "I don't care about arguments, always return X"
-    // - OnCall() is for "I need to compute return based on arguments"
+    // - Returns(value) is for "I don't care about arguments, always return X"
+    // - Returns(callback) is for "I need to compute return based on arguments"
     // These are fundamentally different use cases.
     // =========================================================================
 
-    public void Returns_And_OnCall_AreExclusive()
+    public void Returns_ValueAndCallback_AreExclusive()
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.OnCall((a, b) => a + b);  // Set callback
+        stub.Add.Returns((a, b) => a + b);  // Set callback
         stub.Add.Returns(42);               // REPLACES callback with constant
 
         ICalculator calc = stub;
@@ -136,7 +136,7 @@ public partial class BasicMethodsDemo
     // Void Methods
     // =========================================================================
     // DESIGN DECISION: Void methods have simpler interceptor APIs:
-    // - OnCall(callback) for side effects
+    // - Execute(callback) for side effects
     // - Verify() for call count verification
     // - No Returns() since there's nothing to return
     //
@@ -144,19 +144,19 @@ public partial class BasicMethodsDemo
     //
     //   public class ResetInterceptor : VoidMethodInterceptor<Unit>
     //   {
-    //       public void OnCall(Action callback) { ... }
+    //       public void Execute(Action callback) { ... }
     //       public void Verify() { ... }
     //       public void Verify(Times times) { ... }
     //   }
     // =========================================================================
 
-    public void VoidMethods_OnCallForSideEffects()
+    public void VoidMethods_ExecuteForSideEffects()
     {
         var stub = new Stubs.ICalculator();
         var resetCount = 0;
 
-        // Void OnCall uses Action, not Func
-        stub.Reset.OnCall(() => resetCount++);
+        // Void Execute uses Action, not Func
+        stub.Reset.Execute(() => resetCount++);
 
         ICalculator calc = stub;
         calc.Reset();
@@ -205,8 +205,8 @@ public partial class BasicMethodsDemo
         var args = stub.Add.LastArgs;
         // args == (10, 20)
 
-        // For OnCall() return values, you get LastArgs via the builder interface:
-        var builder = stub.Subtract.OnCall((a, b) => a - b);
+        // For Returns() return values, you get LastArgs via the builder interface:
+        var builder = stub.Subtract.Returns((a, b) => a - b);
         calc.Subtract(100, 25);
         var subtractArgs = builder.LastArgs;
         // subtractArgs == (100, 25)
@@ -253,12 +253,12 @@ public partial class BasicMethodsDemo
         // result == "test data"
     }
 
-    public async Task AsyncMethods_OnCall_ReturnsTaskDirectly()
+    public async Task AsyncMethods_Returns_CallbackAutoWraps()
     {
         var stub = new Stubs.IDataService();
 
-        // OnCall for async methods: callback returns T, not Task<T>
-        stub.GetDataAsync.OnCall((id) => $"Data for ID {id}");
+        // Returns callback for async methods: callback returns T, not Task<T>
+        stub.GetDataAsync.Returns((id) => $"Data for ID {id}");
 
         IDataService service = stub;
         var result = await service.GetDataAsync(42);
@@ -269,23 +269,23 @@ public partial class BasicMethodsDemo
     // Void Async Methods (Task return)
     // =========================================================================
     // DESIGN DECISION: For async void methods (Task return, no value),
-    // OnCall receives the arguments and Returns() is not available.
+    // Execute receives the arguments and Returns() is not available.
     //
     // GENERATOR BEHAVIOR: Task-returning void methods generate:
     //
     //   public class SaveDataAsyncInterceptor : VoidMethodInterceptor<string>
     //   {
-    //       public void OnCall(Action<string> callback) { ... }
+    //       public void Execute(Action<string> callback) { ... }
     //       // Returns Task.CompletedTask when not configured
     //   }
     // =========================================================================
 
-    public async Task VoidAsyncMethods_OnCall()
+    public async Task VoidAsyncMethods_Execute()
     {
         var stub = new Stubs.IDataService();
         string? savedData = null;
 
-        stub.SaveDataAsync.OnCall((data) => savedData = data);
+        stub.SaveDataAsync.Execute((data) => savedData = data);
 
         IDataService service = stub;
         await service.SaveDataAsync("important data");
@@ -298,7 +298,7 @@ public partial class BasicMethodsDemo
     // DESIGN DECISION: Reset() clears tracking state without changing configuration.
     // - LastArg/LastArgs reset to default
     // - Call count resets to 0
-    // - Returns/OnCall configuration is PRESERVED
+    // - Returns/Execute configuration is PRESERVED
     //
     // DID NOT DO THIS: Reset() clears configuration too
     //

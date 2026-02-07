@@ -33,12 +33,12 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 |-------------|---------------------|
 | `new Mock<IFoo>()` | `new FooStub()` with `[KnockOff] partial class FooStub : IFoo` |
 | `mock.Object` | `stub` (direct instance) |
-| `.Setup(x => x.Method()).Returns(value)` | `stub.Method.OnCall((args) => value)` |
+| `.Setup(x => x.Method()).Returns(value)` | `stub.Method.Returns((args) => value)` |
 | `.Setup(x => x.Property).Returns(value)` | `stub.Property.OnGet(value)` |
 | `.ReturnsAsync(value)` | `stub.Method.Returns(value)` (auto-wraps) or `OnCall((args) => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `OnCall` delegate |
-| `.Verify(x => x.Method(), Times.Once)` | `var t = stub.Method.OnCall(...); t.Verify(Times.Once)` |
-| `.Verifiable()` | `stub.Method.OnCall(...).Verifiable()` |
+| `.Verify(x => x.Method(), Times.Once)` | `var t = stub.Method.Returns(...); t.Verify(Times.Once)` |
+| `.Verifiable()` | `stub.Method.Returns(...).Verifiable()` |
 | `mock.Verify()` | `stub.Verify()` (checks all `.Verifiable()` calls) |
 | `It.IsAny<T>()` | Callback receives all arguments for inspection |
 
@@ -110,7 +110,7 @@ This guide uses the standalone pattern (`[KnockOff]` with explicit interface imp
 
 ## Step 3: Configure Methods
 
-Replace `.Setup().Returns()` with `OnCall` property assignments.
+Replace `.Setup().Returns()` with `Returns`/`Execute` property assignments.
 
 **Moq:**
 
@@ -126,7 +126,7 @@ mock.Setup(x => x.GetUser(It.IsAny<int>())).Returns(testUser);
 <!-- snippet: moq-migration-setup-method-knockoff -->
 ```cs
 // OnCall with typed delegate - arguments available directly
-stub.GetUser.OnCall((id) => testUser);
+stub.GetUser.Returns((id) => testUser);
 ```
 <!-- endSnippet -->
 
@@ -184,7 +184,7 @@ mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Once());
 <!-- snippet: moq-migration-verify-knockoff -->
 ```cs
 // Mark as verifiable during setup, then verify all at once
-stub.SaveUser.OnCall((user) => { }).Verifiable();
+stub.SaveUser.Execute((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -198,7 +198,7 @@ stub.SaveUser.OnCall((user) => { }).Verifiable();
 
 ## Step 6: Async Methods
 
-Replace `.ReturnsAsync()` with `Returns()` (auto-wrapped) or `OnCall()`.
+Replace `.ReturnsAsync()` with `Returns()` (auto-wrapped).
 
 **Moq:**
 
@@ -214,7 +214,7 @@ mock.Setup(x => x.GetUserAsync(It.IsAny<int>())).ReturnsAsync(testUser);
 <!-- snippet: moq-migration-async-knockoff -->
 ```cs
 // Use Task.FromResult to wrap the return value
-stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
@@ -225,11 +225,11 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 // 1. Returns() -- auto-wraps in Task.FromResult (recommended for fixed values)
 stub.GetUserAsync.Returns(testUser);
 
-// 2. OnCall() simplified -- callback returns unwrapped type, auto-wrapped
-stub.GetUserAsync.OnCall((id) => new User { Id = id });
+// 2. Returns() simplified -- callback returns unwrapped type, auto-wrapped
+stub.GetUserAsync.Returns((id) => new User { Id = id });
 
 // 3. OnCall() full -- callback returns Task<T> directly
-stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
+stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(testUser));
 ```
 <!-- endSnippet -->
 
@@ -244,7 +244,7 @@ stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(testUser));
 
 ## Step 7: Callbacks
 
-Replace `.Callback()` with logic directly in `OnCall` delegates.
+Replace `.Callback()` with logic directly in `Returns`/`Execute` delegates.
 
 **Moq:**
 
@@ -261,7 +261,7 @@ mock.Setup(x => x.SaveUser(It.IsAny<User>()))
 <!-- snippet: moq-migration-callback-knockoff -->
 ```cs
 // Logic goes directly in OnCall delegate
-stub.SaveUser.OnCall((user) => savedUsers.Add(user));
+stub.SaveUser.Execute((user) => savedUsers.Add(user));
 ```
 <!-- endSnippet -->
 
@@ -291,7 +291,7 @@ mock.Setup(x => x.GetUser(It.Is<int>(id => id > 0)))
 <!-- snippet: moq-migration-arguments-knockoff -->
 ```cs
 // Arguments available directly - use standard C# conditionals
-stub.GetUser.OnCall((id) =>
+stub.GetUser.Returns((id) =>
     id > 0 ? new User { Id = id, Name = "Valid User" } : null);
 ```
 <!-- endSnippet -->
@@ -326,7 +326,7 @@ _mockRepo.Verify(x => x.GetUserAsync(1), Moq.Times.Once());
 <!-- snippet: moq-migration-complete-knockoff -->
 ```cs
 // OnCall with Verifiable marks for batch verification
-_stub.GetUserAsync.OnCall((id) => Task.FromResult<User?>(user)).Verifiable();
+_stub.GetUserAsync.Returns((id) => Task.FromResult<User?>(user)).Verifiable();
 
 var result = await _service.GetUserAsync(1);
 
@@ -371,7 +371,7 @@ partial class MoqUserRepoStubCorrect { }
 ```
 <!-- endSnippet -->
 
-### Wrong `OnCall` Signature
+### Wrong `Returns`/`Execute` Signature
 
 **Problem:** Callback signature doesn't match the method parameters.
 
@@ -385,7 +385,7 @@ partial class MoqUserRepoStubCorrect { }
 <!-- snippet: moq-migration-gotcha-signature-correct -->
 ```cs
 // Correct
-stub.GetUser.OnCall((id) => user);
+stub.GetUser.Returns((id) => user);
 ```
 <!-- endSnippet -->
 
@@ -416,7 +416,7 @@ var knockoffService = new UserServiceMigration(stub);
 ## Next Steps
 
 - **[Getting Started Guide](../getting-started.md)** - Learn KnockOff patterns from scratch
-- **[Interceptor API Reference](../reference/interceptor-api.md)** - Deep dive into `OnCall`, `OnGet`, `OnSet`
+- **[Interceptor API Reference](../reference/interceptor-api.md)** - Deep dive into `Returns`, `Execute`, `OnGet`, `OnSet`
 - **[Verification Guide](../guides/verification.md)** - Advanced call tracking and verification patterns
 - **[Methods Guide](../guides/methods.md)** - Configure method behavior and callbacks
 - **[Properties Guide](../guides/properties.md)** - Work with property interceptors

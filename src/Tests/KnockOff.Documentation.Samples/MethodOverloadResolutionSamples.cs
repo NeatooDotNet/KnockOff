@@ -87,8 +87,8 @@ public class KnockOffOverloadResolutionTests
 
         #region readme-knockoff-any-value
         // Explicit parameter types resolve the overload - standard C# syntax
-        stub.Format.OnCall((string input, bool uppercase) => "bool overload");
-        stub.Format.OnCall((string input, int maxLength) => "int overload");
+        stub.Format.Returns((string input, bool uppercase) => "bool overload");
+        stub.Format.Returns((string input, int maxLength) => "int overload");
         #endregion
 
         IFormatter formatter = stub;
@@ -121,7 +121,7 @@ public class KnockOffOverloadResolutionTests
 
         #region readme-knockoff-argument-access
         // Arguments are directly available with names and types:
-        stub.Format.OnCall((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+        stub.Format.Returns((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
         #endregion
 
         IFormatter formatter = stub;
@@ -143,11 +143,11 @@ public class MethodOverloadResolutionTests
         var stub = new FormatterStub();
 
         // Configure bool overload - use argument values directly
-        stub.Format.OnCall((string input, bool uppercase) =>
+        stub.Format.Returns((string input, bool uppercase) =>
             uppercase ? input.ToUpper() : input.ToLower());
 
         // Configure int overload - truncate to maxLength
-        stub.Format.OnCall((string input, int maxLength) =>
+        stub.Format.Returns((string input, int maxLength) =>
             input.Length <= maxLength ? input : input[..maxLength] + "...");
 
         IFormatter formatter = stub;
@@ -167,8 +167,8 @@ public class MethodOverloadResolutionTests
         var stub = new FormatterStub();
 
         // Configure both overloads with verification
-        stub.Format.OnCall((string input, bool uppercase) => input).Verifiable();
-        stub.Format.OnCall((string input, int maxLength) => input).Verifiable();
+        stub.Format.Returns((string input, bool uppercase) => input).Verifiable();
+        stub.Format.Returns((string input, int maxLength) => input).Verifiable();
 
         IFormatter formatter = stub;
 
@@ -187,12 +187,12 @@ public class MethodOverloadResolutionTests
         // When for specific values on bool overload
         stub.Format.When("special", true).Returns("SPECIAL CASE");
 
-        // OnCall as fallback for bool overload
-        stub.Format.OnCall((string input, bool uppercase) =>
+        // Returns as fallback for bool overload
+        stub.Format.Returns((string input, bool uppercase) =>
             uppercase ? input.ToUpper() : input);
 
-        // OnCall for int overload
-        stub.Format.OnCall((string input, int maxLength) =>
+        // Returns for int overload
+        stub.Format.Returns((string input, int maxLength) =>
             input[..Math.Min(input.Length, maxLength)]);
 
         IFormatter formatter = stub;

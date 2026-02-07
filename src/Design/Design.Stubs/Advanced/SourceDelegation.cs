@@ -89,16 +89,16 @@ public partial class SourceDelegationDemo
     }
 
     // =========================================================================
-    // Source Priority vs OnCall Configuration
+    // Source Priority vs Returns/Execute Configuration
     // =========================================================================
-    // DESIGN DECISION: OnCall/Returns configuration always takes priority over
+    // DESIGN DECISION: Returns/Execute configuration always takes priority over
     // Source delegation. The source is only used when:
-    // 1. The method is NOT configured (no OnCall/Returns)
+    // 1. The method is NOT configured (no Returns/Execute)
     // 2. A When chain doesn't match (falls through to source)
     //
     // Order of evaluation:
     // 1. When chain (if configured)
-    // 2. OnCall/Returns configuration
+    // 2. Returns/Execute configuration
     // 3. Source delegation
     // 4. Default value (if not strict)
     // =========================================================================
@@ -326,8 +326,8 @@ public partial class SourceHierarchyDemo
 
         // Explicitly configure write operations
         var saved = new Dictionary<int, string>();
-        stub.Save.OnCall((id, value) => saved[id] = value);
-        stub.Delete.OnCall((id) => saved.Remove(id));
+        stub.Save.Execute((id, value) => saved[id] = value);
+        stub.Delete.Execute((id) => saved.Remove(id));
 
         IStore store = stub;
 

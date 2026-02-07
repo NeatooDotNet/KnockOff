@@ -55,7 +55,7 @@ public class BasicCallVerificationTests
 
         #region verify-verifiable
         // Mark for batch verification, then verify all marked members
-        stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
+        stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
 
         IRepoVerify repository = stub;
         repository.GetById(42);
@@ -68,7 +68,7 @@ public class BasicCallVerificationTests
     public void Verify_WithTimesOnce()
     {
         var stub = new RepoVerifyStub();
-        var tracking = stub.Save.OnCall((user) => { });
+        var tracking = stub.Save.Execute((user) => { });
 
         IRepoVerify repository = stub;
         repository.Save(new User { Id = 1 });
@@ -83,7 +83,7 @@ public class BasicCallVerificationTests
     public void Verify_WithTimesAtLeast()
     {
         var stub = new RepoVerifyStub();
-        var tracking = stub.Refresh.OnCall(() => { });
+        var tracking = stub.Refresh.Execute(() => { });
 
         IRepoVerify repository = stub;
         repository.Refresh();
@@ -100,7 +100,7 @@ public class BasicCallVerificationTests
     public void Verify_WithTimesNever()
     {
         var stub = new RepoVerifyStub();
-        var tracking = stub.Refresh.OnCall(() => { });
+        var tracking = stub.Refresh.Execute(() => { });
 
         IRepoVerify repository = stub;
         // Don't call Refresh
@@ -115,7 +115,7 @@ public class BasicCallVerificationTests
     public void Verify_WithTimesExactly()
     {
         var stub = new RepoVerifyStub();
-        var tracking = stub.Refresh.OnCall(() => { });
+        var tracking = stub.Refresh.Execute(() => { });
 
         IRepoVerify repository = stub;
         repository.Refresh();
@@ -133,7 +133,7 @@ public class BasicCallVerificationTests
 
         #region verify-verifiable-times
         // Mark with Times constraint for batch verification
-        stub.Refresh.OnCall(() => { }).Verifiable(Times.Exactly(2));
+        stub.Refresh.Execute(() => { }).Verifiable(Times.Exactly(2));
         #endregion
 
         IRepoVerify repository = stub;
@@ -147,8 +147,8 @@ public class BasicCallVerificationTests
     public void VerifyAll_ChecksAllConfiguredMembers()
     {
         var stub = new RepoVerifyStub();
-        stub.GetById.OnCall((id) => new User { Id = id });
-        stub.Save.OnCall((user) => { });
+        stub.GetById.Returns((id) => new User { Id = id });
+        stub.Save.Execute((user) => { });
 
         IRepoVerify repository = stub;
         repository.GetById(1);
@@ -171,7 +171,7 @@ public class ArgumentVerificationTests
     public void LastArg_VerifiesSingleParameter()
     {
         var stub = new RepoVerifyStub();
-        var tracking = stub.GetById.OnCall((id) => new User { Id = id });
+        var tracking = stub.GetById.Returns((id) => new User { Id = id });
 
         IRepoVerify repository = stub;
         repository.GetById(42);
@@ -186,7 +186,7 @@ public class ArgumentVerificationTests
     public void LastArgs_VerifiesMultipleParameters()
     {
         var stub = new SvcVerifyStub();
-        var tracking = stub.Update.OnCall((id, name) => { });
+        var tracking = stub.Update.Execute((id, name) => { });
 
         ISvcVerify service = stub;
         service.Update(42, "Alice");
@@ -214,7 +214,7 @@ public class CallCountTests
         #region verify-callcount-tracking
         // Track call count in the callback for custom assertions
         var saveCount = 0;
-        stub.Save.OnCall((user) => { saveCount++; });
+        stub.Save.Execute((user) => { saveCount++; });
         #endregion
 
         IRepoVerify repository = stub;
@@ -239,7 +239,7 @@ public class CallHistoryTests
         #region verify-call-history
         // Capture all calls to a list for history inspection
         var calls = new List<int>();
-        stub.GetById.OnCall((id) =>
+        stub.GetById.Returns((id) =>
         {
             calls.Add(id);
             return new User { Id = id };
@@ -272,8 +272,8 @@ public class CallOrderTests
         var saveOrder = 0;
         var refreshOrder = 0;
 
-        stub.Save.OnCall((user) => saveOrder = ++order);
-        stub.Refresh.OnCall(() => refreshOrder = ++order);
+        stub.Save.Execute((user) => saveOrder = ++order);
+        stub.Refresh.Execute(() => refreshOrder = ++order);
         #endregion
 
         IRepoVerify repository = stub;
@@ -297,9 +297,9 @@ public class CrossInterceptorTests
 
         #region verify-cross-interceptor
         // Mark multiple methods as verifiable
-        stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
-        stub.Save.OnCall((user) => { }).Verifiable();
-        stub.Refresh.OnCall(() => { }).Verifiable();
+        stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
+        stub.Save.Execute((user) => { }).Verifiable();
+        stub.Refresh.Execute(() => { }).Verifiable();
         #endregion
 
         IRepoVerify repository = stub;
@@ -389,15 +389,15 @@ public class CompleteVerificationTests
         var getIdHistory = new List<int>();
 
         // Configure with tracking and verification
-        var getTracking = stub.GetById.OnCall((id) =>
+        var getTracking = stub.GetById.Returns((id) =>
         {
             getIdHistory.Add(id);
             getOrder = ++order;
             return new User { Id = id, Name = $"User{id}" };
         }).Verifiable(Times.Exactly(2));
 
-        stub.Save.OnCall((user) => { saveOrder = ++order; }).Verifiable(Times.Once);
-        stub.Refresh.OnCall(() => { refreshOrder = ++order; }).Verifiable(Times.Once);
+        stub.Save.Execute((user) => { saveOrder = ++order; }).Verifiable(Times.Once);
+        stub.Refresh.Execute(() => { refreshOrder = ++order; }).Verifiable(Times.Once);
 
         IRepoVerify repository = stub;
         repository.GetById(1);
@@ -433,7 +433,7 @@ public partial class DelegateVerificationHost
         #region verify-delegate-basic
         // Create delegate stub and configure with Verifiable()
         var stub = new DelegateVerificationHost.Stubs.VerifyArithmeticOp();
-        stub.Interceptor.OnCall((a, b) => a + b).Verifiable();
+        stub.Interceptor.Returns((a, b) => a + b).Verifiable();
 
         VerifyArithmeticOp op = stub;
         op(2, 3);

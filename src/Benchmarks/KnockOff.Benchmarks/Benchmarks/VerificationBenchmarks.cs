@@ -36,7 +36,7 @@ public class VerificationBenchmarks
         _moqSimple.Object.DoWork();
 
         _knockOffSimple = new SimpleServiceStub();
-        _knockOffSimpleTracking = _knockOffSimple.DoWork.OnCall(() => { });
+        _knockOffSimpleTracking = _knockOffSimple.DoWork.Execute(() => { });
         ((ISimpleService)_knockOffSimple).DoWork();
         ((ISimpleService)_knockOffSimple).DoWork();
         ((ISimpleService)_knockOffSimple).DoWork();
@@ -54,7 +54,7 @@ public class VerificationBenchmarks
         _ = _moqCalculator.Object.Add(3, 4);
 
         _knockOffCalculator = new CalculatorStub();
-        _knockOffCalculatorTracking = _knockOffCalculator.Add.OnCall((a, b) => 0);
+        _knockOffCalculatorTracking = _knockOffCalculator.Add.Returns((a, b) => 0);
         _ = ((ICalculator)_knockOffCalculator).Add(1, 2);
         _ = ((ICalculator)_knockOffCalculator).Add(3, 4);
 

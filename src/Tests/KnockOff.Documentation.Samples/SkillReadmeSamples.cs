@@ -35,7 +35,7 @@ public class SkillReadmeUserMethodsTests
         var stub = new RepoStub();
 
         // User override is fallback; OnCall supersedes it
-        stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
+        stub.GetById.Returns(id => new User { Id = id, Name = "Override" });
 
         // Returns for constant values (auto-wraps for async)
         stub.GetById.Returns(new User { Id = 99 });
@@ -92,7 +92,7 @@ public class SkillReadmeMethodConfigTests
         stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
 
         // Dynamic callback
-        stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Returns((id) => new User { Id = id, Name = $"User{id}" });
 
         // Argument matching
         stub.GetUser.When(42).Returns(adminUser);
@@ -103,7 +103,7 @@ public class SkillReadmeMethodConfigTests
         // Returns: 1, 2, 3, 3, 3... (repeats last value)
 
         // Mix callbacks with value sequences
-        stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
+        stub.Add.Returns((a, b) => a + b).ThenReturns(100, 200);
         // First call: computed. Then: 100, 200, 200, 200...
 
         // Use ThenDefault() to return default(T) instead of repeating
@@ -139,7 +139,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetUser.Returns((id) => new User { Id = id, Name = $"User{id}" });
 
         IMethodConfigService svc = stub;
         var user = svc.GetUser(42);
@@ -188,7 +188,7 @@ public class SkillReadmeMethodConfigTests
     {
         var stub = new MethodConfigStub();
 
-        stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
+        stub.Add.Returns((a, b) => a + b).ThenReturns(100, 200);
 
         IMethodConfigService svc = stub;
 
@@ -236,13 +236,13 @@ public class SkillReadmeVerificationTests
 
         #region skill-readme-verification
         // Mark for batch verification
-        stub.Save.OnCall((user) => { }).Verifiable();
+        stub.Save.Execute((user) => { }).Verifiable();
         svc.Save(new User { Id = 1 }); // Call the method
         stub.Verify();  // Checks all Verifiable() members
 
         // Or verify individually
         stub.Save.Reset(); // Reset for second pattern demo
-        var tracking = stub.Save.OnCall((user) => { });
+        var tracking = stub.Save.Execute((user) => { });
         svc.Save(new User { Id = 2 }); // Call the method
         tracking.Verify(Times.Once);
         #endregion
@@ -253,7 +253,7 @@ public class SkillReadmeVerificationTests
     {
         var stub = new SaverStub();
 
-        stub.Save.OnCall((user) => { }).Verifiable();
+        stub.Save.Execute((user) => { }).Verifiable();
 
         ISaver svc = stub;
         svc.Save(new User { Id = 1 });
@@ -266,7 +266,7 @@ public class SkillReadmeVerificationTests
     {
         var stub = new SaverStub();
 
-        var tracking = stub.Save.OnCall((user) => { });
+        var tracking = stub.Save.Execute((user) => { });
 
         ISaver svc = stub;
         svc.Save(new User { Id = 1 });

@@ -21,8 +21,8 @@
 // "string", "int").
 //
 // EXPECTED BEHAVIOR:
-// - SaveOrder_ should be called when no OnCall is configured
-// - FormatOrder_ should be called when no OnCall/Returns is configured
+// - SaveOrder_ should be called when no Execute is configured
+// - FormatOrder_ should be called when no Returns is configured
 // - LogMessage_ and GetStatus_ should work (primitive types -- control case)
 //
 // ACTUAL BEHAVIOR:
@@ -59,7 +59,7 @@ public partial class VoidUserMethodFallbackStub
     // =========================================================================
     // BUG CASE: Void method with custom-type parameter
     // =========================================================================
-    // EXPECTED: When no OnCall is configured, calling SaveOrder should
+    // EXPECTED: When no Execute is configured, calling SaveOrder should
     //           invoke this user method as fallback.
     // ACTUAL:   This method is never called because the generator does not
     //           recognize it as a user override (signature key mismatch).
@@ -73,7 +73,7 @@ public partial class VoidUserMethodFallbackStub
     // =========================================================================
     // BUG CASE: Non-void method with custom-type parameter
     // =========================================================================
-    // EXPECTED: When no OnCall/Returns is configured, calling FormatOrder
+    // EXPECTED: When no Returns is configured, calling FormatOrder
     //           should invoke this user method and return its result.
     // ACTUAL:   This method is never called; FormatOrder returns default (null).
     // =========================================================================

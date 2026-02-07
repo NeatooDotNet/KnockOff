@@ -1,7 +1,7 @@
 ---
 name: knockoff
-description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "OnCall", "Returns", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "assembly-wide strict", "[assembly: KnockOffStrict]", "ThenCall", "ThenGet", "ThenSet", ".Of<T>()", "generic method interceptor", "Source() delegation", "When()", "argument matching", or needs guidance on creating, configuring, or verifying KnockOff test stubs. IMPORTANT: When writing tests that need stubs, this skill MUST be consulted to check for existing stubs before creating new inline stubs - prefer standalone stubs when the same type is stubbed in multiple test classes.
-version: 2.1.0
+description: This skill should be used when the user asks about "KnockOff stubs", "create a stub", "mock with KnockOff", "[KnockOff] attribute", "[KnockOff<T>] attribute", "Returns", "Execute", "OnGet", "OnSet", "setup stub behavior", "Verify calls", "Verifiable", "VerifyAll", "track method calls", "stub patterns", "Stand-Alone pattern", "Inline Interface", "Inline Class", "Inline Delegate", "stub a delegate", "migrate from Moq", "KnockOff async", "interceptor API", "Strict mode", "Strict()", "assembly-wide strict", "[assembly: KnockOffStrict]", "ThenReturns", "ThenExecute", "ThenGet", "ThenSet", ".Of<T>()", "generic method interceptor", "Source() delegation", "When()", "argument matching", or needs guidance on creating, configuring, or verifying KnockOff test stubs. IMPORTANT: When writing tests that need stubs, this skill MUST be consulted to check for existing stubs before creating new inline stubs - prefer standalone stubs when the same type is stubbed in multiple test classes.
+version: 2.2.0
 ---
 
 # KnockOff Usage Guide
@@ -86,14 +86,14 @@ stub.Save.Verify(Times.AtMost(5));
 ```
 <!-- endSnippet -->
 
-### 7. Returns() vs OnCall() - Mutual Exclusivity
+### 7. Returns(value) vs Returns(callback) - Last One Wins
 
-`Returns()` and `OnCall()` are mutually exclusive. Last one wins:
+`Returns(value)` and `Returns(callback)` are mutually exclusive. Last one wins:
 
 <!-- snippet: skill-gotcha-returns-vs-oncall -->
 ```cs
 stub.GetValue.Returns("fixed");           // Sets constant value
-stub.GetValue.OnCall((id) => $"val-{id}"); // REPLACES Returns, now dynamic
+stub.GetValue.Returns((id) => $"val-{id}"); // REPLACES constant, now dynamic
 ```
 <!-- endSnippet -->
 
@@ -112,15 +112,15 @@ service.Name = "test";
 
 | Interceptor | Reset Clears | Reset Preserves |
 |-------------|--------------|-----------------|
-| Method | Counts, LastArg/LastArgs, sequence index, When chain position, source delegation | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
-| User Method | Counts, LastArg | **OnCall configuration**, verifiable flag |
+| Method | Counts, LastArg/LastArgs, sequence index, When chain position, source delegation | **Returns/Execute callbacks**, sequence structure, verifiable flag |
+| User Method | Counts, LastArg | **Returns/Execute configuration**, verifiable flag |
 | Property | Get/set counts, LastSetValue, sequence index, source delegation | **OnGet/OnSet callbacks**, verifiable flag |
 | User Property | Get/set counts, LastSetValue | **OnGet/OnSet configuration**, verifiable flag |
 | Indexer | Get/set counts, LastGetKey, LastSetEntry | **Backing dictionary**, OnGet/OnSet callbacks |
-| Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **OnCall/Returns callbacks**, sequence structure, verifiable flag |
+| Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **Returns/Execute callbacks**, sequence structure, verifiable flag |
 | Event | Tracking counts | **Active subscribers**, verifiable flag |
 
-**Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve OnCall/OnGet/OnSet configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
+**Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve Returns/Execute/OnGet/OnSet configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
 
 ---
 
@@ -179,8 +179,8 @@ Usage:
 public void StandaloneStub_ConfigureAndVerify()
 {
     var stub = new SkillUserRepoStub();
-    stub.GetById.OnCall((id) => new User { Id = id }).Verifiable();
-    stub.Save.OnCall((user) => { }).Verifiable();
+    stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
+    stub.Save.Execute((user) => { }).Verifiable();
     ISkillUserRepo repo = stub;
 
     var user = repo.GetById(42);
@@ -204,7 +204,7 @@ public partial class SkillEmailTests
     public void Test()
     {
         var stub = new Stubs.ISkillEmailService();
-        stub.Send.OnCall((to, subj) => true).Verifiable();
+        stub.Send.Returns((to, subj) => true).Verifiable();
         ISkillEmailService email = stub;
     }
 }
@@ -222,7 +222,7 @@ public partial class SkillDataTests
     public void Test()
     {
         var stub = new Stubs.SkillDataServiceBase();
-        stub.GetData.OnCall((id) => "test").Verifiable();
+        stub.GetData.Returns((id) => "test").Verifiable();
         SkillDataServiceBase service = stub.Object;  // Use .Object!
     }
 }
@@ -240,7 +240,7 @@ public partial class SkillValidationTests
     public void Test()
     {
         var stub = new Stubs.SkillValidationRule();
-        stub.Interceptor.OnCall((val) => val != "invalid");
+        stub.Interceptor.Returns((val) => val != "invalid");
         SkillValidationRule rule = stub;  // Implicit conversion
     }
 }
@@ -259,19 +259,19 @@ stub.GetUser.Returns(new User { Id = 1, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
-### OnCall() - Dynamic Callbacks
+### Returns(callback) / Execute(callback) - Dynamic Callbacks
 
 <!-- snippet: skill-method-oncall -->
 ```cs
 // With arguments
-stub.GetUser.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+stub.GetUser.Returns((id) => new User { Id = id, Name = $"User{id}" });
 
 // Void methods
-stub.Save.OnCall((user) => { /* side effects */ });
+stub.Save.Execute((user) => { /* side effects */ });
 
 // Async methods - auto-wrapped, no Task.FromResult needed
-stub.GetUserAsync.OnCall((id) => new User { Id = id });  // Returns Task<User>
-stub.SaveAsync.OnCall((user) => { });  // Returns Task.CompletedTask
+stub.GetUserAsync.Returns((id) => new User { Id = id });  // Returns Task<User>
+stub.SaveAsync.Execute((user) => { });  // Returns Task.CompletedTask
 ```
 <!-- endSnippet -->
 
@@ -284,7 +284,7 @@ stub.GetNext.Returns(1, 2, 3);
 // After third call, repeats 3 (NSubstitute-like behavior)
 
 // Mix callbacks with value sequences
-stub.Add.OnCall((a, b) => a + b).ThenReturns(100, 200);
+stub.Add.Returns((a, b) => a + b).ThenReturns(100, 200);
 // First: computed, then 100, 200, 200...
 
 // Use ThenDefault() to return default(T) instead of repeating:
@@ -309,8 +309,8 @@ stub.GetUser
     .ThenWhen(id => id > 100).Returns(premiumUser)
     .ThenWhen(id => id > 0).Returns(regularUser);
 
-// Void methods use Call instead of Returns
-stub.Log.When("error").Call((msg) => { /* handle */ });
+// Void methods use Execute instead of Returns
+stub.Log.When("error").Execute((msg) => { /* handle */ });
 ```
 <!-- endSnippet -->
 
@@ -393,9 +393,9 @@ Delegates use `stub.Interceptor` instead of named member properties. All method 
 ```cs
 var stub = new Stubs.SkillArithmeticOp();
 
-// Returns / OnCall
+// Returns (value or callback)
 stub.Interceptor.Returns(42);
-stub.Interceptor.OnCall((a, b) => a + b);
+stub.Interceptor.Returns((a, b) => a + b);
 
 // Sequences
 stub.Interceptor.Returns(10, 20, 30);
@@ -406,11 +406,11 @@ stub.Interceptor.When(1, 2).Returns(100)
 
 // Async auto-wrapping (for delegates returning Task<T>)
 // stub.Interceptor.Returns(42);              // auto-wraps in Task.FromResult
-// stub.Interceptor.OnCall((int x) => x * 2); // simplified, auto-wrapped
+// stub.Interceptor.Returns((int x) => x * 2); // simplified, auto-wrapped
 
 // Verification (fresh stub for clean tracking)
 var verifyStub = new Stubs.SkillArithmeticOp();
-verifyStub.Interceptor.OnCall((a, b) => a + b);
+verifyStub.Interceptor.Returns((a, b) => a + b);
 SkillArithmeticOp op = verifyStub;
 op(1, 2);
 verifyStub.Interceptor.Verify(Times.Once);
@@ -432,7 +432,7 @@ SkillArithmeticOp opRef = stub;
 
 <!-- snippet: skill-verify-individual -->
 ```cs
-var tracking = stub.Save.OnCall((user) => { });
+var tracking = stub.Save.Execute((user) => { });
 // ... exercise stub ...
 ```
 <!-- endSnippet -->
@@ -441,8 +441,8 @@ var tracking = stub.Save.OnCall((user) => { });
 
 <!-- snippet: skill-verify-batch -->
 ```cs
-stub.GetUser.OnCall((id) => new User { Id = id }).Verifiable();
-stub.Save.OnCall((u) => { }).Verifiable(Times.Once);
+stub.GetUser.Returns((id) => new User { Id = id }).Verifiable();
+stub.Save.Execute((u) => { }).Verifiable(Times.Once);
 // ... exercise stub ...
 ```
 <!-- endSnippet -->
@@ -450,7 +450,7 @@ stub.Save.OnCall((u) => { }).Verifiable(Times.Once);
 ### Verify() vs VerifyAll()
 
 - `stub.Verify()` - Only members marked with `.Verifiable()`
-- `stub.VerifyAll()` - ALL configured members (OnCall, OnGet, etc.)
+- `stub.VerifyAll()` - ALL configured members (Returns, Execute, OnGet, etc.)
 
 ### Times Constraints
 
@@ -470,12 +470,12 @@ stub.Save.OnCall((u) => { }).Verifiable(Times.Once);
 <!-- snippet: skill-arg-capture -->
 ```cs
 // Single parameter - LastArg
-var getTracking = stub.GetUser.OnCall((id) => new User { Id = id });
+var getTracking = stub.GetUser.Returns((id) => new User { Id = id });
 service.GetUser(42);
 Assert.Equal(42, getTracking.LastArg);
 
 // Multiple parameters - LastArgs tuple
-var updateTracking = stub.Update.OnCall((id, name) => { });
+var updateTracking = stub.Update.Execute((id, name) => { });
 service.Update(1, "Alice");
 var (id, name) = updateTracking.LastArgs;
 ```
@@ -506,7 +506,7 @@ stub.Strict();
 
 ## User Methods (Stand-Alone Only)
 
-User methods let you define default stub behavior at compile time. The user method is the fallback when no `OnCall` is configured.
+User methods let you define default stub behavior at compile time. The user method is the fallback when no `Returns`/`Execute` callback is configured.
 
 ### Defining User Methods
 
@@ -527,20 +527,20 @@ public partial class SkUserMethodRepoStub
 
 The interceptor uses a clean name (e.g., `GetById`, not `GetById2`) regardless of whether you override the method.
 
-### OnCall Supersedes User Method
+### Returns(callback) Supersedes User Method
 
-Use `OnCall()` to override the user method for specific tests:
+Use `Returns(callback)` to override the user method for specific tests:
 
 <!-- snippet: skill-user-method-oncall -->
 ```cs
 var stub = new SkUserMethodRepoStub();
 IUserRepo repo = stub;
 
-// Without OnCall: user method is called
+// Without Returns: user method is called
 var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
 
-// With OnCall: callback supersedes user method (clean interceptor name)
-stub.GetById.OnCall(id => new User { Id = id, Name = "Override" });
+// With Returns: callback supersedes user method (clean interceptor name)
+stub.GetById.Returns(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
 ```
 <!-- endSnippet -->
@@ -564,13 +564,13 @@ stub.GetUserAsync.Returns(new User { Id = 1 });
 ```
 <!-- endSnippet -->
 
-### Tracking Works with OnCall
+### Tracking Works with Returns
 
-User method interceptors provide full tracking even when using `OnCall`:
+User method interceptors provide full tracking even when using `Returns`:
 
 <!-- snippet: skill-user-method-tracking -->
 ```cs
-stub.GetById.OnCall(id => new User { Id = id });
+stub.GetById.Returns(id => new User { Id = id });
 repo.GetById(42);
 
 stub.GetById.Verify(Times.Once);
@@ -578,20 +578,20 @@ Assert.Equal(42, stub.GetById.LastArg);
 ```
 <!-- endSnippet -->
 
-### Reset Preserves OnCall Configuration
+### Reset Preserves Returns Configuration
 
-`Reset()` clears tracking state but preserves the OnCall configuration:
+`Reset()` clears tracking state but preserves the Returns configuration:
 
 <!-- snippet: skill-user-method-reset -->
 ```cs
-stub.GetById.OnCall(id => new User { Id = id });
+stub.GetById.Returns(id => new User { Id = id });
 repo.GetById(1);
 stub.GetById.Verify(Times.Once);
 
 stub.GetById.Reset();
 stub.GetById.Verify(Times.Never);  // Tracking cleared
 
-repo.GetById(2);  // Still uses OnCall callback
+repo.GetById(2);  // Still uses Returns callback
 ```
 <!-- endSnippet -->
 
@@ -677,7 +677,7 @@ _ = service.Count;  // Still uses OnGet (returns 100)
 
 ## Source Delegation
 
-`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured members (OnCall, Returns, When) still take priority -- Source is only consulted when nothing else handles the call.
+`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Configured members (Returns, Execute, When) still take priority -- Source is only consulted when nothing else handles the call.
 
 <!-- snippet: skill-source-delegation -->
 ```cs
@@ -685,7 +685,7 @@ var stub = new SkSourceDelegationStub();
 stub.Source(realImplementation);
 
 // Configured members override source
-stub.GetById.OnCall((id) => testUser);  // This wins over source
+stub.GetById.Returns((id) => testUser);  // This wins over source
 
 // Reset clears tracking (counts, args, sequence position) and source delegation
 // but preserves callbacks (OnCall, Returns, OnGet, OnSet)
@@ -700,7 +700,7 @@ stub.GetById.OnCall((id) => testUser);  // This wins over source
 KnockOff evaluates member calls in this order:
 
 1. **When chains** -- `stub.Method.When(...).Returns(...)`
-2. **OnCall / Returns** -- `stub.Method.OnCall(...)` or `stub.Method.Returns(...)`
+2. **Returns / Execute** -- `stub.Method.Returns(...)` or `stub.Method.Execute(...)`
 3. **User methods** -- `protected override` with `_` suffix (Standalone only)
 4. **Source delegation** -- `stub.Source(realImplementation)`
 5. **Smart default** -- KnockOff's built-in default value
@@ -731,7 +731,7 @@ Remove source delegation by passing null: `stub.Source(null)`. After clearing, u
 | `.Setup(x => x.Method(arg)).Returns(val)` | `stub.Method.When(arg).Returns(val)` |
 | `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.OnGet(val)` |
 | `.ReturnsAsync(val)` | `stub.Method.Returns(val)` (auto-wraps) |
-| `.Callback(action)` | Logic inside `OnCall` callback |
+| `.Callback(action)` | Logic inside `Returns`/`Execute` callback |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` |
 | `.Verifiable()` + `mock.Verify()` | `.Verifiable()` + `stub.Verify()` |
 | `It.IsAny<T>()` | Callback always receives all args |
@@ -763,7 +763,7 @@ public partial class SkillPartialDemoStub : ISvc { }
 // stub.Process.OnCall((string id) => { });  // Method takes int
 
 // RIGHT: Match signature exactly
-stub.Process.OnCall((int id) => { });
+stub.Process.Execute((int id) => { });
 ```
 <!-- endSnippet -->
 
@@ -828,4 +828,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-06
+**UPDATED:** 2026-02-07

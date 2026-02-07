@@ -175,7 +175,7 @@ public class MethodValueOverloadTests
 		Assert.Equal("value", service.GetOptional());
 
 		// Then configure with callback - should clear value
-		knockOff.GetOptional.OnCall(() => "callback");
+		knockOff.GetOptional.Returns(() => "callback");
 		Assert.Equal("callback", service.GetOptional());
 	}
 
@@ -186,7 +186,7 @@ public class MethodValueOverloadTests
 		ISampleService service = knockOff;
 
 		// First configure with callback
-		knockOff.GetOptional.OnCall(() => "callback");
+		knockOff.GetOptional.Returns(() => "callback");
 		Assert.Equal("callback", service.GetOptional());
 
 		// Then configure with value - should clear callback
@@ -204,8 +204,8 @@ public class MethodValueOverloadTests
 		knockOff.GetOptional.Returns("value");
 		Assert.Equal("value", service.GetOptional());
 
-		// Then configure with OnCall().ThenCall() sequence - should clear value
-		knockOff.GetOptional.OnCall(() => "seq1").ThenCall(() => "seq2");
+		// Then configure with OnCall().ThenReturns() sequence - should clear value
+		knockOff.GetOptional.Returns(() => "seq1").ThenReturns(() => "seq2");
 		Assert.Equal("seq1", service.GetOptional());
 		Assert.Equal("seq2", service.GetOptional());
 	}

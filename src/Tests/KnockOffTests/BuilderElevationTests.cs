@@ -31,7 +31,7 @@ public partial class BuilderElevationIndexerStub : IBuilderElevationIndexer
 
 /// <summary>
 /// Tests for the builder pattern that enables lazy elevation from repeating callbacks to sequences.
-/// These tests verify that OnCall().ThenCall() works correctly for sequence elevation.
+/// These tests verify that OnCall().ThenReturns() works correctly for sequence elevation.
 /// </summary>
 public class BuilderElevationTests
 {
@@ -42,7 +42,7 @@ public class BuilderElevationTests
     {
         // Arrange
         var stub = new BuilderElevationStub();
-        stub.Calculate.OnCall(x => x * 2);
+        stub.Calculate.Returns(x => x * 2);
 
         IBuilderElevationService svc = stub;
 
@@ -60,9 +60,9 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationStub();
         stub.Calculate
-            .OnCall(x => 100)
-            .ThenCall(x => 200)
-            .ThenCall(x => 300);
+            .Returns(x => 100)
+            .ThenReturns(x => 200)
+            .ThenReturns(x => 300);
 
         IBuilderElevationService svc = stub;
 
@@ -77,7 +77,7 @@ public class BuilderElevationTests
     {
         // Arrange
         var stub = new BuilderElevationStub();
-        var builder = stub.Calculate.OnCall(x => x * 10);
+        var builder = stub.Calculate.Returns(x => x * 10);
 
         IBuilderElevationService svc = stub;
 
@@ -87,7 +87,7 @@ public class BuilderElevationTests
 
         // Elevate to sequence - this converts to sequence mode with fresh index
         // Sequence becomes: [x*10 (original), x*100 (new)]
-        var sequence = builder.ThenCall(x => x * 100);
+        var sequence = builder.ThenReturns(x => x * 100);
 
         // After elevation, sequence starts at index 0, so next call uses first callback (x*10)
         Assert.Equal(70, svc.Calculate(7));  // Uses sequence[0] = x*10
@@ -104,7 +104,7 @@ public class BuilderElevationTests
     {
         // Arrange
         var stub = new BuilderElevationStub();
-        var tracking = stub.Calculate.OnCall(x => x);
+        var tracking = stub.Calculate.Returns(x => x);
 
         IBuilderElevationService svc = stub;
 
@@ -123,11 +123,11 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationStub();
         stub.Calculate
-            .OnCall(x => 1)
-            .ThenCall(x => 2)
-            .ThenCall(x => 3)
-            .ThenCall(x => 4)
-            .ThenCall(x => 5);
+            .Returns(x => 1)
+            .ThenReturns(x => 2)
+            .ThenReturns(x => 3)
+            .ThenReturns(x => 4)
+            .ThenReturns(x => 5);
 
         IBuilderElevationService svc = stub;
 
@@ -146,8 +146,8 @@ public class BuilderElevationTests
         var stub = new BuilderElevationStub();
         stub.Strict = true;
         stub.Calculate
-            .OnCall(x => 100)
-            .ThenCall(x => 200);
+            .Returns(x => 100)
+            .ThenReturns(x => 200);
 
         IBuilderElevationService svc = stub;
 
@@ -167,8 +167,8 @@ public class BuilderElevationTests
         var stub = new BuilderElevationStub();
         stub.Strict = false;
         stub.Calculate
-            .OnCall(x => 100)
-            .ThenCall(x => 200);
+            .Returns(x => 100)
+            .ThenReturns(x => 200);
 
         IBuilderElevationService svc = stub;
 
@@ -188,8 +188,8 @@ public class BuilderElevationTests
         var stub = new BuilderElevationStub();
         stub.Strict = false;
         stub.Calculate
-            .OnCall(x => 100)
-            .ThenCall(x => 200)
+            .Returns(x => 100)
+            .ThenReturns(x => 200)
             .ThenDefault();  // Explicitly request default after exhaustion
 
         IBuilderElevationService svc = stub;
@@ -211,15 +211,15 @@ public class BuilderElevationTests
 
         // First, configure a sequence
         stub.Calculate
-            .OnCall(x => 100)
-            .ThenCall(x => 200);
+            .Returns(x => 100)
+            .ThenReturns(x => 200);
 
         IBuilderElevationService svc = stub;
         Assert.Equal(100, svc.Calculate(0));
         Assert.Equal(200, svc.Calculate(0));
 
         // Now reconfigure with OnCall (should clear the sequence)
-        stub.Calculate.OnCall(x => 999);
+        stub.Calculate.Returns(x => 999);
 
         // Act & Assert - should now be repeating mode again
         Assert.Equal(999, svc.Calculate(0));
@@ -233,8 +233,8 @@ public class BuilderElevationTests
         // Arrange
         var stub = new BuilderElevationStub();
         stub.Calculate
-            .OnCall(x => 1).Verifiable()
-            .ThenCall(x => 2);
+            .Returns(x => 1).Verifiable()
+            .ThenReturns(x => 2);
 
         IBuilderElevationService svc = stub;
 

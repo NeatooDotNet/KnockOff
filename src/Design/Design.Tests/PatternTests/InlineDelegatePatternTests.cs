@@ -47,7 +47,7 @@ public class InlineDelegatePatternTests
     public void InlineDelegate_OnCall_ConfiguresCallback()
     {
         var stub = new InlineDelegateExample.Stubs.ArithmeticOperation();
-        stub.Interceptor.OnCall((a, b) => a + b);
+        stub.Interceptor.Returns((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
         var result = operation(5, 10);
@@ -76,7 +76,7 @@ public class InlineDelegatePatternTests
     {
         var stub = new InlineDelegateExample.Stubs.LogAction();
         string? capturedMessage = null;
-        stub.Interceptor.OnCall(msg => capturedMessage = msg);
+        stub.Interceptor.Execute(msg => capturedMessage = msg);
 
         LogAction logger = stub;
         logger("Hello, World!");

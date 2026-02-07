@@ -17,7 +17,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.OnCall(x => x * 100); // Override user method (which does x * 10)
+        stub.GetValue.Returns(x => x * 100); // Override user method (which does x * 10)
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -33,7 +33,7 @@ public class UserMethodOnCallTests
         // Arrange
         var stub = new StrictModeUserMethodStub();
         var callbackInvoked = false;
-        stub.DoSomething.OnCall(() => callbackInvoked = true);
+        stub.DoSomething.Execute(() => callbackInvoked = true);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -105,7 +105,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.OnCall(x => x * 100);
+        stub.GetValue.Returns(x => x * 100);
 
         IStrictModeUserMethodTest service = stub;
         service.GetValue(5);
@@ -148,7 +148,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new MultiParamUserMethodStub();
-        stub.Calculate.OnCall((a, b) => a - b); // Override user method (which does a + b)
+        stub.Calculate.Returns((a, b) => a - b); // Override user method (which does a + b)
 
         // Act
         IMultiParamUserMethodService service = stub;
@@ -182,7 +182,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.OnCall(x => x * 100);
+        stub.GetValue.Returns(x => x * 100);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -197,7 +197,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.OnCall(x => 42).Verifiable();
+        stub.GetValue.Returns(x => 42).Verifiable();
 
         // Act - Don't call the method
 
@@ -210,7 +210,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.OnCall(x => x);
+        stub.GetValue.Returns(x => x);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -230,7 +230,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new AsyncUserMethodTestStub();
-        stub.ProcessAsync.OnCall(input => Task.FromResult($"[OnCall: {input}]"));
+        stub.ProcessAsync.Returns(input => Task.FromResult($"[OnCall: {input}]"));
 
         // Act
         IAsyncUserMethodTestService service = stub;

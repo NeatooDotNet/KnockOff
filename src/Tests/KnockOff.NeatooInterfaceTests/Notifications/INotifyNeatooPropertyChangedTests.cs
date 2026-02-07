@@ -129,7 +129,7 @@ public partial class NeatooPropertyChangedDelegateTests
         NeatooPropertyChanged del = stub;
 
         // Set OnCall to return Task.CompletedTask since it's an async delegate
-        stub.Interceptor.OnCall((args) => Task.CompletedTask);
+        stub.Interceptor.Returns((args) => Task.CompletedTask);
 
         await del(new NeatooPropertyChangedEventArgs("TestProperty", this));
 
@@ -142,7 +142,7 @@ public partial class NeatooPropertyChangedDelegateTests
         var stub = new Stubs.NeatooPropertyChanged();
         NeatooPropertyChanged del = stub;
 
-        stub.Interceptor.OnCall((args) => Task.CompletedTask);
+        stub.Interceptor.Returns((args) => Task.CompletedTask);
 
         await del(new NeatooPropertyChangedEventArgs("Prop1", this));
         await del(new NeatooPropertyChangedEventArgs("Prop2", this));
@@ -159,7 +159,7 @@ public partial class NeatooPropertyChangedDelegateTests
         var callbackExecuted = false;
         string? capturedPropertyName = null;
 
-        stub.Interceptor.OnCall((args) =>
+        stub.Interceptor.Returns((args) =>
         {
             callbackExecuted = true;
             capturedPropertyName = args.PropertyName;
@@ -178,7 +178,7 @@ public partial class NeatooPropertyChangedDelegateTests
         var stub = new Stubs.NeatooPropertyChanged();
         NeatooPropertyChanged del = stub;
 
-        stub.Interceptor.OnCall((args) => Task.CompletedTask);
+        stub.Interceptor.Returns((args) => Task.CompletedTask);
 
         await del(new NeatooPropertyChangedEventArgs("Prop", this));
 

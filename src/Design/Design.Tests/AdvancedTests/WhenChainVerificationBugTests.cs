@@ -340,7 +340,7 @@ public class WhenChainVerificationBugTests
         // Configure When chain (non-terminal, specific value matching)
         stub.Format.When("special").Returns("SPECIAL");
         // Configure OnCall on the same overload as fallback
-        stub.Format.OnCall((string input) => "default");
+        stub.Format.Returns((string input) => "default");
 
         IFormatter formatter = stub;
 
@@ -395,7 +395,7 @@ public class WhenChainVerificationBugTests
         stub.Format.When("special").Returns("SPECIAL");
         // Configure OnCall on the same overload (makes condExpr true in Block 1,
         // isolating the count bug from the condExpr bug)
-        stub.Format.OnCall((string input) => "default");
+        stub.Format.Returns((string input) => "default");
 
         IFormatter formatter = stub;
 
@@ -430,9 +430,9 @@ public class WhenChainVerificationBugTests
         var callLog = new List<string>();
 
         // Configure void When chain (non-terminal, specific value matching)
-        stub.Log.When("special").Call(msg => callLog.Add($"when:{msg}"));
+        stub.Log.When("special").Execute(msg => callLog.Add($"when:{msg}"));
         // Configure OnCall on the same overload as fallback
-        stub.Log.OnCall((string msg) => callLog.Add($"oncall:{msg}"));
+        stub.Log.Execute((string msg) => callLog.Add($"oncall:{msg}"));
 
         IFormatter formatter = stub;
 

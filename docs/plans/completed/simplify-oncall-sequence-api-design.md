@@ -2,8 +2,8 @@
 
 **Date:** 2026-01-29
 **Related Todo:** [Simplify OnCall Sequence API](../todos/simplify-oncall-sequence-api.md)
-**Status:** Ready for Implementation
-**Last Updated:** 2026-01-29 (Developer Approved)
+**Status:** Superseded by unify-returns-execute-design
+**Last Updated:** 2026-02-07
 
 ---
 

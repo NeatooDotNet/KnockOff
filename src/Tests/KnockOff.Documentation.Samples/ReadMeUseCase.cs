@@ -157,7 +157,7 @@ public class UserDomainModelTests
 
         // When and OnCall overrides the stub methods
         myRepoKO.GetUser.When(2).Returns(user2).Verifiable();
-        myRepoKO.Update.OnCall(u => Assert.Same(u, user2)).Verifiable();
+        myRepoKO.Update.Execute(u => Assert.Same(u, user2)).Verifiable();
 
         userDomainModel.Fetch(2);
         userDomainModel.Update();

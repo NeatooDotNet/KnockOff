@@ -27,8 +27,8 @@ public class OverloadedMethodInvocationBenchmarks
 
         var stub = new OverloadedServiceStub();
         // Overloaded methods use single interceptor with overloaded OnCall methods
-        stub.Calculate.OnCall((int v) => v * 2);
-        stub.Calculate.OnCall((int a, int b) => a + b);
+        stub.Calculate.Returns((int v) => v * 2);
+        stub.Calculate.Returns((int a, int b) => a + b);
         _knockOff = stub;
     }
 
@@ -91,11 +91,11 @@ public class OverloadedMethodSetupBenchmarks
     {
         var stub = new OverloadedServiceStub();
         // Overloaded methods use single interceptor with overloaded OnCall methods
-        stub.Process.OnCall((int v) => { });
-        stub.Process.OnCall((string v) => { });
-        stub.Process.OnCall((int a, int b) => { });
-        stub.Calculate.OnCall((int v) => v * 2);
-        stub.Calculate.OnCall((int a, int b) => a + b);
+        stub.Process.Execute((int v) => { });
+        stub.Process.Execute((string v) => { });
+        stub.Process.Execute((int a, int b) => { });
+        stub.Calculate.Returns((int v) => v * 2);
+        stub.Calculate.Returns((int a, int b) => a + b);
         return stub;
     }
 }
@@ -125,9 +125,9 @@ public class OverloadedMethodVerificationBenchmarks
 
         _knockOffStub = new OverloadedServiceStub();
         // Set up callbacks to get tracking objects
-        _processIntTracking = _knockOffStub.Process.OnCall((int v) => { });
-        _processStringTracking = _knockOffStub.Process.OnCall((string v) => { });
-        _processTwoArgsTracking = _knockOffStub.Process.OnCall((int a, int b) => { });
+        _processIntTracking = _knockOffStub.Process.Execute((int v) => { });
+        _processStringTracking = _knockOffStub.Process.Execute((string v) => { });
+        _processTwoArgsTracking = _knockOffStub.Process.Execute((int a, int b) => { });
 
         ((IOverloadedService)_knockOffStub).Process(42);
         ((IOverloadedService)_knockOffStub).Process("test");

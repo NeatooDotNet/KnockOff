@@ -31,12 +31,12 @@ public class RefOutInvocationBenchmarks
         _moq = mock.Object;
 
         var stub = new ParserStub();
-        stub.TryParse.OnCall((string input, out int result) =>
+        stub.TryParse.Returns((string input, out int result) =>
         {
             result = 42;
             return true;
         });
-        stub.Increment.OnCall((ref int value) => value++);
+        stub.Increment.Execute((ref int value) => value++);
         _knockOff = stub;
     }
 
@@ -95,12 +95,12 @@ public class RefOutSetupBenchmarks
     public ParserStub KnockOff_SetupRefOut()
     {
         var stub = new ParserStub();
-        stub.TryParse.OnCall((string input, out int result) =>
+        stub.TryParse.Returns((string input, out int result) =>
         {
             result = 42;
             return true;
         });
-        stub.Increment.OnCall((ref int value) => value++);
+        stub.Increment.Execute((ref int value) => value++);
         return stub;
     }
 }

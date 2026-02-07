@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 // This stub tests the intersection of:
 // - Generic standalone stub pattern (Pattern 1B)
-// - Overload API (OnCall disambiguation by parameter signature)
+// - Overload API (Returns/Execute disambiguation by parameter signature)
 // - User methods (base class overrides) with generic type T
 // -----------------------------------------------------------------------------
 

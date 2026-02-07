@@ -107,7 +107,7 @@ public class PartialOverrideTests
 
         #region source-partial-override
         // Override specific member while source handles the rest
-        stub.GetById.OnCall((id) => new User { Id = id, Name = "Test User" });
+        stub.GetById.Returns((id) => new User { Id = id, Name = "Test User" });
         #endregion
 
         IRepository repository = stub;
@@ -207,7 +207,7 @@ public class PriorityOrderTests
 
         #region source-priority
         // OnCall takes precedence over source
-        stub.GetPriority.OnCall((user) => 42);
+        stub.GetPriority.Returns((user) => 42);
         #endregion
         var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(42, fromOnCall);
@@ -226,7 +226,7 @@ public class PriorityOrderTests
         stub.GetPriority.Returns(99);
 
         // Callback overload - use when you need logic or side effects
-        stub.GetPriority.OnCall((user) => user.IsActive ? 1 : 0);
+        stub.GetPriority.Returns((user) => user.IsActive ? 1 : 0);
         #endregion
 
         var result = repository.GetPriority(new User { IsActive = true });
@@ -242,7 +242,7 @@ public class PriorityOrderTests
         IRepository repository = stub;
 
         #region source-oncall-api-callback
-        stub.GetById.OnCall((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetById.Returns((id) => new User { Id = id, Name = $"User{id}" });
         #endregion
 
         var user = repository.GetById(1);
@@ -308,7 +308,7 @@ public class HierarchyPartialSourceTests
 
         // AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
         // Configure it explicitly, or it returns the smart default
-        stub.AddRange.OnCall((newItems) =>
+        stub.AddRange.Execute((newItems) =>
         {
             foreach (var newItem in newItems)
             {
@@ -378,7 +378,7 @@ public class CompleteSourceExampleTests
 
         #region source-complete-example
         // OnCall takes full control - source not consulted even for non-matches
-        stub.Read.OnCall((filename) =>
+        stub.Read.Returns((filename) =>
             filename == "config.txt" ? "Test Config" : null);
         #endregion
 

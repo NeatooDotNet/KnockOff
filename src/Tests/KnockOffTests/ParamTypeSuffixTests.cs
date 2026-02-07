@@ -23,7 +23,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = knockOff;
 
 		List<string?>? captured = null;
-		knockOff.Process.OnCall((List<string?> data) => { captured = data; });
+		knockOff.Process.Execute((List<string?> data) => { captured = data; });
 
 		var input = new List<string?> { "a", null, "b" };
 		service.Process(input);
@@ -38,7 +38,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = knockOff;
 
 		(int, string)? captured = null;
-		knockOff.Process.OnCall(((int, string) pair) => { captured = pair; });
+		knockOff.Process.Execute(((int, string) pair) => { captured = pair; });
 
 		service.Process((42, "hello"));
 
@@ -52,7 +52,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = knockOff;
 
 		int[,]? captured = null;
-		knockOff.Process.OnCall((int[,] matrix) => { captured = matrix; });
+		knockOff.Process.Execute((int[,] matrix) => { captured = matrix; });
 
 		var input = new int[,] { { 1, 2 }, { 3, 4 } };
 		service.Process(input);
@@ -67,7 +67,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = knockOff;
 
 		string?[]? captured = null;
-		knockOff.Process.OnCall((string?[] items) => { captured = items; });
+		knockOff.Process.Execute((string?[] items) => { captured = items; });
 
 		var input = new string?[] { "x", null, "y" };
 		service.Process(input);
@@ -82,7 +82,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = knockOff;
 
 		nint? captured = null;
-		knockOff.Process.OnCall((nint value) => { captured = value; });
+		knockOff.Process.Execute((nint value) => { captured = value; });
 
 		service.Process((nint)123);
 
@@ -96,7 +96,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = knockOff;
 
 		nuint? captured = null;
-		knockOff.Process.OnCall((nuint value) => { captured = value; });
+		knockOff.Process.Execute((nuint value) => { captured = value; });
 
 		service.Process((nuint)456);
 
@@ -113,12 +113,12 @@ public class ParamTypeSuffixTests
 		var knockOff = new ParamTypeSuffixKnockOff();
 		IParamTypeSuffixService service = knockOff;
 
-		var tracking1 = knockOff.Process.OnCall((List<string?> data) => { });
-		var tracking2 = knockOff.Process.OnCall(((int, string) pair) => { });
-		var tracking3 = knockOff.Process.OnCall((int[,] matrix) => { });
-		var tracking4 = knockOff.Process.OnCall((string?[] items) => { });
-		var tracking5 = knockOff.Process.OnCall((nint value) => { });
-		var tracking6 = knockOff.Process.OnCall((nuint value) => { });
+		var tracking1 = knockOff.Process.Execute((List<string?> data) => { });
+		var tracking2 = knockOff.Process.Execute(((int, string) pair) => { });
+		var tracking3 = knockOff.Process.Execute((int[,] matrix) => { });
+		var tracking4 = knockOff.Process.Execute((string?[] items) => { });
+		var tracking5 = knockOff.Process.Execute((nint value) => { });
+		var tracking6 = knockOff.Process.Execute((nuint value) => { });
 
 		service.Process(new List<string?> { "a" });
 		service.Process((1, "b"));
@@ -141,12 +141,12 @@ public class ParamTypeSuffixTests
 		var knockOff = new ParamTypeSuffixKnockOff();
 		IParamTypeSuffixService service = knockOff;
 
-		knockOff.Process.OnCall((List<string?> data) => { });
-		knockOff.Process.OnCall(((int, string) pair) => { });
-		knockOff.Process.OnCall((int[,] matrix) => { });
-		knockOff.Process.OnCall((string?[] items) => { });
-		knockOff.Process.OnCall((nint value) => { });
-		knockOff.Process.OnCall((nuint value) => { });
+		knockOff.Process.Execute((List<string?> data) => { });
+		knockOff.Process.Execute(((int, string) pair) => { });
+		knockOff.Process.Execute((int[,] matrix) => { });
+		knockOff.Process.Execute((string?[] items) => { });
+		knockOff.Process.Execute((nint value) => { });
+		knockOff.Process.Execute((nuint value) => { });
 
 		service.Process(new List<string?>());
 		service.Process((1, "x"));
@@ -169,7 +169,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = stub;
 
 		List<string?>? captured = null;
-		stub.Process.OnCall((List<string?> data) => { captured = data; });
+		stub.Process.Execute((List<string?> data) => { captured = data; });
 
 		var input = new List<string?> { "a", null, "b" };
 		service.Process(input);
@@ -184,7 +184,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = stub;
 
 		(int, string)? captured = null;
-		stub.Process.OnCall(((int, string) pair) => { captured = pair; });
+		stub.Process.Execute(((int, string) pair) => { captured = pair; });
 
 		service.Process((42, "hello"));
 
@@ -198,7 +198,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = stub;
 
 		int[,]? captured = null;
-		stub.Process.OnCall((int[,] matrix) => { captured = matrix; });
+		stub.Process.Execute((int[,] matrix) => { captured = matrix; });
 
 		var input = new int[,] { { 1, 2 }, { 3, 4 } };
 		service.Process(input);
@@ -213,7 +213,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = stub;
 
 		string?[]? captured = null;
-		stub.Process.OnCall((string?[] items) => { captured = items; });
+		stub.Process.Execute((string?[] items) => { captured = items; });
 
 		var input = new string?[] { "x", null, "y" };
 		service.Process(input);
@@ -228,7 +228,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = stub;
 
 		nint? captured = null;
-		stub.Process.OnCall((nint value) => { captured = value; });
+		stub.Process.Execute((nint value) => { captured = value; });
 
 		service.Process((nint)123);
 
@@ -242,7 +242,7 @@ public class ParamTypeSuffixTests
 		IParamTypeSuffixService service = stub;
 
 		nuint? captured = null;
-		stub.Process.OnCall((nuint value) => { captured = value; });
+		stub.Process.Execute((nuint value) => { captured = value; });
 
 		service.Process((nuint)456);
 
@@ -259,12 +259,12 @@ public class ParamTypeSuffixTests
 		var stub = new ParamTypeSuffixInlineTests.Stubs.IParamTypeSuffixService();
 		IParamTypeSuffixService service = stub;
 
-		var tracking1 = stub.Process.OnCall((List<string?> data) => { });
-		var tracking2 = stub.Process.OnCall(((int, string) pair) => { });
-		var tracking3 = stub.Process.OnCall((int[,] matrix) => { });
-		var tracking4 = stub.Process.OnCall((string?[] items) => { });
-		var tracking5 = stub.Process.OnCall((nint value) => { });
-		var tracking6 = stub.Process.OnCall((nuint value) => { });
+		var tracking1 = stub.Process.Execute((List<string?> data) => { });
+		var tracking2 = stub.Process.Execute(((int, string) pair) => { });
+		var tracking3 = stub.Process.Execute((int[,] matrix) => { });
+		var tracking4 = stub.Process.Execute((string?[] items) => { });
+		var tracking5 = stub.Process.Execute((nint value) => { });
+		var tracking6 = stub.Process.Execute((nuint value) => { });
 
 		service.Process(new List<string?> { "a" });
 		service.Process((1, "b"));
@@ -287,12 +287,12 @@ public class ParamTypeSuffixTests
 		var stub = new ParamTypeSuffixInlineTests.Stubs.IParamTypeSuffixService();
 		IParamTypeSuffixService service = stub;
 
-		stub.Process.OnCall((List<string?> data) => { });
-		stub.Process.OnCall(((int, string) pair) => { });
-		stub.Process.OnCall((int[,] matrix) => { });
-		stub.Process.OnCall((string?[] items) => { });
-		stub.Process.OnCall((nint value) => { });
-		stub.Process.OnCall((nuint value) => { });
+		stub.Process.Execute((List<string?> data) => { });
+		stub.Process.Execute(((int, string) pair) => { });
+		stub.Process.Execute((int[,] matrix) => { });
+		stub.Process.Execute((string?[] items) => { });
+		stub.Process.Execute((nint value) => { });
+		stub.Process.Execute((nuint value) => { });
 
 		service.Process(new List<string?>());
 		service.Process((1, "x"));

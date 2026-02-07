@@ -3,9 +3,9 @@
 // -----------------------------------------------------------------------------
 // This file demonstrates sequence APIs for methods:
 // - Returns(first, params rest) for concise value sequences (NSubstitute-style)
-// - OnCall().ThenReturns(params values) for adding multiple values to sequences
-// - OnCall().ThenCall() for callback sequences
-// - OnCall().ThenReturns() for value sequences
+// - Returns().ThenReturns(params values) for adding multiple values to sequences
+// - Returns().ThenReturns() for callback sequences
+// - Returns().ThenReturns() for value sequences
 // - ThenDefault() to return default(T) after exhaustion instead of repeating
 // - Lazy elevation from builder to sequence mode
 // - Sequence exhaustion behavior (repeat last value by default, NSubstitute-like)
@@ -37,10 +37,10 @@ namespace Design.Stubs.Methods;
 //   stub.Method(); // 3 (repeats last)
 //
 // KnockOff (original explicit syntax - still supported):
-//   stub.Method.OnCall(() => 1).ThenReturns(2).ThenReturns(3);
+//   stub.Method.Returns(() => 1).ThenReturns(2).ThenReturns(3);
 //
 // KnockOff extends this with ThenDefault() for explicit default termination:
-//   stub.Method.OnCall(() => 1).ThenReturns(2).ThenDefault();
+//   stub.Method.Returns(() => 1).ThenReturns(2).ThenDefault();
 //   stub.Method(); // 1
 //   stub.Method(); // 2
 //   stub.Method(); // default(T) - NSubstitute has no equivalent
@@ -108,7 +108,7 @@ public partial class MethodSequencesDemo
     // ThenReturns(params values) - Add Multiple Values to Sequence
     // =========================================================================
     // DESIGN DECISION: ThenReturns(params values) adds multiple values at once.
-    // This is useful when building sequences with OnCall() for the first value.
+    // This is useful when building sequences with Returns(callback) for the first value.
     //
     // GENERATOR BEHAVIOR: Params version loops over single-value ThenReturns:
     //
@@ -124,9 +124,9 @@ public partial class MethodSequencesDemo
     {
         var stub = new Stubs.ICalculator();
 
-        // OnCall for first, then add multiple with params
+        // Returns callback for first, then add multiple with params
         stub.Add
-            .OnCall((a, b) => a + b)  // First: compute a + b
+            .Returns((a, b) => a + b)  // First: compute a + b
             .ThenReturns(100, 200, 300);  // Then: 100, 200, 300
 
         ICalculator calc = stub;
@@ -144,12 +144,12 @@ public partial class MethodSequencesDemo
     // DESIGN DECISION: For Task<T> and ValueTask<T> methods, params values are
     // auto-wrapped just like single-value Returns(). No Task.FromResult needed.
     //
-    // GENERATOR BEHAVIOR: The first value uses Task.FromResult in the OnCall,
+    // GENERATOR BEHAVIOR: The first value uses Task.FromResult in the Returns,
     // and subsequent values use the existing ThenReturns auto-wrapping:
     //
     //   public MethodSequenceImpl Returns(string first, params string[] rest)
     //   {
-    //       var seq = OnCall(() => Task.FromResult(first));
+    //       var seq = Returns(() => Task.FromResult(first));
     //       foreach (var value in rest)
     //           seq = seq.ThenReturns(value);  // ThenReturns auto-wraps
     //       return seq;
@@ -196,18 +196,18 @@ public partial class MethodSequencesDemo
     }
 
     // =========================================================================
-    // OnCall().ThenCall() - Callback Sequences
+    // Returns().ThenReturns() - Callback Sequences
     // =========================================================================
-    // DESIGN DECISION: ThenCall() chains multiple callbacks that execute in order.
-    // Each call to the method advances through the sequence.
+    // DESIGN DECISION: ThenReturns(callback) chains multiple callbacks that execute
+    // in order. Each call to the method advances through the sequence.
     //
-    // GENERATOR BEHAVIOR: ThenCall() converts the interceptor to sequence mode:
+    // GENERATOR BEHAVIOR: ThenReturns(callback) converts the interceptor to sequence mode:
     //
     //   public class AddInterceptor
     //   {
     //       private Queue<Func<int, int, int>>? _callbackSequence;
     //
-    //       public IMethodSequence<Func<int, int, int>, int> ThenCall(Func<int, int, int> callback)
+    //       public IMethodSequence<Func<int, int, int>, int> ThenReturns(Func<int, int, int> callback)
     //       {
     //           _callbackSequence ??= new Queue<...>();
     //           _callbackSequence.Enqueue(callback);
@@ -216,10 +216,10 @@ public partial class MethodSequencesDemo
     //   }
     //
     // DESIGN DECISION: Lazy elevation - the interceptor only enters sequence mode
-    // when ThenCall() is first called. Before that, OnCall() behaves normally.
+    // when ThenReturns() is first called. Before that, Returns() behaves normally.
     // =========================================================================
 
-    public void ThenCall_CreatesSequenceOfCallbacks()
+    public void ThenReturns_CreatesSequenceOfCallbacks()
     {
         var stub = new Stubs.ICalculator();
         int callCount = 0;
@@ -229,15 +229,15 @@ public partial class MethodSequencesDemo
         // Third call: returns 3
         // Fourth+ calls: repeats last value (3) - NSubstitute-like behavior
         // Use ThenDefault() to return default(T) instead, or Strict mode to throw
-        stub.Add.OnCall((a, b) =>
+        stub.Add.Returns((a, b) =>
         {
             callCount++;
             return 1;
-        }).ThenCall((a, b) =>
+        }).ThenReturns((a, b) =>
         {
             callCount++;
             return 2;
-        }).ThenCall((a, b) =>
+        }).ThenReturns((a, b) =>
         {
             callCount++;
             return 3;
@@ -252,34 +252,34 @@ public partial class MethodSequencesDemo
     }
 
     // =========================================================================
-    // OnCall().ThenReturns() - Value Sequences (Explicit Syntax)
+    // Returns().ThenReturns() - Value Sequences (Explicit Syntax)
     // =========================================================================
     // DESIGN DECISION: ThenReturns(value) provides a cleaner syntax for
     // sequences of constant values, avoiding the need for explicit lambdas.
     //
     // For most use cases, prefer Returns(x, y, z) which is more concise.
-    // Use OnCall().ThenReturns() when you need a callback for the first value.
+    // Use Returns(callback).ThenReturns() when you need a callback for the first value.
     //
     // GENERATOR BEHAVIOR: ThenReturns() wraps the value in a callback:
     //
     //   public class MethodSequenceImpl
     //   {
     //       public MethodSequenceImpl ThenReturns(int value)
-    //           => ThenCall((_, _) => value);
+    //           => ThenReturns((_, _) => value);
     //   }
     //
     // For async methods, ThenReturns auto-wraps values:
-    //   Task<T>:      ThenReturns(value) => ThenCall(() => Task.FromResult(value))
-    //   ValueTask<T>: ThenReturns(value) => ThenCall(() => new ValueTask<T>(value))
+    //   Task<T>:      ThenReturns(value) => ThenReturns(() => Task.FromResult(value))
+    //   ValueTask<T>: ThenReturns(value) => ThenReturns(() => new ValueTask<T>(value))
     // =========================================================================
 
     public void ThenReturns_CreatesSequenceOfValues()
     {
         var stub = new Stubs.ICalculator();
 
-        // OnCall starts the sequence, ThenReturns adds values
+        // Returns starts the sequence, ThenReturns adds values
         stub.Add
-            .OnCall((_, _) => 1)
+            .Returns((_, _) => 1)
             .ThenReturns(2)
             .ThenReturns(3);
 
@@ -294,7 +294,7 @@ public partial class MethodSequencesDemo
     // =========================================================================
     // Mixed Sequences - Callbacks and Values Together
     // =========================================================================
-    // DESIGN DECISION: ThenReturns() and ThenCall() can be freely mixed in the
+    // DESIGN DECISION: ThenReturns(value) and ThenReturns(callback) can be freely mixed in the
     // same sequence. This allows computed values at some positions and constants
     // at others.
     // =========================================================================
@@ -306,13 +306,13 @@ public partial class MethodSequencesDemo
 
         // Mix callbacks and values in the same sequence
         stub.Add
-            .OnCall((a, b) =>
+            .Returns((a, b) =>
             {
                 computedValue = a + b;
                 return computedValue;
             })
             .ThenReturns(100)  // Constant value
-            .ThenCall((a, b) => a * b)  // Computed value
+            .ThenReturns((a, b) => a * b)  // Computed value
             .ThenReturns(999);  // Another constant
 
         ICalculator calc = stub;
@@ -330,20 +330,20 @@ public partial class MethodSequencesDemo
     // This matches NSubstitute's behavior for easier migration and more forgiving tests.
     //
     // DEFAULT BEHAVIOR (repeat last value):
-    //   stub.Add.OnCall(() => 1).ThenCall(() => 999);
+    //   stub.Add.Returns(() => 1).ThenReturns(() => 999);
     //   calc.Add(0, 0);  // 1
     //   calc.Add(0, 0);  // 999
     //   calc.Add(0, 0);  // 999 (repeats forever)
     //
     // EXPLICIT DEFAULT TERMINATION (ThenDefault):
-    //   stub.Add.OnCall(() => 1).ThenCall(() => 999).ThenDefault();
+    //   stub.Add.Returns(() => 1).ThenReturns(() => 999).ThenDefault();
     //   calc.Add(0, 0);  // 1
     //   calc.Add(0, 0);  // 999
     //   calc.Add(0, 0);  // 0 (default(T) after exhaustion)
     //
     // STRICT MODE (throws exception):
     //   stub.Strict = true;
-    //   stub.Add.OnCall(() => 1).ThenCall(() => 999);
+    //   stub.Add.Returns(() => 1).ThenReturns(() => 999);
     //   calc.Add(0, 0);  // 1
     //   calc.Add(0, 0);  // 999
     //   calc.Add(0, 0);  // Throws StubException.SequenceExhausted
@@ -358,10 +358,10 @@ public partial class MethodSequencesDemo
         var stub = new Stubs.ICalculator();
         stub.Strict = true;
 
-        // With only one ThenCall, we have two total callbacks
+        // With only one ThenReturns, we have two total callbacks
         stub.Add
-            .OnCall((a, b) => 100)
-            .ThenCall((a, b) => 200);
+            .Returns((a, b) => 100)
+            .ThenReturns((a, b) => 200);
 
         ICalculator calc = stub;
 
@@ -385,8 +385,8 @@ public partial class MethodSequencesDemo
         var stub = new Stubs.ICalculator();
 
         stub.Add
-            .OnCall((a, b) => 1)
-            .ThenCall((a, b) => 999);
+            .Returns((a, b) => 1)
+            .ThenReturns((a, b) => 999);
 
         ICalculator calc = stub;
 
@@ -410,8 +410,8 @@ public partial class MethodSequencesDemo
         var stub = new Stubs.ICalculator();
 
         stub.Add
-            .OnCall((a, b) => 1)
-            .ThenCall((a, b) => 999)
+            .Returns((a, b) => 1)
+            .ThenReturns((a, b) => 999)
             .ThenDefault();  // Terminates chain, return default after exhaustion
 
         ICalculator calc = stub;
@@ -425,14 +425,14 @@ public partial class MethodSequencesDemo
     // =========================================================================
     // Void Method Sequences
     // =========================================================================
-    // DESIGN DECISION: Void methods support OnCall().ThenCall() sequences too.
+    // DESIGN DECISION: Void methods support Execute().ThenExecute() sequences too.
     // Each callback is invoked in sequence.
     //
     // GENERATOR BEHAVIOR: VoidMethodInterceptor has the same sequence support:
     //
     //   public class ResetInterceptor : VoidMethodInterceptor<Unit>
     //   {
-    //       public IVoidMethodSequence ThenCall(Action callback) { ... }
+    //       public IVoidMethodSequence ThenExecute(Action callback) { ... }
     //       public IVoidMethodSequence ThenNone() { ... }
     //   }
     // =========================================================================
@@ -443,9 +443,9 @@ public partial class MethodSequencesDemo
         var log = new List<string>();
 
         stub.Reset
-            .OnCall(() => log.Add("First reset"))
-            .ThenCall(() => log.Add("Second reset"))
-            .ThenCall(() => log.Add("Subsequent reset"));
+            .Execute(() => log.Add("First reset"))
+            .ThenExecute(() => log.Add("Second reset"))
+            .ThenExecute(() => log.Add("Subsequent reset"));
 
         ICalculator calc = stub;
 
@@ -461,9 +461,9 @@ public partial class MethodSequencesDemo
     // PRIORITY ORDER for method resolution:
     //
     // 1. When chains (highest) - stub.Add.When(1, 2).Returns(100)
-    // 2. Sequences            - stub.Add.OnCall(() => 1).ThenCall(() => 2)
+    // 2. Sequences            - stub.Add.Returns(() => 1).ThenReturns(() => 2)
     // 3. Returns              - stub.Add.Returns(42)
-    // 4. OnCall               - stub.Add.OnCall((a, b) => a + b)
+    // 4. Returns(callback)    - stub.Add.Returns((a, b) => a + b)
     // 5. Source               - stub.Source(realImpl)
     // 6. SmartDefault         - default(T) or null
     //
@@ -477,8 +477,8 @@ public partial class MethodSequencesDemo
 
         // General sequence behavior
         stub.Add
-            .OnCall((a, b) => 1)
-            .ThenCall((a, b) => 2);
+            .Returns((a, b) => 1)
+            .ThenReturns((a, b) => 2);
 
         // Specific argument match (higher priority)
         stub.Add.When(99, 99).Returns(9999);

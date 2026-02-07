@@ -254,7 +254,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		stub.Add.When(1, 2).Returns(100);
-		stub.Add.OnCall((a, b) => a * b);
+		stub.Add.Returns((a, b) => a * b);
 
 		Assert.Equal(100, service.Add(1, 2));   // When matches
 		Assert.Equal(27, service.Add(9, 3));    // Falls through to OnCall
@@ -270,7 +270,7 @@ public class WhenChainTests
 		// Note: Returns() and OnCall() are mutually exclusive - the last one configured wins
 		// But When() is separate and always takes priority when it matches
 		stub.Add.When(1, 2).Returns(100);
-		stub.Add.OnCall((a, b) => 300);
+		stub.Add.Returns((a, b) => 300);
 
 		// When has priority when it matches
 		Assert.Equal(100, service.Add(1, 2));
@@ -306,7 +306,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2);
+		stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2);
 		stub.Add.When(1, 2).Returns(100);
 
 		// When takes priority when matching
@@ -335,7 +335,7 @@ public class WhenChainTests
 		var stub = new WhenChainTestStub();
 		IWhenChainTestService service = stub;
 
-		stub.Add.OnCall((a, b) => 999);
+		stub.Add.Returns((a, b) => 999);
 		stub.Add.When(1, 2).Returns(100);
 
 		Assert.Equal(100, service.Add(1, 2));   // When matches
@@ -749,7 +749,7 @@ public class WhenChainTests
 		var classStub = new WhenChainInlineStubs.Stubs.WhenChainBaseClass();
 		WhenChainBaseClass instance = classStub.Object;
 
-		classStub.ComputeVirtual.OnCall((a, b) => a * b);
+		classStub.ComputeVirtual.Returns((a, b) => a * b);
 
 		Assert.Equal(6, instance.ComputeVirtual(2, 3));
 	}
@@ -915,7 +915,7 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		var calls = new List<(int a, int b)>();
-		classStub.ProcessVirtual.When(1, 2).Call((a, b) => calls.Add((a, b)));
+		classStub.ProcessVirtual.When(1, 2).Execute((a, b) => calls.Add((a, b)));
 
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(1, 2);
@@ -930,7 +930,7 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		var calls = new List<(int a, int b)>();
-		classStub.ProcessVirtual.When((a, b) => a > 10).Call((a, b) => calls.Add((a, b)));
+		classStub.ProcessVirtual.When((a, b) => a > 10).Execute((a, b) => calls.Add((a, b)));
 
 		instance.ProcessVirtual(1, 2);    // Doesn't match
 		instance.ProcessVirtual(15, 20);  // Matches
@@ -962,9 +962,9 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		classStub.ProcessVirtual
-			.When(1, 2).Call((a, b) => calls.Add("first"))
-			.ThenWhen(3, 4).Call((a, b) => calls.Add("second"))
-			.ThenWhen((a, b) => a > 100).Call((a, b) => calls.Add("large"));
+			.When(1, 2).Execute((a, b) => calls.Add("first"))
+			.ThenWhen(3, 4).Execute((a, b) => calls.Add("second"))
+			.ThenWhen((a, b) => a > 100).Execute((a, b) => calls.Add("large"));
 
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(3, 4);
@@ -982,8 +982,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		classStub.ProcessVirtual
-			.When(1, 2).Call((a, b) => calls.Add("specific"))
-			.ThenCall((a, b) => calls.Add($"any:{a},{b}"));
+			.When(1, 2).Execute((a, b) => calls.Add("specific"))
+			.ThenExecute((a, b) => calls.Add($"any:{a},{b}"));
 
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(9, 9);
@@ -999,8 +999,8 @@ public class WhenChainTests
 		WhenChainBaseClass instance = classStub.Object;
 
 		var calls = new List<string>();
-		classStub.ProcessVirtual.When(1, 2).Call((a, b) => calls.Add("matched")).ThenNone();
-		classStub.ProcessVirtual.OnCall((a, b) => calls.Add("fallback"));
+		classStub.ProcessVirtual.When(1, 2).Execute((a, b) => calls.Add("matched")).ThenNone();
+		classStub.ProcessVirtual.Execute((a, b) => calls.Add("fallback"));
 
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(1, 2);  // Falls through to OnCall
@@ -1175,7 +1175,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var calls = new List<(int a, int b)>();
-		stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
+		stub.Process.When(1, 2).Execute((a, b) => calls.Add((a, b)));
 
 		service.Process(1, 2);
 		service.Process(1, 2);
@@ -1191,7 +1191,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var largeCalls = new List<(int a, int b)>();
-		stub.Process.When((a, b) => a > 10).Call((a, b) => largeCalls.Add((a, b)));
+		stub.Process.When((a, b) => a > 10).Execute((a, b) => largeCalls.Add((a, b)));
 
 		service.Process(1, 2);    // Doesn't match
 		service.Process(15, 20);  // Matches
@@ -1238,9 +1238,9 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		stub.Process
-			.When(1, 2).Call((a, b) => calls.Add("first"))
-			.ThenWhen(3, 4).Call((a, b) => calls.Add("second"))
-			.ThenWhen((a, b) => a > 100).Call((a, b) => calls.Add("large"));
+			.When(1, 2).Execute((a, b) => calls.Add("first"))
+			.ThenWhen(3, 4).Execute((a, b) => calls.Add("second"))
+			.ThenWhen((a, b) => a > 100).Execute((a, b) => calls.Add("large"));
 
 		service.Process(1, 2);    // First matcher
 		service.Process(3, 4);    // Second matcher
@@ -1258,8 +1258,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		stub.Process
-			.When(1, 2).Call((a, b) => calls.Add("specific"))
-			.ThenCall((a, b) => calls.Add($"any:{a},{b}"));
+			.When(1, 2).Execute((a, b) => calls.Add("specific"))
+			.ThenExecute((a, b) => calls.Add($"any:{a},{b}"));
 
 		service.Process(1, 2);    // First matcher
 		service.Process(9, 9);    // ThenCall
@@ -1275,8 +1275,8 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var calls = new List<string>();
-		stub.Process.When(1, 2).Call((a, b) => calls.Add("matched")).ThenNone();
-		stub.Process.OnCall((a, b) => calls.Add("fallback"));
+		stub.Process.When(1, 2).Execute((a, b) => calls.Add("matched")).ThenNone();
+		stub.Process.Execute((a, b) => calls.Add("fallback"));
 
 		service.Process(1, 2);    // First matcher
 		service.Process(1, 2);    // Falls through to OnCall (ThenNone exhausted)
@@ -1292,8 +1292,8 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var calls = new List<string>();
-		stub.Process.When(1, 2).Call((a, b) => calls.Add("when"));
-		stub.Process.OnCall((a, b) => calls.Add("oncall"));
+		stub.Process.When(1, 2).Execute((a, b) => calls.Add("when"));
+		stub.Process.Execute((a, b) => calls.Add("oncall"));
 
 		service.Process(1, 2);    // When matches
 		service.Process(9, 9);    // Falls through to OnCall
@@ -1309,7 +1309,7 @@ public class WhenChainTests
 
 		stub.Process
 			.When(1, 2)
-			.ThenCall((a, b) => { })
+			.ThenExecute((a, b) => { })
 			.Verifiable();
 
 		service.Process(1, 2);  // Consume first
@@ -1327,8 +1327,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		var chain = stub.Process
-			.When(1, 2).Call((a, b) => calls.Add("first"))
-			.ThenCall((a, b) => calls.Add("terminal"));
+			.When(1, 2).Execute((a, b) => calls.Add("first"))
+			.ThenExecute((a, b) => calls.Add("terminal"));
 
 		service.Process(1, 2);    // First
 		service.Process(9, 9);    // Terminal
@@ -1364,7 +1364,7 @@ public class WhenChainTests
 		IWhenChainTestService service = stub;
 
 		var calls = new List<(int a, int b)>();
-		stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
+		stub.Process.When(1, 2).Execute((a, b) => calls.Add((a, b)));
 
 		service.Process(1, 2);
 
@@ -1410,7 +1410,7 @@ public class WhenChainTests
 		VoidProcessor processor = stub;
 
 		var calls = new List<(int a, int b)>();
-		stub.Interceptor.When(1, 2).Call((a, b) => calls.Add((a, b)));
+		stub.Interceptor.When(1, 2).Execute((a, b) => calls.Add((a, b)));
 
 		processor(1, 2);
 		processor(1, 2);
@@ -1425,7 +1425,7 @@ public class WhenChainTests
 		VoidProcessor processor = stub;
 
 		var calls = new List<(int a, int b)>();
-		stub.Interceptor.When((a, b) => a > 10).Call((a, b) => calls.Add((a, b)));
+		stub.Interceptor.When((a, b) => a > 10).Execute((a, b) => calls.Add((a, b)));
 
 		processor(1, 2);    // Doesn't match
 		processor(15, 20);  // Matches
@@ -1457,8 +1457,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		stub.Interceptor
-			.When(1, 2).Call((a, b) => calls.Add("first"))
-			.ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
+			.When(1, 2).Execute((a, b) => calls.Add("first"))
+			.ThenWhen(3, 4).Execute((a, b) => calls.Add("second"));
 
 		processor(1, 2);
 		processor(3, 4);
@@ -1475,8 +1475,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		stub.Interceptor
-			.When(1, 2).Call((a, b) => calls.Add("specific"))
-			.ThenCall((a, b) => calls.Add("any"));
+			.When(1, 2).Execute((a, b) => calls.Add("specific"))
+			.ThenExecute((a, b) => calls.Add("any"));
 
 		processor(1, 2);
 		processor(9, 9);
@@ -1492,8 +1492,8 @@ public class WhenChainTests
 		VoidProcessor processor = stub;
 
 		var calls = new List<string>();
-		stub.Interceptor.When(1, 2).Call((a, b) => calls.Add("matched")).ThenNone();
-		stub.Interceptor.OnCall((a, b) => calls.Add("fallback"));
+		stub.Interceptor.When(1, 2).Execute((a, b) => calls.Add("matched")).ThenNone();
+		stub.Interceptor.Execute((a, b) => calls.Add("fallback"));
 
 		processor(1, 2);
 		processor(1, 2);  // Falls through
@@ -1509,8 +1509,8 @@ public class WhenChainTests
 
 		var calls = new List<string>();
 		var chain = stub.Interceptor
-			.When(1, 2).Call((a, b) => calls.Add("first"))
-			.ThenCall((a, b) => calls.Add("terminal"));
+			.When(1, 2).Execute((a, b) => calls.Add("first"))
+			.ThenExecute((a, b) => calls.Add("terminal"));
 
 		processor(1, 2);
 		processor(9, 9);
@@ -1530,7 +1530,7 @@ public class WhenChainTests
 		VoidFormatter formatter = stub;
 
 		var calls = new List<string>();
-		stub.Interceptor.When("hello").Call(s => calls.Add(s));
+		stub.Interceptor.When("hello").Execute(s => calls.Add(s));
 
 		formatter("hello");
 		formatter("world");  // Doesn't match, falls through

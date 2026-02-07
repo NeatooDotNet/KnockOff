@@ -65,9 +65,9 @@ Assert.Equal(30, stub.Interceptor.LastArgs!.Value.age);
 
 ## Configuring Callbacks
 
-Use `stub.Interceptor.OnCall(...)` to configure custom behavior when the delegate is invoked.
+Use `stub.Interceptor.Returns(...)` (non-void delegates) or `stub.Interceptor.Execute(...)` (void delegates) to configure custom behavior when the delegate is invoked.
 
-**Important:** Each call to `OnCall` replaces the previous configuration. The most recent `OnCall` wins.
+**Important:** Each call to `Returns`/`Execute` replaces the previous configuration. The most recent configuration wins.
 
 ### Configuration Methods
 
@@ -76,20 +76,20 @@ Delegates with return values support two configuration methods:
 | Method | Signature | Use Case | Example |
 |--------|-----------|----------|---------|
 | **Returns** | `Returns(TReturn value)` | Return fixed value regardless of input | `stub.Interceptor.Returns("SUCCESS")` |
-| **OnCall** | `OnCall(Func<...> callback)` | Compute return value from input | `stub.Interceptor.OnCall((x) => x * 2)` |
+| **Returns** | `Returns(Func<...> callback)` | Compute return value from input | `stub.Interceptor.Returns((x) => x * 2)` |
 
 Void delegates (`Action`, `Action<T>`) support only the callback method:
 
 | Overload | Signature | Use Case | Example |
 |----------|-----------|----------|---------|
-| **Callback** | `OnCall(Action callback)` | Execute side effects | `stub.Interceptor.OnCall(() => counter++)` |
+| **Execute** | `Execute(Action callback)` | Execute side effects | `stub.Interceptor.Execute(() => counter++)` |
 
-### OnCall for Void Delegates
+### Execute for Void Delegates
 
 <!-- snippet: delegate-stub-oncall-void -->
 ```cs
 // Configure side effects for void delegate
-stub.Interceptor.OnCall(() => notified = true);
+stub.Interceptor.Execute(() => notified = true);
 ```
 <!-- endSnippet -->
 
@@ -111,14 +111,14 @@ stub.Interceptor.Returns("FORMATTED");
 
 **Signature:** `Returns(TReturn value)` where `TReturn` is the delegate's return type.
 
-### OnCall with Computed Return Value
+### Returns with Computed Return Value
 
 Use the callback overload to compute the return value based on input arguments. The callback receives the same parameters as the delegate and returns the result.
 
 <!-- snippet: delegate-stub-oncall-return -->
 ```cs
 // OnCall() - compute return value based on input
-stub.Interceptor.OnCall((input) => input.ToUpperInvariant());
+stub.Interceptor.Returns((input) => input.ToUpperInvariant());
 ```
 <!-- endSnippet -->
 
@@ -127,14 +127,14 @@ stub.Interceptor.OnCall((input) => input.ToUpperInvariant());
 - You need conditional logic or computation
 - You need to capture or transform input
 
-**Signature:** `OnCall(Func<TArg1, ..., TReturn> callback)` matching the delegate signature.
+**Signature:** `Returns(Func<TArg1, ..., TReturn> callback)` matching the delegate signature.
 
-### OnCall with Multiple Parameters
+### Returns with Multiple Parameters
 
 <!-- snippet: delegate-stub-oncall-multi-param -->
 ```cs
 // Configure with multiple parameters
-stub.Interceptor.OnCall((name, age) => $"{name} is {age} years old");
+stub.Interceptor.Returns((name, age) => $"{name} is {age} years old");
 ```
 <!-- endSnippet -->
 
@@ -164,12 +164,12 @@ stub.Interceptor.Verify(Times.AtMost(5));
 
 ### Verifiable Pattern
 
-Delegate stubs support `.Verifiable()` chaining on `OnCall()` and `Returns()`, just like interface and class stubs:
+Delegate stubs support `.Verifiable()` chaining on `Returns()` and `Execute()`, just like interface and class stubs:
 
 <!-- snippet: delegate-verifiable-pattern -->
 ```cs
 // Mark for verification with Verifiable() chaining
-stub.Interceptor.OnCall((x) => x * 2).Verifiable();
+stub.Interceptor.Returns((x) => x * 2).Verifiable();
 stub.Interceptor.Verify(Times.Never); // Not called yet
 
 Transform transform = stub;
@@ -224,7 +224,7 @@ KnockOff supports closed generic delegates using standard generic attribute synt
 ```cs
 // Closed generic: type arguments specified at stub definition
 var stub = new DelegateStubTests.Stubs.Factory();
-stub.Interceptor.OnCall(() => "generated value");
+stub.Interceptor.Returns(() => "generated value");
 Factory<string> factory = stub;
 ```
 <!-- endSnippet -->
@@ -235,10 +235,10 @@ Factory<string> factory = stub;
 ```cs
 // Open generic: create stub with any type argument
 var stringFactory = new OpenGenericDelegateTest.Stubs.Factory<string>();
-stringFactory.Interceptor.OnCall(() => "hello");
+stringFactory.Interceptor.Returns(() => "hello");
 
 var intFactory = new OpenGenericDelegateTest.Stubs.Factory<int>();
-intFactory.Interceptor.OnCall(() => 42);
+intFactory.Interceptor.Returns(() => 42);
 ```
 <!-- endSnippet -->
 
@@ -248,7 +248,7 @@ intFactory.Interceptor.OnCall(() => 42);
 ```cs
 // ConstrainedFactory<T> requires T : new() - compiler enforces this
 var productFactory = new OpenGenericDelegateTest.Stubs.ConstrainedFactory<Product>();
-productFactory.Interceptor.OnCall(() => new Product { Id = 1, Name = "Widget" });
+productFactory.Interceptor.Returns(() => new Product { Id = 1, Name = "Widget" });
 ```
 <!-- endSnippet -->
 
@@ -289,9 +289,9 @@ stub.Interceptor.Returns(10, 20, 30);
 ```cs
 // Callback sequences
 stub.Interceptor
-    .OnCall((x) => x * 1)
-    .ThenCall((x) => x * 2)
-    .ThenCall((x) => x * 3);
+    .Returns((x) => x * 1)
+    .ThenReturns((x) => x * 2)
+    .ThenReturns((x) => x * 3);
 ```
 <!-- endSnippet -->
 
@@ -301,7 +301,7 @@ stub.Interceptor
 ```cs
 // ThenReturns for fixed values after callback
 stub.Interceptor
-    .OnCall((x) => x)
+    .Returns((x) => x)
     .ThenReturns(99);
 ```
 <!-- endSnippet -->
@@ -312,8 +312,8 @@ stub.Interceptor
 ```cs
 // ThenDefault: return default(T) after exhaustion instead of repeating
 stub.Interceptor
-    .OnCall((a, b) => 100)
-    .ThenCall((a, b) => 200)
+    .Returns((a, b) => 100)
+    .ThenReturns((a, b) => 200)
     .ThenDefault();
 // Call 1: 100, Call 2: 200, Call 3+: 0 (default(int))
 ```
@@ -376,13 +376,13 @@ stub.Interceptor
 
 ### Void Delegate When Chains
 
-Void delegates use `.Call()` instead of `.Returns()`:
+Void delegates use `.Execute()` instead of `.Returns()`:
 
 <!-- snippet: delegate-when-void-chains -->
 ```cs
 stub.Interceptor
-    .When(1, 2).Call((a, b) => calls.Add("first"))
-    .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
+    .When(1, 2).Execute((a, b) => calls.Add("first"))
+    .ThenWhen(3, 4).Execute((a, b) => calls.Add("second"));
 ```
 <!-- endSnippet -->
 
@@ -427,12 +427,12 @@ Assert.Throws<StubException>(() => op(0, 0)); // Throws StubException.SequenceEx
 
 ## Configuration Mutual Exclusivity
 
-`Returns()` and `OnCall()` are mutually exclusive. Configuring one clears the other:
+`Returns()` and `Execute()` are mutually exclusive. Configuring one clears the other:
 
 <!-- snippet: delegate-config-mutual-exclusivity -->
 ```cs
 stub.Interceptor.Returns(42);
-stub.Interceptor.OnCall((a, b) => a + b); // Clears Returns(42)
+stub.Interceptor.Returns((a, b) => a + b); // Clears Returns(42)
 ```
 <!-- endSnippet -->
 
@@ -441,10 +441,10 @@ stub.Interceptor.OnCall((a, b) => a + b); // Clears Returns(42)
 When a delegate is invoked, KnockOff checks configurations in this priority order:
 
 1. **When chains** (highest) — parameter-specific matching
-2. **Sequences** — `OnCall().ThenCall()` sequence callbacks
+2. **Sequences** — `Returns().ThenReturns()` / `Execute().ThenExecute()` sequence callbacks
 3. **Returns value** — `Returns(value)` repeating constant
-4. **OnCall callback** — `OnCall(delegate)` repeating callback
-5. **Simplified callback** — `OnCall(simplified)` for async delegates
+4. **Returns callback** — `Returns(delegate)` repeating callback
+5. **Simplified callback** — `Returns(simplified)` for async delegates
 6. **Strict mode check** — throws `StubException.NotConfigured` if strict
 7. **Smart default** — `default(T)` for value types, `null` for reference types
 
@@ -478,7 +478,7 @@ var result = ProcessWithFormatter(stub);
 <!-- snippet: delegate-stub-validation-rule -->
 ```cs
 // Configure validation: "admin" is taken, others are available
-stub.Interceptor.OnCall((value) => value != "admin");
+stub.Interceptor.Returns((value) => value != "admin");
 ```
 <!-- endSnippet -->
 
@@ -487,7 +487,7 @@ stub.Interceptor.OnCall((value) => value != "admin");
 <!-- snippet: delegate-stub-factory -->
 ```cs
 // Configure factory to return test instance
-stub.Interceptor.OnCall(() => testProduct);
+stub.Interceptor.Returns(() => testProduct);
 Factory<Product> factory = stub;
 ```
 <!-- endSnippet -->
@@ -497,7 +497,7 @@ Factory<Product> factory = stub;
 <!-- snippet: delegate-stub-event-callback -->
 ```cs
 // Track received events
-stub.Interceptor.OnCall((evt) => receivedEvent = evt);
+stub.Interceptor.Execute((evt) => receivedEvent = evt);
 ```
 <!-- endSnippet -->
 
@@ -508,10 +508,10 @@ This example demonstrates delegate stubs in a realistic validation scenario.
 <!-- snippet: delegate-stub-complete-example -->
 ```cs
 // Configure format rule: must be at least 3 characters
-formatStub.Interceptor.OnCall((value) => value.Length >= 3);
+formatStub.Interceptor.Returns((value) => value.Length >= 3);
 
 // Configure uniqueness rule: "admin" and "root" are taken
-uniqueStub.Interceptor.OnCall((value) => value != "admin" && value != "root");
+uniqueStub.Interceptor.Returns((value) => value != "admin" && value != "root");
 
 // Create validator with stubbed rules
 var validator = new UsernameValidator(uniqueStub, formatStub);
@@ -523,7 +523,7 @@ var validator = new UsernameValidator(uniqueStub, formatStub);
 ## Next Steps
 
 - **[Stub Patterns](stub-patterns.md)** - Learn about all nine patterns including Inline Delegate
-- **[Methods Guide](methods.md)** - Configure method behavior with OnCall
+- **[Methods Guide](methods.md)** - Configure method behavior with Returns/Execute
 - **[Parameter Matching](parameter-matching.md)** - When chains and conditional behavior
 - **[Async Patterns](async-patterns.md)** - Async auto-wrapping details
 - **[Verification Guide](verification.md)** - Verify delegate invocations

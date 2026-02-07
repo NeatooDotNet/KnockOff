@@ -125,7 +125,7 @@ public partial class IEntityPropertyTests
         IEntityProperty property = stub;
         IPropertyInfo? capturedPropertyInfo = null;
 
-        stub.ApplyPropertyInfo.OnCall((propInfo) =>
+        stub.ApplyPropertyInfo.Execute((propInfo) =>
         {
             capturedPropertyInfo = propInfo;
         });

@@ -25,9 +25,9 @@ public partial class OpenGenericInterfaceOverloadTests
         // Arrange
         var stub = new Stubs.IGenericFormatter<string>();
 
-        stub.Format.OnCall((item) => $"[1: {item}]");
-        stub.Format.OnCall((item, uppercase) => $"[2: {item}, {uppercase}]");
-        stub.Format.OnCall((item, uppercase, maxLength) => $"[3: {item}, {uppercase}, {maxLength}]");
+        stub.Format.Returns((item) => $"[1: {item}]");
+        stub.Format.Returns((item, uppercase) => $"[2: {item}, {uppercase}]");
+        stub.Format.Returns((item, uppercase, maxLength) => $"[3: {item}, {uppercase}, {maxLength}]");
 
         IGenericFormatter<string> formatter = stub;
 
@@ -44,9 +44,9 @@ public partial class OpenGenericInterfaceOverloadTests
         var stub = new Stubs.IGenericFormatter<TestEntity>();
 
         // Overloads differ by parameter type - need explicit types
-        stub.Get.OnCall(() => new TestEntity { Id = 0, Name = "Default" });
-        stub.Get.OnCall((int id) => new TestEntity { Id = id, Name = "ById" });
-        stub.Get.OnCall((string name) => new TestEntity { Id = 99, Name = name });
+        stub.Get.Returns(() => new TestEntity { Id = 0, Name = "Default" });
+        stub.Get.Returns((int id) => new TestEntity { Id = id, Name = "ById" });
+        stub.Get.Returns((string name) => new TestEntity { Id = 99, Name = name });
 
         IGenericFormatter<TestEntity> formatter = stub;
 
@@ -62,7 +62,7 @@ public partial class OpenGenericInterfaceOverloadTests
         // Arrange
         var stub = new Stubs.IGenericFormatter<string>();
 
-        stub.Format.OnCall((item) => "default");
+        stub.Format.Returns((item) => "default");
         stub.Format.When("special").Returns("SPECIAL");
 
         IGenericFormatter<string> formatter = stub;
@@ -78,8 +78,8 @@ public partial class OpenGenericInterfaceOverloadTests
         // Arrange
         var stub = new Stubs.IGenericFormatter<string>();
 
-        var tracking1 = stub.Format.OnCall((item) => item);
-        var tracking2 = stub.Format.OnCall((item, uppercase) => item);
+        var tracking1 = stub.Format.Returns((item) => item);
+        var tracking2 = stub.Format.Returns((item, uppercase) => item);
 
         IGenericFormatter<string> formatter = stub;
 
@@ -100,8 +100,8 @@ public partial class OpenGenericInterfaceOverloadTests
         // Arrange
         var stub = new Stubs.IGenericFormatter<TestEntity>();
 
-        stub.Transform.OnCall((item) => new TestEntity { Id = item.Id * 2, Name = item.Name });
-        stub.Transform.OnCall((item, options) => new TestEntity { Id = item.Id, Name = $"{item.Name}-{options}" });
+        stub.Transform.Returns((item) => new TestEntity { Id = item.Id * 2, Name = item.Name });
+        stub.Transform.Returns((item, options) => new TestEntity { Id = item.Id, Name = $"{item.Name}-{options}" });
 
         IGenericFormatter<TestEntity> formatter = stub;
 
@@ -123,8 +123,8 @@ public partial class OpenGenericInterfaceOverloadTests
         var stringStub = new Stubs.IGenericFormatter<string>();
         var entityStub = new Stubs.IGenericFormatter<TestEntity>();
 
-        stringStub.Format.OnCall((item) => $"String: {item}");
-        entityStub.Format.OnCall((item) => $"Entity: {item.Name}");
+        stringStub.Format.Returns((item) => $"String: {item}");
+        entityStub.Format.Returns((item) => $"Entity: {item.Name}");
 
         IGenericFormatter<string> stringFormatter = stringStub;
         IGenericFormatter<TestEntity> entityFormatter = entityStub;
@@ -149,7 +149,7 @@ public partial class OpenGenericClassOverloadTests
         var stub = new Stubs.RepositoryBase<TestEntity>();
 
         stub.Name.OnGet("TestRepository");
-        stub.GetById.OnCall((id) => new TestEntity { Id = id, Name = "ById" });
+        stub.GetById.Returns((id) => new TestEntity { Id = id, Name = "ById" });
 
         // Act - use .Object to get the actual instance
         RepositoryBase<TestEntity> repo = stub.Object;
@@ -167,8 +167,8 @@ public partial class OpenGenericClassOverloadTests
 
         // Class stubs now use the same overload API as interface stubs
         // C# overload resolution determines which OnCall to use based on lambda signature
-        stub.GetDefault.OnCall(() => new TestEntity { Id = 0, Name = "Default" });
-        stub.GetDefault.OnCall((string filter) => new TestEntity { Id = 1, Name = $"Filtered: {filter}" });
+        stub.GetDefault.Returns(() => new TestEntity { Id = 0, Name = "Default" });
+        stub.GetDefault.Returns((string filter) => new TestEntity { Id = 1, Name = $"Filtered: {filter}" });
 
         RepositoryBase<TestEntity> repo = stub.Object;
 
@@ -187,7 +187,7 @@ public partial class OpenGenericClassOverloadTests
         // Arrange
         var stub = new Stubs.RepositoryBase<TestEntity>();
 
-        var tracking = stub.Save.OnCall((entity) => { });
+        var tracking = stub.Save.Execute((entity) => { });
 
         RepositoryBase<TestEntity> repo = stub.Object;
 
@@ -206,8 +206,8 @@ public partial class OpenGenericClassOverloadTests
         var stringRepo = new Stubs.RepositoryBase<string>();
         var entityRepo = new Stubs.RepositoryBase<TestEntity>();
 
-        stringRepo.GetById.OnCall((id) => $"String-{id}");
-        entityRepo.GetById.OnCall((id) => new TestEntity { Id = id, Name = "Entity" });
+        stringRepo.GetById.Returns((id) => $"String-{id}");
+        entityRepo.GetById.Returns((id) => new TestEntity { Id = id, Name = "Entity" });
 
         RepositoryBase<string> strRepo = stringRepo.Object;
         RepositoryBase<TestEntity> entRepo = entityRepo.Object;

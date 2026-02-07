@@ -1,9 +1,9 @@
 # Sequence Callback Simplification (ThenCall)
 
-**Status:** Not Started
+**Status:** Complete (Subsumed by unify-returns-execute-api)
 **Priority:** Low
 **Created:** 2026-01-26
-**Last Updated:** 2026-01-26
+**Last Updated:** 2026-02-07
 
 ---
 

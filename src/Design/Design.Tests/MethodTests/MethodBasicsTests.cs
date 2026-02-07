@@ -28,7 +28,7 @@ public class MethodBasicsTests
     public void OnCall_ConfiguresCallback()
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
-        stub.Add.OnCall((a, b) => a + b);
+        stub.Add.Returns((a, b) => a + b);
 
         Design.Domain.Services.ICalculator calc = stub;
 
@@ -64,7 +64,7 @@ public class MethodBasicsTests
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
         var resetCalled = false;
-        stub.Reset.OnCall(() => resetCalled = true);
+        stub.Reset.Execute(() => resetCalled = true);
 
         Design.Domain.Services.ICalculator calc = stub;
         calc.Reset();

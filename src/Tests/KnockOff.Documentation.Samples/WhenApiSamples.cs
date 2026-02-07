@@ -87,7 +87,7 @@ public class WhenProblemTests
 
         #region when-problem-one-callback-all-args
         // Without When(): callback must handle all argument combinations
-        stub.Calculate.OnCall((a, b) =>
+        stub.Calculate.Returns((a, b) =>
         {
             // Complex branching logic inside callback
             if (a == 5 && b == 10)
@@ -224,7 +224,7 @@ public class WhenVoidMethodTests
         var calls = new List<(int, int)>();
         #region when-void-with-callback
         // Call() adds callback for side effects
-        stub.Process.When(1, 2).Call((a, b) => calls.Add((a, b)));
+        stub.Process.When(1, 2).Execute((a, b) => calls.Add((a, b)));
         #endregion
 
         IWhenProcessor processor = stub;
@@ -242,7 +242,7 @@ public class WhenVoidMethodTests
         var matched = new List<(int, int)>();
         #region when-void-predicate
         // Predicate matching works the same for void methods
-        stub.Process.When((a, b) => a > 10).Call((a, b) => matched.Add((a, b)));
+        stub.Process.When((a, b) => a > 10).Execute((a, b) => matched.Add((a, b)));
         #endregion
 
         IWhenProcessor processor = stub;
@@ -390,7 +390,7 @@ public class WhenFallbackTests
         #region when-fallback-oncall
         // When() falls through to OnCall() when no match
         stub.Add.When(1, 2).Returns(100);
-        stub.Add.OnCall((a, b) => a * b);
+        stub.Add.Returns((a, b) => a * b);
         #endregion
 
         IWhenCalculator calc = stub;
@@ -446,8 +446,8 @@ public class WhenPriorityTests
         var stub = new WhenCalculatorStub();
 
         #region when-priority-over-sequence
-        // Sequence configured via OnCall().ThenCall()
-        stub.Add.OnCall((a, b) => 1).ThenCall((a, b) => 2);
+        // Sequence configured via Returns().ThenReturns()
+        stub.Add.Returns((a, b) => 1).ThenReturns((a, b) => 2);
 
         // When() has higher priority
         stub.Add.When(1, 2).Returns(100);
@@ -687,11 +687,11 @@ public class WhenUseCaseTests
         var stub = new WhenStatusServiceStub();
 
         #region when-usecase-state-transitions
-        // For parameterless methods, use OnCall().ThenCall() sequences
+        // For parameterless methods, use Returns().ThenReturns() sequences
         stub.GetStatus
-            .OnCall(() => "Pending")
-            .ThenCall(() => "Processing")
-            .ThenCall(() => "Complete");
+            .Returns(() => "Pending")
+            .ThenReturns(() => "Processing")
+            .ThenReturns(() => "Complete");
         #endregion
 
         IWhenStatusService service = stub;
@@ -783,8 +783,8 @@ public class WhenChainApiTests
         // Void methods: When() returns IVoidWhenChain directly
         var chain = stub.Process.When(1, 2);
 
-        // .Call() is optional - adds callback for side effects
-        chain.Call((a, b) => called = true);
+        // .Execute() is optional - adds callback for side effects
+        chain.Execute((a, b) => called = true);
         #endregion
 
         IWhenProcessor processor = stub;

@@ -82,7 +82,7 @@ internal static class ModelAdapters
 			CustomDelegateSignature: first.CustomDelegateSignature,
 			LastArgType: GetLastArgType(first.TrackableParameters),
 			LastArgsType: GetLastArgsType(first.TrackableParameters, first.LastCallType),
-			BuilderInterface: GetBuilderInterface(first.TrackableParameters, first.LastCallType, delegateTypeForBuilder),
+			BuilderInterface: GetBuilderInterface(first.TrackableParameters, first.LastCallType, delegateTypeForBuilder, first.IsVoid),
 			DefaultExpression: first.DefaultExpression,
 			ThrowsOnDefault: first.ThrowsOnDefault,
 			// User method name: if HasUserOverride, the user method name is MethodName + "_"
@@ -129,7 +129,7 @@ internal static class ModelAdapters
 				DelegateSignature: delegateSignature,
 				LastArgType: GetLastArgType(method.TrackableParameters),
 				LastArgsType: GetLastArgsType(method.TrackableParameters, method.LastCallType),
-				BuilderInterface: GetBuilderInterface(method.TrackableParameters, method.LastCallType, delegateName),
+				BuilderInterface: GetBuilderInterface(method.TrackableParameters, method.LastCallType, delegateName, method.IsVoid),
 				DefaultExpression: method.DefaultExpression,
 				ThrowsOnDefault: method.ThrowsOnDefault,
 				// Per-signature user method name for mixed overload groups
@@ -197,17 +197,32 @@ internal static class ModelAdapters
 		return lastCallType ?? $"({string.Join(", ", trackableParams.Select(p => $"{p.Type} {p.EscapedName}"))})";
 	}
 
-	private static string GetBuilderInterface(EquatableArray<ParameterModel> trackableParams, string? lastCallType, string delegateType)
+	private static string GetBuilderInterface(EquatableArray<ParameterModel> trackableParams, string? lastCallType, string delegateType, bool isVoid)
 	{
-		if (trackableParams.Count == 0)
-			return $"global::KnockOff.IMethodCallBuilder<{delegateType}>";
-		if (trackableParams.Count == 1)
+		if (isVoid)
 		{
-			var param = trackableParams.GetArray()![0];
-			return $"global::KnockOff.IMethodCallBuilder<{delegateType}, {param.Type}>";
+			if (trackableParams.Count == 0)
+				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}>";
+			if (trackableParams.Count == 1)
+			{
+				var param = trackableParams.GetArray()![0];
+				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}, {param.Type}>";
+			}
+			var tupleType = lastCallType ?? $"({string.Join(", ", trackableParams.Select(p => $"{p.Type} {p.EscapedName}"))})";
+			return $"global::KnockOff.IMethodExecuteBuilderArgs<{delegateType}, {tupleType}>";
 		}
-		var tupleType = lastCallType ?? $"({string.Join(", ", trackableParams.Select(p => $"{p.Type} {p.EscapedName}"))})";
-		return $"global::KnockOff.IMethodCallBuilderArgs<{delegateType}, {tupleType}>";
+		else
+		{
+			if (trackableParams.Count == 0)
+				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}>";
+			if (trackableParams.Count == 1)
+			{
+				var param = trackableParams.GetArray()![0];
+				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}, {param.Type}>";
+			}
+			var tupleType = lastCallType ?? $"({string.Join(", ", trackableParams.Select(p => $"{p.Type} {p.EscapedName}"))})";
+			return $"global::KnockOff.IMethodReturnsBuilderArgs<{delegateType}, {tupleType}>";
+		}
 	}
 
 	private static string BuildDelegateParamList(EquatableArray<ParameterModel> parameters)
@@ -318,7 +333,7 @@ internal static class ModelAdapters
 	{
 		// Delegates have no out params, so trackable == all params
 		var onCallType = del.OnCallType;
-		var builderInterface = GetBuilderInterface(del.Parameters, null, onCallType);
+		var builderInterface = GetBuilderInterface(del.Parameters, null, onCallType, del.IsVoid);
 
 		var model = new UnifiedMethodInterceptorModel(
 			InterceptorClassName: del.InterceptorClassName,

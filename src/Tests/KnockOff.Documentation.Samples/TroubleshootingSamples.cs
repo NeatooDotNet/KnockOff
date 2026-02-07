@@ -56,7 +56,7 @@ public partial class TroubleshootEmailServiceTests
     public void ClassStub_RequiresObjectProperty()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.OnCall((to, subject) => true);
+        stub.Send.Returns((to, subject) => true);
 
         #region troubleshoot-object
         // Use .Object to get the typed instance for class stubs
@@ -76,7 +76,7 @@ public partial class TroubleshootEmailServiceTests
     public void PassingStubObjectToMethod()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.OnCall((to, subject) => true);
+        stub.Send.Returns((to, subject) => true);
         UseEmailService(stub.Object);
         stub.Send.Verify();
     }
@@ -95,7 +95,7 @@ public class OnCallSignatureTests
 
         #region troubleshoot-oncall-signature
         // OnCall signature must match method parameters exactly
-        stub.GetByIdAsync.OnCall((int id) =>
+        stub.GetByIdAsync.Returns((int id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
         #endregion
 
@@ -151,7 +151,7 @@ public class NoCallbackTests
 
         #region troubleshoot-no-callback
         // Configure required (non-nullable) return values explicitly
-        stub.GetName.OnCall(() => "Configured Name");
+        stub.GetName.Returns(() => "Configured Name");
         #endregion
 
         var name = repository.GetName();
@@ -360,15 +360,15 @@ public class OnCallSignatureAdditionalTests
         // Interface method: User GetUser(int id, bool includeDeleted)
 
         // ERROR: Wrong - no parameters (CS1593)
-        // stub.GetUser.OnCall(() => new User());
+        // stub.GetUser.Returns(() => new User());
 
         // ERROR: Wrong - only one parameter (CS1593)
-        // stub.GetUser.OnCall((id) => new User());
+        // stub.GetUser.Returns((id) => new User());
         #endregion
 
         #region troubleshoot-oncall-signature-correct
         // CORRECT: Match all parameters from method signature
-        stub.GetUser.OnCall((int id, bool includeDeleted) =>
+        stub.GetUser.Returns((int id, bool includeDeleted) =>
             new User { Id = id, Name = includeDeleted ? "All" : "Active" });
         #endregion
 
@@ -396,7 +396,7 @@ public partial class EmailServiceAdditionalTests
     public void ClassStub_UseObjectProperty()
     {
         var stub = new Stubs.EmailService();
-        stub.Send.OnCall((to, subject) => true);
+        stub.Send.Returns((to, subject) => true);
 
         // Use .Object to get the typed instance
         EmailService service = stub.Object;
@@ -418,16 +418,16 @@ public class AsyncReturnTests
         // Interface: Task<User?> GetUserAsync(int id)
 
         // ERROR: Returning unwrapped value (CS0029)
-        // stub.GetUserAsync.OnCall((id) => new User());
+        // stub.GetUserAsync.Returns((id) => new User());
         #endregion
 
         #region troubleshoot-async-return-correct
         // CORRECT: Return Task.FromResult for async methods
-        stub.GetUserAsync.OnCall((int id) =>
+        stub.GetUserAsync.Returns((int id) =>
             Task.FromResult<User?>(new User { Id = id }));
 
         // For Task (void async), use Task.CompletedTask:
-        stub.SaveAsync.OnCall((user) => Task.CompletedTask);
+        stub.SaveAsync.Execute((user) => { });
         #endregion
 
         #region troubleshoot-async-simpler-alternatives
@@ -435,7 +435,7 @@ public class AsyncReturnTests
         stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
 
         // Simplified OnCall also auto-wraps
-        stub.GetUserAsync.OnCall((id) => new User { Id = id });
+        stub.GetUserAsync.Returns((id) => new User { Id = id });
         #endregion
 
         IUserService service = stub;
@@ -453,7 +453,7 @@ public class VerificationTests
         var stub = new UserServiceStub();
 
         // ARRANGE: Configure OnCall with Verifiable BEFORE acting
-        stub.GetUserAsync.OnCall((id) =>
+        stub.GetUserAsync.Returns((id) =>
             Task.FromResult<User?>(new User { Id = id }))
             .Verifiable();
 
@@ -475,7 +475,7 @@ public class VerificationTests
         var stub = new UserServiceStub();
 
         // Configure the stub
-        stub.GetUserAsync.OnCall((id) =>
+        stub.GetUserAsync.Returns((id) =>
             Task.FromResult<User?>(new User { Id = id }))
             .Verifiable();
 
@@ -507,7 +507,7 @@ public class MultipleInterfaceTests
 
         // When multiple interfaces share the same method signature,
         // KnockOff generates a single shared interceptor
-        stub.DoWork.OnCall(() => { }).Verifiable();
+        stub.DoWork.Execute(() => { }).Verifiable();
 
         // Calls through either interface use the same interceptor
         IFoo foo = stub;
@@ -604,10 +604,10 @@ public partial class CalcDelegateTests
 
         #region troubleshoot-delegate-interceptor-pattern
         // Interface stub pattern:
-        interfaceStub.GetById.OnCall((id) => user);
+        interfaceStub.GetById.Returns((id) => user);
 
         // Delegate stub pattern (different!):
-        delegateStub.Interceptor.OnCall((a, b) => a + b);
+        delegateStub.Interceptor.Returns((a, b) => a + b);
         delegateStub.Interceptor.Returns(42);
         #endregion
 
@@ -625,17 +625,17 @@ public partial class CalcDelegateTests
         // Delegate: int CalcOperation(int a, int b)
 
         // Wrong: missing parameter
-        // stub.Interceptor.OnCall((a) => a);
+        // stub.Interceptor.Returns((a) => a);
 
         // Wrong: wrong parameter type
-        // stub.Interceptor.OnCall((string a, string b) => 0);
+        // stub.Interceptor.Returns((string a, string b) => 0);
         #endregion
 
         #region troubleshoot-delegate-oncall-correct
         // Correct: matches delegate signature
-        stub.Interceptor.OnCall((int a, int b) => a + b);
+        stub.Interceptor.Returns((int a, int b) => a + b);
         // Or with inferred types:
-        stub.Interceptor.OnCall((a, b) => a + b);
+        stub.Interceptor.Returns((a, b) => a + b);
         #endregion
 
         CalcOperation op = stub;
@@ -688,7 +688,7 @@ public class UserMethodExampleTests
         var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
 
         // You can still override per-test with OnCall
-        stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
+        stub.GetById.Returns(id => new User { Id = id, Name = "Test User" });
         #endregion
 
         Assert.Equal("Default User", user!.Name);

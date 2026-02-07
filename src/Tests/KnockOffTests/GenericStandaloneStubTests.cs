@@ -41,7 +41,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
-		var tracking = stub.Save.OnCall((entity) => { });
+		var tracking = stub.Save.Execute((entity) => { });
 		IGenericRepository<User> repo = stub;
 
 		// Act
@@ -57,7 +57,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
-		var tracking = stub.Save.OnCall((entity) => { });
+		var tracking = stub.Save.Execute((entity) => { });
 		IGenericRepository<User> repo = stub;
 		var user = new User { Id = 42, Name = "Test" };
 
@@ -79,7 +79,7 @@ public class GenericStandaloneStubTests
 		var stub = new GenericRepositoryStub<User>();
 		IGenericRepository<User> repo = stub;
 		var expected = new User { Id = 123, Name = "Found" };
-		stub.GetById.OnCall((id) => expected);
+		stub.GetById.Returns((id) => expected);
 
 		// Act
 		var result = repo.GetById(123);
@@ -126,7 +126,7 @@ public class GenericStandaloneStubTests
 			new() { Id = 1, Name = "User1" },
 			new() { Id = 2, Name = "User2" }
 		};
-		stub.GetAll.OnCall(() => users);
+		stub.GetAll.Returns(() => users);
 
 		// Act
 		var result = repo.GetAll();
@@ -160,7 +160,7 @@ public class GenericStandaloneStubTests
 		// Arrange
 		var stub = new GenericKeyValueStoreStub<string, int>();
 		IGenericKeyValueStore<string, int> store = stub;
-		var tracking = stub.Get.OnCall((key) => 42);
+		var tracking = stub.Get.Returns((key) => 42);
 
 		// Act
 		var result = store.Get("answer");
@@ -194,7 +194,7 @@ public class GenericStandaloneStubTests
 		var stub = new ConstrainedRepositoryStub<User>();
 		IConstrainedRepository<User> repo = stub;
 		var user = new User { Id = 1 };
-		var tracking = stub.Save.OnCall((entity) => { });
+		var tracking = stub.Save.Execute((entity) => { });
 
 		// Act
 		repo.Save(user);
@@ -227,7 +227,7 @@ public class GenericStandaloneStubTests
 	{
 		// Arrange
 		var stub = new GenericRepositoryStub<User>();
-		var tracking = stub.GetById.OnCall((id) => null);
+		var tracking = stub.GetById.Returns((id) => null);
 		IGenericRepository<User> repo = stub;
 		repo.GetById(1);
 		repo.GetById(2);

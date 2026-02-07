@@ -9,7 +9,7 @@ public class AsyncMethodTests
 	public async Task AsyncMethod_Task_ReturnsCompletedTask()
 	{
 		var knockOff = new AsyncServiceKnockOff();
-		var tracking = knockOff.DoWorkAsync.OnCall(() => Task.CompletedTask);
+		var tracking = knockOff.DoWorkAsync.Returns(() => Task.CompletedTask);
 		IAsyncService service = knockOff;
 
 		await service.DoWorkAsync();
@@ -33,7 +33,7 @@ public class AsyncMethodTests
 	public async Task AsyncMethod_TaskOfNullableT_ReturnsDefault()
 	{
 		var knockOff = new AsyncServiceKnockOff();
-		var tracking = knockOff.GetOptionalAsync.OnCall(() => Task.FromResult<string?>(null));
+		var tracking = knockOff.GetOptionalAsync.Returns(() => Task.FromResult<string?>(null));
 		IAsyncService service = knockOff;
 
 		var result = await service.GetOptionalAsync();
@@ -46,7 +46,7 @@ public class AsyncMethodTests
 	public async Task AsyncMethod_ValueTask_ReturnsCompleted()
 	{
 		var knockOff = new AsyncServiceKnockOff();
-		var tracking = knockOff.DoWorkValueTaskAsync.OnCall(() => default);
+		var tracking = knockOff.DoWorkValueTaskAsync.Returns(() => default);
 		IAsyncService service = knockOff;
 
 		await service.DoWorkValueTaskAsync();

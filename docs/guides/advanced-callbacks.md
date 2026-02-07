@@ -2,7 +2,7 @@
 
 # Advanced Callback Patterns
 
-When simple `OnCall` configuration isn't enough, callbacks give you complete control over stub behavior. This guide covers practical patterns for sequential returns, conditional logic, exceptions, state tracking, and side effects.
+When simple `Returns`/`Execute` configuration isn't enough, callbacks give you complete control over stub behavior. This guide covers practical patterns for sequential returns, conditional logic, exceptions, state tracking, and side effects.
 
 ## When You Need Advanced Callbacks
 
@@ -27,7 +27,7 @@ Return different values on successive calls by maintaining a queue:
 ```cs
 // Queue of results: first succeeds, second fails
 var results = new Queue<bool>(new[] { true, false });
-stub.Send.OnCall((to, message) => results.Dequeue());
+stub.Send.Returns((to, message) => results.Dequeue());
 ```
 <!-- endSnippet -->
 
@@ -39,7 +39,7 @@ Control behavior based on call count using a simple counter:
 ```cs
 // Counter tracks call count for conditional behavior
 var attempts = 0;
-stub.Attempt.OnCall(() =>
+stub.Attempt.Returns(() =>
 {
     attempts++;
     return attempts > 3; // Succeed on 4th attempt
@@ -56,7 +56,7 @@ Return different values based on method arguments using pattern matching:
 <!-- snippet: advanced-conditional-switch -->
 ```cs
 // Pattern matching for argument-based return values
-stub.FindById.OnCall((id) => id switch
+stub.FindById.Returns((id) => id switch
 {
     1 => new User { Id = 1, Name = "Admin", Email = "admin@test.com" },
     2 => new User { Id = 2, Name = "User", Email = "user@test.com" },
@@ -74,7 +74,7 @@ Simulate error conditions by throwing exceptions from callbacks:
 <!-- snippet: advanced-exception -->
 ```cs
 // Throw exceptions based on argument conditions
-stub.Charge.OnCall((amount) =>
+stub.Charge.Execute((amount) =>
 {
     if (amount > 1000)
         throw new PaymentException("Insufficient funds");
@@ -95,7 +95,7 @@ Use interceptor state to make one member's behavior depend on another:
 // Shared state between property and method
 var isConnected = false;
 stub.IsConnected.OnGet(() => isConnected);
-stub.Connect.OnCall(() => { isConnected = true; });
+stub.Connect.Execute(() => { isConnected = true; });
 ```
 <!-- endSnippet -->
 
@@ -107,8 +107,8 @@ Enforce ordering requirements by checking state in callbacks:
 ```cs
 // Enforce method ordering with shared state
 var isInitialized = false;
-stub.Initialize.OnCall(() => { isInitialized = true; });
-stub.Query.OnCall((sql) =>
+stub.Initialize.Execute(() => { isInitialized = true; });
+stub.Query.Returns((sql) =>
 {
     if (!isInitialized)
         throw new InvalidOperationException("Must call Initialize() first");
@@ -126,7 +126,7 @@ Callbacks can perform actions beyond returning values. Use this to simulate depe
 <!-- snippet: advanced-side-effects -->
 ```cs
 // Callbacks can track state and perform side effects
-stub.PlaceOrder.OnCall((order) =>
+stub.PlaceOrder.Returns((order) =>
 {
     placedOrders.Add(order);
     notifications.Add($"Order {nextOrderId} placed for user {order.UserId}");
@@ -144,7 +144,7 @@ This example combines multiple patterns to create a realistic cache simulation w
 <!-- snippet: advanced-complete-example -->
 ```cs
 // Get: Check expiration, track hits/misses
-stub.Get.OnCall((key) =>
+stub.Get.Returns((key) =>
 {
     if (cache.TryGetValue(key, out var entry))
     {
@@ -160,7 +160,7 @@ stub.Get.OnCall((key) =>
 });
 
 // Set: Enforce capacity, evict oldest if needed
-stub.Set.OnCall((key, value) =>
+stub.Set.Execute((key, value) =>
 {
     if (cache.Count >= maxCapacity && !cache.ContainsKey(key))
     {
@@ -171,7 +171,7 @@ stub.Set.OnCall((key, value) =>
 });
 
 // Clear: Reset everything
-stub.Clear.OnCall(() =>
+stub.Clear.Execute(() =>
 {
     cache.Clear();
     hits = 0;

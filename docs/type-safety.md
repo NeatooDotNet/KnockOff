@@ -55,7 +55,7 @@ Assert.Equal(0, result);
 ```
 <!-- endSnippet -->
 
-**KnockOff — `OnCall` and `Returns` are each a single, complete call. There is no second step to forget:**
+**KnockOff — `Returns` and `Execute` are each a single, complete call. There is no second step to forget:**
 
 <!-- snippet: partial-setup-knockoff-oncall -->
 ```cs
@@ -64,7 +64,7 @@ var stub = new PartialSetupCalcStub();
 
 // One call does both: configures the method AND defines the return value
 // There is no second step to forget
-stub.Calculate.OnCall((a, b) => a + b);
+stub.Calculate.Returns((a, b) => a + b);
 
 IPartialSetupCalc calc = stub;
 Assert.Equal(3, calc.Calculate(1, 2));
@@ -174,9 +174,9 @@ NSubstitute does provide `ArgAt<T>(index)` to disambiguate, but the index is unc
 
 ## KnockOff: Fully Typed
 
-KnockOff's generated interceptors match the method signature exactly. OnCall and When lambdas receive typed, named parameters — no manual type specifications, no casts, no index lookups.
+KnockOff's generated interceptors match the method signature exactly. Returns/Execute and When lambdas receive typed, named parameters — no manual type specifications, no casts, no index lookups.
 
-**OnCall with typed parameters:**
+**Returns with typed parameters:**
 
 <!-- snippet: type-safety-knockoff-oncall-typed -->
 ```cs
@@ -185,7 +185,7 @@ var stub = new TypeSafeCalcStub();
 
 // (int a, int b) — types and names come from Add(int a, int b)
 // Wrong types here cause a COMPILE error, not a runtime error
-stub.Add.OnCall((a, b) => a + b);
+stub.Add.Returns((a, b) => a + b);
 
 ITypeSafeCalc calc = stub;
 Assert.Equal(3, calc.Add(1, 2));
@@ -216,7 +216,7 @@ If you try to use the wrong types in a KnockOff lambda, you get a compile error 
 
 | | Moq | NSubstitute | KnockOff |
 |---|---|---|---|
-| **Partial setup (forgot `.Returns()`)** | Strict: runtime error. Loose: silent `default(T)` | Silent `default(T)` | Impossible — `OnCall`/`Returns` are each complete in one call |
+| **Partial setup (forgot `.Returns()`)** | Strict: runtime error. Loose: silent `default(T)` | Silent `default(T)` | Impossible — `Returns`/`Execute` are each complete in one call |
 | **Lambda setup** | Typed (compile-time safe) | Typed (compile-time safe) | Typed (compile-time safe) |
 | **Callback/Returns type params** | Manual `<T1, T2>` — unchecked | N/A | Generated — compile-time safe |
 | **Argument access in callbacks** | Via `.Returns<T1,T2>((a,b) => ...)` — manual types | Via `callInfo[i]` (untyped) or `.Arg<T>()` (ambiguous) | Via lambda params `(a, b) => ...` — typed and named |

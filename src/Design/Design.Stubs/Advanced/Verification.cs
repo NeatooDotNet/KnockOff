@@ -172,7 +172,7 @@ public partial class VerificationDemo
     // stub.VerifyAll() - Verify All Configured Members
     // =========================================================================
     // DESIGN DECISION: stub.VerifyAll() checks all CONFIGURED members, not just
-    // those marked Verifiable(). If you configured a method (OnCall, Returns,
+    // those marked Verifiable(). If you configured a method (Returns, Execute,
     // When), VerifyAll expects it to be called at least once.
     //
     // This is useful for ensuring all stub configurations were actually used.
@@ -254,9 +254,9 @@ public partial class VerificationDemo
     {
         var stub = new Stubs.ICalculator();
 
-        var sequence = stub.Add.OnCall((a, b) => a + b)
-            .ThenCall((a, b) => a * b)
-            .ThenCall((a, b) => 999);
+        var sequence = stub.Add.Returns((a, b) => a + b)
+            .ThenReturns((a, b) => a * b)
+            .ThenReturns((a, b) => 999);
 
         ICalculator calc = stub;
 

@@ -9,7 +9,7 @@ namespace KnockOff.Tests;
 /// - Nullable async types (Task&lt;string?&gt;)
 /// - Overloaded methods (overload groups don't have value overloads yet)
 ///
-/// Note: Generic methods with Of&lt;T&gt;().OnCall(value) is NOT implemented -
+/// Note: Generic methods with Of&lt;T&gt;().Returns(value) is NOT implemented -
 /// generic typed handlers only support callback syntax.
 /// </summary>
 public partial class EdgeCaseValueOverloadTests
@@ -165,8 +165,8 @@ public partial class EdgeCaseValueOverloadTests
 		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Void handler1 = (x) => { };
 		OverloadedMethodKnockOff.CalculateInterceptor.CalculateDelegate_Int32_Int32_Void handler2 = (x, y) => { };
 
-		knockOff.Calculate.OnCall(handler1);
-		knockOff.Calculate.OnCall(handler2);
+		knockOff.Calculate.Execute(handler1);
+		knockOff.Calculate.Execute(handler2);
 
 		service.Calculate(1);
 		service.Calculate(2, 3);
@@ -183,7 +183,7 @@ public partial class EdgeCaseValueOverloadTests
 
 		// Add is a single-signature method (not overloaded), so it uses the simple delegate name
 		OverloadedMethodKnockOff.AddInterceptor.AddDelegate addHandler = (a, b) => a + b;
-		knockOff.Add.OnCall(addHandler);
+		knockOff.Add.Returns(addHandler);
 
 		Assert.Equal(5, service.Add(2, 3));
 		Assert.Equal(10, service.Add(4, 6));

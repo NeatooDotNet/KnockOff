@@ -46,16 +46,16 @@ EmailService service = stub.Object;
 
 ### Error: No overload matches delegate
 
-**Cause:** The OnCall callback signature doesn't match the method's parameters.
+**Cause:** The Returns/Execute callback signature doesn't match the method's parameters.
 
-OnCall callbacks receive only the method's parameters. The callback must match the parameter types exactly.
+Returns/Execute callbacks receive only the method's parameters. The callback must match the parameter types exactly.
 
 **Solution:** Ensure your callback signature matches the method parameters exactly.
 
 <!-- snippet: troubleshoot-oncall-signature -->
 ```cs
 // OnCall signature must match method parameters exactly
-stub.GetByIdAsync.OnCall((int id) =>
+stub.GetByIdAsync.Returns((int id) =>
     Task.FromResult<User?>(new User { Id = id, Name = "Test" }));
 ```
 <!-- endSnippet -->
@@ -80,11 +80,12 @@ stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
 **Available on:**
 - **Methods**: `stub.MethodName.Returns(value)` - Returns the same value for every call
 - **Properties**: `stub.PropertyName.OnGet(value)` - Returns the same value for every get
-- **Sequences**: `stub.MethodName.OnCall(callback).ThenCall(callback)` - Each callback in sequence
+- **Sequences**: `stub.MethodName.Returns(callback).ThenReturns(callback)` - Each callback in sequence
 
 **Key difference from callbacks:**
 - **Returns(value)**: Simple, concise for constant returns
-- **OnCall(callback)**: Dynamic behavior based on parameters or state
+- **Returns(callback)**: Dynamic behavior based on parameters or state (non-void methods)
+- **Execute(callback)**: Side effects (void methods)
 
 ---
 
@@ -96,12 +97,12 @@ stub.GetById.Returns(new User { Id = 999, Name = "Static User" });
 
 KnockOff throws this exception for methods returning non-nullable reference types when no callback is configured. Properties and nullable types use default values instead.
 
-**Solution:** Configure the return value using `OnCall` for methods or `OnGet` for properties.
+**Solution:** Configure the return value using `Returns` for methods or `OnGet` for properties.
 
 <!-- snippet: troubleshoot-no-callback -->
 ```cs
 // Configure required (non-nullable) return values explicitly
-stub.GetName.OnCall(() => "Configured Name");
+stub.GetName.Returns(() => "Configured Name");
 ```
 <!-- endSnippet -->
 
@@ -178,10 +179,10 @@ public partial class CalcDelegateTests { }
 <!-- snippet: troubleshoot-delegate-interceptor-pattern -->
 ```cs
 // Interface stub pattern:
-interfaceStub.GetById.OnCall((id) => user);
+interfaceStub.GetById.Returns((id) => user);
 
 // Delegate stub pattern (different!):
-delegateStub.Interceptor.OnCall((a, b) => a + b);
+delegateStub.Interceptor.Returns((a, b) => a + b);
 delegateStub.Interceptor.Returns(42);
 ```
 <!-- endSnippet -->
@@ -199,19 +200,19 @@ delegateStub.Interceptor.Returns(42);
 // Delegate: int CalcOperation(int a, int b)
 
 // Wrong: missing parameter
-// stub.Interceptor.OnCall((a) => a);
+// stub.Interceptor.Returns((a) => a);
 
 // Wrong: wrong parameter type
-// stub.Interceptor.OnCall((string a, string b) => 0);
+// stub.Interceptor.Returns((string a, string b) => 0);
 ```
 <!-- endSnippet -->
 
 <!-- snippet: troubleshoot-delegate-oncall-correct -->
 ```cs
 // Correct: matches delegate signature
-stub.Interceptor.OnCall((int a, int b) => a + b);
+stub.Interceptor.Returns((int a, int b) => a + b);
 // Or with inferred types:
-stub.Interceptor.OnCall((a, b) => a + b);
+stub.Interceptor.Returns((a, b) => a + b);
 ```
 <!-- endSnippet -->
 
@@ -315,7 +316,7 @@ ITroubleshootUserRepo repo = stub;
 var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
 
 // You can still override per-test with OnCall
-stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
+stub.GetById.Returns(id => new User { Id = id, Name = "Test User" });
 ```
 <!-- endSnippet -->
 
@@ -323,7 +324,7 @@ stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
 - Use `protected override` keyword
 - Add underscore suffix to method name (e.g., `GetById_`)
 - User methods provide default behavior for all tests
-- Individual tests can still override with `OnCall`
+- Individual tests can still override with `Returns`/`Execute`
 
 **Solutions:**
 

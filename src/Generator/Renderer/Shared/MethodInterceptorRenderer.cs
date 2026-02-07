@@ -9,7 +9,7 @@ namespace KnockOff.Renderer.Shared;
 
 /// <summary>
 /// Renders method interceptor classes for both inline and flat stubs.
-/// Generates OnCall() returning IMethodCallBuilder (repeating callback, elevatable to sequence via ThenCall),
+/// Generates Returns()/Execute() entry points (repeating callback, elevatable to sequence via ThenReturns/ThenExecute),
 /// nested MethodCallBuilderImpl and MethodSequenceImpl classes, Invoke methods, and verification.
 /// </summary>
 internal static class MethodInterceptorRenderer
@@ -17,7 +17,7 @@ internal static class MethodInterceptorRenderer
 	/// <summary>
 	/// Renders a complete method interceptor class.
 	/// For single-signature methods, generates a simple interceptor.
-	/// For overload groups, generates per-signature delegates, sequences, and OnCall overloads.
+	/// For overload groups, generates per-signature delegates, sequences, and Returns/Execute overloads.
 	/// </summary>
 	public static void RenderInterceptorClass(
 		CodeWriter w,
@@ -56,7 +56,7 @@ internal static class MethodInterceptorRenderer
 		// Source field for Source(T) feature - uses declaring interface type
 		if (!string.IsNullOrEmpty(model.DeclaringInterface))
 		{
-			w.Line($"/// <summary>Source object to delegate to when no OnCall is configured.</summary>");
+			w.Line($"/// <summary>Source object to delegate to when no callback is configured.</summary>");
 			w.Line($"internal {model.DeclaringInterface}? _source;");
 			w.Line();
 		}
@@ -69,7 +69,7 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 		}
 
-		// OnCall storage - single repeating callback (separate from sequence)
+		// Callback storage - single repeating callback (separate from sequence)
 		w.Line($"private {delegateType}? _onCall;");
 		w.Line("private MethodCallBuilderImpl? _onCallTracking;");
 		w.Line();
@@ -166,9 +166,10 @@ internal static class MethodInterceptorRenderer
 		// Verify() methods for direct interceptor verification
 		RenderInterceptorVerifyMethods(w, model.MethodName);
 
-		// OnCall() - repeating callback, returns concrete builder for ThenReturns access
+		// Returns()/Execute() - repeating callback, returns concrete builder for sequence chaining
+		var entryPointName = model.IsVoid ? "Execute" : "Returns";
 		w.Line($"/// <summary>Configures callback that repeats indefinitely. Returns builder for sequence chaining.</summary>");
-		w.Line($"public MethodCallBuilderImpl OnCall({delegateType} callback)");
+		w.Line($"public MethodCallBuilderImpl {entryPointName}({delegateType} callback)");
 		using (w.Braces())
 		{
 			w.Line("_sequence = null;");
@@ -234,19 +235,19 @@ internal static class MethodInterceptorRenderer
 			w.Line($"public MethodSequenceImpl Returns({valueStorageType} first, params {valueStorageType}[] rest)");
 			using (w.Braces())
 			{
-				// Start with OnCall for first value, then ThenReturns to get MethodSequenceImpl
+				// Start with Returns for first value, then ThenReturns to get MethodSequenceImpl
 				// If rest is empty, we still return a sequence (with just first value repeating)
 				if (isTaskT)
 				{
-					w.Line($"var builder = OnCall({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(first));");
+					w.Line($"var builder = Returns({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(first));");
 				}
 				else if (isValueTaskT)
 				{
-					w.Line($"var builder = OnCall({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueStorageType}>(first));");
+					w.Line($"var builder = Returns({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueStorageType}>(first));");
 				}
 				else
 				{
-					w.Line($"var builder = OnCall({discardPrefix} => first);");
+					w.Line($"var builder = Returns({discardPrefix} => first);");
 				}
 				w.Line("if (rest.Length == 0)");
 				using (w.Braces())
@@ -266,12 +267,12 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 		}
 
-		// OnCall(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> methods
+		// Returns(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> methods
 		if (isAsyncWithInnerType && !hasRefOrOut)
 		{
 			var simplifiedDelegateType = BuildSimplifiedDelegateType(model.Parameters, innerType);
 			w.Line($"/// <summary>Configures callback returning unwrapped value. Result auto-wrapped in {(isAsyncTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
-			w.Line($"public MethodCallBuilderImpl OnCall({simplifiedDelegateType} callback)");
+			w.Line($"public MethodCallBuilderImpl Returns({simplifiedDelegateType} callback)");
 			using (w.Braces())
 			{
 				w.Line("_sequence = null;");
@@ -296,12 +297,12 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 		}
 
-		// OnCall(Action<...>) - simplified void callback for Task/ValueTask methods
+		// Execute(Action<...>) - simplified void callback for Task/ValueTask methods
 		if (isVoidAsync && !hasRefOrOut)
 		{
 			var voidDelegateType = BuildSimplifiedVoidDelegateType(model.Parameters);
 			w.Line($"/// <summary>Configures callback action. {(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.</summary>");
-			w.Line($"public MethodCallBuilderImpl OnCall({voidDelegateType} callback)");
+			w.Line($"public MethodCallBuilderImpl Execute({voidDelegateType} callback)");
 			using (w.Braces())
 			{
 				w.Line("_sequence = null;");
@@ -350,10 +351,10 @@ internal static class MethodInterceptorRenderer
 			hasWhenChain: canHaveWhenChain || canHaveVoidWhenChain);
 
 		// Nested MethodCallBuilderImpl (renamed from MethodCallBuilderImpl)
-		RenderMethodCallBuilderImpl(w, model.TrackableParameters, model.LastArgType, model.LastArgsType, model.BuilderInterface, fullInterceptorClassName, delegateType, null, model.ReturnType, model.IsVoid, hasRefOrOut, model.Parameters.Count);
+		RenderMethodCallBuilderImpl(w, model.TrackableParameters, model.LastArgType, model.LastArgsType, model.BuilderInterface, fullInterceptorClassName, delegateType, null, model.ReturnType, model.IsVoid, hasRefOrOut, model.Parameters.Count, model.Parameters);
 
 		// Nested MethodSequenceImpl
-		RenderMethodSequenceImpl(w, fullInterceptorClassName, delegateType, null, model.ReturnType, model.IsVoid, hasRefOrOut, model.Parameters.Count);
+		RenderMethodSequenceImpl(w, fullInterceptorClassName, delegateType, null, model.ReturnType, model.IsVoid, hasRefOrOut, model.Parameters.Count, model.Parameters);
 
 		// Nested When chain classes (for parameter-specific matching)
 		if (canHaveWhenChain)
@@ -383,7 +384,7 @@ internal static class MethodInterceptorRenderer
 		// Source field for Source(T) feature - uses declaring interface type
 		if (!string.IsNullOrEmpty(model.DeclaringInterface))
 		{
-			w.Line($"/// <summary>Source object to delegate to when no OnCall is configured.</summary>");
+			w.Line($"/// <summary>Source object to delegate to when no callback is configured.</summary>");
 			w.Line($"internal {model.DeclaringInterface}? _source;");
 			w.Line();
 		}
@@ -404,7 +405,7 @@ internal static class MethodInterceptorRenderer
 			w.Line(overload.DelegateSignature);
 			w.Line();
 
-			// OnCall storage
+			// Callback storage
 			w.Line($"private {overload.DelegateName}? _onCall_{overload.SignatureSuffix};");
 			w.Line($"private MethodCallBuilderImpl_{overload.SignatureSuffix}? _onCallTracking_{overload.SignatureSuffix};");
 			w.Line();
@@ -470,7 +471,7 @@ internal static class MethodInterceptorRenderer
 		// Skip Verifiable() for overload groups - they have per-signature verifiable fields
 		RenderInterceptorVerifyMethods(w, model.MethodName, isOverloadGroup: true);
 
-		// OnCall overloads for each unique signature
+		// Returns/Execute overloads for each unique signature
 		foreach (var overload in model.Overloads)
 		{
 			// Determine async characteristics for this overload
@@ -480,9 +481,10 @@ internal static class MethodInterceptorRenderer
 			var (isVoidTask, isVoidValueTask) = GetVoidAsyncInfo(overload.ReturnType);
 			var isVoidAsync = isVoidTask || isVoidValueTask;
 
-			// OnCall - repeating callback
+			// Returns/Execute - repeating callback
+			var overloadEntryPointName = overload.IsVoid ? "Execute" : "Returns";
 			w.Line($"/// <summary>Configures callback for {model.MethodName}({GetParamTypeList(overload.Parameters)}). Returns builder for sequence chaining.</summary>");
-			w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} OnCall({overload.DelegateName} callback)");
+			w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} {overloadEntryPointName}({overload.DelegateName} callback)");
 			using (w.Braces())
 			{
 				w.Line($"_sequence_{overload.SignatureSuffix} = null;");
@@ -506,12 +508,12 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// OnCall(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> overloads
+			// Returns(Func<..., TInnerType>) - simplified callback for Task<T>/ValueTask<T> overloads
 			if (isAsyncWithInnerType && !hasRefOrOut)
 			{
 				var simplifiedDelegateType = BuildSimplifiedDelegateType(overload.Parameters, innerType);
 				w.Line($"/// <summary>Configures callback returning unwrapped value for {model.MethodName}({GetParamTypeList(overload.Parameters)}). Result auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
-				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} OnCall({simplifiedDelegateType} callback)");
+				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Returns({simplifiedDelegateType} callback)");
 				using (w.Braces())
 				{
 					w.Line($"_sequence_{overload.SignatureSuffix} = null;");
@@ -529,12 +531,12 @@ internal static class MethodInterceptorRenderer
 				w.Line();
 			}
 
-			// OnCall(Action<...>) - simplified void callback for Task/ValueTask overloads
+			// Execute(Action<...>) - simplified void callback for Task/ValueTask overloads
 			if (isVoidAsync && !hasRefOrOut)
 			{
 				var voidDelegateType = BuildSimplifiedVoidDelegateType(overload.Parameters);
 				w.Line($"/// <summary>Configures callback action for {model.MethodName}({GetParamTypeList(overload.Parameters)}). {(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.</summary>");
-				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} OnCall({voidDelegateType} callback)");
+				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Execute({voidDelegateType} callback)");
 				using (w.Braces())
 				{
 					w.Line($"_sequence_{overload.SignatureSuffix} = null;");
@@ -595,14 +597,14 @@ internal static class MethodInterceptorRenderer
 		foreach (var overload in model.Overloads)
 		{
 			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
-			RenderMethodCallBuilderImpl(w, overload.TrackableParameters, overload.LastArgType, overload.LastArgsType, overload.BuilderInterface, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix, overload.ReturnType, overload.IsVoid, hasRefOrOut, overload.Parameters.Count);
+			RenderMethodCallBuilderImpl(w, overload.TrackableParameters, overload.LastArgType, overload.LastArgsType, overload.BuilderInterface, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix, overload.ReturnType, overload.IsVoid, hasRefOrOut, overload.Parameters.Count, overload.Parameters);
 		}
 
 		// Nested sequence classes for each unique signature
 		foreach (var overload in model.Overloads)
 		{
 			var hasRefOrOut = HasRefOrOutParameters(overload.Parameters);
-			RenderMethodSequenceImpl(w, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix, overload.ReturnType, overload.IsVoid, hasRefOrOut, overload.Parameters.Count);
+			RenderMethodSequenceImpl(w, fullInterceptorClassName, overload.DelegateName, overload.SignatureSuffix, overload.ReturnType, overload.IsVoid, hasRefOrOut, overload.Parameters.Count, overload.Parameters);
 		}
 
 		// Nested When chain classes for each unique signature (for parameter-specific matching)
@@ -705,7 +707,7 @@ internal static class MethodInterceptorRenderer
 				w.Line();
 			}
 
-			// Check repeating OnCall callback
+			// Check repeating callback
 			w.Line("if (_onCall != null && _onCallTracking != null)");
 			using (w.Braces())
 			{
@@ -844,7 +846,7 @@ internal static class MethodInterceptorRenderer
 				if (model.IsVoid)
 					w.Line("return;");
 				else if (model.ThrowsOnDefault)
-					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via OnCall.\");");
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via Returns or Execute.\");");
 				else
 				{
 					var defaultExpr = string.IsNullOrEmpty(model.DefaultExpression) ? "default!" : model.DefaultExpression;
@@ -909,7 +911,7 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Check repeating OnCall callback
+			// Check repeating callback
 			w.Line($"if (_onCall_{overload.SignatureSuffix} != null && _onCallTracking_{overload.SignatureSuffix} != null)");
 			using (w.Braces())
 			{
@@ -1040,7 +1042,7 @@ internal static class MethodInterceptorRenderer
 				if (overload.IsVoid)
 					w.Line("return;");
 				else if (overload.ThrowsOnDefault)
-					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via OnCall.\");");
+					w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {model.MethodName}. Configure via Returns or Execute.\");");
 				else
 				{
 					var defaultExpr = string.IsNullOrEmpty(overload.DefaultExpression) ? "default!" : overload.DefaultExpression;
@@ -1215,7 +1217,7 @@ internal static class MethodInterceptorRenderer
 				isConfiguredExpr += " || _onCallSimplifiedVoid != null";
 			if (hasWhenChain)
 				isConfiguredExpr += " || (_whenChain?.Count ?? 0) > 0";
-			w.Line("/// <summary>Whether this interceptor has been configured (OnCall, Returns(value), or When).</summary>");
+			w.Line("/// <summary>Whether this interceptor has been configured (Returns, Execute, Returns(value), or When).</summary>");
 			w.Line($"internal bool IsConfigured => {isConfiguredExpr};");
 			w.Line();
 
@@ -1449,7 +1451,8 @@ internal static class MethodInterceptorRenderer
 		string returnType,
 		bool isVoid,
 		bool hasRefOrOut,
-		int parameterCount)
+		int parameterCount,
+		EquatableArray<ParameterModel> parameters)
 	{
 		var className = signatureSuffix == null ? "MethodCallBuilderImpl" : $"MethodCallBuilderImpl_{signatureSuffix}";
 		var sequenceClassName = signatureSuffix == null ? "MethodSequenceImpl" : $"MethodSequenceImpl_{signatureSuffix}";
@@ -1545,9 +1548,10 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// ThenCall() - lazy elevation from repeating to sequence mode
+			// ThenReturns()/ThenExecute() - lazy elevation from repeating to sequence mode
+			var thenChainName = isVoid ? "ThenExecute" : "ThenReturns";
 			w.Line("/// <summary>Elevates to sequence mode and adds another callback. Returns sequence for further chaining.</summary>");
-			w.Line($"public {sequenceClassName} ThenCall({delegateType} callback)");
+			w.Line($"public {sequenceClassName} {thenChainName}({delegateType} callback)");
 			using (w.Braces())
 			{
 				// Lazy elevation: if not already in sequence mode, move this callback into sequence as first element
@@ -1555,7 +1559,7 @@ internal static class MethodInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line($"_interceptor.{sequenceFieldName} = new global::System.Collections.Generic.List<({delegateType} Callback, {className} Tracking)>();");
-					// Move current OnCall into sequence as first element (this builder tracks it)
+					// Move current callback into sequence as first element (this builder tracks it)
 					w.Line($"_interceptor.{sequenceFieldName}.Add((_interceptor.{onCallFieldName}!, this));");
 					w.Line($"_interceptor.{onCallFieldName} = null;");
 					w.Line($"_interceptor.{onCallTrackingFieldName} = null;");
@@ -1576,15 +1580,15 @@ internal static class MethodInterceptorRenderer
 				w.Line($"/// <summary>Elevates to sequence mode and adds a value. Returns sequence for further chaining.</summary>");
 				if (isTaskT)
 				{
-					w.Line($"public {sequenceClassName} ThenReturns({valueType} value) => ThenCall({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(value));");
+					w.Line($"public {sequenceClassName} ThenReturns({valueType} value) => ThenReturns({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(value));");
 				}
 				else if (isValueTaskT)
 				{
-					w.Line($"public {sequenceClassName} ThenReturns({valueType} value) => ThenCall({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueType}>(value));");
+					w.Line($"public {sequenceClassName} ThenReturns({valueType} value) => ThenReturns({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueType}>(value));");
 				}
 				else
 				{
-					w.Line($"public {sequenceClassName} ThenReturns({valueType} value) => ThenCall({discardPrefix} => value);");
+					w.Line($"public {sequenceClassName} ThenReturns({valueType} value) => ThenReturns({discardPrefix} => value);");
 				}
 				w.Line();
 
@@ -1596,7 +1600,7 @@ internal static class MethodInterceptorRenderer
 					w.Line("if (values.Length == 0)");
 					using (w.Braces())
 					{
-						// Elevate to sequence mode without adding any new values (same as ThenCall elevation)
+						// Elevate to sequence mode without adding any new values (same as ThenReturns elevation)
 						w.Line($"if (_interceptor.{sequenceFieldName} == null)");
 						using (w.Braces())
 						{
@@ -1617,6 +1621,26 @@ internal static class MethodInterceptorRenderer
 					w.Line("return seq;");
 				}
 				w.Line();
+
+				// Simplified async ThenReturns(Func<..., T>) - for Task<T>/ValueTask<T> methods
+				var (builderAsyncInner, builderIsTaskT, builderIsValueTaskT) = GetAsyncTypeInfo(returnType);
+				var builderIsAsync = builderIsTaskT || builderIsValueTaskT;
+				if (builderIsAsync && !hasRefOrOut)
+				{
+					var simplifiedDelegateType = BuildSimplifiedDelegateType(parameters, builderAsyncInner);
+					var lambdaParams = BuildLambdaParams(parameters);
+					var lambdaCall = parameters.Count == 0 ? "callback()" : $"callback({lambdaParams})";
+					w.Line($"/// <summary>Elevates to sequence mode with simplified callback. Result auto-wrapped in {(builderIsTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+					if (builderIsTaskT)
+					{
+						w.Line($"public {sequenceClassName} ThenReturns({simplifiedDelegateType} callback) => ThenReturns(({lambdaParams}) => global::System.Threading.Tasks.Task.FromResult({lambdaCall}));");
+					}
+					else
+					{
+						w.Line($"public {sequenceClassName} ThenReturns({simplifiedDelegateType} callback) => ThenReturns(({lambdaParams}) => new global::System.Threading.Tasks.ValueTask<{builderAsyncInner}>({lambdaCall}));");
+					}
+					w.Line();
+				}
 			}
 
 			// Verifiable() - returns builder interface for fluent chaining
@@ -1658,8 +1682,15 @@ internal static class MethodInterceptorRenderer
 				w.Line($"global::KnockOff.IMethodTrackingArgs<{lastArgsType}> global::KnockOff.IMethodTrackingArgs<{lastArgsType}>.Verifiable(global::KnockOff.Times times) => Verifiable(times);");
 			}
 
-			// Explicit interface implementation for ThenCall - interface requires IMethodSequence<T> return
-			w.Line($"global::KnockOff.IMethodSequence<{delegateType}> {builderInterface}.ThenCall({delegateType} callback) => ThenCall(callback);");
+			// Explicit interface implementation for ThenReturns/ThenExecute - interface requires sequence return
+			if (isVoid)
+			{
+				w.Line($"global::KnockOff.IMethodExecuteSequence<{delegateType}> {builderInterface}.ThenExecute({delegateType} callback) => ThenExecute(callback);");
+			}
+			else
+			{
+				w.Line($"global::KnockOff.IMethodReturnsSequence<{delegateType}> {builderInterface}.ThenReturns({delegateType} callback) => ThenReturns(callback);");
+			}
 		}
 		w.Line();
 	}
@@ -1676,7 +1707,8 @@ internal static class MethodInterceptorRenderer
 		string returnType,
 		bool isVoid,
 		bool hasRefOrOut,
-		int parameterCount)
+		int parameterCount,
+		EquatableArray<ParameterModel> parameters)
 	{
 		var className = signatureSuffix == null ? "MethodSequenceImpl" : $"MethodSequenceImpl_{signatureSuffix}";
 		var trackingClassName = signatureSuffix == null ? "MethodCallBuilderImpl" : $"MethodCallBuilderImpl_{signatureSuffix}";
@@ -1685,9 +1717,16 @@ internal static class MethodInterceptorRenderer
 		var repeatLastValueField = signatureSuffix == null ? "_repeatLastValue" : $"_repeatLastValue_{signatureSuffix}";
 		var verifiableField = signatureSuffix == null ? "_isVerifiable" : $"_isVerifiable_{signatureSuffix}";
 		var verifiableTimesField = signatureSuffix == null ? "_verifiableTimes" : $"_verifiableTimes_{signatureSuffix}";
+		var thenChainName = isVoid ? "ThenExecute" : "ThenReturns";
+		var sequenceInterface = isVoid
+			? $"global::KnockOff.IMethodExecuteSequence<{delegateType}>"
+			: $"global::KnockOff.IMethodReturnsSequence<{delegateType}>";
+		var sequenceBaseInterface = isVoid
+			? "global::KnockOff.IMethodExecuteSequence"
+			: "global::KnockOff.IMethodReturnsSequence";
 
-		w.Line($"/// <summary>Sequence implementation for ThenCall chaining.</summary>");
-		w.Line($"public sealed class {className} : global::KnockOff.IMethodSequence<{delegateType}>");
+		w.Line($"/// <summary>Sequence implementation for {thenChainName} chaining.</summary>");
+		w.Line($"public sealed class {className} : {sequenceInterface}");
 		using (w.Braces())
 		{
 			w.Line($"private readonly {interceptorClassName} _interceptor;");
@@ -1712,9 +1751,9 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// ThenCall - no Times parameter, each callback runs once
+			// ThenReturns/ThenExecute - no Times parameter, each callback runs once
 			w.Line($"/// <summary>Adds another callback to the sequence. Each callback runs exactly once.</summary>");
-			w.Line($"public {className} ThenCall({delegateType} callback)");
+			w.Line($"public {className} {thenChainName}({delegateType} callback)");
 			using (w.Braces())
 			{
 				w.Line($"var tracking = new {trackingClassName}(_interceptor);");
@@ -1723,7 +1762,7 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// ThenReturns(value) - value wrapper for ThenCall, only for non-void methods without ref/out
+			// ThenReturns(value) - value wrapper for ThenReturns(callback), only for non-void methods without ref/out
 			if (!isVoid && !hasRefOrOut)
 			{
 				var (valueType, isTaskT, isValueTaskT) = GetAsyncTypeInfo(returnType);
@@ -1731,15 +1770,15 @@ internal static class MethodInterceptorRenderer
 				w.Line($"/// <summary>Adds a value to the sequence. The value is returned exactly once.</summary>");
 				if (isTaskT)
 				{
-					w.Line($"public {className} ThenReturns({valueType} value) => ThenCall({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(value));");
+					w.Line($"public {className} ThenReturns({valueType} value) => ThenReturns({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(value));");
 				}
 				else if (isValueTaskT)
 				{
-					w.Line($"public {className} ThenReturns({valueType} value) => ThenCall({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueType}>(value));");
+					w.Line($"public {className} ThenReturns({valueType} value) => ThenReturns({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{valueType}>(value));");
 				}
 				else
 				{
-					w.Line($"public {className} ThenReturns({valueType} value) => ThenCall({discardPrefix} => value);");
+					w.Line($"public {className} ThenReturns({valueType} value) => ThenReturns({discardPrefix} => value);");
 				}
 				w.Line();
 
@@ -1756,6 +1795,24 @@ internal static class MethodInterceptorRenderer
 					w.Line("return this;");
 				}
 				w.Line();
+
+				// Simplified async ThenReturns(Func<..., T>) - for Task<T>/ValueTask<T> methods
+				if ((isTaskT || isValueTaskT) && !hasRefOrOut)
+				{
+					var simplifiedDelegateType = BuildSimplifiedDelegateType(parameters, valueType);
+					var lambdaParams = BuildLambdaParams(parameters);
+					var lambdaCall = parameters.Count == 0 ? "callback()" : $"callback({lambdaParams})";
+					w.Line($"/// <summary>Adds simplified callback to the sequence. Result auto-wrapped in {(isTaskT ? "Task.FromResult" : "new ValueTask")}.</summary>");
+					if (isTaskT)
+					{
+						w.Line($"public {className} ThenReturns({simplifiedDelegateType} callback) => ThenReturns(({lambdaParams}) => global::System.Threading.Tasks.Task.FromResult({lambdaCall}));");
+					}
+					else
+					{
+						w.Line($"public {className} ThenReturns({simplifiedDelegateType} callback) => ThenReturns(({lambdaParams}) => new global::System.Threading.Tasks.ValueTask<{valueType}>({lambdaCall}));");
+					}
+					w.Line();
+				}
 			}
 
 			// Verify() - throws if sequence incomplete
@@ -1796,12 +1853,19 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Explicit interface implementations for IMethodSequence<T>
-			w.Line($"global::KnockOff.IMethodSequence<{delegateType}> global::KnockOff.IMethodSequence<{delegateType}>.ThenCall({delegateType} callback) => ThenCall(callback);");
-			w.Line($"global::KnockOff.IMethodSequence<{delegateType}> global::KnockOff.IMethodSequence<{delegateType}>.Verifiable() => Verifiable();");
+			// Explicit interface implementations for IMethodReturnsSequence<T> / IMethodExecuteSequence<T>
+			if (isVoid)
+			{
+				w.Line($"global::KnockOff.IMethodExecuteSequence<{delegateType}> global::KnockOff.IMethodExecuteSequence<{delegateType}>.ThenExecute({delegateType} callback) => ThenExecute(callback);");
+				w.Line($"global::KnockOff.IMethodExecuteSequence<{delegateType}> global::KnockOff.IMethodExecuteSequence<{delegateType}>.Verifiable() => Verifiable();");
+			}
+			else
+			{
+				w.Line($"global::KnockOff.IMethodReturnsSequence<{delegateType}> global::KnockOff.IMethodReturnsSequence<{delegateType}>.ThenReturns({delegateType} callback) => ThenReturns(callback);");
+				w.Line($"global::KnockOff.IMethodReturnsSequence<{delegateType}> global::KnockOff.IMethodReturnsSequence<{delegateType}>.Verifiable() => Verifiable();");
+			}
 
-			// Non-generic IMethodSequence.Verifiable()
-			w.Line("/// <summary>Marks this sequence for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+			// IMethodSequence.Verifiable() (base interface - IMethodReturnsSequence/IMethodExecuteSequence are marker interfaces with no members)
 			w.Line("global::KnockOff.IMethodSequence global::KnockOff.IMethodSequence.Verifiable() => Verifiable();");
 		}
 		w.Line();
@@ -2313,7 +2377,7 @@ internal static class MethodInterceptorRenderer
 				{
 					w.Line($"{whenChainHeadField}++;");
 				}
-				w.Line("// At last matcher: never advance (repeat behavior for both ThenWhen and ThenCall)");
+				w.Line("// At last matcher: never advance (repeat behavior for both ThenWhen and ThenExecute)");
 				w.Line();
 
 				// Execute (void) and return - no return value
@@ -2417,7 +2481,7 @@ internal static class MethodInterceptorRenderer
 		var predicateType = BuildPredicateType(parameters);
 		var paramTypeList = BuildParamTypeList(parameters);
 
-		w.Line($"/// <summary>Void When chain implementation with Call, ThenWhen, ThenCall, ThenNone, verification support.</summary>");
+		w.Line($"/// <summary>Void When chain implementation with Execute, ThenWhen, ThenExecute, ThenNone, verification support.</summary>");
 		w.Line($"public sealed class VoidWhenChain{suffix} : global::KnockOff.IVoidWhenChain<{delegateType}>");
 		using (w.Braces())
 		{
@@ -2435,18 +2499,18 @@ internal static class MethodInterceptorRenderer
 
 			var chainType = $"VoidWhenChain{suffix}";
 
-			// Call - sets optional callback on current matcher
+			// Execute - sets optional callback on current matcher
 			// Returns concrete type to enable fluent ThenWhen chaining
 			w.Line($"/// <summary>Sets an optional callback to invoke when this matcher matches.</summary>");
-			w.Line($"public {chainType} Call({delegateType} callback)");
+			w.Line($"public {chainType} Execute({delegateType} callback)");
 			using (w.Braces())
 			{
 				w.Line("_currentMatcher.Callback = callback;");
 				w.Line("return this;");
 			}
 			w.Line();
-			// Explicit interface implementation for IVoidWhenChain.Call
-			w.Line($"global::KnockOff.IVoidWhenChain<{delegateType}> global::KnockOff.IVoidWhenChain<{delegateType}>.Call({delegateType} callback) => Call(callback);");
+			// Explicit interface implementation for IVoidWhenChain.Execute
+			w.Line($"global::KnockOff.IVoidWhenChain<{delegateType}> global::KnockOff.IVoidWhenChain<{delegateType}>.Execute({delegateType} callback) => Execute(callback);");
 			w.Line();
 
 			// ThenWhen with values and predicate
@@ -2479,9 +2543,9 @@ internal static class MethodInterceptorRenderer
 				w.Line();
 			}
 
-			// ThenCall - terminal with callback
+			// ThenExecute - terminal with callback
 			w.Line($"/// <summary>Adds an unconditional callback as terminal matcher.</summary>");
-			w.Line($"public global::KnockOff.IWhenTracking ThenCall({delegateType} callback)");
+			w.Line($"public global::KnockOff.IWhenTracking ThenExecute({delegateType} callback)");
 			using (w.Braces())
 			{
 				w.Line($"_interceptor.{whenChainField} ??= new global::System.Collections.Generic.List<VoidWhenMatcher{suffix}>();");
@@ -2749,7 +2813,7 @@ internal static class MethodInterceptorRenderer
 		bool hasSimplifiedVoidCallback = false,
 		bool hasWhenChain = false)
 	{
-		// CallCount - total across OnCall + Returns(value) + simplified + sequence + When chain + unconfigured (private - use Verify() API to check call counts)
+		// CallCount - total across Returns/Execute + Returns(value) + simplified + sequence + When chain + unconfigured (private - use Verify() API to check call counts)
 		// Include value tracking when value overload exists, and simplified callback tracking when present
 		var valueTrackingPart = hasValueOverload ? " + (_returnsValueTracking?._callCount ?? 0)" : "";
 		var simplifiedTrackingPart = hasSimplifiedCallback ? " + (_onCallSimplifiedTracking?._callCount ?? 0)" : "";
