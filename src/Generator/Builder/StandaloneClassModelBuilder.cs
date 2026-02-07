@@ -388,12 +388,19 @@ internal static class StandaloneClassModelBuilder
         string constraintClause)
     {
         var interceptClassName = $"{stubClassName}_{evt.Name}Interceptor";
+        var (raiseParams, raiseArgs, raiseReturnType, raiseReturnsValue, usesDynamicInvoke) =
+            EventBuilderHelpers.GetRaiseMethodInfo(evt);
         return new InlineClassEventModel(
             InterceptorClassName: interceptClassName,
             EventName: evt.Name,
             DelegateType: evt.FullDelegateTypeName.TrimEnd('?'),
             TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+            ConstraintClauses: constraintClause,
+            RaiseParameters: raiseParams,
+            RaiseArguments: raiseArgs,
+            RaiseReturnType: raiseReturnType,
+            RaiseReturnsValue: raiseReturnsValue,
+            UsesDynamicInvoke: usesDynamicInvoke);
     }
 
     private static InlineConstructorModel BuildConstructorModel(ClassConstructorInfo ctor, string typeParamList)

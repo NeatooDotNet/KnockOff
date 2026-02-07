@@ -45,6 +45,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `mock.Verify()` | `stub.Verify()` |
 | `It.IsAny<T>()` | Callback receives all args |
 | `It.Is<T>(pred)` | `stub.Method.When(pred).Returns(val)` |
+| `mock.CallBase = true` | `stub.Source(realImpl)` (interface stubs only) |
 
 ---
 
@@ -503,4 +504,4 @@ Use this checklist when migrating a test file from Moq to KnockOff:
 
 ---
 
-**UPDATED:** 2026-02-01
+**UPDATED:** 2026-02-06

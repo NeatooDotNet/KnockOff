@@ -273,7 +273,7 @@ public partial class IValidatePropertyTests
 
         property.PropertyChanged += (s, e) => { };
 
-        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
+        stub.PropertyChanged.VerifyAdd(Times.Once);
     }
 
     [Fact]
@@ -286,8 +286,8 @@ public partial class IValidatePropertyTests
         property.PropertyChanged += handler;
         property.PropertyChanged -= handler;
 
-        stub.PropertyChangedInterceptor.VerifyAdd(Times.Once);
-        stub.PropertyChangedInterceptor.VerifyRemove(Times.Once);
+        stub.PropertyChanged.VerifyAdd(Times.Once);
+        stub.PropertyChanged.VerifyRemove(Times.Once);
     }
 
     [Fact]
@@ -298,7 +298,7 @@ public partial class IValidatePropertyTests
 
         property.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChangedInterceptor.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
     }
 
     #endregion

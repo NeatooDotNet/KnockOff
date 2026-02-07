@@ -255,10 +255,12 @@ In CLI:
 2. **In CLI:** Review the build output for diagnostic codes starting with `KO`
 
 Common diagnostics:
-- **KO001:** Class must be partial
-- **KO002:** Unsupported member type
-- **KO003:** Interface not found
+- **KO0010:** Standalone stubs should implement a single interface
+- **KO0100:** Method overloads not supported (same method name across multiple interfaces)
 - **KO0200:** Standalone stub cannot have base class (see section below)
+- **KO1001:** Type must be interface, class, or delegate
+- **KO2004:** Class has no virtual or abstract members to intercept
+- **KO2008:** Class must be partial (for `[KnockOffBase<T>]` stubs)
 
 Review the build output messages for specific guidance on resolving each diagnostic.
 
@@ -326,12 +328,17 @@ stub.GetById.OnCall(id => new User { Id = id, Name = "Test User" });
 **Solutions:**
 
 1. **Remove the base class** from the standalone stub if the base class behavior is not essential—KnockOff's generated base class provides user method support
-2. **Use inline stub pattern** if you need the stub inside a class that has a base class:
-   <!-- snippet: troubleshoot-inline-alternative -->
-   ```cs
-   ```
-   <!-- endSnippet -->
+2. **Use inline stub pattern** if you need the stub inside a class that has a base class (see example below)
 3. **Use composition instead of inheritance** if you need shared behavior across stubs—inject or delegate to the shared logic rather than inheriting from a base class
+
+Inline stub alternative for solution 2:
+
+<!-- snippet: troubleshoot-inline-alternative -->
+```cs
+[KnockOff<ITroubleshootMyService>]
+public partial class TroubleshootInlineContainer { }
+```
+<!-- endSnippet -->
 
 ---
 

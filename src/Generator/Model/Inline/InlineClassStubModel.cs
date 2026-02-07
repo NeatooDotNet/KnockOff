@@ -160,7 +160,17 @@ internal sealed record InlineClassEventModel(
     /// <summary>Type parameter list string (e.g., "&lt;T&gt;").</summary>
     string TypeParameterList = "",
     /// <summary>Constraint clauses string (e.g., "where T : class").</summary>
-    string ConstraintClauses = "");
+    string ConstraintClauses = "",
+    /// <summary>Parameter declarations for the Raise method (e.g., "object? sender, EventArgs e").</summary>
+    string RaiseParameters = "",
+    /// <summary>Argument names for the Raise method (e.g., "sender, e").</summary>
+    string RaiseArguments = "",
+    /// <summary>Return type of the Raise method (e.g., "void").</summary>
+    string RaiseReturnType = "void",
+    /// <summary>Whether the delegate returns a value (Func-style).</summary>
+    bool RaiseReturnsValue = false,
+    /// <summary>Whether the delegate requires DynamicInvoke (custom delegates).</summary>
+    bool UsesDynamicInvoke = false);
 
 // ==========================================================================
 // Impl class member models - for nested Impl class overrides

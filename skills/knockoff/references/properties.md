@@ -290,7 +290,7 @@ stub.Name.OnGet(() => "dynamic");
 
 ## Resetting Property Interceptors
 
-Calling `Reset()` on a property interceptor clears all tracking state and configured callbacks.
+Calling `Reset()` on a property interceptor clears tracking state but preserves configured callbacks.
 
 <!-- snippet: properties-reset -->
 ```cs
@@ -307,12 +307,15 @@ stub.Name.VerifySet(Times.Never);
 Reset() clears:
 - Tracking state (get/set counts)
 - `LastSetValue`
-- All `OnGet` callbacks (including sequences)
-- All `OnSet` callbacks (including sequences)
 - Sequence index (resets to beginning)
 - Source delegation
 
-After reset, the property returns to unconfigured state.
+Reset() preserves:
+- `OnGet` callbacks (including sequence structure)
+- `OnSet` callbacks (including sequence structure)
+- Verifiable marking
+
+After reset, the property retains its configured behavior but tracking counts restart at zero.
 
 ---
 
@@ -581,7 +584,7 @@ Choose your configuration approach based on the test scenario:
 
 | Method | Description |
 |--------|-------------|
-| `Reset()` | Clears all tracking, callbacks, sequences, and source delegation |
+| `Reset()` | Clears tracking state (get/set counts, LastSetValue, sequence index, source delegation). Preserves OnGet/OnSet callbacks and verifiable marking. |
 
 ### Sequence Methods
 
@@ -594,4 +597,4 @@ Choose your configuration approach based on the test scenario:
 
 ---
 
-**UPDATED:** 2026-02-04
+**UPDATED:** 2026-02-06

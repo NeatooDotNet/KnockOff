@@ -845,8 +845,8 @@ public class BclInterfaceTests
 
         notifier.PropertyChanged += (s, e) => eventFired = true;
 
-        // Raise the event through the interceptor's Handler
-        stub.PropertyChangedInterceptor.Handler?.Invoke(stub, new PropertyChangedEventArgs("TestProperty"));
+        // Raise the event through the interceptor
+        stub.PropertyChanged.Raise(stub, new PropertyChangedEventArgs("TestProperty"));
 
         Assert.True(eventFired);
     }
@@ -860,7 +860,7 @@ public class BclInterfaceTests
         notifier.PropertyChanged += (s, e) => { };
         notifier.PropertyChanged += (s, e) => { };
 
-        stub.PropertyChangedInterceptor.VerifyAdd(Times.Exactly(2));
+        stub.PropertyChanged.VerifyAdd(Times.Exactly(2));
     }
 
     [Fact]
@@ -872,7 +872,7 @@ public class BclInterfaceTests
 
         notifier.PropertyChanging += (s, e) => eventFired = true;
 
-        stub.PropertyChangingInterceptor.Handler?.Invoke(stub, new PropertyChangingEventArgs("TestProperty"));
+        stub.PropertyChanging.Raise(stub, new PropertyChangingEventArgs("TestProperty"));
 
         Assert.True(eventFired);
     }
