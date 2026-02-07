@@ -16,8 +16,8 @@ Configure void methods using `Execute` with an `Action` that matches the method 
 
 <!-- snippet: methods-oncall-void -->
 ```cs
-// OnCall for void methods uses Action<...params>
-stub.LogMessage.Execute((message) => logged.Add(message));
+// Return for void methods uses Action<...params>
+stub.LogMessage.Call((message) => logged.Add(message));
 ```
 <!-- endSnippet -->
 
@@ -29,8 +29,8 @@ Configure methods that return values using `Returns`. You have two options:
 
 <!-- snippet: methods-oncall-return -->
 ```cs
-// OnCall with return value: Func<...params, TReturn>
-stub.GetUserName.Returns((userId) => "TestUser");
+// Return with return value: Func<...params, TReturn>
+stub.GetUserName.Return((userId) => "TestUser");
 ```
 <!-- endSnippet -->
 
@@ -39,7 +39,7 @@ stub.GetUserName.Returns((userId) => "TestUser");
 <!-- snippet: methods-oncall-value -->
 ```cs
 // Returns - simpler syntax when you don't need callback logic
-stub.GetUserName.Returns("StaticUser");
+stub.GetUserName.Return("StaticUser");
 ```
 <!-- endSnippet -->
 
@@ -52,7 +52,7 @@ The callback signature includes all method parameters in the same order:
 <!-- snippet: methods-oncall-multi-param -->
 ```cs
 // All method parameters are passed to the callback in order
-stub.ValidateCredentials.Returns((username, password) =>
+stub.ValidateCredentials.Return((username, password) =>
     username == "admin" && password == "secret");
 ```
 <!-- endSnippet -->
@@ -74,7 +74,7 @@ Call `.Verify()` on the builder object returned by `Returns`/`Execute` to verify
 <!-- snippet: methods-verify-wascalled -->
 ```cs
 // Mark with Verifiable(), then stub.Verify() checks all marked members
-stub.Save.Execute((entity) => { }).Verifiable();
+stub.Save.Call((entity) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -96,8 +96,8 @@ For batch verification of multiple methods, mark each with `.Verifiable()` then 
 <!-- snippet: methods-verify-verifiable -->
 ```cs
 // Mark expected calls with Verifiable(), then stub.Verify() checks all
-stub.Save.Execute((entity) => { }).Verifiable(Times.Once);
-stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
+stub.Save.Call((entity) => { }).Verifiable(Times.Once);
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -131,18 +131,18 @@ var (username, password) = tracking.LastArgs;
 
 ## Overloaded Methods
 
-When an interface has overloaded methods, KnockOff generates a single interceptor with overloaded `Returns()`/`Execute()` methods. The lambda's parameter types disambiguate which overload to configure:
+When an interface has overloaded methods, KnockOff generates a single interceptor with overloaded `Return()`/`Call()` methods. The lambda's parameter types disambiguate which overload to configure:
 
 <!-- snippet: methods-overloads -->
 ```cs
 // Fully-typed lambda tells KnockOff which overload to configure
-stub.Find.Returns(() => new List<User>());
-stub.Find.Returns((int id) => new User { Id = id, Name = "ById" });
-stub.Find.Returns((string name) => new User { Id = 1, Name = name });
+stub.Find.Return(() => new List<User>());
+stub.Find.Return((int id) => new User { Id = id, Name = "ById" });
+stub.Find.Return((string name) => new User { Id = 1, Name = name });
 ```
 <!-- endSnippet -->
 
-Each overload gets its own `Returns`/`Execute` overload on the same interceptor property, distinguished by the delegate signature.
+Each overload gets its own `Return`/`Call` overload on the same interceptor property, distinguished by the delegate signature.
 
 **Stand-Alone pattern with user methods:** Each overload gets its own virtual method in the generated base class. You can selectively override specific overloads without affecting others. See the [User Methods: Overloads](user-methods.md#overloads) section for details.
 
@@ -167,8 +167,8 @@ This is useful when reusing a stub instance across multiple test phases or asser
 
 Use sequences when a method should behave differently across multiple calls. KnockOff provides two approaches:
 
-1. **Params syntax** (recommended for constant values) - `Returns(first, params rest)` creates a sequence in a single call
-2. **Callback chaining** (for dynamic values) - Chain `ThenReturns()` or `ThenExecute()` after `Returns(callback)` or `Execute(callback)`
+1. **Params syntax** (recommended for constant values) - `Return(first, params rest)` creates a sequence in a single call
+2. **Callback chaining** (for dynamic values) - Chain `ThenReturn()` or `ThenCall()` after `Return(callback)` or `Call(callback)`
 
 ### Concise Value Sequences (Params Syntax)
 
@@ -177,7 +177,7 @@ For constant value sequences, use the concise params syntax:
 <!-- snippet: methods-sequence-params -->
 ```cs
 // Returns(first, params rest) for value sequences
-stub.GetValue.Returns(1, 2, 3);
+stub.GetValue.Return(1, 2, 3);
 ```
 <!-- endSnippet -->
 
@@ -190,34 +190,34 @@ Async methods auto-wrap values - no `Task.FromResult` needed:
 <!-- snippet: methods-sequence-params-async -->
 ```cs
 // Async methods auto-wrap values - no Task.FromResult needed
-stub.GetDataAsync.Returns("first", "second", "third");
+stub.GetDataAsync.Return("first", "second", "third");
 ```
 <!-- endSnippet -->
 
 ### Mixing Callbacks with Value Params
 
-Use `Returns(callback)` for the first callback, then `ThenReturns()` with params for subsequent values:
+Use `Return(callback)` for the first callback, then `ThenReturn()` with params for subsequent values:
 
 <!-- snippet: methods-sequence-callback-then-params -->
 ```cs
-// OnCall for first callback, then ThenReturns for constant values
+// Return for first callback, then ThenReturn for constant values
 stub.Calculate
-    .Returns((x, y) => x + y)
-    .ThenReturns(100, 200, 300);
+    .Return((x, y) => x + y)
+    .ThenReturn(100, 200, 300);
 ```
 <!-- endSnippet -->
 
 ### Callback Sequences
 
-For callback sequences or mixed sequences with dynamic values, chain `ThenReturns()` after `Returns(callback)`:
+For callback sequences or mixed sequences with dynamic values, chain `ThenReturn()` after `Return(callback)`:
 
 <!-- snippet: methods-sequence-basic -->
 ```cs
 // Chain ThenCall() for callback sequences
 stub.GetStatus
-    .Returns(() => "Pending")
-    .ThenReturns(() => "Processing")
-    .ThenReturns(() => "Complete");
+    .Return(() => "Pending")
+    .ThenReturn(() => "Processing")
+    .ThenReturn(() => "Complete");
 ```
 <!-- endSnippet -->
 
@@ -231,9 +231,9 @@ Sequences work with void methods using `Action` callbacks:
 ```cs
 // Void method sequences use Action callbacks
 stub.Notify
-    .Execute((msg) => calls.Add("first"))
-    .ThenExecute((msg) => calls.Add("second"))
-    .ThenExecute((msg) => calls.Add("third"));
+    .Call((msg) => calls.Add("first"))
+    .ThenCall((msg) => calls.Add("second"))
+    .ThenCall((msg) => calls.Add("third"));
 ```
 <!-- endSnippet -->
 
@@ -245,13 +245,13 @@ Sequences with return values use `Func` callbacks:
 ```cs
 // Return method sequences use Func callbacks
 stub.Calculate
-    .Returns((x, y) => x + y)
-    .ThenReturns((x, y) => x * y)
-    .ThenReturns((x, y) => x - y);
+    .Return((x, y) => x + y)
+    .ThenReturn((x, y) => x * y)
+    .ThenReturn((x, y) => x - y);
 ```
 <!-- endSnippet -->
 
-The callback signature matches the method signature, just like `Returns(callback)` and `Execute(callback)`.
+The callback signature matches the method signature, just like `Return(callback)` and `Call(callback)`.
 
 ### Sequence Exhaustion
 
@@ -260,7 +260,7 @@ After the sequence is exhausted (all callbacks consumed), subsequent calls **rep
 <!-- snippet: methods-sequence-exhaustion -->
 ```cs
 // After exhaustion: repeats last value (NSubstitute behavior)
-stub.GetValue.Returns(() => 1).ThenReturns(() => 2).ThenReturns(() => 3);
+stub.GetValue.Return(() => 1).ThenReturn(() => 2).ThenReturn(() => 3);
 ```
 <!-- endSnippet -->
 
@@ -271,7 +271,7 @@ Use `ThenDefault()` when you want the sequence to return `default(T)` after exha
 <!-- snippet: methods-sequence-then-default -->
 ```cs
 // ThenDefault() returns default(T) after exhaustion instead of repeating
-stub.GetValue.Returns(() => 1).ThenReturns(() => 2).ThenDefault();
+stub.GetValue.Return(() => 1).ThenReturn(() => 2).ThenDefault();
 ```
 <!-- endSnippet -->
 
@@ -283,25 +283,25 @@ In strict mode, exhausted sequences throw `StubException.SequenceExhausted` rega
 ```cs
 // Strict mode throws on sequence exhaustion
 stub.Strict = true;
-stub.GetValue.Returns(() => 1).ThenReturns(() => 2);
+stub.GetValue.Return(() => 1).ThenReturn(() => 2);
 ```
 <!-- endSnippet -->
 
 ### Mixing Fixed Values and Dynamic Callbacks
 
-You can mix fixed values and dynamic callbacks in the same sequence using `Returns(callback)`:
+You can mix fixed values and dynamic callbacks in the same sequence using `Return(callback)`:
 
 <!-- snippet: methods-sequence-mixed -->
 ```cs
 // Mix fixed values with dynamic callbacks
 stub.GetStatus
-    .Returns(() => "Initial")
-    .ThenReturns(() => DateTime.Now.ToString("HH:mm:ss"))
-    .ThenReturns(() => "Final");
+    .Return(() => "Initial")
+    .ThenReturn(() => DateTime.Now.ToString("HH:mm:ss"))
+    .ThenReturn(() => "Final");
 ```
 <!-- endSnippet -->
 
-**Note:** Use `Returns(() => value)` to include fixed values in a sequence chain.
+**Note:** Use `Return(() => value)` to include fixed values in a sequence chain.
 
 ### Sequence Verification
 
@@ -320,8 +320,8 @@ sequence.Verify();
 ```cs
 // Mark sequence for batch verification via stub.Verify()
 stub.Process
-    .Execute(() => { })
-    .ThenExecute(() => { })
+    .Call(() => { })
+    .ThenCall(() => { })
     .Verifiable();
 ```
 <!-- endSnippet -->
@@ -335,8 +335,8 @@ This example demonstrates method configuration, argument capturing, and verifica
 <!-- snippet: methods-complete-example -->
 ```cs
 // Configure stub with tracking
-var getTracking = stub.GetUser.Returns((id) => id == 1 ? testUser : null).Verifiable();
-var saveTracking = stub.SaveUser.Execute((user) => { }).Verifiable();
+var getTracking = stub.GetUser.Return((id) => id == 1 ? testUser : null).Verifiable();
+var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -344,13 +344,13 @@ var saveTracking = stub.SaveUser.Execute((user) => { }).Verifiable();
 
 ## Key Takeaways
 
-- **Configuration options**: Use `Returns(callback)` for dynamic return values, `Execute(callback)` for void methods, or `Returns(value)` for fixed return values
+- **Configuration options**: Use `Return(callback)` for dynamic return values, `Call(callback)` for void methods, or `Return(value)` for fixed return values
 - **Callback signature**: Callback matches method signature—receives only the method parameters
 - **Verification patterns**: Individual tracking with `tracking.Verify(Times)` or batch verification with `.Verifiable()` then `stub.Verify()`
 - **Times options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`
 - **Argument capture**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Configure using fully-typed lambda to distinguish which overload
-- **Sequences**: Use `Returns(1, 2, 3)` for constant value sequences (NSubstitute-style); use `ThenReturns()`/`ThenExecute()` chaining for callback sequences
+- **Sequences**: Use `Return(1, 2, 3)` for constant value sequences (NSubstitute-style); use `ThenReturn()`/`ThenCall()` chaining for callback sequences
 - **Async auto-wrapping**: Async methods auto-wrap params values - no `Task.FromResult` needed
 - **ThenDefault()**: Opt-in to returning `default(T)` after sequence exhaustion instead of repeating
 - **Reset**: Clears call count, captured arguments, and sequence position, but preserves callbacks

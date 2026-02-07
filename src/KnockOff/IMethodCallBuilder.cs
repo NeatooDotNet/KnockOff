@@ -1,85 +1,85 @@
 namespace KnockOff;
 
 /// <summary>
-/// Returned by Execute(callback) on void methods. Supports tracking and optional sequence chaining via ThenExecute.
+/// Returned by Call(callback) on void methods. Supports tracking and optional sequence chaining via ThenCall.
 /// </summary>
 /// <remarks>
-/// The builder IS the tracking implementation. When ThenExecute is invoked,
+/// The builder IS the tracking implementation. When ThenCall is invoked,
 /// the builder lazily elevates from repeating to sequence mode.
 /// </remarks>
-public interface IMethodExecuteBuilder<TCallback> : IMethodTracking
+public interface IMethodCallBuilder<TCallback> : IMethodTracking
 {
     /// <summary>
     /// Elevates to sequence mode and adds another callback.
     /// The current callback becomes the first element; the new callback is appended.
     /// </summary>
-    IMethodExecuteSequence<TCallback> ThenExecute(TCallback callback);
+    IMethodCallSequence<TCallback> ThenCall(TCallback callback);
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
     /// Uses Times.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
-    new IMethodExecuteBuilder<TCallback> Verifiable();
+    new IMethodCallBuilder<TCallback> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
     /// with a specific Times constraint. Returns this for fluent chaining.
     /// </summary>
     /// <param name="times">The Times constraint to verify against.</param>
-    new IMethodExecuteBuilder<TCallback> Verifiable(Times times);
+    new IMethodCallBuilder<TCallback> Verifiable(Times times);
 }
 
 /// <summary>
-/// Returned by Execute(callback) for void methods with a single trackable parameter.
-/// Supports tracking with LastArg access and optional sequence chaining via ThenExecute.
+/// Returned by Call(callback) for void methods with a single trackable parameter.
+/// Supports tracking with LastArg access and optional sequence chaining via ThenCall.
 /// </summary>
-public interface IMethodExecuteBuilder<TCallback, TArg> : IMethodTracking<TArg>
+public interface IMethodCallBuilder<TCallback, TArg> : IMethodTracking<TArg>
 {
     /// <summary>
     /// Elevates to sequence mode and adds another callback.
     /// The current callback becomes the first element; the new callback is appended.
     /// </summary>
-    IMethodExecuteSequence<TCallback> ThenExecute(TCallback callback);
+    IMethodCallSequence<TCallback> ThenCall(TCallback callback);
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
     /// Uses Times.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining with LastArg access.
     /// </summary>
-    new IMethodExecuteBuilder<TCallback, TArg> Verifiable();
+    new IMethodCallBuilder<TCallback, TArg> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
     /// with a specific Times constraint. Returns this for fluent chaining.
     /// </summary>
     /// <param name="times">The Times constraint to verify against.</param>
-    new IMethodExecuteBuilder<TCallback, TArg> Verifiable(Times times);
+    new IMethodCallBuilder<TCallback, TArg> Verifiable(Times times);
 }
 
 /// <summary>
-/// Returned by Execute(callback) for void methods with multiple trackable parameters.
-/// Supports tracking with LastArgs access and optional sequence chaining via ThenExecute.
+/// Returned by Call(callback) for void methods with multiple trackable parameters.
+/// Supports tracking with LastArgs access and optional sequence chaining via ThenCall.
 /// </summary>
-public interface IMethodExecuteBuilderArgs<TCallback, TArgs> : IMethodTrackingArgs<TArgs>
+public interface IMethodCallBuilderArgs<TCallback, TArgs> : IMethodTrackingArgs<TArgs>
 {
     /// <summary>
     /// Elevates to sequence mode and adds another callback.
     /// The current callback becomes the first element; the new callback is appended.
     /// </summary>
-    IMethodExecuteSequence<TCallback> ThenExecute(TCallback callback);
+    IMethodCallSequence<TCallback> ThenCall(TCallback callback);
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
     /// Uses Times.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining with LastArgs access.
     /// </summary>
-    new IMethodExecuteBuilderArgs<TCallback, TArgs> Verifiable();
+    new IMethodCallBuilderArgs<TCallback, TArgs> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
     /// with a specific Times constraint. Returns this for fluent chaining.
     /// </summary>
     /// <param name="times">The Times constraint to verify against.</param>
-    new IMethodExecuteBuilderArgs<TCallback, TArgs> Verifiable(Times times);
+    new IMethodCallBuilderArgs<TCallback, TArgs> Verifiable(Times times);
 }

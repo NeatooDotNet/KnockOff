@@ -93,8 +93,8 @@ public class MethodInterceptionTests
 
         #region matrix-method-interception
         // Configure behavior
-        stub.GetData.Returns("test-value");
-        stub.GetData.Returns((id) => $"Data-{id}");
+        stub.GetData.Return("test-value");
+        stub.GetData.Return((id) => $"Data-{id}");
 
         // Verify calls
         stub.GetData.Verify(Times.Never);
@@ -239,9 +239,9 @@ public class SequenceTests
         #region matrix-sequences
         // Return different values on successive calls
         stub.GetStatus
-            .Returns(() => "Pending")
-            .ThenReturns(() => "Processing")
-            .ThenReturns(() => "Complete");
+            .Return(() => "Pending")
+            .ThenReturn(() => "Processing")
+            .ThenReturn(() => "Complete");
         // Call 1: "Pending", Call 2: "Processing", Call 3+: "Complete" (repeats last)
 
         // Properties support sequences too
@@ -275,12 +275,12 @@ public class WhenChainsTests
         #region matrix-when-chains
         // Chain multiple conditions (sequential - each consumed once)
         stub.Add
-            .When(1, 2).Returns(100)
-            .ThenWhen(3, 4).Returns(200)
-            .ThenWhen((a, b) => a < 0).Returns(0);
+            .When(1, 2).Return(100)
+            .ThenWhen(3, 4).Return(200)
+            .ThenWhen((a, b) => a < 0).Return(0);
 
         // Fallback for non-matching calls or after chain is consumed
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
         #endregion
 
         Assert.Equal(100, calc.Add(1, 2));
@@ -304,7 +304,7 @@ public class VerificationTests
 
         #region matrix-verification
         // Mark for verification
-        stub.GetData.Returns((id) => "data").Verifiable();
+        stub.GetData.Return((id) => "data").Verifiable();
 
         // Verify only marked items
         // stub.Verify();  // Throws if any Verifiable() not called
@@ -361,7 +361,7 @@ public class ResetTests
         var stub = new MatrixServiceStub();
         IMatrixService svc = stub;
 
-        stub.GetData.Returns((id) => "data");
+        stub.GetData.Return((id) => "data");
         svc.GetData(1);
         stub.GetData.Verify(Times.Once);
 
@@ -392,8 +392,8 @@ public class UserMethodsTests
         var result = calc.Add(3, 4);
         Assert.Equal(7, result);
 
-        // OnCall supersedes user method
-        stub.Add.Returns((a, b) => 999);
+        // Return supersedes user method
+        stub.Add.Return((a, b) => 999);
         var overridden = calc.Add(3, 4);
         Assert.Equal(999, overridden);
         #endregion
@@ -416,13 +416,13 @@ public class AsyncAutoWrapTests
         // Given: Task<string> GetDataAsync(int id)
 
         // Tier 1: Returns(unwrappedValue) - auto-wraps in Task.FromResult
-        stub.GetDataAsync.Returns("hello");
+        stub.GetDataAsync.Return("hello");
 
-        // Tier 2: OnCall(simplified callback) - returns T, auto-wrapped
-        stub.GetDataAsync.Returns((id) => $"Data-{id}");
+        // Tier 2: Return(simplified callback) - returns T, auto-wrapped
+        stub.GetDataAsync.Return((id) => $"Data-{id}");
 
-        // Tier 3: OnCall(full delegate) - returns Task<T> directly
-        stub.GetDataAsync.Returns((int id) => Task.FromResult($"Full-{id}"));
+        // Tier 3: Return(full delegate) - returns Task<T> directly
+        stub.GetDataAsync.Return((int id) => Task.FromResult($"Full-{id}"));
         #endregion
 
         var result = await svc.GetDataAsync(42);
@@ -451,7 +451,7 @@ public class InstantiationTests
         IMatrixCalculator calc = calcStub;
 
         // Configure and use - same API across all patterns
-        calcStub.Add.Returns((a, b) => a + b);
+        calcStub.Add.Return((a, b) => a + b);
         var result = calc.Add(3, 4);
         Assert.Equal(7, result);
 

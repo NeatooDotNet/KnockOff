@@ -731,8 +731,8 @@ internal static class InlineRenderer
         w.Line($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();");
         w.Line();
 
-        // Reset method - clears tracking state but preserves configuration (typed handlers with OnCall)
-        w.Line("\t\t\t/// <summary>Resets tracking state (call counts) but preserves configuration (OnCall callbacks).</summary>");
+        // Reset method - clears tracking state but preserves configuration (typed handlers with Return/Call)
+        w.Line("\t\t\t/// <summary>Resets tracking state (call counts) but preserves configuration (Return/Call callbacks).</summary>");
         w.Line("\t\t\tpublic void Reset()");
         w.Line("\t\t\t{");
         w.Line("\t\t\t\tforeach (var handler in _typedHandlers.Values.Cast<IResettable>())");
@@ -813,9 +813,10 @@ internal static class InlineRenderer
             w.Line();
         }
 
-        // OnCall method (returns IMethodTracking for consistency with regular method interceptors)
+        // Return/Call method (returns IMethodTracking for consistency with regular method interceptors)
+        var typedHandlerEntryPoint = handler.IsVoid ? "Call" : "Return";
         w.Line("\t\t\t\t/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
-        w.Line($"\t\t\t\tpublic global::KnockOff.IMethodTracking OnCall({handler.MethodName}Delegate callback) {{ _onCall = callback; return this; }}");
+        w.Line($"\t\t\t\tpublic global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({handler.MethodName}Delegate callback) {{ _onCall = callback; return this; }}");
         w.Line();
 
         // Callback property for internal use by invocation logic
@@ -842,8 +843,8 @@ internal static class InlineRenderer
         }
         w.Line();
 
-        // Reset - clears tracking state but preserves configuration (OnCall callback)
-        w.Line("\t\t\t\t/// <summary>Resets tracking state (_callCount, LastArg/LastArgs) but preserves configuration (OnCall).</summary>");
+        // Reset - clears tracking state but preserves configuration (Return/Call callback)
+        w.Line("\t\t\t\t/// <summary>Resets tracking state (_callCount, LastArg/LastArgs) but preserves configuration (Return/Call).</summary>");
         if (handler.NonGenericParameters.Count == 0)
         {
             w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; }");
@@ -1077,7 +1078,7 @@ internal static class InlineRenderer
         w.Line();
         w.Line("\t\t\t\tthrow new global::System.InvalidOperationException(");
         w.Line("\t\t\t\t\t$\"No implementation provided for {methodName}<{type.Name}>. \" +");
-        w.Line("\t\t\t\t\t$\"Set the handler's OnCall.\");");
+        w.Line("\t\t\t\t\t$\"Set the handler's Return or Call.\");");
         w.Line("\t\t\t}");
         w.Line();
     }

@@ -94,7 +94,7 @@ public class BasicSourceDelegationTests
 public class PartialOverrideTests
 {
     [Fact]
-    public void Source_PartialOverrideWithOnCall()
+    public void Source_PartialOverrideWithReturn()
     {
         var stub = new SourceRepoStub();
         var realRepo = new SimpleRepository();
@@ -107,17 +107,17 @@ public class PartialOverrideTests
 
         #region source-partial-override
         // Override specific member while source handles the rest
-        stub.GetById.Returns((id) => new User { Id = id, Name = "Test User" });
+        stub.GetById.Return((id) => new User { Id = id, Name = "Test User" });
         #endregion
 
         IRepository repository = stub;
 
-        // GetById uses OnCall override
+        // GetById uses Return override
         var testUser = repository.GetById(1);
         Assert.NotNull(testUser);
         Assert.Equal("Test User", testUser.Name);
 
-        // Save delegates to source (no OnCall configured)
+        // Save delegates to source (no Return configured)
         repository.Save(new User { Id = 2, Name = "New User" });
         Assert.NotNull(realRepo.GetById(2));
     }
@@ -189,7 +189,7 @@ public class ClearSourceTests
 public class PriorityOrderTests
 {
     [Fact]
-    public void Priority_OnCallBeatsSourceBeatsSmartDefault()
+    public void Priority_ReturnBeatsSourceBeatsSmartDefault()
     {
         var stub = new SourceRepoStub();
         var realRepo = new SimpleRepository();
@@ -201,16 +201,16 @@ public class PriorityOrderTests
 
         IRepository repository = stub;
 
-        // Source returns 1 for active user (when no OnCall is set)
+        // Source returns 1 for active user (when no Return is set)
         var fromSource = repository.GetPriority(new User { Id = 1, IsActive = true });
         Assert.Equal(1, fromSource);
 
         #region source-priority
-        // OnCall takes precedence over source
-        stub.GetPriority.Returns((user) => 42);
+        // Return takes precedence over source
+        stub.GetPriority.Return((user) => 42);
         #endregion
-        var fromOnCall = repository.GetPriority(new User { Id = 1, IsActive = true });
-        Assert.Equal(42, fromOnCall);
+        var fromReturn = repository.GetPriority(new User { Id = 1, IsActive = true });
+        Assert.Equal(42, fromReturn);
     }
 
     [Fact]
@@ -223,10 +223,10 @@ public class PriorityOrderTests
 
         #region source-oncall-value-vs-callback
         // Value overload - simpler for fixed values
-        stub.GetPriority.Returns(99);
+        stub.GetPriority.Return(99);
 
         // Callback overload - use when you need logic or side effects
-        stub.GetPriority.Returns((user) => user.IsActive ? 1 : 0);
+        stub.GetPriority.Return((user) => user.IsActive ? 1 : 0);
         #endregion
 
         var result = repository.GetPriority(new User { IsActive = true });
@@ -234,7 +234,7 @@ public class PriorityOrderTests
     }
 
     [Fact]
-    public void OnCallCallback_OverridesSource()
+    public void ReturnCallback_OverridesSource()
     {
         var stub = new SourceRepoStub();
         var realRepo = new SimpleRepository();
@@ -242,7 +242,7 @@ public class PriorityOrderTests
         IRepository repository = stub;
 
         #region source-oncall-api-callback
-        stub.GetById.Returns((id) => new User { Id = id, Name = $"User{id}" });
+        stub.GetById.Return((id) => new User { Id = id, Name = $"User{id}" });
         #endregion
 
         var user = repository.GetById(1);
@@ -250,7 +250,7 @@ public class PriorityOrderTests
     }
 
     [Fact]
-    public void OnCallValue_OverridesSource()
+    public void ReturnValue_OverridesSource()
     {
         var stub = new SourceRepoStub();
         var realRepo = new SimpleRepository();
@@ -258,7 +258,7 @@ public class PriorityOrderTests
         IRepository repository = stub;
 
         #region source-oncall-api-value
-        stub.GetById.Returns(new User { Id = 1, Name = "Fixed User" });
+        stub.GetById.Return(new User { Id = 1, Name = "Fixed User" });
         #endregion
 
         var user = repository.GetById(99);
@@ -308,7 +308,7 @@ public class HierarchyPartialSourceTests
 
         // AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
         // Configure it explicitly, or it returns the smart default
-        stub.AddRange.Execute((newItems) =>
+        stub.AddRange.Call((newItems) =>
         {
             foreach (var newItem in newItems)
             {
@@ -377,23 +377,23 @@ public class CompleteSourceExampleTests
         stub.Source(realDataSource);
 
         #region source-complete-example
-        // OnCall takes full control - source not consulted even for non-matches
-        stub.Read.Returns((filename) =>
+        // Return takes full control - source not consulted even for non-matches
+        stub.Read.Return((filename) =>
             filename == "config.txt" ? "Test Config" : null);
         #endregion
 
         IDataSource dataSource = stub;
 
-        // OnCall handles config.txt
+        // Return handles config.txt
         var config = dataSource.Read("config.txt");
         Assert.Equal("Test Config", config);
 
-        // OnCall returned null for data.txt, but source is NOT consulted
-        // once OnCall is configured - it takes full control
+        // Return returned null for data.txt, but source is NOT consulted
+        // once Return is configured - it takes full control
         var data = dataSource.Read("data.txt");
         Assert.Null(data);
 
-        // Write delegates entirely to source (no OnCall configured)
+        // Write delegates entirely to source (no Return configured)
         dataSource.Write("output.txt", "New Data");
         Assert.Equal("New Data", realDataSource.Read("output.txt"));
     }

@@ -2,7 +2,7 @@
 
 # User Methods
 
-User methods let you define default stub behavior at compile time by writing protected override methods in your stub class. Tests can override these defaults using `Returns(callback)` or `Execute(callback)` when needed.
+User methods let you define default stub behavior at compile time by writing protected override methods in your stub class. Tests can override these defaults using `Return(callback)` or `Call(callback)` when needed.
 
 **Availability**: User methods work with all four **Standalone patterns**: `[KnockOff]` on a class implementing an interface (patterns 1, 2) and `[KnockOffBase<T>]` / `[KnockOffBase(typeof(T<>))]` on class stubs (patterns 3, 4). They are not available in Inline patterns.
 
@@ -21,7 +21,7 @@ public partial class UserMethodsRepoStub : IUserMethodsRepo { }
 public partial class UserMethodsRepoStub
 {
     // Protected override method with underscore suffix
-    // This is the fallback when no OnCall is configured
+    // This is the fallback when no Return is configured
     protected override User? GetUserById_(int id)
     {
         return new User { Id = id, Name = "Default User" };
@@ -69,15 +69,15 @@ KnockOff generates a base class (e.g., `UserMethodsRepoStubBase`) with virtual m
 
 When you override a virtual method:
 
-1. The generated interface implementation checks for `Returns`/`Execute` configuration first
-2. If `Returns`/`Execute` is configured, it supersedes the user method
-3. If no `Returns`/`Execute` is configured, your override is called as the fallback
+1. The generated interface implementation checks for `Return`/`Call` configuration first
+2. If `Return`/`Call` is configured, it supersedes the user method
+3. If no `Return`/`Call` is configured, your override is called as the fallback
 
 This provides compile-time safety: if you typo the method name or get the signature wrong, the compiler reports "no suitable method to override" instead of silently ignoring your code.
 
 <!-- snippet: user-methods-fallback -->
 ```cs
-// No OnCall configured - user method provides behavior
+// No Return configured - user method provides behavior
 var user = repository.GetUserById(1);
 
 // Verify the call was tracked
@@ -89,38 +89,38 @@ stub.GetUserById.Verify(Times.Once);
 
 ---
 
-## Overriding with Returns/Execute
+## Overriding with Return/Call
 
-Use `Returns(callback)` or `Execute(callback)` to override the user method for specific tests. The callback supersedes the user method.
+Use `Return(callback)` or `Call(callback)` to override the user method for specific tests. The callback supersedes the user method.
 
 <!-- snippet: user-methods-oncall -->
 ```cs
-// OnCall supersedes the user method
-stub.GetUserById.Returns(id => new User { Id = id, Name = "Overridden" });
+// Return supersedes the user method
+stub.GetUserById.Return(id => new User { Id = id, Name = "Overridden" });
 
 var user = repository.GetUserById(42);
 Assert.Equal("Overridden", user!.Name);
 ```
 <!-- endSnippet -->
 
-For constant return values, use `Returns()`:
+For constant return values, use `Return()`:
 
 <!-- snippet: user-methods-returns -->
 ```cs
-// Returns() for constant values
-stub.GetBalance.Returns(500.00m);
+// Return() for constant values
+stub.GetBalance.Return(500.00m);
 
 var balance = repository.GetBalance(1);
 Assert.Equal(500.00m, balance);
 ```
 <!-- endSnippet -->
 
-For async methods, `Returns()` auto-wraps the value in `Task.FromResult`:
+For async methods, `Return()` auto-wraps the value in `Task.FromResult`:
 
 <!-- snippet: user-methods-async-returns -->
 ```cs
 // Returns auto-wraps value in Task.FromResult for async methods
-stub.GetUserByIdAsync.Returns(new User { Id = 99, Name = "Test User" });
+stub.GetUserByIdAsync.Return(new User { Id = 99, Name = "Test User" });
 
 var user = await repository.GetUserByIdAsync(99);
 Assert.Equal("Test User", user!.Name);
@@ -131,14 +131,14 @@ Assert.Equal("Test User", user!.Name);
 
 ## Tracking and Verification
 
-User method interceptors provide full tracking capabilities. Tracking works the same whether using the user method or a `Returns`/`Execute` override.
+User method interceptors provide full tracking capabilities. Tracking works the same whether using the user method or a `Return`/`Call` override.
 
 <!-- snippet: user-methods-tracking -->
 ```cs
-stub.IsActive.Returns(false);
+stub.IsActive.Return(false);
 repository.IsActive(42);
 
-// Tracking works whether using OnCall or user method
+// Tracking works whether using Return or user method
 stub.IsActive.Verify(Times.Once);
 Assert.Equal(42, stub.IsActive.LastArg);
 ```
@@ -150,11 +150,11 @@ User method interceptors have the same tracking API as regular interceptors: `Ve
 
 ## Resetting Call Tracking
 
-Call `Reset()` to clear call count and argument tracking. The `Returns`/`Execute` configuration is preserved.
+Call `Reset()` to clear call count and argument tracking. The `Return`/`Call` configuration is preserved.
 
 <!-- snippet: user-methods-reset -->
 ```cs
-// Reset clears tracking state but preserves OnCall configuration
+// Reset clears tracking state but preserves Return configuration
 stub.GetBalance.Reset();
 stub.GetBalance.Verify(Times.Never);
 ```
@@ -199,10 +199,10 @@ Specific tests override when needed:
 <!-- snippet: user-methods-shareable-override -->
 ```cs
 // Specific test overrides to simulate failure
-stub.SendEmail.Returns(false);
+stub.SendEmail.Return(false);
 
 var sent = service.SendEmail("user@test.com", "Welcome");
-Assert.False(sent); // OnCall supersedes user method
+Assert.False(sent); // Return supersedes user method
 ```
 <!-- endSnippet -->
 
@@ -214,12 +214,12 @@ This pattern keeps test code DRY while maintaining flexibility for edge cases.
 
 <!-- snippet: user-methods-complete-example -->
 ```cs
-// User method provides default; OnCall can override
+// User method provides default; Return can override
 var user = repository.GetUserById(42);
 stub.GetUserById.Verify(Times.Once);
 
 // Override for next call
-stub.GetUserById.Returns(id => new User { Id = id, Name = "Custom" });
+stub.GetUserById.Return(id => new User { Id = id, Name = "Custom" });
 var customUser = repository.GetUserById(99);
 Assert.Equal("Custom", customUser!.Name);
 ```
@@ -245,7 +245,7 @@ public partial class UserMethodsFormatterStub
 ```
 <!-- endSnippet -->
 
-Overriding one overload does not affect others. The non-overridden overloads work exactly like regular methods: configure them with `Returns(callback)` or `Returns(value)`, or leave them to return defaults.
+Overriding one overload does not affect others. The non-overridden overloads work exactly like regular methods: configure them with `Return(callback)` or `Return(value)`, or leave them to return defaults.
 
 ---
 
@@ -253,7 +253,7 @@ Overriding one overload does not affect others. The non-overridden overloads wor
 
 **No user-defined base classes**: Standalone stubs cannot have a user-defined base class because KnockOff generates the base class. If you add `: MyBaseClass` to a `[KnockOff]` stub, you will get diagnostic **KO0200** ("Standalone stubs cannot have user-defined base classes").
 
-**Generic methods excluded**: Generic methods (e.g., `T Create<T>()`) are not included in the base class pattern. Use `stub.Create.Of<T>().OnCall(...)` to configure them instead.
+**Generic methods excluded**: Generic methods (e.g., `T Create<T>()`) are not included in the base class pattern. Use `stub.Create.Of<T>().Return(...)` to configure them instead.
 
 ---
 
@@ -263,10 +263,10 @@ Overriding one overload does not affect others. The non-overridden overloads wor
 - Override virtual methods with underscore suffix (e.g., `protected override string Method_(...)`)
 - Interceptor properties use clean names (`stub.Method`), not the underscore suffix
 - Compile-time safety: signature mismatches cause "no suitable method to override" errors
-- User methods are the fallback when no `Returns`/`Execute` is configured
-- `Returns(callback)`/`Execute(callback)` supersedes the user method when configured
+- User methods are the fallback when no `Return`/`Call` is configured
+- `Return(callback)`/`Call(callback)` supersedes the user method when configured
 - Overloads can be selectively overridden (overriding one does not affect others)
-- `Reset()` clears tracking but preserves `Returns`/`Execute` configuration
+- `Reset()` clears tracking but preserves `Return`/`Call` configuration
 - Ideal for the shareable stub pattern: defaults in stub, overrides in specific tests
 
 Next: [Source Delegation](source-delegation.md) for partial stubbing patterns where you want to delegate to a real implementation.

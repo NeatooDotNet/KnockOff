@@ -95,7 +95,7 @@ public class StandaloneClassUserMethodTests
 		// Arrange
 		var stub = new SCUserMethodStub();
 		var onCallInvoked = false;
-		stub.Execute.Execute((cmd) => onCallInvoked = true);
+		stub.Execute.Call((cmd) => onCallInvoked = true);
 
 		// Act
 		stub.Object.Execute("test");
@@ -110,7 +110,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.Returns(input => "[ONCALL: " + input + "]");
+		stub.Process.Return(input => "[ONCALL: " + input + "]");
 
 		// Act
 		var result = stub.Object.Process("hello");
@@ -128,7 +128,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.Returns("[CONSTANT]");
+		stub.Process.Return("[CONSTANT]");
 
 		// Act
 		var result = stub.Object.Process("ignored");
@@ -146,7 +146,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.When("special").Returns("[WHEN MATCHED]");
+		stub.Process.When("special").Return("[WHEN MATCHED]");
 
 		// Act
 		var result = stub.Object.Process("special");
@@ -160,7 +160,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.When("special").Returns("[WHEN MATCHED]");
+		stub.Process.When("special").Return("[WHEN MATCHED]");
 
 		// Act
 		var result = stub.Object.Process("normal");
@@ -174,8 +174,8 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.When("first").Returns("[1]")
-			.ThenWhen("second").Returns("[2]")
+		stub.Process.When("first").Return("[1]")
+			.ThenWhen("second").Return("[2]")
 			.ThenNone();
 
 		// Act
@@ -195,7 +195,7 @@ public class StandaloneClassUserMethodTests
 		// Arrange
 		var stub = new SCUserMethodStub();
 		var callbackInvoked = false;
-		stub.Execute.When("trigger").Execute(cmd => callbackInvoked = true);
+		stub.Execute.When("trigger").Call(cmd => callbackInvoked = true);
 
 		// Act
 		stub.Object.Execute("trigger");
@@ -209,7 +209,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Execute.When("trigger").Execute(cmd => { });
+		stub.Execute.When("trigger").Call(cmd => { });
 
 		// Act
 		stub.Object.Execute("other"); // Falls to user method
@@ -224,8 +224,8 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.Returns(s => "[ONCALL]");
-		stub.Process.When("special").Returns("[WHEN]");
+		stub.Process.Return(s => "[ONCALL]");
+		stub.Process.When("special").Return("[WHEN]");
 
 		// Act
 		var whenResult = stub.Object.Process("special");
@@ -245,7 +245,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.Returns(s => "[FIRST]").ThenReturns("[SECOND]");
+		stub.Process.Return(s => "[FIRST]").ThenReturn("[SECOND]");
 
 		// Act
 		var r1 = stub.Object.Process("a");
@@ -263,7 +263,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.Returns("[1]", "[2]");
+		stub.Process.Return("[1]", "[2]");
 
 		// Act
 		var r1 = stub.Object.Process("a");
@@ -282,9 +282,9 @@ public class StandaloneClassUserMethodTests
 		// Arrange
 		var stub = new SCUserMethodStub();
 		var calls = new System.Collections.Generic.List<string>();
-		stub.Execute.Execute(cmd => calls.Add("first:" + cmd))
-			.ThenExecute(cmd => calls.Add("second:" + cmd))
-			.ThenExecute(cmd => calls.Add("third:" + cmd));
+		stub.Execute.Call(cmd => calls.Add("first:" + cmd))
+			.ThenCall(cmd => calls.Add("second:" + cmd))
+			.ThenCall(cmd => calls.Add("third:" + cmd));
 
 		// Act
 		stub.Object.Execute("a");
@@ -448,7 +448,7 @@ public class StandaloneClassUserMethodTests
 		// Arrange
 		var stub = new SCGenericUserMethodStub<ClassStubUser>();
 		var onCallEntity = new ClassStubUser { Id = 99, Name = "OnCall" };
-		stub.GetById.Returns(id => onCallEntity);
+		stub.GetById.Return(id => onCallEntity);
 
 		// Act
 		var result = stub.Object.GetById(1);
@@ -463,7 +463,7 @@ public class StandaloneClassUserMethodTests
 		// Arrange
 		var stub = new SCGenericUserMethodStub<ClassStubUser>();
 		var returnsEntity = new ClassStubUser { Id = 77, Name = "Returns" };
-		stub.GetById.Returns(returnsEntity);
+		stub.GetById.Return(returnsEntity);
 
 		// Act
 		var result = stub.Object.GetById(1);
@@ -536,7 +536,7 @@ public class StandaloneClassUserMethodTests
 		// Arrange
 		var stub = new SCGenericUserMethodStub<ClassStubUser>();
 		var onCallEntity = new ClassStubUser { Id = 5, Name = "Filtered" };
-		stub.GetDefault.Returns(filter => onCallEntity);
+		stub.GetDefault.Return(filter => onCallEntity);
 
 		// Act
 		var result = stub.Object.GetDefault("any-filter");
@@ -553,7 +553,7 @@ public class StandaloneClassUserMethodTests
 		var userEntity = new ClassStubUser { Id = 0, Name = "UserDefault" };
 		var onCallEntity = new ClassStubUser { Id = 1, Name = "FilteredResult" };
 		stub.DefaultGetDefaultEntity = userEntity;
-		stub.GetDefault.Returns(filter => onCallEntity);
+		stub.GetDefault.Return(filter => onCallEntity);
 
 		// Act
 		var userResult = stub.Object.GetDefault();        // User method overload
@@ -573,7 +573,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Process.Returns(s => "[ONCALL]");
+		stub.Process.Return(s => "[ONCALL]");
 
 		stub.Object.Process("first");
 		stub.Process.Verify(Times.Once);

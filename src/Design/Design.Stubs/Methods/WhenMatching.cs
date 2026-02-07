@@ -2,8 +2,8 @@
 // Design.Stubs - When() Parameter-Specific Matching
 // -----------------------------------------------------------------------------
 // This file demonstrates the When() API for parameter-specific matching:
-// - When(args).Returns(value) for value equality matching
-// - When(predicate).Returns(value) for predicate matching
+// - When(args).Return(value) for value equality matching
+// - When(predicate).Return(value) for predicate matching
 // - ThenWhen() for chaining multiple matchers
 // - Void method variants with IVoidWhenChain
 // - When chain verification with Verify(Times)
@@ -23,7 +23,7 @@ namespace Design.Stubs.Methods;
 public partial class WhenMatchingDemo
 {
     // =========================================================================
-    // When(args).Returns(value) - Value Equality Matching
+    // When(args).Return(value) - Value Equality Matching
     // =========================================================================
     // DESIGN DECISION: When() matches specific argument values using equality.
     // When the method is called with matching arguments, the configured return
@@ -64,11 +64,11 @@ public partial class WhenMatchingDemo
         var stub = new Stubs.ICalculator();
 
         // Default behavior for unmatched calls
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         // Specific matches take precedence
-        stub.Add.When(1, 2).Returns(100);
-        stub.Add.When(5, 5).Returns(500);
+        stub.Add.When(1, 2).Return(100);
+        stub.Add.When(5, 5).Return(500);
 
         ICalculator calc = stub;
 
@@ -78,7 +78,7 @@ public partial class WhenMatchingDemo
     }
 
     // =========================================================================
-    // When(predicate).Returns(value) - Predicate Matching
+    // When(predicate).Return(value) - Predicate Matching
     // =========================================================================
     // DESIGN DECISION: When() also accepts a predicate function for complex
     // matching logic. The predicate receives the arguments and returns bool.
@@ -100,13 +100,13 @@ public partial class WhenMatchingDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         // Match when both arguments are positive
-        stub.Add.When((a, b) => a > 0 && b > 0).Returns(42);
+        stub.Add.When((a, b) => a > 0 && b > 0).Return(42);
 
         // Match when either argument is negative
-        stub.Add.When((a, b) => a < 0 || b < 0).Returns(-1);
+        stub.Add.When((a, b) => a < 0 || b < 0).Return(-1);
 
         ICalculator calc = stub;
 
@@ -121,10 +121,10 @@ public partial class WhenMatchingDemo
     // DESIGN DECISION: When chains use Returns(value) only - no Returns(callback) variant.
     // For dynamic behavior based on matched arguments, use Returns(callback) without When.
     //
-    // DID NOT DO THIS: Add When().Returns(callback) for dynamic returns on match
+    // DID NOT DO THIS: Add When().Return(callback) for dynamic returns on match
     //
     // REJECTED PATTERN:
-    //   stub.Add.When(10, 10).Returns((a, b) => a * b);  // Does NOT exist
+    //   stub.Add.When(10, 10).Return((a, b) => a * b);  // Does NOT exist
     //
     // WHY NOT: When() is for simple "if args match, return value" scenarios.
     // For dynamic behavior, use the predicate form of Returns():
@@ -134,13 +134,13 @@ public partial class WhenMatchingDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         // When() uses Returns() for the match result
-        stub.Add.When(10, 10).Returns(100);
+        stub.Add.When(10, 10).Return(100);
 
         // For dynamic behavior on ALL calls:
-        // stub.Add.Returns((a, b) => a * b);
+        // stub.Add.Return((a, b) => a * b);
 
         ICalculator calc = stub;
 
@@ -165,9 +165,9 @@ public partial class WhenMatchingDemo
     // DID NOT DO THIS: Require separate When() calls for each matcher
     //
     // REJECTED PATTERN:
-    //   stub.Add.When(1, 1).Returns(1);
-    //   stub.Add.When(2, 2).Returns(2);
-    //   stub.Add.When(3, 3).Returns(3);
+    //   stub.Add.When(1, 1).Return(1);
+    //   stub.Add.When(2, 2).Return(2);
+    //   stub.Add.When(3, 3).Return(3);
     //
     // WHY ThenWhen EXISTS: While separate When() calls work fine, ThenWhen()
     // allows building related matchers as a logical group. This can be
@@ -178,13 +178,13 @@ public partial class WhenMatchingDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         // Chain of related matchers
         stub.Add
-            .When(1, 1).Returns(1)
-            .ThenWhen(2, 2).Returns(2)
-            .ThenWhen(3, 3).Returns(3);
+            .When(1, 1).Return(1)
+            .ThenWhen(2, 2).Return(2)
+            .ThenWhen(3, 3).Return(3);
 
         ICalculator calc = stub;
 
@@ -203,7 +203,7 @@ public partial class WhenMatchingDemo
     // might interpret it as a predicate overload.
     //
     // RIGHT:
-    //   stub.Method.When((s) => s == null).Returns(defaultValue);
+    //   stub.Method.When((s) => s == null).Return(defaultValue);
     //
     // Use a predicate to explicitly check for null.
     // =========================================================================
@@ -213,10 +213,10 @@ public partial class WhenMatchingDemo
         var stub = new Stubs.IDataService();
 
         // Use predicate to match null
-        stub.GetDataAsync.When((id) => id < 0).Returns("not found");
+        stub.GetDataAsync.When((id) => id < 0).Return("not found");
 
         // For nullable parameters, use predicate form
-        // stub.SomeMethod.When((s) => s == null).Returns("default");
+        // stub.SomeMethod.When((s) => s == null).Return("default");
 
         IDataService service = stub;
         var result = await service.GetDataAsync(-1);
@@ -237,11 +237,11 @@ public partial class WhenMatchingDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         // Order matters! First match wins.
-        stub.Add.When((a, b) => a > 0).Returns(100);  // Added first
-        stub.Add.When(5, 5).Returns(500);              // Added second
+        stub.Add.When((a, b) => a > 0).Return(100);  // Added first
+        stub.Add.When(5, 5).Return(500);              // Added second
 
         ICalculator calc = stub;
 
@@ -249,8 +249,8 @@ public partial class WhenMatchingDemo
         var result = calc.Add(5, 5); // 100!
 
         // To get expected behavior, add specific matchers first:
-        // stub.Add.When(5, 5).Returns(500);
-        // stub.Add.When((a, b) => a > 0).Returns(100);
+        // stub.Add.When(5, 5).Return(500);
+        // stub.Add.When((a, b) => a > 0).Return(100);
     }
 
     // =========================================================================
@@ -287,7 +287,7 @@ public partial class WhenMatchingDemo
     //
     // For return methods, use Verifiable() to mark for batch verification:
     //
-    //   stub.Add.When(1, 2).Returns(100).Verifiable();
+    //   stub.Add.When(1, 2).Return(100).Verifiable();
     //   // Later:
     //   stub.Verify();  // Checks all Verifiable() marked items
     //
@@ -303,8 +303,8 @@ public partial class WhenMatchingDemo
         var stub = new Stubs.ICalculator();
 
         // Mark When chains for batch verification
-        stub.Add.When(1, 2).Returns(100).Verifiable();
-        stub.Add.When(5, 5).Returns(500).Verifiable();
+        stub.Add.When(1, 2).Return(100).Verifiable();
+        stub.Add.When(5, 5).Return(500).Verifiable();
 
         ICalculator calc = stub;
 
@@ -326,9 +326,9 @@ public partial class WhenMatchingDemo
     {
         var stub = new Stubs.IDataService();
 
-        stub.GetDataAsync.When(1).Returns("Item 1");
-        stub.GetDataAsync.When(2).Returns("Item 2");
-        stub.GetDataAsync.When((id) => id > 100).Returns("Bulk item");
+        stub.GetDataAsync.When(1).Return("Item 1");
+        stub.GetDataAsync.When(2).Return("Item 2");
+        stub.GetDataAsync.When((id) => id > 100).Return("Bulk item");
 
         IDataService service = stub;
 
@@ -358,8 +358,8 @@ public partial class WhenMatchingDemo
     // WHY NOT: ThenWhen(TArgs) would receive a tuple, losing individual
     // parameter names and making the API awkward:
     //
-    //   stub.Add.When((1, 2)).Returns(100);  // Awkward tuple syntax
-    //   stub.Add.When(1, 2).Returns(100);    // Natural separate args
+    //   stub.Add.When((1, 2)).Return(100);  // Awkward tuple syntax
+    //   stub.Add.When(1, 2).Return(100);    // Natural separate args
     //
     // Per-method classes allow natural argument syntax at the cost of more
     // generated code.

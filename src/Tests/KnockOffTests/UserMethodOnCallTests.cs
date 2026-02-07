@@ -17,7 +17,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(x => x * 100); // Override user method (which does x * 10)
+        stub.GetValue.Return(x => x * 100); // Override user method (which does x * 10)
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -33,7 +33,7 @@ public class UserMethodOnCallTests
         // Arrange
         var stub = new StrictModeUserMethodStub();
         var callbackInvoked = false;
-        stub.DoSomething.Execute(() => callbackInvoked = true);
+        stub.DoSomething.Call(() => callbackInvoked = true);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -52,7 +52,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(999); // Override user method
+        stub.GetValue.Return(999); // Override user method
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -105,7 +105,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(x => x * 100);
+        stub.GetValue.Return(x => x * 100);
 
         IStrictModeUserMethodTest service = stub;
         service.GetValue(5);
@@ -125,7 +125,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(42);
+        stub.GetValue.Return(42);
 
         IStrictModeUserMethodTest service = stub;
         service.GetValue(1);
@@ -148,7 +148,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new MultiParamUserMethodStub();
-        stub.Calculate.Returns((a, b) => a - b); // Override user method (which does a + b)
+        stub.Calculate.Return((a, b) => a - b); // Override user method (which does a + b)
 
         // Act
         IMultiParamUserMethodService service = stub;
@@ -163,7 +163,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new MultiParamUserMethodStub();
-        stub.Calculate.Returns(999);
+        stub.Calculate.Return(999);
 
         // Act
         IMultiParamUserMethodService service = stub;
@@ -182,7 +182,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(x => x * 100);
+        stub.GetValue.Return(x => x * 100);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -197,7 +197,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(x => 42).Verifiable();
+        stub.GetValue.Return(x => 42).Verifiable();
 
         // Act - Don't call the method
 
@@ -210,7 +210,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(x => x);
+        stub.GetValue.Return(x => x);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -230,7 +230,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new AsyncUserMethodTestStub();
-        stub.ProcessAsync.Returns(input => Task.FromResult($"[OnCall: {input}]"));
+        stub.ProcessAsync.Return(input => Task.FromResult($"[OnCall: {input}]"));
 
         // Act
         IAsyncUserMethodTestService service = stub;
@@ -245,7 +245,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new AsyncUserMethodTestStub();
-        stub.ProcessAsync.Returns("constant value"); // Returns auto-wraps in Task.FromResult
+        stub.ProcessAsync.Return("constant value"); // Returns auto-wraps in Task.FromResult
 
         // Act
         IAsyncUserMethodTestService service = stub;
@@ -275,7 +275,7 @@ public class UserMethodOnCallTests
     {
         // Arrange
         var stub = new AsyncUserMethodTestStub();
-        stub.ComputeAsync.Returns(42); // Returns auto-wraps in new ValueTask<int>()
+        stub.ComputeAsync.Return(42); // Returns auto-wraps in new ValueTask<int>()
 
         // Act
         IAsyncUserMethodTestService service = stub;

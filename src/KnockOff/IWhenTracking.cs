@@ -15,7 +15,7 @@ public interface IWhenTracking : ITracking
 
 /// <summary>
 /// Chainable When for non-void methods. Allows adding more matchers
-/// or terminal operations after <see cref="IWhenBuilder{TDelegate, TReturn}.Returns"/>.
+/// or terminal operations after <see cref="IWhenBuilder{TDelegate, TReturn}.Return"/>.
 /// </summary>
 /// <typeparam name="TDelegate">The delegate type for callbacks (e.g., Func&lt;int, int, int&gt;).</typeparam>
 /// <typeparam name="TReturn">The return type of the method.</typeparam>
@@ -48,7 +48,7 @@ public interface IWhenChain<TDelegate, TReturn> : IWhenTracking
 
 /// <summary>
 /// Builder returned by When() and ThenWhen() for non-void methods.
-/// Captures the matcher predicate and awaits a return value via <see cref="Returns"/>.
+/// Captures the matcher predicate and awaits a return value via <see cref="Return"/>.
 /// </summary>
 /// <typeparam name="TDelegate">The delegate type for callbacks (e.g., Func&lt;int, int, int&gt;).</typeparam>
 /// <typeparam name="TReturn">The return type of the method.</typeparam>
@@ -59,7 +59,9 @@ public interface IWhenBuilder<TDelegate, TReturn>
     /// For async methods, the value is automatically wrapped with Task.FromResult().
     /// </summary>
     /// <param name="value">The value to return when matched.</param>
-    IWhenChain<TDelegate, TReturn> Returns(TReturn value);
+#pragma warning disable CA1716
+    IWhenChain<TDelegate, TReturn> Return(TReturn value);
+#pragma warning restore CA1716
 }
 
 /// <summary>
@@ -80,14 +82,16 @@ public interface IVoidWhenChain<TDelegate> : IWhenTracking
     /// Returns this for fluent chaining.
     /// </summary>
     /// <param name="callback">The callback to invoke when matched.</param>
-    IVoidWhenChain<TDelegate> Execute(TDelegate callback);
+#pragma warning disable CA1716
+    IVoidWhenChain<TDelegate> Call(TDelegate callback);
+#pragma warning restore CA1716
 
     /// <summary>
     /// Adds an unconditional callback as the terminal matcher.
     /// This matcher always matches and repeats forever.
     /// </summary>
     /// <param name="callback">The callback to invoke when reached.</param>
-    IWhenTracking ThenExecute(TDelegate callback);
+    IWhenTracking ThenCall(TDelegate callback);
 
     /// <summary>
     /// Closes the chain with no matcher.

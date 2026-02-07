@@ -24,8 +24,8 @@ namespace Design.Stubs.Methods;
 // which overload is configured based on lambda parameter types.
 //
 // KEY DIFFERENCE FROM NON-OVERLOADED METHODS:
-// - Non-overloaded: stub.Method.Returns(42) is available
-// - Overloaded: stub.Method.Returns(42) does NOT exist - use Returns(callback) instead
+// - Non-overloaded: stub.Method.Return(42) is available
+// - Overloaded: stub.Method.Return(42) does NOT exist - use Returns(callback) instead
 //
 // WHY: With overloads, Returns(value) would be ambiguous - should it
 // configure one overload or all? Returns(callback) makes the target explicit.
@@ -55,9 +55,9 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         // Compiler resolves by parameter count - no explicit types needed
-        stub.Format.Returns((input) => input.ToUpperInvariant());
-        stub.Format.Returns((input, options) => options.Uppercase ? input.ToUpperInvariant() : input);
-        stub.Format.Returns((input, options, maxLength) =>
+        stub.Format.Return((input) => input.ToUpperInvariant());
+        stub.Format.Return((input, options) => options.Uppercase ? input.ToUpperInvariant() : input);
+        stub.Format.Return((input, options, maxLength) =>
         {
             var result = options.Uppercase ? input.ToUpperInvariant() : input;
             return result[..Math.Min(result.Length, maxLength)];
@@ -77,18 +77,18 @@ public partial class MethodOverloadsDemo
     // NOT have a direct Returns() method on the interceptor.
     //
     // NON-OVERLOADED (ICalculator.Add):
-    //   stub.Add.Returns(42);  // Available
+    //   stub.Add.Return(42);  // Available
     //
     // OVERLOADED (IFormatter.Format):
-    //   stub.Format.Returns("x");  // Does not exist - which overload?
+    //   stub.Format.Return("x");  // Does not exist - which overload?
     //
     // WHY NOT: Returns(value) would be ambiguous:
     // - Should it configure ALL overloads to return "x"?
     // - Should it configure just ONE (which one)?
     //
     // WORKAROUND: Use Returns(callback) with explicit overload targeting:
-    //   stub.Format.Returns((input) => "constant");
-    //   stub.Format.Returns((input, options) => "constant");
+    //   stub.Format.Return((input) => "constant");
+    //   stub.Format.Return((input, options) => "constant");
     //
     // DID NOT DO THIS: Add ReturnsForAll(value) to configure all overloads
     //
@@ -101,9 +101,9 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         // For a constant return value, use Returns with a constant lambda
-        stub.Format.Returns((input) => "formatted");
-        stub.Format.Returns((input, options) => "formatted");
-        stub.Format.Returns((input, options, maxLength) => "formatted");
+        stub.Format.Return((input) => "formatted");
+        stub.Format.Return((input, options) => "formatted");
+        stub.Format.Return((input, options, maxLength) => "formatted");
 
         IFormatter formatter = stub;
 
@@ -135,12 +135,12 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         // Default behavior via Returns
-        stub.Format.Returns((input) => "default-1");
-        stub.Format.Returns((input, options) => "default-2");
+        stub.Format.Return((input) => "default-1");
+        stub.Format.Return((input, options) => "default-2");
 
         // Each When targets a specific overload based on parameter signature
-        stub.Format.When("special").Returns("SPECIAL-1");
-        stub.Format.When("special", new FormatOptions(Uppercase: true)).Returns("SPECIAL-2");
+        stub.Format.When("special").Return("SPECIAL-1");
+        stub.Format.When("special", new FormatOptions(Uppercase: true)).Return("SPECIAL-2");
 
         IFormatter formatter = stub;
 
@@ -159,8 +159,8 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         // Predicate parameter count determines which overload
-        stub.Format.When((input) => input.StartsWith("X", StringComparison.Ordinal)).Returns("X-PREFIX");
-        stub.Format.When((input, options) => options.Uppercase).Returns("UPPER-MODE");
+        stub.Format.When((input) => input.StartsWith("X", StringComparison.Ordinal)).Return("X-PREFIX");
+        stub.Format.When((input, options) => options.Uppercase).Return("UPPER-MODE");
 
         IFormatter formatter = stub;
 
@@ -192,9 +192,9 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         // Each Returns returns a separate tracking object
-        var tracking1 = stub.Format.Returns((input) => input);
-        var tracking2 = stub.Format.Returns((input, options) => input);
-        var tracking3 = stub.Format.Returns((input, options, maxLength) => input);
+        var tracking1 = stub.Format.Return((input) => input);
+        var tracking2 = stub.Format.Return((input, options) => input);
+        var tracking3 = stub.Format.Return((input, options, maxLength) => input);
 
         IFormatter formatter = stub;
 
@@ -226,8 +226,8 @@ public partial class MethodOverloadsDemo
     {
         var stub = new Stubs.IFormatter();
 
-        stub.Format.Returns((input) => input);
-        stub.Format.Returns((input, options) => input);
+        stub.Format.Return((input) => input);
+        stub.Format.Return((input, options) => input);
 
         IFormatter formatter = stub;
 
@@ -249,9 +249,9 @@ public partial class MethodOverloadsDemo
         var logs = new List<string>();
 
         // Configure each void overload
-        var tracking1 = stub.Log.Execute((msg) => logs.Add($"[INFO] {msg}"));
-        var tracking2 = stub.Log.Execute((msg, level) => logs.Add($"[L{level}] {msg}"));
-        var tracking3 = stub.Log.Execute((msg, level, cat) => logs.Add($"[{cat}:L{level}] {msg}"));
+        var tracking1 = stub.Log.Call((msg) => logs.Add($"[INFO] {msg}"));
+        var tracking2 = stub.Log.Call((msg, level) => logs.Add($"[L{level}] {msg}"));
+        var tracking3 = stub.Log.Call((msg, level, cat) => logs.Add($"[{cat}:L{level}] {msg}"));
 
         IFormatter formatter = stub;
 
@@ -277,10 +277,10 @@ public partial class MethodOverloadsDemo
         var stub = new Stubs.IFormatter();
 
         // Configure async overload without cancellation
-        var tracking1 = stub.TransformAsync.Returns((input) => $"[{input}]");
+        var tracking1 = stub.TransformAsync.Return((input) => $"[{input}]");
 
         // Configure async overload with cancellation
-        var tracking2 = stub.TransformAsync.Returns((input, ct) =>
+        var tracking2 = stub.TransformAsync.Return((input, ct) =>
         {
             ct.ThrowIfCancellationRequested();
             return $"[{input}:ct]";
@@ -311,14 +311,14 @@ public partial class MethodOverloadsDemo
 
         // Sequence for single-param overload
         stub.Format
-            .Returns((input) => "first")
-            .ThenReturns("second")
-            .ThenReturns("third");
+            .Return((input) => "first")
+            .ThenReturn("second")
+            .ThenReturn("third");
 
         // Sequence for two-param overload (independent)
         stub.Format
-            .Returns((input, options) => "A")
-            .ThenReturns("B");
+            .Return((input, options) => "A")
+            .ThenReturn("B");
 
         IFormatter formatter = stub;
 

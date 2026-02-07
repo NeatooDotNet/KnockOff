@@ -65,7 +65,7 @@ OnGet callbacks can create state-dependent behavior:
 // OnGet checks the tracked state
 stub.IsReady.OnGet(() => isInitialized);
 // Initialize method updates the tracked state
-stub.Initialize.Execute(() => { isInitialized = true; });
+stub.Initialize.Call(() => { isInitialized = true; });
 ```
 <!-- endSnippet -->
 
@@ -527,7 +527,7 @@ var connectionStrings = new List<string>();
 stub.ConnectionString.OnSet((value) => connectionStrings.Add(value));
 
 // Method callback updates the tracked state
-stub.Connect.Execute(() => { isConnected = true; });
+stub.Connect.Call(() => { isConnected = true; });
 ```
 <!-- endSnippet -->
 

@@ -14,7 +14,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.Returns("configured value");
+		var tracking = knockOff.GetOptional.Return("configured value");
 
 		var result = service.GetOptional();
 
@@ -28,7 +28,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.Returns((string?)null);
+		var tracking = knockOff.GetOptional.Return((string?)null);
 
 		var result = service.GetOptional();
 
@@ -42,7 +42,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.Returns("repeated");
+		knockOff.GetOptional.Return("repeated");
 
 		Assert.Equal("repeated", service.GetOptional());
 		Assert.Equal("repeated", service.GetOptional());
@@ -55,7 +55,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.Returns("test");
+		var tracking = knockOff.GetOptional.Return("test");
 
 		service.GetOptional();
 		service.GetOptional();
@@ -71,7 +71,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		var tracking = knockOff.GetInt.Returns(42);
+		var tracking = knockOff.GetInt.Return(42);
 
 		var result = service.GetInt();
 
@@ -85,7 +85,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		var tracking = knockOff.GetInt.Returns(0);
+		var tracking = knockOff.GetInt.Return(0);
 
 		var result = service.GetInt();
 
@@ -99,7 +99,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		knockOff.GetBool.Returns(true);
+		knockOff.GetBool.Return(true);
 
 		Assert.True(service.GetBool());
 	}
@@ -110,7 +110,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SmartDefaultsKnockOff();
 		ISmartDefaultsService service = knockOff;
 
-		knockOff.GetBool.Returns(false);
+		knockOff.GetBool.Return(false);
 
 		Assert.False(service.GetBool());
 	}
@@ -126,7 +126,7 @@ public class MethodValueOverloadTests
 		IAsyncService service = knockOff;
 
 		// GetRequiredAsync returns Task<string> - no user method, so we can test value overload
-		knockOff.GetRequiredAsync.Returns("async result");
+		knockOff.GetRequiredAsync.Return("async result");
 
 		var result = await service.GetRequiredAsync();
 
@@ -139,7 +139,7 @@ public class MethodValueOverloadTests
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		knockOff.GetOptionalAsync.Returns((string?)null);
+		knockOff.GetOptionalAsync.Return((string?)null);
 
 		var result = await service.GetOptionalAsync();
 
@@ -152,7 +152,7 @@ public class MethodValueOverloadTests
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		var tracking = knockOff.GetRequiredAsync.Returns("test");
+		var tracking = knockOff.GetRequiredAsync.Return("test");
 
 		await service.GetRequiredAsync();
 		await service.GetRequiredAsync();
@@ -171,11 +171,11 @@ public class MethodValueOverloadTests
 		ISampleService service = knockOff;
 
 		// First configure with value
-		knockOff.GetOptional.Returns("value");
+		knockOff.GetOptional.Return("value");
 		Assert.Equal("value", service.GetOptional());
 
 		// Then configure with callback - should clear value
-		knockOff.GetOptional.Returns(() => "callback");
+		knockOff.GetOptional.Return(() => "callback");
 		Assert.Equal("callback", service.GetOptional());
 	}
 
@@ -186,11 +186,11 @@ public class MethodValueOverloadTests
 		ISampleService service = knockOff;
 
 		// First configure with callback
-		knockOff.GetOptional.Returns(() => "callback");
+		knockOff.GetOptional.Return(() => "callback");
 		Assert.Equal("callback", service.GetOptional());
 
 		// Then configure with value - should clear callback
-		knockOff.GetOptional.Returns("value");
+		knockOff.GetOptional.Return("value");
 		Assert.Equal("value", service.GetOptional());
 	}
 
@@ -201,11 +201,11 @@ public class MethodValueOverloadTests
 		ISampleService service = knockOff;
 
 		// First configure with value
-		knockOff.GetOptional.Returns("value");
+		knockOff.GetOptional.Return("value");
 		Assert.Equal("value", service.GetOptional());
 
-		// Then configure with OnCall().ThenReturns() sequence - should clear value
-		knockOff.GetOptional.Returns(() => "seq1").ThenReturns(() => "seq2");
+		// Then configure with OnCall().ThenReturn() sequence - should clear value
+		knockOff.GetOptional.Return(() => "seq1").ThenReturn(() => "seq2");
 		Assert.Equal("seq1", service.GetOptional());
 		Assert.Equal("seq2", service.GetOptional());
 	}
@@ -220,7 +220,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.Returns("test").Verifiable();
+		knockOff.GetOptional.Return("test").Verifiable();
 
 		service.GetOptional();
 
@@ -233,7 +233,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.Returns("test").Verifiable(Times.Exactly(2));
+		knockOff.GetOptional.Return("test").Verifiable(Times.Exactly(2));
 
 		service.GetOptional();
 		service.GetOptional();
@@ -246,7 +246,7 @@ public class MethodValueOverloadTests
 	{
 		var knockOff = new SampleKnockOff();
 
-		knockOff.GetOptional.Returns("test");
+		knockOff.GetOptional.Return("test");
 
 		// VerifyAll should not fail because IsConfigured is true
 		Assert.Throws<VerificationException>(() => knockOff.VerifyAll());
@@ -268,7 +268,7 @@ public class MethodValueOverloadTests
 		IRepository<User> repo = knockOff;
 
 		var mockUser = new User { Id = 1, Name = "Test" };
-		var tracking = knockOff.GetById.Returns(mockUser);
+		var tracking = knockOff.GetById.Return(mockUser);
 
 		var result = repo.GetById(42);
 
@@ -282,7 +282,7 @@ public class MethodValueOverloadTests
 		var knockOff = new UserRepositoryKnockOff();
 		IRepository<User> repo = knockOff;
 
-		knockOff.GetById.Returns((User?)null);
+		knockOff.GetById.Return((User?)null);
 
 		var result = repo.GetById(42);
 
@@ -300,7 +300,7 @@ public class MethodValueOverloadTests
 		ISmartDefaultsService service = knockOff;
 
 		var entity = new TestEntity { Id = 99, Name = "TestName" };
-		knockOff.GetEntity.Returns(entity);
+		knockOff.GetEntity.Return(entity);
 
 		var result = service.GetEntity();
 
@@ -314,7 +314,7 @@ public class MethodValueOverloadTests
 		ISmartDefaultsService service = knockOff;
 
 		var list = new List<string> { "a", "b", "c" };
-		knockOff.GetList.Returns(list);
+		knockOff.GetList.Return(list);
 
 		var result = service.GetList();
 

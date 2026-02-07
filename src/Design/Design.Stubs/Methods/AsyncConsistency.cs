@@ -5,9 +5,9 @@
 // all nine KnockOff patterns:
 //
 // For an async method like Task<string> FetchAsync(int id):
-// 1. stub.FetchAsync.Returns("value")       — auto-wraps in Task.FromResult
-// 2. stub.FetchAsync.Returns((id) => "value") — simplified callback, auto-wrapped
-// 3. stub.FetchAsync.Returns((id) => Task.FromResult("value")) — full delegate
+// 1. stub.FetchAsync.Return("value")       — auto-wraps in Task.FromResult
+// 2. stub.FetchAsync.Return((id) => "value") — simplified callback, auto-wrapped
+// 3. stub.FetchAsync.Return((id) => Task.FromResult("value")) — full delegate
 //
 // Pattern 1 is already covered in BasicMethods.cs (IDataService).
 // Pattern 7 (delegate) now supports full auto-wrapping via MethodInterceptorRenderer reuse.
@@ -63,7 +63,7 @@ public partial class AsyncClosedGenericDemo
     public async Task Pattern6_Returns()
     {
         var stub = new Stubs.AsyncServiceBase();
-        stub.FetchAsync.Returns("fetched");
+        stub.FetchAsync.Return("fetched");
 
         AsyncServiceBase svc = stub.Object;
         var result = await svc.FetchAsync(1);
@@ -73,7 +73,7 @@ public partial class AsyncClosedGenericDemo
     public async Task Pattern6_ReturnsSimplified()
     {
         var stub = new Stubs.AsyncServiceBase();
-        stub.FetchAsync.Returns((id) => $"Fetch-{id}");
+        stub.FetchAsync.Return((id) => $"Fetch-{id}");
 
         AsyncServiceBase svc = stub.Object;
         var result = await svc.FetchAsync(42);
@@ -83,7 +83,7 @@ public partial class AsyncClosedGenericDemo
     public async Task Pattern6_ReturnsFull()
     {
         var stub = new Stubs.AsyncServiceBase();
-        stub.FetchAsync.Returns((int id) => Task.FromResult($"Full-{id}"));
+        stub.FetchAsync.Return((int id) => Task.FromResult($"Full-{id}"));
 
         AsyncServiceBase svc = stub.Object;
         var result = await svc.FetchAsync(99);
@@ -104,7 +104,7 @@ public partial class AsyncClosedGenericDemo
     {
         var stub = new Stubs.AsyncOperation();
         // Tier 1: auto-wraps int -> Task<int> via Task.FromResult
-        stub.Interceptor.Returns(42);
+        stub.Interceptor.Return(42);
 
         AsyncOperation op = stub;
         var result = await op(10);
@@ -115,7 +115,7 @@ public partial class AsyncClosedGenericDemo
     {
         var stub = new Stubs.AsyncOperation();
         // Tier 2: simplified callback (int -> int), auto-wrapped in Task.FromResult
-        stub.Interceptor.Returns((int x) => x * 2);
+        stub.Interceptor.Return((int x) => x * 2);
 
         AsyncOperation op = stub;
         var result = await op(21);
@@ -127,7 +127,7 @@ public partial class AsyncClosedGenericDemo
         var stub = new Stubs.AsyncOperation();
         // Returns takes the inner type (int) and auto-wraps in Task.FromResult
         // Same as Pattern7_Returns_AutoWrapped — confirming Returns(int) works
-        stub.Interceptor.Returns(42);
+        stub.Interceptor.Return(42);
 
         AsyncOperation op = stub;
         var result = await op(10);
@@ -138,7 +138,7 @@ public partial class AsyncClosedGenericDemo
     {
         var stub = new Stubs.AsyncOperation();
         // Tier 3: full delegate still works
-        stub.Interceptor.Returns((int x) => Task.FromResult(x * 2));
+        stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
 
         AsyncOperation op = stub;
         var result = await op(21);
@@ -149,7 +149,7 @@ public partial class AsyncClosedGenericDemo
     {
         var stub = new Stubs.AsyncOperation();
         // Sequence support: first value returned once, then second repeats
-        stub.Interceptor.Returns(10, 20);
+        stub.Interceptor.Return(10, 20);
 
         AsyncOperation op = stub;
         var r1 = await op(0); // 10
@@ -173,7 +173,7 @@ public partial class AsyncOpenGenericDemo
     public async Task Pattern8_Returns()
     {
         var stub = new Stubs.IAsyncRepository<string>();
-        stub.GetByIdAsync.Returns("found");
+        stub.GetByIdAsync.Return("found");
 
         IAsyncRepository<string> repo = stub;
         var result = await repo.GetByIdAsync(1);
@@ -183,7 +183,7 @@ public partial class AsyncOpenGenericDemo
     public async Task Pattern8_ReturnsSimplified()
     {
         var stub = new Stubs.IAsyncRepository<string>();
-        stub.GetByIdAsync.Returns((id) => $"Item-{id}");
+        stub.GetByIdAsync.Return((id) => $"Item-{id}");
 
         IAsyncRepository<string> repo = stub;
         var result = await repo.GetByIdAsync(42);
@@ -193,7 +193,7 @@ public partial class AsyncOpenGenericDemo
     public async Task Pattern8_ReturnsFull()
     {
         var stub = new Stubs.IAsyncRepository<string>();
-        stub.GetByIdAsync.Returns((int id) => Task.FromResult<string?>($"Full-{id}"));
+        stub.GetByIdAsync.Return((int id) => Task.FromResult<string?>($"Full-{id}"));
 
         IAsyncRepository<string> repo = stub;
         var result = await repo.GetByIdAsync(99);
@@ -207,7 +207,7 @@ public partial class AsyncOpenGenericDemo
     public async Task Pattern9_Returns()
     {
         var stub = new Stubs.AsyncRepositoryBase<string>();
-        stub.GetByIdAsync.Returns("found");
+        stub.GetByIdAsync.Return("found");
 
         AsyncRepositoryBase<string> repo = stub.Object;
         var result = await repo.GetByIdAsync(1);
@@ -217,7 +217,7 @@ public partial class AsyncOpenGenericDemo
     public async Task Pattern9_ReturnsSimplified()
     {
         var stub = new Stubs.AsyncRepositoryBase<string>();
-        stub.GetByIdAsync.Returns((id) => $"Item-{id}");
+        stub.GetByIdAsync.Return((id) => $"Item-{id}");
 
         AsyncRepositoryBase<string> repo = stub.Object;
         var result = await repo.GetByIdAsync(42);
@@ -227,7 +227,7 @@ public partial class AsyncOpenGenericDemo
     public async Task Pattern9_ReturnsFull()
     {
         var stub = new Stubs.AsyncRepositoryBase<string>();
-        stub.GetByIdAsync.Returns((int id) => Task.FromResult<string?>($"Full-{id}"));
+        stub.GetByIdAsync.Return((int id) => Task.FromResult<string?>($"Full-{id}"));
 
         AsyncRepositoryBase<string> repo = stub.Object;
         var result = await repo.GetByIdAsync(99);

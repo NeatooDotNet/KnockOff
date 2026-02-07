@@ -48,13 +48,13 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.ICalculator();
 
         // Configure to always return 42
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
 
         ICalculator calc = stub;
         var result = calc.Add(100, 200); // Returns 42, ignores arguments
 
         // Returns() is chainable (returns the interceptor)
-        stub.Subtract.Returns(10).Verifiable();
+        stub.Subtract.Return(10).Verifiable();
     }
 
     // =========================================================================
@@ -69,7 +69,7 @@ public partial class BasicMethodsDemo
     // DID NOT DO THIS: Use untyped argument access
     //
     // REJECTED PATTERN (NSubstitute-style):
-    //   stub.Add.Returns(callInfo => callInfo.Arg<int>(0) + callInfo.Arg<int>(1));
+    //   stub.Add.Return(callInfo => callInfo.Arg<int>(0) + callInfo.Arg<int>(1));
     //
     // WHY NOT: Source generators can provide typed access at compile time.
     // Typed callbacks are safer and provide IntelliSense support.
@@ -80,7 +80,7 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.ICalculator();
 
         // Callback receives actual method arguments with correct types
-        stub.Add.Returns((a, b) => a + b);
+        stub.Add.Return((a, b) => a + b);
 
         ICalculator calc = stub;
         var result = calc.Add(3, 5); // Returns 8 (3 + 5)
@@ -91,7 +91,7 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.ICalculator();
 
         // Callbacks can throw exceptions for error testing
-        stub.Divide.Returns((a, b) =>
+        stub.Divide.Return((a, b) =>
         {
             if (b == 0)
                 throw new DivideByZeroException();
@@ -109,8 +109,8 @@ public partial class BasicMethodsDemo
     // COMMON MISTAKE: Expecting Returns(value) and Returns(callback) to combine
     //
     // WRONG:
-    //   stub.Add.Returns((a, b) => a + b);
-    //   stub.Add.Returns(42);  // This REPLACES the callback, does not combine
+    //   stub.Add.Return((a, b) => a + b);
+    //   stub.Add.Return(42);  // This REPLACES the callback, does not combine
     //
     // Calling Returns(value) after Returns(callback) (or vice versa) replaces
     // the previous configuration. The last call wins.
@@ -125,8 +125,8 @@ public partial class BasicMethodsDemo
     {
         var stub = new Stubs.ICalculator();
 
-        stub.Add.Returns((a, b) => a + b);  // Set callback
-        stub.Add.Returns(42);               // REPLACES callback with constant
+        stub.Add.Return((a, b) => a + b);  // Set callback
+        stub.Add.Return(42);               // REPLACES callback with constant
 
         ICalculator calc = stub;
         var result = calc.Add(3, 5); // Returns 42, not 8
@@ -156,7 +156,7 @@ public partial class BasicMethodsDemo
         var resetCount = 0;
 
         // Void Execute uses Action, not Func
-        stub.Reset.Execute(() => resetCount++);
+        stub.Reset.Call(() => resetCount++);
 
         ICalculator calc = stub;
         calc.Reset();
@@ -194,7 +194,7 @@ public partial class BasicMethodsDemo
     public void ArgumentCapture_LastArgs_ForMultipleParameters()
     {
         var stub = new Stubs.ICalculator();
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         ICalculator calc = stub;
         calc.Add(3, 5);
@@ -206,7 +206,7 @@ public partial class BasicMethodsDemo
         // args == (10, 20)
 
         // For Returns() return values, you get LastArgs via the builder interface:
-        var builder = stub.Subtract.Returns((a, b) => a - b);
+        var builder = stub.Subtract.Return((a, b) => a - b);
         calc.Subtract(100, 25);
         var subtractArgs = builder.LastArgs;
         // subtractArgs == (100, 25)
@@ -224,10 +224,10 @@ public partial class BasicMethodsDemo
     // DID NOT DO THIS: Require explicit Task.FromResult wrapping
     //
     // REJECTED PATTERN:
-    //   stub.GetDataAsync.Returns(Task.FromResult("data"));  // Verbose
+    //   stub.GetDataAsync.Return(Task.FromResult("data"));  // Verbose
     //
     // ACTUAL PATTERN:
-    //   stub.GetDataAsync.Returns("data");  // Auto-wrapped
+    //   stub.GetDataAsync.Return("data");  // Auto-wrapped
     //
     // WHY NOT: Reducing boilerplate improves readability. The method signature
     // already indicates it's async - forcing explicit wrapping adds noise.
@@ -246,7 +246,7 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.IDataService();
 
         // No Task.FromResult needed - auto-wrapped
-        stub.GetDataAsync.Returns("test data");
+        stub.GetDataAsync.Return("test data");
 
         IDataService service = stub;
         var result = await service.GetDataAsync(1);
@@ -258,7 +258,7 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.IDataService();
 
         // Returns callback for async methods: callback returns T, not Task<T>
-        stub.GetDataAsync.Returns((id) => $"Data for ID {id}");
+        stub.GetDataAsync.Return((id) => $"Data for ID {id}");
 
         IDataService service = stub;
         var result = await service.GetDataAsync(42);
@@ -285,7 +285,7 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.IDataService();
         string? savedData = null;
 
-        stub.SaveDataAsync.Execute((data) => savedData = data);
+        stub.SaveDataAsync.Call((data) => savedData = data);
 
         IDataService service = stub;
         await service.SaveDataAsync("important data");
@@ -312,7 +312,7 @@ public partial class BasicMethodsDemo
     public void Reset_ClearsTrackingButPreservesConfiguration()
     {
         var stub = new Stubs.ICalculator();
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
 
         ICalculator calc = stub;
         calc.Add(1, 2);

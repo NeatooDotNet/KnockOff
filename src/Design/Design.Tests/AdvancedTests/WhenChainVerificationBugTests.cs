@@ -4,7 +4,7 @@
 // This file contains tests for TWO related When chain verification bugs:
 //
 // BUG 1 (HEAD Bug): When a When chain has a single non-terminal matcher (e.g.,
-//   .When(1, 2).Returns(100).Verifiable()),
+//   .When(1, 2).Return(100).Verifiable()),
 // calling Stub.Verify() always throws "sequence incomplete" even though
 // the matcher was successfully invoked.
 //
@@ -78,7 +78,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a single When matcher and mark verifiable
-        stub.Add.When(1, 2).Returns(100).Verifiable();
+        stub.Add.When(1, 2).Return(100).Verifiable();
 
         ICalculator calc = stub;
 
@@ -110,7 +110,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a single When matcher
-        var chain = stub.Add.When(1, 2).Returns(100);
+        var chain = stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -145,8 +145,8 @@ public class WhenChainVerificationBugTests
 
         // Chain with two non-terminal matchers (no terminal at end)
         var chain = stub.Add
-            .When(1, 2).Returns(10)
-            .ThenWhen(3, 4).Returns(20);
+            .When(1, 2).Return(10)
+            .ThenWhen(3, 4).Return(20);
 
         ICalculator calc = stub;
 
@@ -178,7 +178,7 @@ public class WhenChainVerificationBugTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        var chain = stub.Add.When(1, 2).Returns(100);
+        var chain = stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -211,7 +211,7 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure a When chain (making it "configured" for VerifyAll)
-        stub.Add.When(1, 2).Returns(100);
+        stub.Add.When(1, 2).Return(100);
 
         ICalculator calc = stub;
 
@@ -240,7 +240,7 @@ public class WhenChainVerificationBugTests
 
         // Chain ending with terminal matcher (ThenCall)
         var chain = stub.Add
-            .When(1, 2).Returns(10)
+            .When(1, 2).Return(10)
             .ThenCall((a, b) => a + b);
 
         ICalculator calc = stub;
@@ -294,9 +294,9 @@ public class WhenChainVerificationBugTests
         var stub = new VerificationDemo.Stubs.ICalculator();
 
         // Configure When chain (non-terminal, specific value matching)
-        stub.Add.When(1, 2).Returns(100);
+        stub.Add.When(1, 2).Return(100);
         // Configure Returns as fallback for non-matching args
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         ICalculator calc = stub;
 
@@ -338,9 +338,9 @@ public class WhenChainVerificationBugTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         // Configure When chain (non-terminal, specific value matching)
-        stub.Format.When("special").Returns("SPECIAL");
+        stub.Format.When("special").Return("SPECIAL");
         // Configure OnCall on the same overload as fallback
-        stub.Format.Returns((string input) => "default");
+        stub.Format.Return((string input) => "default");
 
         IFormatter formatter = stub;
 
@@ -392,10 +392,10 @@ public class WhenChainVerificationBugTests
         var stub = new MethodOverloadsDemo.Stubs.IFormatter();
 
         // Configure When chain (non-terminal, specific value matching)
-        stub.Format.When("special").Returns("SPECIAL");
+        stub.Format.When("special").Return("SPECIAL");
         // Configure OnCall on the same overload (makes condExpr true in Block 1,
         // isolating the count bug from the condExpr bug)
-        stub.Format.Returns((string input) => "default");
+        stub.Format.Return((string input) => "default");
 
         IFormatter formatter = stub;
 
@@ -430,9 +430,9 @@ public class WhenChainVerificationBugTests
         var callLog = new List<string>();
 
         // Configure void When chain (non-terminal, specific value matching)
-        stub.Log.When("special").Execute(msg => callLog.Add($"when:{msg}"));
+        stub.Log.When("special").Call(msg => callLog.Add($"when:{msg}"));
         // Configure OnCall on the same overload as fallback
-        stub.Log.Execute((string msg) => callLog.Add($"oncall:{msg}"));
+        stub.Log.Call((string msg) => callLog.Add($"oncall:{msg}"));
 
         IFormatter formatter = stub;
 

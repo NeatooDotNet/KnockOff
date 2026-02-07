@@ -15,9 +15,9 @@ For an async method like `Task<string> GetDataAsync(int id)`:
 
 | Tier | API | Accepts | Auto-wraps? |
 |------|-----|---------|-------------|
-| 1 | `Returns(value)` | `string` | Yes — `Task.FromResult(value)` |
-| 2 | `Returns((id) => value)` | `Func<int, string>` | Yes — `Task.FromResult(value)` |
-| 3 | `Returns((id) => Task.FromResult(value))` | `Func<int, Task<string>>` | No — you provide the Task |
+| 1 | `Return(value)` | `string` | Yes -- `Task.FromResult(value)` |
+| 2 | `Return((id) => value)` | `Func<int, string>` | Yes -- `Task.FromResult(value)` |
+| 3 | `Return((id) => Task.FromResult(value))` | `Func<int, Task<string>>` | No -- you provide the Task |
 
 All three tiers work identically across all 9 stub patterns (1–9), including delegate stubs.
 
@@ -25,9 +25,9 @@ All three tiers work identically across all 9 stub patterns (1–9), including d
 
 ## Task<T> Methods
 
-### Tier 1: Returns (Recommended for Constants)
+### Tier 1: Return (Recommended for Constants)
 
-`Returns(unwrappedValue)` auto-wraps the value in `Task.FromResult`:
+`Return(unwrappedValue)` auto-wraps the value in `Task.FromResult`:
 
 ```csharp
 // Given: Task<string?> GetDataAsync(int id)
@@ -41,7 +41,7 @@ No `Task.FromResult` needed. This is the simplest syntax when the return value i
 
 ### Tier 2: Simplified Callback (Recommended for Dynamic Values)
 
-`Returns(Func<..., T>)` receives typed arguments and returns the unwrapped type. KnockOff auto-wraps the result:
+`Return(Func<..., T>)` receives typed arguments and returns the unwrapped type. KnockOff auto-wraps the result:
 
 ```csharp
 // Callback returns string, not Task<string> — auto-wrapped
@@ -55,7 +55,7 @@ Use this when the return value depends on the arguments but you don't need async
 
 ### Tier 3: Full Delegate (For Async Callbacks)
 
-`Returns(Func<..., Task<T>>)` gives full control — you construct the Task yourself:
+`Return(Func<..., Task<T>>)` gives full control -- you construct the Task yourself:
 
 ```csharp
 // Callback returns Task<string?> directly
@@ -194,10 +194,10 @@ When throwing directly in a simplified callback (Tier 2), you may need to specif
 
 ## Key Takeaways
 
-- **Three tiers** for async methods: `Returns(T)`, `Returns(Func<..., T>)`, `Returns(Func<..., Task<T>>)`
-- **Tiers 1 and 2 auto-wrap** — you work with the unwrapped type, KnockOff handles `Task.FromResult`
-- **Tier 3 gives full control** — use for async lambdas, delays, and faulted tasks
-- **Void async methods** use `Execute(Action<...>)` — `Task.CompletedTask` is returned automatically
+- **Three tiers** for async methods: `Return(T)`, `Return(Func<..., T>)`, `Return(Func<..., Task<T>>)`
+- **Tiers 1 and 2 auto-wrap** -- you work with the unwrapped type, KnockOff handles `Task.FromResult`
+- **Tier 3 gives full control** -- use for async lambdas, delays, and faulted tasks
+- **Void async methods** use `Call(Action<...>)` -- `Task.CompletedTask` is returned automatically
 - **ValueTask<T>** follows the same three tiers with `ValueTask` wrapping
 - **All 9 patterns** (including Pattern 7 delegates) support identical async APIs
 - **All interceptor features** (verification, argument capture, sequences, When chains) work with async methods

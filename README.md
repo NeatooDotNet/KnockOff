@@ -2,7 +2,7 @@
 
 A .NET mocking library that lets you define reusable stub classes — with full mocking capabilities built in. 
 
-Define your test double once. Reuse it across your test project. Customize it per-test with Returns, Execute, Verify, and When chains. No more copying mock setups between tests or maintaining shared factory methods full of `Arg.Any<>()`.
+Define your test double once. Reuse it across your test project. Customize it per-test with Return, Call, Verify, and When chains. No more copying mock setups between tests or maintaining shared factory methods full of `Arg.Any<>()`.
 
 Powered by Roslyn source generation for [tighter type safety](docs/type-safety.md) — more issues surface as compile errors instead of runtime surprises.
 
@@ -37,8 +37,8 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
 
 - **`[KnockOff]` + `partial class`** — KnockOff generates a base class that implements every member of `IMyRepo`. Your stub is a real class — define it once, reuse it across your entire test project. Pass it around, register it in DI, share it between test fixtures.
 - **Constructor parameters** — `List<User> Users` is a primary constructor. Test data flows in naturally, just like any other C# class.
-- **Overrides are optional** — `GetUser_` and `Update_` override the generated defaults. Only override what you need — everything else still works with [Returns/Execute](docs/guides/methods.md), [Returns(value)](docs/reference/interceptor-api.md), or [When chains](docs/guides/parameter-matching.md).
-- **Tighter type safety** — Every Returns, Execute, and When call is complete in a single step — no forgotten `.Returns()` that [silently breaks at runtime](docs/type-safety.md). No manual `<T1, T2>` type parameters that can drift. [Details →](docs/type-safety.md)
+- **Overrides are optional** — `GetUser_` and `Update_` override the generated defaults. Only override what you need — everything else still works with [Return/Call](docs/guides/methods.md), [Return(value)](docs/reference/interceptor-api.md), or [When chains](docs/guides/parameter-matching.md).
+- **Tighter type safety** — Every Return, Call, and When call is complete in a single step — no forgotten `.Returns()` that [silently breaks at runtime](docs/type-safety.md). No manual `<T1, T2>` type parameters that can drift. [Details →](docs/type-safety.md)
 
 This stub is also a full mock. It has [Verify](docs/guides/verification.md), [Strict mode](docs/guides/strict-mode.md), [Async](docs/guides/async-patterns.md), and [Source Delegation](docs/guides/source-delegation.md) — all on the same reusable class.
 
@@ -108,7 +108,7 @@ myRepoKO.GetUser.Verify(Times.Once);
 ```
 <!-- endSnippet -->
 
-Need different behavior for a specific test? Override with Returns/Execute:
+Need different behavior for a specific test? Override with Return/Call:
 
 <!-- snippet: readme-knockoff-oncall-test -->
 ```cs
@@ -118,9 +118,9 @@ var userDomainModel = new UserDomainModel(myRepoKO);
 
 var user2 = new User { Id = 2 };
 
-// When and OnCall overrides the stub methods
-myRepoKO.GetUser.When(2).Returns(user2).Verifiable();
-myRepoKO.Update.Execute(u => Assert.Same(u, user2)).Verifiable();
+// When and Return overrides the stub methods
+myRepoKO.GetUser.When(2).Return(user2).Verifiable();
+myRepoKO.Update.Call(u => Assert.Same(u, user2)).Verifiable();
 
 userDomainModel.Fetch(2);
 userDomainModel.Update();
@@ -139,8 +139,8 @@ myRepoKO.Verify();
 |---------|-----------------|
 | **Reusable stub classes** | Define once, customize per-test. No more copying mock setups or shared factory methods. |
 | **Source delegation** | Delegate to a real implementation, override only specific methods. [No equivalent in Moq or NSubstitute.](docs/guides/source-delegation.md) |
-| **Tighter type safety** | Each Returns/Execute/When call is complete in one step — [no forgotten `.Returns()` that silently breaks](docs/type-safety.md). No manual `<T1,T2>` type parameters. |
-| **Parameter matching** | `Returns((a, b) => a > 0 ? 100 : 0)` — standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter. |
+| **Tighter type safety** | Each Return/Call/When call is complete in one step — [no forgotten `.Returns()` that silently breaks](docs/type-safety.md). No manual `<T1,T2>` type parameters. |
+| **Parameter matching** | `Return((a, b) => a > 0 ? 100 : 0)` -- standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter. |
 | **Built-in capture** | `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` — no manual `Arg.Do<>` or `Callback<>` setup. |
 | **Event verification** | `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute. |
 | **Explicit Get/Set verify** | `VerifyGet(Times)` / `VerifySet(Times)` for properties and indexers. |
@@ -163,7 +163,7 @@ myRepoKO.Verify();
 
 ## Unique Feature: Source Delegation
 
-`stub.Source(realImplementation)` delegates unconfigured method calls to a real object. Configured methods (Returns, Execute, When) still take priority.
+`stub.Source(realImplementation)` delegates unconfigured method calls to a real object. Configured methods (Return, Call, When) still take priority.
 
 **The key: you don't need a complete implementation.** KnockOff generates a separate `Source()` overload for each interface in the hierarchy. Pass an object that implements any interface in the hierarchy — only the matching methods get delegated.
 
@@ -202,7 +202,7 @@ Assert.Equal(new[] { "step1", "step2", "step3" }, items);
 
 // AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
 // Configure it explicitly, or it returns the smart default
-stub.AddRange.Execute((newItems) =>
+stub.AddRange.Call((newItems) =>
 {
     foreach (var newItem in newItems)
     {
@@ -255,11 +255,11 @@ public class QuickStartCreateStubTests
 <!-- snippet: readme-quickstart-configure -->
 ```cs
 [Fact]
-public void ConfigureStub_WithOnCall()
+public void ConfigureStub_WithReturn()
 {
     var stub = new QuickStartRepoStub();
 
-    stub.GetUser.Returns((id) => new User { Id = id, Name = "Test User" });
+    stub.GetUser.Return((id) => new User { Id = id, Name = "Test User" });
 
     IQuickStartRepo repository = stub;
     var user = repository.GetUser(42);
@@ -277,7 +277,7 @@ public void ConfigureStub_WithOnCall()
 public void VerifyCalls_WithVerifiable()
 {
     var stub = new QuickStartRepoStub();
-    stub.GetUser.Returns((id) => new User { Id = id, Name = "Test" }).Verifiable();
+    stub.GetUser.Return((id) => new User { Id = id, Name = "Test" }).Verifiable();
 
     IQuickStartRepo repository = stub;
 
@@ -311,7 +311,7 @@ repo.GetUser(Arg.Is<int>(id => id > 0)).Returns(x => new User { Id = x.Arg<int>(
 <!-- snippet: readme-hero-knockoff -->
 ```cs
 var stub = new CompareUserRepoStub();
-stub.GetUser.Returns((id) => id > 0 ? new User { Id = id } : null);
+stub.GetUser.Return((id) => id > 0 ? new User { Id = id } : null);
 ```
 <!-- endSnippet -->
 
@@ -343,14 +343,14 @@ calc.Add(Arg.Is<int>(a => a > 0), Arg.Any<int>()).Returns(100);
 <!-- snippet: readme-argmatch-knockoff-oncall -->
 ```cs
 // KnockOff - Returns with conditional (permanent, matches all calls)
-stub.Add.Returns((a, b) => a > 0 ? 100 : 0);
+stub.Add.Return((a, b) => a > 0 ? 100 : 0);
 ```
 <!-- endSnippet -->
 
 <!-- snippet: readme-argmatch-knockoff-when -->
 ```cs
 // KnockOff - When() for sequential matching (first match returns 100, then falls through)
-stub.Add.When((a, b) => a > 0).Returns(100).ThenCall((a, b) => a + b);
+stub.Add.When((a, b) => a > 0).Return(100).ThenCall((a, b) => a + b);
 ```
 <!-- endSnippet -->
 
@@ -372,12 +372,12 @@ calc.Add(3, 4).Returns(200);
 
 <!-- snippet: readme-argmatch-knockoff-specific -->
 ```cs
-stub.Add.When(1, 2).Returns(100);
-stub.Add.When(3, 4).Returns(200);
+stub.Add.When(1, 2).Return(100);
+stub.Add.When(3, 4).Return(200);
 ```
 <!-- endSnippet -->
 
-**Note:** Moq and NSubstitute matchers are permanent — they match all qualifying calls. KnockOff's `When()` is sequential — matchers are consumed in order. Use `Returns(callback)` with conditionals for permanent matching behavior.
+**Note:** Moq and NSubstitute matchers are permanent -- they match all qualifying calls. KnockOff's `When()` is sequential -- matchers are consumed in order. Use `Return(callback)` with conditionals for permanent matching behavior.
 
 ### Argument Capture
 
@@ -404,7 +404,7 @@ calc.Add(1, 2);
 <!-- snippet: readme-argcapture-knockoff -->
 ```cs
 // KnockOff - built-in, no pre-setup
-var tracking = stub.Add.Returns((a, b) => a + b);
+var tracking = stub.Add.Return((a, b) => a + b);
 ICalculator calc = stub;
 calc.Add(1, 2);
 var (a, b) = tracking.LastArgs;  // Named tuple: a = 1, b = 2
@@ -451,8 +451,8 @@ formatter.Format(Arg.Any<string>(), Arg.Any<int>()).Returns("int overload");
 <!-- snippet: readme-knockoff-any-value -->
 ```cs
 // Explicit parameter types resolve the overload - standard C# syntax
-stub.Format.Returns((string input, bool uppercase) => "bool overload");
-stub.Format.Returns((string input, int maxLength) => "int overload");
+stub.Format.Return((string input, bool uppercase) => "bool overload");
+stub.Format.Return((string input, int maxLength) => "int overload");
 ```
 <!-- endSnippet -->
 
@@ -471,8 +471,8 @@ formatter.Format("test", 10).Returns("truncated");
 <!-- snippet: readme-knockoff-specific-value -->
 ```cs
 // Specific value matching - parameter types resolve the overload
-stub.Format.When("test", true).Returns("UPPERCASE");
-stub.Format.When("test", 10).Returns("truncated");
+stub.Format.When("test", true).Return("UPPERCASE");
+stub.Format.When("test", 10).Return("truncated");
 ```
 <!-- endSnippet -->
 
@@ -498,7 +498,7 @@ formatter.Format(Arg.Any<string>(), Arg.Any<bool>())
 <!-- snippet: readme-knockoff-argument-access -->
 ```cs
 // Arguments are directly available with names and types:
-stub.Format.Returns((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+stub.Format.Return((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
 ```
 <!-- endSnippet -->
 
@@ -528,7 +528,7 @@ public partial class ReadmeStandaloneStub : IUserRepo { }
 public void InlineInterface_Pattern()
 {
     var stub = new Stubs.IUserRepo();
-    stub.GetUser.Returns((id) => new User { Id = id });
+    stub.GetUser.Return((id) => new User { Id = id });
 
     IUserRepo repo = stub;
     Assert.NotNull(repo.GetUser(1));
@@ -543,7 +543,7 @@ public void InlineInterface_Pattern()
 public void InlineClass_Pattern()
 {
     var stub = new Stubs.MyService();
-    stub.GetUser.Returns((id) => new User { Id = id });
+    stub.GetUser.Return((id) => new User { Id = id });
 
     MyService service = stub.Object;
     Assert.NotNull(service.GetUser(1));

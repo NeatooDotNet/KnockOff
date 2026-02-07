@@ -100,7 +100,7 @@ stub.LastUpdated.OnGet(() => DateTime.UtcNow);
 
 ## Why This Change?
 
-1. **API Consistency**: Methods now use `OnCall(value)`, properties use `OnGet(value)`. The pattern is consistent.
+1. **API Consistency**: Methods now use `Return(value)`, properties use `OnGet(value)`. The pattern is consistent.
 
 2. **Clearer Intent**: `OnGet("value")` clearly indicates you're configuring what the getter returns. `.Value = x` was ambiguous about whether it was setting a backing store or configuring behavior.
 

@@ -17,7 +17,7 @@ public class DelegateStubTests
     public void DelegateStub_ImplicitConversion()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(42);
+        stub.Interceptor.Return(42);
 
         ArithmeticOperation operation = stub;
 
@@ -28,7 +28,7 @@ public class DelegateStubTests
     public void Returns_ConfiguresConstantReturnValue()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(100);
+        stub.Interceptor.Return(100);
 
         ArithmeticOperation operation = stub;
 
@@ -40,7 +40,7 @@ public class DelegateStubTests
     public void OnCall_ConfiguresCallback()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns((a, b) => a + b);
+        stub.Interceptor.Return((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
 
@@ -52,7 +52,7 @@ public class DelegateStubTests
     public void LastCallArgs_TracksMultipleArguments()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(0);
+        stub.Interceptor.Return(0);
 
         ArithmeticOperation operation = stub;
         operation(5, 10);
@@ -69,7 +69,7 @@ public class DelegateStubTests
     {
         var stub = new DelegateStubsDemo.Stubs.LogAction();
         var messages = new List<string>();
-        stub.Interceptor.Execute(msg => messages.Add(msg));
+        stub.Interceptor.Call(msg => messages.Add(msg));
 
         LogAction logger = stub;
         logger("Hello");
@@ -95,7 +95,7 @@ public class DelegateStubTests
     {
         var stub = new DelegateStubsDemo.Stubs.SimpleAction();
         var callCount = 0;
-        stub.Interceptor.Execute(() => callCount++);
+        stub.Interceptor.Call(() => callCount++);
 
         SimpleAction action = stub;
         action();
@@ -110,7 +110,7 @@ public class DelegateStubTests
     public void GenericDelegate_ClosedGeneric()
     {
         var stub = new DelegateStubsDemo.Stubs.Factory();
-        stub.Interceptor.Returns("Created item");
+        stub.Interceptor.Return("Created item");
 
         Factory<string> factory = stub;
 
@@ -121,8 +121,8 @@ public class DelegateStubTests
     public void When_ConditionalBehavior()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.When(1, 2).Returns(100)
-            .ThenWhen(3, 4).Returns(200)
+        stub.Interceptor.When(1, 2).Return(100)
+            .ThenWhen(3, 4).Return(200)
             .ThenCall((a, b) => a + b);
 
         ArithmeticOperation operation = stub;
@@ -136,7 +136,7 @@ public class DelegateStubTests
     public void Verify_ChecksCallCount()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(0);
+        stub.Interceptor.Return(0);
 
         ArithmeticOperation operation = stub;
         operation(1, 2);
@@ -149,7 +149,7 @@ public class DelegateStubTests
     public void Reset_ClearsTracking()
     {
         var stub = new DelegateStubsDemo.Stubs.ArithmeticOperation();
-        stub.Interceptor.Returns(42);
+        stub.Interceptor.Return(42);
 
         ArithmeticOperation operation = stub;
         operation(1, 2);

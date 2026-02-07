@@ -25,8 +25,8 @@ public class StandalonePatternTests
     public void StandaloneStub_ConfigureAndVerify()
     {
         var stub = new SkillUserRepoStub();
-        stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
-        stub.Save.Execute((user) => { }).Verifiable();
+        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.Save.Call((user) => { }).Verifiable();
         ISkillUserRepo repo = stub;
 
         var user = repo.GetById(42);
@@ -54,7 +54,7 @@ public partial class SkillEmailTests
     public void Test()
     {
         var stub = new Stubs.ISkillEmailService();
-        stub.Send.Returns((to, subj) => true).Verifiable();
+        stub.Send.Return((to, subj) => true).Verifiable();
         ISkillEmailService email = stub;
     }
 }
@@ -77,7 +77,7 @@ public partial class SkillDataTests
     public void Test()
     {
         var stub = new Stubs.SkillDataServiceBase();
-        stub.GetData.Returns((id) => "test").Verifiable();
+        stub.GetData.Return((id) => "test").Verifiable();
         SkillDataServiceBase service = stub.Object;  // Use .Object!
     }
 }
@@ -97,14 +97,14 @@ public partial class SkillValidationTests
     public void Test()
     {
         var stub = new Stubs.SkillValidationRule();
-        stub.Interceptor.Returns((val) => val != "invalid");
+        stub.Interceptor.Return((val) => val != "invalid");
         SkillValidationRule rule = stub;  // Implicit conversion
     }
 }
 #endregion
 
 // =============================================================================
-// Method OnCall Examples
+// Method Return Examples
 // =============================================================================
 
 public interface ISkillConfigSvc
@@ -116,21 +116,21 @@ public interface ISkillConfigSvc
 [KnockOff]
 public partial class SkillConfigSvcStub : ISkillConfigSvc { }
 
-public class MethodOnCallTests
+public class MethodReturnTests
 {
     [Fact]
-    public void OnCall_ValueAndCallbackExamples()
+    public void Return_ValueAndCallbackExamples()
     {
         var stub = new SkillConfigSvcStub();
 
         // VALUE syntax - for fixed return values
-        stub.GetValue.Returns("default-value");
+        stub.GetValue.Return("default-value");
 
         // CALLBACK syntax - for dynamic values based on arguments
-        stub.GetValue.Returns((key) => key == "debug" ? "true" : "false");
+        stub.GetValue.Return((key) => key == "debug" ? "true" : "false");
 
         // Void methods use Action callback
-        stub.SetValue.Execute((key, value) => { /* track or validate */ });
+        stub.SetValue.Call((key, value) => { /* track or validate */ });
     }
 }
 
@@ -186,8 +186,8 @@ public class SkillVerificationTests
         var stub = new SkillLoggerStub();
 
         // Mark methods as verifiable
-        stub.Log.Execute((msg) => { }).Verifiable();
-        stub.LogError.Execute((msg) => { }).Verifiable();
+        stub.Log.Call((msg) => { }).Verifiable();
+        stub.LogError.Call((msg) => { }).Verifiable();
 
         ISkillLogger logger = stub;
         logger.Log("Starting");
@@ -203,7 +203,7 @@ public class SkillVerificationTests
         var stub = new SkillLoggerStub();
 
         // Verify specific call counts
-        var tracking = stub.Log.Execute((msg) => { });
+        var tracking = stub.Log.Call((msg) => { });
 
         ISkillLogger logger = stub;
         logger.Log("First");
@@ -234,7 +234,7 @@ public class ArgumentAccessTests
     {
         var stub = new SkillNotifierStub();
 
-        var tracking = stub.Notify.Execute((userId, message) => { });
+        var tracking = stub.Notify.Call((userId, message) => { });
 
         ISkillNotifier notifier = stub;
         notifier.Notify(42, "Hello");
@@ -279,7 +279,7 @@ public class GotchaTests
         var stub = new SkillBarStub();
 
         // CORRECT: Callback signature matches method parameters exactly
-        stub.Process.Execute((int id, string name) => { /* ... */ });
+        stub.Process.Call((int id, string name) => { /* ... */ });
     }
 }
 
@@ -326,9 +326,9 @@ public class AsyncGotchaTests
         var stub = new SkillAsyncSvcStub();
 
         // CORRECT: KnockOff auto-wraps - just pass the value directly
-        stub.GetUserAsync.Returns(new User { Id = 1, Name = "Alice" });
+        stub.GetUserAsync.Return(new User { Id = 1, Name = "Alice" });
 
-        // No need for Task.FromResult with Returns()
+        // No need for Task.FromResult with Return()
         ISkillAsyncSvc service = stub;
         var user = await service.GetUserAsync(1);
         Assert.Equal("Alice", user!.Name);

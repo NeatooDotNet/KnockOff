@@ -39,7 +39,7 @@ The simplest verification checks whether a method was invoked at least once.
 <!-- snippet: verify-verifiable -->
 ```cs
 // Mark for batch verification, then verify all marked members
-stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
 
 IRepoVerify repository = stub;
 repository.GetById(42);
@@ -112,7 +112,7 @@ You can specify `Times` constraints when marking with `.Verifiable()`.
 <!-- snippet: verify-verifiable-times -->
 ```cs
 // Mark with Times constraint for batch verification
-stub.Refresh.Execute(() => { }).Verifiable(Times.Exactly(2));
+stub.Refresh.Call(() => { }).Verifiable(Times.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -182,7 +182,7 @@ For scenarios where you need to track call counts for custom logic, capture the 
 ```cs
 // Track call count in the callback for custom assertions
 var saveCount = 0;
-stub.Save.Execute((user) => { saveCount++; });
+stub.Save.Call((user) => { saveCount++; });
 ```
 <!-- endSnippet -->
 
@@ -203,7 +203,7 @@ For complex scenarios requiring inspection of all calls (not just the last), use
 ```cs
 // Capture all calls to a list for history inspection
 var calls = new List<int>();
-stub.GetById.Returns((id) =>
+stub.GetById.Return((id) =>
 {
     calls.Add(id);
     return new User { Id = id };
@@ -226,8 +226,8 @@ var order = 0;
 var saveOrder = 0;
 var refreshOrder = 0;
 
-stub.Save.Execute((user) => saveOrder = ++order);
-stub.Refresh.Execute(() => refreshOrder = ++order);
+stub.Save.Call((user) => saveOrder = ++order);
+stub.Refresh.Call(() => refreshOrder = ++order);
 ```
 <!-- endSnippet -->
 
@@ -242,9 +242,9 @@ Verify multiple methods were called using `.Verifiable()` and `stub.Verify()`.
 <!-- snippet: verify-cross-interceptor -->
 ```cs
 // Mark multiple methods as verifiable
-stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
-stub.Save.Execute((user) => { }).Verifiable();
-stub.Refresh.Execute(() => { }).Verifiable();
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.Save.Call((user) => { }).Verifiable();
+stub.Refresh.Call(() => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -370,7 +370,7 @@ Delegate stubs support the same verification API via `stub.Interceptor`:
 ```cs
 // Create delegate stub and configure with Verifiable()
 var stub = new DelegateVerificationHost.Stubs.VerifyArithmeticOp();
-stub.Interceptor.Returns((a, b) => a + b).Verifiable();
+stub.Interceptor.Return((a, b) => a + b).Verifiable();
 
 VerifyArithmeticOp op = stub;
 op(2, 3);

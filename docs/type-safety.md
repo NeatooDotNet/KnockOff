@@ -55,16 +55,16 @@ Assert.Equal(0, result);
 ```
 <!-- endSnippet -->
 
-**KnockOff — `Returns` and `Execute` are each a single, complete call. There is no second step to forget:**
+**KnockOff — `Return` and `Call` are each a single, complete call. There is no second step to forget:**
 
 <!-- snippet: partial-setup-knockoff-oncall -->
 ```cs
-// KnockOff — OnCall IS the setup AND the return value
+// KnockOff — Return IS the setup AND the return value
 var stub = new PartialSetupCalcStub();
 
 // One call does both: configures the method AND defines the return value
 // There is no second step to forget
-stub.Calculate.Returns((a, b) => a + b);
+stub.Calculate.Return((a, b) => a + b);
 
 IPartialSetupCalc calc = stub;
 Assert.Equal(3, calc.Calculate(1, 2));
@@ -73,10 +73,10 @@ Assert.Equal(3, calc.Calculate(1, 2));
 
 <!-- snippet: partial-setup-knockoff-returns -->
 ```cs
-// KnockOff — Returns is also a single complete call
+// KnockOff — Return is also a single complete call
 var stub = new PartialSetupCalcStub();
 
-stub.Calculate.Returns(42);
+stub.Calculate.Return(42);
 
 IPartialSetupCalc calc = stub;
 Assert.Equal(42, calc.Calculate(1, 2));
@@ -174,18 +174,18 @@ NSubstitute does provide `ArgAt<T>(index)` to disambiguate, but the index is unc
 
 ## KnockOff: Fully Typed
 
-KnockOff's generated interceptors match the method signature exactly. Returns/Execute and When lambdas receive typed, named parameters — no manual type specifications, no casts, no index lookups.
+KnockOff's generated interceptors match the method signature exactly. Return/Call and When lambdas receive typed, named parameters -- no manual type specifications, no casts, no index lookups.
 
 **Returns with typed parameters:**
 
 <!-- snippet: type-safety-knockoff-oncall-typed -->
 ```cs
-// KnockOff — OnCall parameters are generated from the method signature
+// KnockOff — Return parameters are generated from the method signature
 var stub = new TypeSafeCalcStub();
 
 // (int a, int b) — types and names come from Add(int a, int b)
 // Wrong types here cause a COMPILE error, not a runtime error
-stub.Add.Returns((a, b) => a + b);
+stub.Add.Return((a, b) => a + b);
 
 ITypeSafeCalc calc = stub;
 Assert.Equal(3, calc.Add(1, 2));
@@ -201,7 +201,7 @@ var stub = new TypeSafeValidatorStub();
 
 // (string firstName, string lastName) — both parameters are named and typed
 // No ambiguity: each parameter is a separate lambda argument
-stub.Validate.When((firstName, lastName) => firstName.Length > 0).Returns(true);
+stub.Validate.When((firstName, lastName) => firstName.Length > 0).Return(true);
 
 ITypeSafeValidator validator = stub;
 Assert.True(validator.Validate("Jane", "Doe"));
@@ -216,7 +216,7 @@ If you try to use the wrong types in a KnockOff lambda, you get a compile error 
 
 | | Moq | NSubstitute | KnockOff |
 |---|---|---|---|
-| **Partial setup (forgot `.Returns()`)** | Strict: runtime error. Loose: silent `default(T)` | Silent `default(T)` | Impossible — `Returns`/`Execute` are each complete in one call |
+| **Partial setup (forgot `.Returns()`)** | Strict: runtime error. Loose: silent `default(T)` | Silent `default(T)` | Impossible -- `Return`/`Call` are each complete in one call |
 | **Lambda setup** | Typed (compile-time safe) | Typed (compile-time safe) | Typed (compile-time safe) |
 | **Callback/Returns type params** | Manual `<T1, T2>` — unchecked | N/A | Generated — compile-time safe |
 | **Argument access in callbacks** | Via `.Returns<T1,T2>((a,b) => ...)` — manual types | Via `callInfo[i]` (untyped) or `.Arg<T>()` (ambiguous) | Via lambda params `(a, b) => ...` — typed and named |

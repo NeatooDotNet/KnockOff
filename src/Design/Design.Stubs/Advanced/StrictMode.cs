@@ -112,7 +112,7 @@ public partial class StrictModeDemo
         var stub = new Stubs.ICalculator(strict: true);
 
         // Configure Add
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
 
         ICalculator calc = stub;
 
@@ -200,13 +200,13 @@ public partial class StrictModeDemo
     {
         // Good: Strict mode when you want explicit control
         var strictStub = new Stubs.ICalculator(strict: true);
-        strictStub.Add.Returns(42);
-        strictStub.Subtract.Returns(10);
+        strictStub.Add.Return(42);
+        strictStub.Subtract.Return(10);
         // Now all called methods are explicitly configured
 
         // Good: Loose mode when you only care about specific methods
         var looseStub = new Stubs.ICalculator();
-        looseStub.Add.Returns(42);
+        looseStub.Add.Return(42);
         // Subtract returns 0, but we don't care about it in this test
     }
 

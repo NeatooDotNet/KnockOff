@@ -223,7 +223,7 @@ public partial class UserMethodBasicsDemo
         // defaultResult == "[Processed: hello]" (from Process_ override)
 
         // Returns supersedes the user method for per-test override
-        stub.Process.Returns(input => $"[Override: {input}]");
+        stub.Process.Return(input => $"[Override: {input}]");
         var overrideResult = service.Process("hello");
         // overrideResult == "[Override: hello]" (Returns wins)
 
@@ -233,7 +233,7 @@ public partial class UserMethodBasicsDemo
     public void Returns_SupersedesUserMethod()
     {
         var stub = new BasicUserMethodStub();
-        stub.Process.Returns("constant"); // Returns(value) is shorthand for Returns(_ => value)
+        stub.Process.Return("constant"); // Returns(value) is shorthand for Returns(_ => value)
 
         IUserMethodService service = stub;
         var result = service.Process("ignored");
@@ -244,7 +244,7 @@ public partial class UserMethodBasicsDemo
     {
         var stub = new BasicUserMethodStub();
         var callbackInvoked = false;
-        stub.Execute.Execute(cmd => callbackInvoked = true);
+        stub.Execute.Call(cmd => callbackInvoked = true);
 
         IUserMethodService service = stub;
         service.Execute("test");
@@ -256,7 +256,7 @@ public partial class UserMethodBasicsDemo
     public void Reset_PreservesReturnsConfiguration()
     {
         var stub = new BasicUserMethodStub();
-        stub.Calculate.Returns((a, b) => a * b); // Override addition with multiplication
+        stub.Calculate.Return((a, b) => a * b); // Override addition with multiplication
 
         IUserMethodService service = stub;
         service.Calculate(3, 4);
@@ -345,10 +345,10 @@ public partial class MixedUserMethodDemo
         stub.WithUserMethod.Verify(Times.Never);
 
         // Methods WITHOUT user override also use interceptor (same API)
-        stub.WithoutUserMethod.Returns((input) => $"[Configured: {input}]");
+        stub.WithoutUserMethod.Return((input) => $"[Configured: {input}]");
         stub.WithoutUserMethod.Verify(Times.Never);
 
-        stub.ComputeWithoutUserMethod.Returns(42);
+        stub.ComputeWithoutUserMethod.Return(42);
 
         IMixedUserMethodService service = stub;
 
@@ -545,8 +545,8 @@ public partial class GenericUserMethodStub
     // 3. These are fundamentally different approaches
     //
     // For generic methods, use the standard interceptor API:
-    //   stub.Create.Of<List<int>>().Returns(new List<int>());
-    //   stub.Create.Of<User>().Returns(() => new User { Id = 1 });
+    //   stub.Create.Of<List<int>>().Return(new List<int>());
+    //   stub.Create.Of<User>().Return(() => new User { Id = 1 });
     //
     // The Of<T>() pattern handles both behavior AND verification consistently.
     // =========================================================================
@@ -555,8 +555,8 @@ public partial class GenericUserMethodStub
     // Use stub.Create.Of<T>() instead
 
     // If you need generic "default" behavior, you can still use:
-    //   stub.Create.Of<List<int>>().Returns(new List<int>());
-    //   stub.Transform.Of<string, StringBuilder>().Returns(new StringBuilder());
+    //   stub.Create.Of<List<int>>().Return(new List<int>());
+    //   stub.Transform.Of<string, StringBuilder>().Return(new StringBuilder());
 }
 
 [KnockOff<IGenericUserMethodService>]
@@ -567,8 +567,8 @@ public partial class GenericUserMethodDemo
         var stub = new GenericUserMethodStub();
         IGenericUserMethodService service = stub;
 
-        // Configure via Of<T>().Returns() - this is the ONLY way for generic methods
-        stub.Create.Of<List<int>>().OnCall(() => new List<int> { 1, 2, 3 });
+        // Configure via Of<T>().Return() - this is the ONLY way for generic methods
+        stub.Create.Of<List<int>>().Return(() => new List<int> { 1, 2, 3 });
 
         var list = service.Create<List<int>>();
         // list == { 1, 2, 3 }
@@ -582,8 +582,8 @@ public partial class GenericUserMethodDemo
         var stub = new GenericUserMethodStub();
         IGenericUserMethodService service = stub;
 
-        // Multi-type-parameter methods also use Of<T>().Returns()
-        stub.Transform.Of<string, StringBuilder>().OnCall(input => new StringBuilder($"transformed: {input}"));
+        // Multi-type-parameter methods also use Of<T>().Return()
+        stub.Transform.Of<string, StringBuilder>().Return(input => new StringBuilder($"transformed: {input}"));
 
         var result = service.Transform<string, StringBuilder>("hello");
         // result.ToString() == "transformed: hello"
@@ -633,7 +633,7 @@ public static class WhenChainUserMethodDemo
         IUserMethodService service = stub;
 
         // Configure When chain for specific values
-        stub.Process.When("special").Returns("[SPECIAL HANDLING]");
+        stub.Process.When("special").Return("[SPECIAL HANDLING]");
 
         // Call with matching value - When chain handles it
         var result1 = service.Process("special");  // Returns "[SPECIAL HANDLING]"
@@ -656,7 +656,7 @@ public static class WhenChainUserMethodDemo
 
         // Configure predicate matching
         stub.Process.When(input => input.StartsWith("VIP:", StringComparison.Ordinal))
-            .Returns("[VIP CUSTOMER]");
+            .Return("[VIP CUSTOMER]");
 
         // Matching calls go to When chain
         var vip = service.Process("VIP:12345");     // Returns "[VIP CUSTOMER]"
@@ -675,8 +675,8 @@ public static class WhenChainUserMethodDemo
         IUserMethodService service = stub;
 
         // Chain of When matchers
-        stub.Process.When("first").Returns("[1st]")
-            .ThenWhen("second").Returns("[2nd]")
+        stub.Process.When("first").Return("[1st]")
+            .ThenWhen("second").Return("[2nd]")
             .ThenNone();  // Stop matching after sequence
 
         // First three calls match the chain
@@ -695,8 +695,8 @@ public static class WhenChainUserMethodDemo
         IUserMethodService service = stub;
 
         // Configure specific parameter combinations
-        stub.Calculate.When(0, 0).Returns(0);  // Edge case
-        stub.Calculate.When((a, b) => a < 0 && b < 0).Returns(-1);  // Both negative
+        stub.Calculate.When(0, 0).Return(0);  // Edge case
+        stub.Calculate.When((a, b) => a < 0 && b < 0).Return(-1);  // Both negative
 
         // Matching calls use When chain
         var zero = service.Calculate(0, 0);      // 0 (from When)
@@ -716,7 +716,7 @@ public static class WhenChainUserMethodDemo
         IUserMethodService service = stub;
 
         // Mark When chain as verifiable
-        stub.Process.When("expected").Returns("result").Verifiable();
+        stub.Process.When("expected").Return("result").Verifiable();
 
         // Call the method
         service.Process("expected");
@@ -735,7 +735,7 @@ public static class WhenChainUserMethodDemo
         IUserMethodService service = stub;
 
         // Priority: When > Sequences > Returns > User Method
-        stub.Process.When("priority1").Returns("[FROM WHEN]");
+        stub.Process.When("priority1").Return("[FROM WHEN]");
 
         // First call matches When
         var from_when = service.Process("priority1");  // "[FROM WHEN]"
@@ -744,7 +744,7 @@ public static class WhenChainUserMethodDemo
         var from_user = service.Process("anything");   // User method result
 
         // You can also configure Returns which takes precedence over user method
-        stub.Process.Returns(input => $"[RETURNS: {input}]");
+        stub.Process.Return(input => $"[RETURNS: {input}]");
         var from_returns = service.Process("test");     // "[RETURNS: test]"
     }
 }

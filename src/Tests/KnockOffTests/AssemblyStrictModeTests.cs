@@ -145,7 +145,7 @@ public class AssemblyStrictModeTests
 	public void FluentChaining_WithConfiguration_Works()
 	{
 		var stub = new AssemblyStrictOverrideInlineTests.Stubs.IStrictFalseOverride(strict: false).Strict();
-		stub.GetValue.Returns((x) => x * 2);
+		stub.GetValue.Return((x) => x * 2);
 		IStrictFalseOverride service = stub;
 
 		// Should work - OnCall is configured

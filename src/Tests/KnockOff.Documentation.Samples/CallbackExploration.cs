@@ -80,15 +80,15 @@ public class NSubPartialSetupTests
 public class KnockOffPartialSetupTests
 {
     [Fact]
-    public void KnockOff_OnCall_IsSetupAndReturn()
+    public void KnockOff_Return_IsSetupAndReturn()
     {
         #region partial-setup-knockoff-oncall
-        // KnockOff — OnCall IS the setup AND the return value
+        // KnockOff — Return IS the setup AND the return value
         var stub = new PartialSetupCalcStub();
 
         // One call does both: configures the method AND defines the return value
         // There is no second step to forget
-        stub.Calculate.Returns((a, b) => a + b);
+        stub.Calculate.Return((a, b) => a + b);
 
         IPartialSetupCalc calc = stub;
         Assert.Equal(3, calc.Calculate(1, 2));
@@ -99,10 +99,10 @@ public class KnockOffPartialSetupTests
     public void KnockOff_Returns_IsAlsoComplete()
     {
         #region partial-setup-knockoff-returns
-        // KnockOff — Returns is also a single complete call
+        // KnockOff — Return is also a single complete call
         var stub = new PartialSetupCalcStub();
 
-        stub.Calculate.Returns(42);
+        stub.Calculate.Return(42);
 
         IPartialSetupCalc calc = stub;
         Assert.Equal(42, calc.Calculate(1, 2));

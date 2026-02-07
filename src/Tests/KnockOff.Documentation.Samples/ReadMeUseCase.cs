@@ -146,7 +146,7 @@ public class UserDomainModelTests
 
 
     [Fact]
-    public void UpdateTest_KnockOff_OnCall()
+    public void UpdateTest_KnockOff_Return()
     {
         #region readme-knockoff-oncall-test
         var user1 = new User { Id = 1 }; // Ignored do to per-test configuration
@@ -155,9 +155,9 @@ public class UserDomainModelTests
 
         var user2 = new User { Id = 2 };
 
-        // When and OnCall overrides the stub methods
-        myRepoKO.GetUser.When(2).Returns(user2).Verifiable();
-        myRepoKO.Update.Execute(u => Assert.Same(u, user2)).Verifiable();
+        // When and Return overrides the stub methods
+        myRepoKO.GetUser.When(2).Return(user2).Verifiable();
+        myRepoKO.Update.Call(u => Assert.Same(u, user2)).Verifiable();
 
         userDomainModel.Fetch(2);
         userDomainModel.Update();
@@ -167,7 +167,7 @@ public class UserDomainModelTests
     }
 
     [Fact]
-    public void UpdateTest_KnockOff_OnCall_Verify()
+    public void UpdateTest_KnockOff_Return_Verify()
     {
         var user1 = new User { Id = 1 }; // Ignored do to per-test configuration
         var myRepoKO = new MyRepoStub([user1]);
@@ -175,8 +175,8 @@ public class UserDomainModelTests
 
         var user2 = new User { Id = 2 };
 
-        // When and OnCall overrides the stub methods
-        myRepoKO.GetUser.When(2).Returns(user2).Verifiable();
+        // When and Return overrides the stub methods
+        myRepoKO.GetUser.When(2).Return(user2).Verifiable();
 
         userDomainModel.Fetch(1);
         userDomainModel.Update();

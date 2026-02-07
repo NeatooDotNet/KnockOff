@@ -16,7 +16,7 @@ public class MethodBasicsTests
     public void Returns_ConfiguresConstantReturnValue()
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
 
         Design.Domain.Services.ICalculator calc = stub;
 
@@ -28,7 +28,7 @@ public class MethodBasicsTests
     public void OnCall_ConfiguresCallback()
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
-        stub.Add.Returns((a, b) => a + b);
+        stub.Add.Return((a, b) => a + b);
 
         Design.Domain.Services.ICalculator calc = stub;
 
@@ -64,7 +64,7 @@ public class MethodBasicsTests
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
         var resetCalled = false;
-        stub.Reset.Execute(() => resetCalled = true);
+        stub.Reset.Call(() => resetCalled = true);
 
         Design.Domain.Services.ICalculator calc = stub;
         calc.Reset();
@@ -76,7 +76,7 @@ public class MethodBasicsTests
     public void Verify_ThrowsWhenNotCalled()
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         Assert.Throws<VerificationException>(() => stub.Add.Verify());
     }
@@ -85,7 +85,7 @@ public class MethodBasicsTests
     public void Verify_PassesWhenCalled()
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
-        stub.Add.Returns(0);
+        stub.Add.Return(0);
 
         Design.Domain.Services.ICalculator calc = stub;
         calc.Add(1, 2);
@@ -109,7 +109,7 @@ public class MethodBasicsTests
     public void Reset_ClearsTracking()
     {
         var stub = new BasicMethodsDemo.Stubs.ICalculator();
-        stub.Add.Returns(42);
+        stub.Add.Return(42);
 
         Design.Domain.Services.ICalculator calc = stub;
         calc.Add(1, 2);

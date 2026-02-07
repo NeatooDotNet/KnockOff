@@ -37,7 +37,7 @@ public class RealisticBenchmarks
         // Arrange
         var stub = new SimpleServiceStub();
         var callCount = 0;
-        var tracking = stub.DoWork.Execute(() => callCount++);
+        var tracking = stub.DoWork.Call(() => callCount++);
 
         // Act
         ((ISimpleService)stub).DoWork();
@@ -91,10 +91,10 @@ public class RealisticBenchmarks
     {
         // Arrange
         var stub = new OrderServiceStub();
-        var getOrderTracking = stub.GetOrder.Returns((id) => new Order { Id = id, CustomerId = 1 });
-        var validateOrderTracking = stub.ValidateOrder.Returns((_) => true);
-        stub.CalculateTotal.Returns((_) => 100m);
-        var saveOrderTracking = stub.SaveOrder.Execute((_) => { });
+        var getOrderTracking = stub.GetOrder.Return((id) => new Order { Id = id, CustomerId = 1 });
+        var validateOrderTracking = stub.ValidateOrder.Return((_) => true);
+        stub.CalculateTotal.Return((_) => 100m);
+        var saveOrderTracking = stub.SaveOrder.Call((_) => { });
 
         // Act
         var sut = new OrderProcessor(stub);
@@ -171,8 +171,8 @@ public class TestSuiteBenchmarks
             // Simulate a typical test
             var stub = new OrderServiceStub();
             var capturedI = i;
-            var getOrderTracking = stub.GetOrder.Returns((_) => new Order { Id = capturedI });
-            var validateOrderTracking = stub.ValidateOrder.Returns((_) => true);
+            var getOrderTracking = stub.GetOrder.Return((_) => new Order { Id = capturedI });
+            var validateOrderTracking = stub.ValidateOrder.Return((_) => true);
 
             _ = ((IOrderService)stub).GetOrder(i);
             _ = ((IOrderService)stub).ValidateOrder(new Order());

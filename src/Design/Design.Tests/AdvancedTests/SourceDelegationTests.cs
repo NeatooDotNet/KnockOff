@@ -32,7 +32,7 @@ public class SourceDelegationTests
         var realCalc = new RealCalculator();
 
         stub.Source(realCalc);
-        stub.Add.Returns(999);
+        stub.Add.Return(999);
 
         ICalculator calc = stub;
 
@@ -65,7 +65,7 @@ public class SourceDelegationTests
         stub.Source(realCalc);
 
         // Override just Add to throw
-        stub.Add.Returns((a, b) => throw new InvalidOperationException("Simulated error"));
+        stub.Add.Return((a, b) => throw new InvalidOperationException("Simulated error"));
 
         ICalculator calc = stub;
 
@@ -140,7 +140,7 @@ public class SourceHierarchyTests
 
         // Configure writes explicitly
         var saved = new Dictionary<int, string>();
-        stub.Save.Execute((id, value) => saved[id] = value);
+        stub.Save.Call((id, value) => saved[id] = value);
 
         IStore store = stub;
 

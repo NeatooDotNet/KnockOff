@@ -264,33 +264,33 @@ internal static class UnifiedInterceptorBuilder
 
 	/// <summary>
 	/// Determines the builder interface type based on trackable parameter count and void/non-void.
-	/// Non-void methods use IMethodReturnsBuilder, void methods use IMethodExecuteBuilder.
+	/// Non-void methods use IMethodReturnBuilder, void methods use IMethodCallBuilder.
 	/// </summary>
 	public static string GetBuilderInterface(EquatableArray<ParameterModel> trackableParams, string delegateType, bool isVoid)
 	{
 		if (isVoid)
 		{
 			if (trackableParams.Count == 0)
-				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}>";
+				return $"global::KnockOff.IMethodCallBuilder<{delegateType}>";
 			if (trackableParams.Count == 1)
 			{
 				var param = trackableParams.GetArray()![0];
-				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}, {param.Type}>";
+				return $"global::KnockOff.IMethodCallBuilder<{delegateType}, {param.Type}>";
 			}
 			var tupleType = GetLastArgsType(trackableParams);
-			return $"global::KnockOff.IMethodExecuteBuilderArgs<{delegateType}, {tupleType}>";
+			return $"global::KnockOff.IMethodCallBuilderArgs<{delegateType}, {tupleType}>";
 		}
 		else
 		{
 			if (trackableParams.Count == 0)
-				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}>";
+				return $"global::KnockOff.IMethodReturnBuilder<{delegateType}>";
 			if (trackableParams.Count == 1)
 			{
 				var param = trackableParams.GetArray()![0];
-				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}, {param.Type}>";
+				return $"global::KnockOff.IMethodReturnBuilder<{delegateType}, {param.Type}>";
 			}
 			var tupleType = GetLastArgsType(trackableParams);
-			return $"global::KnockOff.IMethodReturnsBuilderArgs<{delegateType}, {tupleType}>";
+			return $"global::KnockOff.IMethodReturnBuilderArgs<{delegateType}, {tupleType}>";
 		}
 	}
 

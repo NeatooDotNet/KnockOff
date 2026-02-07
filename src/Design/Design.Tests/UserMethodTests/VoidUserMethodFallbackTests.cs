@@ -148,7 +148,7 @@ public class VoidUserMethodFallbackTests
         IVoidUserMethodService service = stub;
 
         var captured = false;
-        stub.SaveOrder.Execute(order => captured = true);
+        stub.SaveOrder.Call(order => captured = true);
 
         service.SaveOrder(new Order { Id = 1 });
 
@@ -163,7 +163,7 @@ public class VoidUserMethodFallbackTests
         var stub = new VoidUserMethodFallbackStub();
         IVoidUserMethodService service = stub;
 
-        stub.FormatOrder.Returns(order => $"Custom: {order.Id}");
+        stub.FormatOrder.Return(order => $"Custom: {order.Id}");
 
         var result = service.FormatOrder(new Order { Id = 99 });
 

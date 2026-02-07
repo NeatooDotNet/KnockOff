@@ -1,27 +1,27 @@
 namespace KnockOff;
 
 /// <summary>
-/// Represents a sequence of void method callbacks.
+/// Represents a sequence of non-void method callbacks.
 /// Each callback in the sequence is invoked exactly once.
 /// </summary>
-public interface IMethodExecuteSequence : IMethodSequence
+public interface IMethodReturnSequence : IMethodSequence
 {
 }
 
 /// <summary>
-/// Typed sequence for void methods that enables ThenExecute chaining.
+/// Typed sequence for non-void methods that enables ThenReturn chaining.
 /// </summary>
-public interface IMethodExecuteSequence<TCallback> : IMethodExecuteSequence
+public interface IMethodReturnSequence<TCallback> : IMethodReturnSequence
 {
     /// <summary>
     /// Marks this sequence for verification by Stub.Verify().
     /// Returns this for fluent chaining.
     /// </summary>
-    new IMethodExecuteSequence<TCallback> Verifiable();
+    new IMethodReturnSequence<TCallback> Verifiable();
 
     /// <summary>
     /// Adds another callback to the sequence.
     /// Each callback in the sequence is invoked exactly once.
     /// </summary>
-    IMethodExecuteSequence<TCallback> ThenExecute(TCallback callback);
+    IMethodReturnSequence<TCallback> ThenReturn(TCallback callback);
 }

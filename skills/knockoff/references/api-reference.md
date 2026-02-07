@@ -24,10 +24,10 @@ All interceptors provide a `Reset()` method to clear tracking state (counts, cap
 <!-- snippet: interceptor-overview-quick-example -->
 ```cs
 // Method interceptor
-stub.Save.Execute((item) => { }).Verifiable();
+stub.Save.Call((item) => { }).Verifiable();
 
 // Generic method interceptor
-stub.GetById.Of<User>().OnCall((id) => new User { Id = id });
+stub.GetById.Of<User>().Return((id) => new User { Id = id });
 
 // Property interceptor
 stub.Name.OnGet("TestRepo");
@@ -53,8 +53,8 @@ The interceptor API works identically across all nine KnockOff patterns (see [pa
 var stub = new ApiUserRepoStub();
 
 // Interceptor accessed via interface-named property
-stub.GetById.Returns((id) => new User { Id = id });
-stub.Save.Execute((user) => { }).Verifiable();
+stub.GetById.Return((id) => new User { Id = id });
+stub.Save.Call((user) => { }).Verifiable();
 
 IApiUserRepo repository = stub;
 repository.Save(new User { Id = 1 });
@@ -71,8 +71,8 @@ stub.Verify();
 var stub = new Stubs.IApiUserRepo();
 
 // Same interceptor API as standalone
-stub.GetById.Returns((id) => new User { Id = id });
-stub.Save.Execute((user) => { }).Verifiable();
+stub.GetById.Return((id) => new User { Id = id });
+stub.Save.Call((user) => { }).Verifiable();
 
 IApiUserRepo repository = stub;
 repository.Save(new User { Id = 1 });
@@ -89,8 +89,8 @@ stub.Verify();
 var stub = new Stubs.ApiServiceClass();
 
 // Interceptors accessed via class-named container
-stub.GetUser.Returns((id) => new User { Id = id, Name = "FromStub" });
-stub.SaveUser.Execute((user) => { }).Verifiable();
+stub.GetUser.Return((id) => new User { Id = id, Name = "FromStub" });
+stub.SaveUser.Call((user) => { }).Verifiable();
 
 // Use .Object to get the actual class instance
 ApiServiceClass service = stub.Object;
@@ -114,8 +114,8 @@ Generated for non-generic interface methods. Tracks call counts, captures argume
 When you define a **user method** (override a virtual method with underscore suffix), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). This interceptor:
 
 - Tracks all calls to the interface method
-- Allows `Returns(callback)` to supersede the user method
-- Uses the user method as fallback when no `Returns` callback is configured
+- Allows `Return(callback)` to supersede the user method
+- Uses the user method as fallback when no `Return` callback is configured
 
 <!-- snippet: user-method-interceptor-standalone-api-example -->
 ```cs
@@ -138,8 +138,8 @@ IApiRepo repo = stub;
 // User method provides default behavior
 var user1 = repo.GetById(1);  // Returns "Default"
 
-// OnCall supersedes user method (clean interceptor name)
-stub.GetById.Returns(id => new User { Id = id, Name = "Override" });
+// Return supersedes user method (clean interceptor name)
+stub.GetById.Return(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns "Override"
 
 // Full tracking works - counts all calls regardless of configuration
@@ -147,23 +147,23 @@ stub.GetById.Verify(Times.Exactly(2));
 Assert.Equal(2, stub.GetById.LastArg);
 
 // Returns for constant values (auto-wraps for async)
-stub.GetById.Returns(new User { Id = 99 });
+stub.GetById.Return(new User { Id = 99 });
 var user3 = repo.GetById(3);  // Returns User { Id = 99 }
 ```
 <!-- endSnippet -->
 
-**Reset behavior for user method interceptors:** `Reset()` clears tracking state (call count, LastArg) but preserves the Returns configuration.
+**Reset behavior for user method interceptors:** `Reset()` clears tracking state (call count, LastArg) but preserves the Return configuration.
 
 ### Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `Returns` | Method | Configures callback/return value for non-void methods. Returns `IMethodReturnsBuilder` for chaining |
-| `Execute` | Method | Configures callback for void methods. Returns `IMethodExecuteBuilder` for chaining |
+| `Return` | Method | Configures callback/return value for non-void methods. Returns `IMethodReturnBuilder` for chaining |
+| `Call` | Method | Configures callback for void methods. Returns `IMethodCallBuilder` for chaining |
 
 ### Tracking Properties
 
-The `Returns`/`Execute` method returns `IMethodTracking<T>` (or `IMethodTrackingArgs<TArgs>` for multi-parameter methods) which provides:
+The `Return`/`Call` method returns `IMethodTracking<T>` (or `IMethodTrackingArgs<TArgs>` for multi-parameter methods) which provides:
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -181,16 +181,16 @@ The `Returns`/`Execute` method returns `IMethodTracking<T>` (or `IMethodTracking
 | `Verifiable()` | `{Interceptor}` | Mark interceptor for batch verification with default constraint (AtLeastOnce), returns self for chaining |
 | `Verifiable(Times)` | `{Interceptor}` | Mark interceptor for batch verification with specific Times constraint, returns self for chaining |
 
-**Note**: `Verifiable()` and `Verifiable(Times)` return the interceptor instance, enabling fluent chaining with `Returns`/`Execute`.
+**Note**: `Verifiable()` and `Verifiable(Times)` return the interceptor instance, enabling fluent chaining with `Return`/`Call`.
 
 ### Configuration Methods
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Returns(callback)` | `IMethodReturnsBuilder` | Configures callback for non-void methods. Repeats indefinitely |
-| `Execute(callback)` | `IMethodExecuteBuilder` | Configures callback for void methods. Repeats indefinitely |
-| `Returns(T value)` | `IMethodReturnsBuilder` | Configures constant return value. Repeats indefinitely |
-| `Returns(T first, params T[] rest)` | `IMethodReturnsSequence` | Creates sequence from multiple values. Last value repeats after exhaustion |
+| `Return(callback)` | `IMethodReturnBuilder` | Configures callback for non-void methods. Repeats indefinitely |
+| `Call(callback)` | `IMethodCallBuilder` | Configures callback for void methods. Repeats indefinitely |
+| `Return(T value)` | `IMethodReturnBuilder` | Configures constant return value. Repeats indefinitely |
+| `Return(T first, params T[] rest)` | `IMethodReturnSequence` | Creates sequence from multiple values. Last value repeats after exhaustion |
 
 ### Callback Signatures
 
@@ -198,52 +198,52 @@ The callback type varies based on method signature:
 
 | Method Signature | API | Callback Type |
 |-----------------|-----|---------------|
-| `void M()` | `Execute(callback)` | `Action` |
-| `void M(T arg)` | `Execute(callback)` | `Action<T>` |
-| `void M(T1 a, T2 b)` | `Execute(callback)` | `Action<T1, T2>` |
-| `R M()` | `Returns(callback)` | `Func<R>` |
-| `R M(T arg)` | `Returns(callback)` | `Func<T, R>` |
-| `R M(T1 a, T2 b)` | `Returns(callback)` | `Func<T1, T2, R>` |
+| `void M()` | `Call(callback)` | `Action` |
+| `void M(T arg)` | `Call(callback)` | `Action<T>` |
+| `void M(T1 a, T2 b)` | `Call(callback)` | `Action<T1, T2>` |
+| `R M()` | `Return(callback)` | `Func<R>` |
+| `R M(T arg)` | `Return(callback)` | `Func<T, R>` |
+| `R M(T1 a, T2 b)` | `Return(callback)` | `Func<T1, T2, R>` |
 
-When `Returns`/`Execute` is set with a callback, the callback is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
+When `Return`/`Call` is set with a callback, the callback is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
 
 ### Sequence Building Methods
 
-For non-void methods, sequences can be built using these methods on `IMethodReturnsSequence`:
+For non-void methods, sequences can be built using these methods on `IMethodReturnSequence`:
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `ThenReturns(T value)` | `IMethodReturnsSequence` | Adds single constant value to sequence |
-| `ThenReturns(params T[] values)` | `IMethodReturnsSequence` | Adds multiple constant values to sequence |
-| `ThenReturns(callback)` | `IMethodReturnsSequence` | Adds callback to sequence |
+| `ThenReturn(T value)` | `IMethodReturnSequence` | Adds single constant value to sequence |
+| `ThenReturn(params T[] values)` | `IMethodReturnSequence` | Adds multiple constant values to sequence |
+| `ThenReturn(callback)` | `IMethodReturnSequence` | Adds callback to sequence |
 | `ThenDefault()` | `void` | Terminates sequence; return `default(T)` after exhaustion instead of repeating |
 
-For void methods, sequences can be built using these methods on `IMethodExecuteSequence`:
+For void methods, sequences can be built using these methods on `IMethodCallSequence`:
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `ThenExecute(callback)` | `IMethodExecuteSequence` | Adds callback to sequence |
+| `ThenCall(callback)` | `IMethodCallSequence` | Adds callback to sequence |
 | `ThenDefault()` | `void` | Terminates sequence; falls through to next priority after exhaustion instead of repeating |
 
 **Sequence Exhaustion Behavior**: By default, after all values/callbacks are consumed, the last one repeats indefinitely (NSubstitute-like). Use `ThenDefault()` to return `default(T)` after exhaustion, or enable `Strict` mode to throw an exception.
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (call counts, `LastArg`/`LastArgs`), resets sequence index, When chain position, and source delegation reference. Preserves `Returns`/`Execute` callbacks
+- `void Reset()` - Clears tracking state (call counts, `LastArg`/`LastArgs`), resets sequence index, When chain position, and source delegation reference. Preserves `Return`/`Call` callbacks
 
 ### Example
 
 <!-- snippet: method-interceptor-complete-api-demo -->
 ```cs
-// Configure void method with OnCall and mark verifiable
-stub.Save.Execute((user) => { }).Verifiable();
+// Configure void method with Return and mark verifiable
+stub.Save.Call((user) => { }).Verifiable();
 
 // Configure return method with Returns
-var getTracking = stub.GetById.Returns((id) =>
+var getTracking = stub.GetById.Return((id) =>
     new User { Id = id, Name = $"User{id}" }).Verifiable();
 
 // Configure multi-parameter method
-var updateTracking = stub.Update.Execute((id, name) => { }).Verifiable();
+var updateTracking = stub.Update.Call((id, name) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -455,7 +455,7 @@ Call `.Of<T>()` returns a typed interceptor with these properties:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `OnCall` | Method | Configures callback/return value. Returns `IMethodTracking<T>` for accessing `LastArg` |
+| `Return` / `Call` | Method | Configures callback/return value. `Return` for non-void, `Call` for void. Returns `IMethodTracking<T>` for accessing `LastArg` |
 
 The typed tracking interface (`IMethodTracking<T>` or `IMethodTrackingArgs<TArgs>`) provides:
 
@@ -464,9 +464,9 @@ The typed tracking interface (`IMethodTracking<T>` or `IMethodTrackingArgs<TArgs
 | `LastArg` | `TArg` | The argument from the most recent call with these type arguments (single-parameter methods) |
 | `LastArgs` | `(TArg1, TArg2, ...)` | Tuple of arguments from the most recent call (multi-parameter methods) |
 
-The `OnCall` method follows the same signature rules as non-generic method interceptors (see Method Interceptor section).
+The `Return`/`Call` method follows the same signature rules as non-generic method interceptors (see Method Interceptor section).
 
-**Note**: Generic method typed handlers (`.Of<T>().OnCall(...)`) still use `OnCall`. This is intentional -- generic handlers do not use the `Returns`/`Execute` split.
+**Note**: Generic method typed handlers use `.Of<T>().Return(callback)` for non-void methods and `.Of<T>().Call(callback)` for void methods, matching the regular method interceptor naming.
 
 #### Typed Verification Methods
 
@@ -487,10 +487,10 @@ The `OnCall` method follows the same signature rules as non-generic method inter
 <!-- snippet: generic-method-interceptor-complete-api-demo -->
 ```cs
 // Of<T>(): access typed interceptor for specific type argument
-stub.GetById.Of<User>().OnCall((id) =>
+stub.GetById.Of<User>().Return((id) =>
     new User { Id = id, Name = $"User{id}" });
 
-stub.GetById.Of<Product>().OnCall((id) =>
+stub.GetById.Of<Product>().Return((id) =>
     new Product { Id = id, Name = $"Product{id}" });
 
 // CalledTypeArguments: list of all type arguments used
@@ -502,7 +502,7 @@ var typeArgs = stub.GetById.CalledTypeArguments;
 
 ## Delegate Interceptor
 
-Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a single `Interceptor` property. The interceptor reuses the same renderer as interface/class method interceptors, so delegates support: Returns, Execute, sequences, When chains, async auto-wrapping, verification, and strict mode.
+Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a single `Interceptor` property. The interceptor reuses the same renderer as interface/class method interceptors, so delegates support: Return, Call, sequences, When chains, async auto-wrapping, verification, and strict mode.
 
 **Important:** Only named delegate types are supported. `Func<>` and `Action<>` cannot be stubbed directly.
 
@@ -513,8 +513,8 @@ Generated for delegate types via `[KnockOff<TDelegate>]`. Delegate stubs use a s
 var stub = new Stubs.ArithmeticOperation();
 
 // All configuration goes through stub.Interceptor
-stub.Interceptor.Returns(42);
-stub.Interceptor.Returns((a, b) => a + b);
+stub.Interceptor.Return(42);
+stub.Interceptor.Return((a, b) => a + b);
 
 // Implicit conversion to delegate type
 ArithmeticOperation op = stub;
@@ -526,10 +526,10 @@ var result = op(2, 3);
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Returns(TReturn value)` | `IMethodReturnsBuilder` | Fixed return value (not for void delegates) |
-| `Returns(TReturn first, params TReturn[] rest)` | `IMethodReturnsSequence` | Sequence of values |
-| `Returns(callback)` | `IMethodReturnsBuilder` | Callback for non-void delegates |
-| `Execute(callback)` | `IMethodExecuteBuilder` | Callback for void delegates |
+| `Return(TReturn value)` | `IMethodReturnBuilder` | Fixed return value (not for void delegates) |
+| `Return(TReturn first, params TReturn[] rest)` | `IMethodReturnSequence` | Sequence of values |
+| `Return(callback)` | `IMethodReturnBuilder` | Callback for non-void delegates |
+| `Call(callback)` | `IMethodCallBuilder` | Callback for void delegates |
 | `When(values)` / `When(predicate)` | `IWhenBuilder` / `IVoidWhenChain` | Parameter matching |
 
 ### Async Auto-Wrapping
@@ -542,13 +542,13 @@ Async delegates (`Task<T>`, `ValueTask<T>`) support three-tier auto-wrapping:
 var stub = new Stubs.AsyncOperation();
 
 // Tier 1: Returns takes inner type — auto-wraps in Task.FromResult
-stub.Interceptor.Returns(42);
+stub.Interceptor.Return(42);
 
 // Tier 2: Simplified callback returns int — auto-wrapped
-stub.Interceptor.Returns((int x) => x * 2);
+stub.Interceptor.Return((int x) => x * 2);
 
 // Tier 3: Full delegate returns Task<int> directly
-stub.Interceptor.Returns((int x) => Task.FromResult(x * 2));
+stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
 ```
 <!-- endSnippet -->
 
@@ -569,12 +569,12 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
-| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position, source delegation | `Returns`/`Execute` callbacks, sequence structure, When chain structure, verifiable marking |
-| **User Method** | Call counts, `LastArg` | `Returns`/`Execute` configuration, verifiable marking |
+| **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position, source delegation | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
+| **User Method** | Call counts, `LastArg` | `Return`/`Call` configuration, verifiable marking |
 | **Property** | Get/set counts, `LastSetValue`, sequence index, source delegation | `OnGet`/`OnSet` callbacks, sequence structure, verifiable marking |
 | **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `OnGet`/`OnSet` callbacks, `Backing` dictionary, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
-| **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `Returns`/`Execute` callbacks, sequence structure, When chain structure, verifiable marking |
+| **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
 | **Generic Method (Typed)** | Tracking for specific type argument(s) only | Tracking for other type arguments |
 
@@ -642,9 +642,9 @@ Stub classes provide a `Verify()` method that validates all interceptors marked 
 <!-- snippet: batch-verification-workflow-example -->
 ```cs
 // Step 1: Mark interceptors with Verifiable()
-stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
-stub.Save.Execute((user) => { }).Verifiable(Times.Exactly(2));
-stub.Delete.Execute((id) => { }).Verifiable(Times.Never);
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.Save.Call((user) => { }).Verifiable(Times.Exactly(2));
+stub.Delete.Call((id) => { }).Verifiable(Times.Never);
 
 // Step 2: Exercise the stub through the interface
 var user = repository.GetById(1);
@@ -678,13 +678,13 @@ For interface hierarchies, KnockOff generates one `Source()` overload per interf
 
 KnockOff evaluates member calls in this order:
 
-1. **When chains** -- `stub.Method.When(...).Returns(...)`
-2. **Returns / Execute** -- `stub.Method.Returns(...)` or `stub.Method.Execute(...)`
+1. **When chains** -- `stub.Method.When(...).Return(...)`
+2. **Return / Call** -- `stub.Method.Return(...)` or `stub.Method.Call(...)`
 3. **User methods** -- `protected override` with `_` suffix (Standalone only)
 4. **Source delegation** -- `stub.Source(realImplementation)`
 5. **Smart default** -- KnockOff's built-in default value
 
-The first match wins. Returns/Execute takes full control when configured -- Source is not consulted even for arguments that do not match When predicates.
+The first match wins. Return/Call takes full control when configured -- Source is not consulted even for arguments that do not match When predicates.
 
 ### Reset Interaction
 
@@ -706,7 +706,7 @@ The first match wins. Returns/Execute takes full control when configured -- Sour
 - [Verification](../../../../docs/guides/verification.md) - Advanced verification patterns and Times constraints
 
 **Advanced Topics**:
-- [Advanced Callbacks](../../../../docs/guides/advanced-callbacks.md) - Best practices for Returns, Execute, OnGet, OnSet callbacks
+- [Advanced Callbacks](../../../../docs/guides/advanced-callbacks.md) - Best practices for Return, Call, OnGet, OnSet callbacks
 
 ---
 

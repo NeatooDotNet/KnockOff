@@ -17,7 +17,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.When("special").Returns("[WHEN MATCHED]");
+        stub.Process.When("special").Return("[WHEN MATCHED]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -32,7 +32,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.When("special").Returns("[WHEN MATCHED]");
+        stub.Process.When("special").Return("[WHEN MATCHED]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -47,8 +47,8 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.When("first").Returns("[FIRST]");
-        stub.Process.When("second").Returns("[SECOND]");
+        stub.Process.When("first").Return("[FIRST]");
+        stub.Process.When("second").Return("[SECOND]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -71,7 +71,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.When(s => s.Length > 10).Returns("[LONG STRING]");
+        stub.Process.When(s => s.Length > 10).Return("[LONG STRING]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -92,8 +92,8 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.When("first").Returns("[1]")
-            .ThenWhen("second").Returns("[2]")
+        stub.Process.When("first").Return("[1]")
+            .ThenWhen("second").Return("[2]")
             .ThenNone();
 
         // Act
@@ -113,7 +113,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.When("callback").Returns("[INITIAL]")
+        stub.Process.When("callback").Return("[INITIAL]")
             .ThenCall(s => $"[CALLBACK: {s}]");
 
         // Act
@@ -136,7 +136,7 @@ public class UserMethodWhenTests
         // Arrange
         var stub = new WhenUserMethodStub();
         var callbackInvoked = false;
-        stub.Execute.When("trigger").Execute(cmd => callbackInvoked = true);
+        stub.Execute.When("trigger").Call(cmd => callbackInvoked = true);
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -151,7 +151,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Execute.When("trigger").Execute(cmd => { });
+        stub.Execute.When("trigger").Call(cmd => { });
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -170,7 +170,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.GetAsync.When(1).Returns("async-result"); // Auto-wraps in Task
+        stub.GetAsync.When(1).Return("async-result"); // Auto-wraps in Task
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -191,7 +191,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.Returns("[1]", "[2]");
+        stub.Process.Return("[1]", "[2]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -210,7 +210,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.Returns(s => "[FIRST]").ThenReturns("[SECOND]");
+        stub.Process.Return(s => "[FIRST]").ThenReturn("[SECOND]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -234,7 +234,7 @@ public class UserMethodWhenTests
         // Arrange
         var stub = new WhenUserMethodStub();
         // Need to add ThenCall or ThenNone to make the chain terminal
-        stub.Process.When("expected").Returns("[FIRST]")
+        stub.Process.When("expected").Return("[FIRST]")
             .ThenCall(s => "[TERMINAL]")
             .Verifiable();
 
@@ -252,8 +252,8 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.When("first").Returns("[1]");
-        stub.Process.When("second").Returns("[2]").Verifiable();
+        stub.Process.When("first").Return("[1]");
+        stub.Process.When("second").Return("[2]").Verifiable();
 
         // Act - Only call first matcher, second not consumed
         IWhenUserMethodTest service = stub;
@@ -284,7 +284,7 @@ public class UserMethodWhenTests
     {
         // Arrange - When chain calls are included in TotalCallCount
         var stub = new WhenUserMethodStub();
-        stub.Process.When("special").Returns("[SPECIAL]").ThenNone();
+        stub.Process.When("special").Return("[SPECIAL]").ThenNone();
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -304,8 +304,8 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.Returns(s => "[ONCALL]");
-        stub.Process.When("special").Returns("[WHEN]");
+        stub.Process.Return(s => "[ONCALL]");
+        stub.Process.When("special").Return("[WHEN]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -326,7 +326,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Process.When("when-value").Returns("[WHEN]");
+        stub.Process.When("when-value").Return("[WHEN]");
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -346,8 +346,8 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new WhenUserMethodStub();
-        stub.Calculate.When(0, 0).Returns(0);
-        stub.Calculate.When((a, b) => a < 0 && b < 0).Returns(-1);
+        stub.Calculate.When(0, 0).Return(0);
+        stub.Calculate.When((a, b) => a < 0 && b < 0).Return(-1);
 
         // Act
         IWhenUserMethodTest service = stub;
@@ -370,7 +370,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new GenericWhenUserMethodStub<string>();
-        stub.Process.When("special").Returns("[WHEN: special]");
+        stub.Process.When("special").Return("[WHEN: special]");
 
         // Act
         IGenericWhenUserMethodService<string> service = stub;
@@ -387,7 +387,7 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new GenericWhenUserMethodStub<int>();
-        stub.Process.When(x => x > 100).Returns(-1);
+        stub.Process.When(x => x > 100).Return(-1);
 
         // Act
         IGenericWhenUserMethodService<int> service = stub;
@@ -404,8 +404,8 @@ public class UserMethodWhenTests
     {
         // Arrange
         var stub = new GenericWhenUserMethodStub<string>();
-        stub.Process.When("first").Returns("[1]")
-            .ThenWhen("second").Returns("[2]")
+        stub.Process.When("first").Return("[1]")
+            .ThenWhen("second").Return("[2]")
             .ThenNone();
 
         // Act
@@ -429,7 +429,7 @@ public class UserMethodWhenTests
     {
         // Arrange - OverloadedUserMethodStub has user override on Format(string) only
         var stub = new OverloadedUserMethodStub();
-        stub.Format.When("special").Returns("[WHEN]");
+        stub.Format.When("special").Return("[WHEN]");
 
         // Act
         IOverloadedUserMethodService service = stub;
@@ -446,8 +446,8 @@ public class UserMethodWhenTests
     {
         // Arrange - Format2 (two-param overload) has no user override
         var stub = new OverloadedUserMethodStub();
-        stub.Format2.When("hello", true).Returns("[WHEN UPPER]");
-        stub.Format2.Returns("[DEFAULT]");
+        stub.Format2.When("hello", true).Return("[WHEN UPPER]");
+        stub.Format2.Return("[DEFAULT]");
 
         // Act
         IOverloadedUserMethodService service = stub;
@@ -464,9 +464,9 @@ public class UserMethodWhenTests
     {
         // Arrange - Configure When on both overloads independently
         var stub = new OverloadedUserMethodStub();
-        stub.Format.When("special").Returns("[WHEN1]");
-        stub.Format2.When("special", true).Returns("[WHEN2]");
-        stub.Format2.Returns("[DEFAULT2]");
+        stub.Format.When("special").Return("[WHEN1]");
+        stub.Format2.When("special", true).Return("[WHEN2]");
+        stub.Format2.Return("[DEFAULT2]");
 
         // Act
         IOverloadedUserMethodService service = stub;

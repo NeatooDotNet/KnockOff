@@ -87,8 +87,8 @@ public class KnockOffOverloadResolutionTests
 
         #region readme-knockoff-any-value
         // Explicit parameter types resolve the overload - standard C# syntax
-        stub.Format.Returns((string input, bool uppercase) => "bool overload");
-        stub.Format.Returns((string input, int maxLength) => "int overload");
+        stub.Format.Return((string input, bool uppercase) => "bool overload");
+        stub.Format.Return((string input, int maxLength) => "int overload");
         #endregion
 
         IFormatter formatter = stub;
@@ -104,8 +104,8 @@ public class KnockOffOverloadResolutionTests
 
         #region readme-knockoff-specific-value
         // Specific value matching - parameter types resolve the overload
-        stub.Format.When("test", true).Returns("UPPERCASE");
-        stub.Format.When("test", 10).Returns("truncated");
+        stub.Format.When("test", true).Return("UPPERCASE");
+        stub.Format.When("test", 10).Return("truncated");
         #endregion
 
         IFormatter formatter = stub;
@@ -121,7 +121,7 @@ public class KnockOffOverloadResolutionTests
 
         #region readme-knockoff-argument-access
         // Arguments are directly available with names and types:
-        stub.Format.Returns((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
+        stub.Format.Return((string input, bool uppercase) => uppercase ? input.ToUpper() : input);
         #endregion
 
         IFormatter formatter = stub;
@@ -143,11 +143,11 @@ public class MethodOverloadResolutionTests
         var stub = new FormatterStub();
 
         // Configure bool overload - use argument values directly
-        stub.Format.Returns((string input, bool uppercase) =>
+        stub.Format.Return((string input, bool uppercase) =>
             uppercase ? input.ToUpper() : input.ToLower());
 
         // Configure int overload - truncate to maxLength
-        stub.Format.Returns((string input, int maxLength) =>
+        stub.Format.Return((string input, int maxLength) =>
             input.Length <= maxLength ? input : input[..maxLength] + "...");
 
         IFormatter formatter = stub;
@@ -167,8 +167,8 @@ public class MethodOverloadResolutionTests
         var stub = new FormatterStub();
 
         // Configure both overloads with verification
-        stub.Format.Returns((string input, bool uppercase) => input).Verifiable();
-        stub.Format.Returns((string input, int maxLength) => input).Verifiable();
+        stub.Format.Return((string input, bool uppercase) => input).Verifiable();
+        stub.Format.Return((string input, int maxLength) => input).Verifiable();
 
         IFormatter formatter = stub;
 
@@ -180,19 +180,19 @@ public class MethodOverloadResolutionTests
     }
 
     [Fact]
-    public void MixedConfiguration_WhenAndOnCall()
+    public void MixedConfiguration_WhenAndReturn()
     {
         var stub = new FormatterStub();
 
         // When for specific values on bool overload
-        stub.Format.When("special", true).Returns("SPECIAL CASE");
+        stub.Format.When("special", true).Return("SPECIAL CASE");
 
         // Returns as fallback for bool overload
-        stub.Format.Returns((string input, bool uppercase) =>
+        stub.Format.Return((string input, bool uppercase) =>
             uppercase ? input.ToUpper() : input);
 
         // Returns for int overload
-        stub.Format.Returns((string input, int maxLength) =>
+        stub.Format.Return((string input, int maxLength) =>
             input[..Math.Min(input.Length, maxLength)]);
 
         IFormatter formatter = stub;
@@ -200,10 +200,10 @@ public class MethodOverloadResolutionTests
         // When match takes precedence
         Assert.Equal("SPECIAL CASE", formatter.Format("special", true));
 
-        // OnCall fallback for non-matching bool calls
+        // Return fallback for non-matching bool calls
         Assert.Equal("OTHER", formatter.Format("other", true));
 
-        // Int overload uses its OnCall
+        // Int overload uses its Return
         Assert.Equal("hello", formatter.Format("hello world", 5));
     }
 }

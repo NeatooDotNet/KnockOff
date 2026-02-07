@@ -55,7 +55,7 @@ Assert.Equal(new[] { "step1", "step2", "step3" }, items);
 
 // AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
 // Configure it explicitly, or it returns the smart default
-stub.AddRange.Execute((newItems) =>
+stub.AddRange.Call((newItems) =>
 {
     foreach (var newItem in newItems)
     {
@@ -90,8 +90,8 @@ Note: `Reset()` on an individual interceptor also clears its source reference. I
 
 KnockOff evaluates member calls in this order:
 
-1. **When chains** — `stub.Method.When(...).Returns(...)`
-2. **Returns / Execute** — `stub.Method.Returns(...)` or `stub.Method.Execute(...)`
+1. **When chains** — `stub.Method.When(...).Return(...)`
+2. **Return / Call** — `stub.Method.Return(...)` or `stub.Method.Call(...)`
 3. **User methods** — `protected override` with `_` suffix (Standalone only)
 4. **Source delegation** — `stub.Source(realImplementation)`
 5. **Smart default** — KnockOff's built-in default value

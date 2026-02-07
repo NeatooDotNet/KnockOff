@@ -24,9 +24,9 @@ string? lastSetValue = knockOff.Name.LastSetValue;
 Console.WriteLine($"  LastSetValue (typed): {lastSetValue}");
 Console.WriteLine();
 
-// Test void method with no params - uses Execute API
+// Test void method with no params - uses Call API
 Console.WriteLine("Void Method (no params):");
-var doWorkTracking = knockOff.DoWork.Execute(() => { });
+var doWorkTracking = knockOff.DoWork.Call(() => { });
 service.DoWork();
 doWorkTracking.Verify(); // Verify method was called
 Console.WriteLine($"  DoWork verified!");
@@ -46,9 +46,9 @@ string lastArg = knockOff.GetGreeting.LastArg!;
 Console.WriteLine($"  LastArg: {lastArg}");
 Console.WriteLine();
 
-// Test method with multiple params - uses Execute API
+// Test method with multiple params - uses Call API
 Console.WriteLine("Method with multiple params:");
-var processTracking = knockOff.Process.Execute((id, count, urgent) => { });
+var processTracking = knockOff.Process.Call((id, count, urgent) => { });
 service.Process("item1", 100, true);
 service.Process("item2", 200, false);
 

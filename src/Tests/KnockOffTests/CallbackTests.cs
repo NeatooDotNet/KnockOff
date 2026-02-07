@@ -12,7 +12,7 @@ public class CallbackTests
 		ISampleService service = knockOff;
 
 		var callbackInvoked = false;
-		var tracking = knockOff.DoSomething.Execute(() =>
+		var tracking = knockOff.DoSomething.Call(() =>
 		{
 			callbackInvoked = true;
 		});
@@ -48,7 +48,7 @@ public class CallbackTests
 		string? capturedName = null;
 		int? capturedValue = null;
 		bool? capturedFlag = null;
-		var tracking = knockOff.Calculate.Execute((name, value, flag) =>
+		var tracking = knockOff.Calculate.Call((name, value, flag) =>
 		{
 			capturedName = name;
 			capturedValue = value;
@@ -66,7 +66,7 @@ public class CallbackTests
 	public void OnCall_CanAccessOtherInterceptorState()
 	{
 		var knockOff = new SampleKnockOff();
-		var doSomethingTracking = knockOff.DoSomething.Execute(() => { });
+		var doSomethingTracking = knockOff.DoSomething.Call(() => { });
 		ISampleService service = knockOff;
 
 		service.DoSomething();
@@ -122,7 +122,7 @@ public class CallbackTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		var tracking = knockOff.GetOptional.Returns(() => "callback value");
+		var tracking = knockOff.GetOptional.Return(() => "callback value");
 
 		var resultBefore = service.GetOptional();
 		Assert.Equal("callback value", resultBefore);
@@ -160,7 +160,7 @@ public class CallbackTests
 		IRepository<User> repo = knockOff;
 
 		var mockUser = new User { Id = 42, Name = "MockUser" };
-		var tracking = knockOff.GetById.Returns((id) =>
+		var tracking = knockOff.GetById.Return((id) =>
 		{
 			if (id == 42) return mockUser;
 			return null;

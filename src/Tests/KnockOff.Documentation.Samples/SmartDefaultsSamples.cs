@@ -217,8 +217,8 @@ public class NoConstructorSmartDefaultsTests
         // Types without parameterless constructor throw if not configured
         // factory.GetUser(); // throws InvalidOperationException
 
-        // Fix: configure OnCall to provide the value
-        stub.GetUser.Returns(() => new UserWithRequiredCtor(1, "Configured"));
+        // Fix: configure Return to provide the value
+        stub.GetUser.Return(() => new UserWithRequiredCtor(1, "Configured"));
         #endregion
 
         var user = factory.GetUser();
@@ -289,12 +289,12 @@ public class RealOverridableService : IOverridableService
 public class OverrideSmartDefaultsTests
 {
     [Fact]
-    public void Override_WithOnCall()
+    public void Override_WithReturn()
     {
         var stub = new OverridableServiceStub();
 
         #region smart-defaults-override-oncall
-        stub.GetUser.Returns(() => new User { Name = "Test" });
+        stub.GetUser.Return(() => new User { Name = "Test" });
         #endregion
 
         IOverridableService service = stub;

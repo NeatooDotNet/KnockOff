@@ -16,7 +16,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.Returns("configured value");
+		stub.Interceptor.Return("configured value");
 
 		var result = factory();
 
@@ -30,7 +30,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.IntFactory();
 		IntFactory factory = stub;
 
-		stub.Interceptor.Returns(42);
+		stub.Interceptor.Return(42);
 
 		var result = factory();
 
@@ -44,7 +44,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.BoolFactory();
 		BoolFactory factory = stub;
 
-		stub.Interceptor.Returns(true);
+		stub.Interceptor.Return(true);
 
 		var result = factory();
 
@@ -58,7 +58,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.NullableStringFactory();
 		NullableStringFactory factory = stub;
 
-		stub.Interceptor.Returns((string?)null);
+		stub.Interceptor.Return((string?)null);
 
 		var result = factory();
 
@@ -71,7 +71,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.Returns("repeated");
+		stub.Interceptor.Return("repeated");
 
 		Assert.Equal("repeated", factory());
 		Assert.Equal("repeated", factory());
@@ -91,7 +91,7 @@ public class DelegateValueOverloadTests
 		StringTransformer transformer = stub;
 
 		// Value overload ignores the argument and always returns configured value
-		stub.Interceptor.Returns("constant");
+		stub.Interceptor.Return("constant");
 
 		var result1 = transformer("input1");
 		var result2 = transformer("input2");
@@ -106,7 +106,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringTransformer();
 		StringTransformer transformer = stub;
 
-		stub.Interceptor.Returns("result");
+		stub.Interceptor.Return("result");
 
 		transformer("first");
 		transformer("second");
@@ -125,7 +125,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.MessageBuilder();
 		MessageBuilder builder = stub;
 
-		stub.Interceptor.Returns("constant message");
+		stub.Interceptor.Return("constant message");
 
 		var result = builder("Alice", 30);
 
@@ -138,7 +138,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.MessageBuilder();
 		MessageBuilder builder = stub;
 
-		stub.Interceptor.Returns("result");
+		stub.Interceptor.Return("result");
 
 		builder("Alice", 30);
 		builder("Bob", 25);
@@ -160,7 +160,7 @@ public class DelegateValueOverloadTests
 		PersonFactory factory = stub;
 
 		var testPerson = new Person { Name = "Test", Age = 42 };
-		stub.Interceptor.Returns(testPerson);
+		stub.Interceptor.Return(testPerson);
 
 		var result = factory();
 
@@ -174,7 +174,7 @@ public class DelegateValueOverloadTests
 		ListFactory factory = stub;
 
 		var testList = new List<string> { "a", "b", "c" };
-		stub.Interceptor.Returns(testList);
+		stub.Interceptor.Return(testList);
 
 		var result = factory();
 
@@ -192,11 +192,11 @@ public class DelegateValueOverloadTests
 		StringFactory factory = stub;
 
 		// First configure with value
-		stub.Interceptor.Returns("value");
+		stub.Interceptor.Return("value");
 		Assert.Equal("value", factory());
 
 		// Then configure with callback - should override
-		stub.Interceptor.Returns(() => "callback");
+		stub.Interceptor.Return(() => "callback");
 		Assert.Equal("callback", factory());
 	}
 
@@ -207,11 +207,11 @@ public class DelegateValueOverloadTests
 		StringFactory factory = stub;
 
 		// First configure with callback
-		stub.Interceptor.Returns(() => "callback");
+		stub.Interceptor.Return(() => "callback");
 		Assert.Equal("callback", factory());
 
 		// Then configure with value - should override
-		stub.Interceptor.Returns("value");
+		stub.Interceptor.Return("value");
 		Assert.Equal("value", factory());
 	}
 
@@ -229,7 +229,7 @@ public class DelegateValueOverloadTests
 		VoidNotify notify = stub;
 
 		var wasNotified = false;
-		stub.Interceptor.Execute(() => wasNotified = true);
+		stub.Interceptor.Call(() => wasNotified = true);
 
 		notify();
 
@@ -244,7 +244,7 @@ public class DelegateValueOverloadTests
 		VoidLogger logger = stub;
 
 		string? loggedMessage = null;
-		stub.Interceptor.Execute((msg) => loggedMessage = msg);
+		stub.Interceptor.Call((msg) => loggedMessage = msg);
 
 		logger("Hello");
 
@@ -262,7 +262,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.Returns("test");
+		stub.Interceptor.Return("test");
 
 		factory();
 
@@ -275,7 +275,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.Returns("test");
+		stub.Interceptor.Return("test");
 
 		factory();
 		factory();
@@ -294,7 +294,7 @@ public class DelegateValueOverloadTests
 		var stub = new DelegateValueOverloadTestClass.Stubs.StringFactory();
 		StringFactory factory = stub;
 
-		stub.Interceptor.Returns("configured");
+		stub.Interceptor.Return("configured");
 		factory();
 		factory();
 

@@ -1196,9 +1196,10 @@ internal static class FlatRenderer
 				w.Line();
 			}
 
-			// OnCall method (returns IMethodTracking for consistency with regular method interceptors)
+			// Return/Call method (returns IMethodTracking for consistency with regular method interceptors)
+			var typedHandlerEntryPoint = handler.IsVoid ? "Call" : "Return";
 			w.Line("/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
-			w.Line($"public global::KnockOff.IMethodTracking OnCall({handler.MethodName}Delegate callback) {{ _onCall = callback; return this; }}");
+			w.Line($"public global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({handler.MethodName}Delegate callback) {{ _onCall = callback; return this; }}");
 			w.Line();
 
 			// Callback property for internal use by invocation logic
@@ -1406,11 +1407,12 @@ internal static class FlatRenderer
 			if (arity.SignatureGroups.Count > 0)
 				w.Line();
 
-			// OnCall methods (one per signature)
+			// Return/Call methods (one per signature)
 			foreach (var sig in arity.SignatureGroups)
 			{
+				var sigEntryPoint = sig.IsVoid ? "Call" : "Return";
 				w.Line($"/// <summary>Sets the callback invoked when this signature is called. Returns this handler for tracking.</summary>");
-				w.Line($"public global::KnockOff.IMethodTracking OnCall{sig.SignatureSuffix}({sig.DelegateName} callback) {{ _onCall{sig.SignatureSuffix} = callback; return this; }}");
+				w.Line($"public global::KnockOff.IMethodTracking {sigEntryPoint}{sig.SignatureSuffix}({sig.DelegateName} callback) {{ _onCall{sig.SignatureSuffix} = callback; return this; }}");
 			}
 			w.Line();
 
@@ -1929,7 +1931,7 @@ internal static class FlatRenderer
 			w.Line();
 			w.Line("throw new global::System.InvalidOperationException(");
 			w.Line("\t$\"No implementation provided for {methodName}<{type.Name}>. \" +");
-			w.Line("\t$\"Set the handler's OnCall.\");");
+			w.Line("\t$\"Set the handler's Return or Call.\");");
 		}
 		w.Line();
 	}
@@ -2138,14 +2140,14 @@ internal static class FlatRenderer
 			return;
 		}
 
-		// Generic methods use method-based OnCall API via typed handlers
+		// Generic methods use method-based Return/Call API via typed handlers
 		if (method.IsGenericMethod)
 		{
 			RenderGenericMethodImplementation(w, method, multiOverloadGenericUserMethodInterceptors, genericUserMethodHandlerGroups);
 			return;
 		}
 
-		// User-defined methods with base class pattern: record call, check OnCall, then delegate to virtual method
+		// User-defined methods with base class pattern: record call, check Return/Call, then delegate to virtual method
 		if (method.HasUserOverride)
 		{
 			RenderUserOverrideImplementation(w, method, multiOverloadUserMethodInterceptors);
@@ -2175,7 +2177,7 @@ internal static class FlatRenderer
 
 	/// <summary>
 	/// Renders the explicit interface implementation for a method with user override (base class pattern).
-	/// Priority chain: When chains > Sequences > OnCall > User Override (virtual method with _ suffix).
+	/// Priority chain: When chains > Sequences > Return/Call > User Override (virtual method with _ suffix).
 	/// The unified interceptor handles all logic including user method fallback.
 	/// </summary>
 	private static void RenderUserOverrideImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadUserMethodInterceptors)
@@ -2206,7 +2208,7 @@ internal static class FlatRenderer
 		HashSet<string> multiOverloadGenericUserMethodInterceptors,
 		EquatableArray<FlatGenericMethodHandlerGroup> genericUserMethodHandlerGroups)
 	{
-		// Generic methods use the method-based OnCall API via typed handlers
+		// Generic methods use the method-based Return/Call API via typed handlers
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
 		using (w.Braces())
 		{
@@ -2241,7 +2243,7 @@ internal static class FlatRenderer
 				w.Line($"if ({interceptorAccess}.Callback is {{ }} callback)");
 				w.Line($"\treturn callback({onCallArgs});");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
-				w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Use {interceptorAccess}.OnCall(callback).\");");
+				w.Line($"throw new global::System.InvalidOperationException(\"No implementation provided for {method.MethodName}. Use {interceptorAccess}.{(method.IsVoid ? "Call" : "Return")}(callback).\");");
 			}
 			else
 			{

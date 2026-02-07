@@ -161,7 +161,7 @@ public class BaseClassUserMethodTests
     {
         // Arrange
         var stub = new NoOverrideStub();
-        stub.GetValue.Returns(x => x * 3);
+        stub.GetValue.Return(x => x * 3);
         INoOverrideService service = stub;
 
         // Act
@@ -191,7 +191,7 @@ public class BaseClassUserMethodTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(x => x * 100); // Override user method (which does x * 10)
+        stub.GetValue.Return(x => x * 100); // Override user method (which does x * 10)
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -207,7 +207,7 @@ public class BaseClassUserMethodTests
         // Arrange
         var stub = new StrictModeUserMethodStub();
         var callbackInvoked = false;
-        stub.DoSomething.Execute(() => callbackInvoked = true);
+        stub.DoSomething.Call(() => callbackInvoked = true);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -222,7 +222,7 @@ public class BaseClassUserMethodTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(999);
+        stub.GetValue.Return(999);
 
         // Act
         IStrictModeUserMethodTest service = stub;
@@ -237,7 +237,7 @@ public class BaseClassUserMethodTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Returns(x => x * 100);
+        stub.GetValue.Return(x => x * 100);
         IStrictModeUserMethodTest service = stub;
 
         // Act - first call uses OnCall
@@ -340,8 +340,8 @@ public class BaseClassUserMethodTests
         var stub = new GenericRepositoryStub<User>();
         IGenericRepository<User> repo = stub;
         var user = new User { Id = 42, Name = "Test" };
-        stub.Save.Execute(u => { });
-        stub.GetById.Returns(id => user);
+        stub.Save.Call(u => { });
+        stub.GetById.Return(id => user);
 
         // Act
         repo.Save(user);
@@ -357,7 +357,7 @@ public class BaseClassUserMethodTests
         // Arrange
         var stub = new GenericKeyValueStoreStub<string, int>();
         IGenericKeyValueStore<string, int> store = stub;
-        stub.Get.Returns(key => 42);
+        stub.Get.Return(key => 42);
 
         // Act
         var result = store.Get("answer");
@@ -393,7 +393,7 @@ public class BaseClassUserMethodTests
 
         // Act
         var entity = new ComparableEntity { Name = "Test" };
-        stub.Process.Returns(e => e);
+        stub.Process.Return(e => e);
         var result = service.Process(entity);
 
         // Assert
@@ -451,7 +451,7 @@ public class BaseClassUserMethodTests
         // Arrange
         var stub = new OverloadedUserMethodStub();
         // User override overload uses Format (single-overload interceptor)
-        stub.Format.Returns(input => "ONCALL:" + input);
+        stub.Format.Return(input => "ONCALL:" + input);
         IOverloadedUserMethodService service = stub;
 
         // Act
@@ -467,7 +467,7 @@ public class BaseClassUserMethodTests
         // Arrange
         var stub = new OverloadedUserMethodStub();
         // Non-overridden overload uses Format2 (separate interceptor after fix)
-        stub.Format2.Returns((input, upper) => upper ? input.ToUpper() : input);
+        stub.Format2.Return((input, upper) => upper ? input.ToUpper() : input);
         IOverloadedUserMethodService service = stub;
 
         // Act
@@ -483,7 +483,7 @@ public class BaseClassUserMethodTests
         // Arrange - one overload uses user override, another uses OnCall
         var stub = new OverloadedUserMethodStub();
         // Each overload now has its own interceptor (Format for overridden, Format2 for non-overridden)
-        stub.Format2.Returns((input, upper) => "ONCALL:" + (upper ? input.ToUpper() : input));
+        stub.Format2.Return((input, upper) => "ONCALL:" + (upper ? input.ToUpper() : input));
         IOverloadedUserMethodService service = stub;
 
         // Act

@@ -202,26 +202,26 @@ internal static class ModelAdapters
 		if (isVoid)
 		{
 			if (trackableParams.Count == 0)
-				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}>";
+				return $"global::KnockOff.IMethodCallBuilder<{delegateType}>";
 			if (trackableParams.Count == 1)
 			{
 				var param = trackableParams.GetArray()![0];
-				return $"global::KnockOff.IMethodExecuteBuilder<{delegateType}, {param.Type}>";
+				return $"global::KnockOff.IMethodCallBuilder<{delegateType}, {param.Type}>";
 			}
 			var tupleType = lastCallType ?? $"({string.Join(", ", trackableParams.Select(p => $"{p.Type} {p.EscapedName}"))})";
-			return $"global::KnockOff.IMethodExecuteBuilderArgs<{delegateType}, {tupleType}>";
+			return $"global::KnockOff.IMethodCallBuilderArgs<{delegateType}, {tupleType}>";
 		}
 		else
 		{
 			if (trackableParams.Count == 0)
-				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}>";
+				return $"global::KnockOff.IMethodReturnBuilder<{delegateType}>";
 			if (trackableParams.Count == 1)
 			{
 				var param = trackableParams.GetArray()![0];
-				return $"global::KnockOff.IMethodReturnsBuilder<{delegateType}, {param.Type}>";
+				return $"global::KnockOff.IMethodReturnBuilder<{delegateType}, {param.Type}>";
 			}
 			var tupleType = lastCallType ?? $"({string.Join(", ", trackableParams.Select(p => $"{p.Type} {p.EscapedName}"))})";
-			return $"global::KnockOff.IMethodReturnsBuilderArgs<{delegateType}, {tupleType}>";
+			return $"global::KnockOff.IMethodReturnBuilderArgs<{delegateType}, {tupleType}>";
 		}
 	}
 

@@ -8,12 +8,12 @@ Method interceptors track calls, capture arguments, and configure return values 
 
 ### Void Methods
 
-Configure void methods using `Execute` with an `Action`:
+Configure void methods using `Call` with an `Action`:
 
 <!-- snippet: methods-oncall-void -->
 ```cs
-// OnCall for void methods uses Action<...params>
-stub.LogMessage.Execute((message) => logged.Add(message));
+// Return for void methods uses Action<...params>
+stub.LogMessage.Call((message) => logged.Add(message));
 ```
 <!-- endSnippet -->
 
@@ -21,12 +21,12 @@ stub.LogMessage.Execute((message) => logged.Add(message));
 
 #### Using a Callback
 
-Configure methods that return values using `Returns` with a `Func`:
+Configure methods that return values using `Return` with a `Func`:
 
 <!-- snippet: methods-oncall-return -->
 ```cs
-// OnCall with return value: Func<...params, TReturn>
-stub.GetUserName.Returns((userId) => "TestUser");
+// Return with return value: Func<...params, TReturn>
+stub.GetUserName.Return((userId) => "TestUser");
 ```
 <!-- endSnippet -->
 
@@ -37,7 +37,7 @@ For simple scenarios where the return value does not depend on arguments, use th
 <!-- snippet: methods-oncall-value -->
 ```cs
 // Returns - simpler syntax when you don't need callback logic
-stub.GetUserName.Returns("StaticUser");
+stub.GetUserName.Return("StaticUser");
 ```
 <!-- endSnippet -->
 
@@ -46,13 +46,13 @@ stub.GetUserName.Returns("StaticUser");
 <!-- snippet: methods-oncall-value-vs-callback -->
 ```cs
 // Use VALUE when returning a fixed result:
-stub.GetUserName.Returns("Alice");
+stub.GetUserName.Return("Alice");
 
 // Use CALLBACK when you need:
 // - Dynamic values based on arguments
 // - Side effects
 // - Conditional logic
-stub.GetUserName.Returns((userId) => userId > 100 ? "Admin" : "User");
+stub.GetUserName.Return((userId) => userId > 100 ? "Admin" : "User");
 
 // Both return tracking objects for verification
 ```
@@ -64,20 +64,20 @@ stub.GetUserName.Returns((userId) => userId > 100 ? "Admin" : "User");
 ```cs
 // Use PARAMS SEQUENCE for multiple constant values:
 // Returns 1, then 2, then 3, then repeats 3
-stub.GetValue.Returns(1, 2, 3);
+stub.GetValue.Return(1, 2, 3);
 
 // Mix callbacks with params for complex sequences:
 // First call uses callback, then returns 100, 200, 300
-addStub.Calculate.Returns((x, y) => x + y).ThenReturns(100, 200, 300);
+addStub.Calculate.Return((x, y) => x + y).ThenReturn(100, 200, 300);
 ```
 <!-- endSnippet -->
 
 | Scenario | Recommended Syntax |
 |----------|-------------------|
-| Fixed value (always same) | `Returns(value)` |
-| Constant sequence | `Returns(first, second, ...)` |
-| Dynamic based on args | `Returns((args) => computed)` |
-| Callback then constants | `Returns(cb).ThenReturns(x, y, z)` |
+| Fixed value (always same) | `Return(value)` |
+| Constant sequence | `Return(first, second, ...)` |
+| Dynamic based on args | `Return((args) => computed)` |
+| Callback then constants | `Return(cb).ThenReturn(x, y, z)` |
 
 ### Methods with Multiple Parameters
 
@@ -86,7 +86,7 @@ Methods with multiple parameters include all parameters in the callback:
 <!-- snippet: methods-oncall-multi-param -->
 ```cs
 // All method parameters are passed to the callback in order
-stub.ValidateCredentials.Returns((username, password) =>
+stub.ValidateCredentials.Return((username, password) =>
     username == "admin" && password == "secret");
 ```
 <!-- endSnippet -->
@@ -97,12 +97,12 @@ stub.ValidateCredentials.Returns((username, password) =>
 
 ### Using Verify()
 
-Call `.Verify()` on the tracking object returned by `Returns`/`Execute`:
+Call `.Verify()` on the tracking object returned by `Return`/`Call`:
 
 <!-- snippet: methods-verify-wascalled -->
 ```cs
 // Mark with Verifiable(), then stub.Verify() checks all marked members
-stub.Save.Execute((entity) => { }).Verifiable();
+stub.Save.Call((entity) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -136,8 +136,8 @@ For batch verification of multiple methods, use `.Verifiable()` then call `stub.
 <!-- snippet: methods-verify-verifiable -->
 ```cs
 // Mark expected calls with Verifiable(), then stub.Verify() checks all
-stub.Save.Execute((entity) => { }).Verifiable(Times.Once);
-stub.GetById.Returns((id) => new User { Id = id }).Verifiable();
+stub.Save.Call((entity) => { }).Verifiable(Times.Once);
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -184,21 +184,21 @@ For methods returning `Task<T>` or `ValueTask<T>`, you have three options:
 <!-- snippet: async-task-value-overload -->
 ```cs
 // KnockOff auto-wraps the value in Task.FromResult
-stub.GetUserAsync.Returns(new User { Id = 42, Name = "Alice" });
+stub.GetUserAsync.Return(new User { Id = 42, Name = "Alice" });
 ```
 <!-- endSnippet -->
 
 <!-- snippet: async-task-simplified-callback -->
 ```cs
-// OnCall() with unwrapped return type - auto-wrapped in Task.FromResult
-stub.GetUserAsync.Returns((id) => new User { Id = id, Name = "Alice" }).Verifiable();
+// Return() with unwrapped return type - auto-wrapped in Task.FromResult
+stub.GetUserAsync.Return((id) => new User { Id = id, Name = "Alice" }).Verifiable();
 ```
 <!-- endSnippet -->
 
 <!-- snippet: async-task-result -->
 ```cs
 // Use Task.FromResult when you need parameter-based return values
-stub.GetUserAsync.Returns((id) =>
+stub.GetUserAsync.Return((id) =>
     Task.FromResult<User?>(new User { Id = id, Name = "Alice" })).Verifiable();
 ```
 <!-- endSnippet -->
@@ -210,7 +210,7 @@ For methods returning `Task` or `ValueTask` (no result), use `Action` callbacks 
 <!-- snippet: async-task-simplified-void -->
 ```cs
 // Action callback for void async - Task.CompletedTask auto-returned
-stub.UpdateUserAsync.Execute((user) => updatedUsers.Add(user)).Verifiable();
+stub.UpdateUserAsync.Call((user) => updatedUsers.Add(user)).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -218,10 +218,10 @@ stub.UpdateUserAsync.Execute((user) => updatedUsers.Add(user)).Verifiable();
 
 | Return Type | Simplest Syntax | When to Use Full Syntax |
 |-------------|-----------------|------------------------|
-| `Task<T>` | `Returns((args) => value)` | When callback needs actual async operations |
-| `ValueTask<T>` | `Returns((args) => value)` | When callback needs actual async operations |
-| `Task` | `Execute((args) => { action(); })` | When callback needs to return a specific Task |
-| `ValueTask` | `Execute((args) => { action(); })` | When callback needs to return a specific ValueTask |
+| `Task<T>` | `Return((args) => value)` | When callback needs actual async operations |
+| `ValueTask<T>` | `Return((args) => value)` | When callback needs actual async operations |
+| `Task` | `Call((args) => { action(); })` | When callback needs to return a specific Task |
+| `ValueTask` | `Call((args) => { action(); })` | When callback needs to return a specific ValueTask |
 
 ---
 
@@ -231,12 +231,12 @@ When a method should return different values on successive calls, use sequences.
 
 ### Concise Value Sequences (NSubstitute-style)
 
-Use `Returns(first, ...rest)` to create a sequence from multiple values in a single call:
+Use `Return(first, ...rest)` to create a sequence from multiple values in a single call:
 
 <!-- snippet: methods-sequence-nsub-style -->
 ```cs
 // Returns 1 on first call, 2 on second, 3 on third and all subsequent calls
-stub.GetValue.Returns(1, 2, 3);
+stub.GetValue.Return(1, 2, 3);
 
 IValueSvc calc = stub;
 var r1 = calc.GetValue();  // 1
@@ -248,7 +248,7 @@ var r4 = calc.GetValue();  // 3 (repeats last value)
 
 This matches NSubstitute's syntax for easier migration:
 - NSubstitute: `substitute.Method().Returns(1, 2, 3);`
-- KnockOff: `stub.Method.Returns(1, 2, 3);`
+- KnockOff: `stub.Method.Return(1, 2, 3);`
 
 ### Single Value vs Params Sequence
 
@@ -257,22 +257,22 @@ C# overload resolution distinguishes between single values and sequences:
 <!-- snippet: methods-single-vs-params -->
 ```cs
 // Single value - repeats indefinitely (no sequence)
-singleStub.GetValue.Returns(42);
+singleStub.GetValue.Return(42);
 
 // Params sequence - progresses through values, repeats last
-paramsStub.GetValue.Returns(1, 2, 3);
+paramsStub.GetValue.Return(1, 2, 3);
 ```
 <!-- endSnippet -->
 
 ### Mixing Callbacks with Params
 
-Use `Returns(callback)` for the first value when you need callback logic, then `ThenReturns(params)` for subsequent constant values:
+Use `Return(callback)` for the first value when you need callback logic, then `ThenReturn(params)` for subsequent constant values:
 
 <!-- snippet: methods-sequence-callback-then-params-full -->
 ```cs
 // First call: compute dynamically
 // Then: return 100, 200, 300 in sequence
-stub.Calculate.Returns((a, b) => a + b).ThenReturns(100, 200, 300);
+stub.Calculate.Return((a, b) => a + b).ThenReturn(100, 200, 300);
 
 ICalculatorSvc calc = stub;
 var r1 = calc.Calculate(1, 2);  // 3 (computed: 1 + 2)
@@ -290,7 +290,7 @@ For `Task<T>` and `ValueTask<T>` methods, params values are auto-wrapped - no `T
 <!-- snippet: methods-sequence-params-async-full -->
 ```cs
 // Async values auto-wrapped - no Task.FromResult needed
-stub.GetDataAsync.Returns("first", "second", "third");
+stub.GetDataAsync.Return("first", "second", "third");
 
 IDataSvc service = stub;
 var r1 = await service.GetDataAsync(1);  // "first"
@@ -306,7 +306,7 @@ By default, sequences repeat the last value after exhaustion (matching NSubstitu
 
 <!-- snippet: methods-sequence-exhaustion-params -->
 ```cs
-stub.GetValue.Returns(1, 2);
+stub.GetValue.Return(1, 2);
 
 IValueSvc calc = stub;
 var r1 = calc.GetValue();  // 1
@@ -320,8 +320,8 @@ For different exhaustion behaviors:
 
 | Behavior | How to Configure |
 |----------|-----------------|
-| Repeat last value (default) | `Returns(1, 2, 3)` or `Returns(cb).ThenReturns(...)` |
-| Return default(T) | `Returns(cb).ThenReturns(...).ThenDefault()` |
+| Repeat last value (default) | `Return(1, 2, 3)` or `Return(cb).ThenReturn(...)` |
+| Return default(T) | `Return(cb).ThenReturn(...).ThenDefault()` |
 | Throw exception | Set `stub.Strict = true` |
 
 ### Sequence Verification
@@ -330,7 +330,7 @@ Params sequences support verification to ensure all values were consumed:
 
 <!-- snippet: methods-sequence-params-verify -->
 ```cs
-var sequence = stub.GetValue.Returns(1, 2, 3);
+var sequence = stub.GetValue.Return(1, 2, 3);
 
 IValueSvc calc = stub;
 calc.GetValue();  // 1
@@ -350,9 +350,9 @@ When an interface has overloaded methods, KnockOff distinguishes them by the cal
 <!-- snippet: methods-overloads -->
 ```cs
 // Fully-typed lambda tells KnockOff which overload to configure
-stub.Find.Returns(() => new List<User>());
-stub.Find.Returns((int id) => new User { Id = id, Name = "ById" });
-stub.Find.Returns((string name) => new User { Id = 1, Name = name });
+stub.Find.Return(() => new List<User>());
+stub.Find.Return((int id) => new User { Id = id, Name = "ById" });
+stub.Find.Return((string name) => new User { Id = 1, Name = name });
 ```
 <!-- endSnippet -->
 
@@ -382,9 +382,9 @@ stub.ProcessData.Reset();
 
 ## User Method Interceptors (Stand-Alone Pattern)
 
-When you define a **user method** (override a virtual method with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). These interceptors support `Returns(callback)` and `Returns(value)` to override the user method.
+When you define a **user method** (override a virtual method with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). These interceptors support `Return(callback)` and `Return(value)` to override the user method.
 
-### Returns Supersedes User Method
+### Return Supersedes User Method
 
 <!-- snippet: user-methods-standalone-example -->
 ```cs
@@ -405,33 +405,33 @@ public partial class SkillRepoStub
 var stub = new SkillRepoStub();
 ISkillRepo repo = stub;
 
-// Without OnCall: user method provides behavior
+// Without Return: user method provides behavior
 var user1 = repo.GetById(1);  // Name = "Default"
 
-// With OnCall: callback supersedes user method (clean interceptor name)
-stub.GetById.Returns(id => new User { Id = id, Name = "Override" });
+// With Return: callback supersedes user method (clean interceptor name)
+stub.GetById.Return(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Name = "Override"
 ```
 <!-- endSnippet -->
 
-### Returns for Constant Values
+### Return for Constant Values
 
-`Returns()` provides constant values. For async methods (`Task<T>`, `ValueTask<T>`), the value is auto-wrapped:
+`Return()` provides constant values. For async methods (`Task<T>`, `ValueTask<T>`), the value is auto-wrapped:
 
 <!-- snippet: methods-user-returns-constant-combined -->
 ```cs
-stub.GetUser.Returns(new User { Id = 99, Name = "Fixed" });
-stub.GetUserAsync.Returns(new User { Id = 1 });  // Auto-wrapped in Task.FromResult
+stub.GetUser.Return(new User { Id = 99, Name = "Fixed" });
+stub.GetUserAsync.Return(new User { Id = 1 });  // Auto-wrapped in Task.FromResult
 ```
 <!-- endSnippet -->
 
 ### Full Tracking Support
 
-User method interceptors provide full tracking even when using `Returns`:
+User method interceptors provide full tracking even when using `Return`:
 
 <!-- snippet: user-methods-tracking-with-oncall -->
 ```cs
-stub.GetById.Returns(id => new User { Id = id });
+stub.GetById.Return(id => new User { Id = id });
 repo.GetById(42);
 
 stub.GetById.Verify(Times.Once);
@@ -439,20 +439,20 @@ Assert.Equal(42, stub.GetById.LastArg);
 ```
 <!-- endSnippet -->
 
-### Reset Preserves Returns Configuration
+### Reset Preserves Return Configuration
 
-Like regular method interceptors, user method interceptors preserve `Returns` configuration across `Reset()`:
+Like regular method interceptors, user method interceptors preserve `Return` configuration across `Reset()`:
 
 <!-- snippet: user-methods-reset-preserves-oncall -->
 ```cs
-stub.GetById.Returns(id => new User { Id = id });
+stub.GetById.Return(id => new User { Id = id });
 repo.GetById(1);
 stub.GetById.Verify(Times.Once);
 
 stub.GetById.Reset();
 stub.GetById.Verify(Times.Never);  // Tracking cleared
 
-repo.GetById(2);  // Still uses OnCall callback (not reset to user method)
+repo.GetById(2);  // Still uses Return callback (not reset to user method)
 ```
 <!-- endSnippet -->
 
@@ -465,8 +465,8 @@ This example demonstrates a realistic test using method configuration, execution
 <!-- snippet: methods-complete-example -->
 ```cs
 // Configure stub with tracking
-var getTracking = stub.GetUser.Returns((id) => id == 1 ? testUser : null).Verifiable();
-var saveTracking = stub.SaveUser.Execute((user) => { }).Verifiable();
+var getTracking = stub.GetUser.Return((id) => id == 1 ? testUser : null).Verifiable();
+var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -476,41 +476,41 @@ var saveTracking = stub.SaveUser.Execute((user) => { }).Verifiable();
 
 | Task | Code |
 |------|------|
-| Configure void method | `stub.Method.Execute((args) => { })` |
-| Configure method with callback | `stub.Method.Returns((args) => returnValue)` |
-| Configure method with value | `stub.Method.Returns(fixedValue)` |
-| Create value sequence (NSubstitute-style) | `stub.Method.Returns(1, 2, 3)` |
-| Mix callback with value sequence | `stub.Method.Returns(cb).ThenReturns(x, y, z)` |
-| Configure async Task<T> (simplified) | `stub.AsyncMethod.Returns(value)` |
-| Configure async Task<T> sequence | `stub.AsyncMethod.Returns(v1, v2, v3)` |
-| Configure async Task (void, simplified) | `stub.AsyncMethod.Execute((args) => { action(); })` |
+| Configure void method | `stub.Method.Call((args) => { })` |
+| Configure method with callback | `stub.Method.Return((args) => returnValue)` |
+| Configure method with value | `stub.Method.Return(fixedValue)` |
+| Create value sequence (NSubstitute-style) | `stub.Method.Return(1, 2, 3)` |
+| Mix callback with value sequence | `stub.Method.Return(cb).ThenReturn(x, y, z)` |
+| Configure async Task<T> (simplified) | `stub.AsyncMethod.Return(value)` |
+| Configure async Task<T> sequence | `stub.AsyncMethod.Return(v1, v2, v3)` |
+| Configure async Task (void, simplified) | `stub.AsyncMethod.Call((args) => { action(); })` |
 | Verify method was called | `tracking.Verify()` |
 | Verify call count | `tracking.Verify(Times.Exactly(n))` |
-| Mark for batch verify | `stub.Method.Returns(...).Verifiable()` |
+| Mark for batch verify | `stub.Method.Return(...).Verifiable()` |
 | Batch verify all | `stub.Verify()` |
 | Get last single arg | `tracking.LastArg` |
 | Get last multiple args | `tracking.LastArgs` (named tuple) |
 | Reset interceptor | `stub.Method.Reset()` |
-| Override user method | `stub.Method.Returns((args) => returnValue)` |
-| Override user method (constant) | `stub.Method.Returns(value)` |
-| Override async user method | `stub.AsyncMethod.Returns(value)` (auto-wraps) |
+| Override user method | `stub.Method.Return((args) => returnValue)` |
+| Override user method (constant) | `stub.Method.Return(value)` |
+| Override async user method | `stub.AsyncMethod.Return(value)` (auto-wraps) |
 
 ---
 
 ## Key Takeaways
 
 - **Callback signature**: Callback receives only the method parameters
-- **Value vs Callback**: Use `Returns(value)` for fixed returns, `Returns(callback)` for dynamic logic; `Execute(callback)` for void methods
-- **Params sequences**: Use `Returns(1, 2, 3)` for concise value sequences (matches NSubstitute)
+- **Value vs Callback**: Use `Return(value)` for fixed returns, `Return(callback)` for dynamic logic; `Call(callback)` for void methods
+- **Params sequences**: Use `Return(1, 2, 3)` for concise value sequences (matches NSubstitute)
 - **Sequence exhaustion**: Last value repeats after exhaustion (NSubstitute-like behavior)
 - **Async auto-wrapping**: Params values auto-wrap for `Task<T>` and `ValueTask<T>` - no `Task.FromResult()` needed
 - **Verification**: Use `tracking.Verify(Times)` for single methods or `.Verifiable()` + `stub.Verify()` for batch
 - **Arguments**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Distinguished by callback parameter types - use explicit types in lambdas
-- **Reset**: Clears call counts and tracking state, preserves Returns/Execute callbacks
+- **Reset**: Clears call counts and tracking state, preserves Return/Call callbacks
 - **User methods**: Override virtual methods (with underscore suffix) in Stand-Alone stubs for default behavior
-- **User method override**: Use `stub.Method.Returns(callback)` or `stub.Method.Returns(value)` to supersede user method
-- **User method reset**: `Reset()` preserves Returns configuration (same semantics as regular interceptors)
+- **User method override**: Use `stub.Method.Return(callback)` or `stub.Method.Return(value)` to supersede user method
+- **User method reset**: `Reset()` preserves Return configuration (same semantics as regular interceptors)
 
 ---
 
