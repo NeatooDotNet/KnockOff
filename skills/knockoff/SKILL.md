@@ -47,8 +47,8 @@ stub.Started.Raise(stub, EventArgs.Empty);
 <!-- snippet: skill-gotcha-event-naming -->
 ```cs
 // Event interceptors use the event name directly:
-stub.Started.VerifyAdd(Times.Never);
-stub.DataReceived.VerifyAdd(Times.Never);
+stub.Started.VerifyAdd(Called.Never);
+stub.DataReceived.VerifyAdd(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -75,14 +75,14 @@ var stub = new Stubs.IRepository();  // NOT Stubs.IRepository<User>
 ```
 <!-- endSnippet -->
 
-### 6. Times.Between() Does NOT Exist
+### 6. Called.Between() Does NOT Exist
 
 <!-- snippet: skill-gotcha-times-between -->
 ```cs
-// WRONG: Times.Between(1, 5)
+// WRONG: Called.Between(1, 5)
 // RIGHT: Use separate constraints
-stub.Save.Verify(Times.AtLeast(1));
-stub.Save.Verify(Times.AtMost(5));
+stub.Save.Verify(Called.AtLeast(1));
+stub.Save.Verify(Called.AtMost(5));
 ```
 <!-- endSnippet -->
 
@@ -372,8 +372,8 @@ stub.Indexer.Set((key, value) => { /* handle */ });
 stub.DataReceived.Raise(stub, new DataEventArgs("test-data"));
 
 // Verify subscriptions
-stub.DataReceived.VerifyAdd(Times.Once);
-stub.DataReceived.VerifyRemove(Times.Never);
+stub.DataReceived.VerifyAdd(Called.Once);
+stub.DataReceived.VerifyRemove(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -388,8 +388,8 @@ stub.GetById.Of<User>().Return((id) => new User { Id = id });
 stub.GetById.Of<Product>().Return((id) => new Product { Id = id });
 
 // Verify by type
-stub.GetById.Of<User>().Verify(Times.Never);
-stub.GetById.Of<Product>().Verify(Times.Never);
+stub.GetById.Of<User>().Verify(Called.Never);
+stub.GetById.Of<Product>().Verify(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -423,7 +423,7 @@ var verifyStub = new Stubs.SkillArithmeticOp();
 verifyStub.Interceptor.Return((a, b) => a + b);
 SkillArithmeticOp op = verifyStub;
 op(1, 2);
-verifyStub.Interceptor.Verify(Times.Once);
+verifyStub.Interceptor.Verify(Called.Once);
 Assert.Equal((1, 2), verifyStub.Interceptor.LastArgs);
 
 // Strict mode
@@ -452,7 +452,7 @@ var tracking = stub.Save.Call((user) => { });
 <!-- snippet: skill-verify-batch -->
 ```cs
 stub.GetUser.Return((id) => new User { Id = id }).Verifiable();
-stub.Save.Call((u) => { }).Verifiable(Times.Once);
+stub.Save.Call((u) => { }).Verifiable(Called.Once);
 // ... exercise stub ...
 ```
 <!-- endSnippet -->
@@ -462,16 +462,16 @@ stub.Save.Call((u) => { }).Verifiable(Times.Once);
 - `stub.Verify()` - Only members marked with `.Verifiable()`
 - `stub.VerifyAll()` - ALL configured members (Return, Call, Get, etc.)
 
-### Times Constraints
+### Called Constraints
 
 | Constraint | Description |
 |------------|-------------|
-| `Times.Never` | Must not be called |
-| `Times.Once` | Exactly 1 call |
-| `Times.AtLeastOnce` | 1 or more calls |
-| `Times.Exactly(n)` | Exactly n calls |
-| `Times.AtLeast(n)` | n or more calls |
-| `Times.AtMost(n)` | n or fewer calls |
+| `Called.Never` | Must not be called |
+| `Called.Once` | Exactly 1 call |
+| `Called.AtLeastOnce` | 1 or more calls |
+| `Called.Exactly(n)` | Exactly n calls |
+| `Called.AtLeast(n)` | n or more calls |
+| `Called.AtMost(n)` | n or fewer calls |
 
 ---
 
@@ -583,7 +583,7 @@ User method interceptors provide full tracking even when using `Return`:
 stub.GetById.Return(id => new User { Id = id });
 repo.GetById(42);
 
-stub.GetById.Verify(Times.Once);
+stub.GetById.Verify(Called.Once);
 Assert.Equal(42, stub.GetById.LastArg);
 ```
 <!-- endSnippet -->
@@ -596,10 +596,10 @@ Assert.Equal(42, stub.GetById.LastArg);
 ```cs
 stub.GetById.Return(id => new User { Id = id });
 repo.GetById(1);
-stub.GetById.Verify(Times.Once);
+stub.GetById.Verify(Called.Once);
 
 stub.GetById.Reset();
-stub.GetById.Verify(Times.Never);  // Tracking cleared
+stub.GetById.Verify(Called.Never);  // Tracking cleared
 
 repo.GetById(2);  // Still uses Returns callback
 ```
@@ -662,7 +662,7 @@ User property interceptors provide full tracking even when using the user overri
 _ = service.Count;
 _ = service.Count;
 
-stub.Count.VerifyGet(Times.Exactly(2));
+stub.Count.VerifyGet(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -674,10 +674,10 @@ stub.Count.VerifyGet(Times.Exactly(2));
 ```cs
 stub.Count.Get(100);
 _ = service.Count;
-stub.Count.VerifyGet(Times.Once);
+stub.Count.VerifyGet(Called.Once);
 
 stub.Count.Reset();
-stub.Count.VerifyGet(Times.Never);  // Tracking cleared
+stub.Count.VerifyGet(Called.Never);  // Tracking cleared
 
 _ = service.Count;  // Still uses Get (returns 100)
 ```
@@ -742,7 +742,7 @@ Remove source delegation by passing null: `stub.Source(null)`. After clearing, u
 | `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.Get(val)` |
 | `.ReturnsAsync(val)` | `stub.Method.Return(val)` (auto-wraps) |
 | `.Callback(action)` | Logic inside `Return`/`Call` callback |
-| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` |
+| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Called.Once)` |
 | `.Verifiable()` + `mock.Verify()` | `.Verifiable()` + `stub.Verify()` |
 | `It.IsAny<T>()` | Callback always receives all args |
 | `It.Is<T>(pred)` | `stub.Method.When(pred).Return(val)` |

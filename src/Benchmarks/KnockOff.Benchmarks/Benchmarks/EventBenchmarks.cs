@@ -123,7 +123,7 @@ public class EventVerificationBenchmarks
     {
         try
         {
-            _knockOffStub.MessageReceived.VerifyAdd(Times.Exactly(2));
+            _knockOffStub.MessageReceived.VerifyAdd(Called.Exactly(2));
             return _knockOffStub.MessageReceived.HasSubscribers;
         }
         catch (VerificationException)

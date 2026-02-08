@@ -71,7 +71,7 @@ public partial class SequenceValueOverloadTests
 
 		// Verify sequence was fully consumed
 		sequence.Verify();
-		knockOff.Name.VerifyGet(Times.Exactly(3));
+		knockOff.Name.VerifyGet(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -442,7 +442,7 @@ public partial class SequenceValueOverloadTests
 
 		// Verify sequence was fully consumed
 		sequence.Verify();
-		knockOff.GetOptional.Verify(Times.Exactly(3));
+		knockOff.GetOptional.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -894,7 +894,7 @@ public partial class SequenceValueOverloadTests
 
 		// Verify sequence was fully consumed
 		sequence.Verify();
-		knockOff.GetOptional.Verify(Times.Exactly(3));
+		knockOff.GetOptional.Verify(Called.Exactly(3));
 	}
 
 	[Fact]

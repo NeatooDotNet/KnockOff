@@ -25,7 +25,7 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
 }
 
 // This fails to compile:
-myRepoKO.GetUser.When(1).Returns(user1).Verifiable(Times.Twice);
+myRepoKO.GetUser.When(1).Returns(user1).Verifiable(Called.Twice);
 // Error: cannot convert from 'int' to 'System.Action<...GetUserInterceptor>'
 ```
 

@@ -52,7 +52,7 @@ Use `VerifyAdd` to verify how many times handlers have been subscribed to the ev
 <!-- snippet: events-verify-addcount -->
 ```cs
 // Verify how many times handlers were subscribed
-stub.OnCompleted.VerifyAdd(Times.Exactly(2));
+stub.OnCompleted.VerifyAdd(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -65,7 +65,7 @@ Use `VerifyRemove` to verify how many times handlers have been unsubscribed from
 <!-- snippet: events-verify-unsubscribe -->
 ```cs
 // Verify how many times handlers were unsubscribed
-stub.OnCompleted.VerifyRemove(Times.Once);
+stub.OnCompleted.VerifyRemove(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -82,9 +82,9 @@ stub.OnCompleted.Verifiable();
 ```
 <!-- endSnippet -->
 
-**What Verifiable tracks**: The total event access count (add + remove operations combined). If you need to verify subscriptions and unsubscriptions separately, use `VerifyAdd(Times)` or `VerifyRemove(Times)` directly instead.
+**What Verifiable tracks**: The total event access count (add + remove operations combined). If you need to verify subscriptions and unsubscriptions separately, use `VerifyAdd(Called)` or `VerifyRemove(Called)` directly instead.
 
-**Default behavior**: Calling `.Verifiable()` without arguments marks the event to be verified with `Times.AtLeastOnce` when `stub.Verify()` is called.
+**Default behavior**: Calling `.Verifiable()` without arguments marks the event to be verified with `Called.AtLeastOnce` when `stub.Verify()` is called.
 
 ---
 
@@ -111,14 +111,14 @@ This example demonstrates the full event interceptor workflow: subscribing handl
 ```cs
 // Subscribe through the interface
 publisher.DataReceived += handler;
-stub.DataReceived.VerifyAdd(Times.Once);
+stub.DataReceived.VerifyAdd(Called.Once);
 
 // Raise the event from the stub
 stub.DataReceived.Raise(stub, new DataEventArgs { Data = "Test" });
 
 // Unsubscribe and verify
 publisher.DataReceived -= handler;
-stub.DataReceived.VerifyRemove(Times.Once);
+stub.DataReceived.VerifyRemove(Called.Once);
 ```
 <!-- endSnippet -->
 

@@ -43,7 +43,7 @@ public partial class IEntityPropertyTests
         stub.IsPaused.Get(true);
 
         Assert.True(property.IsPaused);
-        stub.IsPaused.VerifyGet(Times.Once);
+        stub.IsPaused.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public partial class IEntityPropertyTests
 
         property.IsPaused = true;
 
-        stub.IsPaused.VerifySet(Times.Once);
+        stub.IsPaused.VerifySet(Called.Once);
         Assert.Equal(true, stub.IsPaused.LastSetValue);
     }
 
@@ -103,7 +103,7 @@ public partial class IEntityPropertyTests
 
         property.MarkSelfUnmodified();
 
-        stub.MarkSelfUnmodified.Verify(Times.Once);
+        stub.MarkSelfUnmodified.Verify(Called.Once);
     }
 
     [Fact]
@@ -237,7 +237,7 @@ public partial class IEntityPropertyTests
 
         stub.IsModified.Reset();
 
-        stub.IsModified.VerifyGet(Times.Never);
+        stub.IsModified.VerifyGet(Called.Never);
     }
 
     [Fact]
@@ -251,7 +251,7 @@ public partial class IEntityPropertyTests
 
         stub.MarkSelfUnmodified.Reset();
 
-        stub.MarkSelfUnmodified.Verify(Times.Never);
+        stub.MarkSelfUnmodified.Verify(Called.Never);
     }
 
     #endregion
@@ -371,7 +371,7 @@ public partial class IEntityPropertyOfTTests
 
         property.Value = "NewTypedEntityValue";
 
-        stub.Value.VerifySet(Times.Once);
+        stub.Value.VerifySet(Called.Once);
         Assert.Equal("NewTypedEntityValue", stub.Value.LastSetValue);
     }
 

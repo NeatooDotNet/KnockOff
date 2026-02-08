@@ -163,8 +163,8 @@ public partial class UserPropertyBasicsDemo
     // - Interceptor: stub.Count (clean name)
     //
     // The tracking interceptor provides:
-    // - VerifyGet(Times) - verify getter call count
-    // - VerifySet(Times) - verify setter call count
+    // - VerifyGet(Called) - verify getter call count
+    // - VerifySet(Called) - verify setter call count
     // - LastSetValue - last value passed to setter
     // - Reset() - clear tracking state
     // - Get() - supersede user property getter per-test
@@ -183,8 +183,8 @@ public partial class UserPropertyBasicsDemo
         _ = service.Count;
 
         // Verify getter was called three times
-        stub.Count.VerifyGet(Times.Exactly(3));
-        stub.Count.VerifyGet(Times.AtLeast(2));
+        stub.Count.VerifyGet(Called.Exactly(3));
+        stub.Count.VerifyGet(Called.AtLeast(2));
     }
 
     public void TrackingWithVerifySet()
@@ -196,7 +196,7 @@ public partial class UserPropertyBasicsDemo
         service.Name = "Second";
 
         // Verify setter was called twice
-        stub.Name.VerifySet(Times.Exactly(2));
+        stub.Name.VerifySet(Called.Exactly(2));
     }
 
     public void TrackingWithLastSetValue()
@@ -219,12 +219,12 @@ public partial class UserPropertyBasicsDemo
         IUserPropertyService service = stub;
 
         _ = service.Count;
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
 
         // Reset clears all tracking state
         stub.Count.Reset();
 
-        stub.Count.VerifyGet(Times.Never);
+        stub.Count.VerifyGet(Called.Never);
         // But user property still works
         var count = service.Count;
         // count == 50 (user override still active)
@@ -267,7 +267,7 @@ public partial class UserPropertyBasicsDemo
         var overrideValue = service.Count;
         // overrideValue == 999 (Get wins)
 
-        stub.Count.VerifyGet(Times.Exactly(2)); // Both calls tracked
+        stub.Count.VerifyGet(Called.Exactly(2)); // Both calls tracked
     }
 
     public void Set_SupersedesUserProperty()
@@ -284,7 +284,7 @@ public partial class UserPropertyBasicsDemo
         // capturedValue == "Captured: Test" (Set was invoked)
         // stub._name is NOT set because Set bypassed the user override
 
-        stub.Name.VerifySet(Times.Once);
+        stub.Name.VerifySet(Called.Once);
     }
 
     public void Reset_PreservesGetConfiguration()
@@ -294,11 +294,11 @@ public partial class UserPropertyBasicsDemo
 
         IUserPropertyService service = stub;
         _ = service.Count;
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
 
         // Reset clears tracking but preserves Get
         stub.Count.Reset();
-        stub.Count.VerifyGet(Times.Never);
+        stub.Count.VerifyGet(Called.Never);
 
         var value = service.Count;
         // value == 100 (Get still active)
@@ -337,11 +337,11 @@ public partial class MixedUserPropertyDemo
         var stub = new MixedUserPropertyStub();
 
         // Properties WITH user override use the interceptor for tracking + Get
-        stub.WithUserProperty.VerifyGet(Times.Never);
+        stub.WithUserProperty.VerifyGet(Called.Never);
 
         // Properties WITHOUT user override also use interceptor (same API)
         stub.WithoutUserProperty.Get(42);
-        stub.WithoutUserProperty.VerifyGet(Times.Never);
+        stub.WithoutUserProperty.VerifyGet(Called.Never);
 
         stub.ComputedWithoutUserProperty.Get("Configured value");
 
@@ -352,8 +352,8 @@ public partial class MixedUserPropertyDemo
         var r3 = service.ComputedWithUserProperty;  // "Computed: 100" (from override)
         var r4 = service.ComputedWithoutUserProperty; // "Configured value" (from Get)
 
-        stub.WithUserProperty.VerifyGet(Times.Once);
-        stub.WithoutUserProperty.VerifyGet(Times.Once);
+        stub.WithUserProperty.VerifyGet(Called.Once);
+        stub.WithoutUserProperty.VerifyGet(Called.Once);
     }
 
     // =========================================================================
@@ -408,8 +408,8 @@ public partial class StrictModeUserPropertyDemo
         service.Setting = "value";  // Calls user override
 
         // All tracked correctly
-        stub.Count.VerifyGet(Times.Once);
-        stub.Name.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
+        stub.Name.VerifyGet(Called.Once);
     }
 
     // =========================================================================
@@ -483,9 +483,9 @@ public partial class GenericUserPropertyDemo
         // count == 5
 
         // Tracking works as expected
-        stub.CurrentItem.VerifyGet(Times.Once);
-        stub.DefaultItem.VerifyGet(Times.Once);
-        stub.DefaultItem.VerifySet(Times.Once);
+        stub.CurrentItem.VerifyGet(Called.Once);
+        stub.DefaultItem.VerifyGet(Called.Once);
+        stub.DefaultItem.VerifySet(Called.Once);
     }
 
     public void GenericStandalone_GetSupersedes()
@@ -584,9 +584,9 @@ public partial class StandaloneClassUserPropertyDemo
         // path == "/var/log/app.log"
 
         // Tracking works as expected
-        stub.ConfigName.VerifyGet(Times.Once);
-        stub.MaxRetries.VerifyGet(Times.Exactly(2));
-        stub.MaxRetries.VerifySet(Times.Once);
+        stub.ConfigName.VerifyGet(Called.Once);
+        stub.MaxRetries.VerifyGet(Called.Exactly(2));
+        stub.MaxRetries.VerifySet(Called.Once);
     }
 
     public void StandaloneClass_GetSupersedes()
@@ -601,7 +601,7 @@ public partial class StandaloneClassUserPropertyDemo
         var name = config.ConfigName;
         // name == "Override Config" (Get wins)
 
-        stub.ConfigName.VerifyGet(Times.Once);
+        stub.ConfigName.VerifyGet(Called.Once);
     }
 }
 
@@ -677,9 +677,9 @@ public partial class GenericStandaloneClassUserPropertyDemo
         // name == "String Cache"
 
         // Tracking works as expected
-        stub.DefaultValue.VerifyGet(Times.Once);
-        stub.CurrentValue.VerifyGet(Times.Once);
-        stub.CurrentValue.VerifySet(Times.Once);
+        stub.DefaultValue.VerifyGet(Called.Once);
+        stub.CurrentValue.VerifyGet(Called.Once);
+        stub.CurrentValue.VerifySet(Called.Once);
     }
 
     public void GenericStandaloneClass_GetSupersedes()

@@ -4,12 +4,12 @@ namespace KnockOff;
 /// Specifies the expected number of times a method should be called during verification.
 /// Used with Verify() and Verifiable() methods to assert call counts.
 /// </summary>
-public readonly struct Times : IEquatable<Times>
+public readonly struct Called : IEquatable<Called>
 {
     private readonly int _count;
-    private readonly TimesKind _kind;
+    private readonly CalledKind _kind;
 
-    private enum TimesKind
+    private enum CalledKind
     {
         Exactly,
         AtLeast,
@@ -17,32 +17,32 @@ public readonly struct Times : IEquatable<Times>
         Never
     }
 
-    private Times(int count, TimesKind kind)
+    private Called(int count, CalledKind kind)
     {
         _count = count;
         _kind = kind;
     }
 
     /// <summary>Exactly one call expected.</summary>
-    public static Times Once => new(1, TimesKind.Exactly);
+    public static Called Once => new(1, CalledKind.Exactly);
 
     /// <summary>Exactly two calls expected.</summary>
-    public static Times Twice => new(2, TimesKind.Exactly);
+    public static Called Twice => new(2, CalledKind.Exactly);
 
     /// <summary>Exactly n calls expected.</summary>
-    public static Times Exactly(int count) => new(count, TimesKind.Exactly);
+    public static Called Exactly(int count) => new(count, CalledKind.Exactly);
 
     /// <summary>At least n calls expected.</summary>
-    public static Times AtLeast(int count) => new(count, TimesKind.AtLeast);
+    public static Called AtLeast(int count) => new(count, CalledKind.AtLeast);
 
     /// <summary>At least one call expected.</summary>
-    public static Times AtLeastOnce => new(1, TimesKind.AtLeast);
+    public static Called AtLeastOnce => new(1, CalledKind.AtLeast);
 
     /// <summary>At most n calls expected.</summary>
-    public static Times AtMost(int count) => new(count, TimesKind.AtMost);
+    public static Called AtMost(int count) => new(count, CalledKind.AtMost);
 
     /// <summary>No calls expected.</summary>
-    public static Times Never => new(0, TimesKind.Never);
+    public static Called Never => new(0, CalledKind.Never);
 
     /// <summary>The count for this constraint.</summary>
     public int Count => _count;
@@ -52,18 +52,18 @@ public readonly struct Times : IEquatable<Times>
     /// <returns>True if the constraint is satisfied.</returns>
     public bool Validate(int actualCount) => _kind switch
     {
-        TimesKind.Exactly => actualCount == _count,
-        TimesKind.AtLeast => actualCount >= _count,
-        TimesKind.AtMost => actualCount <= _count,
-        TimesKind.Never => actualCount == 0,
+        CalledKind.Exactly => actualCount == _count,
+        CalledKind.AtLeast => actualCount >= _count,
+        CalledKind.AtMost => actualCount <= _count,
+        CalledKind.Never => actualCount == 0,
         _ => false
     };
 
     /// <inheritdoc />
-    public bool Equals(Times other) => _count == other._count && _kind == other._kind;
+    public bool Equals(Called other) => _count == other._count && _kind == other._kind;
 
     /// <inheritdoc />
-    public override bool Equals(object? obj) => obj is Times other && Equals(other);
+    public override bool Equals(object? obj) => obj is Called other && Equals(other);
 
     /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(_count, _kind);
@@ -71,16 +71,16 @@ public readonly struct Times : IEquatable<Times>
     /// <inheritdoc />
     public override string ToString() => _kind switch
     {
-        TimesKind.Exactly => _count == 1 ? "Once" : _count == 2 ? "Twice" : $"Exactly({_count})",
-        TimesKind.AtLeast => _count == 1 ? "AtLeastOnce" : $"AtLeast({_count})",
-        TimesKind.AtMost => $"AtMost({_count})",
-        TimesKind.Never => "Never",
+        CalledKind.Exactly => _count == 1 ? "Once" : _count == 2 ? "Twice" : $"Exactly({_count})",
+        CalledKind.AtLeast => _count == 1 ? "AtLeastOnce" : $"AtLeast({_count})",
+        CalledKind.AtMost => $"AtMost({_count})",
+        CalledKind.Never => "Never",
         _ => "Unknown"
     };
 
     /// <summary>Equality operator.</summary>
-    public static bool operator ==(Times left, Times right) => left.Equals(right);
+    public static bool operator ==(Called left, Called right) => left.Equals(right);
 
     /// <summary>Inequality operator.</summary>
-    public static bool operator !=(Times left, Times right) => !left.Equals(right);
+    public static bool operator !=(Called left, Called right) => !left.Equals(right);
 }

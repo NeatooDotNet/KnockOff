@@ -39,7 +39,7 @@ public class OutParameterTests
 		service.TryGetValue("myKey", out var result);
 
 		// Tracking should only show the input parameter 'key', not the out param 'value'
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 		Assert.Equal("myKey", tracking.LastArg);
 	}
 
@@ -96,7 +96,7 @@ public class OutParameterTests
 		Assert.Equal(0, defaultVal);
 
 		// Verify tracking
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -116,7 +116,7 @@ public class OutParameterTests
 
 		Assert.Equal("TestName", name);
 		Assert.Equal(100, count);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -162,11 +162,11 @@ public class OutParameterTests
 		service.TryGetValue("key1", out _);
 		service.TryGetValue("key2", out _);
 
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 
 		knockOff.TryGetValue.Reset();
 
-		tracking.Verify(Times.Never);
+		tracking.Verify(Called.Never);
 	}
 
 	[Fact]
@@ -181,7 +181,7 @@ public class OutParameterTests
 		service.TryParse("second", out _);
 		service.TryParse("third", out _);
 
-		tracking.Verify(Times.Exactly(3));
+		tracking.Verify(Called.Exactly(3));
 		Assert.Equal("third", tracking.LastArg); // Last call
 	}
 
@@ -231,7 +231,7 @@ public class OutParameterTests
 		service.TryGetValue("key1", out _);
 
 		Assert.Throws<VerificationException>(() =>
-			knockOff.TryGetValue.Verify(Times.Exactly(2)));
+			knockOff.TryGetValue.Verify(Called.Exactly(2)));
 	}
 
 	[Fact]

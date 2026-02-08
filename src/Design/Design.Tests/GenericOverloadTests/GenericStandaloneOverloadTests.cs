@@ -147,9 +147,9 @@ public class GenericStandaloneOverloadTests
         formatter.Format("e", true, 10);
 
         // Assert - per-overload tracking
-        tracking1.Verify(Times.Exactly(2));  // "a", "b"
-        tracking2.Verify(Times.Once);        // "c"
-        tracking3.Verify(Times.Exactly(2));  // "d", "e"
+        tracking1.Verify(Called.Exactly(2));  // "a", "b"
+        tracking2.Verify(Called.Once);        // "c"
+        tracking3.Verify(Called.Exactly(2));  // "d", "e"
     }
 
     [Fact]
@@ -211,7 +211,7 @@ public class GenericStandaloneOverloadTests
         formatter.Format("d");
 
         // Assert - Verify on interceptor counts ALL overloads
-        stub.Format.Verify(Times.Exactly(4));
+        stub.Format.Verify(Called.Exactly(4));
     }
 
     // =========================================================================
@@ -323,8 +323,8 @@ public class GenericStandaloneOverloadTests
         Assert.Equal("Entity: Test", entityFormatter.Format(new TestEntity { Id = 1, Name = "Test" }));
 
         // Verify independently
-        stringStub.Format.Verify(Times.Once);
-        entityStub.Format.Verify(Times.Once);
+        stringStub.Format.Verify(Called.Once);
+        entityStub.Format.Verify(Called.Once);
     }
 
     // =========================================================================
@@ -370,7 +370,7 @@ public class GenericStandaloneOverloadTests
         formatter.Get();
 
         // Assert
-        tracking.Verify(Times.Exactly(2));
+        tracking.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -453,8 +453,8 @@ public class GenericStandaloneOverloadTests
         formatter.Find(s => true, 5);
 
         // Assert
-        tracking1.Verify(Times.Exactly(2));
-        tracking2.Verify(Times.Once);
+        tracking1.Verify(Called.Exactly(2));
+        tracking2.Verify(Called.Once);
     }
     // =========================================================================
     // USER METHODS - Overrides Returning Generic Type T
@@ -544,7 +544,7 @@ public class GenericStandaloneOverloadTests
         formatter.Get(3);
 
         // Assert - tracking works across all overloads
-        stub.Get.Verify(Times.Exactly(5));
+        stub.Get.Verify(Called.Exactly(5));
     }
 
     [Fact]

@@ -110,7 +110,7 @@ public class SubscriptionVerificationTests
 
         #region events-verify-addcount
         // Verify how many times handlers were subscribed
-        stub.OnCompleted.VerifyAdd(Times.Exactly(2));
+        stub.OnCompleted.VerifyAdd(Called.Exactly(2));
         #endregion
     }
 
@@ -126,7 +126,7 @@ public class SubscriptionVerificationTests
 
         #region events-verify-unsubscribe
         // Verify how many times handlers were unsubscribed
-        stub.OnCompleted.VerifyRemove(Times.Once);
+        stub.OnCompleted.VerifyRemove(Called.Once);
         #endregion
     }
 }
@@ -170,7 +170,7 @@ public class EventResetTests
         EventHandler handler = (sender, args) => { };
         subscriber.OnCompleted += handler;
 
-        stub.OnCompleted.VerifyAdd(Times.Once);
+        stub.OnCompleted.VerifyAdd(Called.Once);
         Assert.True(stub.OnCompleted.HasSubscribers);
 
         #region events-reset
@@ -179,7 +179,7 @@ public class EventResetTests
         #endregion
 
         // Counts are cleared - verify add was never called after reset
-        stub.OnCompleted.VerifyAdd(Times.Never);
+        stub.OnCompleted.VerifyAdd(Called.Never);
 
         // Subscribers are also cleared
         Assert.False(stub.OnCompleted.HasSubscribers);
@@ -211,14 +211,14 @@ public class CompleteEventExampleTests
         #region events-complete-example
         // Subscribe through the interface
         publisher.DataReceived += handler;
-        stub.DataReceived.VerifyAdd(Times.Once);
+        stub.DataReceived.VerifyAdd(Called.Once);
 
         // Raise the event from the stub
         stub.DataReceived.Raise(stub, new DataEventArgs { Data = "Test" });
 
         // Unsubscribe and verify
         publisher.DataReceived -= handler;
-        stub.DataReceived.VerifyRemove(Times.Once);
+        stub.DataReceived.VerifyRemove(Called.Once);
         #endregion
 
         Assert.Equal(1, raiseCount);

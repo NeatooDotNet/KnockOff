@@ -238,7 +238,7 @@ public class ProtectedMethodBehaviorTests
         service.GetDescription(); // calls GetInternalId once
         service.GetDescription(); // calls GetInternalId again
 
-        stub.GetInternalId.Verify(Times.Exactly(2));
+        stub.GetInternalId.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -252,7 +252,7 @@ public class ProtectedMethodBehaviorTests
         service.GetDescription(); // calls FormatTag (unconfigured, falls to base)
 
         // FormatTag was still called (and tracked) even though it fell back to base
-        stub.FormatTag.Verify(Times.Once);
+        stub.FormatTag.Verify(Called.Once);
     }
 
     [Fact]
@@ -266,7 +266,7 @@ public class ProtectedMethodBehaviorTests
         service.GetDescription(); // 1 call
 
         Assert.Throws<VerificationException>(() =>
-            stub.GetInternalId.Verify(Times.Exactly(2)));
+            stub.GetInternalId.Verify(Called.Exactly(2)));
     }
 
     // =========================================================================

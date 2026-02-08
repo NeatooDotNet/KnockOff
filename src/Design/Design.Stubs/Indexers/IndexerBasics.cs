@@ -239,8 +239,8 @@ public partial class IndexerBasicsDemo
         _ = collection["test"];
         collection["new"] = 42;
 
-        stub.Indexer.VerifyGet(Times.Exactly(2));
-        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Exactly(2));
+        stub.Indexer.VerifySet(Called.Once);
     }
 
     // =========================================================================

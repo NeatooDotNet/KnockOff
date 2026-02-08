@@ -133,7 +133,7 @@ public partial class UserMethodBasicsDemo
     // - Interceptor: stub.Process (clean name)
     //
     // The tracking interceptor provides:
-    // - Verify(Times) - verify call count
+    // - Verify(Called) - verify call count
     // - LastArg - last single argument
     // - LastArgs - last arguments as tuple
     // - Reset() - clear tracking state
@@ -151,8 +151,8 @@ public partial class UserMethodBasicsDemo
         service.Process("third");
 
         // Verify with clean interceptor name
-        stub.Process.Verify(Times.Exactly(3));
-        stub.Process.Verify(Times.AtLeast(2));
+        stub.Process.Verify(Called.Exactly(3));
+        stub.Process.Verify(Called.AtLeast(2));
     }
 
     public void TrackingWithLastArg()
@@ -187,12 +187,12 @@ public partial class UserMethodBasicsDemo
         IUserMethodService service = stub;
 
         service.Process("test");
-        stub.Process.Verify(Times.Once);
+        stub.Process.Verify(Called.Once);
 
         // Reset clears all tracking state
         stub.Process.Reset();
 
-        stub.Process.Verify(Times.Never);
+        stub.Process.Verify(Called.Never);
         // LastArg is now default (null for reference types)
     }
 
@@ -227,7 +227,7 @@ public partial class UserMethodBasicsDemo
         var overrideResult = service.Process("hello");
         // overrideResult == "[Override: hello]" (Returns wins)
 
-        stub.Process.Verify(Times.Exactly(2)); // Both calls tracked
+        stub.Process.Verify(Called.Exactly(2)); // Both calls tracked
     }
 
     public void Returns_SupersedesUserMethod()
@@ -250,7 +250,7 @@ public partial class UserMethodBasicsDemo
         service.Execute("test");
 
         // callbackInvoked == true (Execute was invoked, not user method)
-        stub.Execute.Verify(Times.Once);
+        stub.Execute.Verify(Called.Once);
     }
 
     public void Reset_PreservesReturnsConfiguration()
@@ -260,11 +260,11 @@ public partial class UserMethodBasicsDemo
 
         IUserMethodService service = stub;
         service.Calculate(3, 4);
-        stub.Calculate.Verify(Times.Once);
+        stub.Calculate.Verify(Called.Once);
 
         // Reset clears tracking but preserves Returns
         stub.Calculate.Reset();
-        stub.Calculate.Verify(Times.Never);
+        stub.Calculate.Verify(Called.Never);
 
         var result = service.Calculate(5, 6);
         // result == 30 (Returns still active: 5 * 6)
@@ -342,11 +342,11 @@ public partial class MixedUserMethodDemo
         var stub = new MixedUserMethodStub();
 
         // Methods WITH user override use the interceptor for tracking + Returns
-        stub.WithUserMethod.Verify(Times.Never);
+        stub.WithUserMethod.Verify(Called.Never);
 
         // Methods WITHOUT user override also use interceptor (same API)
         stub.WithoutUserMethod.Return((input) => $"[Configured: {input}]");
-        stub.WithoutUserMethod.Verify(Times.Never);
+        stub.WithoutUserMethod.Verify(Called.Never);
 
         stub.ComputeWithoutUserMethod.Return(42);
 
@@ -357,8 +357,8 @@ public partial class MixedUserMethodDemo
         var r3 = service.ComputeWithUserMethod(5);     // 10 (from override)
         var r4 = service.ComputeWithoutUserMethod(5);  // 42 (from Returns)
 
-        stub.WithUserMethod.Verify(Times.Once);
-        stub.WithoutUserMethod.Verify(Times.Once);
+        stub.WithUserMethod.Verify(Called.Once);
+        stub.WithoutUserMethod.Verify(Called.Once);
     }
 
     // =========================================================================
@@ -498,7 +498,7 @@ public partial class AsyncUserMethodDemo
         // result == "[Async: hello]"
 
         // Verify with clean interceptor name
-        stub.ProcessAsync.Verify(Times.Once);
+        stub.ProcessAsync.Verify(Called.Once);
     }
 
     public async Task AsyncUserMethod_VoidTask()
@@ -508,7 +508,7 @@ public partial class AsyncUserMethodDemo
 
         await service.ExecuteAsync("command");
 
-        stub.ExecuteAsync.Verify(Times.Once);
+        stub.ExecuteAsync.Verify(Called.Once);
         // LastArg captures the command
         var lastCommand = stub.ExecuteAsync.LastArg;
     }
@@ -521,7 +521,7 @@ public partial class AsyncUserMethodDemo
         var result = await service.ComputeAsync(21);
         // result == 42
 
-        stub.ComputeAsync.Verify(Times.Once);
+        stub.ComputeAsync.Verify(Called.Once);
     }
 }
 
@@ -574,7 +574,7 @@ public partial class GenericUserMethodDemo
         // list == { 1, 2, 3 }
 
         // Verify with Of<T>()
-        stub.Create.Of<List<int>>().Verify(Times.Once);
+        stub.Create.Of<List<int>>().Verify(Called.Once);
     }
 
     public void GenericMethod_MultiTypeParam()
@@ -588,7 +588,7 @@ public partial class GenericUserMethodDemo
         var result = service.Transform<string, StringBuilder>("hello");
         // result.ToString() == "transformed: hello"
 
-        stub.Transform.Of<string, StringBuilder>().Verify(Times.Once);
+        stub.Transform.Of<string, StringBuilder>().Verify(Called.Once);
     }
 }
 

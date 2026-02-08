@@ -170,10 +170,10 @@ public partial class EventPatternsDemo
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void VerifyAdd() { VerifyAdd(Times.AtLeastOnce); }
-    //   public void VerifyAdd(Times times) { ... check _addCount ... }
-    //   public void VerifyRemove() { VerifyRemove(Times.AtLeastOnce); }
-    //   public void VerifyRemove(Times times) { ... check _removeCount ... }
+    //   public void VerifyAdd() { VerifyAdd(Called.AtLeastOnce); }
+    //   public void VerifyAdd(Called called) { ... check _addCount ... }
+    //   public void VerifyRemove() { VerifyRemove(Called.AtLeastOnce); }
+    //   public void VerifyRemove(Called called) { ... check _removeCount ... }
     // =========================================================================
 
     public void Verify_SubscriptionAndUnsubscription()
@@ -192,8 +192,8 @@ public partial class EventPatternsDemo
         source.Started -= Handler1;
 
         // Verify add/remove counts
-        stub.Started.VerifyAdd(Times.Exactly(2));
-        stub.Started.VerifyRemove(Times.Once);
+        stub.Started.VerifyAdd(Called.Exactly(2));
+        stub.Started.VerifyRemove(Called.Once);
     }
 
     // =========================================================================
@@ -244,7 +244,7 @@ public partial class EventPatternsDemo
         stub.Started.Reset();
 
         var hasHandlers = stub.Started.HasSubscribers; // false
-        // VerifyAdd(Times.AtLeastOnce) would fail now
+        // VerifyAdd(Called.AtLeastOnce) would fail now
     }
 
     // =========================================================================

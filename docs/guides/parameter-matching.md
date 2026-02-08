@@ -333,7 +333,7 @@ stub.Add
 
 ### Parameter-Specific Verification (Void Methods)
 
-For void methods, verify specific parameter calls with `Times`:
+For void methods, verify specific parameter calls with `Called`:
 
 <!-- snippet: when-void-verify-times -->
 ```cs

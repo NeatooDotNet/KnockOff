@@ -33,7 +33,7 @@
 //   returns early, bypassing all TotalCallCount component increments.
 //   The TotalCallCount property and overload-group local counts do not
 //   sum When chain matcher CallCount values. This means:
-//   - stub.Method.Verify(Times) undercounts (missing When chain calls)
+//   - stub.Method.Verify(Called) undercounts (missing When chain calls)
 //   - Overload CheckVerificationAll() condition guard skips When-chain-only
 //     overloads (condExpr doesn't include When chain)
 //   - Overload CheckVerificationAll() local count excludes When chain calls
@@ -261,8 +261,8 @@ public class WhenChainVerificationBugTests
     // TotalCallCount or the per-overload local count variables used for
     // verification.
     //
-    // NOTE: These tests use Verify(Times) on the interceptor, which checks
-    // TotalCallCount. The HEAD bug (Bug 1) does NOT affect Verify(Times) --
+    // NOTE: These tests use Verify(Called) on the interceptor, which checks
+    // TotalCallCount. The HEAD bug (Bug 1) does NOT affect Verify(Called) --
     // it only affects chain.Verify() and CheckVerification/CheckVerificationAll
     // When chain HEAD checks. So these tests cleanly isolate the TotalCallCount
     // bug without interference from the HEAD bug.
@@ -271,17 +271,17 @@ public class WhenChainVerificationBugTests
     // =========================================================================
 
     // =========================================================================
-    // Bug 2, Scenario 1: Single-sig Verify(Times) excludes When chain calls
+    // Bug 2, Scenario 1: Single-sig Verify(Called) excludes When chain calls
     // =========================================================================
     // ICalculator.Add is a non-overloaded method (single-signature interceptor).
     // TotalCallCount sums _unconfiguredCallCount, _callTracking, _returnValue,
     // and _sequence counts -- but NOT When chain matcher CallCount values.
     //
     // WHAT SHOULD HAPPEN: After calling Add(1,2) via When chain and Add(5,6)
-    // via Returns fallback, Verify(Times.Exactly(2)) should pass (2 total calls).
+    // via Returns fallback, Verify(Called.Exactly(2)) should pass (2 total calls).
     //
     // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the Returns call counted).
-    // Verify(Times.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
+    // Verify(Called.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
     //
     // WHY: The When chain invoke path does matcher.CallCount++ and returns early,
     // bypassing _returnValueTracking.RecordCall(). The TotalCallCount getter
@@ -311,21 +311,21 @@ public class WhenChainVerificationBugTests
 
         // BUG: TotalCallCount = 1 (only Returns call counted).
         // Should be 2 (When chain + Returns).
-        stub.Add.Verify(Times.Exactly(2));
+        stub.Add.Verify(Called.Exactly(2));
     }
 
     // =========================================================================
-    // Bug 2, Scenario 2: Overload Verify(Times) excludes When chain calls
+    // Bug 2, Scenario 2: Overload Verify(Called) excludes When chain calls
     // =========================================================================
     // IFormatter.Format is an overloaded method (overload-group interceptor).
     // The overload-group TotalCallCount expression sums per-overload tracking
     // counts -- but NOT When chain matcher CallCount values.
     //
     // WHAT SHOULD HAPPEN: After calling Format("special") via When chain and
-    // Format("other") via Call, Verify(Times.Exactly(2)) should pass.
+    // Format("other") via Call, Verify(Called.Exactly(2)) should pass.
     //
     // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the Call path counted).
-    // Verify(Times.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
+    // Verify(Called.Exactly(2)) throws "expected Exactly(2), actual 1 calls".
     //
     // WHY: Same root cause as scenario 1, but in the overload-group code path.
     // The overload-group TotalCallCount expression does not include
@@ -355,7 +355,7 @@ public class WhenChainVerificationBugTests
 
         // BUG: TotalCallCount = 1 (only Call path counted).
         // Should be 2 (When chain + Call).
-        stub.Format.Verify(Times.Exactly(2));
+        stub.Format.Verify(Called.Exactly(2));
     }
 
     // =========================================================================
@@ -411,14 +411,14 @@ public class WhenChainVerificationBugTests
     }
 
     // =========================================================================
-    // Bug 2, Scenario 4: Void overload Verify(Times) excludes When chain calls
+    // Bug 2, Scenario 4: Void overload Verify(Called) excludes When chain calls
     // =========================================================================
     // Same as scenario 2 but for void method overloads (IFormatter.Log).
     // Void When chains use VoidWhenMatcher with matcher.CallCount++, which is
     // equally excluded from the overload-group TotalCallCount expression.
     //
     // WHAT SHOULD HAPPEN: After calling Log("special") via void When chain and
-    // Log("other") via Call, Verify(Times.Exactly(2)) should pass.
+    // Log("other") via Call, Verify(Called.Exactly(2)) should pass.
     //
     // WHAT ACTUALLY HAPPENS: TotalCallCount = 1 (only the Call path counted).
     // =========================================================================
@@ -447,6 +447,6 @@ public class WhenChainVerificationBugTests
 
         // BUG: TotalCallCount = 1 (only Call path counted).
         // Should be 2 (When chain + Call).
-        stub.Log.Verify(Times.Exactly(2));
+        stub.Log.Verify(Called.Exactly(2));
     }
 }

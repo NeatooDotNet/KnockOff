@@ -40,7 +40,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `.Setup(x => x.Property).Returns(value)` | `stub.Property.Get(value)` |
 | `.ReturnsAsync(value)` | `stub.Method.Return(value)` (auto-wraps) |
 | `.Callback(x => ...)` | Logic in `Return`/`Call` callback |
-| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Times.Once)` |
+| `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Called.Once)` |
 | `.Verifiable()` | `.Verifiable()` then `stub.Verify()` |
 | `mock.Verify()` | `stub.Verify()` |
 | `It.IsAny<T>()` | Callback receives all args |
@@ -187,7 +187,7 @@ stub.SaveUser.Call((user) => { }).Verifiable();
   - `tracking.Verify(times)` on the object returned by `Return`/`Call`
   - `stub.Method.Verify(times)` directly on the interceptor property
   - `.Verifiable()` + `stub.Verify()` for batch verification
-- Both support the same `Times` matchers (Once, AtLeastOnce, Exactly, etc.)
+- Both support the same `Called` matchers (Once, AtLeastOnce, Exactly, etc.)
 
 ---
 
@@ -451,20 +451,20 @@ stub.SaveUser.Call((user) => { });
 
 ---
 
-## Times Matcher Reference
+## Called Matcher Reference
 
-KnockOff supports these `Times` matchers:
+KnockOff supports these `Called` matchers:
 
 | Matcher | Description |
 |---------|-------------|
-| `Times.Never` | Method was never called |
-| `Times.Once` | Method was called exactly once |
-| `Times.AtLeastOnce` | Method was called one or more times |
-| `Times.AtLeast(n)` | Method was called at least n times |
-| `Times.AtMost(n)` | Method was called at most n times |
-| `Times.Exactly(n)` | Method was called exactly n times |
+| `Called.Never` | Method was never called |
+| `Called.Once` | Method was called exactly once |
+| `Called.AtLeastOnce` | Method was called one or more times |
+| `Called.AtLeast(n)` | Method was called at least n times |
+| `Called.AtMost(n)` | Method was called at most n times |
+| `Called.Exactly(n)` | Method was called exactly n times |
 
-**Note:** Unlike Moq, KnockOff does NOT have `Times.Between()`. Use separate `AtLeast` and `AtMost` checks instead.
+**Note:** Unlike Moq, KnockOff does NOT have `Called.Between()`. Use separate `AtLeast` and `AtMost` checks instead.
 
 **Example:**
 
@@ -474,11 +474,11 @@ KnockOff supports these `Times` matchers:
 mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Exactly(3));
 
 // KnockOff
-stub.SaveUser.Verify(Times.Exactly(3));
+stub.SaveUser.Verify(Called.Exactly(3));
 
-// For range verification (no Times.Between in KnockOff):
-stub.SaveUser.Verify(Times.AtLeast(1));
-stub.SaveUser.Verify(Times.AtMost(5));
+// For range verification (no Called.Between in KnockOff):
+stub.SaveUser.Verify(Called.AtLeast(1));
+stub.SaveUser.Verify(Called.AtMost(5));
 ```
 <!-- endSnippet -->
 

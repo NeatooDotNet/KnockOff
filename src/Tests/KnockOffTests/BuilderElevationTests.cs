@@ -114,7 +114,7 @@ public class BuilderElevationTests
 
         // Assert - tracking should work
         Assert.Equal(99, tracking.LastArg);
-        tracking.Verify(Times.Exactly(2));
+        tracking.Verify(Called.Exactly(2));
     }
 
     [Fact]

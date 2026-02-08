@@ -84,7 +84,7 @@ public class GenericStandaloneClassStubTests
 		stub.Object.GetById(1);
 		stub.Object.GetById(2);
 
-		stub.GetById.Verify(Times.Exactly(2));
+		stub.GetById.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -130,7 +130,7 @@ public class GenericStandaloneClassStubTests
 		var user = new ClassStubUser { Id = 1, Name = "Saved" };
 		stub.Object.Save(user);
 
-		stub.Save.Verify(Times.Once);
+		stub.Save.Verify(Called.Once);
 		Assert.Same(user, stub.Save.LastArg);
 		Assert.Single(saved);
 	}
@@ -164,7 +164,7 @@ public class GenericStandaloneClassStubTests
 
 		stub.GetById.Reset();
 
-		stub.GetById.Verify(Times.Never);
+		stub.GetById.Verify(Called.Never);
 		Assert.Null(stub.GetById.LastArg);
 	}
 
@@ -178,8 +178,8 @@ public class GenericStandaloneClassStubTests
 
 		stub.ResetInterceptors();
 
-		stub.GetById.Verify(Times.Never);
-		stub.Save.Verify(Times.Never);
+		stub.GetById.Verify(Called.Never);
+		stub.Save.Verify(Called.Never);
 	}
 
 	#endregion

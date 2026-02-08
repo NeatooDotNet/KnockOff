@@ -156,8 +156,8 @@ public class UserPropertyBasicsTests
         _ = service.Count;
         _ = service.Count;
 
-        stub.Count.VerifyGet(Times.Exactly(3));
-        stub.Count.VerifyGet(Times.AtLeast(2));
+        stub.Count.VerifyGet(Called.Exactly(3));
+        stub.Count.VerifyGet(Called.AtLeast(2));
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public class UserPropertyBasicsTests
         service.Name = "First";
         service.Name = "Second";
 
-        stub.Name.VerifySet(Times.Exactly(2));
+        stub.Name.VerifySet(Called.Exactly(2));
     }
 
     // =========================================================================
@@ -221,7 +221,7 @@ public class UserPropertyBasicsTests
         // Set-only user override also works in strict mode
         service.Setting = "value";
 
-        stub.Setting.VerifySet(Times.Once);
+        stub.Setting.VerifySet(Called.Once);
     }
 
     // =========================================================================
@@ -236,11 +236,11 @@ public class UserPropertyBasicsTests
 
         IUserPropertyService service = stub;
         _ = service.Count;
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
 
         // Reset clears tracking but preserves Get
         stub.Count.Reset();
-        stub.Count.VerifyGet(Times.Never);
+        stub.Count.VerifyGet(Called.Never);
 
         var value = service.Count;
         Assert.Equal(100, value); // Get still active
@@ -259,7 +259,7 @@ public class UserPropertyBasicsTests
 
         // Reset clears tracking but preserves Set
         stub.Name.Reset();
-        stub.Name.VerifySet(Times.Never);
+        stub.Name.VerifySet(Called.Never);
 
         service.Name = "Second";
         Assert.Equal(2, callCount); // Set still active
@@ -274,11 +274,11 @@ public class UserPropertyBasicsTests
         IUserPropertyService service = stub;
 
         _ = service.Count;
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
 
         // Reset clears tracking
         stub.Count.Reset();
-        stub.Count.VerifyGet(Times.Never);
+        stub.Count.VerifyGet(Called.Never);
 
         // User override still works
         var count = service.Count;
@@ -295,7 +295,7 @@ public class UserPropertyBasicsTests
         var stub = new MixedUserPropertyStub();
 
         // Properties WITH user override
-        stub.WithUserProperty.VerifyGet(Times.Never);
+        stub.WithUserProperty.VerifyGet(Called.Never);
 
         // Properties WITHOUT user override - configure via Get
         stub.WithoutUserProperty.Get(42);
@@ -313,8 +313,8 @@ public class UserPropertyBasicsTests
         Assert.Equal("Computed: 100", r3);
         Assert.Equal("Configured value", r4);
 
-        stub.WithUserProperty.VerifyGet(Times.Once);
-        stub.WithoutUserProperty.VerifyGet(Times.Once);
+        stub.WithUserProperty.VerifyGet(Called.Once);
+        stub.WithoutUserProperty.VerifyGet(Called.Once);
     }
 
     // =========================================================================
@@ -330,7 +330,7 @@ public class UserPropertyBasicsTests
         IUserPropertyService service = stub;
 
         Assert.Equal(42, service.Count);
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -348,10 +348,10 @@ public class UserPropertyBasicsTests
         service.DefaultItem = "New Default";
         Assert.Equal("New Default", service.DefaultItem);
 
-        stub.CurrentItem.VerifyGet(Times.Once);
-        stub.ItemCount.VerifyGet(Times.Once);
-        stub.DefaultItem.VerifyGet(Times.Once);
-        stub.DefaultItem.VerifySet(Times.Once);
+        stub.CurrentItem.VerifyGet(Called.Once);
+        stub.ItemCount.VerifyGet(Called.Once);
+        stub.DefaultItem.VerifyGet(Called.Once);
+        stub.DefaultItem.VerifySet(Called.Once);
     }
 
     [Fact]
@@ -374,11 +374,11 @@ public class UserPropertyBasicsTests
         config.LogPath = "/var/log/test.log";
         Assert.Equal("/var/log/test.log", stub.GetLogPath());
 
-        stub.ConfigName.VerifyGet(Times.Once);
-        stub.MaxRetries.VerifyGet(Times.Exactly(2));
-        stub.MaxRetries.VerifySet(Times.Once);
-        stub.IsDebugMode.VerifyGet(Times.Once);
-        stub.LogPath.VerifySet(Times.Once);
+        stub.ConfigName.VerifyGet(Called.Once);
+        stub.MaxRetries.VerifyGet(Called.Exactly(2));
+        stub.MaxRetries.VerifySet(Called.Once);
+        stub.IsDebugMode.VerifyGet(Called.Once);
+        stub.LogPath.VerifySet(Called.Once);
     }
 
     [Fact]
@@ -399,11 +399,11 @@ public class UserPropertyBasicsTests
         cache.CurrentValue = "Current String";
         Assert.Equal("Current String", cache.CurrentValue);
 
-        stub.DefaultValue.VerifyGet(Times.Once);
-        stub.CacheSize.VerifyGet(Times.Once);
-        stub.CacheName.VerifyGet(Times.Once);
-        stub.CurrentValue.VerifyGet(Times.Once);
-        stub.CurrentValue.VerifySet(Times.Once);
+        stub.DefaultValue.VerifyGet(Called.Once);
+        stub.CacheSize.VerifyGet(Called.Once);
+        stub.CacheName.VerifyGet(Called.Once);
+        stub.CurrentValue.VerifyGet(Called.Once);
+        stub.CurrentValue.VerifySet(Called.Once);
     }
 
     // =========================================================================
@@ -444,7 +444,7 @@ public class UserPropertyBasicsTests
         ConfigBase config = stub.Object;
 
         Assert.Equal("Override Config", config.ConfigName);
-        stub.ConfigName.VerifyGet(Times.Once);
+        stub.ConfigName.VerifyGet(Called.Once);
     }
 
     [Fact]

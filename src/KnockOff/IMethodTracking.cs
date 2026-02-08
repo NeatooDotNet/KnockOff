@@ -15,25 +15,25 @@ public interface IMethodTracking : ITracking
     new void Verify();
 
     /// <summary>
-    /// Verifies the callback was invoked according to the Times constraint.
+    /// Verifies the callback was invoked according to the Called constraint.
     /// Throws VerificationException if not satisfied.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    void Verify(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    void Verify(Called called);
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
     IMethodTracking Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
-    /// with a specific Times constraint. Returns this for fluent chaining.
+    /// with a specific Called constraint. Returns this for fluent chaining.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    IMethodTracking Verifiable(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    IMethodTracking Verifiable(Called called);
 }
 
 /// <summary>
@@ -46,17 +46,17 @@ public interface IMethodTracking<TArg> : IMethodTracking
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining with LastArg access.
     /// </summary>
     new IMethodTracking<TArg> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
-    /// with a specific Times constraint. Returns this for fluent chaining.
+    /// with a specific Called constraint. Returns this for fluent chaining.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    new IMethodTracking<TArg> Verifiable(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    new IMethodTracking<TArg> Verifiable(Called called);
 }
 
 /// <summary>
@@ -69,15 +69,15 @@ public interface IMethodTrackingArgs<TArgs> : IMethodTracking
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining with LastArgs access.
     /// </summary>
     new IMethodTrackingArgs<TArgs> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
-    /// with a specific Times constraint. Returns this for fluent chaining.
+    /// with a specific Called constraint. Returns this for fluent chaining.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    new IMethodTrackingArgs<TArgs> Verifiable(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    new IMethodTrackingArgs<TArgs> Verifiable(Called called);
 }

@@ -55,7 +55,7 @@ public partial class IValidatePropertyTests
         stub.Name.Get("TestProperty");
 
         Assert.Equal("TestProperty", property.Name);
-        stub.Name.VerifyGet(Times.Once);
+        stub.Name.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public partial class IValidatePropertyTests
 
         property.Value = "NewValue";
 
-        stub.Value.VerifySet(Times.Once);
+        stub.Value.VerifySet(Called.Once);
         Assert.Equal("NewValue", stub.Value.LastSetValue);
     }
 
@@ -171,7 +171,7 @@ public partial class IValidatePropertyTests
 
         await property.SetValue("NewValue");
 
-        stub.SetValue.Verify(Times.Once);
+        stub.SetValue.Verify(Called.Once);
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public partial class IValidatePropertyTests
 
         property.PropertyChanged += (s, e) => { };
 
-        stub.PropertyChanged.VerifyAdd(Times.Once);
+        stub.PropertyChanged.VerifyAdd(Called.Once);
     }
 
     [Fact]
@@ -286,8 +286,8 @@ public partial class IValidatePropertyTests
         property.PropertyChanged += handler;
         property.PropertyChanged -= handler;
 
-        stub.PropertyChanged.VerifyAdd(Times.Once);
-        stub.PropertyChanged.VerifyRemove(Times.Once);
+        stub.PropertyChanged.VerifyAdd(Called.Once);
+        stub.PropertyChanged.VerifyRemove(Called.Once);
     }
 
     [Fact]
@@ -298,7 +298,7 @@ public partial class IValidatePropertyTests
 
         property.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Called.Once);
     }
 
     #endregion
@@ -362,7 +362,7 @@ public partial class IValidatePropertyTests
 
         stub.Name.Reset();
 
-        stub.Name.VerifyGet(Times.Never);
+        stub.Name.VerifyGet(Called.Never);
     }
 
     [Fact]
@@ -376,7 +376,7 @@ public partial class IValidatePropertyTests
 
         stub.SetValue.Reset();
 
-        stub.SetValue.Verify(Times.Never);
+        stub.SetValue.Verify(Called.Never);
     }
 
     #endregion
@@ -479,7 +479,7 @@ public partial class IValidatePropertyOfTTests
 
         property.Value = "NewTypedValue";
 
-        stub.Value.VerifySet(Times.Once);
+        stub.Value.VerifySet(Called.Once);
         Assert.Equal("NewTypedValue", stub.Value.LastSetValue);
     }
 

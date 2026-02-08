@@ -23,7 +23,7 @@ public class StandaloneClassUserMethodTests
 
 		// Assert - user method was called (Execute_ records the command)
 		Assert.Equal("test-command", stub.LastExecutedCommand);
-		stub.Execute.Verify(Times.Once);
+		stub.Execute.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -37,7 +37,7 @@ public class StandaloneClassUserMethodTests
 
 		// Assert - user method provided the value
 		Assert.Equal("[USER: hello]", result);
-		stub.Process.Verify(Times.Once);
+		stub.Process.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -68,7 +68,7 @@ public class StandaloneClassUserMethodTests
 
 		// Assert - user method was called instead of base.Initialize()
 		Assert.True(stub.InitializeCalled);
-		stub.Initialize.Verify(Times.Once);
+		stub.Initialize.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -82,7 +82,7 @@ public class StandaloneClassUserMethodTests
 
 		// Assert - base.Initialize() was called (via unconfigured-count pattern)
 		// The fact that it doesn't throw shows base was called
-		stub.Initialize.Verify(Times.Once);
+		stub.Initialize.Verify(Called.Once);
 	}
 
 	#endregion
@@ -216,7 +216,7 @@ public class StandaloneClassUserMethodTests
 
 		// Assert - user method was called
 		Assert.Equal("other", stub.LastExecutedCommand);
-		stub.Execute.Verify(Times.Once);
+		stub.Execute.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -330,7 +330,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Execute.Verifiable(Times.Exactly(2));
+		stub.Execute.Verifiable(Called.Exactly(2));
 
 		// Act
 		stub.Object.Execute("a");
@@ -345,7 +345,7 @@ public class StandaloneClassUserMethodTests
 	{
 		// Arrange
 		var stub = new SCUserMethodStub();
-		stub.Execute.Verifiable(Times.Exactly(2));
+		stub.Execute.Verifiable(Called.Exactly(2));
 
 		// Act - only call once
 		stub.Object.Execute("a");
@@ -392,7 +392,7 @@ public class StandaloneClassUserMethodTests
 		stub.Object.Process("c");
 
 		// Assert - tracking works even through user method fallback
-		stub.Process.Verify(Times.Exactly(3));
+		stub.Process.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -576,13 +576,13 @@ public class StandaloneClassUserMethodTests
 		stub.Process.Return(s => "[ONCALL]");
 
 		stub.Object.Process("first");
-		stub.Process.Verify(Times.Once);
+		stub.Process.Verify(Called.Once);
 
 		// Act
 		stub.Process.Reset();
 
 		// Assert - OnCall preserved, tracking cleared
-		stub.Process.Verify(Times.Never);
+		stub.Process.Verify(Called.Never);
 		var result = stub.Object.Process("second");
 		Assert.Equal("[ONCALL]", result);
 	}
@@ -600,9 +600,9 @@ public class StandaloneClassUserMethodTests
 		stub.ResetInterceptors();
 
 		// Assert
-		stub.Execute.Verify(Times.Never);
-		stub.Process.Verify(Times.Never);
-		stub.Initialize.Verify(Times.Never);
+		stub.Execute.Verify(Called.Never);
+		stub.Process.Verify(Called.Never);
+		stub.Initialize.Verify(Called.Never);
 	}
 
 	#endregion

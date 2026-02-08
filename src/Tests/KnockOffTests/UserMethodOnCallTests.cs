@@ -93,7 +93,7 @@ public class UserMethodOnCallTests
         service.DoSomething(); // Should not throw
 
         // Assert - Verify it was tracked
-        stub.DoSomething.Verify(Times.Once);
+        stub.DoSomething.Verify(Called.Once);
     }
 
     #endregion
@@ -109,13 +109,13 @@ public class UserMethodOnCallTests
 
         IStrictModeUserMethodTest service = stub;
         service.GetValue(5);
-        stub.GetValue.Verify(Times.Once);
+        stub.GetValue.Verify(Called.Once);
 
         // Act - Reset tracking state
         stub.GetValue.Reset();
 
         // Assert - OnCall configuration is preserved, tracking is cleared
-        stub.GetValue.Verify(Times.Never);
+        stub.GetValue.Verify(Called.Never);
         var result = service.GetValue(3);
         Assert.Equal(300, result); // Still uses OnCall (3 * 100)
     }
@@ -130,13 +130,13 @@ public class UserMethodOnCallTests
         IStrictModeUserMethodTest service = stub;
         service.GetValue(1);
         service.GetValue(2);
-        stub.GetValue.Verify(Times.Exactly(2));
+        stub.GetValue.Verify(Called.Exactly(2));
 
         // Act
         stub.GetValue.Reset();
 
         // Assert - Call count is cleared
-        stub.GetValue.Verify(Times.Never);
+        stub.GetValue.Verify(Called.Never);
     }
 
     #endregion
@@ -218,7 +218,7 @@ public class UserMethodOnCallTests
         service.GetValue(2);
 
         // Assert
-        stub.GetValue.Verify(Times.Exactly(2));
+        stub.GetValue.Verify(Called.Exactly(2));
     }
 
     #endregion

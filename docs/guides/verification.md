@@ -55,7 +55,7 @@ Verify a method was called exactly once.
 <!-- snippet: verify-times-once -->
 ```cs
 // Verify exactly one call
-tracking.Verify(Times.Once);
+tracking.Verify(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -66,7 +66,7 @@ Verify a method was called a minimum number of times.
 <!-- snippet: verify-times-atleast -->
 ```cs
 // Verify at least N calls
-tracking.Verify(Times.AtLeast(2));
+tracking.Verify(Called.AtLeast(2));
 ```
 <!-- endSnippet -->
 
@@ -77,23 +77,23 @@ Verify a method was never invoked.
 <!-- snippet: verify-times-never -->
 ```cs
 // Verify method was never called
-tracking.Verify(Times.Never);
+tracking.Verify(Called.Never);
 ```
 <!-- endSnippet -->
 
-### All Times Matchers
+### All Called Matchers
 
-The `Times` struct supports these verification modes:
+The `Called` struct supports these verification modes:
 
-- `Times.AtLeastOnce` - Default, at least one call
-- `Times.Once` - Exactly one call
-- `Times.Twice` - Exactly two calls
-- `Times.Exactly(n)` - Exactly N calls
-- `Times.AtLeast(n)` - At least N calls
-- `Times.AtMost(n)` - At most N calls
-- `Times.Never` - Zero calls
+- `Called.AtLeastOnce` - Default, at least one call
+- `Called.Once` - Exactly one call
+- `Called.Twice` - Exactly two calls
+- `Called.Exactly(n)` - Exactly N calls
+- `Called.AtLeast(n)` - At least N calls
+- `Called.AtMost(n)` - At most N calls
+- `Called.Never` - Zero calls
 
-**Note:** For most scenarios, use `Times.Once`, `Times.AtLeast(n)`, or `Times.Never`.
+**Note:** For most scenarios, use `Called.Once`, `Called.AtLeast(n)`, or `Called.Never`.
 
 ---
 
@@ -105,14 +105,14 @@ Use `.Verifiable()` to mark interceptors as requiring verification, then call `s
 
 The `verify-verifiable` example in the Direct Verification section demonstrates this pattern. Chain `.Verifiable()` on the builder returned by `Returns`/`Execute`, then call `stub.Verify()` to check all marked members at once.
 
-### Verifiable with Times
+### Verifiable with Called
 
-You can specify `Times` constraints when marking with `.Verifiable()`.
+You can specify `Called` constraints when marking with `.Verifiable()`.
 
 <!-- snippet: verify-verifiable-times -->
 ```cs
-// Mark with Times constraint for batch verification
-stub.Refresh.Call(() => { }).Verifiable(Times.Exactly(2));
+// Mark with Called constraint for batch verification
+stub.Refresh.Call(() => { }).Verifiable(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -187,11 +187,11 @@ stub.Save.Call((user) => { saveCount++; });
 <!-- endSnippet -->
 
 **When to use tracked counts:**
-- Custom verification logic that doesn't fit `Times` matchers
+- Custom verification logic that doesn't fit `Called` matchers
 - Relative comparisons between multiple methods
 - Debugging to understand call patterns
 
-**Prefer `.Verify(Times)` when possible** - it provides clearer error messages and aligns with the verification pattern.
+**Prefer `.Verify(Called)` when possible** - it provides clearer error messages and aligns with the verification pattern.
 
 ---
 
@@ -257,14 +257,14 @@ This approach is cleaner than individual assertions and catches missing verifica
 Properties expose separate verification methods for get and set operations.
 
 **Get verification:**
-- `VerifyGet()` / `VerifyGet(Times)` - Verify get access count
+- `VerifyGet()` / `VerifyGet(Called)` - Verify get access count
 
 **Set verification:**
 - `LastSetValue` - The most recent value assigned to the property
-- `VerifySet()` / `VerifySet(Times)` - Verify set access count
+- `VerifySet()` / `VerifySet(Called)` - Verify set access count
 
 **Combined verification:**
-- `Verify()` / `Verify(Times)` - Verify total access count (get + set)
+- `Verify()` / `Verify(Called)` - Verify total access count (get + set)
 
 ### Property Get Verification
 
@@ -273,7 +273,7 @@ Verify that a property was read the expected number of times.
 <!-- snippet: verify-property-get -->
 ```cs
 // VerifyGet checks how many times property was read
-stub.MaxRetries.VerifyGet(Times.Exactly(2));
+stub.MaxRetries.VerifyGet(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -284,7 +284,7 @@ Verify that a property was written and inspect the assigned value.
 <!-- snippet: verify-property-set -->
 ```cs
 // VerifySet checks property was written
-stub.Timeout.VerifySet(Times.Once);
+stub.Timeout.VerifySet(Called.Once);
 
 // LastSetValue contains the assigned value
 Assert.Equal(30, stub.Timeout.LastSetValue);
@@ -298,7 +298,7 @@ Verify total property access across both get and set operations.
 <!-- snippet: verify-property-combined -->
 ```cs
 // Verify checks combined get + set count (2 gets + 2 sets = 4)
-stub.MaxRetries.Verify(Times.Exactly(4));
+stub.MaxRetries.Verify(Called.Exactly(4));
 ```
 <!-- endSnippet -->
 
@@ -310,7 +310,7 @@ Here's a comprehensive verification scenario demonstrating the recommended patte
 
 <!-- snippet: verify-complete-example -->
 ```cs
-// 1. Batch verification - checks all Times constraints
+// 1. Batch verification - checks all Called constraints
 stub.Verify();
 
 // 2. Argument verification via tracking
@@ -334,8 +334,8 @@ When verification fails, KnockOff throws an exception with a clear message indic
 
 **Common failure scenarios:**
 
-- **Not called enough times**: "Expected method GetById to be called Times.Once, but was called 0 times"
-- **Called too many times**: "Expected method Save to be called Times.Once, but was called 2 times"
+- **Not called enough times**: "Expected method GetById to be called Called.Once, but was called 0 times"
+- **Called too many times**: "Expected method Save to be called Called.Once, but was called 2 times"
 - **Missing `.Verifiable()` calls**: If you call `stub.Verify()` but nothing was marked `.Verifiable()`, no verification occurs
 - **VerifyAll with uncalled members**: "Expected method Refresh to be called at least once, but was never called"
 
@@ -352,7 +352,7 @@ When verification fails, KnockOff throws an exception with a clear message indic
 
 **Prefer `.Verifiable()` + `stub.Verify()` over manual assertions.** This prevents forgetting to verify critical calls and makes test intent explicit.
 
-**Use `Times` constraints to be precise.** `Times.Once` is better than `Times.AtLeastOnce` when you know the exact expected behavior.
+**Use `Called` constraints to be precise.** `Called.Once` is better than `Called.AtLeastOnce` when you know the exact expected behavior.
 
 **Verify intent, not implementation details.** Test that the right methods were called with the right data, not the exact number of times internal helpers ran.
 
@@ -375,8 +375,8 @@ stub.Interceptor.Return((a, b) => a + b).Verifiable();
 VerifyArithmeticOp op = stub;
 op(2, 3);
 
-// Direct verification with Times
-stub.Interceptor.Verify(Times.Once);
+// Direct verification with Called
+stub.Interceptor.Verify(Called.Once);
 
 // Argument tracking via LastArgs
 Assert.Equal((2, 3), stub.Interceptor.LastArgs);

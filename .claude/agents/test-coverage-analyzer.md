@@ -35,7 +35,7 @@ Determine what feature is being tested:
 - Overloaded methods (Method1, Method2 suffixes)
 - User-defined methods (compile-time defaults)
 - Reset() functionality
-- Verification APIs (Verify, Verifiable, Times)
+- Verification APIs (Verify, Verifiable, Called)
 
 ### 2. Search Test Projects
 

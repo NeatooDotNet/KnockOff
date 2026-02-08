@@ -288,7 +288,7 @@ public class ReceivedKnockOffTests
         stub.Verify();
 
         // Or verify with explicit Times
-        stub.SaveUser.Verify(Times.Once);
+        stub.SaveUser.Verify(Called.Once);
     }
 }
 
@@ -324,8 +324,8 @@ public class DidNotReceiveKnockOffTests
         // Don't call DeleteUser
 
         #region nsub-migration-didnotreceive-knockoff
-        // KnockOff: Use Verify(Times.Never) for "did not receive"
-        stub.DeleteUser.Verify(Times.Never);
+        // KnockOff: Use Verify(Called.Never) for "did not receive"
+        stub.DeleteUser.Verify(Called.Never);
         #endregion
     }
 }
@@ -655,14 +655,14 @@ public class ClearReceivedKnockOffTests
         repository.GetUser(1);
         repository.GetUser(2);
 
-        stub.GetUser.Verify(Times.Exactly(2));
+        stub.GetUser.Verify(Called.Exactly(2));
 
         #region nsub-migration-clear-knockoff
         // KnockOff: Reset clears call tracking per-interceptor
         stub.GetUser.Reset();
         #endregion
 
-        stub.GetUser.Verify(Times.Never);
+        stub.GetUser.Verify(Called.Never);
     }
 }
 
@@ -835,8 +835,8 @@ public class CompleteKnockOffNSubTests
     // Argument capture: capture in the callback delegate
     // _stub.SaveUser.Call((user) => { savedUser = user; }).Verifiable();
 
-    // Negative verification: .Verify(Times.Never)
-    // _stub.DeleteUser.Verify(Times.Never);
+    // Negative verification: .Verify(Called.Never)
+    // _stub.DeleteUser.Verify(Called.Never);
     #endregion
 
     private readonly UserServiceNSub _service;
@@ -891,7 +891,7 @@ public class CompleteKnockOffNSubTests
         var result = _service.TryDeleteUser(1);
 
         Assert.False(result);
-        _stub.DeleteUser.Verify(Times.Never);
+        _stub.DeleteUser.Verify(Called.Never);
     }
 }
 
@@ -1126,8 +1126,8 @@ public class GotchaReceivedSyntaxTests
         // stub.DidNotReceive().DeleteUser(1);    // Compile error
 
         // Correct: Use Verify with Times
-        stub.GetUser.Verify(Times.Once);
-        stub.DeleteUser.Verify(Times.Never);
+        stub.GetUser.Verify(Called.Once);
+        stub.DeleteUser.Verify(Called.Never);
         #endregion
     }
 }

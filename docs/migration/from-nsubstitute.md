@@ -56,7 +56,7 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 | Feature | NSubstitute | KnockOff | Verdict |
 |---------|-------------|----------|---------|
 | **API elegance** | `.Returns(42)` | `.Return(42)` or `Return(() => 42)` | Comparable |
-| **Verification readability** | `sub.Received().Method()` | `tracking.Verify(Times.Once)` | NSub is more intuitive |
+| **Verification readability** | `sub.Received().Method()` | `tracking.Verify(Called.Once)` | NSub is more intuitive |
 | **Async setup** | `.Returns(user)` auto-wraps | `Return(user)` auto-wraps; `Return(callback)` simplified also auto-wraps | Comparable |
 | **Learning curve** | Familiar to most C# devs | New patterns to learn | NSub wins |
 | **Recursive mocks** | Built-in support | Not supported | NSub only |
@@ -86,9 +86,9 @@ NSubstitute is a mature, battle-tested framework with an exceptionally clean API
 | `.ReturnsForAnyArgs(value)` | `stub.Method.Return(value)` (inherently matches any) |
 | `.When(x => x.Method()).Do(...)` | Logic in `Return`/`Call` delegate |
 | `.Returns(...).AndDoes(...)` | Combine in single `Return` delegate |
-| `.Received()` | `stub.Method.Verify(Times.AtLeastOnce)` or `.Verifiable()` |
-| `.Received(n)` | `stub.Method.Verify(Times.Exactly(n))` |
-| `.DidNotReceive()` | `tracking.Verify(Times.Never)` |
+| `.Received()` | `stub.Method.Verify(Called.AtLeastOnce)` or `.Verifiable()` |
+| `.Received(n)` | `stub.Method.Verify(Called.Exactly(n))` |
+| `.DidNotReceive()` | `tracking.Verify(Called.Never)` |
 | `Arg.Any<T>()` | Callback receives all arguments (default behavior) |
 | `Arg.Is<T>(predicate)` | `stub.Method.When((args) => predicate).Return(value)` |
 | `.Returns(v1, v2, v3)` | `stub.Method.Return(v1, v2, v3)` (identical syntax) |
@@ -251,7 +251,7 @@ stub.IsConnected.Get(true);
 
 ## Step 7: Verify Calls (Received)
 
-Replace `.Received()` with `Verifiable()` + `Verify()` or direct `Verify(Times)`.
+Replace `.Received()` with `Verifiable()` + `Verify()` or direct `Verify(Called)`.
 
 **NSubstitute:**
 
@@ -278,7 +278,7 @@ stub.SaveUser.Call((user) => { }).Verifiable();
 
 ## Step 8: Verify No Calls (DidNotReceive)
 
-Replace `.DidNotReceive()` with `Times.Never`.
+Replace `.DidNotReceive()` with `Called.Never`.
 
 **NSubstitute:**
 
@@ -293,12 +293,12 @@ substitute.DidNotReceive().DeleteUser(Arg.Any<int>());
 
 <!-- snippet: nsub-migration-didnotreceive-knockoff -->
 ```cs
-// KnockOff: Use Verify(Times.Never) for "did not receive"
-stub.DeleteUser.Verify(Times.Never);
+// KnockOff: Use Verify(Called.Never) for "did not receive"
+stub.DeleteUser.Verify(Called.Never);
 ```
 <!-- endSnippet -->
 
-**Trade-off:** NSubstitute's `.DidNotReceive()` is self-documenting. KnockOff's `Times.Never` achieves the same result but requires knowing the `Times` API.
+**Trade-off:** NSubstitute's `.DidNotReceive()` is self-documenting. KnockOff's `Called.Never` achieves the same result but requires knowing the `Called` API.
 
 ---
 
@@ -632,8 +632,8 @@ private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
 // Argument capture: capture in the callback delegate
 // _stub.SaveUser.Call((user) => { savedUser = user; }).Verifiable();
 
-// Negative verification: .Verify(Times.Never)
-// _stub.DeleteUser.Verify(Times.Never);
+// Negative verification: .Verify(Called.Never)
+// _stub.DeleteUser.Verify(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -642,7 +642,7 @@ private readonly NSubUserRepoStub _stub = new NSubUserRepoStub();
 - Replaced `Substitute.For<T>()` with stub instance
 - Replaced `.Returns()` with `Return`/`Call` delegates
 - Replaced `.Received()` with `.Verifiable()` + `.Verify()`
-- Replaced `.DidNotReceive()` with `tracking.Verify(Times.Never)`
+- Replaced `.DidNotReceive()` with `tracking.Verify(Called.Never)`
 - Added explicit `Task.FromResult()` for async methods
 
 **What stayed the same:**
@@ -692,9 +692,9 @@ stub.GetUserAsync.Return(testUser);
 // stub.Received().GetUser(42);          // Compile error
 // stub.DidNotReceive().DeleteUser(1);    // Compile error
 
-// Correct: Use Verify with Times
-stub.GetUser.Verify(Times.Once);
-stub.DeleteUser.Verify(Times.Never);
+// Correct: Use Verify with Called
+stub.GetUser.Verify(Called.Once);
+stub.DeleteUser.Verify(Called.Never);
 ```
 <!-- endSnippet -->
 

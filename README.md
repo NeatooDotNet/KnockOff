@@ -104,7 +104,7 @@ var userDomainModel = new UserDomainModel(myRepoKO);
 Assert.True(userDomainModel.Fetch(1));
 
 // I have Verify on my Stub!
-myRepoKO.GetUser.Verify(Times.Once);
+myRepoKO.GetUser.Verify(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -143,7 +143,7 @@ myRepoKO.Verify();
 | **Parameter matching** | `Return((a, b) => a > 0 ? 100 : 0)` -- standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter. |
 | **Built-in capture** | `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` — no manual `Arg.Do<>` or `Callback<>` setup. |
 | **Event verification** | `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute. |
-| **Explicit Get/Set verify** | `VerifyGet(Times)` / `VerifySet(Times)` for properties and indexers. |
+| **Explicit Get/Set verify** | `VerifyGet(Called)` / `VerifySet(Called)` for properties and indexers. |
 
 ---
 

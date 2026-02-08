@@ -80,12 +80,12 @@ stub.Save.Call((entity) => { }).Verifiable();
 
 ### Verifying Call Frequency
 
-Use `Times` to specify exact call count requirements. Available options include `Once`, `Never`, `AtLeastOnce`, and `Exactly(n)`:
+Use `Called` to specify exact call count requirements. Available options include `Once`, `Never`, `AtLeastOnce`, and `Exactly(n)`:
 
 <!-- snippet: methods-verify-callcount -->
 ```cs
 // Verify exact call count (throws if different)
-tracking.Verify(Times.Exactly(2));
+tracking.Verify(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -96,7 +96,7 @@ For batch verification of multiple methods, mark each with `.Verifiable()` then 
 <!-- snippet: methods-verify-verifiable -->
 ```cs
 // Mark expected calls with Verifiable(), then stub.Verify() checks all
-stub.Save.Call((entity) => { }).Verifiable(Times.Once);
+stub.Save.Call((entity) => { }).Verifiable(Called.Once);
 stub.GetById.Return((id) => new User { Id = id }).Verifiable();
 ```
 <!-- endSnippet -->
@@ -346,8 +346,8 @@ var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 
 - **Configuration options**: Use `Return(callback)` for dynamic return values, `Call(callback)` for void methods, or `Return(value)` for fixed return values
 - **Callback signature**: Callback matches method signature—receives only the method parameters
-- **Verification patterns**: Individual tracking with `tracking.Verify(Times)` or batch verification with `.Verifiable()` then `stub.Verify()`
-- **Times options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`
+- **Verification patterns**: Individual tracking with `tracking.Verify(Called)` or batch verification with `.Verifiable()` then `stub.Verify()`
+- **Called options**: `Once`, `Never`, `AtLeastOnce`, `Exactly(n)`
 - **Argument capture**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Configure using fully-typed lambda to distinguish which overload
 - **Sequences**: Use `Return(1, 2, 3)` for constant value sequences (NSubstitute-style); use `ThenReturn()`/`ThenCall()` chaining for callback sequences

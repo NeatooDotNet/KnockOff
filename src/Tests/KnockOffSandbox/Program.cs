@@ -16,9 +16,9 @@ IUserService service = knockOff;
 Console.WriteLine("Property Tracking:");
 service.Name = "Test User";
 Console.WriteLine($"  Set Name to: {service.Name}");
-knockOff.Name.VerifySet(Times.Once);
-knockOff.Name.VerifyGet(Times.Once);
-Console.WriteLine($"  Verified: VerifySet(Times.Once) and VerifyGet(Times.Once) passed");
+knockOff.Name.VerifySet(Called.Once);
+knockOff.Name.VerifyGet(Called.Once);
+Console.WriteLine($"  Verified: VerifySet(Called.Once) and VerifyGet(Called.Once) passed");
 // Strongly typed - no cast!
 string? lastSetValue = knockOff.Name.LastSetValue;
 Console.WriteLine($"  LastSetValue (typed): {lastSetValue}");
@@ -31,15 +31,15 @@ service.DoWork();
 doWorkTracking.Verify(); // Verify method was called
 Console.WriteLine($"  DoWork verified!");
 // Verify method was called (throws if not)
-doWorkTracking.Verify(Times.Once);
+doWorkTracking.Verify(Called.Once);
 Console.WriteLine();
 
 // Test method with single param - user-defined method with tracking interceptor
 Console.WriteLine("Method with single param (typed access):");
 var greeting = service.GetGreeting("World");
 Console.WriteLine($"  Result: {greeting}");
-knockOff.GetGreeting.Verify(Times.Once);
-Console.WriteLine($"  Verified: Verify(Times.Once) passed");
+knockOff.GetGreeting.Verify(Called.Once);
+Console.WriteLine($"  Verified: Verify(Called.Once) passed");
 
 // User-defined method tracking has LastArg directly on the interceptor
 string lastArg = knockOff.GetGreeting.LastArg!;
@@ -54,7 +54,7 @@ service.Process("item2", 200, false);
 
 var processArgs = processTracking.LastArgs;
 // Verify method was called twice (throws if not)
-processTracking.Verify(Times.Exactly(2));
+processTracking.Verify(Called.Exactly(2));
 Console.WriteLine($"  Last call: ({processArgs.id}, {processArgs.count}, {processArgs.urgent})");
 Console.WriteLine();
 
@@ -67,12 +67,12 @@ Console.WriteLine();
 
 // Test Reset
 Console.WriteLine("Reset tracking:");
-Console.WriteLine("  Before reset - testing VerifySet(Times.AtLeast(2))...");
-knockOff.Name.VerifySet(Times.AtLeast(2));  // Name was set twice (once in Property Tracking, once via cast)
+Console.WriteLine("  Before reset - testing VerifySet(Called.AtLeast(2))...");
+knockOff.Name.VerifySet(Called.AtLeast(2));  // Name was set twice (once in Property Tracking, once via cast)
 Console.WriteLine("  Verified!");
 knockOff.Name.Reset();
-Console.WriteLine("  After reset - testing VerifySet(Times.Never)...");
-knockOff.Name.VerifySet(Times.Never);
+Console.WriteLine("  After reset - testing VerifySet(Called.Never)...");
+knockOff.Name.VerifySet(Called.Never);
 Console.WriteLine("  Verified! Reset cleared tracking.");
 
 Console.WriteLine();

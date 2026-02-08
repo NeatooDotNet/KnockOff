@@ -37,8 +37,8 @@ public class KOPropertyCollisionTests
 		var value = collision.ICollision;
 
 		Assert.Equal("test", value);
-		knockOff.ICollision.VerifySet(Times.Once);
-		knockOff.ICollision.VerifyGet(Times.Once);
+		knockOff.ICollision.VerifySet(Called.Once);
+		knockOff.ICollision.VerifyGet(Called.Once);
 	}
 
 	[Fact]

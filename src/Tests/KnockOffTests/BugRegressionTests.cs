@@ -22,7 +22,7 @@ public class BugRegressionTests
 		var stub = new ObjectOverrideInlineTest.Stubs.EntityWithObjectOverrides();
 
 		stub.Object.Save();
-		stub.Save.Verify(Times.Once);
+		stub.Save.Verify(Called.Once);
 	}
 
 	// Pattern 3: Standalone Class — [KnockOffBase<T>] → StandaloneClassModelBuilder → StandaloneClassRenderer
@@ -32,7 +32,7 @@ public class BugRegressionTests
 		var stub = new EntityWithObjectOverridesStub();
 
 		stub.Object.Save();
-		stub.Save.Verify(Times.Once);
+		stub.Save.Verify(Called.Once);
 	}
 
 	// Pattern 9: Open Generic Class — [KnockOff(typeof(T<>))] → ClassModelBuilder → ClassRenderer
@@ -42,7 +42,7 @@ public class BugRegressionTests
 		var stub = new OpenGenericObjectOverrideTest.Stubs.GenericEntityWithObjectOverrides<int>();
 
 		stub.Object.Save();
-		stub.Save.Verify(Times.Once);
+		stub.Save.Verify(Called.Once);
 	}
 
 	// Pattern 4: Generic Standalone Class — [KnockOffBase(typeof(T<>))] → StandaloneClassModelBuilder → StandaloneClassRenderer
@@ -52,7 +52,7 @@ public class BugRegressionTests
 		var stub = new GenericEntityWithObjectOverridesStub<int>();
 
 		stub.Object.Save();
-		stub.Save.Verify(Times.Once);
+		stub.Save.Verify(Called.Once);
 	}
 
 	#endregion
@@ -87,7 +87,7 @@ public class BugRegressionTests
 		service.Process("c", 2, true);
 
 		// VerifyAll internally calls TotalCallCount which uses .Sum() across overloads
-		knockOff.Process.Verify(Times.Exactly(3));
+		knockOff.Process.Verify(Called.Exactly(3));
 	}
 
 	#endregion

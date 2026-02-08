@@ -22,7 +22,7 @@ public class InlineStubTests
 		ISimpleService service = stub;
 		var name = service.Name;
 
-		stub.Name.VerifyGet(Times.Once);
+		stub.Name.VerifyGet(Called.Once);
 		Assert.Equal("Test", name);
 	}
 
@@ -34,7 +34,7 @@ public class InlineStubTests
 		ISimpleService service = stub;
 		service.Name = "NewValue";
 
-		stub.Name.VerifySet(Times.Once);
+		stub.Name.VerifySet(Called.Once);
 		Assert.Equal("NewValue", stub.Name.LastSetValue);
 	}
 
@@ -47,7 +47,7 @@ public class InlineStubTests
 		service.DoSomething();
 		service.DoSomething();
 
-		stub.DoSomething.Verify(Times.Exactly(2));
+		stub.DoSomething.Verify(Called.Exactly(2));
 		stub.DoSomething.Verify();
 	}
 
@@ -99,8 +99,8 @@ public class InlineStubTests
 
 		stub.GetValue.Reset();
 
-		stub.GetValue.Verify(Times.Never);
-		stub.GetValue.Verify(Times.Never);
+		stub.GetValue.Verify(Called.Never);
+		stub.GetValue.Verify(Called.Never);
 		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.GetValue.LastArg);
 	}
@@ -153,7 +153,7 @@ public class InlineStubTests
 		service.Create<TestEntity>();
 		service.Create<TestEntity>();
 
-		stub.Create.Of<TestEntity>().Verify(Times.Exactly(2));
+		stub.Create.Of<TestEntity>().Verify(Called.Exactly(2));
 		stub.Create.Of<TestEntity>().Verify();
 	}
 
@@ -167,8 +167,8 @@ public class InlineStubTests
 		service.Create<List<int>>();
 		service.Create<List<int>>();
 
-		stub.Create.Of<TestEntity>().Verify(Times.Once);
-		stub.Create.Of<List<int>>().Verify(Times.Exactly(2));
+		stub.Create.Of<TestEntity>().Verify(Called.Once);
+		stub.Create.Of<List<int>>().Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -181,7 +181,7 @@ public class InlineStubTests
 		service.Create<List<int>>();
 		service.Create<List<string>>();
 
-		stub.Create.Verify(Times.Exactly(3));
+		stub.Create.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -208,8 +208,8 @@ public class InlineStubTests
 		service.Process(42);
 		service.Process(42);
 
-		stub.Process.Of<string>().Verify(Times.Once);
-		stub.Process.Of<int>().Verify(Times.Exactly(2));
+		stub.Process.Of<string>().Verify(Called.Once);
+		stub.Process.Of<int>().Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -224,8 +224,8 @@ public class InlineStubTests
 		service.Convert<string, int>("hello");
 		service.Convert<int, string>(42);
 
-		stub.Convert.Of<string, int>().Verify(Times.Once);
-		stub.Convert.Of<int, string>().Verify(Times.Once);
+		stub.Convert.Of<string, int>().Verify(Called.Once);
+		stub.Convert.Of<int, string>().Verify(Called.Once);
 	}
 
 	[Fact]
@@ -239,8 +239,8 @@ public class InlineStubTests
 
 		stub.Create.Reset();
 
-		stub.Create.Verify(Times.Never);
-		stub.Create.Verify(Times.Never);
+		stub.Create.Verify(Called.Never);
+		stub.Create.Verify(Called.Never);
 	}
 
 	#endregion
@@ -321,7 +321,7 @@ public class DelegateStubTests
 		del();
 		del();
 
-		stub.Interceptor.Verify(Times.Exactly(2));
+		stub.Interceptor.Verify(Called.Exactly(2));
 		stub.Interceptor.Verify();
 	}
 
@@ -334,7 +334,7 @@ public class DelegateStubTests
 		del("hello");
 		del("world");
 
-		stub.Interceptor.Verify(Times.Exactly(2));
+		stub.Interceptor.Verify(Called.Exactly(2));
 		Assert.Equal("world", stub.Interceptor.LastArg);
 	}
 
@@ -413,8 +413,8 @@ public class DelegateStubTests
 		stub.Interceptor.Reset();
 
 		// Tracking state is cleared
-		stub.Interceptor.Verify(Times.Never);
-		stub.Interceptor.Verify(Times.Never);
+		stub.Interceptor.Verify(Called.Never);
+		stub.Interceptor.Verify(Called.Never);
 		Assert.Null(stub.Interceptor.LastArg);
 
 		// Configuration is preserved (Call is a method now, no direct assertion needed)
@@ -445,7 +445,7 @@ public class DelegateStubTests
 
 		Assert.Equal("generated value", result);
 		stub.Interceptor.Verify();
-		stub.Interceptor.Verify(Times.Once);
+		stub.Interceptor.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -474,8 +474,8 @@ public class DelegateStubTests
 		stub.Interceptor.Reset();
 
 		// Tracking state is cleared
-		stub.Interceptor.Verify(Times.Never);
-		stub.Interceptor.Verify(Times.Never);
+		stub.Interceptor.Verify(Called.Never);
+		stub.Interceptor.Verify(Called.Never);
 		Assert.Null(stub.Interceptor.LastArg);
 
 		// Configuration is preserved (Call is a method now, no direct assertion needed)
@@ -752,7 +752,7 @@ public class ClassStubTests
 
 		var name = stub.Object.Name;
 
-		stub.Name.VerifyGet(Times.Once);
+		stub.Name.VerifyGet(Called.Once);
 		Assert.Equal("Intercepted", name);
 	}
 
@@ -763,7 +763,7 @@ public class ClassStubTests
 
 		stub.Object.Name = "NewValue";
 
-		stub.Name.VerifySet(Times.Once);
+		stub.Name.VerifySet(Called.Once);
 		Assert.Equal("NewValue", stub.Name.LastSetValue);
 	}
 
@@ -789,7 +789,7 @@ public class ClassStubTests
 		stub.Object.DoWork();
 		stub.Object.DoWork();
 
-		stub.DoWork.Verify(Times.Exactly(2));
+		stub.DoWork.Verify(Called.Exactly(2));
 		stub.DoWork.Verify();
 	}
 
@@ -848,8 +848,8 @@ public class ClassStubTests
 
 		stub.Calculate.Reset();
 
-		stub.Calculate.Verify(Times.Never);
-		stub.Calculate.Verify(Times.Never);
+		stub.Calculate.Verify(Called.Never);
+		stub.Calculate.Verify(Called.Never);
 		// OnCall callback state is internal after API change to method-based
 		Assert.Null(stub.Calculate.LastArg);
 	}
@@ -865,9 +865,9 @@ public class ClassStubTests
 
 		stub.ResetInterceptors();
 
-		stub.Calculate.Verify(Times.Never);
-		stub.DoWork.Verify(Times.Never);
-		stub.Name.VerifySet(Times.Never);
+		stub.Calculate.Verify(Called.Never);
+		stub.DoWork.Verify(Called.Never);
+		stub.Name.VerifySet(Called.Never);
 	}
 
 	[Fact]
@@ -981,7 +981,7 @@ public class MixedClassStubTests
 
 		stub.Object.VirtualProperty = "Test";
 
-		stub.VirtualProperty.VerifySet(Times.Once);
+		stub.VirtualProperty.VerifySet(Called.Once);
 	}
 
 	[Fact]

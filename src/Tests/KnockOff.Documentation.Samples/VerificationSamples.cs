@@ -75,7 +75,7 @@ public class BasicCallVerificationTests
 
         #region verify-times-once
         // Verify exactly one call
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
         #endregion
     }
 
@@ -92,7 +92,7 @@ public class BasicCallVerificationTests
 
         #region verify-times-atleast
         // Verify at least N calls
-        tracking.Verify(Times.AtLeast(2));
+        tracking.Verify(Called.AtLeast(2));
         #endregion
     }
 
@@ -107,7 +107,7 @@ public class BasicCallVerificationTests
 
         #region verify-times-never
         // Verify method was never called
-        tracking.Verify(Times.Never);
+        tracking.Verify(Called.Never);
         #endregion
     }
 
@@ -123,7 +123,7 @@ public class BasicCallVerificationTests
         repository.Refresh();
 
         // Verify exactly N calls
-        tracking.Verify(Times.Exactly(3));
+        tracking.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class BasicCallVerificationTests
 
         #region verify-verifiable-times
         // Mark with Times constraint for batch verification
-        stub.Refresh.Call(() => { }).Verifiable(Times.Exactly(2));
+        stub.Refresh.Call(() => { }).Verifiable(Called.Exactly(2));
         #endregion
 
         IRepoVerify repository = stub;
@@ -330,7 +330,7 @@ public class PropertyVerificationTests
 
         #region verify-property-get
         // VerifyGet checks how many times property was read
-        stub.MaxRetries.VerifyGet(Times.Exactly(2));
+        stub.MaxRetries.VerifyGet(Called.Exactly(2));
         #endregion
     }
 
@@ -344,7 +344,7 @@ public class PropertyVerificationTests
 
         #region verify-property-set
         // VerifySet checks property was written
-        stub.Timeout.VerifySet(Times.Once);
+        stub.Timeout.VerifySet(Called.Once);
 
         // LastSetValue contains the assigned value
         Assert.Equal(30, stub.Timeout.LastSetValue);
@@ -365,7 +365,7 @@ public class PropertyVerificationTests
 
         #region verify-property-combined
         // Verify checks combined get + set count (2 gets + 2 sets = 4)
-        stub.MaxRetries.Verify(Times.Exactly(4));
+        stub.MaxRetries.Verify(Called.Exactly(4));
         #endregion
     }
 }
@@ -394,10 +394,10 @@ public class CompleteVerificationTests
             getIdHistory.Add(id);
             getOrder = ++order;
             return new User { Id = id, Name = $"User{id}" };
-        }).Verifiable(Times.Exactly(2));
+        }).Verifiable(Called.Exactly(2));
 
-        stub.Save.Call((user) => { saveOrder = ++order; }).Verifiable(Times.Once);
-        stub.Refresh.Call(() => { refreshOrder = ++order; }).Verifiable(Times.Once);
+        stub.Save.Call((user) => { saveOrder = ++order; }).Verifiable(Called.Once);
+        stub.Refresh.Call(() => { refreshOrder = ++order; }).Verifiable(Called.Once);
 
         IRepoVerify repository = stub;
         repository.GetById(1);
@@ -439,7 +439,7 @@ public partial class DelegateVerificationHost
         op(2, 3);
 
         // Direct verification with Times
-        stub.Interceptor.Verify(Times.Once);
+        stub.Interceptor.Verify(Called.Once);
 
         // Argument tracking via LastArgs
         Assert.Equal((2, 3), stub.Interceptor.LastArgs);

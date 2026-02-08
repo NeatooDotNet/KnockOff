@@ -106,28 +106,28 @@ stub.Save.Call((entity) => { }).Verifiable();
 ```
 <!-- endSnippet -->
 
-### Verifying Call Frequency with Times
+### Verifying Call Frequency with Called
 
-Use `Times` to specify exact call count requirements:
+Use `Called` to specify exact call count requirements:
 
 <!-- snippet: methods-verify-callcount -->
 ```cs
 // Verify exact call count (throws if different)
-tracking.Verify(Times.Exactly(2));
+tracking.Verify(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
-**Available Times constraints:**
+**Available Called constraints:**
 
 | Constraint | Description |
 |------------|-------------|
-| `Times.Never` | Method must not be called |
-| `Times.Once` | Method must be called exactly once |
-| `Times.Twice` | Method must be called exactly twice |
-| `Times.AtLeastOnce` | Method must be called one or more times |
-| `Times.Exactly(n)` | Method must be called exactly n times |
-| `Times.AtLeast(n)` | Method must be called n or more times |
-| `Times.AtMost(n)` | Method must be called n or fewer times |
+| `Called.Never` | Method must not be called |
+| `Called.Once` | Method must be called exactly once |
+| `Called.Twice` | Method must be called exactly twice |
+| `Called.AtLeastOnce` | Method must be called one or more times |
+| `Called.Exactly(n)` | Method must be called exactly n times |
+| `Called.AtLeast(n)` | Method must be called n or more times |
+| `Called.AtMost(n)` | Method must be called n or fewer times |
 
 ### Using Verifiable() for Batch Verification
 
@@ -136,7 +136,7 @@ For batch verification of multiple methods, use `.Verifiable()` then call `stub.
 <!-- snippet: methods-verify-verifiable -->
 ```cs
 // Mark expected calls with Verifiable(), then stub.Verify() checks all
-stub.Save.Call((entity) => { }).Verifiable(Times.Once);
+stub.Save.Call((entity) => { }).Verifiable(Called.Once);
 stub.GetById.Return((id) => new User { Id = id }).Verifiable();
 ```
 <!-- endSnippet -->
@@ -434,7 +434,7 @@ User method interceptors provide full tracking even when using `Return`:
 stub.GetById.Return(id => new User { Id = id });
 repo.GetById(42);
 
-stub.GetById.Verify(Times.Once);
+stub.GetById.Verify(Called.Once);
 Assert.Equal(42, stub.GetById.LastArg);
 ```
 <!-- endSnippet -->
@@ -447,10 +447,10 @@ Like regular method interceptors, user method interceptors preserve `Return` con
 ```cs
 stub.GetById.Return(id => new User { Id = id });
 repo.GetById(1);
-stub.GetById.Verify(Times.Once);
+stub.GetById.Verify(Called.Once);
 
 stub.GetById.Reset();
-stub.GetById.Verify(Times.Never);  // Tracking cleared
+stub.GetById.Verify(Called.Never);  // Tracking cleared
 
 repo.GetById(2);  // Still uses Return callback (not reset to user method)
 ```
@@ -485,7 +485,7 @@ var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 | Configure async Task<T> sequence | `stub.AsyncMethod.Return(v1, v2, v3)` |
 | Configure async Task (void, simplified) | `stub.AsyncMethod.Return((args) => { action(); })` |
 | Verify method was called | `tracking.Verify()` |
-| Verify call count | `tracking.Verify(Times.Exactly(n))` |
+| Verify call count | `tracking.Verify(Called.Exactly(n))` |
 | Mark for batch verify | `stub.Method.Return(...).Verifiable()` |
 | Batch verify all | `stub.Verify()` |
 | Get last single arg | `tracking.LastArg` |
@@ -504,7 +504,7 @@ var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 - **Params sequences**: Use `Return(1, 2, 3)` for concise value sequences (matches NSubstitute)
 - **Sequence exhaustion**: Last value repeats after exhaustion (NSubstitute-like behavior)
 - **Async auto-wrapping**: Params values auto-wrap for `Task<T>` and `ValueTask<T>` - no `Task.FromResult()` needed
-- **Verification**: Use `tracking.Verify(Times)` for single methods or `.Verifiable()` + `stub.Verify()` for batch
+- **Verification**: Use `tracking.Verify(Called)` for single methods or `.Verifiable()` + `stub.Verify()` for batch
 - **Arguments**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Distinguished by callback parameter types - use explicit types in lambdas
 - **Reset**: Clears call counts and tracking state, preserves Return/Call callbacks

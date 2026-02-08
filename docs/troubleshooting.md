@@ -139,7 +139,7 @@ Reset() is intended to clear test verification state between test phases, not to
 ```cs
 // Reset() clears tracking but preserves Get configuration
 stub.Host.Reset();
-stub.Host.VerifyGet(Times.Never);  // Tracking cleared
+stub.Host.VerifyGet(Called.Never);  // Tracking cleared
 Assert.Equal("configured-host", config.Host);  // Config preserved
 ```
 <!-- endSnippet -->

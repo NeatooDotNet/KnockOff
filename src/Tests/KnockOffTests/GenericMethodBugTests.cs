@@ -77,8 +77,8 @@ public class GenericMethodBugTests
 		service.Process(42);
 
 		// Non-generic overloads should be tracked
-		stringTracking.Verify(Times.Once); // Process(string)
-		intTracking.Verify(Times.Once); // Process(int)
+		stringTracking.Verify(Called.Once); // Process(string)
+		intTracking.Verify(Called.Once); // Process(int)
 	}
 
 	[Fact]
@@ -91,8 +91,8 @@ public class GenericMethodBugTests
 		service.Process(true);
 
 		// Generic overload should use Of<T>() pattern
-		knockOff.ProcessGeneric.Of<double>().Verify(Times.Once);
-		knockOff.ProcessGeneric.Of<bool>().Verify(Times.Once);
+		knockOff.ProcessGeneric.Of<double>().Verify(Called.Once);
+		knockOff.ProcessGeneric.Of<bool>().Verify(Called.Once);
 	}
 
 	[Fact]
@@ -111,10 +111,10 @@ public class GenericMethodBugTests
 		service.Process<int>(200);          // Generic with T=int
 
 		// All should be tracked independently
-		stringTracking.Verify(Times.Once);  // Process(string)
-		intTracking.Verify(Times.Once);  // Process(int)
-		knockOff.ProcessGeneric.Of<string>().Verify(Times.Once);
-		knockOff.ProcessGeneric.Of<int>().Verify(Times.Once);
+		stringTracking.Verify(Called.Once);  // Process(string)
+		intTracking.Verify(Called.Once);  // Process(int)
+		knockOff.ProcessGeneric.Of<string>().Verify(Called.Once);
+		knockOff.ProcessGeneric.Of<int>().Verify(Called.Once);
 
 		// Note: Process(string) and Process<string>() are DIFFERENT overloads
 		// even though T happens to be string

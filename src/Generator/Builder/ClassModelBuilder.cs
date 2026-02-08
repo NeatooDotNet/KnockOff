@@ -15,6 +15,11 @@ namespace KnockOff.Builder;
 /// </summary>
 internal static class ClassModelBuilder
 {
+    /// <summary>
+    /// Suffix added to generic interceptor property names when a method group has both generic and non-generic overloads.
+    /// </summary>
+    private const string GenericSuffix = "Generic";
+
     public static InlineClassStubModel Build(ClassStubInfo cls)
     {
         var stubClassName = cls.Name;
@@ -29,8 +34,9 @@ internal static class ClassModelBuilder
             ? SymbolHelpers.ReplaceUnboundGeneric(cls.FullName, typeParamList)
             : cls.FullName;
 
-        // Group methods by name with compatibility checking for overload handling
-        var methodGroups = GroupMethodsByName(cls.Members.Where(m => !m.IsProperty && !m.IsIndexer));
+        // Split methods into non-generic and generic groups
+        var allMethods = cls.Members.Where(m => !m.IsProperty && !m.IsIndexer).ToList();
+        var methodsByName = allMethods.GroupBy(m => m.Name).ToList();
 
         // Count indexers to determine naming strategy
         var indexerCount = SymbolHelpers.CountClassIndexers(cls.Members);
@@ -49,6 +55,7 @@ internal static class ClassModelBuilder
         var properties = new List<InlineClassPropertyModel>();
         var indexers = new List<InlineClassIndexerModel>();
         var methods = new List<UnifiedMethodInterceptorModel>();
+        var genericHandlers = new List<InlineGenericMethodHandlerModel>();
         var events = new List<InlineClassEventModel>();
         var interceptorProperties = new List<InlineInterceptorPropertyModel>();
         var resetStatements = new List<string>();
@@ -81,14 +88,63 @@ internal static class ClassModelBuilder
             }
         }
 
-        // Build method interceptors using UnifiedInterceptorBuilder
-        // Each group (compatible or numbered) gets ONE interceptor
-        foreach (var group in methodGroups)
+        // Build method interceptors: handle mixed groups (generic + non-generic with same name)
+        // and pure generic groups separately from pure non-generic groups
+        var nonGenericMethodGroups = new List<MethodGroup>();
+
+        foreach (var nameGroup in methodsByName)
+        {
+            var name = nameGroup.Key;
+            var members = nameGroup.ToList();
+            var hasGeneric = members.Any(m => m.IsGenericMethod);
+            var hasNonGeneric = members.Any(m => !m.IsGenericMethod);
+
+            if (hasGeneric && hasNonGeneric)
+            {
+                // Mixed group: split into separate interceptors
+                var nonGenericMembers = members.Where(m => !m.IsGenericMethod).ToList();
+                var genericMembers = members.Where(m => m.IsGenericMethod).ToList();
+
+                // Non-generic overloads get a UnifiedMethodInterceptorModel
+                var nonGenericGroup = new MethodGroup(name, name, nonGenericMembers);
+                nonGenericMethodGroups.Add(nonGenericGroup);
+
+                // Generic overloads get an InlineGenericMethodHandlerModel with "Generic" suffix
+                var genericName = name + GenericSuffix;
+                var handler = BuildGenericMethodHandlerModel(genericMembers, genericName, name, stubClassName, typeParamList, constraintClause, cls.TypeParameters);
+                genericHandlers.Add(handler);
+                interceptorProperties.Add(new InlineInterceptorPropertyModel(
+                    PropertyName: genericName,
+                    InterceptorTypeName: $"{handler.InterceptorClassName}{typeParamList}",
+                    NeedsNewKeyword: NeedsNewKeyword(genericName),
+                    Description: $"Interceptor for {name} (generic overloads, use .Of<T>())."));
+                resetStatements.Add($"{genericName}.Reset();");
+            }
+            else if (hasGeneric)
+            {
+                // Pure generic group
+                var handler = BuildGenericMethodHandlerModel(members, name, name, stubClassName, typeParamList, constraintClause, cls.TypeParameters);
+                genericHandlers.Add(handler);
+                interceptorProperties.Add(new InlineInterceptorPropertyModel(
+                    PropertyName: name,
+                    InterceptorTypeName: $"{handler.InterceptorClassName}{typeParamList}",
+                    NeedsNewKeyword: NeedsNewKeyword(name),
+                    Description: $"Interceptor for {name} (generic)."));
+                resetStatements.Add($"{name}.Reset();");
+            }
+            else
+            {
+                // Pure non-generic group
+                nonGenericMethodGroups.Add(new MethodGroup(name, name, members));
+            }
+        }
+
+        // Build non-generic method interceptors using UnifiedInterceptorBuilder
+        foreach (var group in nonGenericMethodGroups)
         {
             var interceptorClassName = $"{stubClassName}_{group.GroupName}Interceptor";
             var ownerClassName = $"Stubs.{stubClassName}{typeParamList}";
 
-            // Convert ClassMemberInfo to MethodSignatureInfo for UnifiedInterceptorBuilder
             var signatures = group.Members
                 .Select(m => ToMethodSignatureInfo(m))
                 .ToList();
@@ -96,14 +152,13 @@ internal static class ClassModelBuilder
             var methodModel = UnifiedInterceptorBuilder.BuildMethodInterceptor(
                 interceptorClassName: interceptorClassName,
                 methodName: group.MethodName,
-                declaringInterface: "",  // Class stubs don't have a declaring interface
+                declaringInterface: "",
                 ownerClassName: ownerClassName,
                 ownerTypeParameters: "",
                 overloads: signatures);
 
             methods.Add(methodModel);
 
-            // One interceptor property per group
             interceptorProperties.Add(new InlineInterceptorPropertyModel(
                 PropertyName: group.GroupName,
                 InterceptorTypeName: $"{interceptorClassName}{typeParamList}",
@@ -147,17 +202,15 @@ internal static class ClassModelBuilder
             }
         }
 
-        // Impl methods - one per actual method overload, with signature suffix for multi-overload interceptors
-        foreach (var group in methodGroups)
+        // Impl methods: non-generic methods use existing Invoke pattern
+        foreach (var group in nonGenericMethodGroups)
         {
-            // Find the corresponding method model to check if it has overloads
             var methodModel = methods.First(m => m.MethodName == group.MethodName &&
                 m.InterceptorClassName == $"{stubClassName}_{group.GroupName}Interceptor");
             var hasOverloads = methodModel.Overloads.Count > 0;
 
             foreach (var member in group.Members)
             {
-                // For multi-overload interceptors, compute the invoke suffix
                 var invokeSuffix = "";
                 if (hasOverloads)
                 {
@@ -166,6 +219,23 @@ internal static class ClassModelBuilder
                 }
 
                 implMethods.Add(BuildImplMethodModel(member, group.GroupName, invokeSuffix, hasOverloads));
+            }
+        }
+
+        // Impl methods: generic methods use Of<T>() pattern
+        foreach (var nameGroup in methodsByName)
+        {
+            var name = nameGroup.Key;
+            var members = nameGroup.ToList();
+            var genericMembers = members.Where(m => m.IsGenericMethod).ToList();
+            if (genericMembers.Count == 0) continue;
+
+            var hasNonGeneric = members.Any(m => !m.IsGenericMethod);
+            var handlerName = hasNonGeneric ? name + GenericSuffix : name;
+
+            foreach (var member in genericMembers)
+            {
+                implMethods.Add(BuildImplGenericMethodModel(member, handlerName));
             }
         }
 
@@ -197,6 +267,7 @@ internal static class ClassModelBuilder
             ImplIndexers: implIndexers.ToEquatableArray(),
             ImplMethods: implMethods.ToEquatableArray(),
             ImplEvents: implEvents.ToEquatableArray(),
+            GenericMethodHandlers: genericHandlers.ToEquatableArray(),
             HasRequiredMembers: hasRequiredMembers,
             RequiredMemberNames: requiredMemberNames);
     }
@@ -218,17 +289,6 @@ internal static class ClassModelBuilder
             GroupName = groupName;
             Members = members;
         }
-    }
-
-    /// <summary>
-    /// Groups methods by name. All overloads share a single interceptor with multiple Call signatures.
-    /// </summary>
-    private static List<MethodGroup> GroupMethodsByName(IEnumerable<ClassMemberInfo> methods)
-    {
-        return methods
-            .GroupBy(m => m.Name)
-            .Select(g => new MethodGroup(g.Key, g.Key, g.ToList()))
-            .ToList();
     }
 
     #endregion
@@ -429,6 +489,179 @@ internal static class ClassModelBuilder
             InvokeSuffix: invokeSuffix);
     }
 
+    /// <summary>
+    /// Builds an InlineClassImplMethodModel for a generic method override.
+    /// Generic methods use the Of&lt;T&gt;() handler pattern instead of Invoke.
+    /// </summary>
+    private static InlineClassImplMethodModel BuildImplGenericMethodModel(
+        ClassMemberInfo member,
+        string handlerName)
+    {
+        var typeParams = member.TypeParameters.GetArray()!;
+        var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
+        var typeParamDecl = $"<{typeParamNames}>";
+
+        // Build set of method-level type parameter names for filtering
+        var typeParamSet = new HashSet<string>(typeParams.Select(tp => tp.Name));
+
+        var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
+        var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
+
+        // Non-generic parameters for RecordCall (exclude params typed with method-level type params)
+        var nonGenericParams = member.Parameters
+            .Where(p => !IsGenericParameterType(p.Type, typeParamSet))
+            .ToArray();
+        var nonGenericArgList = string.Join(", ", nonGenericParams.Select(p => p.Name));
+
+        var isVoid = member.ReturnType == "void";
+
+        // Detect Task<T>/ValueTask<T> return types for async handling
+        var isTask = false;
+        var isValueTask = false;
+        var taskTypeArg = "";
+
+        if (member.ReturnType.StartsWith("global::System.Threading.Tasks.Task<"))
+        {
+            isTask = true;
+            taskTypeArg = member.ReturnType.Substring(
+                "global::System.Threading.Tasks.Task<".Length,
+                member.ReturnType.Length - "global::System.Threading.Tasks.Task<".Length - 1);
+        }
+        else if (member.ReturnType.StartsWith("global::System.Threading.Tasks.ValueTask<"))
+        {
+            isValueTask = true;
+            taskTypeArg = member.ReturnType.Substring(
+                "global::System.Threading.Tasks.ValueTask<".Length,
+                member.ReturnType.Length - "global::System.Threading.Tasks.ValueTask<".Length - 1);
+        }
+        else if (member.ReturnType == "global::System.Threading.Tasks.Task")
+        {
+            isTask = true;
+        }
+        else if (member.ReturnType == "global::System.Threading.Tasks.ValueTask")
+        {
+            isValueTask = true;
+        }
+
+        return new InlineClassImplMethodModel(
+            HandlerName: handlerName,
+            MethodName: member.Name,
+            ReturnType: member.ReturnType,
+            AccessModifier: member.AccessModifier,
+            IsVoid: isVoid,
+            IsTask: isTask,
+            IsValueTask: isValueTask,
+            IsAbstract: member.IsAbstract,
+            ParameterDeclarations: paramList,
+            ArgumentList: argList,
+            InputArgumentList: "", // Not used for generic methods
+            CallArgumentList: "", // Not used for generic methods
+            InvokeSuffix: "", // Not used for generic methods
+            IsGenericMethod: true,
+            TypeParameterDecl: typeParamDecl,
+            ConstraintClauses: "", // Must be empty for overrides -- C# inherits constraints from base
+            OfTypeAccess: $".Of<{typeParamNames}>()",
+            NonGenericArgList: nonGenericArgList,
+            TaskTypeArg: taskTypeArg);
+    }
+
+    /// <summary>
+    /// Builds an InlineGenericMethodHandlerModel for a group of generic methods.
+    /// Adapted from InlineModelBuilder.BuildGenericMethodHandlerModel for ClassMemberInfo.
+    /// </summary>
+    private static InlineGenericMethodHandlerModel BuildGenericMethodHandlerModel(
+        List<ClassMemberInfo> genericMembers,
+        string groupName,
+        string methodName,
+        string stubClassName,
+        string classTypeParamList,
+        string classConstraintClause,
+        EquatableArray<TypeParameterInfo> classTypeParams)
+    {
+        var interceptClassName = $"{stubClassName}_{groupName}Interceptor";
+        var stubClassRef = $"Stubs.{stubClassName}{classTypeParamList}";
+
+        // Get the first generic member's type parameters
+        var firstMember = genericMembers[0];
+        var typeParams = firstMember.TypeParameters.GetArray()!;
+        var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
+        var typeParamCount = typeParams.Length;
+
+        // Build constraint clauses for method type parameters
+        var methodConstraintClauses = GetConstraintClauses(typeParams);
+
+        // Get non-generic parameters (exclude params typed with method-level type params)
+        var typeParamSet = new HashSet<string>(typeParams.Select(tp => tp.Name));
+        var inputParams = firstMember.Parameters
+            .Where(p => p.RefKind != RefKind.Out)
+            .ToArray();
+        var nonGenericParams = inputParams
+            .Where(p => !IsGenericParameterType(p.Type, typeParamSet))
+            .ToArray();
+
+        // Build the dictionary key type
+        var keyType = typeParamCount == 1
+            ? "global::System.Type"
+            : $"({string.Join(", ", typeParams.Select(_ => "global::System.Type"))})";
+
+        var keyConstruction = typeParamCount == 1
+            ? $"typeof({typeParams[0].Name})"
+            : $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
+
+        // Build delegate signature (all params, not just non-generic)
+        var delegateReturnType = firstMember.ReturnType == "void" ? "void" : firstMember.ReturnType;
+        var allParams = firstMember.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+        var delegateParams = new List<string>();
+        foreach (var p in allParams)
+        {
+            delegateParams.Add($"{p.Type} {p.Name}");
+        }
+        var delegateParamList = string.Join(", ", delegateParams);
+        var isVoid = firstMember.ReturnType == "void";
+        var delegateSignature = isVoid
+            ? $"public delegate void {methodName}Delegate({delegateParamList});"
+            : $"public delegate {delegateReturnType} {methodName}Delegate({delegateParamList});";
+
+        // LastCallArg/Args types
+        string? lastCallArgType = null;
+        string? lastCallArgsType = null;
+        if (nonGenericParams.Length == 1)
+        {
+            lastCallArgType = MakeNullable(nonGenericParams[0].Type);
+        }
+        else if (nonGenericParams.Length > 1)
+        {
+            lastCallArgsType = "(" + string.Join(", ", nonGenericParams.Select(p => $"{p.Type} {p.Name}")) + ")?";
+        }
+
+        // Build non-generic parameters model
+        var nonGenericParamModels = nonGenericParams.Select(p => new ParameterModel(
+            Name: p.Name,
+            EscapedName: EscapeIdentifier(p.Name),
+            Type: p.Type,
+            NullableType: MakeNullable(p.Type),
+            RefKind: p.RefKind,
+            RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+
+        return new InlineGenericMethodHandlerModel(
+            InterceptorClassName: interceptClassName,
+            MethodName: methodName,
+            ReturnType: firstMember.ReturnType,
+            IsVoid: isVoid,
+            TypeParameterNames: typeParamNames,
+            KeyType: keyType,
+            KeyConstruction: keyConstruction,
+            MethodConstraintClauses: methodConstraintClauses,
+            TypedHandlerClassName: $"{methodName}TypedHandler",
+            DelegateSignature: delegateSignature,
+            NonGenericParameters: nonGenericParamModels,
+            LastCallArgType: lastCallArgType,
+            LastCallArgsType: lastCallArgsType,
+            StubClassName: stubClassRef,
+            InterfaceTypeParameterList: classTypeParamList,
+            InterfaceConstraintClauses: classConstraintClause);
+    }
+
     #endregion
 
     #region NeedsNewKeyword
@@ -486,6 +719,31 @@ internal static class ClassModelBuilder
         };
 
         return keywords.Contains(name) ? $"@{name}" : name;
+    }
+
+    private static bool IsGenericParameterType(string type, HashSet<string> typeParams)
+    {
+        foreach (var tp in typeParams)
+        {
+            if (type == tp || type.Contains($"<{tp}>") || type.Contains($"<{tp},") ||
+                type.Contains($", {tp}>") || type.Contains($", {tp},"))
+                return true;
+        }
+        return false;
+    }
+
+    private static string GetConstraintClauses(TypeParameterInfo[] typeParams)
+    {
+        var clauses = new List<string>();
+        foreach (var tp in typeParams)
+        {
+            if (tp.Constraints.Count > 0)
+            {
+                var constraintStr = string.Join(", ", tp.Constraints);
+                clauses.Add($" where {tp.Name} : {constraintStr}");
+            }
+        }
+        return string.Join("", clauses);
     }
 
     #endregion

@@ -10,8 +10,8 @@ public class VerificationFailure
     /// <summary>The member that failed verification.</summary>
     public string Member { get; }
 
-    /// <summary>The expected Times constraint.</summary>
-    public Times Expected { get; }
+    /// <summary>The expected Called constraint.</summary>
+    public Called Expected { get; }
 
     /// <summary>The actual call count.</summary>
     public int Actual { get; }
@@ -20,12 +20,12 @@ public class VerificationFailure
     public string Message { get; }
 
     /// <summary>
-    /// Creates a verification failure for Times-based failures.
+    /// Creates a verification failure for Called-based failures.
     /// </summary>
     /// <param name="member">The member that failed verification.</param>
-    /// <param name="expected">The expected Times constraint.</param>
+    /// <param name="expected">The expected Called constraint.</param>
     /// <param name="actual">The actual call count.</param>
-    public VerificationFailure(string member, Times expected, int actual)
+    public VerificationFailure(string member, Called expected, int actual)
     {
         Member = member;
         Expected = expected;
@@ -44,12 +44,12 @@ public class VerificationFailure
     {
         return new VerificationFailure(
             member,
-            Times.Exactly(sequenceLength),
+            Called.Exactly(sequenceLength),
             completedCount,
             $"{member}: sequence incomplete - {completedCount} of {sequenceLength} callbacks invoked");
     }
 
-    private VerificationFailure(string member, Times expected, int actual, string message)
+    private VerificationFailure(string member, Called expected, int actual, string message)
     {
         Member = member;
         Expected = expected;

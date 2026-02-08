@@ -301,7 +301,7 @@ public partial class AsyncCallbackSimplificationTests
 		await service.GetStringAsync(2);
 		await service.GetStringAsync(3);
 
-		tracking.Verify(Times.Exactly(3));
+		tracking.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -345,7 +345,7 @@ public partial class AsyncCallbackSimplificationTests
 		await service.SaveAsync("a");
 		await service.SaveAsync("b");
 
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 	}
 
 	[Fact]

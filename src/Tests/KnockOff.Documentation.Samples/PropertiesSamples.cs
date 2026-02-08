@@ -228,7 +228,7 @@ public class PropertyVerificationTests
 
         #region properties-verify-getcount
         // VerifyGet checks how many times property was read
-        stub.Age.VerifyGet(Times.Exactly(2));
+        stub.Age.VerifyGet(Called.Exactly(2));
         #endregion
     }
 
@@ -419,8 +419,8 @@ public class PropertySequenceTests
         setSequence.Verify();
 
         // VerifyGet/VerifySet work the same with sequences
-        stub.Name.VerifyGet(Times.Exactly(2));
-        stub.Age.VerifySet(Times.Exactly(2));
+        stub.Name.VerifyGet(Called.Exactly(2));
+        stub.Age.VerifySet(Called.Exactly(2));
     }
 }
 
@@ -443,15 +443,15 @@ public class PropertyResetTests
         _ = config.Name;
         config.Name = "updated";
 
-        stub.Name.VerifyGet(Times.AtLeastOnce);
-        stub.Name.VerifySet(Times.AtLeastOnce);
+        stub.Name.VerifyGet(Called.AtLeastOnce);
+        stub.Name.VerifySet(Called.AtLeastOnce);
 
         #region properties-reset
         // Reset clears counts but preserves callbacks
         stub.Name.Reset();
 
-        stub.Name.VerifyGet(Times.Never);
-        stub.Name.VerifySet(Times.Never);
+        stub.Name.VerifyGet(Called.Never);
+        stub.Name.VerifySet(Called.Never);
         #endregion
     }
 }
@@ -607,8 +607,8 @@ public class UserPropertyTrackingTests
         _ = service.Count;
         _ = service.Count;
 
-        stub.Count.VerifyGet(Times.Exactly(3));
-        stub.Name.VerifySet(Times.Never);
+        stub.Count.VerifyGet(Called.Exactly(3));
+        stub.Name.VerifySet(Called.Never);
         #endregion
     }
 }
@@ -624,11 +624,11 @@ public class UserPropertyResetTests
 
         ISkillUserSvc service = stub;
         _ = service.Count;
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
 
         // Reset clears tracking but preserves Get
         stub.Count.Reset();
-        stub.Count.VerifyGet(Times.Never);
+        stub.Count.VerifyGet(Called.Never);
 
         var value = service.Count;  // 100 (Get still active)
         #endregion
@@ -714,7 +714,7 @@ public class CompletePropertyExampleTests
         service.ConnectionString = "Server=test";  // Write ConnectionString
 
         // Verification
-        stub.CurrentUser.VerifyGet(Times.Once);
+        stub.CurrentUser.VerifyGet(Called.Once);
         Assert.True(service.IsConnected);
         Assert.Single(connectionStrings);
         Assert.Equal("Server=test", stub.ConnectionString.LastSetValue);

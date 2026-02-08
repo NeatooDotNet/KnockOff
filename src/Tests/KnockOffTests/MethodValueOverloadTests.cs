@@ -19,7 +19,7 @@ public class MethodValueOverloadTests
 		var result = service.GetOptional();
 
 		Assert.Equal("configured value", result);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -33,7 +33,7 @@ public class MethodValueOverloadTests
 		var result = service.GetOptional();
 
 		Assert.Null(result);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -61,7 +61,7 @@ public class MethodValueOverloadTests
 		service.GetOptional();
 		service.GetOptional();
 
-		tracking.Verify(Times.Exactly(3));
+		tracking.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -76,7 +76,7 @@ public class MethodValueOverloadTests
 		var result = service.GetInt();
 
 		Assert.Equal(42, result);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -90,7 +90,7 @@ public class MethodValueOverloadTests
 		var result = service.GetInt();
 
 		Assert.Equal(0, result);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -157,7 +157,7 @@ public class MethodValueOverloadTests
 		await service.GetRequiredAsync();
 		await service.GetRequiredAsync();
 
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 	}
 
 	#endregion
@@ -233,7 +233,7 @@ public class MethodValueOverloadTests
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
-		knockOff.GetOptional.Return("test").Verifiable(Times.Exactly(2));
+		knockOff.GetOptional.Return("test").Verifiable(Called.Exactly(2));
 
 		service.GetOptional();
 		service.GetOptional();

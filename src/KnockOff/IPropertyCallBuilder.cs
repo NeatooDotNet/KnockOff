@@ -23,7 +23,7 @@ public interface IPropertyGetBuilder<TValue> : IPropertyGetTracking
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
     new IPropertyGetBuilder<TValue> Verifiable();
@@ -46,7 +46,7 @@ public interface IPropertySetBuilder<TValue> : IPropertySetTracking<TValue>
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
     new IPropertySetBuilder<TValue> Verifiable();

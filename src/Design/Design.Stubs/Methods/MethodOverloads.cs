@@ -205,13 +205,13 @@ public partial class MethodOverloadsDemo
         formatter.Format("e", new FormatOptions(), 10);
 
         // Each tracker only sees calls to its overload
-        tracking1.Verify(Times.Exactly(2));  // "a", "b"
+        tracking1.Verify(Called.Exactly(2));  // "a", "b"
         // tracking1.LastArg == "b"
 
-        tracking2.Verify(Times.Once);        // "c"
+        tracking2.Verify(Called.Once);        // "c"
         // tracking2.LastArgs == ("c", FormatOptions)
 
-        tracking3.Verify(Times.Exactly(2));  // "d", "e"
+        tracking3.Verify(Called.Exactly(2));  // "d", "e"
         // tracking3.LastArgs == ("e", FormatOptions, 10)
     }
 
@@ -236,7 +236,7 @@ public partial class MethodOverloadsDemo
         formatter.Format("c", new FormatOptions());
 
         // Verify on interceptor counts all overloads: 1 + 2 = 3
-        stub.Format.Verify(Times.Exactly(3));
+        stub.Format.Verify(Called.Exactly(3));
     }
 
     // =========================================================================
@@ -260,9 +260,9 @@ public partial class MethodOverloadsDemo
         formatter.Log("error", 3, "SYSTEM");
 
         // logs.Count == 3
-        tracking1.Verify(Times.Once);
-        tracking2.Verify(Times.Once);
-        tracking3.Verify(Times.Once);
+        tracking1.Verify(Called.Once);
+        tracking2.Verify(Called.Once);
+        tracking3.Verify(Called.Once);
     }
 
     // =========================================================================
@@ -294,8 +294,8 @@ public partial class MethodOverloadsDemo
         // r1 == "[a]"
         // r2 == "[b:ct]"
 
-        tracking1.Verify(Times.Once);
-        tracking2.Verify(Times.Once);
+        tracking1.Verify(Called.Once);
+        tracking2.Verify(Called.Once);
     }
 
     // =========================================================================

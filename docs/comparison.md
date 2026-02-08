@@ -19,7 +19,7 @@ For argument matching, argument capture, and method overload resolution comparis
 | **Sequence** | `mock.SetupSequence(x => x.Add(1, 2)).Returns(1).Returns(2).Returns(3);` | `calc.Add(1, 2).Returns(1, 2, 3);` | `stub.Add.Return(1, 2, 3);` |
 | **Async** | `mock.Setup(x => x.GetUserAsync(1)).ReturnsAsync(user);` | `repo.GetUserAsync(1).Returns(user);` | `stub.GetUserAsync.Return(user);` |
 | **Verify called** | `mock.Verify(x => x.Add(1, 2));` | `calc.Received().Add(1, 2);` | `stub.Add.Verify();` |
-| **Verify count** | `mock.Verify(x => x.Add(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));` | `calc.Received(3).Add(Arg.Any<int>(), Arg.Any<int>());` | `stub.Add.Verify(Times.Exactly(3));` |
+| **Verify count** | `mock.Verify(x => x.Add(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(3));` | `calc.Received(3).Add(Arg.Any<int>(), Arg.Any<int>());` | `stub.Add.Verify(Called.Exactly(3));` |
 
 ---
 
@@ -31,7 +31,7 @@ For argument matching, argument capture, and method overload resolution comparis
 | **Setup setter** | `mock.SetupSet(x => x.Mode = It.IsAny<string>()).Callback<string>(v => captured = v);` | `calc.When(x => x.Mode = Arg.Any<string>()).Do(x => ...);` | `stub.Mode.Set((v) => captured = v);` |
 | **Verify getter** | `mock.VerifyGet(x => x.Mode);` | `_ = calc.Received().Mode;` | `stub.Mode.VerifyGet();` |
 | **Verify setter** | `mock.VerifySet(x => x.Mode = "Scientific");` | `calc.Received().Mode = "Scientific";` | `stub.Mode.VerifySet();` |
-| **Verify count** | `mock.VerifyGet(x => x.Mode, Times.Exactly(3));` | `_ = calc.Received(3).Mode;` | `stub.Mode.VerifyGet(Times.Exactly(3));` |
+| **Verify count** | `mock.VerifyGet(x => x.Mode, Times.Exactly(3));` | `_ = calc.Received(3).Mode;` | `stub.Mode.VerifyGet(Called.Exactly(3));` |
 | **Capture value** | `mock.SetupSet(x => x.Mode = It.IsAny<string>()).Callback<string>(v => captured = v);` | `calc.When(x => x.Mode = Arg.Do<string>(v => ...)).Do(...);` | `stub.Mode.LastSetValue` (built-in) |
 
 ---
@@ -42,8 +42,8 @@ For argument matching, argument capture, and method overload resolution comparis
 |------|-----|-------------|----------|
 | **Raise event** | `mock.Raise(x => x.PoweringUp += null, EventArgs.Empty);` | `calc.PoweringUp += Raise.Event();` | `stub.PoweringUp.Raise(stub, EventArgs.Empty);` |
 | **Raise with args** | `mock.Raise(x => x.PoweringUp += null, sender, args);` | `calc.PoweringUp += Raise.EventWith(sender, args);` | `stub.PoweringUp.Raise(sender, args);` |
-| **Verify subscription** | *(not available)* | *(not available)* | `stub.PoweringUp.VerifyAdd(Times.Once);` |
-| **Verify unsubscription** | *(not available)* | *(not available)* | `stub.PoweringUp.VerifyRemove(Times.Once);` |
+| **Verify subscription** | *(not available)* | *(not available)* | `stub.PoweringUp.VerifyAdd(Called.Once);` |
+| **Verify unsubscription** | *(not available)* | *(not available)* | `stub.PoweringUp.VerifyRemove(Called.Once);` |
 | **Check subscribers** | *(not available)* | *(not available)* | `stub.PoweringUp.HasSubscribers` |
 
 ---
@@ -58,7 +58,7 @@ For argument matching, argument capture, and method overload resolution comparis
 | **Async** | `mock.Setup(x => x(1)).ReturnsAsync(42);` | `asyncOp(1).Returns(42);` | `stub.Interceptor.Return(42);` (auto-wraps) |
 | **Match values** | `mock.Setup(x => x(42)).Returns("found");` | *(per-parameter Arg.Is)* | `stub.Interceptor.When(42).Return("found");` |
 | **Verify** | `mock.Verify(x => x(42));` | `factory.Received()(42);` | `stub.Interceptor.Verify();` |
-| **Verify count** | `mock.Verify(x => x(It.IsAny<int>()), Times.Exactly(3));` | `factory.Received(3)(Arg.Any<int>());` | `stub.Interceptor.Verify(Times.Exactly(3));` |
+| **Verify count** | `mock.Verify(x => x(It.IsAny<int>()), Times.Exactly(3));` | `factory.Received(3)(Arg.Any<int>());` | `stub.Interceptor.Verify(Called.Exactly(3));` |
 | **Capture** | *(manual with Callback)* | *(manual with Arg.Do)* | `stub.Interceptor.LastArg` (built-in) |
 
 ---

@@ -131,7 +131,7 @@ Property interceptors support verification similar to method interceptors.
 <!-- snippet: properties-verify-getcount -->
 ```cs
 // VerifyGet checks how many times property was read
-stub.Age.VerifyGet(Times.Exactly(2));
+stub.Age.VerifyGet(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -151,11 +151,11 @@ Assert.Equal("Expected", stub.Name.LastSetValue);
 | Method | Description |
 |--------|-------------|
 | `VerifyGet()` | Verify property getter was called at least once (throws if not) |
-| `VerifyGet(Times)` | Verify property getter was called according to Times constraint |
+| `VerifyGet(Called)` | Verify property getter was called according to Called constraint |
 | `VerifySet()` | Verify property setter was called at least once (throws if not) |
-| `VerifySet(Times)` | Verify property setter was called according to Times constraint |
+| `VerifySet(Called)` | Verify property setter was called according to Called constraint |
 | `Verify()` | Verify property was accessed (get or set) at least once |
-| `Verify(Times)` | Verify total access count (get + set) satisfies Times constraint |
+| `Verify(Called)` | Verify total access count (get + set) satisfies Called constraint |
 
 ### Inspection Properties
 
@@ -183,7 +183,7 @@ stub.Age.Verifiable();
 | Method | Description |
 |--------|-------------|
 | `Verifiable()` | Mark property (get and set) for batch verification with default constraint (AtLeastOnce) |
-| `Verifiable(Times)` | Mark property (get and set) for batch verification with specific Times constraint |
+| `Verifiable(Called)` | Mark property (get and set) for batch verification with specific Called constraint |
 
 ---
 
@@ -297,8 +297,8 @@ Calling `Reset()` on a property interceptor clears tracking state but preserves 
 // Reset clears counts but preserves callbacks
 stub.Name.Reset();
 
-stub.Name.VerifyGet(Times.Never);
-stub.Name.VerifySet(Times.Never);
+stub.Name.VerifyGet(Called.Never);
+stub.Name.VerifySet(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -440,8 +440,8 @@ _ = service.Count;
 _ = service.Count;
 _ = service.Count;
 
-stub.Count.VerifyGet(Times.Exactly(3));
-stub.Name.VerifySet(Times.Never);
+stub.Count.VerifyGet(Called.Exactly(3));
+stub.Name.VerifySet(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -456,11 +456,11 @@ stub.Count.Get(100);  // Override user property
 
 ISkillUserSvc service = stub;
 _ = service.Count;
-stub.Count.VerifyGet(Times.Once);
+stub.Count.VerifyGet(Called.Once);
 
 // Reset clears tracking but preserves Get
 stub.Count.Reset();
-stub.Count.VerifyGet(Times.Never);
+stub.Count.VerifyGet(Called.Never);
 
 var value = service.Count;  // 100 (Get still active)
 ```
@@ -546,7 +546,7 @@ Choose your configuration approach based on the test scenario:
 | Track all values written to property | `Set` | `stub.Name.Set((v) => list.Add(v));` |
 | Simulate validation in dependency | `Set` | `stub.Age.Set((v) => Validate(v));` |
 | Property should react differently to successive writes | `Set().ThenSet()` | `stub.Name.Set(cb1).ThenSet(cb2);` |
-| Verify property was accessed N times | `VerifyGet` | `stub.UserId.VerifyGet(Times.Exactly(2));` |
+| Verify property was accessed N times | `VerifyGet` | `stub.UserId.VerifyGet(Called.Exactly(2));` |
 | Verify last value written | `LastSetValue` | `Assert.Equal("x", stub.Name.LastSetValue);` |
 
 ---
@@ -566,13 +566,13 @@ Choose your configuration approach based on the test scenario:
 | Method | Description |
 |--------|-------------|
 | `Verify()` | Verify property was accessed (get or set) at least once |
-| `Verify(Times)` | Verify total access count satisfies Times constraint |
+| `Verify(Called)` | Verify total access count satisfies Called constraint |
 | `VerifyGet()` | Verify property getter was called at least once |
-| `VerifyGet(Times)` | Verify property getter was called according to Times constraint |
+| `VerifyGet(Called)` | Verify property getter was called according to Called constraint |
 | `VerifySet()` | Verify property setter was called at least once |
-| `VerifySet(Times)` | Verify property setter was called according to Times constraint |
+| `VerifySet(Called)` | Verify property setter was called according to Called constraint |
 | `Verifiable()` | Mark property for batch verification (AtLeastOnce) |
-| `Verifiable(Times)` | Mark property for batch verification with specific constraint |
+| `Verifiable(Called)` | Mark property for batch verification with specific constraint |
 
 ### Inspection Properties
 

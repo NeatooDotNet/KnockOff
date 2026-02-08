@@ -287,8 +287,8 @@ public partial class OverloadGroupAsyncCallbackTests
 		await service.GetByIdAsync(3, cts.Token);
 
 		// Each overload tracked separately
-		tracking1.Verify(Times.Exactly(2));
-		tracking2.Verify(Times.Once);
+		tracking1.Verify(Called.Exactly(2));
+		tracking2.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -335,9 +335,9 @@ public partial class OverloadGroupAsyncCallbackTests
 		await service.GetCachedAsync("b");
 		await service.GetCachedAsync("c");
 
-		tracking.Verify(Times.AtLeast(2));
-		tracking.Verify(Times.AtMost(5));
-		tracking.Verify(Times.Exactly(3));
+		tracking.Verify(Called.AtLeast(2));
+		tracking.Verify(Called.AtMost(5));
+		tracking.Verify(Called.Exactly(3));
 	}
 
 	#endregion
@@ -417,11 +417,11 @@ public partial class OverloadGroupAsyncCallbackTests
 		await service.GetByIdAsync(1);
 		await service.GetByIdAsync(2);
 
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 
 		stub.GetByIdAsync.Reset();
 
-		tracking.Verify(Times.Never);
+		tracking.Verify(Called.Never);
 	}
 
 	#endregion

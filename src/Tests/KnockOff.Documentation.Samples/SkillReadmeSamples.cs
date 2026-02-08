@@ -244,7 +244,7 @@ public class SkillReadmeVerificationTests
         stub.Save.Reset(); // Reset for second pattern demo
         var tracking = stub.Save.Call((user) => { });
         svc.Save(new User { Id = 2 }); // Call the method
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
         #endregion
     }
 
@@ -271,6 +271,6 @@ public class SkillReadmeVerificationTests
         ISaver svc = stub;
         svc.Save(new User { Id = 1 });
 
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
     }
 }

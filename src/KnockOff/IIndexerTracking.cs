@@ -19,25 +19,25 @@ public interface IIndexerGetTracking<TKey>
     void Verify();
 
     /// <summary>
-    /// Verifies the getter callback was invoked according to the Times constraint.
+    /// Verifies the getter callback was invoked according to the Called constraint.
     /// Throws VerificationException if not satisfied.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    void Verify(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    void Verify(Called called);
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
     IIndexerGetTracking<TKey> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
-    /// with a specific Times constraint. Returns this for fluent chaining.
+    /// with a specific Called constraint. Returns this for fluent chaining.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    IIndexerGetTracking<TKey> Verifiable(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    IIndexerGetTracking<TKey> Verifiable(Called called);
 }
 
 /// <summary>
@@ -59,23 +59,23 @@ public interface IIndexerSetTracking<TKey, TValue>
     void Verify();
 
     /// <summary>
-    /// Verifies the setter callback was invoked according to the Times constraint.
+    /// Verifies the setter callback was invoked according to the Called constraint.
     /// Throws VerificationException if not satisfied.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    void Verify(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    void Verify(Called called);
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
     IIndexerSetTracking<TKey, TValue> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
-    /// with a specific Times constraint. Returns this for fluent chaining.
+    /// with a specific Called constraint. Returns this for fluent chaining.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    IIndexerSetTracking<TKey, TValue> Verifiable(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    IIndexerSetTracking<TKey, TValue> Verifiable(Called called);
 }

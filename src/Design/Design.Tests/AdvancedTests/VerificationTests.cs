@@ -41,7 +41,7 @@ public class VerificationTests
         ICalculator calc = stub;
         calc.Add(1, 2);
 
-        Assert.Throws<VerificationException>(() => stub.Add.Verify(Times.Never));
+        Assert.Throws<VerificationException>(() => stub.Add.Verify(Called.Never));
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class VerificationTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        stub.Add.Verify(Times.Never); // Should not throw
+        stub.Add.Verify(Called.Never); // Should not throw
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class VerificationTests
         calc.Add(1, 2);
         calc.Add(3, 4);
 
-        stub.Add.Verify(Times.Exactly(2));
+        stub.Add.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class VerificationTests
         calc.Add(3, 4);
         calc.Add(5, 6);
 
-        stub.Add.Verify(Times.AtLeast(2));
+        stub.Add.Verify(Called.AtLeast(2));
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class VerificationTests
         calc.Add(1, 2);
         calc.Add(3, 4);
 
-        stub.Add.Verify(Times.AtMost(5));
+        stub.Add.Verify(Called.AtMost(5));
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class VerificationTests
     {
         var stub = new VerificationDemo.Stubs.ICalculator();
 
-        stub.Add.Return(42).Verifiable(Times.Exactly(2));
+        stub.Add.Return(42).Verifiable(Called.Exactly(2));
 
         ICalculator calc = stub;
         calc.Add(1, 2);

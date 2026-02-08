@@ -32,7 +32,7 @@ public partial class INotifyNeatooPropertyChangedTests
 
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Called.Once);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public partial class INotifyNeatooPropertyChangedTests
         notify.NeatooPropertyChanged += handler;
         notify.NeatooPropertyChanged -= handler;
 
-        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
-        stub.NeatooPropertyChanged.VerifyRemove(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Called.Once);
+        stub.NeatooPropertyChanged.VerifyRemove(Called.Once);
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public partial class INotifyNeatooPropertyChangedTests
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChanged.VerifyAdd(Times.Exactly(3));
+        stub.NeatooPropertyChanged.VerifyAdd(Called.Exactly(3));
     }
 }
 
@@ -96,7 +96,7 @@ public class INotifyNeatooPropertyChangedStandaloneTests
 
         notify.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Called.Once);
     }
 }
 
@@ -133,7 +133,7 @@ public partial class NeatooPropertyChangedDelegateTests
 
         await del(new NeatooPropertyChangedEventArgs("TestProperty", this));
 
-        stub.Interceptor.Verify(Times.Once);
+        stub.Interceptor.Verify(Called.Once);
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public partial class NeatooPropertyChangedDelegateTests
         await del(new NeatooPropertyChangedEventArgs("Prop2", this));
         await del(new NeatooPropertyChangedEventArgs("Prop3", this));
 
-        stub.Interceptor.Verify(Times.Exactly(3));
+        stub.Interceptor.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -184,6 +184,6 @@ public partial class NeatooPropertyChangedDelegateTests
 
         stub.Interceptor.Reset();
 
-        stub.Interceptor.Verify(Times.Never);
+        stub.Interceptor.Verify(Called.Never);
     }
 }

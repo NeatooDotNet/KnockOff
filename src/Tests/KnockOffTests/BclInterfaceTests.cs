@@ -26,7 +26,7 @@ public class BclInterfaceTests
 
         disposable.Dispose();
 
-        stub.Dispose.Verify(Times.Once);
+        stub.Dispose.Verify(Called.Once);
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class BclInterfaceTests
         disposable.Dispose();
         disposable.Dispose();
 
-        stub.Dispose.Verify(Times.Exactly(3));
+        stub.Dispose.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class BclInterfaceTests
 
         await disposable.DisposeAsync();
 
-        stub.DisposeAsync.Verify(Times.Once);
+        stub.DisposeAsync.Verify(Called.Once);
     }
 
     #endregion
@@ -140,7 +140,7 @@ public class BclInterfaceTests
 
         Assert.True(enumerator.MoveNext());
         Assert.Equal("a", enumerator.Current);
-        stub.GetEnumerator.Verify(Times.Once); // Should only track once via delegation
+        stub.GetEnumerator.Verify(Called.Once); // Should only track once via delegation
     }
 
     #endregion
@@ -168,8 +168,8 @@ public class BclInterfaceTests
         list[0] = "value";
         var _ = list[1];
 
-        stub.Indexer.VerifySet(Times.Once);
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifySet(Called.Once);
+        stub.Indexer.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class BclInterfaceTests
         list.Add("item1");
         list.Add("item2");
 
-        stub.Add.Verify(Times.Exactly(2));
+        stub.Add.Verify(Called.Exactly(2));
         Assert.Equal("item2", stub.Add.LastArg);
     }
 
@@ -206,8 +206,8 @@ public class BclInterfaceTests
         list[0] = "value";
         var _ = list[1];
 
-        stub.Indexer.VerifySet(Times.Once);
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifySet(Called.Once);
+        stub.Indexer.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public class BclInterfaceTests
         list.Add(42);
         list.Add(100);
 
-        stub.Add.Verify(Times.Exactly(2));
+        stub.Add.Verify(Called.Exactly(2));
         Assert.Equal(100, stub.Add.LastArg);
     }
 
@@ -383,7 +383,7 @@ public class BclInterfaceTests
 
         var _ = collection.Count;
 
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -457,8 +457,8 @@ public class BclInterfaceTests
         dict["key"] = "value";
         var _ = dict["otherKey"];
 
-        stub.Indexer.VerifySet(Times.Once);
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifySet(Called.Once);
+        stub.Indexer.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -493,8 +493,8 @@ public class BclInterfaceTests
         dict[1] = user;
         var _ = dict[2];
 
-        stub.Indexer.VerifySet(Times.Once);
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifySet(Called.Once);
+        stub.Indexer.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -521,7 +521,7 @@ public class BclInterfaceTests
 
         var _ = list[0];
 
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -532,7 +532,7 @@ public class BclInterfaceTests
 
         var _ = list.Count;
 
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -543,7 +543,7 @@ public class BclInterfaceTests
 
         var _ = collection.Count;
 
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -554,7 +554,7 @@ public class BclInterfaceTests
 
         var _ = dict["key"];
 
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -860,7 +860,7 @@ public class BclInterfaceTests
         notifier.PropertyChanged += (s, e) => { };
         notifier.PropertyChanged += (s, e) => { };
 
-        stub.PropertyChanged.VerifyAdd(Times.Exactly(2));
+        stub.PropertyChanged.VerifyAdd(Called.Exactly(2));
     }
 
     [Fact]
@@ -889,7 +889,7 @@ public class BclInterfaceTests
 
         var _ = queryable.Expression;
 
-        stub.Expression.VerifyGet(Times.Once);
+        stub.Expression.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -900,7 +900,7 @@ public class BclInterfaceTests
 
         var _ = queryable.ElementType;
 
-        stub.ElementType.VerifyGet(Times.Once);
+        stub.ElementType.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -911,7 +911,7 @@ public class BclInterfaceTests
 
         var _ = queryable.Provider;
 
-        stub.Provider.VerifyGet(Times.Once);
+        stub.Provider.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -922,7 +922,7 @@ public class BclInterfaceTests
 
         var _ = queryable.Expression;
 
-        stub.Expression.VerifyGet(Times.Once);
+        stub.Expression.VerifyGet(Called.Once);
     }
 
     #endregion
@@ -1022,7 +1022,7 @@ public class BclInterfaceTests
 
         var _ = asyncResult.IsCompleted;
 
-        stub.IsCompleted.VerifyGet(Times.Once);
+        stub.IsCompleted.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -1033,7 +1033,7 @@ public class BclInterfaceTests
 
         var _ = asyncResult.AsyncWaitHandle;
 
-        stub.AsyncWaitHandle.VerifyGet(Times.Once);
+        stub.AsyncWaitHandle.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -1044,7 +1044,7 @@ public class BclInterfaceTests
 
         var _ = asyncResult.CompletedSynchronously;
 
-        stub.CompletedSynchronously.VerifyGet(Times.Once);
+        stub.CompletedSynchronously.VerifyGet(Called.Once);
     }
 
     #endregion
@@ -1138,7 +1138,7 @@ public class BclInterfaceTests
 
         var _ = enumerator.Current;
 
-        stub.Current.VerifyGet(Times.Once);
+        stub.Current.VerifyGet(Called.Once);
     }
 
     #endregion
@@ -1236,7 +1236,7 @@ public class BclInterfaceTests
 
         var _ = enumerator.Key;
 
-        stub.Key.VerifyGet(Times.Once);
+        stub.Key.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -1247,7 +1247,7 @@ public class BclInterfaceTests
 
         var _ = enumerator.Value;
 
-        stub.Value.VerifyGet(Times.Once);
+        stub.Value.VerifyGet(Called.Once);
     }
 
     #endregion
@@ -1262,7 +1262,7 @@ public class BclInterfaceTests
 
         var _ = grouping.Key;
 
-        stub.Key.VerifyGet(Times.Once);
+        stub.Key.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -1273,7 +1273,7 @@ public class BclInterfaceTests
 
         var _ = grouping.Key;
 
-        stub.Key.VerifyGet(Times.Once);
+        stub.Key.VerifyGet(Called.Once);
     }
 
     #endregion
@@ -1299,7 +1299,7 @@ public class BclInterfaceTests
 
         var _ = ordered.Expression;
 
-        stub.Expression.VerifyGet(Times.Once);
+        stub.Expression.VerifyGet(Called.Once);
     }
 
     #endregion

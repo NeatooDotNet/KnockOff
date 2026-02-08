@@ -17,17 +17,17 @@ public interface IMethodCallBuilder<TCallback> : IMethodTracking
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
     new IMethodCallBuilder<TCallback> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
-    /// with a specific Times constraint. Returns this for fluent chaining.
+    /// with a specific Called constraint. Returns this for fluent chaining.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    new IMethodCallBuilder<TCallback> Verifiable(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    new IMethodCallBuilder<TCallback> Verifiable(Called called);
 }
 
 /// <summary>
@@ -44,17 +44,17 @@ public interface IMethodCallBuilder<TCallback, TArg> : IMethodTracking<TArg>
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining with LastArg access.
     /// </summary>
     new IMethodCallBuilder<TCallback, TArg> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
-    /// with a specific Times constraint. Returns this for fluent chaining.
+    /// with a specific Called constraint. Returns this for fluent chaining.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    new IMethodCallBuilder<TCallback, TArg> Verifiable(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    new IMethodCallBuilder<TCallback, TArg> Verifiable(Called called);
 }
 
 /// <summary>
@@ -71,15 +71,15 @@ public interface IMethodCallBuilderArgs<TCallback, TArgs> : IMethodTrackingArgs<
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining with LastArgs access.
     /// </summary>
     new IMethodCallBuilderArgs<TCallback, TArgs> Verifiable();
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify()
-    /// with a specific Times constraint. Returns this for fluent chaining.
+    /// with a specific Called constraint. Returns this for fluent chaining.
     /// </summary>
-    /// <param name="times">The Times constraint to verify against.</param>
-    new IMethodCallBuilderArgs<TCallback, TArgs> Verifiable(Times times);
+    /// <param name="called">The Called constraint to verify against.</param>
+    new IMethodCallBuilderArgs<TCallback, TArgs> Verifiable(Called called);
 }
