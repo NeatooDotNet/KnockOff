@@ -17,7 +17,7 @@ public interface IIndexerGetBuilder<TKey, TValue> : IIndexerGetTracking<TKey>
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
     new IIndexerGetBuilder<TKey, TValue> Verifiable();
@@ -40,7 +40,7 @@ public interface IIndexerSetBuilder<TKey, TValue> : IIndexerSetTracking<TKey, TV
 
     /// <summary>
     /// Marks this callback registration for verification by Stub.Verify().
-    /// Uses Times.AtLeastOnce as the constraint.
+    /// Uses Called.AtLeastOnce as the constraint.
     /// Returns this for fluent chaining.
     /// </summary>
     new IIndexerSetBuilder<TKey, TValue> Verifiable();

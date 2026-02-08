@@ -101,7 +101,7 @@ public class IndexerBasicsTests
         _ = collection["a"];
         _ = collection["b"];
 
-        stub.Indexer.VerifyGet(Times.Exactly(2));
+        stub.Indexer.VerifyGet(Called.Exactly(2));
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class IndexerBasicsTests
         collection["b"] = 2;
         collection["c"] = 3;
 
-        stub.Indexer.VerifySet(Times.Exactly(3));
+        stub.Indexer.VerifySet(Called.Exactly(3));
     }
 
     [Fact]

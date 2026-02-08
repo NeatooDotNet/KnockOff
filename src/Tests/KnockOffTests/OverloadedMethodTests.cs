@@ -23,9 +23,9 @@ public class OverloadedMethodTests
 		service.Process("data3", 10, true);  // Process(string, int, bool)
 
 		// Each overload has its own separate tracking
-		tracking1.Verify(Times.Once);
-		tracking2.Verify(Times.Once);
-		tracking3.Verify(Times.Once);
+		tracking1.Verify(Called.Once);
+		tracking2.Verify(Called.Once);
+		tracking3.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -41,7 +41,7 @@ public class OverloadedMethodTests
 
 		// Single param uses LastArg
 		Assert.Equal("second", tracking.LastArg);
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -92,13 +92,13 @@ public class OverloadedMethodTests
 		service.Process("d", 2, false);
 
 		// Each tracking object tracks its own overload
-		tracking1.Verify(Times.Exactly(2));
+		tracking1.Verify(Called.Exactly(2));
 		Assert.Equal("b", tracking1.LastArg); // Last call to this overload
 
-		tracking2.Verify(Times.Once);
+		tracking2.Verify(Called.Once);
 		Assert.Equal(("c", 1), tracking2.LastArgs);
 
-		tracking3.Verify(Times.Once);
+		tracking3.Verify(Called.Once);
 		Assert.Equal(("d", 2, false), tracking3.LastArgs);
 	}
 
@@ -117,9 +117,9 @@ public class OverloadedMethodTests
 		service.Process("test");
 
 		// Verify only the first overload was called
-		tracking1.Verify(Times.Once);
-		tracking2.Verify(Times.Never);
-		tracking3.Verify(Times.Never);
+		tracking1.Verify(Called.Once);
+		tracking2.Verify(Called.Never);
+		tracking3.Verify(Called.Never);
 	}
 
 	[Fact]
@@ -166,8 +166,8 @@ public class OverloadedMethodTests
 		Assert.Equal("FromCt", result2?.Name);
 
 		// Verify tracking - each overload tracked separately
-		tracking1.Verify(Times.Once);
-		tracking2.Verify(Times.Once);
+		tracking1.Verify(Called.Once);
+		tracking2.Verify(Called.Once);
 
 		// LastArg for single param overload
 		Assert.Equal(1, tracking1.LastArg);
@@ -190,15 +190,15 @@ public class OverloadedMethodTests
 		service.Process("test");
 		service.Process("test2", 1);
 
-		tracking1.Verify(Times.Once);
-		tracking2.Verify(Times.Once);
+		tracking1.Verify(Called.Once);
+		tracking2.Verify(Called.Once);
 
 		// Reset clears all overloads
 		knockOff.Process.Reset();
 
-		tracking1.Verify(Times.Never);
+		tracking1.Verify(Called.Never);
 
-		tracking2.Verify(Times.Never);
+		tracking2.Verify(Called.Never);
 	}
 
 	[Fact]
@@ -215,11 +215,11 @@ public class OverloadedMethodTests
 		service.Calculate(3, 7);
 
 		// Single param overload
-		tracking1.Verify(Times.Once);
+		tracking1.Verify(Called.Once);
 		Assert.Equal(5, tracking1.LastArg);
 
 		// Two param overload
-		tracking2.Verify(Times.Once);
+		tracking2.Verify(Called.Once);
 		Assert.Equal((3, 7), tracking2.LastArgs);
 	}
 
@@ -237,8 +237,8 @@ public class OverloadedMethodTests
 		service.Process("data", 42);  // This is the two-param overload
 
 		// Clear identification of which overload was called
-		tracking1.Verify(Times.Never);  // Process(string) - NOT called
-		tracking2.Verify(Times.Once);   // Process(string, int) - CALLED!
-		tracking3.Verify(Times.Never);  // Process(string, int, bool) - NOT called
+		tracking1.Verify(Called.Never);  // Process(string) - NOT called
+		tracking2.Verify(Called.Once);   // Process(string, int) - CALLED!
+		tracking3.Verify(Called.Never);  // Process(string, int, bool) - NOT called
 	}
 }

@@ -117,7 +117,7 @@ public partial class EventPatternsDemo
         source.Started += (s, e) => { };
 
         // Must compile with bare names:
-        stub.Started.VerifyAdd(Times.Once);
+        stub.Started.VerifyAdd(Called.Once);
         stub.Started.Verify();
         stub.Started.Verifiable();
         stub.Started.Reset();
@@ -178,7 +178,7 @@ public partial class EventServiceBaseStub
         stub.Object.StatusChanged += (s, e) => { };
 
         // Must compile: verification methods
-        stub.StatusChanged.VerifyAdd(Times.Once);
+        stub.StatusChanged.VerifyAdd(Called.Once);
         stub.StatusChanged.Verify();
         stub.StatusChanged.Verifiable();
         stub.StatusChanged.Reset();
@@ -242,7 +242,7 @@ public partial class OpenGenericEventDemo
         source.StatusChanged += (s, e) => { };
 
         // Must compile: verification methods with bare names
-        stub.StatusChanged.VerifyAdd(Times.Once);
+        stub.StatusChanged.VerifyAdd(Called.Once);
         stub.StatusChanged.Verify();
         stub.StatusChanged.Verifiable();
         stub.StatusChanged.Reset();

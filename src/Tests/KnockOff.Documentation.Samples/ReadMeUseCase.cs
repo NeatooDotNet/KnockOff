@@ -1,4 +1,4 @@
-﻿using NSubstitute;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -115,7 +115,7 @@ public class UserDomainModelTests
         Assert.True(userDomainModel.Fetch(1));
 
         // I have Verify on my Stub!
-        myRepoKO.GetUser.Verify(Times.Once);
+        myRepoKO.GetUser.Verify(Called.Once);
         #endregion
     }
 
@@ -140,8 +140,8 @@ public class UserDomainModelTests
         userDomainModel.Update();
 
         // I have Verify on my Stub!
-        myRepoKO.GetUser.Verify(Times.Exactly(2));
-        myRepoKO.Update.Verify(Times.Once);
+        myRepoKO.GetUser.Verify(Called.Exactly(2));
+        myRepoKO.Update.Verify(Called.Once);
     }
 
 

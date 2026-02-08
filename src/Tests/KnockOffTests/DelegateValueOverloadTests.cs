@@ -21,7 +21,7 @@ public class DelegateValueOverloadTests
 		var result = factory();
 
 		Assert.Equal("configured value", result);
-		stub.Interceptor.Verify(Times.Once);
+		stub.Interceptor.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -35,7 +35,7 @@ public class DelegateValueOverloadTests
 		var result = factory();
 
 		Assert.Equal(42, result);
-		stub.Interceptor.Verify(Times.Once);
+		stub.Interceptor.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -77,7 +77,7 @@ public class DelegateValueOverloadTests
 		Assert.Equal("repeated", factory());
 		Assert.Equal("repeated", factory());
 
-		stub.Interceptor.Verify(Times.Exactly(3));
+		stub.Interceptor.Verify(Called.Exactly(3));
 	}
 
 	#endregion
@@ -234,7 +234,7 @@ public class DelegateValueOverloadTests
 		notify();
 
 		Assert.True(wasNotified);
-		stub.Interceptor.Verify(Times.Once);
+		stub.Interceptor.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -281,7 +281,7 @@ public class DelegateValueOverloadTests
 		factory();
 		factory();
 
-		stub.Interceptor.Verify(Times.Exactly(3));
+		stub.Interceptor.Verify(Called.Exactly(3));
 	}
 
 	#endregion
@@ -298,12 +298,12 @@ public class DelegateValueOverloadTests
 		factory();
 		factory();
 
-		stub.Interceptor.Verify(Times.Exactly(2));
+		stub.Interceptor.Verify(Called.Exactly(2));
 
 		// Reset clears tracking but preserves configuration
 		stub.Interceptor.Reset();
 
-		stub.Interceptor.Verify(Times.Never);
+		stub.Interceptor.Verify(Called.Never);
 
 		// Configuration still works
 		var result = factory();

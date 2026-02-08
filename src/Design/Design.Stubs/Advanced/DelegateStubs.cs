@@ -205,7 +205,7 @@ public partial class DelegateStubsDemo
         action();
 
         // callCount == 3
-        stub.Interceptor.Verify(Times.Exactly(3));
+        stub.Interceptor.Verify(Called.Exactly(3));
     }
 
     // =========================================================================
@@ -283,7 +283,7 @@ public partial class DelegateStubsDemo
     // Verification for Delegates
     // =========================================================================
     // DESIGN DECISION: Delegate interceptors have Verify() just like method
-    // interceptors. They also support Times constraints.
+    // interceptors. They also support Called constraints.
     // =========================================================================
 
     public void Delegate_Verification()
@@ -298,7 +298,7 @@ public partial class DelegateStubsDemo
 
         // Verify call count
         stub.Interceptor.Verify(); // At least once
-        stub.Interceptor.Verify(Times.Exactly(2));
+        stub.Interceptor.Verify(Called.Exactly(2));
     }
 
     // =========================================================================
@@ -324,7 +324,7 @@ public partial class DelegateStubsDemo
         var result = operation(3, 4); // Still returns 42
 
         // But call count is reset
-        stub.Interceptor.Verify(Times.Once); // Only one call after reset
+        stub.Interceptor.Verify(Called.Once); // Only one call after reset
     }
 
     // =========================================================================

@@ -40,7 +40,7 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.Verifiable(Times.Exactly(2));
+		stub.Indexer.Verifiable(Called.Exactly(2));
 
 		// Act
 		_ = stub.Object["key1"];
@@ -55,7 +55,7 @@ public class ClassIndexerVerificationTests
 	{
 		// Arrange
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
-		stub.Indexer.Verifiable(Times.Exactly(2));
+		stub.Indexer.Verifiable(Called.Exactly(2));
 
 		// Act
 		_ = stub.Object["key1"];
@@ -117,7 +117,7 @@ public class ClassIndexerVerificationTests
 		_ = stub.Object["key3"];
 
 		// Assert - Should not throw (called 3 times, expected exactly 3)
-		stub.Indexer.VerifyGet(Times.Exactly(3));
+		stub.Indexer.VerifyGet(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -130,7 +130,7 @@ public class ClassIndexerVerificationTests
 		_ = stub.Object["key1"];
 
 		// Assert - Called 1 time, expected exactly 3
-		Assert.Throws<VerificationException>(() => stub.Indexer.VerifyGet(Times.Exactly(3)));
+		Assert.Throws<VerificationException>(() => stub.Indexer.VerifyGet(Called.Exactly(3)));
 	}
 
 	[Fact]
@@ -185,7 +185,7 @@ public class ClassIndexerVerificationTests
 		stub.Object["key2"] = "value2";
 
 		// Assert - Should not throw (set 2 times, expected exactly 2)
-		stub.Indexer.VerifySet(Times.Exactly(2));
+		stub.Indexer.VerifySet(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -198,7 +198,7 @@ public class ClassIndexerVerificationTests
 		stub.Object["key1"] = "value1";
 
 		// Assert - Set 1 time, expected exactly 3
-		Assert.Throws<VerificationException>(() => stub.Indexer.VerifySet(Times.Exactly(3)));
+		Assert.Throws<VerificationException>(() => stub.Indexer.VerifySet(Called.Exactly(3)));
 	}
 
 	[Fact]
@@ -230,7 +230,7 @@ public class ClassIndexerVerificationTests
 		stub.Object["key3"] = "value";
 
 		// Assert - Should not throw (3 total accesses, expected exactly 3)
-		stub.Indexer.Verify(Times.Exactly(3));
+		stub.Indexer.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -243,7 +243,7 @@ public class ClassIndexerVerificationTests
 		_ = stub.Object["key"];
 
 		// Assert - Only 1 access, expected at least 5
-		Assert.Throws<VerificationException>(() => stub.Indexer.Verify(Times.AtLeast(5)));
+		Assert.Throws<VerificationException>(() => stub.Indexer.Verify(Called.AtLeast(5)));
 	}
 
 	[Fact]
@@ -265,7 +265,7 @@ public class ClassIndexerVerificationTests
 		// Don't access the indexer
 
 		// Assert - Should not throw (expected never, never accessed)
-		stub.Indexer.Verify(Times.Never);
+		stub.Indexer.Verify(Called.Never);
 	}
 
 	#endregion
@@ -385,14 +385,14 @@ public class ClassIndexerVerificationTests
 		_ = stub.Object["key2"];
 		stub.Object["key3"] = "value";
 
-		stub.Indexer.VerifyGet(Times.Exactly(2));
-		stub.Indexer.VerifySet(Times.Once);
+		stub.Indexer.VerifyGet(Called.Exactly(2));
+		stub.Indexer.VerifySet(Called.Once);
 
 		stub.Indexer.Reset();
 
 		// Assert
-		stub.Indexer.VerifyGet(Times.Never);
-		stub.Indexer.VerifySet(Times.Never);
+		stub.Indexer.VerifyGet(Called.Never);
+		stub.Indexer.VerifySet(Called.Never);
 	}
 
 	[Fact]
@@ -459,7 +459,7 @@ public class ClassIndexerVerificationTests
 		_ = stub.Object[1];
 
 		// Assert
-		stub.Indexer.VerifyGet(Times.Exactly(2));
+		stub.Indexer.VerifyGet(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -472,7 +472,7 @@ public class ClassIndexerVerificationTests
 		_ = stub.Object[0];
 
 		// Assert - Verify counts total access (which is only gets for this indexer)
-		stub.Indexer.Verify(Times.Exactly(1));
+		stub.Indexer.Verify(Called.Exactly(1));
 	}
 
 	#endregion
@@ -499,7 +499,7 @@ public class ClassIndexerVerificationTests
 		var stub = new ClassIndexerTestClass.Stubs.IndexedCacheService();
 
 		// Act - Fluent chaining returns the interceptor
-		var result = stub.Indexer.Verifiable(Times.AtLeastOnce);
+		var result = stub.Indexer.Verifiable(Called.AtLeastOnce);
 
 		// Assert
 		Assert.Same(stub.Indexer, result);

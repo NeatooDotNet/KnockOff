@@ -156,7 +156,7 @@ public partial class BasicMethodsDemo
     //   {
     //       public void Execute(Action callback) { ... }
     //       public void Verify() { ... }
-    //       public void Verify(Times times) { ... }
+    //       public void Verify(Called called) { ... }
     //   }
     // =========================================================================
 
@@ -173,7 +173,7 @@ public partial class BasicMethodsDemo
         calc.Reset();
 
         // resetCount is now 2
-        stub.Reset.Verify(Times.Exactly(2));
+        stub.Reset.Verify(Called.Exactly(2));
     }
 
     // =========================================================================

@@ -179,7 +179,7 @@ public partial class PropertyBasicsDemo
     // - VerifyGet() checks the getter was accessed
     // - VerifySet() checks the setter was called
     //
-    // Each accepts optional Times constraint.
+    // Each accepts optional Called constraint.
     // =========================================================================
 
     public void Verify_GetterAndSetterSeparately()
@@ -197,8 +197,8 @@ public partial class PropertyBasicsDemo
         entity.Description = "Updated";
 
         // Verify getter and setter separately
-        stub.Description.VerifyGet(Times.Exactly(2));
-        stub.Description.VerifySet(Times.Once);
+        stub.Description.VerifyGet(Called.Exactly(2));
+        stub.Description.VerifySet(Called.Once);
     }
 
     // =========================================================================
@@ -218,7 +218,7 @@ public partial class PropertyBasicsDemo
         IEntity entity = stub;
         var id = entity.Id; // 100
 
-        stub.Id.VerifyGet(Times.Once);
+        stub.Id.VerifyGet(Called.Once);
 
         // These don't exist for get-only:
         // stub.Id.Set(...)     // Compile error

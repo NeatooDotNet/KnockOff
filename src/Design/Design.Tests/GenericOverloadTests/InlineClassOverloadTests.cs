@@ -63,9 +63,9 @@ public partial class InlineClassOverloadTests
         processor.Process("d", 3);
 
         // Assert - per-overload tracking
-        tracking0.Verify(Times.Exactly(2));
-        tracking1.Verify(Times.Once);
-        tracking2.Verify(Times.Exactly(3));
+        tracking0.Verify(Called.Exactly(2));
+        tracking1.Verify(Called.Once);
+        tracking2.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public partial class InlineClassOverloadTests
         processor.Process("b", 1);
 
         // Assert - interceptor-level verify counts all overloads
-        stub.Process.Verify(Times.Exactly(3));
+        stub.Process.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -175,8 +175,8 @@ public partial class InlineClassOverloadTests
         processor.Transform("a");
 
         // Assert
-        tracking1.Verify(Times.Exactly(3));
-        tracking2.Verify(Times.Once);
+        tracking1.Verify(Called.Exactly(3));
+        tracking2.Verify(Called.Once);
     }
 
     // =========================================================================

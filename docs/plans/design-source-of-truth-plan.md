@@ -72,7 +72,7 @@ src/Design/
 │   ├── Delegates/
 │   │   └── DelegatePatterns.cs # Inline delegate stubs
 │   ├── Verification/
-│   │   └── VerificationPatterns.cs # Verifiable, Verify, Times
+│   │   └── VerificationPatterns.cs # Verifiable, Verify, Called
 │   └── Advanced/
 │       ├── SourceDelegation.cs # Source() pattern
 │       └── StrictMode.cs       # Strict behavior
@@ -261,8 +261,8 @@ The design projects must demonstrate ALL of these (verified against codebase 202
 - [ ] `ThenWhen(args).Returns()` / `ThenWhen(predicate).Returns()` - chained matchers
 - [ ] `ThenCall(callback)` - terminal callback (repeats forever)
 - [ ] `ThenNone()` - exhaust and fall through to next priority
-- [ ] `Verify()` / `Verify(Times)` - call count verification
-- [ ] `Verifiable()` / `Verifiable(Times)` - batch verification marker
+- [ ] `Verify()` / `Verify(Called)` - call count verification
+- [ ] `Verifiable()` / `Verifiable(Called)` - batch verification marker
 - [ ] `Reset()` - clear tracking state (LastArg/LastArgs = default, call count = 0)
 - [ ] `LastArg` / `LastArgs` - argument capture (single vs. tuple)
 - [ ] Async auto-wrapping - `Returns(value)` auto-wraps with Task.FromResult for async methods
@@ -274,7 +274,7 @@ The design projects must demonstrate ALL of these (verified against codebase 202
 - [ ] `ThenWhen(args).Call()` / `ThenWhen(predicate).Call()` - chained matchers
 - [ ] `ThenCall(callback)` - terminal callback
 - [ ] `ThenNone()` - exhaust chain
-- [ ] `Verify(Times)` - verify specific matcher was called
+- [ ] `Verify(Called)` - verify specific matcher was called
 
 **Property APIs (IPropertyGetBuilder, IPropertySetBuilder, IPropertyGetSequence, IPropertySetSequence):**
 - [ ] `Get(value)` - getter return value
@@ -283,8 +283,8 @@ The design projects must demonstrate ALL of these (verified against codebase 202
 - [ ] `Set(callback)` - setter callback
 - [ ] `Set().ThenSet(callback)` - setter sequences
 - [ ] `Value` - backing store for get/set properties
-- [ ] `VerifyGet()` / `VerifyGet(Times)` - getter verification
-- [ ] `VerifySet()` / `VerifySet(Times)` - setter verification
+- [ ] `VerifyGet()` / `VerifyGet(Called)` - getter verification
+- [ ] `VerifySet()` / `VerifySet(Called)` - setter verification
 - [ ] `LastValue` - capture last set value (IPropertySetTracking)
 - [ ] `Verifiable()` - batch verification marker
 - [ ] `Reset()` - clear tracking
@@ -295,8 +295,8 @@ The design projects must demonstrate ALL of these (verified against codebase 202
 - [ ] `Get().ThenGet(callback)` - getter sequences
 - [ ] `Set().ThenSet(callback)` - setter sequences
 - [ ] `Backing` - Dictionary<TKey, TValue> for storage
-- [ ] `VerifyGet()` / `VerifyGet(Times)` - getter verification
-- [ ] `VerifySet()` / `VerifySet(Times)` - setter verification
+- [ ] `VerifyGet()` / `VerifyGet(Called)` - getter verification
+- [ ] `VerifySet()` / `VerifySet(Called)` - setter verification
 - [ ] `LastGetKey` - capture last get key (generated property; interface uses `LastKey`)
 - [ ] `LastSetEntry` - capture last (Key, Value) tuple (generated property; interface uses `LastEntry`)
 - [ ] `Verifiable()` - batch verification marker
@@ -308,8 +308,8 @@ The design projects must demonstrate ALL of these (verified against codebase 202
 - [ ] `Raise(sender, args)` - fire EventHandler<T> events
 - [ ] `Raise(args)` - fire EventArgs events
 - [ ] `Raise(arg1, arg2, ...)` - fire Action<T1, T2, ...> events
-- [ ] `VerifyAdd()` / `VerifyAdd(Times)` - subscription verification
-- [ ] `VerifyRemove()` / `VerifyRemove(Times)` - unsubscription verification
+- [ ] `VerifyAdd()` / `VerifyAdd(Called)` - subscription verification
+- [ ] `VerifyRemove()` / `VerifyRemove(Called)` - unsubscription verification
 - [ ] `HasSubscribers` - check for active handlers
 - [ ] `Reset()` - clear handlers and tracking
 
@@ -328,14 +328,14 @@ The design projects must demonstrate ALL of these (verified against codebase 202
 - [ ] Document priority order with examples
 - [ ] Show how When chains interact with OnCall/Returns fallback
 
-**Verification (Times struct):**
-- [ ] `Times.Once` - exactly one call
-- [ ] `Times.Twice` - exactly two calls
-- [ ] `Times.Never` - no calls expected
-- [ ] `Times.Exactly(n)` - exact count
-- [ ] `Times.AtLeastOnce` - one or more calls
-- [ ] `Times.AtLeast(n)` - minimum count
-- [ ] `Times.AtMost(n)` - maximum count
+**Verification (Called struct):**
+- [ ] `Called.Once` - exactly one call
+- [ ] `Called.Twice` - exactly two calls
+- [ ] `Called.Never` - no calls expected
+- [ ] `Called.Exactly(n)` - exact count
+- [ ] `Called.AtLeastOnce` - one or more calls
+- [ ] `Called.AtLeast(n)` - minimum count
+- [ ] `Called.AtMost(n)` - maximum count
 
 **IKnockOffStub interface:**
 - [ ] `Strict` property - get/set strict mode at runtime
@@ -446,7 +446,7 @@ Since automated comment parsing is out of scope for v1, GENERATOR BEHAVIOR comme
 
 21. Implement `Advanced/SourceDelegation.cs` - Source() pattern
 22. Implement `Advanced/StrictMode.cs` - strict behavior
-23. Implement `Verification/VerificationPatterns.cs` - all Times patterns
+23. Implement `Verification/VerificationPatterns.cs` - all Called patterns
 24. Implement `Delegates/DelegatePatterns.cs` - inline delegate stubs
 
 **Dependencies:** Phase 1 (projects must exist)
@@ -685,7 +685,7 @@ Generator Structure:
 Public API (KnockOff library):
 - `src/KnockOff/KnockOffAttribute.cs` - `[KnockOff]`, `[KnockOff<T>]`, Strict property
 - `src/KnockOff/KnockOffStrictAttribute.cs` - `[assembly: KnockOffStrict]`
-- `src/KnockOff/Times.cs` - Verification constraints (Once, Twice, Exactly, AtLeast, AtMost, Never)
+- `src/KnockOff/Called.cs` - Verification constraints (Once, Twice, Exactly, AtLeast, AtMost, Never)
 - `src/KnockOff/IMethodCallBuilder.cs` - OnCall builder/tracking interfaces
 - `src/KnockOff/IMethodSequence.cs` - Sequence interfaces (ThenCall)
 - `src/KnockOff/IMethodTracking.cs` - Tracking interfaces (Verify, Verifiable, Reset, LastArg/LastArgs)
@@ -704,7 +704,7 @@ Test Files (for API usage patterns):
 - `src/Tests/KnockOffTests/EventTests.cs` - Event API tests (Raise, VerifyAdd, HasSubscribers)
 - `src/Tests/KnockOffTests/IndexerTests.cs` - Indexer API tests (Backing, LastGetKey, LastSetEntry)
 - `src/Tests/KnockOffTests/SequencingTests.cs` - Sequence API tests (OnCall().ThenCall())
-- `src/Tests/KnockOffTests/VerificationTests.cs` - Verification tests (Verify, Verifiable, Times)
+- `src/Tests/KnockOffTests/VerificationTests.cs` - Verification tests (Verify, Verifiable, Called)
 - `src/Tests/KnockOff.Documentation.Samples/SourceDelegationSamples.cs` - Source() delegation pattern
 
 **Key Patterns Discovered:**
@@ -734,7 +734,7 @@ Design.Tests will include:
 
 **3. API Coverage Tests (~50 tests minimum)**
 - At least one test per major API element in the checklist
-- Group related APIs: e.g., `Times.Once`, `Times.Twice`, `Times.Never` can share a single test
+- Group related APIs: e.g., `Called.Once`, `Called.Twice`, `Called.Never` can share a single test
 - Focus on demonstrating correct usage, not exhaustive edge cases (that's what KnockOffTests is for)
 
 **4. Comment Accuracy Verification (Manual)**
@@ -784,7 +784,7 @@ Design.Tests will include:
 - `src/KnockOff/IPropertyTracking.cs` - Confirmed LastValue for setters
 - `src/KnockOff/IIndexerCallBuilder.cs` - Confirmed indexer builder APIs
 - `src/KnockOff/IIndexerTracking.cs` - Interface uses `LastKey`/`LastEntry`
-- `src/KnockOff/Times.cs` - Confirmed all Times variants
+- `src/KnockOff/Called.cs` - Confirmed all Called variants
 - `src/KnockOff/KnockOffAttribute.cs` - Confirmed attribute APIs
 - `src/KnockOff/IKnockOffStub.cs` - Confirmed Strict property
 - `src/KnockOff/StubExtensions.cs` - Confirmed .Strict() extension
@@ -846,7 +846,7 @@ Design.Tests will include:
   - Concrete test counts (~70 tests total)
   - Definition of "pattern parity" (same assertions, different stub instantiation)
   - Minimum coverage requirement (at least one test per major API element)
-  - Grouping strategy for related APIs (e.g., Times variants can share tests)
+  - Grouping strategy for related APIs (e.g., Called variants can share tests)
 
 **Concern 3: Comment Accuracy Test Implementation Unclear (Moderate)**
 - **Resolution:** Added detailed "GENERATOR BEHAVIOR Comment Verification Process" to Validation Requirements section:
@@ -946,8 +946,8 @@ All concerns have been addressed. Plan is ready for developer re-review.
 
 **Phase 5: Advanced Features**
 - [ ] Create `src/Design/Design.Stubs/Verification/VerificationPatterns.cs` demonstrating:
-  - `Verify()`, `Verify(Times)`, `Verifiable()`, `Verifiable(Times)`
-  - All Times variants: Once, Twice, Never, Exactly, AtLeastOnce, AtLeast, AtMost
+  - `Verify()`, `Verify(Called)`, `Verifiable()`, `Verifiable(Called)`
+  - All Called variants: Once, Twice, Never, Exactly, AtLeastOnce, AtLeast, AtMost
   - `stub.Verify()` batch verification, `stub.VerifyAll()`
   - `Reset()` for clearing tracking
 - [ ] Create `src/Design/Design.Stubs/Advanced/SourceDelegation.cs` demonstrating:

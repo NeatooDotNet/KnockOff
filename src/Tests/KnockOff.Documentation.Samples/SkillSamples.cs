@@ -209,9 +209,9 @@ public class SkillVerificationTests
         logger.Log("First");
         logger.Log("Second");
 
-        tracking.Verify(Times.Exactly(2));  // Exactly 2 calls
-        tracking.Verify(Times.AtLeast(1));  // At least 1 call
-        // Times.Once, Times.Never, Times.AtMost(n) also available
+        tracking.Verify(Called.Exactly(2));  // Exactly 2 calls
+        tracking.Verify(Called.AtLeast(1));  // At least 1 call
+        // Called.Once, Called.Never, Called.AtMost(n) also available
     }
 }
 

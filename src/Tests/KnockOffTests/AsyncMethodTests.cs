@@ -14,7 +14,7 @@ public class AsyncMethodTests
 
 		await service.DoWorkAsync();
 
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]

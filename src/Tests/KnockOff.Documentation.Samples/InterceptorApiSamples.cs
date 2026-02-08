@@ -283,15 +283,15 @@ public class PropertyInterceptorApiTests
         var timeout = repository.Timeout;
 
         // VerifyGet: Check read count
-        stub.ConnectionString.VerifyGet(Times.Once);
-        stub.Timeout.VerifyGet(Times.Once);
+        stub.ConnectionString.VerifyGet(Called.Once);
+        stub.Timeout.VerifyGet(Called.Once);
 
         // Exercise setter
         repository.ConnectionString = "Server=production";
         repository.Timeout = 60;
 
         // VerifySet: Check write count
-        stub.ConnectionString.VerifySet(Times.Once);
+        stub.ConnectionString.VerifySet(Called.Once);
 
         // LastSetValue: Captured value from setter
         Assert.Equal("Server=production", stub.ConnectionString.LastSetValue);
@@ -329,7 +329,7 @@ public class IndexerInterceptorApiTests
         Assert.Equal("FromCallback", fromCallback?.Name);
 
         // VerifyGet: Check read count
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Once);
 
         // LastGetKey: Key from most recent get
         Assert.Equal(1, stub.Indexer.LastGetKey);
@@ -338,7 +338,7 @@ public class IndexerInterceptorApiTests
         repository[3] = new User { Id = 3, Name = "Charlie" };
 
         // VerifySet: Check write count
-        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifySet(Called.Once);
 
         // LastSetEntry: Key-value tuple from most recent set
         var lastEntry = stub.Indexer.LastSetEntry;
@@ -374,7 +374,7 @@ public class EventInterceptorApiTests
         stub.Changed.Raise(repository, EventArgs.Empty);
 
         // VerifyAdd/VerifyRemove: check subscription counts
-        stub.Changed.VerifyAdd(Times.Once);
+        stub.Changed.VerifyAdd(Called.Once);
         #endregion
 
         Assert.True(hasSubscribers);
@@ -386,7 +386,7 @@ public class EventInterceptorApiTests
         repository.Changed -= handler;
 
         // VerifyRemove: Check unsubscription count
-        stub.Changed.VerifyRemove(Times.Once);
+        stub.Changed.VerifyRemove(Called.Once);
 
         // Action<T> events: Same API, different Raise signature
         User? addedUser = null;
@@ -433,8 +433,8 @@ public class GenericMethodInterceptorApiTests
         Assert.Contains(typeof(Product), stub.GetById.CalledTypeArguments);
 
         // Typed verification: Per-type call counts
-        stub.GetById.Of<User>().Verify(Times.Exactly(2));
-        stub.GetById.Of<Product>().Verify(Times.Once);
+        stub.GetById.Of<User>().Verify(Called.Exactly(2));
+        stub.GetById.Of<Product>().Verify(Called.Once);
 
         // Typed LastArg: Per-type argument capture
         Assert.Equal(3, stub.GetById.Of<User>().LastArg);
@@ -442,12 +442,12 @@ public class GenericMethodInterceptorApiTests
 
         // Typed Reset: Clears only specific type
         stub.GetById.Of<User>().Reset();
-        stub.GetById.Of<User>().Verify(Times.Never);
-        stub.GetById.Of<Product>().Verify(Times.Once); // Preserved
+        stub.GetById.Of<User>().Verify(Called.Never);
+        stub.GetById.Of<Product>().Verify(Called.Once); // Preserved
 
         // Base Reset: Clears all type arguments
         stub.GetById.Reset();
-        stub.GetById.Of<Product>().Verify(Times.Never);
+        stub.GetById.Of<Product>().Verify(Called.Never);
     }
 }
 
@@ -476,28 +476,28 @@ public class TimesConstraintTests
         stub.Delete.Call((id) => { });
 
         #region times-constraint-usage-examples
-        // Times.Never - Expected 0 calls
-        stub.Delete.Verify(Times.Never);
+        // Called.Never - Expected 0 calls
+        stub.Delete.Verify(Called.Never);
 
         // Exercise stub
         repository.GetById(1);
         repository.Save(new User { Id = 1 });
         repository.Save(new User { Id = 2 });
 
-        // Times.Once - Expected exactly 1 call
-        stub.GetById.Verify(Times.Once);
+        // Called.Once - Expected exactly 1 call
+        stub.GetById.Verify(Called.Once);
 
-        // Times.AtLeastOnce - Expected 1+ calls
-        stub.Save.Verify(Times.AtLeastOnce);
+        // Called.AtLeastOnce - Expected 1+ calls
+        stub.Save.Verify(Called.AtLeastOnce);
 
-        // Times.Exactly(n) - Expected exactly n calls
-        stub.Save.Verify(Times.Exactly(2));
+        // Called.Exactly(n) - Expected exactly n calls
+        stub.Save.Verify(Called.Exactly(2));
 
-        // Times.AtLeast(n) - Expected n+ calls
-        stub.Save.Verify(Times.AtLeast(1));
+        // Called.AtLeast(n) - Expected n+ calls
+        stub.Save.Verify(Called.AtLeast(1));
 
-        // Times.AtMost(n) - Expected 0 to n calls
-        stub.GetById.Verify(Times.AtMost(5));
+        // Called.AtMost(n) - Expected 0 to n calls
+        stub.GetById.Verify(Called.AtMost(5));
         #endregion
     }
 }
@@ -517,14 +517,14 @@ public class BatchVerificationTests
         #region batch-verification-workflow-example
         // Step 1: Mark interceptors with Verifiable()
         stub.GetById.Return((id) => new User { Id = id }).Verifiable();
-        stub.Save.Call((user) => { }).Verifiable(Times.Exactly(2));
-        stub.Delete.Call((id) => { }).Verifiable(Times.Never);
+        stub.Save.Call((user) => { }).Verifiable(Called.Exactly(2));
+        stub.Delete.Call((id) => { }).Verifiable(Called.Never);
 
         // Step 2: Exercise the stub through the interface
         var user = repository.GetById(1);
         repository.Save(user!);
         repository.Save(new User { Id = 2 });
-        // Note: Delete is NOT called (expected per Times.Never)
+        // Note: Delete is NOT called (expected per Called.Never)
 
         // Step 3: Single Verify() call validates all marked interceptors
         stub.Verify();
@@ -568,7 +568,7 @@ public partial class DelegateApiTests
         #endregion
 
         Assert.Equal(5, result);
-        stub.Interceptor.Verify(Times.Once);
+        stub.Interceptor.Verify(Called.Once);
     }
 
     [Fact]
@@ -688,8 +688,8 @@ public class TrackingObjectsTests
         Assert.Equal(42, getTracking.LastArg);
 
         // Both support verification
-        stub.GetById.Verify(Times.Once);      // Interceptor verification
-        getTracking.Verify(Times.Once);       // Tracking object verification
+        stub.GetById.Verify(Called.Once);      // Interceptor verification
+        getTracking.Verify(Called.Once);       // Tracking object verification
         #endregion
     }
 }

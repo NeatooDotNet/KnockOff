@@ -298,7 +298,7 @@ public partial class PtDelegateTests
         ValidationRule rule = ruleStub;  // Implicit conversion
         bool isValid = rule("test");
 
-        ruleStub.Interceptor.Verify(Times.Once);
+        ruleStub.Interceptor.Verify(Called.Once);
         #endregion
 
         Assert.True(isValid);

@@ -158,7 +158,7 @@ public class UserMethodWhenTests
         service.Execute("other"); // Falls to user method
 
         // Assert - No exception, user method was called
-        stub.Execute.Verify(Times.Once);
+        stub.Execute.Verify(Called.Once);
     }
 
     #endregion
@@ -276,7 +276,7 @@ public class UserMethodWhenTests
         service.Process("two");
 
         // Assert - Both user method calls are tracked
-        stub.Process.Verify(Times.Exactly(2));
+        stub.Process.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -292,7 +292,7 @@ public class UserMethodWhenTests
         service.Process("normal");   // User method - tracked in _unconfiguredCallCount
 
         // Assert - Both When chain and user method calls count in TotalCallCount
-        stub.Process.Verify(Times.Exactly(2)); // 1 When chain call + 1 user method call
+        stub.Process.Verify(Called.Exactly(2)); // 1 When chain call + 1 user method call
     }
 
     #endregion

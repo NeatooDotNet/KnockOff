@@ -6,7 +6,7 @@
 // - Verifiable() for deferred verification
 // - stub.Verify() for all verifiable members
 // - stub.VerifyAll() for all configured members
-// - Times constraints
+// - Called constraints
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Services;
@@ -24,16 +24,16 @@ public partial class VerificationDemo
     // =========================================================================
     // Direct Verification - Interceptor.Verify()
     // =========================================================================
-    // DESIGN DECISION: Each interceptor has Verify() and Verify(Times) methods
+    // DESIGN DECISION: Each interceptor has Verify() and Verify(Called) methods
     // for immediate verification. This checks the interceptor's call count.
     //
     // GENERATOR BEHAVIOR:
     //
-    //   public void Verify() => Verify(Times.AtLeastOnce);
+    //   public void Verify() => Verify(Called.AtLeastOnce);
     //
-    //   public void Verify(Times times)
+    //   public void Verify(Called called)
     //   {
-    //       if (!times.Validate(TotalCallCount))
+    //       if (!called.Validate(TotalCallCount))
     //           throw VerificationException(...);
     //   }
     // =========================================================================
@@ -50,47 +50,47 @@ public partial class VerificationDemo
 
         // Direct verification - throws if not met
         stub.Add.Verify(); // Passes - called at least once
-        stub.Add.Verify(Times.Exactly(2)); // Passes - called exactly twice
+        stub.Add.Verify(Called.Exactly(2)); // Passes - called exactly twice
     }
 
     // =========================================================================
-    // Times Constraints
+    // Called Constraints
     // =========================================================================
-    // DESIGN DECISION: Times provides static factory methods for common
-    // verification patterns. All verification methods accept Times.
+    // DESIGN DECISION: Called provides static factory methods for common
+    // verification patterns. All verification methods accept Called.
     //
-    // Available Times:
-    // - Times.Never - Must not be called
-    // - Times.Once - Called exactly once
-    // - Times.Exactly(n) - Called exactly n times
-    // - Times.AtLeast(n) - Called n or more times
-    // - Times.AtMost(n) - Called n or fewer times
-    // - Times.AtLeastOnce - Called one or more times (default)
-    // Note: Times.Between is not available. Use AtLeast/AtMost for range constraints.
+    // Available Called:
+    // - Called.Never - Must not be called
+    // - Called.Once - Called exactly once
+    // - Called.Exactly(n) - Called exactly n times
+    // - Called.AtLeast(n) - Called n or more times
+    // - Called.AtMost(n) - Called n or fewer times
+    // - Called.AtLeastOnce - Called one or more times (default)
+    // Note: Called.Between is not available. Use AtLeast/AtMost for range constraints.
     // =========================================================================
 
-    public void Times_AllConstraints()
+    public void Called_AllConstraints()
     {
         var stub = new Stubs.ICalculator();
 
         ICalculator calc = stub;
 
         // Never called
-        stub.Divide.Verify(Times.Never);
+        stub.Divide.Verify(Called.Never);
 
         // Call once
         calc.Add(1, 2);
-        stub.Add.Verify(Times.Once);
-        stub.Add.Verify(Times.AtLeastOnce);
-        stub.Add.Verify(Times.AtLeast(1));
-        stub.Add.Verify(Times.AtMost(5));
+        stub.Add.Verify(Called.Once);
+        stub.Add.Verify(Called.AtLeastOnce);
+        stub.Add.Verify(Called.AtLeast(1));
+        stub.Add.Verify(Called.AtMost(5));
 
         // Call more times
         calc.Add(3, 4);
         calc.Add(5, 6);
-        stub.Add.Verify(Times.Exactly(3));
-        stub.Add.Verify(Times.AtLeast(2));
-        stub.Add.Verify(Times.AtMost(10));
+        stub.Add.Verify(Called.Exactly(3));
+        stub.Add.Verify(Called.AtLeast(2));
+        stub.Add.Verify(Called.AtMost(10));
     }
 
     // =========================================================================
@@ -117,7 +117,7 @@ public partial class VerificationDemo
 
         // Mark as verifiable during configuration
         stub.Add.Return(42).Verifiable();
-        stub.Subtract.Return(10).Verifiable(Times.Exactly(2));
+        stub.Subtract.Return(10).Verifiable(Called.Exactly(2));
 
         ICalculator calc = stub;
 
@@ -298,18 +298,18 @@ public partial class VerificationDemo
     }
 
     // =========================================================================
-    // Verifiable() with Times
+    // Verifiable() with Called
     // =========================================================================
-    // DESIGN DECISION: Verifiable(Times) sets both the verifiable flag AND
-    // the expected Times constraint. This is checked by stub.Verify().
+    // DESIGN DECISION: Verifiable(Called) sets both the verifiable flag AND
+    // the expected Called constraint. This is checked by stub.Verify().
     // =========================================================================
 
-    public void Verifiable_WithTimes()
+    public void Verifiable_WithCalled()
     {
         var stub = new Stubs.ICalculator();
 
         // Must be called exactly twice
-        stub.Add.Return(42).Verifiable(Times.Exactly(2));
+        stub.Add.Return(42).Verifiable(Called.Exactly(2));
 
         ICalculator calc = stub;
 

@@ -136,7 +136,7 @@ internal static class MethodInterceptorRenderer
 
 		// Verifiable state
 		w.Line("private bool _isVerifiable;");
-		w.Line("private global::KnockOff.Times? _verifiableTimes;");
+		w.Line("private global::KnockOff.Called? _verifiableTimes;");
 		w.Line();
 
 		// Track unconfigured calls
@@ -459,7 +459,7 @@ internal static class MethodInterceptorRenderer
 
 			// Verifiable state per overload
 			w.Line($"private bool _isVerifiable_{overload.SignatureSuffix};");
-			w.Line($"private global::KnockOff.Times? _verifiableTimes_{overload.SignatureSuffix};");
+			w.Line($"private global::KnockOff.Called? _verifiableTimes_{overload.SignatureSuffix};");
 			w.Line();
 		}
 
@@ -1232,7 +1232,7 @@ internal static class MethodInterceptorRenderer
 				w.Line("if (_isVerifiable)");
 				using (w.Braces())
 				{
-					w.Line("var times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+					w.Line("var times = _verifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
 					w.Line($"if (!times.Validate(TotalCallCount)) return new global::KnockOff.VerificationFailure(\"{methodName}\", times, TotalCallCount);");
 				}
 				// Check When chain verifiable (only if When chain is supported)
@@ -1258,8 +1258,8 @@ internal static class MethodInterceptorRenderer
 			{
 				w.Line("if (!IsConfigured) return null;");
 				// Check regular configuration
-				w.Line("if (!global::KnockOff.Times.AtLeastOnce.Validate(TotalCallCount))");
-				w.Line($"\treturn new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, TotalCallCount);");
+				w.Line("if (!global::KnockOff.Called.AtLeastOnce.Validate(TotalCallCount))");
+				w.Line($"\treturn new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Called.AtLeastOnce, TotalCallCount);");
 				// Check When chain if configured
 				if (hasWhenChain)
 				{
@@ -1323,7 +1323,7 @@ internal static class MethodInterceptorRenderer
 					w.Line($"if (_isVerifiable_{overload.SignatureSuffix})");
 					using (w.Braces())
 					{
-						w.Line($"var times = _verifiableTimes_{overload.SignatureSuffix} ?? global::KnockOff.Times.AtLeastOnce;");
+						w.Line($"var times = _verifiableTimes_{overload.SignatureSuffix} ?? global::KnockOff.Called.AtLeastOnce;");
 						// Build count including simplified tracking
 						var countParts = new List<string>
 						{
@@ -1410,7 +1410,7 @@ internal static class MethodInterceptorRenderer
 							countParts.Add($"(_whenChain_{overload.SignatureSuffix}?.Sum(m => m.CallCount) ?? 0)");
 						var countExpr = string.Join(" + ", countParts);
 						w.Line($"var count = {countExpr};");
-						w.Line($"if (!global::KnockOff.Times.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Times.AtLeastOnce, count);");
+						w.Line($"if (!global::KnockOff.Called.AtLeastOnce.Validate(count)) return new global::KnockOff.VerificationFailure(\"{methodName}\", global::KnockOff.Called.AtLeastOnce, count);");
 					}
 					// Check When chain for this overload if configured
 					var hasRefOrOutForWhen = HasRefOrOutParameters(overload.Parameters);
@@ -1535,12 +1535,12 @@ internal static class MethodInterceptorRenderer
 
 			// Verify() - no params, defaults to AtLeastOnce
 			w.Line("/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>");
-			w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+			w.Line("public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
 			w.Line();
 
 			// Verify(Times) - throws on failure
-			w.Line("/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-			w.Line("public void Verify(global::KnockOff.Times times)");
+			w.Line("/// <summary>Verifies call count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify(global::KnockOff.Called times)");
 			using (w.Braces())
 			{
 				w.Line("if (!times.Validate(_callCount))");
@@ -1654,8 +1654,8 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-			w.Line($"public {builderInterface} Verifiable(global::KnockOff.Times times)");
+			w.Line("/// <summary>Marks for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+			w.Line($"public {builderInterface} Verifiable(global::KnockOff.Called times)");
 			using (w.Braces())
 			{
 				w.Line($"_interceptor.{verifiableFieldName} = true;");
@@ -1667,19 +1667,19 @@ internal static class MethodInterceptorRenderer
 			// Explicit interface implementations for base tracking interfaces
 			// IMethodTracking.Verifiable() -> builder
 			w.Line("global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable() => Verifiable();");
-			w.Line("global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Times times) => Verifiable(times);");
+			w.Line("global::KnockOff.IMethodTracking global::KnockOff.IMethodTracking.Verifiable(global::KnockOff.Called times) => Verifiable(times);");
 
 			// If implementing IMethodTracking<TArg>, also need explicit implementations for it
 			if (trackableParams.Count == 1)
 			{
 				var param = trackableParams.GetArray()![0];
 				w.Line($"global::KnockOff.IMethodTracking<{param.Type}> global::KnockOff.IMethodTracking<{param.Type}>.Verifiable() => Verifiable();");
-				w.Line($"global::KnockOff.IMethodTracking<{param.Type}> global::KnockOff.IMethodTracking<{param.Type}>.Verifiable(global::KnockOff.Times times) => Verifiable(times);");
+				w.Line($"global::KnockOff.IMethodTracking<{param.Type}> global::KnockOff.IMethodTracking<{param.Type}>.Verifiable(global::KnockOff.Called times) => Verifiable(times);");
 			}
 			else if (trackableParams.Count > 1)
 			{
 				w.Line($"global::KnockOff.IMethodTrackingArgs<{lastArgsType}> global::KnockOff.IMethodTrackingArgs<{lastArgsType}>.Verifiable() => Verifiable();");
-				w.Line($"global::KnockOff.IMethodTrackingArgs<{lastArgsType}> global::KnockOff.IMethodTrackingArgs<{lastArgsType}>.Verifiable(global::KnockOff.Times times) => Verifiable(times);");
+				w.Line($"global::KnockOff.IMethodTrackingArgs<{lastArgsType}> global::KnockOff.IMethodTrackingArgs<{lastArgsType}>.Verifiable(global::KnockOff.Called times) => Verifiable(times);");
 			}
 
 			// Explicit interface implementation for ThenReturn/ThenCall - interface requires sequence return
@@ -2584,7 +2584,7 @@ internal static class MethodInterceptorRenderer
 
 			// Verify(Times) - parameter-specific verification for current matcher
 			w.Line($"/// <summary>Verifies this specific matcher was called the expected number of times.</summary>");
-			w.Line("public void Verify(global::KnockOff.Times times)");
+			w.Line("public void Verify(global::KnockOff.Called times)");
 			using (w.Braces())
 			{
 				w.Line("if (!times.Validate(_currentMatcher.CallCount))");
@@ -2911,11 +2911,11 @@ internal static class MethodInterceptorRenderer
 	private static void RenderInterceptorVerifyMethods(CodeWriter w, string methodName, bool isOverloadGroup = false)
 	{
 		w.Line("/// <summary>Verifies method was called at least once. Throws VerificationException if not.</summary>");
-		w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+		w.Line("public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
 		w.Line();
 
-		w.Line("/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-		w.Line("public void Verify(global::KnockOff.Times times)");
+		w.Line("/// <summary>Verifies call count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+		w.Line("public void Verify(global::KnockOff.Called times)");
 		using (w.Braces())
 		{
 			w.Line("if (!times.Validate(TotalCallCount))");
@@ -2936,8 +2936,8 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			w.Line("/// <summary>Marks for verification by Stub.Verify() with Times constraint.</summary>");
-			w.Line("public void Verifiable(global::KnockOff.Times times)");
+			w.Line("/// <summary>Marks for verification by Stub.Verify() with Called constraint.</summary>");
+			w.Line("public void Verifiable(global::KnockOff.Called times)");
 			using (w.Braces())
 			{
 				w.Line("_isVerifiable = true;");

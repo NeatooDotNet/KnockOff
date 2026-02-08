@@ -61,7 +61,7 @@ public partial class ThreePatternValueOverloadTests
 		service.GetName();
 		service.GetName();
 
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 	}
 
 	#endregion
@@ -112,7 +112,7 @@ public partial class ThreePatternValueOverloadTests
 
 		service.GetName();
 
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	#endregion

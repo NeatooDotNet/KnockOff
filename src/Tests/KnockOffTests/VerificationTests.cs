@@ -55,7 +55,7 @@ public class VerificationTests
         svc.Add(3, 4);
 
         // Assert - Should not throw
-        tracking.Verify(Times.Exactly(3));
+        tracking.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class VerificationTests
         svc.Add(1, 2);
 
         // Assert - Expected exactly 3 but called 1
-        Assert.Throws<VerificationException>(() => tracking.Verify(Times.Exactly(3)));
+        Assert.Throws<VerificationException>(() => tracking.Verify(Called.Exactly(3)));
     }
 
     [Fact]
@@ -178,7 +178,7 @@ public class VerificationTests
     {
         // Arrange
         var stub = new SequenceTestKnockOff();
-        stub.Add.Return((a, b) => a + b).Verifiable(Times.Exactly(2));
+        stub.Add.Return((a, b) => a + b).Verifiable(Called.Exactly(2));
 
         // Act
         ISequenceTestService svc = stub;
@@ -497,8 +497,8 @@ public class VerificationTests
     [Fact]
     public void Times_Validate_ExactlyZeroBehavesLikeNever()
     {
-        var exactlyZero = Times.Exactly(0);
-        var never = Times.Never;
+        var exactlyZero = Called.Exactly(0);
+        var never = Called.Never;
 
         // Both should return true when not called
         Assert.True(exactlyZero.Validate(0));

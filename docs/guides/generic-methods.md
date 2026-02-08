@@ -8,7 +8,7 @@ KnockOff solves this with the `.Of<T>()` accessor pattern, giving you type-speci
 
 **Critical concept**: Use `.Of<T>()` to access type-specific configuration and verification for generic methods. Base properties like `CalledTypeArguments` track calls across all type arguments.
 
-**OnCall and verification**: The `.Of<T>().OnCall()` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Times)` to verify call counts. Each type argument has independent configuration—configuring `.Of<User>().OnCall(...)` does not affect `.Of<Order>().OnCall(...)`. Note: Generic method typed handlers use `Return` (not `Returns`/`Execute`) — this is a separate API from the main method interceptor configuration.
+**OnCall and verification**: The `.Of<T>().OnCall()` method configures the callback for a specific type argument and returns an `IMethodTracking` object for verification. Use `tracking.Verify(Called)` to verify call counts. Each type argument has independent configuration—configuring `.Of<User>().OnCall(...)` does not affect `.Of<Order>().OnCall(...)`. Note: Generic method typed handlers use `Return` (not `Returns`/`Execute`) — this is a separate API from the main method interceptor configuration.
 
 ---
 
@@ -41,7 +41,7 @@ Use `.Of<T>()` to access the type-specific interceptor, then call `Return` to co
 The `Return` method accepts a callback matching the method signature and returns `IMethodTracking` for verification:
 - **Callback parameters**: Match the original method parameters
 - **Callback return type**: Matches the method's return type with the specific type argument substituted
-- **Return value**: `IMethodTracking` object providing `.Verify(Times)` (see [Verification Guide](verification.md))
+- **Return value**: `IMethodTracking` object providing `.Verify(Called)` (see [Verification Guide](verification.md))
 
 **Key point**: `Return` is type-specific—each type argument needs its own configuration. The returned `IMethodTracking` object is used to verify calls for that specific type argument.
 
@@ -74,8 +74,8 @@ After execution, verify calls per type using the same `.Of<T>()` accessor. The `
 
 <!-- snippet: generic-verify-typed -->
 ```cs
-// Verify calls for specific type using Times
-tracking.Verify(Times.Exactly(2));
+// Verify calls for specific type using Called
+tracking.Verify(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -84,8 +84,8 @@ You can verify calls for multiple types independently:
 <!-- snippet: generic-verify-aggregate -->
 ```cs
 // Verify each type was called independently
-userTracking.Verify(Times.Exactly(2));
-orderTracking.Verify(Times.Once);
+userTracking.Verify(Called.Exactly(2));
+orderTracking.Verify(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -133,8 +133,8 @@ Reset type-specific state using `.Of<T>().Reset()`:
 // Reset only User-specific state
 stub.GetById.Of<User>().Reset();
 
-stub.GetById.Of<User>().Verify(Times.Never);
-stub.GetById.Of<Order>().Verify(Times.Once);
+stub.GetById.Of<User>().Verify(Called.Never);
+stub.GetById.Of<Order>().Verify(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -145,8 +145,8 @@ To reset all type arguments at once, call `Reset()` on the base interceptor:
 // Reset all type-specific state
 stub.GetById.Reset();
 
-stub.GetById.Of<User>().Verify(Times.Never);
-stub.GetById.Of<Order>().Verify(Times.Never);
+stub.GetById.Of<User>().Verify(Called.Never);
+stub.GetById.Of<Order>().Verify(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -180,10 +180,10 @@ var deserializeOrderTracking = stub.Deserialize.Of<Order>().Return((data) =>
 
 - **`.Of<T>()`** provides type-specific access to the interceptor for a specific type argument
 - **`Return`** configures the callback for that type—parameters match the method signature, return type matches with type arguments substituted
-- **`Return` returns `IMethodTracking`** enabling verification via `.Verify(Times)`
+- **`Return` returns `IMethodTracking`** enabling verification via `.Verify(Called)`
 - **Base properties** (`CalledTypeArguments`, `Reset()`) track and manage calls across all types
 - **Multiple type parameters** use `.Of<T1, T2, ...>()` matching the method signature
-- **Verification** uses `tracking.Verify(Times)` for type-specific call count assertions
+- **Verification** uses `tracking.Verify(Called)` for type-specific call count assertions
 - **Reset behavior** differs: `.Of<T>().Reset()` is type-specific, `.Reset()` clears everything
 - **Type discovery** via `CalledTypeArguments` shows which types were actually used
 

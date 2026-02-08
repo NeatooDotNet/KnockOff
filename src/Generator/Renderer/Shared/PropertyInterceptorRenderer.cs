@@ -66,7 +66,7 @@ internal static class PropertyInterceptorRenderer
 
 		// Verifiable state (for getter)
 		w.Line("private bool _isGetVerifiable;");
-		w.Line("private global::KnockOff.Times? _getVerifiableTimes;");
+		w.Line("private global::KnockOff.Called? _getVerifiableTimes;");
 		w.Line();
 
 		// Track unconfigured getter calls
@@ -178,7 +178,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line("private int _getSequenceIndex;");
 			w.Line("private bool _getRepeatLastValue = true;");
 			w.Line("private bool _isGetVerifiable;");
-			w.Line("private global::KnockOff.Times? _getVerifiableTimes;");
+			w.Line("private global::KnockOff.Called? _getVerifiableTimes;");
 			w.Line("private int _unconfiguredGetCount;");
 			w.Line();
 		}
@@ -192,7 +192,7 @@ internal static class PropertyInterceptorRenderer
 			w.Line("private int _setSequenceIndex;");
 			w.Line("private bool _setRepeatLastValue = true;");
 			w.Line("private bool _isSetVerifiable;");
-			w.Line("private global::KnockOff.Times? _setVerifiableTimes;");
+			w.Line("private global::KnockOff.Called? _setVerifiableTimes;");
 			w.Line("private int _unconfiguredSetCount;");
 			w.Line($"private {model.NullableValueType} _unconfiguredLastSetValue;");
 			w.Line();
@@ -622,11 +622,11 @@ internal static class PropertyInterceptorRenderer
 	{
 		// Verify() - combined
 		w.Line("/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>");
-		w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+		w.Line("public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
 		w.Line();
 
-		w.Line("/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-		w.Line("public void Verify(global::KnockOff.Times times)");
+		w.Line("/// <summary>Verifies total access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+		w.Line("public void Verify(global::KnockOff.Called times)");
 		using (w.Braces())
 		{
 			w.Line("var totalCount = TotalGetCount + _setCount;");
@@ -637,11 +637,11 @@ internal static class PropertyInterceptorRenderer
 
 		// VerifyGet
 		w.Line("/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>");
-		w.Line("public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);");
+		w.Line("public void VerifyGet() => VerifyGet(global::KnockOff.Called.AtLeastOnce);");
 		w.Line();
 
-		w.Line("/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-		w.Line("public void VerifyGet(global::KnockOff.Times times)");
+		w.Line("/// <summary>Verifies getter access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+		w.Line("public void VerifyGet(global::KnockOff.Called times)");
 		using (w.Braces())
 		{
 			w.Line("if (!times.Validate(TotalGetCount))");
@@ -651,11 +651,11 @@ internal static class PropertyInterceptorRenderer
 
 		// VerifySet
 		w.Line("/// <summary>Verifies the init setter was accessed at least once. Throws VerificationException if not.</summary>");
-		w.Line("public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);");
+		w.Line("public void VerifySet() => VerifySet(global::KnockOff.Called.AtLeastOnce);");
 		w.Line();
 
-		w.Line("/// <summary>Verifies init setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-		w.Line("public void VerifySet(global::KnockOff.Times times)");
+		w.Line("/// <summary>Verifies init setter access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+		w.Line("public void VerifySet(global::KnockOff.Called times)");
 		using (w.Braces())
 		{
 			w.Line("if (!times.Validate(_setCount))");
@@ -667,8 +667,8 @@ internal static class PropertyInterceptorRenderer
 		w.Line($"/// <summary>Marks this property for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
 		w.Line($"public {fullInterceptorClassName} Verifiable() {{ _isGetVerifiable = true; _getVerifiableTimes = null; return this; }}");
 		w.Line();
-		w.Line($"/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Times times) {{ _isGetVerifiable = true; _getVerifiableTimes = times; return this; }}");
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ _isGetVerifiable = true; _getVerifiableTimes = times; return this; }}");
 		w.Line();
 	}
 
@@ -681,11 +681,11 @@ internal static class PropertyInterceptorRenderer
 
 		// Verify() - combined
 		w.Line("/// <summary>Verifies the property was accessed at least once. Throws VerificationException if not.</summary>");
-		w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+		w.Line("public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
 		w.Line();
 
-		w.Line("/// <summary>Verifies total access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-		w.Line("public void Verify(global::KnockOff.Times times)");
+		w.Line("/// <summary>Verifies total access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+		w.Line("public void Verify(global::KnockOff.Called times)");
 		using (w.Braces())
 		{
 			w.Line($"var totalCount = {totalCountExpr};");
@@ -698,11 +698,11 @@ internal static class PropertyInterceptorRenderer
 		if (model.HasGetter)
 		{
 			w.Line("/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>");
-			w.Line("public void VerifyGet() => VerifyGet(global::KnockOff.Times.AtLeastOnce);");
+			w.Line("public void VerifyGet() => VerifyGet(global::KnockOff.Called.AtLeastOnce);");
 			w.Line();
 
-			w.Line("/// <summary>Verifies getter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-			w.Line("public void VerifyGet(global::KnockOff.Times times)");
+			w.Line("/// <summary>Verifies getter access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void VerifyGet(global::KnockOff.Called times)");
 			using (w.Braces())
 			{
 				w.Line("if (!times.Validate(TotalGetCount))");
@@ -715,11 +715,11 @@ internal static class PropertyInterceptorRenderer
 		if (model.HasSetter)
 		{
 			w.Line("/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>");
-			w.Line("public void VerifySet() => VerifySet(global::KnockOff.Times.AtLeastOnce);");
+			w.Line("public void VerifySet() => VerifySet(global::KnockOff.Called.AtLeastOnce);");
 			w.Line();
 
-			w.Line("/// <summary>Verifies setter access count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-			w.Line("public void VerifySet(global::KnockOff.Times times)");
+			w.Line("/// <summary>Verifies setter access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void VerifySet(global::KnockOff.Called times)");
 			using (w.Braces())
 			{
 				w.Line("if (!times.Validate(TotalSetCount))");
@@ -738,8 +738,8 @@ internal static class PropertyInterceptorRenderer
 		var verifiableTimesBody = model.HasGetter && model.HasSetter
 			? "_isGetVerifiable = true; _getVerifiableTimes = times; _isSetVerifiable = true; _setVerifiableTimes = times;"
 			: (model.HasGetter ? "_isGetVerifiable = true; _getVerifiableTimes = times;" : "_isSetVerifiable = true; _setVerifiableTimes = times;");
-		w.Line($"/// <summary>Marks this property for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Times times) {{ {verifiableTimesBody} return this; }}");
+		w.Line($"/// <summary>Marks this property for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+		w.Line($"public {fullInterceptorClassName} Verifiable(global::KnockOff.Called times) {{ {verifiableTimesBody} return this; }}");
 		w.Line();
 	}
 
@@ -762,7 +762,7 @@ internal static class PropertyInterceptorRenderer
 		using (w.Braces())
 		{
 			w.Line("if (!_isGetVerifiable) return null;");
-			w.Line("var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+			w.Line("var times = _getVerifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
 			w.Line("var totalCount = TotalGetCount + _setCount;");
 			w.Line($"return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", times, totalCount);");
 		}
@@ -774,7 +774,7 @@ internal static class PropertyInterceptorRenderer
 		{
 			w.Line("if (!IsConfigured) return null;");
 			w.Line("var totalCount = TotalGetCount + _setCount;");
-			w.Line($"return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", global::KnockOff.Times.AtLeastOnce, totalCount);");
+			w.Line($"return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", global::KnockOff.Called.AtLeastOnce, totalCount);");
 		}
 		w.Line();
 	}
@@ -818,7 +818,7 @@ internal static class PropertyInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line("// Both marked verifiable - check combined count (either accessor satisfies)");
-					w.Line("var times = _getVerifiableTimes ?? _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+					w.Line("var times = _getVerifiableTimes ?? _setVerifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
 					w.Line($"var totalCount = {totalCountExpr};");
 					w.Line($"return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", times, totalCount);");
 				}
@@ -831,7 +831,7 @@ internal static class PropertyInterceptorRenderer
 				w.Line($"if ({condition})");
 				using (w.Braces())
 				{
-					w.Line("var times = _getVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+					w.Line("var times = _getVerifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
 					w.Line($"if (!times.Validate(TotalGetCount)) return new global::KnockOff.VerificationFailure(\"{model.PropertyName} (get)\", times, TotalGetCount);");
 				}
 			}
@@ -842,7 +842,7 @@ internal static class PropertyInterceptorRenderer
 				w.Line($"if ({condition})");
 				using (w.Braces())
 				{
-					w.Line("var times = _setVerifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+					w.Line("var times = _setVerifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
 					w.Line($"if (!times.Validate(TotalSetCount)) return new global::KnockOff.VerificationFailure(\"{model.PropertyName} (set)\", times, TotalSetCount);");
 				}
 			}
@@ -856,7 +856,7 @@ internal static class PropertyInterceptorRenderer
 		{
 			w.Line("if (!IsConfigured) return null;");
 			w.Line($"var totalCount = {totalCountExpr};");
-			w.Line($"return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", global::KnockOff.Times.AtLeastOnce, totalCount);");
+			w.Line($"return totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{model.PropertyName}\", global::KnockOff.Called.AtLeastOnce, totalCount);");
 		}
 		w.Line();
 	}
@@ -893,11 +893,11 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 
 			w.Line("/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>");
-			w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+			w.Line("public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
 			w.Line();
 
-			w.Line("/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-			w.Line("public void Verify(global::KnockOff.Times times)");
+			w.Line("/// <summary>Verifies call count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify(global::KnockOff.Called times)");
 			using (w.Braces())
 			{
 				w.Line("if (!times.Validate(_callCount))");
@@ -972,7 +972,7 @@ internal static class PropertyInterceptorRenderer
 
 			// Explicit interface implementation for base IPropertyGetTracking.Verifiable()
 			w.Line("global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable() => Verifiable();");
-			w.Line("global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Times times) => Verifiable();");
+			w.Line("global::KnockOff.IPropertyGetTracking global::KnockOff.IPropertyGetTracking.Verifiable(global::KnockOff.Called times) => Verifiable();");
 		}
 		w.Line();
 	}
@@ -1015,11 +1015,11 @@ internal static class PropertyInterceptorRenderer
 			w.Line();
 
 			w.Line("/// <summary>Verifies callback was invoked at least once. Throws VerificationException if not.</summary>");
-			w.Line("public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+			w.Line("public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
 			w.Line();
 
-			w.Line("/// <summary>Verifies call count satisfies the Times constraint. Throws VerificationException if not.</summary>");
-			w.Line("public void Verify(global::KnockOff.Times times)");
+			w.Line("/// <summary>Verifies call count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+			w.Line("public void Verify(global::KnockOff.Called times)");
 			using (w.Braces())
 			{
 				w.Line("if (!times.Validate(_callCount))");
@@ -1059,7 +1059,7 @@ internal static class PropertyInterceptorRenderer
 
 			// Explicit interface implementation for base IPropertySetTracking<T>.Verifiable()
 			w.Line($"global::KnockOff.IPropertySetTracking<{valueType}> global::KnockOff.IPropertySetTracking<{valueType}>.Verifiable() => Verifiable();");
-			w.Line($"global::KnockOff.IPropertySetTracking<{valueType}> global::KnockOff.IPropertySetTracking<{valueType}>.Verifiable(global::KnockOff.Times times) => Verifiable();");
+			w.Line($"global::KnockOff.IPropertySetTracking<{valueType}> global::KnockOff.IPropertySetTracking<{valueType}>.Verifiable(global::KnockOff.Called times) => Verifiable();");
 		}
 		w.Line();
 	}

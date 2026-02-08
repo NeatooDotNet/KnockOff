@@ -97,13 +97,13 @@ public class MethodInterceptionTests
         stub.GetData.Return((id) => $"Data-{id}");
 
         // Verify calls
-        stub.GetData.Verify(Times.Never);
+        stub.GetData.Verify(Called.Never);
         #endregion
 
         svc.GetData(1);
         svc.GetData(2);
 
-        stub.GetData.Verify(Times.Exactly(2));
+        stub.GetData.Verify(Called.Exactly(2));
 
         // Access call history
         Assert.Equal(2, stub.GetData.LastArg);
@@ -130,8 +130,8 @@ public class PropertyInterceptionTests
         stub.Name.Set((value) => { /* capture or validate */ });
 
         // Verify
-        stub.Name.VerifyGet(Times.Never);
-        stub.Name.VerifySet(Times.Never);
+        stub.Name.VerifyGet(Called.Never);
+        stub.Name.VerifySet(Called.Never);
 
         // Access history
         // var lastSet = stub.Name.LastSetValue;
@@ -140,8 +140,8 @@ public class PropertyInterceptionTests
         _ = config.Name;
         config.Name = "updated";
 
-        stub.Name.VerifyGet(Times.Once);
-        stub.Name.VerifySet(Times.Once);
+        stub.Name.VerifyGet(Called.Once);
+        stub.Name.VerifySet(Called.Once);
         Assert.Equal("updated", stub.Name.LastSetValue);
     }
 }
@@ -169,8 +169,8 @@ public class IndexerInterceptionTests
         stub.Indexer.Backing["preloaded"] = "data";
 
         // Verify
-        stub.Indexer.VerifyGet(Times.Never);
-        stub.Indexer.VerifySet(Times.Never);
+        stub.Indexer.VerifyGet(Called.Never);
+        stub.Indexer.VerifySet(Called.Never);
 
         // Access history
         // var lastKey = stub.Indexer.LastGetKey;
@@ -180,8 +180,8 @@ public class IndexerInterceptionTests
         _ = cache["test"];
         cache["key"] = "val";
 
-        stub.Indexer.VerifyGet(Times.Once);
-        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Once);
+        stub.Indexer.VerifySet(Called.Once);
         Assert.Equal("test", stub.Indexer.LastGetKey);
         Assert.Equal("key", stub.Indexer.LastSetEntry!.Value.Key);
     }
@@ -207,15 +207,15 @@ public class EventInterceptionTests
         bool hasSubscribers = stub.DataReceived.HasSubscribers;
 
         // Verify add/remove
-        stub.DataReceived.VerifyAdd(Times.Never);
-        stub.DataReceived.VerifyRemove(Times.Never);
+        stub.DataReceived.VerifyAdd(Called.Never);
+        stub.DataReceived.VerifyRemove(Called.Never);
         #endregion
 
         Assert.False(hasSubscribers);
 
         DataEventArgs? received = null;
         pub.DataReceived += (s, e) => received = e;
-        stub.DataReceived.VerifyAdd(Times.Once);
+        stub.DataReceived.VerifyAdd(Called.Once);
 
         stub.DataReceived.Raise(stub, new DataEventArgs { Data = "hello" });
         Assert.Equal("hello", received?.Data);
@@ -313,13 +313,13 @@ public class VerificationTests
         // stub.VerifyAll();  // Throws if any configured member not called
 
         // Individual member verification
-        // stub.GetData.Verify(Times.Once);
+        // stub.GetData.Verify(Called.Once);
         #endregion
 
         svc.GetData(1);
         stub.Verify();
         stub.VerifyAll();
-        stub.GetData.Verify(Times.Once);
+        stub.GetData.Verify(Called.Once);
     }
 }
 
@@ -363,7 +363,7 @@ public class ResetTests
 
         stub.GetData.Return((id) => "data");
         svc.GetData(1);
-        stub.GetData.Verify(Times.Once);
+        stub.GetData.Verify(Called.Once);
 
         #region matrix-reset
         // Reset individual member
@@ -371,7 +371,7 @@ public class ResetTests
         stub.Save.Reset();
         #endregion
 
-        stub.GetData.Verify(Times.Never);
+        stub.GetData.Verify(Called.Never);
     }
 }
 
@@ -456,7 +456,7 @@ public class InstantiationTests
         Assert.Equal(7, result);
 
         // Verification - same API across all patterns
-        calcStub.Add.Verify(Times.Once);
+        calcStub.Add.Verify(Called.Once);
         Assert.Equal((3, 4), calcStub.Add.LastArgs);
         #endregion
     }

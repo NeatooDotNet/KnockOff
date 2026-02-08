@@ -123,7 +123,7 @@ Property interceptors support verification similar to methods.
 <!-- snippet: properties-verify-getcount -->
 ```cs
 // VerifyGet checks how many times property was read
-stub.Age.VerifyGet(Times.Exactly(2));
+stub.Age.VerifyGet(Called.Exactly(2));
 ```
 <!-- endSnippet -->
 
@@ -146,10 +146,10 @@ stub.Age.Verifiable();
 <!-- endSnippet -->
 
 **Available verification methods:**
-- `VerifyGet(Times)` - Verify property getter was called
-- `VerifySet(Times)` - Verify property setter was called
+- `VerifyGet(Called)` - Verify property getter was called
+- `VerifySet(Called)` - Verify property setter was called
 - `Verifiable()` - Mark property for batch verification (verifies both getter and setter)
-- `Verifiable(Times)` - Mark property for batch verification with specific Times constraint
+- `Verifiable(Called)` - Mark property for batch verification with specific Called constraint
 
 **Available inspection properties:**
 - `LastSetValue` - The most recent value written to the property setter
@@ -302,8 +302,8 @@ Calling `Reset()` on a property interceptor clears tracking state but preserves 
 // Reset clears counts but preserves callbacks
 stub.Name.Reset();
 
-stub.Name.VerifyGet(Times.Never);
-stub.Name.VerifySet(Times.Never);
+stub.Name.VerifyGet(Called.Never);
+stub.Name.VerifySet(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -412,8 +412,8 @@ _ = service.Count;
 _ = service.Count;
 _ = service.Count;
 
-stub.Count.VerifyGet(Times.Exactly(3));
-stub.Name.VerifySet(Times.Never);
+stub.Count.VerifyGet(Called.Exactly(3));
+stub.Name.VerifySet(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -466,7 +466,7 @@ Choose your configuration approach based on the test scenario:
 | Track all values written to property | `Set` | `stub.Name.Set((v) => list.Add(v));` |
 | Simulate validation in dependency | `Set` | `stub.Age.Set((v) => Validate(v));` |
 | Setter behavior changes across writes | `Set().ThenSet()` | `stub.Config.Set((v) => Reject(v)).ThenSet((v) => Accept(v));` |
-| Verify property was accessed N times | Verification | `stub.UserId.VerifyGet(Times.Exactly(2));` |
+| Verify property was accessed N times | Verification | `stub.UserId.VerifyGet(Called.Exactly(2));` |
 | Verify last value written | Verification | `Assert.Equal("x", stub.Name.LastSetValue);` |
 
 ---

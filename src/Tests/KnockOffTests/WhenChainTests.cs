@@ -904,7 +904,7 @@ public class WhenChainTests
 		var chain = classStub.ProcessVirtual.When(1, 2);
 		instance.ProcessVirtual(1, 2);
 
-		chain.Verify(Times.Once);
+		chain.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -950,7 +950,7 @@ public class WhenChainTests
 		instance.ProcessVirtual(1, 2);
 		instance.ProcessVirtual(3, 4);
 
-		chain.Verify(Times.Exactly(2));
+		chain.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -1164,7 +1164,7 @@ public class WhenChainTests
 		service.Process(1, 2);
 
 		// Verify parameter-specific call tracking works via chain
-		chain.Verify(Times.Exactly(2));
+		chain.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -1212,7 +1212,7 @@ public class WhenChainTests
 		service.Process(3, 4);  // Doesn't match When
 
 		// Verify specific parameter combination was called exactly twice
-		chain.Verify(Times.Exactly(2));
+		chain.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -1226,7 +1226,7 @@ public class WhenChainTests
 		service.Process(1, 2);
 
 		// Should fail - expected 3 calls but only 1
-		Assert.Throws<VerificationException>(() => chain.Verify(Times.Exactly(3)));
+		Assert.Throws<VerificationException>(() => chain.Verify(Called.Exactly(3)));
 	}
 
 	[Fact]
@@ -1353,7 +1353,7 @@ public class WhenChainTests
 		var chain = stub.Process.When(1, 2);
 		service.Process(1, 2);
 
-		chain.Verify(Times.Once);
+		chain.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -1381,7 +1381,7 @@ public class WhenChainTests
 		service.Process(1, 2);
 		service.Process(1, 2);
 
-		chain.Verify(Times.Exactly(2));
+		chain.Verify(Called.Exactly(2));
 	}
 
 	#endregion
@@ -1399,7 +1399,7 @@ public class WhenChainTests
 		var chain = stub.Interceptor.When(1, 2);
 		processor(1, 2);
 
-		chain.Verify(Times.Once);
+		chain.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -1445,7 +1445,7 @@ public class WhenChainTests
 		processor(1, 2);
 		processor(3, 4);
 
-		chain.Verify(Times.Exactly(2));
+		chain.Verify(Called.Exactly(2));
 	}
 
 	[Fact]

@@ -52,7 +52,7 @@ public partial class IEntityPropertyManagerTests
         stub.IsModified.Get(true);
 
         Assert.True(manager.IsModified);
-        stub.IsModified.VerifyGet(Times.Once);
+        stub.IsModified.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.MarkSelfUnmodified();
 
-        stub.MarkSelfUnmodified.Verify(Times.Once);
+        stub.MarkSelfUnmodified.Verify(Called.Once);
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public partial class IEntityPropertyManagerTests
         manager.MarkSelfUnmodified();
         manager.MarkSelfUnmodified();
 
-        stub.MarkSelfUnmodified.Verify(Times.Exactly(3));
+        stub.MarkSelfUnmodified.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public partial class IEntityPropertyManagerTests
 
         await manager.WaitForTasks();
 
-        stub.WaitForTasks.Verify(Times.Once);
+        stub.WaitForTasks.Verify(Called.Once);
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public partial class IEntityPropertyManagerTests
 
         _ = manager["PropertyName"];
 
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Once);
         Assert.Equal("PropertyName", stub.Indexer.LastGetKey);
     }
 
@@ -260,7 +260,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.PropertyChanged += (s, e) => { };
 
-        stub.PropertyChanged.VerifyAdd(Times.Once);
+        stub.PropertyChanged.VerifyAdd(Called.Once);
     }
 
     [Fact]
@@ -271,7 +271,7 @@ public partial class IEntityPropertyManagerTests
 
         manager.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Called.Once);
     }
 
     #endregion
@@ -290,7 +290,7 @@ public partial class IEntityPropertyManagerTests
 
         stub.IsModified.Reset();
 
-        stub.IsModified.VerifyGet(Times.Never);
+        stub.IsModified.VerifyGet(Called.Never);
     }
 
     [Fact]
@@ -304,7 +304,7 @@ public partial class IEntityPropertyManagerTests
 
         stub.MarkSelfUnmodified.Reset();
 
-        stub.MarkSelfUnmodified.Verify(Times.Never);
+        stub.MarkSelfUnmodified.Verify(Called.Never);
     }
 
     #endregion

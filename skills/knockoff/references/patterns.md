@@ -483,7 +483,7 @@ ruleStub.Interceptor.Return((value) => value != "invalid");
 ValidationRule rule = ruleStub;  // Implicit conversion
 bool isValid = rule("test");
 
-ruleStub.Interceptor.Verify(Times.Once);
+ruleStub.Interceptor.Verify(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -492,7 +492,7 @@ ruleStub.Interceptor.Verify(Times.Once);
 - **Implicit conversion**: Stub converts to delegate type automatically
 - **Invocation tracking**: Use `Verify()`, `LastArg`, `LastArgs`
 - **Behavior configuration**: Use `Return`, `Call`, When chains
-- **Verification**: Use `Verify()`, `Times` constraints, and `.Verifiable()` chaining
+- **Verification**: Use `Verify()`, `Called` constraints, and `.Verifiable()` chaining
 - **Sequences**: `Return(first, params rest)`, `ThenReturn`, `ThenCall`
 - **Async auto-wrapping**: `Return(42)` for `Task<int>` delegates (auto-wraps in Task.FromResult)
 

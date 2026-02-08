@@ -89,9 +89,9 @@ public partial class OpenGenericInterfaceOverloadTests
         formatter.Format("c", true);
 
         // Assert
-        tracking1.Verify(Times.Exactly(2));
-        tracking2.Verify(Times.Once);
-        stub.Format.Verify(Times.Exactly(3)); // Total across all overloads
+        tracking1.Verify(Called.Exactly(2));
+        tracking2.Verify(Called.Once);
+        stub.Format.Verify(Called.Exactly(3)); // Total across all overloads
     }
 
     [Fact]
@@ -196,7 +196,7 @@ public partial class OpenGenericClassOverloadTests
         repo.Save(new TestEntity { Id = 2 });
 
         // Assert
-        tracking.Verify(Times.Exactly(2));
+        tracking.Verify(Called.Exactly(2));
     }
 
     [Fact]

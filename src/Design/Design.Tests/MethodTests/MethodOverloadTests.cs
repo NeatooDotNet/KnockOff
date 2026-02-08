@@ -94,10 +94,10 @@ public class MethodOverloadTests
         formatter.Format("b");
         formatter.Format("c", new FormatOptions());
 
-        tracking1.Verify(Times.Exactly(2));
+        tracking1.Verify(Called.Exactly(2));
         Assert.Equal("b", tracking1.LastArg);
 
-        tracking2.Verify(Times.Once);
+        tracking2.Verify(Called.Once);
         Assert.Equal(("c", new FormatOptions()), tracking2.LastArgs);
     }
 
@@ -115,7 +115,7 @@ public class MethodOverloadTests
         formatter.Format("b", new FormatOptions());
         formatter.Format("c", new FormatOptions());
 
-        stub.Format.Verify(Times.Exactly(3));
+        stub.Format.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -151,8 +151,8 @@ public class MethodOverloadTests
         formatter.Log("b");
         formatter.Log("c", 1);
 
-        tracking1.Verify(Times.Exactly(2));
-        tracking2.Verify(Times.Once);
+        tracking1.Verify(Called.Exactly(2));
+        tracking2.Verify(Called.Once);
     }
 
 #pragma warning disable xUnit1051 // Testing CancellationToken overload specifically
@@ -172,8 +172,8 @@ public class MethodOverloadTests
         Assert.Equal("[a]", r1);
         Assert.Equal("[b:ct]", r2);
 
-        tracking1.Verify(Times.Once);
-        tracking2.Verify(Times.Once);
+        tracking1.Verify(Called.Once);
+        tracking2.Verify(Called.Once);
     }
 #pragma warning restore xUnit1051
 
@@ -217,12 +217,12 @@ public class MethodOverloadTests
         formatter.Format("a");
         formatter.Format("b", new FormatOptions());
 
-        tracking1.Verify(Times.Once);
-        tracking2.Verify(Times.Once);
+        tracking1.Verify(Called.Once);
+        tracking2.Verify(Called.Once);
 
         stub.Format.Reset();
 
-        tracking1.Verify(Times.Never);
-        tracking2.Verify(Times.Never);
+        tracking1.Verify(Called.Never);
+        tracking2.Verify(Called.Never);
     }
 }

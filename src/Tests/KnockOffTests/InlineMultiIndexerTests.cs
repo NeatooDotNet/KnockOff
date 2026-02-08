@@ -26,7 +26,7 @@ public class InlineMultiIndexerTests
 		var result = svc["key1"];
 
 		Assert.Equal("value1", result);
-		stub.Indexer.OfString.VerifyGet(Times.Once);
+		stub.Indexer.OfString.VerifyGet(Called.Once);
 		Assert.Equal("key1", stub.Indexer.OfString.LastGetKey);
 	}
 
@@ -41,7 +41,7 @@ public class InlineMultiIndexerTests
 		Assert.Equal(100, svc[0]);
 		Assert.Equal(200, svc[1]);
 
-		stub.Indexer.OfInt32.VerifyGet(Times.Exactly(2));
+		stub.Indexer.OfInt32.VerifyGet(Called.Exactly(2));
 		Assert.Equal(1, stub.Indexer.OfInt32.LastGetKey);
 	}
 
@@ -55,7 +55,7 @@ public class InlineMultiIndexerTests
 		Assert.Equal("Value for foo", svc["foo"]);
 		Assert.Equal("Value for bar", svc["bar"]);
 
-		stub.Indexer.OfString.VerifyGet(Times.Exactly(2));
+		stub.Indexer.OfString.VerifyGet(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -67,7 +67,7 @@ public class InlineMultiIndexerTests
 		svc["key1"] = "value1";
 		svc["key2"] = "value2";
 
-		stub.Indexer.OfString.VerifySet(Times.Exactly(2));
+		stub.Indexer.OfString.VerifySet(Called.Exactly(2));
 		Assert.NotNull(stub.Indexer.OfString.LastSetEntry);
 		Assert.Equal("key2", stub.Indexer.OfString.LastSetEntry.Value.Key);
 		Assert.Equal("value2", stub.Indexer.OfString.LastSetEntry.Value.Value);
@@ -107,8 +107,8 @@ public class InlineMultiIndexerTests
 		Assert.Equal(42, svc[42]);
 
 		// Verify independent tracking
-		stub.Indexer.OfString.VerifyGet(Times.Once);
-		stub.Indexer.OfInt32.VerifyGet(Times.Once);
+		stub.Indexer.OfString.VerifyGet(Called.Once);
+		stub.Indexer.OfInt32.VerifyGet(Called.Once);
 		Assert.Equal("test", stub.Indexer.OfString.LastGetKey);
 		Assert.Equal(42, stub.Indexer.OfInt32.LastGetKey);
 	}
@@ -124,14 +124,14 @@ public class InlineMultiIndexerTests
 		_ = svc["key"];
 		_ = svc[0];
 
-		stub.Indexer.OfString.VerifyGet(Times.Once);
-		stub.Indexer.OfInt32.VerifyGet(Times.Once);
+		stub.Indexer.OfString.VerifyGet(Called.Once);
+		stub.Indexer.OfInt32.VerifyGet(Called.Once);
 
 		// Reset through container should reset all
 		stub.Indexer.Reset();
 
-		stub.Indexer.OfString.VerifyGet(Times.Never);
-		stub.Indexer.OfInt32.VerifyGet(Times.Never);
+		stub.Indexer.OfString.VerifyGet(Called.Never);
+		stub.Indexer.OfInt32.VerifyGet(Called.Never);
 	}
 }
 

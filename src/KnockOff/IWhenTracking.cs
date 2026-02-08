@@ -103,8 +103,8 @@ public interface IVoidWhenChain<TDelegate> : IWhenTracking
     /// Verifies this specific matcher was called the expected number of times.
     /// Different from Verify() which checks if the chain reached terminal state.
     /// </summary>
-    /// <param name="times">The expected number of times this matcher was called.</param>
-    void Verify(Times times);
+    /// <param name="called">The expected number of times this matcher was called.</param>
+    void Verify(Called called);
 
     /// <summary>
     /// Marks this When chain for verification by Stub.Verify().

@@ -143,7 +143,7 @@ stub.GetById.Return(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns "Override"
 
 // Full tracking works - counts all calls regardless of configuration
-stub.GetById.Verify(Times.Exactly(2));
+stub.GetById.Verify(Called.Exactly(2));
 Assert.Equal(2, stub.GetById.LastArg);
 
 // Returns for constant values (auto-wraps for async)
@@ -177,11 +177,11 @@ The `Return`/`Call` method returns `IMethodTracking<T>` (or `IMethodTrackingArgs
 | Method | Return Type | Description |
 |--------|-------------|-------------|
 | `Verify()` | `void` | Verify method was called at least once (throws if not) |
-| `Verify(Times)` | `void` | Verify method was called according to Times constraint |
+| `Verify(Called)` | `void` | Verify method was called according to Called constraint |
 | `Verifiable()` | `{Interceptor}` | Mark interceptor for batch verification with default constraint (AtLeastOnce), returns self for chaining |
-| `Verifiable(Times)` | `{Interceptor}` | Mark interceptor for batch verification with specific Times constraint, returns self for chaining |
+| `Verifiable(Called)` | `{Interceptor}` | Mark interceptor for batch verification with specific Called constraint, returns self for chaining |
 
-**Note**: `Verifiable()` and `Verifiable(Times)` return the interceptor instance, enabling fluent chaining with `Return`/`Call`.
+**Note**: `Verifiable()` and `Verifiable(Called)` return the interceptor instance, enabling fluent chaining with `Return`/`Call`.
 
 ### Configuration Methods
 
@@ -285,11 +285,11 @@ When a property has a getter, sequences can be built using these methods on `IPr
 | Method | Return Type | Description |
 |--------|-------------|-------------|
 | `VerifyGet()` | `void` | Verify property getter was called at least once (throws if not) |
-| `VerifyGet(Times)` | `void` | Verify property getter was called according to Times constraint |
+| `VerifyGet(Called)` | `void` | Verify property getter was called according to Called constraint |
 | `VerifySet()` | `void` | Verify property setter was called at least once (throws if not) |
-| `VerifySet(Times)` | `void` | Verify property setter was called according to Times constraint |
+| `VerifySet(Called)` | `void` | Verify property setter was called according to Called constraint |
 | `Verifiable()` | `{Interceptor}` | Mark property for batch verification with default constraint (AtLeastOnce), returns self for chaining |
-| `Verifiable(Times)` | `{Interceptor}` | Mark property for batch verification with specific Times constraint, returns self for chaining |
+| `Verifiable(Called)` | `{Interceptor}` | Mark property for batch verification with specific Called constraint, returns self for chaining |
 
 ### Behavior Notes
 
@@ -342,11 +342,11 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 | Method | Return Type | Description |
 |--------|-------------|-------------|
 | `VerifyGet()` | `void` | Verify indexer getter was called at least once (throws if not) |
-| `VerifyGet(Times)` | `void` | Verify indexer getter was called according to Times constraint |
+| `VerifyGet(Called)` | `void` | Verify indexer getter was called according to Called constraint |
 | `VerifySet()` | `void` | Verify indexer setter was called at least once (throws if not) |
-| `VerifySet(Times)` | `void` | Verify indexer setter was called according to Times constraint |
+| `VerifySet(Called)` | `void` | Verify indexer setter was called according to Called constraint |
 | `Verifiable()` | `{Interceptor}` | Mark indexer for batch verification with default constraint (AtLeastOnce), returns self for chaining |
-| `Verifiable(Times)` | `{Interceptor}` | Mark indexer for batch verification with specific Times constraint, returns self for chaining |
+| `Verifiable(Called)` | `{Interceptor}` | Mark indexer for batch verification with specific Called constraint, returns self for chaining |
 
 ### Behavior Notes
 
@@ -390,11 +390,11 @@ Generated for interface events. Tracks add/remove operations, checks for subscri
 | Method | Return Type | Description |
 |--------|-------------|-------------|
 | `VerifyAdd()` | `void` | Verify event was subscribed at least once (throws if not) |
-| `VerifyAdd(Times)` | `void` | Verify event was subscribed according to Times constraint |
+| `VerifyAdd(Called)` | `void` | Verify event was subscribed according to Called constraint |
 | `VerifyRemove()` | `void` | Verify event was unsubscribed at least once (throws if not) |
-| `VerifyRemove(Times)` | `void` | Verify event was unsubscribed according to Times constraint |
+| `VerifyRemove(Called)` | `void` | Verify event was unsubscribed according to Called constraint |
 | `Verifiable()` | `{Interceptor}` | Mark event for batch verification with default constraint (AtLeastOnce), returns self for chaining |
-| `Verifiable(Times)` | `{Interceptor}` | Mark event for batch verification with specific Times constraint, returns self for chaining |
+| `Verifiable(Called)` | `{Interceptor}` | Mark event for batch verification with specific Called constraint, returns self for chaining |
 
 ### Methods
 
@@ -427,7 +427,7 @@ var hasSubscribers = stub.Changed.HasSubscribers;
 stub.Changed.Raise(repository, EventArgs.Empty);
 
 // VerifyAdd/VerifyRemove: check subscription counts
-stub.Changed.VerifyAdd(Times.Once);
+stub.Changed.VerifyAdd(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -473,9 +473,9 @@ The `Return`/`Call` method follows the same signature rules as non-generic metho
 | Method | Return Type | Description |
 |--------|-------------|-------------|
 | `Of<T>().Verify()` | `void` | Verify method was called with these type arguments at least once (throws if not) |
-| `Of<T>().Verify(Times)` | `void` | Verify method was called with these type arguments according to Times constraint |
+| `Of<T>().Verify(Called)` | `void` | Verify method was called with these type arguments according to Called constraint |
 | `Of<T>().Verifiable()` | `{TypedInterceptor}` | Mark typed interceptor for batch verification with default constraint (AtLeastOnce), returns self for chaining |
-| `Of<T>().Verifiable(Times)` | `{TypedInterceptor}` | Mark typed interceptor for batch verification with specific Times constraint, returns self for chaining |
+| `Of<T>().Verifiable(Called)` | `{TypedInterceptor}` | Mark typed interceptor for batch verification with specific Called constraint, returns self for chaining |
 
 ### Methods
 
@@ -582,46 +582,46 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 ---
 
-## Times Constraint Reference
+## Called Constraint Reference
 
-The `Times` struct is used with verification methods to specify expected call counts:
+The `Called` struct is used with verification methods to specify expected call counts:
 
-| Times Method | Description |
+| Called Method | Description |
 |-------------|-------------|
-| `Times.Never` | Expected to not be called (0 times) |
-| `Times.Once` | Expected to be called exactly once |
-| `Times.Twice` | Expected to be called exactly twice |
-| `Times.AtLeastOnce` | Expected to be called one or more times |
-| `Times.Exactly(n)` | Expected to be called exactly n times |
-| `Times.AtLeast(n)` | Expected to be called n or more times |
-| `Times.AtMost(n)` | Expected to be called n or fewer times |
+| `Called.Never` | Expected to not be called (0 times) |
+| `Called.Once` | Expected to be called exactly once |
+| `Called.Twice` | Expected to be called exactly twice |
+| `Called.AtLeastOnce` | Expected to be called one or more times |
+| `Called.Exactly(n)` | Expected to be called exactly n times |
+| `Called.AtLeast(n)` | Expected to be called n or more times |
+| `Called.AtMost(n)` | Expected to be called n or fewer times |
 
 ### Example
 
 <!-- snippet: times-constraint-usage-examples -->
 ```cs
-// Times.Never - Expected 0 calls
-stub.Delete.Verify(Times.Never);
+// Called.Never - Expected 0 calls
+stub.Delete.Verify(Called.Never);
 
 // Exercise stub
 repository.GetById(1);
 repository.Save(new User { Id = 1 });
 repository.Save(new User { Id = 2 });
 
-// Times.Once - Expected exactly 1 call
-stub.GetById.Verify(Times.Once);
+// Called.Once - Expected exactly 1 call
+stub.GetById.Verify(Called.Once);
 
-// Times.AtLeastOnce - Expected 1+ calls
-stub.Save.Verify(Times.AtLeastOnce);
+// Called.AtLeastOnce - Expected 1+ calls
+stub.Save.Verify(Called.AtLeastOnce);
 
-// Times.Exactly(n) - Expected exactly n calls
-stub.Save.Verify(Times.Exactly(2));
+// Called.Exactly(n) - Expected exactly n calls
+stub.Save.Verify(Called.Exactly(2));
 
-// Times.AtLeast(n) - Expected n+ calls
-stub.Save.Verify(Times.AtLeast(1));
+// Called.AtLeast(n) - Expected n+ calls
+stub.Save.Verify(Called.AtLeast(1));
 
-// Times.AtMost(n) - Expected 0 to n calls
-stub.GetById.Verify(Times.AtMost(5));
+// Called.AtMost(n) - Expected 0 to n calls
+stub.GetById.Verify(Called.AtMost(5));
 ```
 <!-- endSnippet -->
 
@@ -633,7 +633,7 @@ Stub classes provide a `Verify()` method that validates all interceptors marked 
 
 ### Workflow
 
-1. Mark interceptors using `Verifiable()` or `Verifiable(Times)`
+1. Mark interceptors using `Verifiable()` or `Verifiable(Called)`
 2. Exercise the stub through the interface
 3. Call `stub.Verify()` to validate all marked interceptors at once
 
@@ -643,14 +643,14 @@ Stub classes provide a `Verify()` method that validates all interceptors marked 
 ```cs
 // Step 1: Mark interceptors with Verifiable()
 stub.GetById.Return((id) => new User { Id = id }).Verifiable();
-stub.Save.Call((user) => { }).Verifiable(Times.Exactly(2));
-stub.Delete.Call((id) => { }).Verifiable(Times.Never);
+stub.Save.Call((user) => { }).Verifiable(Called.Exactly(2));
+stub.Delete.Call((id) => { }).Verifiable(Called.Never);
 
 // Step 2: Exercise the stub through the interface
 var user = repository.GetById(1);
 repository.Save(user!);
 repository.Save(new User { Id = 2 });
-// Note: Delete is NOT called (expected per Times.Never)
+// Note: Delete is NOT called (expected per Called.Never)
 
 // Step 3: Single Verify() call validates all marked interceptors
 stub.Verify();
@@ -703,7 +703,7 @@ The first match wins. Return/Call takes full control when configured -- Source i
 - [Property Stubs](./properties.md) - Detailed guide to property interceptor features
 - [Generic Methods](../../../../docs/guides/generic-methods.md) - Working with generic method interceptors
 - [Events](../../../../docs/guides/events.md) - Event subscription tracking and raising
-- [Verification](../../../../docs/guides/verification.md) - Advanced verification patterns and Times constraints
+- [Verification](../../../../docs/guides/verification.md) - Advanced verification patterns and Called constraints
 
 **Advanced Topics**:
 - [Advanced Callbacks](../../../../docs/guides/advanced-callbacks.md) - Best practices for Return, Call, Get, Set callbacks

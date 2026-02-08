@@ -19,7 +19,7 @@ public partial class PropertyValueOverloadTests
 		var result = service.Name;
 
 		Assert.Equal("configured value", result);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -33,7 +33,7 @@ public partial class PropertyValueOverloadTests
 		var result = service.Name;
 
 		Assert.Null(result);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -111,7 +111,7 @@ public partial class PropertyValueOverloadTests
 
 		_ = service.Name;
 
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -125,7 +125,7 @@ public partial class PropertyValueOverloadTests
 		_ = service.Name;
 		_ = service.Name;
 
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 	}
 
 	#endregion

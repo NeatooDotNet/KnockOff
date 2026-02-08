@@ -80,7 +80,7 @@ public class StandaloneClassStubTests
 
 		var name = stub.Object.Name;
 
-		stub.Name.VerifyGet(Times.Once);
+		stub.Name.VerifyGet(Called.Once);
 		Assert.Equal("Intercepted", name);
 	}
 
@@ -91,7 +91,7 @@ public class StandaloneClassStubTests
 
 		stub.Object.Name = "NewValue";
 
-		stub.Name.VerifySet(Times.Once);
+		stub.Name.VerifySet(Called.Once);
 		Assert.Equal("NewValue", stub.Name.LastSetValue);
 	}
 
@@ -104,7 +104,7 @@ public class StandaloneClassStubTests
 		var name = stub.Object.Name;
 
 		Assert.Equal("InitialName", name);
-		stub.Name.VerifyGet(Times.Once);
+		stub.Name.VerifyGet(Called.Once);
 	}
 
 	[Fact]
@@ -130,7 +130,7 @@ public class StandaloneClassStubTests
 		stub.Object.Initialize();
 		stub.Object.Initialize();
 
-		stub.Initialize.Verify(Times.Exactly(2));
+		stub.Initialize.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -142,7 +142,7 @@ public class StandaloneClassStubTests
 		stub.Object.Initialize();
 
 		// Should still track the call
-		stub.Initialize.Verify(Times.Once);
+		stub.Initialize.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -155,7 +155,7 @@ public class StandaloneClassStubTests
 		stub.Object.Initialize();
 
 		Assert.True(wasCalled);
-		stub.Initialize.Verify(Times.Once);
+		stub.Initialize.Verify(Called.Once);
 	}
 
 	#endregion
@@ -170,7 +170,7 @@ public class StandaloneClassStubTests
 		stub.Object.Execute("command1");
 		stub.Object.Execute("command2");
 
-		stub.Execute.Verify(Times.Exactly(2));
+		stub.Execute.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -244,7 +244,7 @@ public class StandaloneClassStubTests
 
 		stub.Execute.Reset();
 
-		stub.Execute.Verify(Times.Never);
+		stub.Execute.Verify(Called.Never);
 		Assert.Null(stub.Execute.LastArg);
 	}
 
@@ -259,9 +259,9 @@ public class StandaloneClassStubTests
 
 		stub.ResetInterceptors();
 
-		stub.Execute.Verify(Times.Never);
-		stub.Initialize.Verify(Times.Never);
-		stub.Name.VerifySet(Times.Never);
+		stub.Execute.Verify(Called.Never);
+		stub.Initialize.Verify(Called.Never);
+		stub.Name.VerifySet(Called.Never);
 	}
 
 	#endregion
@@ -480,7 +480,7 @@ public class StandaloneClassEventTests
 		stub.Object.StatusChanged += (s, e) => { };
 		stub.Object.StatusChanged += (s, e) => { };
 
-		stub.StatusChanged.VerifyAdd(Times.Exactly(2));
+		stub.StatusChanged.VerifyAdd(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -492,8 +492,8 @@ public class StandaloneClassEventTests
 		stub.Object.StatusChanged += handler;
 		stub.Object.StatusChanged -= handler;
 
-		stub.StatusChanged.VerifyAdd(Times.Once);
-		stub.StatusChanged.VerifyRemove(Times.Once);
+		stub.StatusChanged.VerifyAdd(Called.Once);
+		stub.StatusChanged.VerifyRemove(Called.Once);
 	}
 }
 
@@ -512,7 +512,7 @@ public class StandaloneClassIndexerTests
 		var result = stub.Object["test"];
 
 		Assert.Equal("value_test", result);
-		stub.Indexer.VerifyGet(Times.Once);
+		stub.Indexer.VerifyGet(Called.Once);
 	}
 
 	[Fact]
@@ -522,7 +522,7 @@ public class StandaloneClassIndexerTests
 
 		stub.Object["key1"] = "new_value";
 
-		stub.Indexer.VerifySet(Times.Once);
+		stub.Indexer.VerifySet(Called.Once);
 	}
 
 	[Fact]

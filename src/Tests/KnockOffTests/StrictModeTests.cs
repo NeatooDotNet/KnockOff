@@ -283,7 +283,7 @@ public class StrictModeTests
 		var result = service.GetValue(5);
 
 		Assert.Equal(50, result); // User method multiplies by 10
-		stub.GetValue.Verify(Times.Once);
+		stub.GetValue.Verify(Called.Once);
 		Assert.Equal(5, stub.GetValue.LastArg);
 	}
 
@@ -311,7 +311,7 @@ public class StrictModeTests
 		// Void user method executes without throwing
 		service.DoSomething();
 
-		stub.DoSomething.Verify(Times.Once);
+		stub.DoSomething.Verify(Called.Once);
 	}
 
 	#endregion

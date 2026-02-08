@@ -211,8 +211,8 @@ public class EventGotchaTests
 
         #region skill-gotcha-event-naming
         // Event interceptors use the event name directly:
-        stub.Started.VerifyAdd(Times.Never);
-        stub.DataReceived.VerifyAdd(Times.Never);
+        stub.Started.VerifyAdd(Called.Never);
+        stub.DataReceived.VerifyAdd(Called.Never);
         #endregion
     }
 }
@@ -255,7 +255,7 @@ public partial class ClosedGenericHost
 }
 
 // =============================================================================
-// Gotcha #6: Times.Between() Does NOT Exist
+// Gotcha #6: Called.Between() Does NOT Exist
 // =============================================================================
 
 public class TimesGotchaTests
@@ -269,10 +269,10 @@ public class TimesGotchaTests
         svc.Save(new User { Id = 1 });
 
         #region skill-gotcha-times-between
-        // WRONG: Times.Between(1, 5)
+        // WRONG: Called.Between(1, 5)
         // RIGHT: Use separate constraints
-        stub.Save.Verify(Times.AtLeast(1));
-        stub.Save.Verify(Times.AtMost(5));
+        stub.Save.Verify(Called.AtLeast(1));
+        stub.Save.Verify(Called.AtMost(5));
         #endregion
     }
 }
@@ -493,8 +493,8 @@ public class EventConfigTests
         stub.DataReceived.Raise(stub, new DataEventArgs("test-data"));
 
         // Verify subscriptions
-        stub.DataReceived.VerifyAdd(Times.Once);
-        stub.DataReceived.VerifyRemove(Times.Never);
+        stub.DataReceived.VerifyAdd(Called.Once);
+        stub.DataReceived.VerifyRemove(Called.Never);
         #endregion
     }
 }
@@ -517,15 +517,15 @@ public class GenericMethodTests
         stub.GetById.Of<Product>().Return((id) => new Product { Id = id });
 
         // Verify by type
-        stub.GetById.Of<User>().Verify(Times.Never);
-        stub.GetById.Of<Product>().Verify(Times.Never);
+        stub.GetById.Of<User>().Verify(Called.Never);
+        stub.GetById.Of<Product>().Verify(Called.Never);
         #endregion
 
         repo.GetById<User>(1);
         repo.GetById<User>(2);
         repo.GetById<Product>(1);
-        stub.GetById.Of<User>().Verify(Times.Exactly(2));
-        stub.GetById.Of<Product>().Verify(Times.Once);
+        stub.GetById.Of<User>().Verify(Called.Exactly(2));
+        stub.GetById.Of<Product>().Verify(Called.Once);
     }
 }
 
@@ -567,7 +567,7 @@ public partial class DelegateHost
         verifyStub.Interceptor.Return((a, b) => a + b);
         SkillArithmeticOp op = verifyStub;
         op(1, 2);
-        verifyStub.Interceptor.Verify(Times.Once);
+        verifyStub.Interceptor.Verify(Called.Once);
         Assert.Equal((1, 2), verifyStub.Interceptor.LastArgs);
 
         // Strict mode
@@ -598,7 +598,7 @@ public class VerificationTests
 
         svc.Save(new User { Id = 1 });
         svc.Save(new User { Id = 2 });
-        tracking.Verify(Times.Exactly(2));
+        tracking.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -609,7 +609,7 @@ public class VerificationTests
 
         #region skill-verify-batch
         stub.GetUser.Return((id) => new User { Id = id }).Verifiable();
-        stub.Save.Call((u) => { }).Verifiable(Times.Once);
+        stub.Save.Call((u) => { }).Verifiable(Called.Once);
         // ... exercise stub ...
         #endregion
 
@@ -752,7 +752,7 @@ public class UserMethodTests
         stub.GetById.Return(id => new User { Id = id });
         repo.GetById(42);
 
-        stub.GetById.Verify(Times.Once);
+        stub.GetById.Verify(Called.Once);
         Assert.Equal(42, stub.GetById.LastArg);
         #endregion
     }
@@ -766,10 +766,10 @@ public class UserMethodTests
         #region skill-user-method-reset
         stub.GetById.Return(id => new User { Id = id });
         repo.GetById(1);
-        stub.GetById.Verify(Times.Once);
+        stub.GetById.Verify(Called.Once);
 
         stub.GetById.Reset();
-        stub.GetById.Verify(Times.Never);  // Tracking cleared
+        stub.GetById.Verify(Called.Never);  // Tracking cleared
 
         repo.GetById(2);  // Still uses Returns callback
         #endregion
@@ -815,7 +815,7 @@ public class UserPropertyTests
         _ = service.Count;
         _ = service.Count;
 
-        stub.Count.VerifyGet(Times.Exactly(2));
+        stub.Count.VerifyGet(Called.Exactly(2));
         #endregion
     }
 
@@ -828,10 +828,10 @@ public class UserPropertyTests
         #region skill-user-property-reset
         stub.Count.Get(100);
         _ = service.Count;
-        stub.Count.VerifyGet(Times.Once);
+        stub.Count.VerifyGet(Called.Once);
 
         stub.Count.Reset();
-        stub.Count.VerifyGet(Times.Never);  // Tracking cleared
+        stub.Count.VerifyGet(Called.Never);  // Tracking cleared
 
         _ = service.Count;  // Still uses Get (returns 100)
         #endregion

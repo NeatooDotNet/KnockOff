@@ -11,17 +11,17 @@ ICalculator calc = knockOff;
 // Test property
 calc.LastResult = 42;
 Console.WriteLine($"LastResult set to: {calc.LastResult}");
-knockOff.LastResult.VerifySet(Times.Once);
-Console.WriteLine($"  VerifySet(Times.Once) passed!");
-knockOff.LastResult.VerifyGet(Times.Once);
-Console.WriteLine($"  VerifyGet(Times.Once) passed!");
+knockOff.LastResult.VerifySet(Called.Once);
+Console.WriteLine($"  VerifySet(Called.Once) passed!");
+knockOff.LastResult.VerifyGet(Called.Once);
+Console.WriteLine($"  VerifyGet(Called.Once) passed!");
 Console.WriteLine($"  LastSetValue: {knockOff.LastResult.LastSetValue}");
 
 // Test method with user implementation
 var result = calc.Add(10, 20);
 Console.WriteLine($"Add(10, 20) = {result}");
-knockOff.Add.Verify(Times.Once);
-Console.WriteLine($"  Verify(Times.Once) passed!");
+knockOff.Add.Verify(Called.Once);
+Console.WriteLine($"  Verify(Called.Once) passed!");
 Console.WriteLine($"  LastArgs: {knockOff.Add.LastArgs}");
 
 // Test void method

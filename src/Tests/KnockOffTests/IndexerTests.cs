@@ -15,7 +15,7 @@ public class IndexerTests
 
 		var result = store["Name"];
 
-		knockOff.Indexer.VerifyGet(Times.Once);
+		knockOff.Indexer.VerifyGet(Called.Once);
 		Assert.Equal("Name", knockOff.Indexer.LastGetKey);
 		Assert.NotNull(result);
 		Assert.Equal("Name", result.Name);
@@ -35,7 +35,7 @@ public class IndexerTests
 		_ = store["Second"];
 		_ = store["Third"];
 
-		knockOff.Indexer.VerifyGet(Times.Exactly(3));
+		knockOff.Indexer.VerifyGet(Called.Exactly(3));
 		Assert.Equal("Third", knockOff.Indexer.LastGetKey); // Last key accessed
 	}
 
@@ -88,7 +88,7 @@ public class IndexerTests
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
 		store["Test"] = prop;
 
-		knockOff.Indexer.VerifySet(Times.Once);
+		knockOff.Indexer.VerifySet(Called.Once);
 		Assert.NotNull(knockOff.Indexer.LastSetEntry);
 		Assert.Equal("Test", knockOff.Indexer.LastSetEntry.Value.Key);
 		Assert.Same(prop, knockOff.Indexer.LastSetEntry.Value.Value);
@@ -147,15 +147,15 @@ public class IndexerTests
 		_ = store["Key2"];
 		store["Key3"] = prop;
 
-		knockOff.Indexer.VerifyGet(Times.Exactly(2));
-		knockOff.Indexer.VerifySet(Times.Once);
+		knockOff.Indexer.VerifyGet(Called.Exactly(2));
+		knockOff.Indexer.VerifySet(Called.Once);
 
 		knockOff.Indexer.Reset();
 
 		// Tracking state is cleared
-		knockOff.Indexer.VerifyGet(Times.Never);
+		knockOff.Indexer.VerifyGet(Called.Never);
 		Assert.Null(knockOff.Indexer.LastGetKey);
-		knockOff.Indexer.VerifySet(Times.Never);
+		knockOff.Indexer.VerifySet(Called.Never);
 		Assert.Null(knockOff.Indexer.LastSetEntry);
 
 		// Configuration is preserved - Get callback still works and Backing dictionary preserved
@@ -173,6 +173,6 @@ public class IndexerTests
 		var result = store["NonExistent"];
 
 		Assert.Null(result);
-		knockOff.Indexer.VerifyGet(Times.Once);
+		knockOff.Indexer.VerifyGet(Called.Once);
 	}
 }

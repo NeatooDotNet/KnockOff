@@ -28,7 +28,7 @@ public class BasicTests
 
 		service.Name = "Test";
 
-		knockOff.Name.VerifySet(Times.Once);
+		knockOff.Name.VerifySet(Called.Once);
 		string? lastValue = knockOff.Name.LastSetValue;
 		Assert.Equal("Test", lastValue);
 	}
@@ -42,7 +42,7 @@ public class BasicTests
 		service.Name = "Test";
 		var _ = service.Name;
 
-		knockOff.Name.VerifyGet(Times.Once);
+		knockOff.Name.VerifyGet(Called.Once);
 	}
 
 	[Fact]
@@ -54,7 +54,7 @@ public class BasicTests
 
 		service.DoSomething();
 
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -66,7 +66,7 @@ public class BasicTests
 		var result = service.GetValue(42);
 
 		Assert.Equal(84, result);
-		knockOff.GetValue.Verify(Times.Once);
+		knockOff.GetValue.Verify(Called.Once);
 
 		int lastArg = knockOff.GetValue.LastArg!.Value;
 		Assert.Equal(42, lastArg);
@@ -97,7 +97,7 @@ public class BasicTests
 		service.GetValue(2);
 		service.GetValue(3);
 
-		knockOff.GetValue.Verify(Times.Exactly(3));
+		knockOff.GetValue.Verify(Called.Exactly(3));
 		Assert.Equal(3, knockOff.GetValue.LastArg); // Last call was GetValue(3)
 	}
 
@@ -122,7 +122,7 @@ public class BasicTests
 		ISampleService service = knockOff;
 
 		service.Name = "Test";
-		knockOff.Name.VerifySet(Times.Once);
+		knockOff.Name.VerifySet(Called.Once);
 	}
 
 	[Fact]
@@ -140,10 +140,10 @@ public class BasicTests
 		knockOff.GetValue.Reset();
 		knockOff.DoSomething.Reset();
 
-		knockOff.Name.VerifySet(Times.Never);
-		knockOff.GetValue.Verify(Times.Never);
+		knockOff.Name.VerifySet(Called.Never);
+		knockOff.GetValue.Verify(Called.Never);
 		// After reset, the tracking object is also reset
-		doSomethingTracking.Verify(Times.Never);
+		doSomethingTracking.Verify(Called.Never);
 	}
 
 	[Fact]

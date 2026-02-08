@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.40.0</FileVersion>
-		<PackageVersion>0.40.0</PackageVersion>
+		<FileVersion>0.41.0</FileVersion>
+		<PackageVersion>0.41.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>

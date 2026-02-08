@@ -37,7 +37,7 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `.Setup(x => x.Property).Returns(value)` | `stub.Property.Get(value)` |
 | `.ReturnsAsync(value)` | `stub.Method.Return(value)` (auto-wraps) or `Return((args) => Task.FromResult(value))` |
 | `.Callback(x => ...)` | Logic in `Return` delegate |
-| `.Verify(x => x.Method(), Times.Once)` | `var t = stub.Method.Return(...); t.Verify(Times.Once)` |
+| `.Verify(x => x.Method(), Times.Once)` | `var t = stub.Method.Return(...); t.Verify(Called.Once)` |
 | `.Verifiable()` | `stub.Method.Return(...).Verifiable()` |
 | `mock.Verify()` | `stub.Verify()` (checks all `.Verifiable()` calls) |
 | `It.IsAny<T>()` | Callback receives all arguments for inspection |
@@ -191,8 +191,8 @@ stub.SaveUser.Call((user) => { }).Verifiable();
 **Key differences:**
 - Moq uses `mock.Verify(expression, times)` with expression trees
 - KnockOff uses `.Verifiable()` + `stub.Verify()` for batch verification
-- KnockOff also supports direct verification: `stub.SaveUser.Verify(Times.Once)`
-- Both support the same `Times` matchers (Once, AtLeastOnce, Exactly, etc.)
+- KnockOff also supports direct verification: `stub.SaveUser.Verify(Called.Once)`
+- Both support the same `Called` matchers (Once, AtLeastOnce, Exactly, etc.)
 
 ---
 

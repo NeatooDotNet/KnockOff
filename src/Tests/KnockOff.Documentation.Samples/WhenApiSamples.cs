@@ -213,7 +213,7 @@ public class WhenVoidMethodTests
         processor.Process(1, 2);
 
         // Verify this specific parameter combination was called twice
-        chain.Verify(Times.Exactly(2));
+        chain.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -552,7 +552,7 @@ public class WhenVerificationTests
         processor.Process(3, 4);  // Doesn't match
 
         // Verify specific combination was called exactly twice
-        chain.Verify(Times.Exactly(2));
+        chain.Verify(Called.Exactly(2));
     }
 }
 
@@ -793,6 +793,6 @@ public class WhenChainApiTests
         Assert.True(called);
 
         // Verify this matcher was called once (parameter-specific count)
-        chain.Verify(Times.Once);
+        chain.Verify(Called.Once);
     }
 }

@@ -107,7 +107,7 @@ public class BaseClassUserMethodTests
         service.DoSomething();
 
         // Assert - method was tracked
-        stub.DoSomething.Verify(Times.Once);
+        stub.DoSomething.Verify(Called.Once);
     }
 
     [Fact]
@@ -298,8 +298,8 @@ public class BaseClassUserMethodTests
         service.DoSomething();
 
         // Assert - tracking still works even with user overrides
-        stub.GetValue.Verify(Times.Exactly(3));
-        stub.DoSomething.Verify(Times.Once);
+        stub.GetValue.Verify(Called.Exactly(3));
+        stub.DoSomething.Verify(Called.Once);
         Assert.Equal(3, stub.GetValue.LastArg);
     }
 

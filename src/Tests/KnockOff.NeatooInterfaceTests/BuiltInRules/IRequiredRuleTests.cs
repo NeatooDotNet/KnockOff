@@ -45,7 +45,7 @@ public partial class IRequiredRuleTests
         stub.ErrorMessage.Get("This field is required.");
 
         Assert.Equal("This field is required.", rule.ErrorMessage);
-        stub.ErrorMessage.VerifyGet(Times.Once);
+        stub.ErrorMessage.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public partial class IRequiredRuleTests
 
         stub.ErrorMessage.Reset();
 
-        stub.ErrorMessage.VerifyGet(Times.Never);
+        stub.ErrorMessage.VerifyGet(Called.Never);
     }
 
     #endregion

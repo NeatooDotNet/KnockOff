@@ -52,8 +52,8 @@ var propertyStub = new Stubs.PropertyDescriptor("Property", new Attribute[0]);
 
 ```csharp
 var tracking = stub.GetEvents.OnCall(() => result);
-tracking.Verify(Times.Once);        // Verifies only no-param calls
-stub.GetEvents.Verify(Times.Once);  // Verifies all GetEvents calls (any overload)
+tracking.Verify(Called.Once);        // Verifies only no-param calls
+stub.GetEvents.Verify(Called.Once);  // Verifies all GetEvents calls (any overload)
 ```
 
 ### 5. No .Object for Interface Stubs (Moq Migration Confusion)

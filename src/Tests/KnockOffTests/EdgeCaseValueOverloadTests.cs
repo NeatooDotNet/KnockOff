@@ -172,7 +172,7 @@ public partial class EdgeCaseValueOverloadTests
 		service.Calculate(2, 3);
 
 		// Verify uses the total call count across all overloads
-		knockOff.Calculate.Verify(Times.Exactly(2));
+		knockOff.Calculate.Verify(Called.Exactly(2));
 	}
 
 	[Fact]

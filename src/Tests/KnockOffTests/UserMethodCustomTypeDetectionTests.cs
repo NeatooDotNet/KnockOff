@@ -163,7 +163,7 @@ public class UserMethodCustomTypeDetectionTests
         Assert.Equal("[ONCALL: 99]", result);
 
         // This part tests that tracking works even with the bug
-        stub.FindUser.Verify(Times.Once);
+        stub.FindUser.Verify(Called.Once);
     }
 
     #endregion

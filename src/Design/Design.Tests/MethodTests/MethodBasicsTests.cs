@@ -102,7 +102,7 @@ public class MethodBasicsTests
         calc.Add(1, 2);
         calc.Add(3, 4);
 
-        stub.Add.Verify(Times.Exactly(2));
+        stub.Add.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -120,6 +120,6 @@ public class MethodBasicsTests
         Assert.Equal(42, calc.Add(3, 4));
 
         // But call count reset - verify fails
-        Assert.Throws<VerificationException>(() => stub.Add.Verify(Times.Exactly(2)));
+        Assert.Throws<VerificationException>(() => stub.Add.Verify(Called.Exactly(2)));
     }
 }

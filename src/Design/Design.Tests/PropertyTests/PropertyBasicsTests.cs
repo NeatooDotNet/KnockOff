@@ -88,7 +88,7 @@ public class PropertyBasicsTests
         _ = entity.Id;
         _ = entity.Id;
 
-        stub.Id.VerifyGet(Times.Exactly(2));
+        stub.Id.VerifyGet(Called.Exactly(2));
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class PropertyBasicsTests
         entity.Description = "One";
         entity.Description = "Two";
 
-        stub.Description.VerifySet(Times.Exactly(2));
+        stub.Description.VerifySet(Called.Exactly(2));
     }
 
     [Fact]
@@ -130,6 +130,6 @@ public class PropertyBasicsTests
         Assert.Equal("Test", entity.Description);
 
         // Tracking cleared
-        Assert.Throws<VerificationException>(() => stub.Description.VerifyGet(Times.Exactly(2)));
+        Assert.Throws<VerificationException>(() => stub.Description.VerifyGet(Called.Exactly(2)));
     }
 }

@@ -22,7 +22,7 @@ public class BclStandaloneTests
         disposable.Dispose();
 
         tracking.Verify();
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
     }
 
     [Fact]
@@ -48,12 +48,12 @@ public class BclStandaloneTests
         disposable.Dispose();
         disposable.Dispose();
 
-        tracking.Verify(Times.Exactly(2));
+        tracking.Verify(Called.Exactly(2));
 
         knockOff.Dispose.Reset();
 
-        tracking.Verify(Times.Never);
-        tracking.Verify(Times.Never);
+        tracking.Verify(Called.Never);
+        tracking.Verify(Called.Never);
     }
 
     #endregion
@@ -70,7 +70,7 @@ public class BclStandaloneTests
         await disposable.DisposeAsync();
 
         tracking.Verify();
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class BclStandaloneTests
         comparable.CompareTo("bb");
         comparable.CompareTo("ccc");
 
-        tracking.Verify(Times.Exactly(3));
+        tracking.Verify(Called.Exactly(3));
         Assert.Equal("ccc", tracking.LastArg);
     }
 
@@ -295,7 +295,7 @@ public class BclStandaloneTests
         notifier.PropertyChanged += (s, e) => { };
 
         // Standalone stubs use PropertyChanged.VerifyAdd
-        knockOff.PropertyChanged.VerifyAdd(Times.Exactly(2));
+        knockOff.PropertyChanged.VerifyAdd(Called.Exactly(2));
     }
 
     [Fact]
@@ -308,8 +308,8 @@ public class BclStandaloneTests
         notifier.PropertyChanged += handler;
         notifier.PropertyChanged -= handler;
 
-        knockOff.PropertyChanged.VerifyAdd(Times.Once);
-        knockOff.PropertyChanged.VerifyRemove(Times.Once);
+        knockOff.PropertyChanged.VerifyAdd(Called.Once);
+        knockOff.PropertyChanged.VerifyRemove(Called.Once);
     }
 
     [Fact]
@@ -398,7 +398,7 @@ public class BclStandaloneTests
         observer.OnNext("c");
         observer.OnCompleted();
 
-        onNextTracking.Verify(Times.Exactly(3));
+        onNextTracking.Verify(Called.Exactly(3));
         Assert.Equal(new[] { "a", "b", "c" }, receivedValues);
         onCompletedTracking.Verify();
     }
@@ -456,7 +456,7 @@ public class BclStandaloneTests
 
         Assert.Equal(100, lastProgress);
         Assert.Equal(10, progressUpdates);
-        tracking.Verify(Times.Exactly(10));
+        tracking.Verify(Called.Exactly(10));
     }
 
     #endregion
@@ -473,7 +473,7 @@ public class BclStandaloneTests
         Assert.Throws<InvalidOperationException>(() => enumerable.GetEnumerator());
 
         tracking.Verify();
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
     }
 
     [Fact]
@@ -488,7 +488,7 @@ public class BclStandaloneTests
 
         // Both generic and non-generic should use the same handler
         tracking.Verify();
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
     }
 
     [Fact]
@@ -531,7 +531,7 @@ public class BclStandaloneTests
         var count = collection.Count;
 
         Assert.Equal(42, count);
-        knockOff.Count.VerifyGet(Times.Once);
+        knockOff.Count.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -565,7 +565,7 @@ public class BclStandaloneTests
         var result = list[5];
 
         Assert.Equal("item_5", result);
-        knockOff.Indexer.VerifyGet(Times.Once);
+        knockOff.Indexer.VerifyGet(Called.Once);
     }
 
     [Fact]

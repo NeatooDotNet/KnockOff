@@ -45,7 +45,7 @@ public class ReturnTypeMismatchBugTests
 
 		Assert.NotNull(result);
 		Assert.Equal(42, result!.Id);
-		trackingAsync.Verify(Times.Once);
+		trackingAsync.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -65,8 +65,8 @@ public class ReturnTypeMismatchBugTests
 		_ = factory.Fetch(entity); // Sync overload
 
 		// Each overload has separate tracking
-		trackingAsync.Verify(Times.Once);
-		trackingSync.Verify(Times.Once);
+		trackingAsync.Verify(Called.Once);
+		trackingSync.Verify(Called.Once);
 		Assert.Equal(1L, trackingAsync.LastArg);
 		Assert.Same(entity, trackingSync.LastArg);
 	}

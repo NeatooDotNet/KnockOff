@@ -35,7 +35,7 @@ public partial class IRuleMessageTests
         stub.RuleIndex.Get(42u);
 
         Assert.Equal(42u, message.RuleIndex);
-        stub.RuleIndex.VerifyGet(Times.Once);
+        stub.RuleIndex.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public partial class IRuleMessageTests
 
         stub.RuleIndex.Reset();
 
-        stub.RuleIndex.VerifyGet(Times.Never);
+        stub.RuleIndex.VerifyGet(Called.Never);
     }
 
     #endregion

@@ -46,7 +46,7 @@ public partial class IValidateListBaseTests
         stub.Parent.Get(parentStub);
 
         Assert.Same(parentStub, list.Parent);
-        stub.Parent.VerifyGet(Times.Once);
+        stub.Parent.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public partial class IValidateListBaseTests
 
         await list.WaitForTasks();
 
-        stub.WaitForTasks.Verify(Times.Once);
+        stub.WaitForTasks.Verify(Called.Once);
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public partial class IValidateListBaseTests
 
         list.PropertyChanged += (s, e) => { };
 
-        stub.PropertyChanged.VerifyAdd(Times.Once);
+        stub.PropertyChanged.VerifyAdd(Called.Once);
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public partial class IValidateListBaseTests
 
         list.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Called.Once);
     }
 
     #endregion
@@ -196,7 +196,7 @@ public partial class IValidateListBaseTests
 
         stub.Parent.Reset();
 
-        stub.Parent.VerifyGet(Times.Never);
+        stub.Parent.VerifyGet(Called.Never);
     }
 
     #endregion
@@ -315,7 +315,7 @@ public partial class IValidateListBaseOfTTests
 
         _ = list[0];
 
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Once);
         Assert.Equal(0, stub.Indexer.LastGetKey);
     }
 
@@ -328,7 +328,7 @@ public partial class IValidateListBaseOfTTests
         var itemStub = new ValidateBaseStubForListT();
         list.Add(itemStub);
 
-        stub.Add.Verify(Times.Once);
+        stub.Add.Verify(Called.Once);
     }
 
     [Fact]

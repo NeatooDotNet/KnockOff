@@ -46,7 +46,7 @@ public partial class IEntityListBaseTests
         stub.Root.Get(rootStub);
 
         Assert.Same(rootStub, list.Root);
-        stub.Root.VerifyGet(Times.Once);
+        stub.Root.VerifyGet(Called.Once);
     }
 
     [Fact]
@@ -189,7 +189,7 @@ public partial class IEntityListBaseTests
 
         list.PropertyChanged += (s, e) => { };
 
-        stub.PropertyChanged.VerifyAdd(Times.Once);
+        stub.PropertyChanged.VerifyAdd(Called.Once);
     }
 
     [Fact]
@@ -200,7 +200,7 @@ public partial class IEntityListBaseTests
 
         list.NeatooPropertyChanged += (args) => Task.CompletedTask;
 
-        stub.NeatooPropertyChanged.VerifyAdd(Times.Once);
+        stub.NeatooPropertyChanged.VerifyAdd(Called.Once);
     }
 
     #endregion
@@ -220,7 +220,7 @@ public partial class IEntityListBaseTests
 
         stub.Root.Reset();
 
-        stub.Root.VerifyGet(Times.Never);
+        stub.Root.VerifyGet(Called.Never);
     }
 
     #endregion
@@ -357,7 +357,7 @@ public partial class IEntityListBaseOfTTests
 
         _ = list[0];
 
-        stub.Indexer.VerifyGet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Once);
         Assert.Equal(0, stub.Indexer.LastGetKey);
     }
 
