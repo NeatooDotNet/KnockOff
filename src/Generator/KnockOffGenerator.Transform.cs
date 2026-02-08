@@ -319,6 +319,10 @@ public partial class KnockOffGenerator
 			if (!IsMemberAccessible(member, knockOffAssembly))
 				continue;
 
+			// Skip static members (static virtual/abstract in interfaces)
+			if (member.IsStatic)
+				continue;
+
 			if (member is IPropertySymbol property)
 			{
 				members.Add(InterfaceMemberInfo.FromProperty(property, ifaceFullName));
@@ -340,6 +344,10 @@ public partial class KnockOffGenerator
 			foreach (var member in baseInterface.GetMembers())
 			{
 				if (!IsMemberAccessible(member, knockOffAssembly))
+					continue;
+
+				// Skip static members (static virtual/abstract in interfaces)
+				if (member.IsStatic)
 					continue;
 
 				if (member is IPropertySymbol property)
@@ -814,6 +822,10 @@ public partial class KnockOffGenerator
 				if (!IsMemberAccessible(member, knockOffAssembly))
 					continue;
 
+				// Skip static members (static virtual/abstract in interfaces)
+				if (member.IsStatic)
+					continue;
+
 				if (member is IPropertySymbol property)
 				{
 					members.Add(InterfaceMemberInfo.FromProperty(property, ifaceFullName));
@@ -836,6 +848,10 @@ public partial class KnockOffGenerator
 				foreach (var member in baseInterface.GetMembers())
 				{
 					if (!IsMemberAccessible(member, knockOffAssembly))
+						continue;
+
+					// Skip static members (static virtual/abstract in interfaces)
+					if (member.IsStatic)
 						continue;
 
 					if (member is IPropertySymbol property)
