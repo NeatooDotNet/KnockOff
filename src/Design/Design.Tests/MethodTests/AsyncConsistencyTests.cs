@@ -64,7 +64,7 @@ public class AsyncConsistencyTests
     {
         var stub = new AsyncRepositoryStub<string>();
         string? saved = null;
-        stub.SaveAsync.Call((entity) => saved = entity);
+        stub.SaveAsync.Return((entity) => saved = entity);
 
         IAsyncRepository<string> repo = stub;
         await repo.SaveAsync("test-entity");
@@ -117,7 +117,7 @@ public class AsyncConsistencyTests
     {
         var stub = new AsyncServiceStub();
         string? saved = null;
-        stub.SaveAsync.Call((data) => saved = data);
+        stub.SaveAsync.Return((data) => saved = data);
 
         AsyncServiceBase svc = stub.Object;
         await svc.SaveAsync("test-data");

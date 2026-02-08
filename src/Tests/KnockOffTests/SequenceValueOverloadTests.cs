@@ -966,10 +966,10 @@ public partial class SequenceValueOverloadTests
 
 		var callLog = new List<string>();
 
-		// Call(simplifiedVoidCallback) followed by ThenReturn(fullCallback) -- previously an NRE
+		// Return(simplifiedVoidCallback) followed by ThenReturn(fullCallback) -- previously an NRE
 		// The simplified callback is Action (void), auto-wrapped to return Task.CompletedTask
 		// Note: Task-returning methods use Return/ThenReturn (not Call/ThenCall) since IsVoid=false
-		knockOff.DoWorkAsync.Call(() => { callLog.Add("first"); })
+		knockOff.DoWorkAsync.Return(() => { callLog.Add("first"); })
 			.ThenReturn(() => { callLog.Add("second"); return Task.CompletedTask; });
 
 		await service.DoWorkAsync();
@@ -986,10 +986,10 @@ public partial class SequenceValueOverloadTests
 
 		var callLog = new List<string>();
 
-		// Call(simplifiedVoidCallback) followed by ThenReturn(fullCallback) -- previously an NRE
+		// Return(simplifiedVoidCallback) followed by ThenReturn(fullCallback) -- previously an NRE
 		// The simplified callback is Action (void), auto-wrapped to return default(ValueTask)
 		// Note: ValueTask-returning methods use Return/ThenReturn (not Call/ThenCall) since IsVoid=false
-		knockOff.DoWorkValueTaskAsync.Call(() => { callLog.Add("first"); })
+		knockOff.DoWorkValueTaskAsync.Return(() => { callLog.Add("first"); })
 			.ThenReturn(() => { callLog.Add("second"); return default(ValueTask); });
 
 		await service.DoWorkValueTaskAsync();
