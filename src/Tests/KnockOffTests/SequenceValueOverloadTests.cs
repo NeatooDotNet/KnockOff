@@ -811,6 +811,195 @@ public partial class SequenceValueOverloadTests
 
 	#endregion
 
+	#region Return(value).ThenReturn(value) Sequence Bug Fix (NRE Regression Tests)
+
+	/// <summary>
+	/// Regression tests for the NRE bug where Return(value).ThenReturn(value) caused
+	/// a NullReferenceException because _call was null during sequence elevation.
+	/// </summary>
+
+	[Fact]
+	public void ReturnValue_ThenReturnValue_ReturnsSequence()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Value-based Return followed by value-based ThenReturn -- previously an NRE
+		knockOff.GetOptional.Return("first")
+			.ThenReturn("second")
+			.ThenReturn("third");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("third", service.GetOptional());
+	}
+
+	[Fact]
+	public void ReturnValue_ThenReturnCallback_ReturnsSequence()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		// Value-based start, callback continuation
+		knockOff.GetOptional.Return("first")
+			.ThenReturn(() => "second");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+	}
+
+	[Fact]
+	public void ReturnValue_ThenReturnValue_RepeatsLastAfterExhaustion()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		knockOff.GetOptional.Return("first").ThenReturn("second");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Exhausted -- repeats last value in non-strict mode
+		Assert.Equal("second", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+	}
+
+	[Fact]
+	public void ReturnValue_ThenReturnValue_StrictModeThrows()
+	{
+		var knockOff = new SampleKnockOff();
+		knockOff.Strict = true;
+		ISampleService service = knockOff;
+
+		knockOff.GetOptional.Return("first").ThenReturn("second");
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// Strict mode -- throws on exhaustion
+		Assert.Throws<StubException>(() => service.GetOptional());
+	}
+
+	[Fact]
+	public void ReturnValue_ThenReturnValue_Verification()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		var sequence = knockOff.GetOptional.Return("first")
+			.ThenReturn("second")
+			.ThenReturn("third");
+
+		service.GetOptional();
+		service.GetOptional();
+		service.GetOptional();
+
+		// Verify sequence was fully consumed
+		sequence.Verify();
+		knockOff.GetOptional.Verify(Times.Exactly(3));
+	}
+
+	[Fact]
+	public void ReturnValue_ThenReturnValue_ThenDefault()
+	{
+		var knockOff = new SampleKnockOff();
+		ISampleService service = knockOff;
+
+		knockOff.GetOptional.Return("first").ThenReturn("second").ThenDefault();
+
+		Assert.Equal("first", service.GetOptional());
+		Assert.Equal("second", service.GetOptional());
+		// ThenDefault returns default after exhaustion
+		Assert.Null(service.GetOptional());
+	}
+
+	[Fact]
+	public async Task AsyncReturnValue_ThenReturnValue_AutoWraps()
+	{
+		var knockOff = new AsyncServiceKnockOff();
+		IAsyncService service = knockOff;
+
+		// For Task<T> methods, Return(value) auto-wraps with Task.FromResult
+		knockOff.GetRequiredAsync.Return("first")
+			.ThenReturn("second")
+			.ThenReturn("third");
+
+		Assert.Equal("first", await service.GetRequiredAsync());
+		Assert.Equal("second", await service.GetRequiredAsync());
+		Assert.Equal("third", await service.GetRequiredAsync());
+	}
+
+	[Fact]
+	public async Task ValueTaskReturnValue_ThenReturnValue_AutoWraps()
+	{
+		var knockOff = new ValueTaskMethodKnockOff();
+		IValueTaskMethodService service = knockOff;
+
+		// For ValueTask<T> methods, Return(value) auto-wraps with new ValueTask<T>(value)
+		knockOff.GetValueAsync.Return("first")
+			.ThenReturn("second")
+			.ThenReturn("third");
+
+		Assert.Equal("first", await service.GetValueAsync());
+		Assert.Equal("second", await service.GetValueAsync());
+		Assert.Equal("third", await service.GetValueAsync());
+	}
+
+	[Fact]
+	public async Task AsyncSimplified_ThenReturnCallback_ReturnsSequence()
+	{
+		var knockOff = new AsyncServiceKnockOff();
+		IAsyncService service = knockOff;
+
+		// Return(simplifiedCallback) followed by ThenReturn(fullCallback) -- previously an NRE
+		// The simplified callback returns string, auto-wrapped in Task.FromResult
+		knockOff.GetRequiredAsync.Return(() => "first")
+			.ThenReturn(() => Task.FromResult("second"));
+
+		Assert.Equal("first", await service.GetRequiredAsync());
+		Assert.Equal("second", await service.GetRequiredAsync());
+	}
+
+	[Fact]
+	public async Task VoidTaskSimplifiedCall_ThenReturn_ReturnsSequence()
+	{
+		var knockOff = new AsyncServiceKnockOff();
+		IAsyncService service = knockOff;
+
+		var callLog = new List<string>();
+
+		// Call(simplifiedVoidCallback) followed by ThenReturn(fullCallback) -- previously an NRE
+		// The simplified callback is Action (void), auto-wrapped to return Task.CompletedTask
+		// Note: Task-returning methods use Return/ThenReturn (not Call/ThenCall) since IsVoid=false
+		knockOff.DoWorkAsync.Call(() => { callLog.Add("first"); })
+			.ThenReturn(() => { callLog.Add("second"); return Task.CompletedTask; });
+
+		await service.DoWorkAsync();
+		await service.DoWorkAsync();
+
+		Assert.Equal(new[] { "first", "second" }, callLog);
+	}
+
+	[Fact]
+	public async Task VoidValueTaskSimplifiedCall_ThenReturn_ReturnsSequence()
+	{
+		var knockOff = new AsyncServiceKnockOff();
+		IAsyncService service = knockOff;
+
+		var callLog = new List<string>();
+
+		// Call(simplifiedVoidCallback) followed by ThenReturn(fullCallback) -- previously an NRE
+		// The simplified callback is Action (void), auto-wrapped to return default(ValueTask)
+		// Note: ValueTask-returning methods use Return/ThenReturn (not Call/ThenCall) since IsVoid=false
+		knockOff.DoWorkValueTaskAsync.Call(() => { callLog.Add("first"); })
+			.ThenReturn(() => { callLog.Add("second"); return default(ValueTask); });
+
+		await service.DoWorkValueTaskAsync();
+		await service.DoWorkValueTaskAsync();
+
+		Assert.Equal(new[] { "first", "second" }, callLog);
+	}
+
+	#endregion
+
 	#region Test Stubs
 
 	public interface IPropertyTest

@@ -183,4 +183,68 @@ public class RefParameterTests
 
 		tracking.Verify(Called.Once);
 	}
+
+	[Fact]
+	public void RefParameter_Swap_ExchangesValues()
+	{
+		var knockOff = new RefParameterServiceKnockOff();
+		IRefParameterService service = knockOff;
+
+		knockOff.Swap.Call((ref int a, ref int b) => (a, b) = (b, a));
+
+		int x = 1, y = 2;
+		service.Swap(ref x, ref y);
+
+		Assert.Equal(2, x);
+		Assert.Equal(1, y);
+	}
+
+	[Fact]
+	public void RefParameter_Unconfigured_LeavesRefUnchanged()
+	{
+		var knockOff = new RefParameterServiceKnockOff();
+		IRefParameterService service = knockOff;
+
+		int value = 42;
+		service.Increment(ref value);
+
+		Assert.Equal(42, value); // no delegate to modify it
+	}
+
+	[Fact]
+	public void RefParameter_Sequence_ThenCall()
+	{
+		var knockOff = new RefParameterServiceKnockOff();
+		IRefParameterService service = knockOff;
+
+		knockOff.Increment
+			.Call((ref int v) => v += 10)
+			.ThenCall((ref int v) => v += 100);
+
+		int a = 0;
+		service.Increment(ref a);
+		int b = 0;
+		service.Increment(ref b);
+		int c = 0;
+		service.Increment(ref c); // repeats last
+
+		Assert.Equal(10, a);
+		Assert.Equal(100, b);
+		Assert.Equal(100, c);
+	}
+
+	[Fact]
+	public void RefParameter_Verify_ThrowsWhenNotSatisfied()
+	{
+		var knockOff = new RefParameterServiceKnockOff();
+		IRefParameterService service = knockOff;
+
+		knockOff.Increment.Call((ref int v) => { });
+
+		int dummy = 0;
+		service.Increment(ref dummy);
+
+		Assert.Throws<VerificationException>(() =>
+			knockOff.Increment.Verify(Times.Exactly(2)));
+	}
 }

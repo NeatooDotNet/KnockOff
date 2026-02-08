@@ -184,4 +184,78 @@ public class OutParameterTests
 		tracking.Verify(Called.Exactly(3));
 		Assert.Equal("third", tracking.LastArg); // Last call
 	}
+
+	[Fact]
+	public void OutParameter_Unconfigured_ReturnValueAndOutGetDefaults()
+	{
+		var knockOff = new OutParameterServiceKnockOff();
+		IOutParameterService service = knockOff;
+
+		var found = service.TryGetValue("key", out string? value);
+
+		Assert.False(found);  // default(bool)
+		Assert.Null(value);   // default(string)
+	}
+
+	[Fact]
+	public void OutParameter_Sequence_ThenReturn()
+	{
+		var knockOff = new OutParameterServiceKnockOff();
+		IOutParameterService service = knockOff;
+
+		knockOff.TryGetValue
+			.Return((string key, out string? value) => { value = "first"; return true; })
+			.ThenReturn((string key, out string? value) => { value = "second"; return true; });
+
+		service.TryGetValue("a", out var v1);
+		service.TryGetValue("b", out var v2);
+		service.TryGetValue("c", out var v3); // repeats last
+
+		Assert.Equal("first", v1);
+		Assert.Equal("second", v2);
+		Assert.Equal("second", v3);
+	}
+
+	[Fact]
+	public void OutParameter_Verify_ThrowsWhenNotSatisfied()
+	{
+		var knockOff = new OutParameterServiceKnockOff();
+		IOutParameterService service = knockOff;
+
+		knockOff.TryGetValue.Return((string key, out string? value) =>
+		{
+			value = default;
+			return false;
+		});
+
+		service.TryGetValue("key1", out _);
+
+		Assert.Throws<VerificationException>(() =>
+			knockOff.TryGetValue.Verify(Times.Exactly(2)));
+	}
+
+	[Fact]
+	public void OutParameter_BackedByDictionary()
+	{
+		var knockOff = new OutParameterServiceKnockOff();
+		IOutParameterService service = knockOff;
+		var data = new Dictionary<string, string> { ["key1"] = "value1" };
+
+		knockOff.TryGetValue.Return((string key, out string? value) =>
+		{
+			if (data.TryGetValue(key, out var v))
+			{
+				value = v;
+				return true;
+			}
+			value = null;
+			return false;
+		});
+
+		Assert.True(service.TryGetValue("key1", out var v1));
+		Assert.Equal("value1", v1);
+
+		Assert.False(service.TryGetValue("key2", out var v2));
+		Assert.Null(v2);
+	}
 }

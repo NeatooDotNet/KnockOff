@@ -86,4 +86,28 @@ public abstract class ServiceBase
     {
         InternalStateChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    // =========================================================================
+    // Public methods that exercise protected members
+    // =========================================================================
+    // These are NON-VIRTUAL so they are NOT intercepted — they call through
+    // to the protected virtual/abstract methods, which ARE intercepted by the
+    // generated Impl class. This is the realistic pattern: public methods that
+    // depend on protected template methods.
+
+    /// <summary>
+    /// Calls <see cref="GetInternalId"/> and <see cref="FormatTag"/> to
+    /// build a description. Exercises protected abstract + virtual methods.
+    /// </summary>
+    public string GetDescription() => $"{GetInternalId()}: {FormatTag()}";
+
+    /// <summary>
+    /// Reads the protected indexer at the given position.
+    /// </summary>
+    public string GetItemAt(int index) => this[index];
+
+    /// <summary>
+    /// Writes the protected indexer at the given position.
+    /// </summary>
+    public void SetItemAt(int index, string value) => this[index] = value;
 }
