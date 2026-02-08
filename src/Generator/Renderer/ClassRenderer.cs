@@ -87,8 +87,9 @@ internal static class ClassRenderer
         // Interceptor properties
         foreach (var interceptorProp in cls.InterceptorProperties)
         {
+            var newKeyword = interceptorProp.NeedsNewKeyword ? "new " : "";
             w.Line($"{indent1}/// <summary>{interceptorProp.Description}</summary>");
-            w.Line($"{indent1}public {interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
+            w.Line($"{indent1}public {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
         }
         w.Line();
 
