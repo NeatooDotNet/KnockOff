@@ -674,7 +674,7 @@ internal static class ClassRenderer
     private static void RenderImplEventOverride(CodeWriter w, InlineClassImplEventModel evt, string indent, string indent1)
     {
         w.Line($"{indent}/// <inheritdoc />");
-        w.Line($"{indent}public override event {evt.DelegateType}? {evt.EventName}");
+        w.Line($"{indent}{evt.AccessModifier} override event {evt.DelegateType}? {evt.EventName}");
         w.Line($"{indent}{{");
         // Null check for calls during base constructor
         w.Line($"{indent1}add => _stub?.{evt.EventName}.RecordAdd(value);");

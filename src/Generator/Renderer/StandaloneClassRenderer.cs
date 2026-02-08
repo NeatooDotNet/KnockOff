@@ -907,7 +907,7 @@ internal static class StandaloneClassRenderer
     private static void RenderImplEventOverride(CodeWriter w, InlineClassImplEventModel evt, string indent, string indent1)
     {
         w.Line($"{indent}/// <inheritdoc />");
-        w.Line($"{indent}public override event {evt.DelegateType}? {evt.EventName}");
+        w.Line($"{indent}{evt.AccessModifier} override event {evt.DelegateType}? {evt.EventName}");
         w.Line($"{indent}{{");
         w.Line($"{indent1}add => _stub?.{evt.EventName}.RecordAdd(value);");
         w.Line($"{indent1}remove => _stub?.{evt.EventName}.RecordRemove(value);");

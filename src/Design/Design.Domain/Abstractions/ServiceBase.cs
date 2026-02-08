@@ -44,4 +44,46 @@ public abstract class ServiceBase
     /// Used to demonstrate: Abstract method stubbing
     /// </summary>
     public abstract void Execute(string command);
+
+    // =========================================================================
+    // Protected members for demonstrating access modifier preservation
+    // =========================================================================
+
+    /// <summary>
+    /// Protected virtual event. Class stubs must generate
+    /// <c>protected override event</c> (not <c>public override event</c>).
+    /// </summary>
+    protected virtual event EventHandler? InternalStateChanged;
+
+    /// <summary>
+    /// Protected virtual property with default implementation.
+    /// </summary>
+    protected virtual string Tag { get; set; } = "";
+
+    /// <summary>
+    /// Protected abstract method that must be implemented.
+    /// </summary>
+    protected abstract string GetInternalId();
+
+    /// <summary>
+    /// Protected virtual method with default implementation.
+    /// </summary>
+    protected virtual string FormatTag() => $"[{Tag}]";
+
+    /// <summary>
+    /// Protected virtual indexer with default implementation.
+    /// </summary>
+    protected virtual string this[int index]
+    {
+        get => "";
+        set { }
+    }
+
+    /// <summary>
+    /// Raises InternalStateChanged. Provided so subclasses can fire the event.
+    /// </summary>
+    protected void OnInternalStateChanged()
+    {
+        InternalStateChanged?.Invoke(this, EventArgs.Empty);
+    }
 }

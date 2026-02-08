@@ -95,6 +95,18 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 		defaultSeverity: DiagnosticSeverity.Error,
 		isEnabledByDefault: true);
 
+	/// <summary>
+	/// KO0201: [KnockOff] applied to a class with a concrete base type.
+	/// The user should use [KnockOffBase&lt;T&gt;] or inline [KnockOff&lt;T&gt;] instead.
+	/// </summary>
+	private static readonly DiagnosticDescriptor KO0201_ClassWithBaseType = new(
+		id: "KO0201",
+		title: "[KnockOff] on class with base type",
+		messageFormat: "Class '{0}' has base type '{1}'. Use [KnockOffBase<{1}>] for standalone class stubs or [KnockOff<{1}>] for inline class stubs.",
+		category: "KnockOff",
+		defaultSeverity: DiagnosticSeverity.Error,
+		isEnabledByDefault: true);
+
 	#endregion
 
 	#region Class Stub Diagnostics (KO2xxx)
