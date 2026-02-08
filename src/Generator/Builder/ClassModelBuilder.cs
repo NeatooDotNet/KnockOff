@@ -63,7 +63,7 @@ internal static class ClassModelBuilder
                 interceptorProperties.Add(new InlineInterceptorPropertyModel(
                     PropertyName: member.Name,
                     InterceptorTypeName: $"{propModel.InterceptorClassName}{typeParamList}",
-                    NeedsNewKeyword: false,
+                    NeedsNewKeyword: NeedsNewKeyword(member.Name),
                     Description: $"Interceptor for {member.Name}."));
                 resetStatements.Add($"{member.Name}.Reset();");
             }
@@ -75,7 +75,7 @@ internal static class ClassModelBuilder
                 interceptorProperties.Add(new InlineInterceptorPropertyModel(
                     PropertyName: indexerName,
                     InterceptorTypeName: $"{indexerModel.InterceptorClassName}{typeParamList}",
-                    NeedsNewKeyword: false,
+                    NeedsNewKeyword: NeedsNewKeyword(indexerName),
                     Description: $"Interceptor for {indexerName}."));
                 resetStatements.Add($"{indexerName}.Reset();");
             }
@@ -107,7 +107,7 @@ internal static class ClassModelBuilder
             interceptorProperties.Add(new InlineInterceptorPropertyModel(
                 PropertyName: group.GroupName,
                 InterceptorTypeName: $"{interceptorClassName}{typeParamList}",
-                NeedsNewKeyword: false,
+                NeedsNewKeyword: NeedsNewKeyword(group.GroupName),
                 Description: $"Interceptor for {group.MethodName}."));
             resetStatements.Add($"{group.GroupName}.Reset();");
         }
@@ -120,7 +120,7 @@ internal static class ClassModelBuilder
             interceptorProperties.Add(new InlineInterceptorPropertyModel(
                 PropertyName: evt.Name,
                 InterceptorTypeName: $"{eventModel.InterceptorClassName}{typeParamList}",
-                NeedsNewKeyword: false,
+                NeedsNewKeyword: NeedsNewKeyword(evt.Name),
                 Description: $"Interceptor for {evt.Name}."));
             resetStatements.Add($"{evt.Name}.Reset();");
         }
@@ -427,6 +427,18 @@ internal static class ClassModelBuilder
             CallArgumentList: callArgs,
             InvokeSuffix: invokeSuffix);
     }
+
+    #endregion
+
+    #region NeedsNewKeyword
+
+    private static readonly HashSet<string> ObjectMemberNames = new(StringComparer.Ordinal)
+    {
+        "Equals", "GetHashCode", "ToString", "GetType"
+    };
+
+    private static bool NeedsNewKeyword(string interceptorName) =>
+        ObjectMemberNames.Contains(interceptorName);
 
     #endregion
 

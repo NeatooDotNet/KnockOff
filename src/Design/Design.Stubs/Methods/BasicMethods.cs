@@ -103,22 +103,29 @@ public partial class BasicMethodsDemo
     }
 
     // =========================================================================
-    // COMMON MISTAKE: Returns(value) and Returns(callback) are Mutually Exclusive
+    // OVERALL PRINCIPLE: Configuration Methods — Last One Wins
     // =========================================================================
+    //
+    // All configuration methods use direct replacement. Calling any
+    // configuration method replaces the previous configuration of the same kind:
+    //
+    //   - Return(value) and Return(callback) replace each other
+    //   - Multiple Call(callback) calls — last wins
+    //   - Multiple Get(value) or Get(callback) calls — last wins
+    //   - Multiple Set(callback) calls — last wins
+    //   - Multiple When() calls — last wins (replaces previous When chain)
+    //
+    // Within a When chain, ThenWhen() accumulates matchers. But calling
+    // When() again as a new entry point replaces the entire chain.
+    //
+    // KNOWN BUG: When() currently accumulates like ThenWhen() instead of
+    // replacing. See docs/todos/when-entry-point-should-clear-chain.md.
     //
     // COMMON MISTAKE: Expecting Return(value) and Return(callback) to combine
     //
     // WRONG:
     //   stub.Add.Return((a, b) => a + b);
     //   stub.Add.Return(42);  // This REPLACES the callback, does not combine
-    //
-    // Calling Return(value) after Return(callback) (or vice versa) replaces
-    // the previous configuration. The last call wins.
-    //
-    // DESIGN DECISION: Return overloads replace each other:
-    // - Return(value) is for "I don't care about arguments, always return X"
-    // - Return(callback) is for "I need to compute return based on arguments"
-    // These are fundamentally different use cases.
     //
     // NOTE: Return() is for methods with return values. Call() is for void
     // methods. A method only has one or the other — never both.

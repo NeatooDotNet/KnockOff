@@ -24,12 +24,9 @@ internal static class FlatRenderer
 		w.Line("#nullable enable");
 		w.Line();
 
-		// Add using System.Linq if there are generic methods (needed for aggregate LINQ in handlers)
-		if (unit.HasGenericMethods)
-		{
-			w.Line("using System.Linq;");
-			w.Line();
-		}
+		// Always include System.Linq - needed for .Sum() in overload TotalCallCount and generic methods
+		w.Line("using System.Linq;");
+		w.Line();
 
 		// Namespace
 		if (!string.IsNullOrEmpty(unit.Namespace))

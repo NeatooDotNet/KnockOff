@@ -27,6 +27,10 @@ internal static class StandaloneClassRenderer
         w.Line("#nullable enable");
         w.Line();
 
+        // Always include System.Linq - needed for .Sum() in overload TotalCallCount
+        w.Line("using System.Linq;");
+        w.Line();
+
         // Namespace
         if (!string.IsNullOrEmpty(unit.Namespace))
         {
@@ -120,8 +124,9 @@ internal static class StandaloneClassRenderer
         // Interceptor properties
         foreach (var interceptorProp in unit.InterceptorProperties)
         {
+            var newKeyword = interceptorProp.NeedsNewKeyword ? "new " : "";
             w.Line($"{indent1}/// <summary>{interceptorProp.Description}</summary>");
-            w.Line($"{indent1}public {interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
+            w.Line($"{indent1}public {newKeyword}{interceptorProp.InterceptorTypeName} {interceptorProp.PropertyName} {{ get; }} = new();");
         }
         w.Line();
 
