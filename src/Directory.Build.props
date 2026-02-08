@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.41.0</FileVersion>
-		<PackageVersion>0.41.0</PackageVersion>
+		<FileVersion>0.42.0</FileVersion>
+		<PackageVersion>0.42.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Fix CS0108 (missing 'new' keyword on class stub object-override interceptors) and CS1061 (missing 'using System.Linq;' in generated code for overloaded methods).</PackageReleaseNotes>
+		<PackageReleaseNotes>Rename Call(Action) to Return(Action) on Task/ValueTask methods for consistent API naming.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>
