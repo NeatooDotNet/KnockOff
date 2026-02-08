@@ -1,7 +1,7 @@
 # Base Class Follow-up Fixes
 
 **Date:** 2026-02-03
-**Related Todo:** [Base Class User Methods](../todos/base-class-user-methods.md)
+**Related Todo:** [Base Class User Methods](../todos/base-class-stub-overrides.md)
 **Status:** Complete
 **Last Updated:** 2026-02-03
 

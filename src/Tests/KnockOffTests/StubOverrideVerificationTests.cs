@@ -5,32 +5,32 @@ namespace KnockOff.Tests;
 
 /// <summary>
 /// Tests for verification of user-defined methods in standalone stubs.
-/// User methods are tracked but always "configured" (user provides implementation).
+/// Stub overrides are tracked but always "configured" (user provides implementation).
 /// </summary>
-public class UserMethodVerificationTests
+public class StubOverrideVerificationTests
 {
     #region Verifiable() - Marking for Stub.Verify()
 
     [Fact]
-    public void UserMethod_Verifiable_CalledOnce_PassesVerification()
+    public void StubOverride_Verifiable_CalledOnce_PassesVerification()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable();
 
         // Act
-        IStrictModeUserMethodTest service = stub;
-        service.GetValue(5); // Calls the user method
+        IStrictModeStubOverrideTest service = stub;
+        service.GetValue(5); // Calls the stub override
 
         // Assert - Should not throw
         stub.Verify();
     }
 
     [Fact]
-    public void UserMethod_Verifiable_NotCalled_ThrowsVerificationException()
+    public void StubOverride_Verifiable_NotCalled_ThrowsVerificationException()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable();
         // Don't call the method
 
@@ -39,14 +39,14 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void UserMethod_Verifiable_WithTimesExactly_VerifiesCount()
+    public void StubOverride_Verifiable_WithTimesExactly_VerifiesCount()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable(Called.Exactly(2));
 
         // Act - Call exactly twice
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(1);
         service.GetValue(2);
 
@@ -55,14 +55,14 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void UserMethod_Verifiable_WithTimesExactly_WrongCount_Throws()
+    public void StubOverride_Verifiable_WithTimesExactly_WrongCount_Throws()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable(Called.Exactly(2));
 
         // Act - Call only once (expected 2)
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(1);
 
         // Assert
@@ -70,10 +70,10 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void UserMethod_NotMarkedVerifiable_NotCheckedByStubVerify()
+    public void StubOverride_NotMarkedVerifiable_NotCheckedByStubVerify()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         // Don't mark GetValue as verifiable
         // Don't call the method either
 
@@ -83,13 +83,13 @@ public class UserMethodVerificationTests
 
     #endregion
 
-    #region Multiple User Methods
+    #region Multiple Stub Overrides
 
     [Fact]
-    public void MultipleUserMethods_BothMarkedVerifiable_BothFail_ExceptionContainsBoth()
+    public void MultipleStubOverrides_BothMarkedVerifiable_BothFail_ExceptionContainsBoth()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable();
         stub.DoSomething.Verifiable();
         // Don't call either method
@@ -102,15 +102,15 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void MultipleUserMethods_OnlyOneFails_ExceptionContainsOnlyFailure()
+    public void MultipleStubOverrides_OnlyOneFails_ExceptionContainsOnlyFailure()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable();
         stub.DoSomething.Verifiable();
 
         // Act - Call GetValue but not DoSomething
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(5);
         // Don't call DoSomething
 
@@ -122,17 +122,17 @@ public class UserMethodVerificationTests
 
     #endregion
 
-    #region VerifyAll - User Methods Excluded
+    #region VerifyAll - Stub Overrides Excluded
 
     [Fact]
-    public void VerifyAll_UserMethodNotCalled_DoesNotIncludeUserMethods()
+    public void VerifyAll_StubOverrideNotCalled_DoesNotIncludeStubOverrides()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
-        // User methods are always "configured" - they should not be checked by VerifyAll
+        var stub = new StrictModeStubOverrideStub();
+        // Stub overrides are always "configured" - they should not be checked by VerifyAll
         // Don't call any methods
 
-        // Assert - VerifyAll should pass (user methods excluded)
+        // Assert - VerifyAll should pass (stub overrides excluded)
         stub.VerifyAll(); // Should not throw
     }
 
@@ -140,7 +140,7 @@ public class UserMethodVerificationTests
     public void VerifyAll_ConfiguredPropertyNotCalled_Fails()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.Name.Get("test"); // Configure the property
         // Don't access the property
 
@@ -149,34 +149,34 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void VerifyAll_UserMethodNotCalled_ConfiguredPropertyCalled_Passes()
+    public void VerifyAll_StubOverrideNotCalled_ConfiguredPropertyCalled_Passes()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.Name.Get("test"); // Configure the property
 
-        // Act - Access the property but not the user method
-        IStrictModeUserMethodTest service = stub;
+        // Act - Access the property but not the stub override
+        IStrictModeStubOverrideTest service = stub;
         _ = service.Name;
         // Don't call GetValue or DoSomething
 
-        // Assert - VerifyAll should pass (property accessed, user methods ignored)
+        // Assert - VerifyAll should pass (property accessed, stub overrides ignored)
         stub.VerifyAll();
     }
 
     #endregion
 
-    #region Void User Methods
+    #region Void Stub Overrides
 
     [Fact]
-    public void VoidUserMethod_Verifiable_CalledOnce_PassesVerification()
+    public void VoidStubOverride_Verifiable_CalledOnce_PassesVerification()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.DoSomething.Verifiable();
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.DoSomething();
 
         // Assert - Should not throw
@@ -184,10 +184,10 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void VoidUserMethod_Verifiable_NotCalled_ThrowsVerificationException()
+    public void VoidStubOverride_Verifiable_NotCalled_ThrowsVerificationException()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.DoSomething.Verifiable();
         // Don't call the method
 
@@ -200,14 +200,14 @@ public class UserMethodVerificationTests
     #region Reset Behavior
 
     [Fact]
-    public void UserMethod_VerifiablePreservedAfterReset()
+    public void StubOverride_VerifiablePreservedAfterReset()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable();
 
         // Act - Call, verify passes, reset, verify fails (call count reset but verifiable preserved)
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(5);
         stub.Verify(); // Should pass
 
@@ -218,14 +218,14 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void UserMethod_AfterResetAndRecall_PassesVerification()
+    public void StubOverride_AfterResetAndRecall_PassesVerification()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable();
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(5);
         stub.Verify(); // Should pass
 
@@ -241,13 +241,13 @@ public class UserMethodVerificationTests
     #region Individual Verify Still Works
 
     [Fact]
-    public void UserMethod_IndividualVerify_StillWorks()
+    public void StubOverride_IndividualVerify_StillWorks()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(5);
 
         // Assert - Individual Verify() on the interceptor should work
@@ -256,10 +256,10 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void UserMethod_IndividualVerify_NotCalled_Throws()
+    public void StubOverride_IndividualVerify_NotCalled_Throws()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         // Don't call the method
 
         // Act & Assert
@@ -271,13 +271,13 @@ public class UserMethodVerificationTests
     #region Guard Condition Regression Test
 
     [Fact]
-    public void StubWithOnlyUserMethodsAndProperty_HasVerifyMethods()
+    public void StubWithOnlyStubOverridesAndProperty_HasVerifyMethods()
     {
-        // This test verifies the guard condition fix - stubs with only user methods
+        // This test verifies the guard condition fix - stubs with only stub overrides
         // and properties (no regular method interceptors) should still have Verify/VerifyAll
 
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
 
         // These methods should exist and be callable
         stub.Verify();
@@ -287,14 +287,14 @@ public class UserMethodVerificationTests
     }
 
     [Fact]
-    public void StubWithOnlyUserMethodsAndProperty_VerifyWithMarkedVerifiable_Works()
+    public void StubWithOnlyStubOverridesAndProperty_VerifyWithMarkedVerifiable_Works()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Verifiable();
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(42);
 
         // Assert

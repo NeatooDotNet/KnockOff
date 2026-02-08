@@ -328,11 +328,11 @@ After reset, the property retains its configured behavior but tracking counts re
 
 ---
 
-## User Properties (Stand-Alone Pattern)
+## Stub Override Properties (Stand-Alone Pattern)
 
-When you define a **user property** (override a virtual property with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `Count`, not `Count2`). These interceptors support `Get()` and `Set()` to override the user property per-test.
+When you define a **stub override property** (override a virtual property with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `Count`, not `Count2`). These interceptors support `Get()` and `Set()` to override the stub override property per-test.
 
-### Why Use User Properties?
+### Why Use Stub Override Properties?
 
 User properties provide several advantages over per-test configuration:
 
@@ -342,11 +342,11 @@ User properties provide several advantages over per-test configuration:
 4. **IDE support** - Full IntelliSense, refactoring, debugging
 5. **Compile-time safety** - Signature errors caught by compiler
 
-### Defining User Properties
+### Defining Stub Override Properties
 
 Override protected virtual properties with the underscore suffix convention to provide default implementations:
 
-<!-- snippet: user-properties-interface-and-stub -->
+<!-- snippet: stub-override-properties-interface-and-stub -->
 ```cs
 public interface ISkillUserSvc
 {
@@ -386,9 +386,9 @@ public partial class SkillUserSvcStub
 ```
 <!-- endSnippet -->
 
-### Using Stubs with User Properties
+### Using Stubs with Stub Override Properties
 
-<!-- snippet: user-properties-basic-usage -->
+<!-- snippet: stub-override-properties-basic-usage -->
 ```cs
 var stub = new SkillUserSvcStub();
 stub.SetCount(42);
@@ -407,38 +407,38 @@ service.Setting = "value";
 ```
 <!-- endSnippet -->
 
-### Get/Set Supersede User Properties
+### Get/Set Supersede Stub Override Properties
 
 User properties provide shareable defaults. Use `Get()` or `Set()` to override per-test:
 
-<!-- snippet: user-properties-onget-onset-override -->
+<!-- snippet: stub-override-properties-onget-onset-override -->
 ```cs
 var stub = new SkillUserSvcStub();
 stub.SetCount(42);
 
 ISkillUserSvc service = stub;
 
-// Default: user property is called
+// Default: stub override property is called
 var defaultValue = service.Count;  // 42
 
-// Get supersedes the user property for this test
+// Get supersedes the stub override property for this test
 stub.Count.Get(999);
 var overrideValue = service.Count;  // 999
 
-// Set supersedes the user property for this test
+// Set supersedes the stub override property for this test
 var capturedValue = "";
 stub.Name.Set(v => capturedValue = $"Captured: {v}");
 service.Name = "Test";
 // capturedValue == "Captured: Test"
-// The user override's backing field was NOT updated
+// The stub override's backing field was NOT updated
 ```
 <!-- endSnippet -->
 
-### Tracking Works Through User Properties
+### Tracking Works Through Stub Override Properties
 
-User property interceptors provide full tracking even when using the user override:
+Stub override property interceptors provide full tracking even when using the stub override:
 
-<!-- snippet: user-properties-tracking -->
+<!-- snippet: stub-override-properties-tracking -->
 ```cs
 var stub = new SkillUserSvcStub();
 stub.SetCount(100);
@@ -458,10 +458,10 @@ stub.Name.VerifySet(Called.Never);
 
 `Reset()` clears tracking state but preserves the Get/Set configuration (matching regular interceptor semantics):
 
-<!-- snippet: user-properties-reset -->
+<!-- snippet: stub-override-properties-reset -->
 ```cs
 var stub = new SkillUserSvcStub();
-stub.Count.Get(100);  // Override user property
+stub.Count.Get(100);  // Override stub override property
 
 ISkillUserSvc service = stub;
 _ = service.Count;
@@ -475,11 +475,11 @@ var value = service.Count;  // 100 (Get still active)
 ```
 <!-- endSnippet -->
 
-### Strict Mode Bypassed for User Properties
+### Strict Mode Bypassed for Stub Override Properties
 
-User overrides bypass strict mode because they ARE the configuration:
+Stub overrides bypass strict mode because they ARE the configuration:
 
-<!-- snippet: user-properties-strict-mode -->
+<!-- snippet: stub-override-properties-strict-mode -->
 ```cs
 // [KnockOff(Strict = true)]
 // public partial class StrictSkillUserSvcStub : ISkillUserSvc { }
@@ -493,7 +493,7 @@ User overrides bypass strict mode because they ARE the configuration:
 var stub = new StrictSkillUserSvcStub();
 ISkillUserSvc service = stub;
 
-var count = service.Count;  // 10 (no exception - user override is configured)
+var count = service.Count;  // 10 (no exception - stub override is configured)
 ```
 <!-- endSnippet -->
 
@@ -501,7 +501,7 @@ var count = service.Count;  // 10 (no exception - user override is configured)
 
 User properties apply to all four standalone patterns:
 
-| Pattern | Attribute | User Property Support |
+| Pattern | Attribute | Stub Override Property Support |
 |---------|-----------|----------------------|
 | Standalone | `[KnockOff] class Stub : IService` | Yes |
 | Generic Standalone | `[KnockOff] class Stub<T> : IService<T>` | Yes |

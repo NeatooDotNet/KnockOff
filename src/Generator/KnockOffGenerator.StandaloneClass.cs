@@ -116,8 +116,8 @@ public partial class KnockOffGenerator
 				TargetClassInfo: null,
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				Strict: strict,
-				UserOverrideProperties: default,
-				UserOverrideMethods: default);
+				StubOverrideProperties: default,
+				StubOverrideMethods: default);
 		}
 
 		// For non-open-generic closed generic targets (e.g., [KnockOffBase<ServiceBase>]),
@@ -151,8 +151,8 @@ public partial class KnockOffGenerator
 					TargetClassInfo: null,
 					Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 					Strict: strict,
-					UserOverrideProperties: default,
-					UserOverrideMethods: default);
+					StubOverrideProperties: default,
+					StubOverrideMethods: default);
 			}
 		}
 
@@ -170,12 +170,12 @@ public partial class KnockOffGenerator
 			isOpenGeneric ? openGenericTypeParams : userClassTypeParameters);
 
 		// Detect user-defined property overrides (base class pattern)
-		var userOverrideProperties = DetectUserOverrideProperties(classSymbol);
-		var userOverridePropertiesArray = new EquatableArray<string>(userOverrideProperties.ToArray());
+		var stubOverrideProperties = DetectStubOverrideProperties(classSymbol);
+		var stubOverridePropertiesArray = new EquatableArray<string>(stubOverrideProperties.ToArray());
 
 		// Detect user-defined method overrides (base class pattern)
-		var userOverrideMethods = DetectUserOverrideMethods(classSymbol, context.SemanticModel.Compilation);
-		var userOverrideMethodsArray = new EquatableArray<string>(userOverrideMethods.ToArray());
+		var stubOverrideMethods = DetectStubOverrideMethods(classSymbol, context.SemanticModel.Compilation);
+		var stubOverrideMethodsArray = new EquatableArray<string>(stubOverrideMethods.ToArray());
 
 		return new StandaloneClassStubInfo(
 			Namespace: namespaceName,
@@ -185,8 +185,8 @@ public partial class KnockOffGenerator
 			TargetClassInfo: targetClassInfo,
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 			Strict: strict,
-			UserOverrideProperties: userOverridePropertiesArray,
-			UserOverrideMethods: userOverrideMethodsArray);
+			StubOverrideProperties: stubOverridePropertiesArray,
+			StubOverrideMethods: stubOverrideMethodsArray);
 	}
 
 	/// <summary>
@@ -212,7 +212,7 @@ public partial class KnockOffGenerator
 			? string.Join(".", info.ContainingTypes.Select(ct => ct.Name)) + "." + className
 			: className;
 
-		// Generate base class file first (contains virtual protected properties for user overrides)
+		// Generate base class file first (contains virtual protected properties for stub overrides)
 		var baseClassSource = StandaloneClassRenderer.RenderBaseClass(model);
 		context.AddSource($"{hintName}.Base.g.cs", baseClassSource);
 
@@ -240,7 +240,7 @@ internal sealed record StandaloneClassStubInfo(
 	EquatableArray<DiagnosticInfo> Diagnostics,
 	/// <summary>Whether strict mode is enabled.</summary>
 	bool Strict,
-	/// <summary>Property names (with _ suffix) that have user overrides in the partial class.</summary>
-	EquatableArray<string> UserOverrideProperties = default,
-	/// <summary>Method signature keys (format: "MethodName_(ParamType1,...)") that have user overrides in the partial class.</summary>
-	EquatableArray<string> UserOverrideMethods = default) : IEquatable<StandaloneClassStubInfo>;
+	/// <summary>Property names (with _ suffix) that have stub overrides in the partial class.</summary>
+	EquatableArray<string> StubOverrideProperties = default,
+	/// <summary>Method signature keys (format: "MethodName_(ParamType1,...)") that have stub overrides in the partial class.</summary>
+	EquatableArray<string> StubOverrideMethods = default) : IEquatable<StandaloneClassStubInfo>;

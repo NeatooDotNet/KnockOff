@@ -35,10 +35,10 @@ internal sealed record MethodOverloadSignature(
     /// <summary>Whether to throw when no callback and no default available.</summary>
     bool ThrowsOnDefault,
     /// <summary>
-    /// User method name for this signature's fallback (e.g., "Process_"). Null if no user override exists.
-    /// In mixed overload groups, some signatures may have user overrides while others do not.
+    /// Stub override name for this signature's fallback (e.g., "Process_"). Null if no stub override exists.
+    /// In mixed overload groups, some signatures may have stub overrides while others do not.
     /// </summary>
-    string? UserMethodName = null,
+    string? StubOverrideName = null,
 
     // Ref return support
     /// <summary>True if this signature returns by ref (ref T).</summary>

@@ -42,7 +42,7 @@ public class StandalonePatternTests
     }
 }
 
-#region skill-patterns-user-methods
+#region skill-patterns-stub-overrides
 [KnockOff]
 public partial class PtUserRepositoryStubWithDefaults : IUserRepository
 {
@@ -54,10 +54,10 @@ public partial class PtUserRepositoryStubWithDefaults : IUserRepository
 }
 #endregion
 
-public class UserMethodsTests
+public class StubOverridesTests
 {
     [Fact]
-    public void UserMethods_ProvideDefaultImplementation()
+    public void StubOverrides_ProvideDefaultImplementation()
     {
         var stub = new PtUserRepositoryStubWithDefaults();
         IUserRepository repo = stub;

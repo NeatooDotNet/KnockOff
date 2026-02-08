@@ -53,7 +53,7 @@ Work document-by-document, updating both the markdown file and corresponding C# 
 - [x] `docs/guides/events.md` (8 snippets)
 - [x] `docs/reference/interceptor-api.md` (7 snippets)
 - [x] `docs/reference/smart-defaults.md` (6 snippets)
-- [x] `docs/guides/user-methods.md` (6 snippets)
+- [x] `docs/guides/stub-overrides.md` (6 snippets)
 - [x] `docs/guides/source-delegation.md` (6 snippets)
 - [x] `docs/reference/attribute-options.md` (4 snippets)
 

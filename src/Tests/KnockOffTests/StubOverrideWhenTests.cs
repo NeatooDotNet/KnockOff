@@ -5,10 +5,10 @@ using Xunit;
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for .When() API support on user method interceptors.
-/// When chains have highest priority; user method is the final fallback.
+/// Tests for .When() API support on stub override interceptors.
+/// When chains have highest priority; stub override is the final fallback.
 /// </summary>
-public class UserMethodWhenTests
+public class StubOverrideWhenTests
 {
     #region Basic When Matching
 
@@ -16,11 +16,11 @@ public class UserMethodWhenTests
     public void When_ValueMatch_ReturnsWhenValue()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When("special").Return("[WHEN MATCHED]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var result = service.Process("special");
 
         // Assert - When chain wins
@@ -28,17 +28,17 @@ public class UserMethodWhenTests
     }
 
     [Fact]
-    public void When_NoMatch_FallsToUserMethod()
+    public void When_NoMatch_FallsToStubOverride()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When("special").Return("[WHEN MATCHED]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var result = service.Process("normal");
 
-        // Assert - User method is called as fallback
+        // Assert - Stub override is called as fallback
         Assert.Equal("[USER: normal]", result);
     }
 
@@ -46,12 +46,12 @@ public class UserMethodWhenTests
     public void When_MultipleMatchers_FirstMatchWins()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When("first").Return("[FIRST]");
         stub.Process.When("second").Return("[SECOND]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var result1 = service.Process("first");
         var result2 = service.Process("second");
         var result3 = service.Process("other");
@@ -70,11 +70,11 @@ public class UserMethodWhenTests
     public void When_PredicateMatch_ReturnsWhenValue()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When(s => s.Length > 10).Return("[LONG STRING]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var result = service.Process("short");
         var longResult = service.Process("this is a long string");
 
@@ -91,16 +91,16 @@ public class UserMethodWhenTests
     public void When_ThenWhen_MatchesInSequence()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When("first").Return("[1]")
             .ThenWhen("second").Return("[2]")
             .ThenNone();
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var r1 = service.Process("first");
         var r2 = service.Process("second");
-        var r3 = service.Process("third"); // Falls to user method
+        var r3 = service.Process("third"); // Falls to stub override
 
         // Assert
         Assert.Equal("[1]", r1);
@@ -112,12 +112,12 @@ public class UserMethodWhenTests
     public void When_ThenCall_ExecutesCallback()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When("callback").Return("[INITIAL]")
             .ThenCall(s => $"[CALLBACK: {s}]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var r1 = service.Process("callback");
         var r2 = service.Process("anything");
 
@@ -134,12 +134,12 @@ public class UserMethodWhenTests
     public void When_VoidMethod_CallsCallback()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         var callbackInvoked = false;
         stub.Execute.When("trigger").Call(cmd => callbackInvoked = true);
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         service.Execute("trigger");
 
         // Assert
@@ -147,17 +147,17 @@ public class UserMethodWhenTests
     }
 
     [Fact]
-    public void When_VoidMethod_NoMatch_FallsToUserMethod()
+    public void When_VoidMethod_NoMatch_FallsToStubOverride()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Execute.When("trigger").Call(cmd => { });
 
         // Act
-        IWhenUserMethodTest service = stub;
-        service.Execute("other"); // Falls to user method
+        IWhenStubOverrideTest service = stub;
+        service.Execute("other"); // Falls to stub override
 
-        // Assert - No exception, user method was called
+        // Assert - No exception, stub override was called
         stub.Execute.Verify(Called.Once);
     }
 
@@ -169,11 +169,11 @@ public class UserMethodWhenTests
     public async Task When_AsyncMethod_AutoWrapsReturnValue()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.GetAsync.When(1).Return("async-result"); // Auto-wraps in Task
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var result = await service.GetAsync(1);
         var fallbackResult = await service.GetAsync(999);
 
@@ -184,17 +184,17 @@ public class UserMethodWhenTests
 
     #endregion
 
-    #region Sequences with User Method Fallback
+    #region Sequences with Stub Override Fallback
 
     [Fact]
-    public void Returns_Sequence_ThenFallsToUserMethod()
+    public void Returns_Sequence_ThenFallsToStubOverride()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.Return("[1]", "[2]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var r1 = service.Process("a");
         var r2 = service.Process("b");
         var r3 = service.Process("c"); // Repeats last
@@ -209,11 +209,11 @@ public class UserMethodWhenTests
     public void OnCall_ThenReturns_Sequence()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.Return(s => "[FIRST]").ThenReturn("[SECOND]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var r1 = service.Process("a");
         var r2 = service.Process("b");
         var r3 = service.Process("c"); // Repeats last
@@ -232,14 +232,14 @@ public class UserMethodWhenTests
     public void When_Verifiable_VerifiesChainConsumed()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         // Need to add ThenCall or ThenNone to make the chain terminal
         stub.Process.When("expected").Return("[FIRST]")
             .ThenCall(s => "[TERMINAL]")
             .Verifiable();
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         service.Process("expected");  // Consume first
         service.Process("anything");  // Reach terminal
 
@@ -251,12 +251,12 @@ public class UserMethodWhenTests
     public void When_Verifiable_ThrowsWhenNotConsumed()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When("first").Return("[1]");
         stub.Process.When("second").Return("[2]").Verifiable();
 
         // Act - Only call first matcher, second not consumed
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         service.Process("first");
 
         // Assert - Second matcher not consumed
@@ -264,18 +264,18 @@ public class UserMethodWhenTests
     }
 
     [Fact]
-    public void Verify_CountsUserMethodCalls()
+    public void Verify_CountsStubOverrideCalls()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
-        // No When chain configured - all calls go to user method
+        var stub = new WhenStubOverrideStub();
+        // No When chain configured - all calls go to stub override
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         service.Process("one");
         service.Process("two");
 
-        // Assert - Both user method calls are tracked
+        // Assert - Both stub override calls are tracked
         stub.Process.Verify(Called.Exactly(2));
     }
 
@@ -283,16 +283,16 @@ public class UserMethodWhenTests
     public void Verify_WhenChainCallsIncludedInTotalCount()
     {
         // Arrange - When chain calls are included in TotalCallCount
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When("special").Return("[SPECIAL]").ThenNone();
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         service.Process("special");  // When chain - tracked in matcher.CallCount (included in TotalCallCount)
-        service.Process("normal");   // User method - tracked in _unconfiguredCallCount
+        service.Process("normal");   // Stub override - tracked in _unconfiguredCallCount
 
-        // Assert - Both When chain and user method calls count in TotalCallCount
-        stub.Process.Verify(Called.Exactly(2)); // 1 When chain call + 1 user method call
+        // Assert - Both When chain and stub override calls count in TotalCallCount
+        stub.Process.Verify(Called.Exactly(2)); // 1 When chain call + 1 stub override call
     }
 
     #endregion
@@ -303,16 +303,16 @@ public class UserMethodWhenTests
     public void When_HasPriorityOverOnCall()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.Return(s => "[ONCALL]");
         stub.Process.When("special").Return("[WHEN]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var whenResult = service.Process("special");
         var onCallResult = service.Process("other");
 
-        // Assert - When has priority, OnCall is fallback before user method
+        // Assert - When has priority, OnCall is fallback before stub override
         Assert.Equal("[WHEN]", whenResult);
         Assert.Equal("[ONCALL]", onCallResult);
     }
@@ -325,13 +325,13 @@ public class UserMethodWhenTests
     public void LastArg_TracksAcrossAllCallTypes()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Process.When("when-value").Return("[WHEN]");
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         service.Process("when-value");  // When chain
-        service.Process("user-value");  // User method fallback
+        service.Process("user-value");  // Stub override fallback
 
         // Assert - LastArg tracks most recent call
         Assert.Equal("user-value", stub.Process.LastArg);
@@ -345,12 +345,12 @@ public class UserMethodWhenTests
     public void When_MultipleParameters_MatchesAll()
     {
         // Arrange
-        var stub = new WhenUserMethodStub();
+        var stub = new WhenStubOverrideStub();
         stub.Calculate.When(0, 0).Return(0);
         stub.Calculate.When((a, b) => a < 0 && b < 0).Return(-1);
 
         // Act
-        IWhenUserMethodTest service = stub;
+        IWhenStubOverrideTest service = stub;
         var zero = service.Calculate(0, 0);
         var negative = service.Calculate(-5, -3);
         var normal = service.Calculate(10, 20);
@@ -358,7 +358,7 @@ public class UserMethodWhenTests
         // Assert
         Assert.Equal(0, zero);
         Assert.Equal(-1, negative);
-        Assert.Equal(30, normal); // User method: a + b
+        Assert.Equal(30, normal); // Stub override: a + b
     }
 
     #endregion
@@ -366,53 +366,53 @@ public class UserMethodWhenTests
     #region Generic Standalone When
 
     [Fact]
-    public void GenericStandalone_When_WithUserMethodFallback()
+    public void GenericStandalone_When_WithStubOverrideFallback()
     {
         // Arrange
-        var stub = new GenericWhenUserMethodStub<string>();
+        var stub = new GenericWhenStubOverrideStub<string>();
         stub.Process.When("special").Return("[WHEN: special]");
 
         // Act
-        IGenericWhenUserMethodService<string> service = stub;
+        IGenericWhenStubOverrideService<string> service = stub;
         var whenResult = service.Process("special");
         var userResult = service.Process("normal");
 
-        // Assert - When match returns When value, non-match falls to user method
+        // Assert - When match returns When value, non-match falls to stub override
         Assert.Equal("[WHEN: special]", whenResult);
         Assert.Equal("[USER: normal]", userResult);
     }
 
     [Fact]
-    public void GenericStandalone_When_PredicateWithUserMethodFallback()
+    public void GenericStandalone_When_PredicateWithStubOverrideFallback()
     {
         // Arrange
-        var stub = new GenericWhenUserMethodStub<int>();
+        var stub = new GenericWhenStubOverrideStub<int>();
         stub.Process.When(x => x > 100).Return(-1);
 
         // Act
-        IGenericWhenUserMethodService<int> service = stub;
+        IGenericWhenStubOverrideService<int> service = stub;
         var whenResult = service.Process(999);
         var userResult = service.Process(42);
 
         // Assert
         Assert.Equal(-1, whenResult);
-        Assert.Equal(42, userResult); // User method returns the input as-is
+        Assert.Equal(42, userResult); // Stub override returns the input as-is
     }
 
     [Fact]
-    public void GenericStandalone_When_ThenWhenChainWithUserMethodFallback()
+    public void GenericStandalone_When_ThenWhenChainWithStubOverrideFallback()
     {
         // Arrange
-        var stub = new GenericWhenUserMethodStub<string>();
+        var stub = new GenericWhenStubOverrideStub<string>();
         stub.Process.When("first").Return("[1]")
             .ThenWhen("second").Return("[2]")
             .ThenNone();
 
         // Act
-        IGenericWhenUserMethodService<string> service = stub;
+        IGenericWhenStubOverrideService<string> service = stub;
         var r1 = service.Process("first");
         var r2 = service.Process("second");
-        var r3 = service.Process("third"); // Falls to user method after ThenNone
+        var r3 = service.Process("third"); // Falls to stub override after ThenNone
 
         // Assert
         Assert.Equal("[1]", r1);
@@ -422,35 +422,35 @@ public class UserMethodWhenTests
 
     #endregion
 
-    #region Overloaded User Methods When
+    #region Overloaded Stub Overrides When
 
     [Fact]
-    public void Overloaded_When_OnUserMethodOverload()
+    public void Overloaded_When_OnStubOverrideOverload()
     {
-        // Arrange - OverloadedUserMethodStub has user override on Format(string) only
-        var stub = new OverloadedUserMethodStub();
+        // Arrange - OverloadedStubOverrideStub has stub override on Format(string) only
+        var stub = new OverloadedStubOverrideStub();
         stub.Format.When("special").Return("[WHEN]");
 
         // Act
-        IOverloadedUserMethodService service = stub;
+        IOverloadedStubOverrideService service = stub;
         var whenResult = service.Format("special");
         var userResult = service.Format("normal");
 
-        // Assert - When match returns When value, non-match falls to user method
+        // Assert - When match returns When value, non-match falls to stub override
         Assert.Equal("[WHEN]", whenResult);
-        Assert.Equal("USER:normal", userResult); // User method returns "USER:" + input
+        Assert.Equal("USER:normal", userResult); // Stub override returns "USER:" + input
     }
 
     [Fact]
-    public void Overloaded_When_OnNonUserMethodOverload()
+    public void Overloaded_When_OnNonStubOverrideOverload()
     {
-        // Arrange - Format2 (two-param overload) has no user override
-        var stub = new OverloadedUserMethodStub();
+        // Arrange - Format2 (two-param overload) has no stub override
+        var stub = new OverloadedStubOverrideStub();
         stub.Format2.When("hello", true).Return("[WHEN UPPER]");
         stub.Format2.Return("[DEFAULT]");
 
         // Act
-        IOverloadedUserMethodService service = stub;
+        IOverloadedStubOverrideService service = stub;
         var whenResult = service.Format("hello", true);
         var fallbackResult = service.Format("other", false);
 
@@ -463,15 +463,15 @@ public class UserMethodWhenTests
     public void Overloaded_When_BothOverloadsIndependent()
     {
         // Arrange - Configure When on both overloads independently
-        var stub = new OverloadedUserMethodStub();
+        var stub = new OverloadedStubOverrideStub();
         stub.Format.When("special").Return("[WHEN1]");
         stub.Format2.When("special", true).Return("[WHEN2]");
         stub.Format2.Return("[DEFAULT2]");
 
         // Act
-        IOverloadedUserMethodService service = stub;
-        var when1 = service.Format("special");       // Matches When on user method overload
-        var user1 = service.Format("normal");         // Falls to user method
+        IOverloadedStubOverrideService service = stub;
+        var when1 = service.Format("special");       // Matches When on stub override overload
+        var user1 = service.Format("normal");         // Falls to stub override
         var when2 = service.Format("special", true);  // Matches When on non-user overload
         var fall2 = service.Format("normal", false);   // Falls to Returns
 
@@ -487,7 +487,7 @@ public class UserMethodWhenTests
 
 #region Test Interface and Stub
 
-public interface IWhenUserMethodTest
+public interface IWhenStubOverrideTest
 {
     string Process(string input);
     void Execute(string command);
@@ -496,11 +496,11 @@ public interface IWhenUserMethodTest
 }
 
 [KnockOff]
-public partial class WhenUserMethodStub : IWhenUserMethodTest
+public partial class WhenStubOverrideStub : IWhenStubOverrideTest
 {
 }
 
-public partial class WhenUserMethodStub
+public partial class WhenStubOverrideStub
 {
     protected override string Process_(string input)
     {
@@ -509,7 +509,7 @@ public partial class WhenUserMethodStub
 
     protected override void Execute_(string command)
     {
-        // User method - does nothing but proves fallback works
+        // Stub override - does nothing but proves fallback works
     }
 
     protected override Task<string> GetAsync_(int id)
@@ -527,20 +527,20 @@ public partial class WhenUserMethodStub
 
 #region Generic Standalone Test Types
 
-/// <summary>Generic interface for testing When chains on generic standalone stubs with user methods.</summary>
-public interface IGenericWhenUserMethodService<T>
+/// <summary>Generic interface for testing When chains on generic standalone stubs with stub overrides.</summary>
+public interface IGenericWhenStubOverrideService<T>
 {
     T Process(T input);
 }
 
-/// <summary>Generic standalone stub with user method override for Process.</summary>
+/// <summary>Generic standalone stub with stub override override for Process.</summary>
 [KnockOff]
-public partial class GenericWhenUserMethodStub<T> : IGenericWhenUserMethodService<T>
+public partial class GenericWhenStubOverrideStub<T> : IGenericWhenStubOverrideService<T>
 {
 }
 
-/// <summary>User method implementations for GenericWhenUserMethodStub.</summary>
-public partial class GenericWhenUserMethodStub<T>
+/// <summary>Stub override implementations for GenericWhenStubOverrideStub.</summary>
+public partial class GenericWhenStubOverrideStub<T>
 {
     protected override T Process_(T input)
     {

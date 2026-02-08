@@ -22,14 +22,14 @@ internal static class FlatModelBuilder
 
 	public static FlatGenerationUnit Build(KnockOffTypeInfo typeInfo)
 	{
-		// Build user override methods lookup for base class pattern
-		var userOverrideMethods = new HashSet<string>(typeInfo.UserOverrideMethods.GetArray() ?? Array.Empty<string>());
+		// Build stub override methods lookup for base class pattern
+		var stubOverrideMethods = new HashSet<string>(typeInfo.StubOverrideMethods.GetArray() ?? Array.Empty<string>());
 
-		// Build user override properties lookup for base class pattern
-		var userOverrideProperties = new HashSet<string>(typeInfo.UserOverrideProperties.GetArray() ?? Array.Empty<string>());
+		// Build stub override properties lookup for base class pattern
+		var stubOverrideProperties = new HashSet<string>(typeInfo.StubOverrideProperties.GetArray() ?? Array.Empty<string>());
 
 		// Build name map for collision resolution
-		var nameMap = BuildNameMap(typeInfo.FlatMembers, typeInfo.FlatEvents, userOverrideMethods);
+		var nameMap = BuildNameMap(typeInfo.FlatMembers, typeInfo.FlatEvents, stubOverrideMethods);
 
 		// Group methods for overload handling
 		var methodGroups = GroupMethodsByName(typeInfo.FlatMembers.Where(m => !m.IsProperty && !m.IsIndexer));
@@ -39,15 +39,15 @@ internal static class FlatModelBuilder
 
 		// Build models
 		var className = typeInfo.ClassName + SymbolHelpers.FormatTypeParameterList(typeInfo.TypeParameters);
-		var properties = BuildPropertyModels(typeInfo, nameMap, className, userOverrideProperties);
+		var properties = BuildPropertyModels(typeInfo, nameMap, className, stubOverrideProperties);
 		var indexers = BuildIndexerModels(typeInfo, nameMap, indexerCount, className);
 		var (methods, genericHandlers) = BuildMethodModels(typeInfo, nameMap, methodGroups, className);
 		var events = BuildEventModels(typeInfo, nameMap);
 
 		// Group non-generic methods by interceptor name for multi-overload support
-		// Exclude methods with user implementations (HasUserOverride)
+		// Exclude methods with user implementations (HasStubOverride)
 		var flatMethodGroups = methods
-			.Where(m => !m.IsGenericMethod && !m.HasUserOverride)
+			.Where(m => !m.IsGenericMethod && !m.HasStubOverride)
 			.GroupBy(m => m.InterceptorName)
 			.Select(g => new FlatMethodGroup(
 				InterceptorName: g.Key,
@@ -56,10 +56,10 @@ internal static class FlatModelBuilder
 				Methods: new EquatableArray<FlatMethodModel>(g.ToArray())))
 			.ToList();
 
-		// Group user methods by interceptor name for per-signature RecordCall support
-		// This groups methods where HasUserOverride (base class pattern)
-		var flatUserMethodGroups = methods
-			.Where(m => !m.IsGenericMethod && m.HasUserOverride)
+		// Group stub overrides by interceptor name for per-signature RecordCall support
+		// This groups methods where HasStubOverride (base class pattern)
+		var flatStubOverrideGroups = methods
+			.Where(m => !m.IsGenericMethod && m.HasStubOverride)
 			.GroupBy(m => m.InterceptorName)
 			.Select(g => new FlatMethodGroup(
 				InterceptorName: g.Key,
@@ -87,8 +87,8 @@ internal static class FlatModelBuilder
 		// Build source providers for Source(T) methods
 		var sourceProviders = BuildSourceProviders(typeInfo.Interfaces, properties, indexers, flatIndexerGroups, methods, genericHandlers, nameMap);
 
-		// Build generic user method handler groups (for overloaded generic user methods)
-		var genericUserMethodHandlerGroups = BuildGenericUserMethodHandlerGroups(methods, nameMap);
+		// Build generic stub override handler groups (for overloaded generic stub overrides)
+		var genericStubOverrideHandlerGroups = BuildGenericStubOverrideHandlerGroups(methods, nameMap);
 
 		return new FlatGenerationUnit(
 			ClassName: typeInfo.ClassName,
@@ -101,9 +101,9 @@ internal static class FlatModelBuilder
 			IndexerGroups: new EquatableArray<FlatIndexerGroup>(flatIndexerGroups.ToArray()),
 			Methods: methods,
 			MethodGroups: new EquatableArray<FlatMethodGroup>(flatMethodGroups.ToArray()),
-			UserMethodGroups: new EquatableArray<FlatMethodGroup>(flatUserMethodGroups.ToArray()),
+			StubOverrideGroups: new EquatableArray<FlatMethodGroup>(flatStubOverrideGroups.ToArray()),
 			GenericMethodHandlers: genericHandlers,
-			GenericUserMethodHandlerGroups: genericUserMethodHandlerGroups,
+			GenericStubOverrideHandlerGroups: genericStubOverrideHandlerGroups,
 			Events: events,
 			SourceProviders: sourceProviders,
 			HasGenericMethods: genericHandlers.Count > 0 || methods.Any(m => m.IsGenericMethod),
@@ -121,12 +121,12 @@ internal static class FlatModelBuilder
 	private static Dictionary<string, string> BuildNameMap(
 		EquatableArray<InterfaceMemberInfo> flatMembers,
 		EquatableArray<EventMemberInfo> flatEvents,
-		HashSet<string> userOverrideMethods)
+		HashSet<string> stubOverrideMethods)
 	{
 		var nameMap = new Dictionary<string, string>();
 		var usedNames = new HashSet<string>();
 
-		// Note: User override methods use MethodName_ suffix so they don't conflict
+		// Note: Stub override methods use MethodName_ suffix so they don't conflict
 		// with interceptor properties named MethodName.
 
 		// Count indexers to determine naming strategy
@@ -167,8 +167,8 @@ internal static class FlatModelBuilder
 			if (isMixed)
 			{
 				// Mixed group: handle non-generic and generic overloads separately
-				// For non-generic, split by user override presence
-				AssignNamesForOverloadGroup(methodName, nonGenericOverloads, userOverrideMethods, nameMap, usedNames);
+				// For non-generic, split by stub override presence
+				AssignNamesForOverloadGroup(methodName, nonGenericOverloads, stubOverrideMethods, nameMap, usedNames);
 
 				// Generic overloads use a handler with Generic suffix
 				var genericName = methodName + GenericSuffix;
@@ -201,8 +201,8 @@ internal static class FlatModelBuilder
 			}
 			else
 			{
-				// Non-generic overloads - split by user override presence
-				AssignNamesForOverloadGroup(methodName, overloads, userOverrideMethods, nameMap, usedNames);
+				// Non-generic overloads - split by stub override presence
+				AssignNamesForOverloadGroup(methodName, overloads, stubOverrideMethods, nameMap, usedNames);
 			}
 		}
 
@@ -256,37 +256,37 @@ internal static class FlatModelBuilder
 
 	/// <summary>
 	/// Assigns interceptor names for a group of method overloads with the same name.
-	/// Handles partial user override coverage: overloads WITH user overrides get one name,
-	/// overloads WITHOUT user overrides get a different name.
-	/// Uses base class pattern UserOverrideMethods only.
+	/// Handles partial stub override coverage: overloads WITH stub overrides get one name,
+	/// overloads WITHOUT stub overrides get a different name.
+	/// Uses base class pattern StubOverrideMethods only.
 	/// </summary>
 	private static void AssignNamesForOverloadGroup(
 		string methodName,
 		List<InterfaceMemberInfo> overloads,
-		HashSet<string> userOverrideMethods,
+		HashSet<string> stubOverrideMethods,
 		Dictionary<string, string> nameMap,
 		HashSet<string> usedNames)
 	{
-		// Split overloads by whether they have a matching user override (base class pattern)
-		var withUserOverride = overloads.Where(o => HasMatchingUserOverride(o, userOverrideMethods)).ToList();
-		var withoutUserOverride = overloads.Where(o => !HasMatchingUserOverride(o, userOverrideMethods)).ToList();
+		// Split overloads by whether they have a matching stub override (base class pattern)
+		var withStubOverride = overloads.Where(o => HasMatchingStubOverride(o, stubOverrideMethods)).ToList();
+		var withoutStubOverride = overloads.Where(o => !HasMatchingStubOverride(o, stubOverrideMethods)).ToList();
 
-		if (withUserOverride.Count > 0 && withoutUserOverride.Count > 0)
+		if (withStubOverride.Count > 0 && withoutStubOverride.Count > 0)
 		{
-			// Partial coverage: overloads are split between user override and regular interceptors
-			// Overloads WITH user overrides use one interceptor name
-			var userOverrideName = GetUniqueInterceptorName(methodName, usedNames);
-			usedNames.Add(userOverrideName);
-			foreach (var overload in withUserOverride)
+			// Partial coverage: overloads are split between stub override and regular interceptors
+			// Overloads WITH stub overrides use one interceptor name
+			var stubOverrideName = GetUniqueInterceptorName(methodName, usedNames);
+			usedNames.Add(stubOverrideName);
+			foreach (var overload in withStubOverride)
 			{
 				var key = GetMemberKey(overload);
-				nameMap[key] = userOverrideName;
+				nameMap[key] = stubOverrideName;
 			}
 
-			// Overloads WITHOUT user overrides use a different interceptor name
+			// Overloads WITHOUT stub overrides use a different interceptor name
 			var regularName = GetUniqueInterceptorName(methodName, usedNames);
 			usedNames.Add(regularName);
-			foreach (var overload in withoutUserOverride)
+			foreach (var overload in withoutStubOverride)
 			{
 				var key = GetMemberKey(overload);
 				nameMap[key] = regularName;
@@ -294,7 +294,7 @@ internal static class FlatModelBuilder
 		}
 		else
 		{
-			// All overloads are the same (all with user overrides or all without)
+			// All overloads are the same (all with stub overrides or all without)
 			// They share a single interceptor name
 			var finalName = GetUniqueInterceptorName(methodName, usedNames);
 			usedNames.Add(finalName);
@@ -314,7 +314,7 @@ internal static class FlatModelBuilder
 		KnockOffTypeInfo typeInfo,
 		Dictionary<string, string> nameMap,
 		string className,
-		HashSet<string> userOverrideProperties)
+		HashSet<string> stubOverrideProperties)
 	{
 		var properties = new List<FlatPropertyModel>();
 		var generatedImplementations = new HashSet<string>();
@@ -349,8 +349,8 @@ internal static class FlatModelBuilder
 				var (delegationTarget, delegationInterface) = FindPropertyDelegationTarget(member, typeInfo.Interfaces);
 
 				// Check if this property has a user-defined override (base class pattern)
-				// User overrides use PropertyName_ suffix convention
-				var hasUserOverride = userOverrideProperties.Contains(member.Name + "_");
+				// Stub overrides use PropertyName_ suffix convention
+				var hasStubOverride = stubOverrideProperties.Contains(member.Name + "_");
 
 				properties.Add(new FlatPropertyModel(
 					InterceptorName: interceptorName,
@@ -369,7 +369,7 @@ internal static class FlatModelBuilder
 					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
 					DelegationTarget: delegationTarget,
 					DelegationTargetInterface: delegationInterface,
-					HasUserOverride: hasUserOverride,
+					HasStubOverride: hasStubOverride,
 					ReturnsByRef: member.ReturnsByRef,
 					ReturnsByRefReadonly: member.ReturnsByRefReadonly));
 			}
@@ -657,11 +657,11 @@ internal static class FlatModelBuilder
 		var processedGenericGroups = new HashSet<string>();
 		var generatedImplementations = new HashSet<string>();
 
-		// Build user override method lookup for base class pattern
-		var userOverrideMethods = new HashSet<string>(typeInfo.UserOverrideMethods.GetArray() ?? Array.Empty<string>());
+		// Build stub override method lookup for base class pattern
+		var stubOverrideMethods = new HashSet<string>(typeInfo.StubOverrideMethods.GetArray() ?? Array.Empty<string>());
 
 		// First pass: Build generic method handlers from FlatMembers (deduplicated)
-		// Note: Generic methods do not support user override methods by design
+		// Note: Generic methods do not support stub override methods by design
 		foreach (var member in typeInfo.FlatMembers)
 		{
 			if (member.IsProperty || member.IsIndexer)
@@ -727,7 +727,7 @@ internal static class FlatModelBuilder
 				}
 				else
 				{
-					var model = BuildMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface, signatureSuffix, userOverrideMethods);
+					var model = BuildMethodModel(member, interceptorName, typeInfo, className, delegationTarget, delegationInterface, signatureSuffix, stubOverrideMethods);
 					methods.Add(model);
 				}
 			}
@@ -736,7 +736,7 @@ internal static class FlatModelBuilder
 		// Third pass: Determine which methods are part of overload groups
 		// A method is part of an overload group if there are multiple methods with the same InterceptorName
 		var interceptorNameCounts = methods
-			.Where(m => !m.IsGenericMethod && !m.HasUserOverride)
+			.Where(m => !m.IsGenericMethod && !m.HasStubOverride)
 			.GroupBy(m => m.InterceptorName)
 			.ToDictionary(g => g.Key, g => g.Count());
 
@@ -744,7 +744,7 @@ internal static class FlatModelBuilder
 		{
 			// Check if this method's interceptor name appears multiple times
 			var isPartOfOverloadGroup = !m.IsGenericMethod &&
-			                            !m.HasUserOverride &&
+			                            !m.HasStubOverride &&
 			                            interceptorNameCounts.TryGetValue(m.InterceptorName, out var count) &&
 			                            count > 1;
 			return m with { IsPartOfOverloadGroup = isPartOfOverloadGroup };
@@ -761,7 +761,7 @@ internal static class FlatModelBuilder
 		InterfaceMemberInfo? delegationTarget,
 		string? delegationInterface,
 		string signatureSuffix,
-		HashSet<string> userOverrideMethods)
+		HashSet<string> stubOverrideMethods)
 	{
 		var interceptorClassName = $"{interceptorName}Interceptor";
 		var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
@@ -860,7 +860,7 @@ internal static class FlatModelBuilder
 			CustomDelegateSignature: customDelegateSignature,
 			DefaultExpression: defaultExpr,
 			ThrowsOnDefault: throwsOnDefault,
-			HasUserOverride: userOverrideMethods.Contains(BuildOverrideSignatureKeyFromMember(member)),
+			HasStubOverride: stubOverrideMethods.Contains(BuildOverrideSignatureKeyFromMember(member)),
 			SimpleInterfaceName: simpleIfaceName,
 			TypeParameterDecl: "",
 			TypeParameterList: "",
@@ -979,7 +979,7 @@ internal static class FlatModelBuilder
 			CustomDelegateSignature: delegateSignature,
 			DefaultExpression: defaultExpr,
 			ThrowsOnDefault: throwsOnDefault,
-			HasUserOverride: false, // Generic methods excluded from base class pattern per design
+			HasStubOverride: false, // Generic methods excluded from base class pattern per design
 			SimpleInterfaceName: simpleIfaceName,
 			TypeParameterDecl: typeParamDecl,
 			TypeParameterList: typeParamList,
@@ -1122,15 +1122,15 @@ internal static class FlatModelBuilder
 	}
 
 	/// <summary>
-	/// Builds generic user method handler groups.
-	/// Generic methods do not support user overrides by design.
+	/// Builds generic stub override handler groups.
+	/// Generic methods do not support stub overrides by design.
 	/// This method returns empty and is kept for API compatibility.
 	/// </summary>
-	private static EquatableArray<FlatGenericMethodHandlerGroup> BuildGenericUserMethodHandlerGroups(
+	private static EquatableArray<FlatGenericMethodHandlerGroup> BuildGenericStubOverrideHandlerGroups(
 		EquatableArray<FlatMethodModel> methods,
 		Dictionary<string, string> nameMap)
 	{
-		// Generic methods do not support user overrides by design
+		// Generic methods do not support stub overrides by design
 		return new EquatableArray<FlatGenericMethodHandlerGroup>(Array.Empty<FlatGenericMethodHandlerGroup>());
 	}
 
@@ -1533,7 +1533,7 @@ internal static class FlatModelBuilder
 	};
 
 	/// <summary>
-	/// Builds a signature key from InterfaceMemberInfo for matching against user override methods.
+	/// Builds a signature key from InterfaceMemberInfo for matching against stub override methods.
 	/// Delegates to SymbolHelpers.BuildOverrideSignatureKey shared implementation.
 	/// </summary>
 	private static string BuildOverrideSignatureKeyFromMember(InterfaceMemberInfo member)
@@ -1733,13 +1733,13 @@ internal static class FlatModelBuilder
 		ObjectMemberNames.Contains(interceptorName);
 
 	/// <summary>
-	/// Checks if an interface member has a matching user override method (base class pattern).
-	/// Uses the signature key format from DetectUserOverrideMethods.
+	/// Checks if an interface member has a matching stub override method (base class pattern).
+	/// Uses the signature key format from DetectStubOverrideMethods.
 	/// </summary>
-	private static bool HasMatchingUserOverride(InterfaceMemberInfo member, HashSet<string> userOverrideMethods)
+	private static bool HasMatchingStubOverride(InterfaceMemberInfo member, HashSet<string> stubOverrideMethods)
 	{
 		var signatureKey = BuildOverrideSignatureKeyFromMember(member);
-		return userOverrideMethods.Contains(signatureKey);
+		return stubOverrideMethods.Contains(signatureKey);
 	}
 
 	#endregion
@@ -1812,9 +1812,9 @@ internal static class FlatModelBuilder
 
 		foreach (var method in methods)
 		{
-			// Skip user override implementations and delegation targets
-			// User overrides don't support source delegation - they have fixed implementations
-			if (method.HasUserOverride || method.DelegationTarget != null)
+			// Skip stub override implementations and delegation targets
+			// Stub overrides don't support source delegation - they have fixed implementations
+			if (method.HasStubOverride || method.DelegationTarget != null)
 				continue;
 			// Skip generic methods - they use handlers, not direct interceptors
 			if (method.IsGenericMethod)

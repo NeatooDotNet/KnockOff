@@ -40,7 +40,7 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
 
 ## Plans
 
-- [User Properties Design](../plans/user-properties-design.md)
+- [User Properties Design](../plans/stub-override-properties-design.md)
 
 ---
 
@@ -51,7 +51,7 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
 - [x] Implement override detection for properties
 - [x] Integrate with existing interceptor tracking (VerifyGet, VerifySet, LastSetValue)
 - [x] Support OnGet/OnSet superseding user overrides (like OnCall supersedes user methods)
-- [x] Add Design.Stubs examples in UserMethods/ or new UserProperties/ folder
+- [x] Add Design.Stubs examples in UserMethods/ or new StubOverrideProperties/ folder
 - [x] Add tests for all applicable patterns
 - [x] Update skill documentation
 
@@ -73,7 +73,7 @@ public partial class MyRepoStub(List<User> Users) : IMyRepo
 
 **2026-02-04:** Implementation completed using 3-agent approach:
 - Generator Agent (Phases 1-3): Model changes, base class generation, interceptor methods
-- Examples Agent (Phase 4): UserPropertyBasics.cs with all 4 patterns
+- Examples Agent (Phase 4): StubOverridePropertyBasics.cs with all 4 patterns
 - Tests & Docs Agent (Phases 5-6): 25 tests + skill documentation
 
 **2026-02-04:** Discovered patterns 3-4 (standalone class) needed additional generator work. Extended generator to support all 4 standalone patterns.

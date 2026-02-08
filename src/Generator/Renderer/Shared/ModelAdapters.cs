@@ -87,8 +87,8 @@ internal static class ModelAdapters
 			BuilderInterface: GetBuilderInterface(first.TrackableParameters, first.LastCallType, delegateTypeForBuilder, first.IsVoid),
 			DefaultExpression: first.DefaultExpression,
 			ThrowsOnDefault: first.ThrowsOnDefault,
-			// User method name: if HasUserOverride, the user method name is MethodName + "_"
-			UserMethodName: first.HasUserOverride ? $"{first.MethodName}_" : null,
+			// Stub override name: if HasStubOverride, the stub override name is MethodName + "_"
+			StubOverrideName: first.HasStubOverride ? $"{first.MethodName}_" : null,
 			Overloads: EquatableArray<MethodOverloadSignature>.Empty,
 			ReturnsByRef: first.ReturnsByRef,
 			ReturnsByRefReadonly: first.ReturnsByRefReadonly);
@@ -136,15 +136,15 @@ internal static class ModelAdapters
 				BuilderInterface: GetBuilderInterface(method.TrackableParameters, method.LastCallType, delegateName, method.IsVoid),
 				DefaultExpression: method.DefaultExpression,
 				ThrowsOnDefault: method.ThrowsOnDefault,
-				// Per-signature user method name for mixed overload groups
-				UserMethodName: method.HasUserOverride ? $"{method.MethodName}_" : null,
+				// Per-signature stub override name for mixed overload groups
+				StubOverrideName: method.HasStubOverride ? $"{method.MethodName}_" : null,
 				ReturnsByRef: method.ReturnsByRef,
 				ReturnsByRefReadonly: method.ReturnsByRefReadonly));
 		}
 
-		// For overload groups, check if any method has user override (for model-level tracking)
-		// Per-signature user methods are tracked in MethodOverloadSignature.UserMethodName
-		var anyHasUserOverride = methods.Any(m => m.HasUserOverride);
+		// For overload groups, check if any method has stub override (for model-level tracking)
+		// Per-signature stub overrides are tracked in MethodOverloadSignature.StubOverrideName
+		var anyHasStubOverride = methods.Any(m => m.HasStubOverride);
 
 		return new UnifiedMethodInterceptorModel(
 			InterceptorClassName: group.InterceptorClassName,
@@ -166,8 +166,8 @@ internal static class ModelAdapters
 			BuilderInterface: "global::KnockOff.IMethodTracking",
 			DefaultExpression: first.DefaultExpression,
 			ThrowsOnDefault: first.ThrowsOnDefault,
-			// For overload groups, user method is tracked per-signature (see overloads below)
-			UserMethodName: anyHasUserOverride ? $"{first.MethodName}_" : null,
+			// For overload groups, stub override is tracked per-signature (see overloads below)
+			StubOverrideName: anyHasStubOverride ? $"{first.MethodName}_" : null,
 			Overloads: new EquatableArray<MethodOverloadSignature>(overloads.ToArray()),
 			ReturnsByRef: first.ReturnsByRef,
 			ReturnsByRefReadonly: first.ReturnsByRefReadonly);
@@ -343,7 +343,7 @@ internal static class ModelAdapters
 
 	/// <summary>
 	/// Converts an InlineDelegateStubModel to UnifiedMethodInterceptorModel and InterceptorRenderOptions.
-	/// A delegate maps to a single non-overloaded method with no declaring interface, no user method, no ref/out.
+	/// A delegate maps to a single non-overloaded method with no declaring interface, no stub override, no ref/out.
 	/// </summary>
 	public static (UnifiedMethodInterceptorModel Model, InterceptorRenderOptions Options) ToUnifiedModel(InlineDelegateStubModel del)
 	{
@@ -370,7 +370,7 @@ internal static class ModelAdapters
 			BuilderInterface: builderInterface,
 			DefaultExpression: del.DefaultExpression,
 			ThrowsOnDefault: false,
-			UserMethodName: null,
+			StubOverrideName: null,
 			Overloads: EquatableArray<MethodOverloadSignature>.Empty);
 
 		var options = new InterceptorRenderOptions(
@@ -379,7 +379,7 @@ internal static class ModelAdapters
 			StrictAccessExpression: "strict",
 			InterceptorTypeParameters: del.TypeParameterList,
 			InterceptorConstraints: del.ConstraintClauses,
-			UserMethodFallback: false,
+			StubOverrideFallback: false,
 			StubTypeName: null);
 
 		return (model, options);

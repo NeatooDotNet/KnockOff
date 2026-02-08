@@ -201,7 +201,7 @@ stub.Add.Return(42);
 | `ThenWhen()` chaining | ✓ |
 | Fallback behavior | ✓ |
 
-**Priority:** When chains > Sequences > Return/Call > User Methods > Source > Smart default
+**Priority:** When chains > Sequences > Return/Call > Stub Overrides > Source > Smart default
 
 ---
 
@@ -286,7 +286,7 @@ Reset clears:
 
 ---
 
-## Feature 11: User Methods
+## Feature 11: Stub Overrides
 
 This is the one feature with intentional variation:
 
@@ -299,11 +299,11 @@ This is the one feature with intentional variation:
 
 **All four standalone patterns** allow user-defined methods in the partial class.
 
-### Defining a user method (interface stubs, patterns 1, 2)
+### Defining a stub override (interface stubs, patterns 1, 2)
 
-<!-- snippet: matrix-user-methods-interface -->
+<!-- snippet: matrix-stub-overrides-interface -->
 ```cs
-public partial class MatrixUserMethodStub
+public partial class MatrixStubOverrideStub
 {
     protected override int Add_(int a, int b) => a + b;
 }
@@ -312,16 +312,16 @@ public partial class MatrixUserMethodStub
 
 ### Usage and Returns override
 
-<!-- snippet: matrix-user-methods-interface-usage -->
+<!-- snippet: matrix-stub-overrides-interface-usage -->
 ```cs
-var stub = new MatrixUserMethodStub();
+var stub = new MatrixStubOverrideStub();
 IMatrixCalculator calc = stub;
 
-// User method provides default behavior
+// Stub override provides default behavior
 var result = calc.Add(3, 4);
 Assert.Equal(7, result);
 
-// Return supersedes user method
+// Return supersedes stub override
 stub.Add.Return((a, b) => 999);
 var overridden = calc.Add(3, 4);
 Assert.Equal(999, overridden);
@@ -331,17 +331,17 @@ Assert.Equal(999, overridden);
 ### Class stubs (patterns 3, 4)
 
 Class stubs use the same `protected override MethodName_(...)` convention. Key differences:
-- **Abstract methods**: User method IS the default behavior (no base implementation exists)
-- **Virtual methods**: User method completely replaces the `base.Method()` call -- the user override IS the fallback, not a supplement to the base call
-- **Without user override**: Virtual methods retain the standard interceptor path with `base.Method()` fallback
+- **Abstract methods**: Stub override IS the default behavior (no base implementation exists)
+- **Virtual methods**: Stub override completely replaces the `base.Method()` call -- the stub override IS the fallback, not a supplement to the base call
+- **Without stub override**: Virtual methods retain the standard interceptor path with `base.Method()` fallback
 
 ### Priority chain
 
-User methods sit between Return/Call and Source in the priority chain:
+Stub overrides sit between Return/Call and Source in the priority chain:
 
-`When chains > Sequences > Return/Call > User Method > Source > Smart default`
+`When chains > Sequences > Return/Call > Stub Override > Source > Smart default`
 
-**Inline patterns** are fully generated and cannot be extended. See the [User Methods Guide](user-methods.md) for detailed examples.
+**Inline patterns** are fully generated and cannot be extended. See the [Stub Overrides Guide](stub-overrides.md) for detailed examples.
 
 ---
 
@@ -390,7 +390,7 @@ stub.GetDataAsync.Return((int id) => Task.FromResult($"Full-{id}"));
 | Strict Mode | ✓ **100% consistent** |
 | Reset | ✓ **100% consistent** |
 | Target Access | ✓ **Logical split** (Interface=direct, Class=`.Object`) |
-| User Methods | ✓ **Logical split** (Standalone=yes, Inline=no) |
+| Stub Overrides | ✓ **Logical split** (Standalone=yes, Inline=no) |
 | Async Auto-Wrapping | ✓ **100% consistent** (all 9 patterns) |
 
 ---
@@ -440,6 +440,6 @@ Class stubs use a composition pattern (wrapper + nested Impl) to avoid C# compil
 
 The `.Object` property returns the nested Impl instance that actually inherits from the target class.
 
-### Why Only Standalone Patterns Support User Methods
+### Why Only Standalone Patterns Support Stub Overrides
 
 Inline stubs are fully generated inside the test class's `Stubs` namespace. There's no partial class for users to extend. Standalone stubs are partial classes that users define, allowing them to add custom methods, constructors, and (for class stubs) override base class methods.

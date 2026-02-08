@@ -61,8 +61,8 @@ Indexers/              # Indexer stubbing
 Events/                # Event stubbing
   EventPatterns.cs     # Handler, VerifyAdd, VerifyRemove
 
-UserMethods/           # User-defined methods
-  UserMethodBasics.cs  # Base class pattern with protected override
+StubOverrides/           # Stub overrides
+  StubOverrideBasics.cs  # Base class pattern with protected override
 
 Advanced/              # Advanced features
   SourceDelegation.cs  # Source() for partial mocking

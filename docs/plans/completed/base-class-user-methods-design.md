@@ -1,7 +1,7 @@
 # Base Class User Methods Design
 
 **Date:** 2026-02-02
-**Related Todo:** [Base Class User Methods](../todos/base-class-user-methods.md)
+**Related Todo:** [Base Class User Methods](../todos/base-class-stub-overrides.md)
 **Status:** Ready for Implementation
 **Last Updated:** 2026-02-02
 

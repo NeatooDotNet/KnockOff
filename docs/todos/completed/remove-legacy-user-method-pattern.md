@@ -17,7 +17,7 @@ The base class user methods feature was implemented as a **breaking change** tha
 
 2. **Documentation.Samples was overlooked** - The Implementation Contract listed files to migrate but completely missed `KnockOff.Documentation.Samples/UserMethodsSamples.cs`, which is the source for public markdown documentation via mdsnippets.
 
-3. **Documentation is internally inconsistent** - The markdown prose in `docs/guides/user-methods.md` describes the new pattern (override + underscore), but the code samples show the old pattern (plain protected methods).
+3. **Documentation is internally inconsistent** - The markdown prose in `docs/guides/stub-overrides.md` describes the new pattern (override + underscore), but the code samples show the old pattern (plain protected methods).
 
 4. **mdsnippets was never run** - After updating samples, mdsnippets should verify the sync works.
 

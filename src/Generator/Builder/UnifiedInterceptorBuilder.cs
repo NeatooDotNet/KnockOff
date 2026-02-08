@@ -26,7 +26,7 @@ internal static class UnifiedInterceptorBuilder
 	/// <param name="ownerClassName">The class name that owns this interceptor.</param>
 	/// <param name="ownerTypeParameters">Type parameters on the owner class.</param>
 	/// <param name="overloads">The method signatures (one or more for overload groups).</param>
-	/// <param name="userMethodName">Optional user method name for fallback (e.g., "Process_"). Null if no user override.</param>
+	/// <param name="stubOverrideName">Optional stub override name for fallback (e.g., "Process_"). Null if no stub override.</param>
 	public static UnifiedMethodInterceptorModel BuildMethodInterceptor(
 		string interceptorClassName,
 		string methodName,
@@ -34,7 +34,7 @@ internal static class UnifiedInterceptorBuilder
 		string ownerClassName,
 		string ownerTypeParameters,
 		IReadOnlyList<MethodSignatureInfo> overloads,
-		string? userMethodName = null)
+		string? stubOverrideName = null)
 	{
 		if (overloads.Count == 0)
 			throw new ArgumentException("At least one overload is required", nameof(overloads));
@@ -68,7 +68,7 @@ internal static class UnifiedInterceptorBuilder
 				BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateTypeForBuilder, sig.IsVoid),
 				DefaultExpression: sig.DefaultExpression,
 				ThrowsOnDefault: sig.ThrowsOnDefault,
-				UserMethodName: userMethodName,
+				StubOverrideName: stubOverrideName,
 				Overloads: EquatableArray<MethodOverloadSignature>.Empty,
 				ReturnsByRef: sig.ReturnsByRef,
 				ReturnsByRefReadonly: sig.ReturnsByRefReadonly);
@@ -98,10 +98,10 @@ internal static class UnifiedInterceptorBuilder
 				BuilderInterface: "global::KnockOff.IMethodTracking",
 				DefaultExpression: first.DefaultExpression,
 				ThrowsOnDefault: first.ThrowsOnDefault,
-				// For multi-overload, user method is tracked per-signature (see MethodOverloadSignature.UserMethodName)
-				UserMethodName: userMethodName,
+				// For multi-overload, stub override is tracked per-signature (see MethodOverloadSignature.StubOverrideName)
+				StubOverrideName: stubOverrideName,
 				Overloads: new EquatableArray<MethodOverloadSignature>(
-					uniqueSignatures.Select(sig => BuildOverloadSignature(methodName, sig, ownerClassName, ownerTypeParameters, userMethodName)).ToArray()),
+					uniqueSignatures.Select(sig => BuildOverloadSignature(methodName, sig, ownerClassName, ownerTypeParameters, stubOverrideName)).ToArray()),
 				ReturnsByRef: first.ReturnsByRef,
 				ReturnsByRefReadonly: first.ReturnsByRefReadonly);
 		}
@@ -147,7 +147,7 @@ internal static class UnifiedInterceptorBuilder
 		MethodSignatureInfo sig,
 		string ownerClassName,
 		string ownerTypeParameters,
-		string? userMethodName = null)
+		string? stubOverrideName = null)
 	{
 		var suffix = GetSignatureSuffix(sig.Parameters, sig.ReturnType);
 		var delegateName = $"{methodName}Delegate_{suffix}";
@@ -171,7 +171,7 @@ internal static class UnifiedInterceptorBuilder
 			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateName, sig.IsVoid),
 			DefaultExpression: sig.DefaultExpression,
 			ThrowsOnDefault: sig.ThrowsOnDefault,
-			UserMethodName: sig.UserMethodName,
+			StubOverrideName: sig.StubOverrideName,
 			ReturnsByRef: sig.ReturnsByRef,
 			ReturnsByRefReadonly: sig.ReturnsByRefReadonly);
 	}
@@ -537,8 +537,8 @@ internal sealed record MethodSignatureInfo(
 	bool HasRefOrOutParams,
 	string DefaultExpression,
 	bool ThrowsOnDefault,
-	/// <summary>Per-signature user method name for partial overload coverage. Null if no user override for this signature.</summary>
-	string? UserMethodName = null,
+	/// <summary>Per-signature stub override name for partial overload coverage. Null if no stub override for this signature.</summary>
+	string? StubOverrideName = null,
 	/// <summary>True if the method returns by ref (ref T).</summary>
 	bool ReturnsByRef = false,
 	/// <summary>True if the method returns by ref readonly (ref readonly T).</summary>

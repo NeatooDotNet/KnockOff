@@ -28,7 +28,7 @@ internal sealed record FlatMethodModel(
     string DefaultExpression,
     bool ThrowsOnDefault,
     /// <summary>True if user provided a protected override method (base class pattern).</summary>
-    bool HasUserOverride,
+    bool HasStubOverride,
     string SimpleInterfaceName,
     string TypeParameterDecl,
     string TypeParameterList,

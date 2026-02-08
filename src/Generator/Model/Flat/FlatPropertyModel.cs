@@ -26,9 +26,9 @@ internal sealed record FlatPropertyModel(
     string? DelegationTargetInterface,
     /// <summary>
     /// True if the user has defined a "protected override" property with the _ suffix
-    /// in their partial class (base class user property pattern).
+    /// in their partial class (base class stub override property pattern).
     /// </summary>
-    bool HasUserOverride = false,
+    bool HasStubOverride = false,
 
     // Ref return support
     /// <summary>True if the property returns by ref (ref T).</summary>

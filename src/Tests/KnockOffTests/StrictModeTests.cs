@@ -270,45 +270,45 @@ public class StrictModeTests
 
 	#endregion
 
-	#region User Method Tests
+	#region Stub Override Tests
 
 	[Fact]
-	public void StandaloneStub_Strict_UserMethod_DoesNotThrow()
+	public void StandaloneStub_Strict_StubOverride_DoesNotThrow()
 	{
-		// User methods bypass strict mode - they ARE the configuration
-		var stub = new StrictModeUserMethodStub().Strict();
-		IStrictModeUserMethodTest service = stub;
+		// Stub overrides bypass strict mode - they ARE the configuration
+		var stub = new StrictModeStubOverrideStub().Strict();
+		IStrictModeStubOverrideTest service = stub;
 
-		// User method executes normally even in strict mode
+		// Stub override executes normally even in strict mode
 		var result = service.GetValue(5);
 
-		Assert.Equal(50, result); // User method multiplies by 10
+		Assert.Equal(50, result); // Stub override multiplies by 10
 		stub.GetValue.Verify(Called.Once);
 		Assert.Equal(5, stub.GetValue.LastArg);
 	}
 
 	[Fact]
-	public void StandaloneStub_Strict_UserMethod_NonUserMethodStillThrows()
+	public void StandaloneStub_Strict_StubOverride_NonStubOverrideStillThrows()
 	{
-		// User methods work, but non-user-method members still throw
-		var stub = new StrictModeUserMethodStub().Strict();
-		IStrictModeUserMethodTest service = stub;
+		// Stub overrides work, but non-stub-override members still throw
+		var stub = new StrictModeStubOverrideStub().Strict();
+		IStrictModeStubOverrideTest service = stub;
 
-		// User method works
+		// Stub override works
 		var result = service.GetValue(5);
 		Assert.Equal(50, result);
 
-		// Non-user-method property still throws
+		// Non-stub-override property still throws
 		Assert.Throws<StubException>(() => _ = service.Name);
 	}
 
 	[Fact]
 	public void StandaloneStub_Strict_UserVoidMethod_DoesNotThrow()
 	{
-		var stub = new StrictModeUserMethodStub().Strict();
-		IStrictModeUserMethodTest service = stub;
+		var stub = new StrictModeStubOverrideStub().Strict();
+		IStrictModeStubOverrideTest service = stub;
 
-		// Void user method executes without throwing
+		// Void stub override executes without throwing
 		service.DoSomething();
 
 		stub.DoSomething.Verify(Called.Once);
@@ -357,9 +357,9 @@ public partial class StrictModeInlineTests
 
 #endregion
 
-#region User Method Interface and Stub
+#region Stub Override Interface and Stub
 
-public interface IStrictModeUserMethodTest
+public interface IStrictModeStubOverrideTest
 {
 	string Name { get; set; }
 	int GetValue(int x);
@@ -367,25 +367,25 @@ public interface IStrictModeUserMethodTest
 }
 
 [KnockOff]
-public partial class StrictModeUserMethodStub : IStrictModeUserMethodTest
+public partial class StrictModeStubOverrideStub : IStrictModeStubOverrideTest
 {
 }
 
-public partial class StrictModeUserMethodStub
+public partial class StrictModeStubOverrideStub
 {
-	// User method - bypasses strict mode
+	// Stub override - bypasses strict mode
 	protected override int GetValue_(int x)
 	{
 		return x * 10;
 	}
 
-	// User void method - bypasses strict mode
+	// Void stub override - bypasses strict mode
 	protected override void DoSomething_()
 	{
 		// Intentionally empty - just proves it doesn't throw
 	}
 
-	// Name property has NO user method - will throw in strict mode
+	// Name property has NO stub override - will throw in strict mode
 }
 
 #endregion

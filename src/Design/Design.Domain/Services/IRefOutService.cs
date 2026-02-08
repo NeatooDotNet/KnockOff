@@ -5,7 +5,7 @@
 //
 // KEY CONSTRAINT: Func<> and Action<> delegates cannot have ref/out parameters.
 // This means lambda-based APIs (Return(callback), Call(callback)) cannot work
-// with ref/out parameters. Only constant Return(value), standalone user methods,
+// with ref/out parameters. Only constant Return(value), standalone stub overrides,
 // and possibly Verify() are expected to work.
 // -----------------------------------------------------------------------------
 

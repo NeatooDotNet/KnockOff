@@ -172,7 +172,7 @@ public class ReusableStubsTests
 
         IOrderRepository repo = stub;
         Assert.Equal(999m, repo.GetTotal(1));  // Override wins
-        Assert.NotNull(repo.GetOrder(1));       // User method still works
+        Assert.NotNull(repo.GetOrder(1));       // Stub override still works
         #endregion
     }
 

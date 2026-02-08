@@ -1,7 +1,7 @@
 # Standalone Class Pipeline: User Method Support for Methods
 
 **Date:** 2026-02-05
-**Related Todo:** [Standalone Class User Methods](../todos/standalone-class-user-methods.md)
+**Related Todo:** [Standalone Class User Methods](../todos/standalone-class-stub-overrides.md)
 **Status:** Complete
 **Last Updated:** 2026-02-05
 
@@ -658,8 +658,8 @@ The standalone class pipeline does not have this constraint. The Impl class call
 | Standalone Class + User Methods (Pattern 3) | **Needs Implementation** | CS0115 at `StandaloneClassUserMethods.cs:55,60` -- base class does not generate virtual methods |
 | Generic Standalone Class + User Methods (Pattern 4) | **Needs Implementation** | CS0115 at `StandaloneClassUserMethods.cs:98,106,115` -- generic base class does not generate virtual methods |
 | Standalone (interface) + User Methods | Verified (existing) | `UserMethodBasics.cs` compiles, `BasicUserMethodStub.g.cs` generates correctly |
-| Standalone Class + User Properties | Verified (existing) | `UserPropertyBasics.cs:512-556` compiles, `ConfigStub.Base.g.cs` generates virtual properties |
-| Generic Standalone Class + User Properties (Pattern 4) | Verified (existing) | `UserPropertyBasics.cs:612-651` compiles, `CacheUserPropertyStub.Base.g.cs` generates virtual properties |
+| Standalone Class + User Properties | Verified (existing) | `StubOverridePropertyBasics.cs:512-556` compiles, `ConfigStub.Base.g.cs` generates virtual properties |
+| Generic Standalone Class + User Properties (Pattern 4) | Verified (existing) | `StubOverridePropertyBasics.cs:612-651` compiles, `CacheStubOverridePropertyStub.Base.g.cs` generates virtual properties |
 
 **Failing Design.Stubs code (acceptance criteria):**
 
@@ -712,7 +712,7 @@ Files examined:
 - `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` -- Already handles `UserMethodFallback` option
 - `src/Generator/Renderer/FlatRenderer.cs` -- Working implementation for interface pipeline user methods
 - `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` -- Working interface pipeline user method examples
-- `src/Design/Design.Stubs/UserProperties/UserPropertyBasics.cs` -- Working standalone class user property examples
+- `src/Design/Design.Stubs/StubOverrideProperties/StubOverridePropertyBasics.cs` -- Working standalone class user property examples
 - `src/Design/Design.Stubs/StubPatterns/AllPatterns.cs` -- Existing standalone class stub without user methods
 - `src/Design/Design.Stubs/Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/StandaloneServiceStub.Base.g.cs` -- Generated base class: only virtual properties, no methods
 - `src/Design/Design.Stubs/Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/StandaloneServiceStub.g.cs` -- Generated Impl: methods delegate to interceptor without user method support
@@ -899,7 +899,7 @@ If any of these occur, STOP and report:
 
 ### Phase 7: Documentation
 - [x] Updated `docs/guides/api-consistency-matrix.md` -- user methods section expanded for standalone class patterns (3, 4)
-- [x] Updated `docs/guides/user-methods.md` -- availability note corrected to include all four standalone patterns
+- [x] Updated `docs/guides/stub-overrides.md` -- availability note corrected to include all four standalone patterns
 - [x] Expanded `src/Design/Design.Stubs/UserMethods/StandaloneClassUserMethods.cs` with documentation comments (replaced acceptance criteria language with working-feature documentation)
 - **Verification**: `dotnet build src/Design/Design.Stubs` succeeded (0 warnings, 0 errors)
 

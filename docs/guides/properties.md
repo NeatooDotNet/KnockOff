@@ -311,9 +311,9 @@ stub.Name.VerifySet(Called.Never);
 
 ---
 
-## User Properties (Standalone Patterns)
+## Stub Override Properties (Standalone Patterns)
 
-When using standalone patterns, you can define **user properties** by overriding the generated base class properties with an underscore suffix. This provides reusable default implementations that work across all tests.
+When using standalone patterns, you can define **stub override properties** by overriding the generated base class properties with an underscore suffix. This provides reusable default implementations that work across all tests.
 
 ### When to Use
 
@@ -326,7 +326,7 @@ When using standalone patterns, you can define **user properties** by overriding
 
 Override protected virtual properties using the underscore suffix convention:
 
-<!-- snippet: user-properties-interface-and-stub -->
+<!-- snippet: stub-override-properties-interface-and-stub -->
 ```cs
 public interface ISkillUserSvc
 {
@@ -371,37 +371,37 @@ public partial class SkillUserSvcStub
 When multiple configurations exist:
 
 1. **Get/Set** - Per-test override (highest priority)
-2. **User property** - Shared default from protected override
+2. **Stub override property** - Shared default from protected override
 3. **Smart default** - Returns `default(T)` or throws in strict mode
 
-<!-- snippet: user-properties-onget-onset-override -->
+<!-- snippet: stub-override-properties-onget-onset-override -->
 ```cs
 var stub = new SkillUserSvcStub();
 stub.SetCount(42);
 
 ISkillUserSvc service = stub;
 
-// Default: user property is called
+// Default: stub override property is called
 var defaultValue = service.Count;  // 42
 
-// Get supersedes the user property for this test
+// Get supersedes the stub override property for this test
 stub.Count.Get(999);
 var overrideValue = service.Count;  // 999
 
-// Set supersedes the user property for this test
+// Set supersedes the stub override property for this test
 var capturedValue = "";
 stub.Name.Set(v => capturedValue = $"Captured: {v}");
 service.Name = "Test";
 // capturedValue == "Captured: Test"
-// The user override's backing field was NOT updated
+// The stub override's backing field was NOT updated
 ```
 <!-- endSnippet -->
 
 ### Tracking Works
 
-User property interceptors provide full tracking even when using the user override:
+Stub override property interceptors provide full tracking even when using the stub override:
 
-<!-- snippet: user-properties-tracking -->
+<!-- snippet: stub-override-properties-tracking -->
 ```cs
 var stub = new SkillUserSvcStub();
 stub.SetCount(100);
@@ -419,9 +419,9 @@ stub.Name.VerifySet(Called.Never);
 
 ### Strict Mode Behavior
 
-User properties bypass strict mode because they ARE configured:
+Stub override properties bypass strict mode because they ARE configured:
 
-<!-- snippet: user-properties-strict-mode -->
+<!-- snippet: stub-override-properties-strict-mode -->
 ```cs
 // [KnockOff(Strict = true)]
 // public partial class StrictSkillUserSvcStub : ISkillUserSvc { }
@@ -435,15 +435,15 @@ User properties bypass strict mode because they ARE configured:
 var stub = new StrictSkillUserSvcStub();
 ISkillUserSvc service = stub;
 
-var count = service.Count;  // 10 (no exception - user override is configured)
+var count = service.Count;  // 10 (no exception - stub override is configured)
 ```
 <!-- endSnippet -->
 
 ### Supported Patterns
 
-User properties work with all four standalone patterns:
+Stub override properties work with all four standalone patterns:
 
-| Pattern | User Property Support |
+| Pattern | Stub Override Property Support |
 |---------|----------------------|
 | Standalone | Yes |
 | Generic Standalone | Yes |

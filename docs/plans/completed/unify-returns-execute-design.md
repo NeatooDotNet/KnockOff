@@ -438,7 +438,7 @@ Key files with highest impact:
 | `docs/guides/delegates.md` | Moderate -- delegate stub examples |
 | `docs/guides/generic-methods.md` | Moderate |
 | `docs/guides/parameter-matching.md` | Moderate -- When chain examples |
-| `docs/guides/user-methods.md` | Moderate -- user method overrides |
+| `docs/guides/stub-overrides.md` | Moderate -- stub overrides |
 | `docs/guides/api-consistency-matrix.md` | Moderate |
 | `docs/guides/source-delegation.md` | Light |
 | `docs/guides/stub-patterns.md` | Heavy -- all 9 patterns show OnCall |
@@ -938,9 +938,9 @@ If any of these occur, STOP and report:
   - `docs/guides/async-patterns.md` -- 11 edits (tier table, headings, code descriptions)
   - `docs/guides/delegates.md` -- 11 edits (headings, tables, prose)
   - `docs/guides/verification.md` -- 5 edits (direct verification, batch, argument, history)
-  - `docs/guides/user-methods.md` -- 7 edits (intro, how it works, override heading, tracking, reset, key takeaways)
+  - `docs/guides/stub-overrides.md` -- 7 edits (intro, how it works, override heading, tracking, reset, key takeaways)
   - `docs/guides/parameter-matching.md` -- 8 edits (problem statement, priority order, combining, state transitions, fallback heading)
-  - `docs/guides/api-consistency-matrix.md` -- 6 edits (feature tables, priority chain, reset, user methods, async)
+  - `docs/guides/api-consistency-matrix.md` -- 6 edits (feature tables, priority chain, reset, stub overrides, async)
   - `docs/guides/source-delegation.md` -- 3 edits (intro, priority order, methods guide link)
   - `docs/guides/stub-patterns.md` -- 2 edits (behavior configuration, next steps link)
   - `docs/guides/advanced-callbacks.md` -- 1 edit (intro description)
@@ -956,7 +956,7 @@ If any of these occur, STOP and report:
 - [x] Ran `dotnet mdsnippets` -- 574 snippets synced, no errors
 - [x] **Checkpoint 5:** `dotnet mdsnippets` succeeds. Full solution tests pass (all 12 test runs, 0 failures). Design.Stubs builds (0 warnings, 0 errors).
 - **Note:** Migration guide (`docs/migration/oncall-to-returns-execute.md`) not yet created -- listed in plan but deferred.
-- **Note:** `.Of<T>().OnCall(...)` references in generic-methods.md and user-methods.md remain unchanged (known generator gap -- typed handlers still generate `OnCall`).
+- **Note:** `.Of<T>().OnCall(...)` references in generic-methods.md and stub-overrides.md remain unchanged (known generator gap -- typed handlers still generate `OnCall`).
 
 **Status:** Phase 5 complete (migration guide deferred). Ready for Phase 6 (Cleanup).
 

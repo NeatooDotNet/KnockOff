@@ -614,14 +614,14 @@ Before handing off, you MUST complete:
 
 **Example:**
 ```
-Scope table claims: "Standalone Class: User Methods: Yes"
+Scope table claims: "Standalone Class: Stub Overrides: Yes"
 
-Step 1: Search Design.Stubs for [KnockOffBase<T>] with user method override on a method
-Step 2: Not found — only property user overrides exist
-Step 3: Add minimal code to Design.Stubs/UserMethods/UserMethodBasics.cs:
+Step 1: Search Design.Stubs for [KnockOffBase<T>] with stub override on a method
+Step 2: Not found — only property stub overrides exist
+Step 3: Add minimal code to Design.Stubs/StubOverrides/StubOverrideBasics.cs:
 
     [KnockOffBase<SomeClassBase>]
-    public partial class StandaloneClassUserMethodStub { }
+    public partial class StandaloneClassStubOverrideStub { }
 
     public partial class StandaloneClassUserMethodStub
     {
@@ -631,7 +631,7 @@ Step 3: Add minimal code to Design.Stubs/UserMethods/UserMethodBasics.cs:
 Step 4: dotnet build src/Design/Design.Stubs
 Step 5: CS0115: 'StandaloneClassUserMethodStub.Process_(string)': no suitable method found to override
 Step 6: Leave failing code, update scope table:
-    | Standalone Class | Needs Implementation | CS0115 - pipeline doesn't generate user method overrides |
+    | Standalone Class | Needs Implementation | CS0115 - pipeline doesn't generate stub override overrides |
 ```
 
 **CRITICAL:** If you cannot produce compiling Design.Stubs code for a claim, the scope table MUST say "Needs Implementation", not "Yes". Never claim support you haven't compiled.

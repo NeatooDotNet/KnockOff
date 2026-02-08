@@ -102,7 +102,7 @@ public class BasicTests
 	}
 
 	[Fact]
-	public void Method_WithNullableReturn_NoUserMethod_ReturnsDefault()
+	public void Method_WithNullableReturn_NoStubOverride_ReturnsDefault()
 	{
 		var knockOff = new SampleKnockOff();
 		var tracking = knockOff.GetOptional.Return(() => null);

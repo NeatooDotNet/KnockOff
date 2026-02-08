@@ -410,8 +410,8 @@ For every feature claimed to work across patterns, you MUST:
 
 ```
 Example verification:
-- Claim: "User methods work on [KnockOffBase<T>]"
-- Action: Search Design.Stubs for [KnockOffBase<T>] with user method override on a method
+- Claim: "Stub overrides work on [KnockOffBase<T>]"
+- Action: Search Design.Stubs for [KnockOffBase<T>] with stub override override on a method
 - Action: If not found, write minimal stub and build
 - Result: CS0115 → Report gap, do not mark as verified
 ```
@@ -472,7 +472,7 @@ These are common issues in KnockOff plans. Check for each:
 7. **Init-only properties**: Different code path in renderer
 8. **Indexers**: Often forgotten - do they work?
 9. **Events**: If applicable, are event add/remove handled?
-10. **User-defined methods**: For standalone stubs, how do user methods interact?
+10. **User-defined methods**: For standalone stubs, how do stub overrides interact?
 
 ---
 

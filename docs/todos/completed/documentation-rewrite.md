@@ -59,7 +59,7 @@ Use a structured, phased approach:
   - docs/guides/advanced-callbacks.md (7 snippets)
   - docs/guides/generic-methods.md (7 snippets)
   - docs/guides/source-delegation.md (8 snippets)
-  - docs/guides/user-methods.md (5 snippets)
+  - docs/guides/stub-overrides.md (5 snippets)
   - docs/reference/interceptor-api.md (6 snippets)
   - docs/reference/attribute-options.md (4 snippets)
   - docs/reference/smart-defaults.md (6 snippets)

@@ -237,7 +237,7 @@ Documentation files that reference `Times` as the KnockOff type (not just the En
 | 7 | `docs/guides/generic-methods.md` | Replace `Times.*` code samples |
 | 8 | `docs/guides/parameter-matching.md` | Replace `Times.*` code samples |
 | 9 | `docs/guides/stub-patterns.md` | Replace `Times.*` code samples |
-| 10 | `docs/guides/user-methods.md` | Replace `Times.*` code samples |
+| 10 | `docs/guides/stub-overrides.md` | Replace `Times.*` code samples |
 | 11 | `docs/guides/api-consistency-matrix.md` | Replace `Times` in API tables |
 | 12 | `docs/reference/interceptor-api.md` | Replace `Times` parameter references |
 | 13 | `docs/migration/from-moq.md` | Replace KnockOff `Times` references (keep `Moq.Times` references as-is) |
@@ -410,8 +410,8 @@ This rename does not affect any architectural patterns. It is a pure mechanical 
 - `\bTimes\b` in `.claude/agents/` - 1 file: `test-coverage-analyzer.md`
 - `\bTimesKind\b` across `src/` - only in `src/KnockOff/Times.cs` (confirmed private)
 - `_verifiableTimes` in generator - used extensively as emitted field name in generated code
-- Active plans referencing `Times`: `design-source-of-truth-plan.md`, `unify-returns-execute-design.md`, `when-with-user-methods.md`, `user-method-verifiable-implementation.md`, `parameter-specific-matching-design.md`
-- Active todos referencing `Times`: `skill-documentation-gaps.md`, `when-with-user-methods.md`
+- Active plans referencing `Times`: `design-source-of-truth-plan.md`, `unify-returns-execute-design.md`, `when-with-stub-overrides.md`, `user-method-verifiable-implementation.md`, `parameter-specific-matching-design.md`
+- Active todos referencing `Times`: `skill-documentation-gaps.md`, `when-with-stub-overrides.md`
 
 **Design.Stubs Verification:** Not applicable. This is a mechanical rename -- the compiler verifies correctness. The architect's justification for skipping Design.Stubs evidence is reasonable.
 
@@ -424,11 +424,11 @@ This rename does not affect any architectural patterns. It is a pure mechanical 
 3. **Active plans and todos not listed.** Several active (non-completed) plans and todos reference `Times` as a KnockOff API type in forward-looking code samples. The plan says completed docs should not be updated (correct), but does not list the active plans/todos that should be updated:
    - `docs/plans/design-source-of-truth-plan.md` - ~30 references to `Times` in API checklists and file references
    - `docs/plans/unify-returns-execute-design.md` - 7 references to `Verifiable(Times times)` in interface designs
-   - `docs/plans/when-with-user-methods.md` - `Verify(Times)` in design code
+   - `docs/plans/when-with-stub-overrides.md` - `Verify(Times)` in design code
    - `docs/plans/parameter-specific-matching-design.md` - `Verify(Times)` references
    - `docs/plans/user-method-verifiable-implementation.md` - `Verifiable(Times)` and `_verifiableTimes` in generated code samples
    - `docs/todos/skill-documentation-gaps.md` - `Times` references
-   - `docs/todos/when-with-user-methods.md` - `Times` references
+   - `docs/todos/when-with-stub-overrides.md` - `Times` references
 
 4. **`.claude/agents/test-coverage-analyzer.md` not listed.** This agent file contains `Times` in a coverage checklist description.
 
@@ -563,12 +563,12 @@ The compiler is the acceptance test. After all phases, these must hold:
 - [ ] Update active plans with forward-looking API references:
   - `docs/plans/design-source-of-truth-plan.md`
   - `docs/plans/unify-returns-execute-design.md`
-  - `docs/plans/when-with-user-methods.md`
+  - `docs/plans/when-with-stub-overrides.md`
   - `docs/plans/parameter-specific-matching-design.md`
   - `docs/plans/user-method-verifiable-implementation.md`
 - [ ] Update active todos with forward-looking API references:
   - `docs/todos/skill-documentation-gaps.md`
-  - `docs/todos/when-with-user-methods.md`
+  - `docs/todos/when-with-stub-overrides.md`
 - [ ] Update `.claude/agents/test-coverage-analyzer.md` (1 occurrence)
 - [ ] **DO NOT** update completed plans/todos in `docs/plans/completed/` or `docs/todos/completed/`
 - [ ] **DO NOT** update historical release notes in `docs/release-notes/`

@@ -18,14 +18,14 @@ public class AsyncMethodTests
 	}
 
 	[Fact]
-	public async Task AsyncMethod_TaskOfT_WithUserMethod_ReturnsUserResult()
+	public async Task AsyncMethod_TaskOfT_WithStubOverride_ReturnsStubResult()
 	{
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
 		var result = await service.GetValueAsync(10);
 
-		Assert.Equal(30, result); // User method multiplies by 3
+		Assert.Equal(30, result); // Stub override multiplies by 3
 		Assert.Equal(10, knockOff.GetValueAsync.LastArg);
 	}
 
@@ -55,14 +55,14 @@ public class AsyncMethodTests
 	}
 
 	[Fact]
-	public async Task AsyncMethod_ValueTaskOfT_WithUserMethod_ReturnsUserResult()
+	public async Task AsyncMethod_ValueTaskOfT_WithStubOverride_ReturnsStubResult()
 	{
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
 		var result = await service.GetValueValueTaskAsync(5);
 
-		Assert.Equal(20, result); // User method multiplies by 4
+		Assert.Equal(20, result); // Stub override multiplies by 4
 		Assert.Equal(5, knockOff.GetValueValueTaskAsync.LastArg);
 	}
 }
