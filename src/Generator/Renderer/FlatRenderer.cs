@@ -2235,6 +2235,13 @@ internal static class FlatRenderer
 		HashSet<string> multiOverloadGenericStubOverrideInterceptors,
 		EquatableArray<FlatGenericMethodHandlerGroup> genericStubOverrideHandlerGroups)
 	{
+		// For methods with unconstrained nullable type parameters (T? without where T : class),
+		// we must disable nullable context. Without this, the compiler interprets T? as Nullable<T>
+		// (CS0453) or reports nullability mismatch (CS8769). The type strings are already stripped
+		// of ? for these type parameters by the builder.
+		if (method.NeedsNullableDisable)
+			w.Line("#nullable disable");
+
 		// Generic methods use the method-based Return/Call API via typed handlers
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
 		using (w.Braces())
@@ -2280,6 +2287,9 @@ internal static class FlatRenderer
 				w.Line($"return {method.DefaultExpression};");
 			}
 		}
+
+		if (method.NeedsNullableDisable)
+			w.Line("#nullable restore");
 		w.Line();
 	}
 
@@ -2358,8 +2368,12 @@ internal static class FlatRenderer
 		var argList = string.Join(", ", castArgs);
 
 		// Expression-bodied members don't use 'return' keyword
+		if (method.NeedsNullableDisable)
+			w.Line("#nullable disable");
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations}){method.ConstraintClauses}");
 		w.Line($"\t=> (({targetInterface})this).{target.Name}({argList});");
+		if (method.NeedsNullableDisable)
+			w.Line("#nullable restore");
 		w.Line();
 	}
 

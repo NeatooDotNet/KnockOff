@@ -959,7 +959,19 @@ internal static class InlineModelBuilder
         // For explicit interface implementations, only class/struct constraints are allowed (CS0460)
         var constraintClauses = GetConstraintsForExplicitImpl(typeParams, member.ReturnType);
 
-        var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
+        // Determine if explicit impl needs #nullable disable because of unconstrained nullable
+        // type parameters (T? without where T : class).
+        var paramArray = member.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+        var needsNullableDisable = HasUnconstrainedNullableTypeParams(typeParams, member.ReturnType, paramArray);
+        var implReturnType = needsNullableDisable ? StripUnconstrainedNullableAnnotations(member.ReturnType, typeParams) : member.ReturnType;
+
+        var paramList = needsNullableDisable
+            ? string.Join(", ", member.Parameters.Select(p =>
+            {
+                var strippedType = StripUnconstrainedNullableAnnotations(p.Type, typeParams);
+                return $"{GetRefKindPrefix(p.RefKind)}{strippedType} {p.Name}";
+            }))
+            : string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
         var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
 
         // Get non-generic parameters for RecordCall
@@ -982,7 +994,7 @@ internal static class InlineModelBuilder
             InterfaceFullName: interfaceFullName,
             SimpleInterfaceName: simpleIfaceName,
             MemberName: member.Name,
-            ReturnType: member.ReturnType,
+            ReturnType: implReturnType,
             IsVoid: member.ReturnType == "void",
             IsInitOnly: false,
             HasGetter: false,
@@ -1008,7 +1020,8 @@ internal static class InlineModelBuilder
             DelegationTarget: null,
             OutParameterInitializations: outParamInits,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            NeedsNullableDisable: needsNullableDisable);
     }
 
     private static InlineInterfaceImplementation BuildMethodDelegationImplementation(
@@ -1449,6 +1462,60 @@ internal static class InlineModelBuilder
         return string.Join("", clauses);
     }
 
+    /// <summary>
+    /// Returns true if the method has unconstrained type parameters that appear with nullable
+    /// annotations (T?) in the return type or parameters. These need special handling in
+    /// explicit interface implementations: the ? must be stripped and nullable context disabled.
+    /// </summary>
+    private static bool HasUnconstrainedNullableTypeParams(TypeParameterInfo[] typeParams, string returnType, ParameterInfo[] parameters)
+    {
+        foreach (var tp in typeParams)
+        {
+            if (tp.IsKnownReferenceType)
+                continue;
+
+            var constraintArray = tp.Constraints.GetArray() ?? Array.Empty<string>();
+            if (constraintArray.Contains("struct") || constraintArray.Contains("class"))
+                continue;
+
+            // Check if this unconstrained type parameter appears with ? in return type or parameters
+            var nullableForm = $"{tp.Name}?";
+            if (returnType.Contains(nullableForm))
+                return true;
+            foreach (var p in parameters)
+            {
+                if (p.Type.Contains(nullableForm))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Strips nullable annotations (?) from type parameter references that are NOT known to be
+    /// reference types. For unconstrained T?, C# 9+ uses T? as "default value" annotation in
+    /// interface declarations, but in explicit implementations without "where T : class" the
+    /// compiler interprets T? as Nullable&lt;T&gt; which is invalid. Stripping the ? makes the
+    /// explicit impl match the interface correctly.
+    /// </summary>
+    private static string StripUnconstrainedNullableAnnotations(string typeString, TypeParameterInfo[] typeParams)
+    {
+        var result = typeString;
+        foreach (var tp in typeParams)
+        {
+            if (tp.IsKnownReferenceType)
+                continue;
+
+            var constraintArray = tp.Constraints.GetArray() ?? Array.Empty<string>();
+            if (constraintArray.Contains("struct") || constraintArray.Contains("class"))
+                continue;
+
+            // Replace T? with T for this unconstrained type parameter
+            result = result.Replace($"{tp.Name}?", tp.Name);
+        }
+        return result;
+    }
+
     private static string GetConstraintsForExplicitImpl(TypeParameterInfo[] typeParams, string returnType)
     {
         var clauses = new List<string>();
@@ -1468,7 +1535,11 @@ internal static class InlineModelBuilder
                 continue;
             }
 
-            if (returnType.Contains($"{tp.Name}?") || returnType.EndsWith($"{tp.Name}?"))
+            // If type parameter is known to be a reference type (e.g., where T : Attribute)
+            // and the return type uses T?, we need "where T : class" for explicit impl.
+            // Interface-only constraints (e.g., where T : IDisposable) do NOT qualify.
+            if (tp.IsKnownReferenceType
+                && (returnType.Contains($"{tp.Name}?") || returnType.EndsWith($"{tp.Name}?")))
             {
                 clauses.Add($" where {tp.Name} : class");
             }

@@ -410,7 +410,7 @@ internal static class SymbolHelpers
 		foreach (var tp in typeParams)
 		{
 			var constraints = GetTypeParameterConstraints(tp).ToArray();
-			result.Add(new TypeParameterInfo(tp.Name, new EquatableArray<string>(constraints)));
+			result.Add(new TypeParameterInfo(tp.Name, new EquatableArray<string>(constraints), tp.IsReferenceType));
 		}
 		return new EquatableArray<TypeParameterInfo>(result.ToArray());
 	}

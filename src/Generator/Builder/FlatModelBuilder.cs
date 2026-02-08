@@ -904,6 +904,14 @@ internal static class FlatModelBuilder
 		// Build constraint clauses for explicit interface implementation (only class/struct constraints)
 		var constraintClauses = GetConstraintsForExplicitImpl(tpArray, member.ReturnType);
 
+		// Determine if explicit impl needs #nullable disable because of unconstrained nullable
+		// type parameters. In C# 9+, T? on unconstrained type parameters means "default value"
+		// in the interface declaration, but without "where T : class" the compiler interprets
+		// T? as Nullable<T> in the explicit implementation (CS0453). We strip the ? and disable
+		// nullable context to avoid both CS0453 and CS8769 (nullability mismatch).
+		var needsNullableDisable = HasUnconstrainedNullableTypeParams(tpArray, member.ReturnType, paramArray);
+		var implReturnType = needsNullableDisable ? StripUnconstrainedNullableAnnotations(member.ReturnType, tpArray) : member.ReturnType;
+
 		// Build parameter models
 		var parameters = paramArray.Select(p => new ParameterModel(
 			Name: p.Name,
@@ -925,8 +933,14 @@ internal static class FlatModelBuilder
 				RefKind: p.RefKind,
 				RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
 
-		// Parameter declarations and names
-		var paramDecls = string.Join(", ", paramArray.Select(p => FormatParameterWithRefKind(p)));
+		// Parameter declarations and names (strip nullable annotations for explicit impl if needed)
+		var paramDecls = needsNullableDisable
+			? string.Join(", ", paramArray.Select(p =>
+			{
+				var strippedType = StripUnconstrainedNullableAnnotations(p.Type, tpArray);
+				return $"{GetRefKindPrefix(p.RefKind)}{strippedType} {EscapeIdentifier(p.Name)}";
+			}))
+			: string.Join(", ", paramArray.Select(p => FormatParameterWithRefKind(p)));
 		var paramNames = string.Join(", ", paramArray.Select(p => FormatParameterNameWithRefKind(p)));
 		var recordCallArgs = string.Join(", ", trackableParams.Select(p => p.EscapedName));
 
@@ -965,7 +979,7 @@ internal static class FlatModelBuilder
 			InterceptorClassName: interceptorClassName,
 			DeclaringInterface: member.DeclaringInterfaceFullName,
 			MethodName: member.Name,
-			ReturnType: member.ReturnType,
+			ReturnType: implReturnType,
 			IsVoid: isVoid,
 			Parameters: parameters,
 			ParameterDeclarations: paramDecls,
@@ -993,7 +1007,8 @@ internal static class FlatModelBuilder
 			SignatureSuffix: signatureSuffix,
 			IsPartOfOverloadGroup: false, // Generic methods don't use overload groups
 			ReturnsByRef: member.ReturnsByRef,
-			ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+			NeedsNullableDisable: needsNullableDisable);
 	}
 
 	/// <summary>
@@ -1021,14 +1036,70 @@ internal static class FlatModelBuilder
 				continue;
 			}
 
-			// Check if return type uses this type parameter with nullability (T?)
-			// If the return type is nullable reference type T?, we need class constraint
-			if (returnType.Contains($"{tp.Name}?") || returnType.EndsWith($"{tp.Name}?"))
+			// If type parameter is known to be a reference type (e.g., where T : Attribute)
+			// and the return type uses T?, we need "where T : class" for explicit impl.
+			// Interface-only constraints (e.g., where T : IDisposable) do NOT qualify.
+			if (tp.IsKnownReferenceType
+				&& (returnType.Contains($"{tp.Name}?") || returnType.EndsWith($"{tp.Name}?")))
 			{
 				clauses.Add($" where {tp.Name} : class");
 			}
 		}
 		return string.Join("", clauses);
+	}
+
+	/// <summary>
+	/// Returns true if the method has unconstrained type parameters that appear with nullable
+	/// annotations (T?) in the return type or parameters. These need special handling in
+	/// explicit interface implementations: the ? must be stripped and nullable context disabled.
+	/// </summary>
+	private static bool HasUnconstrainedNullableTypeParams(TypeParameterInfo[] typeParams, string returnType, ParameterInfo[] parameters)
+	{
+		foreach (var tp in typeParams)
+		{
+			if (tp.IsKnownReferenceType)
+				continue;
+
+			var constraintArray = tp.Constraints.GetArray() ?? Array.Empty<string>();
+			if (constraintArray.Contains("struct") || constraintArray.Contains("class"))
+				continue;
+
+			// Check if this unconstrained type parameter appears with ? in return type or parameters
+			var nullableForm = $"{tp.Name}?";
+			if (returnType.Contains(nullableForm))
+				return true;
+			foreach (var p in parameters)
+			{
+				if (p.Type.Contains(nullableForm))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Strips nullable annotations (?) from type parameter references that are NOT known to be
+	/// reference types. For unconstrained T?, C# 9+ uses T? as "default value" annotation in
+	/// interface declarations, but in explicit implementations without "where T : class" the
+	/// compiler interprets T? as Nullable&lt;T&gt; which is invalid. Stripping the ? makes the
+	/// explicit impl match the interface correctly.
+	/// </summary>
+	private static string StripUnconstrainedNullableAnnotations(string typeString, TypeParameterInfo[] typeParams)
+	{
+		var result = typeString;
+		foreach (var tp in typeParams)
+		{
+			if (tp.IsKnownReferenceType)
+				continue;
+
+			var constraintArray = tp.Constraints.GetArray() ?? Array.Empty<string>();
+			if (constraintArray.Contains("struct") || constraintArray.Contains("class"))
+				continue;
+
+			// Replace T? with T for this unconstrained type parameter
+			result = result.Replace($"{tp.Name}?", tp.Name);
+		}
+		return result;
 	}
 
 	private static FlatGenericMethodHandlerModel BuildGenericMethodHandler(
@@ -1057,7 +1128,7 @@ internal static class FlatModelBuilder
 			: $"({string.Join(", ", typeParams.Select(_ => "global::System.Type"))})";
 
 		var keyConstruction = typeParams.Length == 1
-			? "typeof(T)"
+			? $"typeof({typeParams[0].Name})"
 			: $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
 
 		var methodName = group.Name.EndsWith(GenericSuffix, StringComparison.Ordinal)

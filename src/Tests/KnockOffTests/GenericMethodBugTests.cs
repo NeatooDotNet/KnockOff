@@ -214,6 +214,126 @@ public class GenericMethodBugTests
 	}
 
 	#endregion
+
+	#region Bug 4: Spurious where T : class on Nullable Unconstrained Generics (Fixed)
+
+	/// <summary>
+	/// Tests that unconstrained generic methods with T? return type compile and work correctly.
+	/// Bug: Generator emitted "where T : class" on explicit implementation even though the
+	/// original method has no such constraint. This caused CS8665.
+	/// Fix: Generator now checks IsKnownReferenceType and emits #nullable disable instead.
+	/// </summary>
+	[Fact]
+	public void UnconstrainedNullable_ReturnType_CompilesAndWorks()
+	{
+		var knockOff = new NullableGenericServiceKnockOff();
+		INullableGenericServiceForTests service = knockOff;
+
+		knockOff.NullableReturn.Of<string>().Return(() => "hello");
+
+		var result = service.NullableReturn<string>();
+
+		Assert.Equal("hello", result);
+	}
+
+	[Fact]
+	public void UnconstrainedNullable_ReturnType_CanReturnNull()
+	{
+		var knockOff = new NullableGenericServiceKnockOff();
+		INullableGenericServiceForTests service = knockOff;
+
+		knockOff.NullableReturn.Of<string>().Return(() => null!);
+
+		var result = service.NullableReturn<string>();
+
+		Assert.Null(result);
+	}
+
+	[Fact]
+	public void UnconstrainedNullable_WithParameter_CompilesAndWorks()
+	{
+		var knockOff = new NullableGenericServiceKnockOff();
+		INullableGenericServiceForTests service = knockOff;
+
+		knockOff.NullableValues.Of<int>().Return((data) => data);
+
+		var result = service.NullableValues(42);
+
+		Assert.Equal(42, result);
+	}
+
+	[Fact]
+	public void UnconstrainedNullable_WithValueType_Works()
+	{
+		var knockOff = new NullableGenericServiceKnockOff();
+		INullableGenericServiceForTests service = knockOff;
+
+		knockOff.NullableReturn.Of<int>().Return(() => 99);
+
+		var result = service.NullableReturn<int>();
+
+		Assert.Equal(99, result);
+	}
+
+	[Fact]
+	public void InterfaceConstrainedNullable_NoSpuriousClassConstraint()
+	{
+		// Interface-only constraints (e.g., where T : IDisposable) should NOT
+		// get "where T : class" because structs can implement interfaces.
+		var knockOff = new NullableGenericServiceKnockOff();
+		INullableGenericServiceForTests service = knockOff;
+
+		var stream = new MemoryStream();
+		knockOff.InterfaceConstrainedReturn.Of<MemoryStream>().Return(() => stream);
+
+		var result = service.InterfaceConstrainedReturn<MemoryStream>();
+
+		Assert.Same(stream, result);
+	}
+
+	[Fact]
+	public void ClassConstrainedNullable_RegressionStillWorks()
+	{
+		// Methods with class-implying constraints (e.g., where T : Attribute)
+		// should STILL get "where T : class" in the explicit implementation.
+		var knockOff = new NullableGenericServiceKnockOff();
+		INullableGenericServiceForTests service = knockOff;
+
+		var attr = new TestAttribute { Value = "test" };
+		knockOff.ConstrainedNullableReturn.Of<TestAttribute>().Return(() => attr);
+
+		var result = service.ConstrainedNullableReturn<TestAttribute>();
+
+		Assert.Same(attr, result);
+	}
+
+	[Fact]
+	public void ClassConstrainedNullable_CanReturnNull()
+	{
+		var knockOff = new NullableGenericServiceKnockOff();
+		INullableGenericServiceForTests service = knockOff;
+
+		knockOff.ConstrainedNullableReturn.Of<TestAttribute>().Return(() => null);
+
+		var result = service.ConstrainedNullableReturn<TestAttribute>();
+
+		Assert.Null(result);
+	}
+
+	[Fact]
+	public void UnconstrainedNullable_Verification_Works()
+	{
+		var knockOff = new NullableGenericServiceKnockOff();
+		INullableGenericServiceForTests service = knockOff;
+
+		service.NullableReturn<string>();
+		service.NullableReturn<int>();
+
+		knockOff.NullableReturn.Of<string>().Verify(Called.Once);
+		knockOff.NullableReturn.Of<int>().Verify(Called.Once);
+	}
+
+	#endregion
 }
 
 /// <summary>
@@ -300,6 +420,31 @@ public interface IConstrainedGenericMethod
 
 [KnockOff]
 public partial class ConstrainedGenericMethodKnockOff : IConstrainedGenericMethod
+{
+}
+
+/// <summary>
+/// Interface with unconstrained nullable generic type parameters.
+/// Bug 4: Generator incorrectly added "where T : class" to explicit implementations
+/// for methods with T? when T was unconstrained or had only interface constraints.
+/// </summary>
+public interface INullableGenericServiceForTests
+{
+	/// <summary>Nullable unconstrained return and parameter.</summary>
+	TData? NullableValues<TData>(TData? data);
+
+	/// <summary>Nullable unconstrained return only.</summary>
+	T? NullableReturn<T>();
+
+	/// <summary>Interface constraint only - should NOT emit where T : class.</summary>
+	T? InterfaceConstrainedReturn<T>() where T : IDisposable;
+
+	/// <summary>Class-implying constraint (Attribute) - SHOULD emit where T : class.</summary>
+	T? ConstrainedNullableReturn<T>() where T : Attribute;
+}
+
+[KnockOff]
+public partial class NullableGenericServiceKnockOff : INullableGenericServiceForTests
 {
 }
 

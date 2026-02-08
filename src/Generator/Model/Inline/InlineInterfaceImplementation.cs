@@ -71,7 +71,14 @@ internal sealed record InlineInterfaceImplementation(
     /// <summary>True if the member returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if the member returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+
+    /// <summary>
+    /// True when the explicit interface implementation needs #nullable disable / #nullable restore
+    /// pragmas because it has unconstrained nullable type parameters (T? without where T : class).
+    /// The ReturnType and ParameterDeclarations will have ? stripped from these type parameters.
+    /// </summary>
+    bool NeedsNullableDisable = false)
 {
     /// <summary>True if the member returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
