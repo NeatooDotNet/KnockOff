@@ -133,44 +133,20 @@ myRepoKO.Verify();
 
 ---
 
-## What KnockOff Does Better
+## What Sets KnockOff Apart
 
-| Feature | Why It's Better |
-|---------|-----------------|
-| **Reusable stub classes** | Define once, customize per-test. No more copying mock setups or shared factory methods. |
-| **Source delegation** | Delegate to a real implementation, override only specific methods. [No equivalent in Moq or NSubstitute.](docs/guides/source-delegation.md) |
-| **Tighter type safety** | Each Return/Call/When call is complete in one step — [no forgotten `.Returns()` that silently breaks](docs/type-safety.md). No manual `<T1,T2>` type parameters. |
-| **Parameter matching** | `Return((a, b) => a > 0 ? 100 : 0)` -- standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter. |
-| **Built-in capture** | `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` — no manual `Arg.Do<>` or `Callback<>` setup. |
-| **Event verification** | `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute. |
-| **Explicit Get/Set verify** | `VerifyGet(Called)` / `VerifySet(Called)` for properties and indexers. |
-
----
-
-## When KnockOff Shines
-
-**Reusable test doubles** — Define a stub class once with constructor parameters for test data. Use it across hundreds of tests without copying setup code.
-
-**Integration tests with DI** — Your stub is a real class. Register it in a DI container, pass it through constructors, use it anywhere a real implementation would go.
-
-**Partial real implementations** — Use [Source Delegation](docs/guides/source-delegation.md) to delegate to a real implementation and override only the methods you're testing. Perfect for integration tests and decorator patterns.
-
-**Large interfaces** — Stub only the methods you care about. Everything else auto-implements with defaults or can be configured with a single `Returns` call.
-
-**Stubbing concrete classes** — Override virtual methods on non-sealed classes. KnockOff generates the stub with `.Object` to access the typed instance.
-
----
-
-## Where KnockOff is Improved
-
-Source generation gives KnockOff access to full type information at compile time. These are areas where that advantage produces a meaningfully cleaner API than runtime proxy-based mocking:
-
-| Feature | KnockOff | Moq | NSubstitute |
-|---------|----------|-----|-------------|
-| **[Source Delegation](docs/guides/source-delegation.md)** | `stub.Source(real)` — delegates to real implementation, override specific methods | No equivalent | No equivalent |
-| **[Protected Methods](docs/guides/protected-methods.md)** | Same `Return`/`Call`/`Verify` API, fully typed | `Mock.Protected()` — string names, no compile-time safety | Not supported |
-| **[Ref/Out Parameters](docs/guides/ref-out-parameters.md)** | Natural lambda syntax with `ref`/`out` keywords | `It.Ref<T>.IsAny` + special callback syntax | Index-based `x[1] = value` |
-| **[Multiple Interfaces](docs/guides/multiple-interfaces.md)** | Unified interceptors on one stub, Source() per hierarchy level | `.As<T>()` — separate references per interface | Casting required for secondary interfaces |
+- **Reusable stub classes** — Define once, customize per-test. No more copying mock setups or shared factory methods.
+- **[Source delegation](docs/guides/source-delegation.md)** — Delegate to a real implementation, override only specific methods. No equivalent in Moq or NSubstitute.
+- **[Protected methods](docs/guides/protected-methods.md)** — Same `Return`/`Call`/`Verify` API, fully typed. No string-based names, no manual subclasses.
+- **[Ref/out parameters](docs/guides/ref-out-parameters.md)** — Natural lambda syntax with `ref`/`out` keywords. No special matchers or index-based access.
+- **[Multiple interfaces](docs/guides/multiple-interfaces.md)** — Unified interceptors on one stub. No `.As<T>()` references or casting.
+- **[Tighter type safety](docs/type-safety.md)** — Each Return/Call/When call is complete in one step — no forgotten `.Returns()` that silently breaks at runtime.
+- **[Parameter matching](docs/guides/parameter-matching-comparison.md)** — `Return((a, b) => a > 0 ? 100 : 0)` — standard C# conditionals instead of `Arg.Is<>` or `It.Is<>` per parameter.
+- **Built-in argument capture** — `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` — no manual `Arg.Do<>` or `Callback<>` setup.
+- **Event verification** — `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute.
+- **Explicit Get/Set verification** — `VerifyGet(Called)` / `VerifySet(Called)` for properties and indexers.
+- **Integration tests with DI** — Your stub is a real class. Register it in a DI container, pass it through constructors.
+- **Stubbing concrete classes** — Override virtual methods on non-sealed classes with the same API.
 
 ---
 
