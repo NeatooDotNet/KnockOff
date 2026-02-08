@@ -1258,6 +1258,12 @@ internal static class InlineRenderer
 
     private static void RenderGenericMethodImplementation(CodeWriter w, InlineInterfaceImplementation impl)
     {
+        // For methods with unconstrained nullable type parameters (T? without where T : class),
+        // we must disable nullable context. Without this, the compiler interprets T? as Nullable<T>
+        // (CS0453) or reports nullability mismatch (CS8769).
+        if (impl.NeedsNullableDisable)
+            w.Line("#nullable disable");
+
         w.Line($"\t\t\t{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}{impl.TypeParameterDecl}({impl.ParameterDeclarations}){impl.ConstraintClauses}");
         w.Line("\t\t\t{");
 
@@ -1317,6 +1323,9 @@ internal static class InlineRenderer
         }
 
         w.Line("\t\t\t}");
+
+        if (impl.NeedsNullableDisable)
+            w.Line("#nullable restore");
         w.Line();
     }
 

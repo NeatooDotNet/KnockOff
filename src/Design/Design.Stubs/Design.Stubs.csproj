@@ -10,7 +10,8 @@
 		<!-- CA2007: ConfigureAwait not needed for library demos -->
 		<!-- CA1030: Method names with "Raise" are fine for event demo code -->
 		<!-- CS0219: Variables showing result values are assigned but intentionally not asserted in demo code -->
-		<NoWarn>$(NoWarn);CA1707;CA2007;CA1030;CS0219</NoWarn>
+		<!-- CA1052: Static holder types flagged on partial KnockOff stub classes that have no user members -->
+		<NoWarn>$(NoWarn);CA1707;CA2007;CA1030;CS0219;CA1052</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

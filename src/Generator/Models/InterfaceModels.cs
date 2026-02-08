@@ -248,7 +248,8 @@ internal sealed record InterfaceMemberInfo(
 				method.TypeParameters
 					.Select(tp => new TypeParameterInfo(
 						tp.Name,
-						new EquatableArray<string>(SymbolHelpers.GetTypeParameterConstraints(tp).ToArray())))
+						new EquatableArray<string>(SymbolHelpers.GetTypeParameterConstraints(tp).ToArray()),
+						tp.IsReferenceType))
 					.ToArray());
 		}
 
@@ -282,7 +283,14 @@ internal sealed record ParameterInfo(
 /// </summary>
 internal sealed record TypeParameterInfo(
 	string Name,
-	EquatableArray<string> Constraints) : IEquatable<TypeParameterInfo>;
+	EquatableArray<string> Constraints,
+	/// <summary>
+	/// True when Roslyn determines the type parameter is known to be a reference type
+	/// (e.g., has a 'class' constraint or a class-type constraint like 'Attribute').
+	/// Interface-only constraints (e.g., IDisposable) do NOT make this true.
+	/// Used by GetConstraintsForExplicitImpl to decide whether to emit 'where T : class'.
+	/// </summary>
+	bool IsKnownReferenceType = false) : IEquatable<TypeParameterInfo>;
 
 /// <summary>
 /// Maps an interface to its base interfaces for Source(T) hierarchy resolution.

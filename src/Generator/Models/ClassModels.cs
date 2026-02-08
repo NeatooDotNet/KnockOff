@@ -186,7 +186,8 @@ internal sealed record ClassMemberInfo(
 				method.TypeParameters
 					.Select(tp => new TypeParameterInfo(
 						tp.Name,
-						new EquatableArray<string>(SymbolHelpers.GetTypeParameterConstraints(tp).ToArray())))
+						new EquatableArray<string>(SymbolHelpers.GetTypeParameterConstraints(tp).ToArray()),
+						tp.IsReferenceType))
 					.ToArray());
 		}
 
