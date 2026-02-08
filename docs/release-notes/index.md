@@ -8,6 +8,8 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v0.43.0](v0.43.0.md) | 2026-02-08 | Ref return support for methods, properties, and indexers |
+| [v0.42.0](v0.42.0.md) | 2026-02-08 | **Breaking:** Rename Call(Action) to Return(Action) on Task/ValueTask methods |
 | [v0.40.0](v0.40.0.md) | 2026-02-07 | Fix CS0108 and CS1061 bugs in class stub generation |
 | [v0.39.0](v0.39.0.md) | 2026-02-07 | **Breaking:** Singular method API — Returns→Return, Execute→Call, OnCall→Return/Call |
 | [v0.38.0](v0.38.0.md) | 2026-02-07 | **Breaking:** Unified method API — OnCall→Returns/Execute, ThenCall→ThenReturns/ThenExecute, simplified async sequences |
@@ -41,6 +43,8 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v0.43.0](v0.43.0.md) - 2026-02-08 - Ref return support for methods, properties, and indexers
+- [v0.42.0](v0.42.0.md) - 2026-02-08 - **Breaking:** Rename Call(Action) to Return(Action) on Task/ValueTask methods
 - [v0.40.0](v0.40.0.md) - 2026-02-07 - Fix CS0108 and CS1061 bugs in class stub generation
 - [v0.39.0](v0.39.0.md) - 2026-02-07 - **Breaking:** Singular method API — Returns→Return, Execute→Call, OnCall→Return/Call
 - [v0.38.0](v0.38.0.md) - 2026-02-07 - **Breaking:** Unified method API — OnCall→Returns/Execute, ThenCall→ThenReturns/ThenExecute, simplified async sequences
