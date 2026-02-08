@@ -1,9 +1,9 @@
 # Return(value).ThenReturn() Sequence NRE Bug
 
-**Status:** Awaiting Verification
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-02-07
-**Last Updated:** 2026-02-07 (implementation complete, awaiting verification)
+**Last Updated:** 2026-02-07
 **Plan:** Inline (see Plans section below)
 
 ---
