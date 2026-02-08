@@ -218,10 +218,26 @@ public interface IRefParameterService
 {
 	void Increment(ref int value);
 	bool TryUpdate(string key, ref string value);
+	void Swap(ref int a, ref int b);
 }
 
 [KnockOff]
 public partial class RefParameterServiceKnockOff : IRefParameterService
+{
+}
+
+#endregion
+
+#region Mixed Ref/Out Parameter Test Types
+
+public interface IMixedRefOutService
+{
+	bool Process(string input, out string output, ref int counter);
+	int Transform(string input, out string transformed, out bool wasModified);
+}
+
+[KnockOff]
+public partial class MixedRefOutServiceKnockOff : IMixedRefOutService
 {
 }
 
