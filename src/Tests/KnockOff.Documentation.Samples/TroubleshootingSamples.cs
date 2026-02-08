@@ -426,8 +426,8 @@ public class AsyncReturnTests
         stub.GetUserAsync.Return((int id) =>
             Task.FromResult<User?>(new User { Id = id }));
 
-        // For Task (void async), use Task.CompletedTask:
-        stub.SaveAsync.Call((user) => { });
+        // For Task (void async), use Return with Action callback:
+        stub.SaveAsync.Return((user) => { });
         #endregion
 
         #region troubleshoot-async-simpler-alternatives

@@ -97,7 +97,7 @@ public class TaskMethodTests
 
         #region async-task-simplified-void
         // Action callback for void async - Task.CompletedTask auto-returned
-        stub.UpdateUserAsync.Call((user) => updatedUsers.Add(user)).Verifiable();
+        stub.UpdateUserAsync.Return((user) => updatedUsers.Add(user)).Verifiable();
         #endregion
 
         IAsyncUserSvc service = stub;
@@ -114,8 +114,8 @@ public class TaskMethodTests
         var updatedUsers = new List<User>();
 
         #region async-task-void
-        // Call() auto-returns Task.CompletedTask for async void methods
-        stub.UpdateUserAsync.Call((user) =>
+        // Return() auto-returns Task.CompletedTask for async void methods
+        stub.UpdateUserAsync.Return((user) =>
         {
             updatedUsers.Add(user);
         }).Verifiable();
@@ -296,7 +296,7 @@ public class CompleteAsyncExampleTests
         // Configure multiple async methods with verification
         stub.FindAsync.Return((id) =>
             Task.FromResult<User?>(new User { Id = id, Name = "Original" })).Verifiable();
-        stub.SaveAsync.Call((user) => { }).Verifiable();
+        stub.SaveAsync.Return((user) => { }).Verifiable();
         #endregion
 
         var manager = new UserManager(stub);

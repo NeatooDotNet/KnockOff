@@ -210,7 +210,7 @@ For methods returning `Task` or `ValueTask` (no result), use `Action` callbacks 
 <!-- snippet: async-task-simplified-void -->
 ```cs
 // Action callback for void async - Task.CompletedTask auto-returned
-stub.UpdateUserAsync.Call((user) => updatedUsers.Add(user)).Verifiable();
+stub.UpdateUserAsync.Return((user) => updatedUsers.Add(user)).Verifiable();
 ```
 <!-- endSnippet -->
 
@@ -483,7 +483,7 @@ var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 | Mix callback with value sequence | `stub.Method.Return(cb).ThenReturn(x, y, z)` |
 | Configure async Task<T> (simplified) | `stub.AsyncMethod.Return(value)` |
 | Configure async Task<T> sequence | `stub.AsyncMethod.Return(v1, v2, v3)` |
-| Configure async Task (void, simplified) | `stub.AsyncMethod.Call((args) => { action(); })` |
+| Configure async Task (void, simplified) | `stub.AsyncMethod.Return((args) => { action(); })` |
 | Verify method was called | `tracking.Verify()` |
 | Verify call count | `tracking.Verify(Called.Exactly(n))` |
 | Mark for batch verify | `stub.Method.Return(...).Verifiable()` |

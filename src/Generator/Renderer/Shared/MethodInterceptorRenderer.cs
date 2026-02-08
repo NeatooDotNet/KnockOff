@@ -9,7 +9,7 @@ namespace KnockOff.Renderer.Shared;
 
 /// <summary>
 /// Renders method interceptor classes for both inline and flat stubs.
-/// Generates Return()/Call() entry points (repeating callback, elevatable to sequence via ThenReturn/ThenCall),
+/// Generates Return()/Call() entry points for non-void/void methods (repeating callback, elevatable to sequence via ThenReturn/ThenCall),
 /// nested MethodCallBuilderImpl and MethodSequenceImpl classes, Invoke methods, and verification.
 /// </summary>
 internal static class MethodInterceptorRenderer
@@ -297,12 +297,12 @@ internal static class MethodInterceptorRenderer
 			w.Line();
 		}
 
-		// Call(Action<...>) - simplified void callback for Task/ValueTask methods
+		// Return(Action<...>) - simplified void callback for Task/ValueTask methods
 		if (isVoidAsync && !hasRefOrOut)
 		{
 			var voidDelegateType = BuildSimplifiedVoidDelegateType(model.Parameters);
 			w.Line($"/// <summary>Configures callback action. {(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.</summary>");
-			w.Line($"public MethodCallBuilderImpl Call({voidDelegateType} callback)");
+			w.Line($"public MethodCallBuilderImpl Return({voidDelegateType} callback)");
 			using (w.Braces())
 			{
 				w.Line("_sequence = null;");
@@ -531,12 +531,12 @@ internal static class MethodInterceptorRenderer
 				w.Line();
 			}
 
-			// Call(Action<...>) - simplified void callback for Task/ValueTask overloads
+			// Return(Action<...>) - simplified void callback for Task/ValueTask overloads
 			if (isVoidAsync && !hasRefOrOut)
 			{
 				var voidDelegateType = BuildSimplifiedVoidDelegateType(overload.Parameters);
 				w.Line($"/// <summary>Configures callback action for {model.MethodName}({GetParamTypeList(overload.Parameters)}). {(isVoidTask ? "Task.CompletedTask" : "default(ValueTask)")} auto-returned.</summary>");
-				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Call({voidDelegateType} callback)");
+				w.Line($"public MethodCallBuilderImpl_{overload.SignatureSuffix} Return({voidDelegateType} callback)");
 				using (w.Braces())
 				{
 					w.Line($"_sequence_{overload.SignatureSuffix} = null;");
@@ -2642,7 +2642,7 @@ internal static class MethodInterceptorRenderer
 	/// <summary>
 	/// Emits the sequence elevation block used by ThenReturn/ThenCall and ThenReturn(params) when
 	/// the sequence has not yet been created. Handles three cases where _call may be null:
-	/// Return(value), Return(simplifiedCallback), and Call(simplifiedVoidCallback).
+	/// Return(value), Return(simplifiedCallback), and Return(simplifiedVoidCallback).
 	/// </summary>
 	private static void EmitSequenceElevation(
 		CodeWriter w,
@@ -2673,7 +2673,7 @@ internal static class MethodInterceptorRenderer
 		{
 			w.Line($"_interceptor.{sequenceFieldName} = new global::System.Collections.Generic.List<({delegateType} Callback, {className} Tracking)>();");
 
-			// Branch 1: _call is non-null (Return(callback) or Call(callback) was used -- existing non-buggy path)
+			// Branch 1: _call is non-null (Return(callback) was used -- existing non-buggy path)
 			w.Line($"if (_interceptor.{callFieldName} != null)");
 			using (w.Braces())
 			{
@@ -2731,7 +2731,7 @@ internal static class MethodInterceptorRenderer
 				}
 			}
 
-			// Branch 4: _callSimplifiedVoid is non-null (Call(simplifiedVoidCallback) was used for Task/ValueTask void)
+			// Branch 4: _callSimplifiedVoid is non-null (Return(simplifiedVoidCallback) was used for Task/ValueTask void)
 			// Only emitted when method is void Task or void ValueTask and has no ref/out params
 			if (isVoidAsync && !hasRefOrOut)
 			{

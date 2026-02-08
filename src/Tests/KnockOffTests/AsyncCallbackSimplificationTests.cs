@@ -177,7 +177,7 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		string? capturedData = null;
-		stub.SaveAsync.Call((data) => capturedData = data);
+		stub.SaveAsync.Return((data) => capturedData = data);
 
 		await service.SaveAsync("test data");
 
@@ -192,7 +192,7 @@ public partial class AsyncCallbackSimplificationTests
 
 		int capturedId = 0;
 		string? capturedName = null;
-		stub.ProcessAsync.Call((id, name) =>
+		stub.ProcessAsync.Return((id, name) =>
 		{
 			capturedId = id;
 			capturedName = name;
@@ -211,7 +211,7 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		bool wasInvoked = false;
-		stub.RunAsync.Call(() => wasInvoked = true);
+		stub.RunAsync.Return(() => wasInvoked = true);
 
 		await service.RunAsync();
 
@@ -224,7 +224,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.SaveAsync.Call((data) => { /* no-op */ });
+		stub.SaveAsync.Return((data) => { /* no-op */ });
 
 		// Should not throw and should complete
 		var task = service.SaveAsync("test");
@@ -244,7 +244,7 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		string? capturedMessage = null;
-		stub.LogAsync.Call((message) => capturedMessage = message);
+		stub.LogAsync.Return((message) => capturedMessage = message);
 
 		await service.LogAsync("log entry");
 
@@ -259,7 +259,7 @@ public partial class AsyncCallbackSimplificationTests
 
 		int capturedId = 0;
 		int capturedCount = 0;
-		stub.RecordAsync.Call((id, count) =>
+		stub.RecordAsync.Return((id, count) =>
 		{
 			capturedId = id;
 			capturedCount = count;
@@ -278,7 +278,7 @@ public partial class AsyncCallbackSimplificationTests
 		ISimplifiedAsyncService service = stub;
 
 		bool wasInvoked = false;
-		stub.PingAsync.Call(() => wasInvoked = true);
+		stub.PingAsync.Return(() => wasInvoked = true);
 
 		await service.PingAsync();
 
@@ -340,7 +340,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		var tracking = stub.SaveAsync.Call((data) => { });
+		var tracking = stub.SaveAsync.Return((data) => { });
 
 		await service.SaveAsync("a");
 		await service.SaveAsync("b");
@@ -354,7 +354,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		var tracking = stub.SaveAsync.Call((data) => { });
+		var tracking = stub.SaveAsync.Return((data) => { });
 
 		await service.SaveAsync("first");
 		await service.SaveAsync("last");
@@ -381,7 +381,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new SimplifiedAsyncServiceKnockOff();
 		ISimplifiedAsyncService service = stub;
 
-		stub.SaveAsync.Call((data) => { }).Verifiable();
+		stub.SaveAsync.Return((data) => { }).Verifiable();
 
 		await service.SaveAsync("test");
 
@@ -486,7 +486,7 @@ public partial class AsyncCallbackSimplificationTests
 		asyncCalled = false;
 
 		// Configure with simplified void callback - should clear async callback
-		stub.SaveAsync.Call((data) => simplifiedCalled = true);
+		stub.SaveAsync.Return((data) => simplifiedCalled = true);
 		await service.SaveAsync("test2");
 		Assert.True(simplifiedCalled);
 		Assert.False(asyncCalled); // async callback should not be called
@@ -502,7 +502,7 @@ public partial class AsyncCallbackSimplificationTests
 		bool simplifiedCalled = false;
 
 		// Configure with simplified void callback first
-		stub.SaveAsync.Call((data) => simplifiedCalled = true);
+		stub.SaveAsync.Return((data) => simplifiedCalled = true);
 		await service.SaveAsync("test1");
 		Assert.True(simplifiedCalled);
 
@@ -599,7 +599,7 @@ public partial class AsyncCallbackSimplificationTests
 		var stub = new InlineInterfaceAsyncStub.Stubs.ISimplifiedAsyncService();
 
 		string? captured = null;
-		stub.SaveAsync.Call((data) => captured = data);
+		stub.SaveAsync.Return((data) => captured = data);
 
 		ISimplifiedAsyncService service = stub;
 		await service.SaveAsync("test");

@@ -126,7 +126,7 @@ public partial class IRuleManagerTests
         IRuleManager ruleManager = stub;
         IRule? capturedRule = null;
 
-        stub.RunRule.Call((rule, token) =>
+        stub.RunRule.Return((rule, token) =>
         {
             capturedRule = rule;
         });

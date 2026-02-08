@@ -295,7 +295,7 @@ public partial class BasicMethodsDemo
         var stub = new Stubs.IDataService();
         string? savedData = null;
 
-        stub.SaveDataAsync.Call((data) => savedData = data);
+        stub.SaveDataAsync.Return((data) => savedData = data);
 
         IDataService service = stub;
         await service.SaveDataAsync("important data");

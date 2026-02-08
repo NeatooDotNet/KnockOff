@@ -369,7 +369,7 @@ stub.GetDataAsync.Return((int id) => Task.FromResult($"Full-{id}"));
 | `Return(unwrappedValue)` auto-wrap | ✓ |
 | `Return(Func<..., T>)` simplified callback | ✓ |
 | `Return(Func<..., Task<T>>)` full delegate | ✓ |
-| Void async `Call(Action<...>)` | ✓ |
+| Void async `Return(Action<...>)` | ✓ |
 | `ValueTask<T>` auto-wrap | ✓ |
 
 **See also:** [Async Patterns Guide](async-patterns.md) for detailed examples including delays and failure simulation.
