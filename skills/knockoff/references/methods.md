@@ -1,6 +1,19 @@
 # Method Interceptors Reference
 
-Method interceptors track calls, capture arguments, and configure return values for interface methods in your stub. Each method on the stubbed interface gets a corresponding interceptor property that provides verification and configuration capabilities.
+Method interceptors track calls, capture arguments, and configure return values for stubbed methods. Each method on the stubbed interface or class gets a corresponding interceptor property that provides verification and configuration capabilities.
+
+## Class Stub Method Behavior
+
+Class stubs (Patterns 3, 4, 6, 9) have a different default behavior than interface stubs. For unconfigured virtual methods, the base class implementation is called automatically. This is the equivalent of Moq's `CallBase = true`, but it is the default -- no opt-in required.
+
+| Member Kind | Unconfigured Behavior | Configured Behavior |
+|-------------|----------------------|---------------------|
+| **Virtual method** | Calls base class implementation | Interceptor handles it (base is NOT called) |
+| **Abstract method** | Returns `default(T)` (or throws in strict mode) | Interceptor handles it |
+| **Virtual property** | Calls base getter/setter | Interceptor handles it (base is NOT called) |
+| **Abstract property** | Returns `default(T)` (or throws in strict mode) | Interceptor handles it |
+
+When you configure a method with Return, Call, or When, the interceptor takes full control and the base implementation is not invoked. Only unconfigured members fall through to the base.
 
 ---
 
@@ -514,4 +527,4 @@ var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 
 ---
 
-**UPDATED:** 2026-02-07
+**UPDATED:** 2026-02-08

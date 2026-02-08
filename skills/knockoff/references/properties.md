@@ -6,7 +6,7 @@ This reference covers all aspects of property interceptors in KnockOff, includin
 
 ## Overview
 
-Property interceptors are generated for every property in an interface. Each interceptor provides:
+Property interceptors are generated for every property in an interface or for every virtual/abstract property in a stubbed class. Each interceptor provides:
 
 - **Get(value)** - Set a static value to return from the getter
 - **Get(callback)** - Dynamic callback for computed values
@@ -14,6 +14,15 @@ Property interceptors are generated for every property in an interface. Each int
 - **Get().ThenGet() / Set().ThenSet()** - Different behavior for successive accesses (sequences)
 - **Verification methods** - For asserting on property access patterns
 - **LastSetValue** - For capturing the most recent value written to a setter
+
+### Class Stub Property Behavior
+
+For class stubs (Patterns 3, 4, 6, 9), unconfigured virtual properties call the base class getter/setter by default. This is the same base fallback behavior as class stub methods -- equivalent to Moq's `CallBase = true`, but on by default.
+
+- **Virtual property, unconfigured**: calls base getter/setter
+- **Virtual property, configured** (Get/Set): interceptor handles it, base is NOT called
+- **Abstract property, unconfigured**: returns `default(T)` for getter (or throws in strict mode)
+- **Abstract property, configured**: interceptor handles it
 
 ---
 
@@ -597,4 +606,4 @@ Choose your configuration approach based on the test scenario:
 
 ---
 
-**UPDATED:** 2026-02-06
+**UPDATED:** 2026-02-08

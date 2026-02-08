@@ -52,7 +52,16 @@ stub.DataReceived.VerifyAdd(Called.Never);
 ```
 <!-- endSnippet -->
 
-### 4. Class Stubs Use .Object Property
+### 4. Class Stubs Call Base by Default (Virtual Methods)
+
+Class stubs (Patterns 3, 4, 6, 9) automatically call the base class implementation for unconfigured virtual methods. This is equivalent to Moq's `.CallBase = true`, but it is the default behavior -- no opt-in required. Abstract methods return `default(T)` when unconfigured (there is no base to call).
+
+- **Virtual method, unconfigured**: calls base class implementation
+- **Virtual method, configured** (Return/Call/When): interceptor handles it, base is NOT called
+- **Abstract method, unconfigured**: returns `default(T)` (or throws in strict mode)
+- **Abstract method, configured**: interceptor handles it
+
+### 5. Class Stubs Use .Object Property
 
 Inline class stubs don't inherit from the base class:
 
@@ -66,7 +75,7 @@ service.Initialize();
 ```
 <!-- endSnippet -->
 
-### 5. Closed Generic Stubs Use Simple Names
+### 6. Closed Generic Stubs Use Simple Names
 
 <!-- snippet: skill-gotcha-closed-generic -->
 ```cs
@@ -75,7 +84,7 @@ var stub = new Stubs.IRepository();  // NOT Stubs.IRepository<User>
 ```
 <!-- endSnippet -->
 
-### 6. Called.Between() Does NOT Exist
+### 7. Called.Between() Does NOT Exist
 
 <!-- snippet: skill-gotcha-times-between -->
 ```cs
@@ -86,7 +95,7 @@ stub.Save.Verify(Called.AtMost(5));
 ```
 <!-- endSnippet -->
 
-### 7. Configuration Methods — Last One Wins
+### 8. Configuration Methods — Last One Wins
 
 All configuration methods use direct replacement. Calling any configuration method replaces the previous configuration of the same kind:
 
@@ -107,7 +116,7 @@ stub.GetValue.Return((id) => $"val-{id}"); // REPLACES constant, now dynamic
 ```
 <!-- endSnippet -->
 
-### 8. Set Does NOT Auto-Update Getter
+### 9. Set Does NOT Auto-Update Getter
 
 <!-- snippet: skill-gotcha-onset-no-auto-update -->
 ```cs
@@ -118,7 +127,7 @@ service.Name = "test";
 ```
 <!-- endSnippet -->
 
-### 9. Reset() Clears Tracking BUT Preserves Some State
+### 10. Reset() Clears Tracking BUT Preserves Some State
 
 | Interceptor | Reset Clears | Reset Preserves |
 |-------------|--------------|-----------------|
@@ -222,6 +231,8 @@ public partial class SkillEmailTests
 <!-- endSnippet -->
 
 ### Inline Class Pattern
+
+Class stubs call the base class implementation by default for unconfigured virtual methods. Only configure what you need to override. Abstract methods return `default(T)` when unconfigured.
 
 <!-- snippet: skill-inline-class-pattern -->
 ```cs
@@ -703,7 +714,7 @@ stub.GetById.Return((id) => testUser);  // This wins over source
 ```
 <!-- endSnippet -->
 
-**Availability:** Source() is available for **interface stubs only** (Standalone and Inline Interface patterns). Class stubs inherit from the base class directly and do not need Source().
+**Availability:** Source() is available for **interface stubs only** (Standalone and Inline Interface patterns). Class stubs do not need Source() because they already call the base class implementation by default for unconfigured virtual methods (see Gotcha #4).
 
 ### Priority Order
 
@@ -742,6 +753,7 @@ Remove source delegation by passing null: `stub.Source(null)`. After clearing, u
 | `.Setup(x => x.Prop).Returns(val)` | `stub.Prop.Get(val)` |
 | `.ReturnsAsync(val)` | `stub.Method.Return(val)` (auto-wraps) |
 | `.Callback(action)` | Logic inside `Return`/`Call` callback |
+| `mock.CallBase = true` | Default for class stubs (just don't configure the member) |
 | `.Verify(x => x.Method(), Times.Once)` | `tracking.Verify(Called.Once)` |
 | `.Verifiable()` + `mock.Verify()` | `.Verifiable()` + `stub.Verify()` |
 | `It.IsAny<T>()` | Callback always receives all args |
@@ -838,4 +850,4 @@ For detailed documentation, see the reference files in `references/`:
 
 ---
 
-**UPDATED:** 2026-02-07
+**UPDATED:** 2026-02-08
