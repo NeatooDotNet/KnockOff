@@ -96,7 +96,15 @@ internal sealed record InterfaceMemberInfo(
 	/// True if the property setter is init-only (C# 9 init accessor).
 	/// When true, the generated setter uses 'init' instead of 'set'.
 	/// </summary>
-	bool IsInitOnly = false) : IEquatable<InterfaceMemberInfo>
+	bool IsInitOnly = false,
+	/// <summary>
+	/// True if the member returns by ref (ref T).
+	/// </summary>
+	bool ReturnsByRef = false,
+	/// <summary>
+	/// True if the member returns by ref readonly (ref readonly T).
+	/// </summary>
+	bool ReturnsByRefReadonly = false) : IEquatable<InterfaceMemberInfo>
 {
 	/// <summary>
 	/// Creates an InterfaceMemberInfo from a property symbol.
@@ -177,7 +185,9 @@ internal sealed record InterfaceMemberInfo(
 			SetterHasDisallowNull: setterHasDisallowNull,
 			SetterHasAllowNull: setterHasAllowNull,
 			IndexerTypeSuffix: indexerTypeSuffix,
-			IsInitOnly: isInitOnly);
+			IsInitOnly: isInitOnly,
+			ReturnsByRef: property.ReturnsByRef,
+			ReturnsByRefReadonly: property.ReturnsByRefReadonly);
 	}
 
 	/// <summary>
@@ -256,7 +266,9 @@ internal sealed record InterfaceMemberInfo(
 			IndexerParameters: EquatableArray<ParameterInfo>.Empty,
 			IsGenericMethod: isGenericMethod,
 			TypeParameters: typeParameters,
-			DeclaringInterfaceFullName: declaringInterfaceFullName);
+			DeclaringInterfaceFullName: declaringInterfaceFullName,
+			ReturnsByRef: method.ReturnsByRef,
+			ReturnsByRefReadonly: method.ReturnsByRefReadonly);
 	}
 }
 

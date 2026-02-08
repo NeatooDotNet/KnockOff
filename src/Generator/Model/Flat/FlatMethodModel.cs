@@ -42,4 +42,16 @@ internal sealed record FlatMethodModel(
     /// <summary>Suffix for this signature when part of overload group (e.g., "String_Int32_String").</summary>
     string SignatureSuffix,
     /// <summary>True if this method is part of an overload group with multiple signatures.</summary>
-    bool IsPartOfOverloadGroup);
+    bool IsPartOfOverloadGroup,
+
+    // Ref return support
+    /// <summary>True if the method returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the method returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}

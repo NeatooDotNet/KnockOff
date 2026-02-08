@@ -1123,10 +1123,19 @@ internal static class InlineRenderer
             return;
         }
 
-        w.Line($"\t\t\t{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}");
+        w.Line($"\t\t\t{impl.RefReturnPrefix}{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}");
         w.Line("\t\t\t{");
 
-        if (impl.HasGetter)
+        if (impl.IsRefReturn)
+        {
+            // Ref return properties are always get-only (C# constraint)
+            w.Line("\t\t\t\tget");
+            w.Line("\t\t\t\t{");
+            w.Line($"\t\t\t\t\t{impl.InterceptorName}.InvokeRefGet(Strict);");
+            w.Line($"\t\t\t\t\treturn ref {impl.InterceptorName}._refReturnBacking;");
+            w.Line("\t\t\t\t}");
+        }
+        else if (impl.HasGetter)
         {
             if (impl.IsInitOnly)
             {
@@ -1140,7 +1149,7 @@ internal static class InlineRenderer
             }
         }
 
-        if (impl.HasSetter)
+        if (!impl.IsRefReturn && impl.HasSetter)
         {
             var setterKeyword = impl.IsInitOnly ? "init" : "set";
             if (impl.SetterPragmaDisable != null)
@@ -1165,19 +1174,31 @@ internal static class InlineRenderer
 
     private static void RenderIndexerImplementation(CodeWriter w, InlineInterfaceImplementation impl)
     {
-        w.Line($"\t\t\t{impl.ReturnType} {impl.InterfaceFullName}.this[{impl.ParameterDeclarations}]");
+        w.Line($"\t\t\t{impl.RefReturnPrefix}{impl.ReturnType} {impl.InterfaceFullName}.this[{impl.ParameterDeclarations}]");
         w.Line("\t\t\t{");
 
-        if (impl.HasGetter)
+        if (impl.IsRefReturn)
         {
-            // Use InvokeGet which handles the priority chain
-            w.Line($"\t\t\t\tget => {impl.InterceptorName}.InvokeGet(Strict, {impl.ArgumentList});");
+            // Ref return indexers are always get-only (C# constraint)
+            w.Line("\t\t\t\tget");
+            w.Line("\t\t\t\t{");
+            w.Line($"\t\t\t\t\t{impl.InterceptorName}.InvokeRefGet(Strict, {impl.ArgumentList});");
+            w.Line($"\t\t\t\t\treturn ref {impl.InterceptorName}._refReturnBacking;");
+            w.Line("\t\t\t\t}");
         }
-
-        if (impl.HasSetter)
+        else
         {
-            // Use InvokeSet which handles the priority chain
-            w.Line($"\t\t\t\tset => {impl.InterceptorName}.InvokeSet(Strict, {impl.ArgumentList}, value);");
+            if (impl.HasGetter)
+            {
+                // Use InvokeGet which handles the priority chain
+                w.Line($"\t\t\t\tget => {impl.InterceptorName}.InvokeGet(Strict, {impl.ArgumentList});");
+            }
+
+            if (impl.HasSetter)
+            {
+                // Use InvokeSet which handles the priority chain
+                w.Line($"\t\t\t\tset => {impl.InterceptorName}.InvokeSet(Strict, {impl.ArgumentList}, value);");
+            }
         }
 
         w.Line("\t\t\t}");
@@ -1210,7 +1231,7 @@ internal static class InlineRenderer
 
     private static void RenderNonGenericMethodImplementation(CodeWriter w, InlineInterfaceImplementation impl)
     {
-        w.Line($"\t\t\t{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}({impl.ParameterDeclarations})");
+        w.Line($"\t\t\t{impl.RefReturnPrefix}{impl.ReturnType} {impl.InterfaceFullName}.{impl.MemberName}({impl.ParameterDeclarations})");
         w.Line("\t\t\t{");
 
         // Build invoke args (includes Strict, no stub parameter)
@@ -1219,7 +1240,14 @@ internal static class InlineRenderer
             : $"Strict, {impl.ArgumentList}";
 
         // Call the interceptor's Invoke method (handles out params, tracking, callbacks, strict, defaults)
-        if (impl.IsVoid)
+        if (impl.IsRefReturn)
+        {
+            var invokeRefSuffix = string.IsNullOrEmpty(impl.InvokeSuffix) ? "" : impl.InvokeSuffix;
+            var backingField = string.IsNullOrEmpty(impl.InvokeSuffix) ? "_refReturnBacking" : $"_refReturnBacking{impl.InvokeSuffix}";
+            w.Line($"\t\t\t\t{impl.InterceptorName}.InvokeRef{invokeRefSuffix}({invokeArgs});");
+            w.Line($"\t\t\t\treturn ref {impl.InterceptorName}.{backingField};");
+        }
+        else if (impl.IsVoid)
             w.Line($"\t\t\t\t{impl.InterceptorName}.Invoke{impl.InvokeSuffix}({invokeArgs});");
         else
             w.Line($"\t\t\t\treturn {impl.InterceptorName}.Invoke{impl.InvokeSuffix}({invokeArgs});");

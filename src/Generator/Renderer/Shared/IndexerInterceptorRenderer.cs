@@ -140,10 +140,24 @@ internal static class IndexerInterceptorRenderer
 
 			}
 
+			// Ref return backing field (for ref return indexers)
+			if (model.IsRefReturn)
+			{
+				w.Line("#pragma warning disable CS8618 // Ref return backing field initialized by InvokeRefGet before use");
+				w.Line($"internal {model.ValueType} _refReturnBacking;");
+				w.Line("#pragma warning restore CS8618");
+				w.Line();
+			}
+
 			// InvokeGet/InvokeSet methods
 			if (model.HasGetter)
 			{
 				RenderInvokeGet(w, model, options);
+				// InvokeRefGet for ref return indexers - writes to _refReturnBacking instead of returning
+				if (model.IsRefReturn)
+				{
+					RenderInvokeRefGet(w, model, options);
+				}
 			}
 			if (model.HasSetter)
 			{
@@ -320,6 +334,87 @@ internal static class IndexerInterceptorRenderer
 
 			// Priority 5: Update Backing
 			w.Line($"Backing[{model.KeyExpression}] = value;");
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders InvokeRefGet for ref return indexers.
+	/// Same priority chain as InvokeGet but writes to _refReturnBacking instead of returning.
+	/// </summary>
+	private static void RenderInvokeRefGet(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		IndexerInterceptorRenderOptions options)
+	{
+		var strictParam = options.IncludeStrictParameter ? "bool strict, " : "";
+
+		w.Line($"/// <summary>Invokes the configured getter callback, writing result to _refReturnBacking. Called by ref return interface implementations.</summary>");
+		w.Line($"internal void InvokeRefGet({strictParam}{model.ParameterSignature})");
+		using (w.Braces())
+		{
+			// Priority 1: Sequence (if present and not exhausted)
+			w.Line("if (_getSequence != null && _getSequenceIndex < _getSequence.Count)");
+			using (w.Braces())
+			{
+				w.Line("var (callback, tracking) = _getSequence[_getSequenceIndex];");
+				w.Line($"tracking.RecordCall({model.KeyExpression});");
+				w.Line("_getSequenceIndex++;");
+				w.Line($"_refReturnBacking = callback({model.KeyExpression});");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then default
+			w.Line("if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)");
+			using (w.Braces())
+			{
+				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.IndexerName} (get)\");");
+				// Repeat last value if enabled (default behavior in non-strict mode)
+				w.Line("if (_getRepeatLastValue && _getSequence.Count > 0)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _getSequence[_getSequence.Count - 1];");
+					w.Line($"tracking.RecordCall({model.KeyExpression});");
+					w.Line($"_refReturnBacking = callback({model.KeyExpression});");
+					w.Line("return;");
+				}
+			}
+			w.Line();
+
+			// Priority 2: Repeating Get callback
+			w.Line("if (_get != null && _getTracking != null)");
+			using (w.Braces())
+			{
+				w.Line($"_getTracking.RecordCall({model.KeyExpression});");
+				w.Line($"_refReturnBacking = _get({model.KeyExpression});");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// No callback configured - track unconfigured call
+			w.Line("_unconfiguredGetCount++;");
+			w.Line($"_unconfiguredLastGetKey = {model.KeyExpression};");
+			w.Line();
+
+			// Priority 3: Backing dictionary
+			w.Line($"if (Backing.TryGetValue({model.KeyExpression}, out var backingValue)) {{ _refReturnBacking = backingValue; return; }}");
+			w.Line();
+
+			// Priority 4: Source (if available)
+			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			{
+				// Source delegation: copy source's value to _refReturnBacking (lossy ref redirection)
+				w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src[{model.KeyExpression}]; return; }}");
+				w.Line();
+			}
+
+			// Priority 5: Strict mode check
+			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.IndexerName}\");");
+
+			// Priority 6: Default
+			w.Line("_refReturnBacking = default!;");
 		}
 		w.Line();
 	}

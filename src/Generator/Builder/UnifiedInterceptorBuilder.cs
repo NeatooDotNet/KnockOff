@@ -69,7 +69,9 @@ internal static class UnifiedInterceptorBuilder
 				DefaultExpression: sig.DefaultExpression,
 				ThrowsOnDefault: sig.ThrowsOnDefault,
 				UserMethodName: userMethodName,
-				Overloads: EquatableArray<MethodOverloadSignature>.Empty);
+				Overloads: EquatableArray<MethodOverloadSignature>.Empty,
+				ReturnsByRef: sig.ReturnsByRef,
+				ReturnsByRefReadonly: sig.ReturnsByRefReadonly);
 		}
 		else
 		{
@@ -99,7 +101,9 @@ internal static class UnifiedInterceptorBuilder
 				// For multi-overload, user method is tracked per-signature (see MethodOverloadSignature.UserMethodName)
 				UserMethodName: userMethodName,
 				Overloads: new EquatableArray<MethodOverloadSignature>(
-					uniqueSignatures.Select(sig => BuildOverloadSignature(methodName, sig, ownerClassName, ownerTypeParameters, userMethodName)).ToArray()));
+					uniqueSignatures.Select(sig => BuildOverloadSignature(methodName, sig, ownerClassName, ownerTypeParameters, userMethodName)).ToArray()),
+				ReturnsByRef: first.ReturnsByRef,
+				ReturnsByRefReadonly: first.ReturnsByRefReadonly);
 		}
 	}
 
@@ -167,7 +171,9 @@ internal static class UnifiedInterceptorBuilder
 			BuilderInterface: GetBuilderInterface(sig.TrackableParameters, delegateName, sig.IsVoid),
 			DefaultExpression: sig.DefaultExpression,
 			ThrowsOnDefault: sig.ThrowsOnDefault,
-			UserMethodName: sig.UserMethodName);
+			UserMethodName: sig.UserMethodName,
+			ReturnsByRef: sig.ReturnsByRef,
+			ReturnsByRefReadonly: sig.ReturnsByRefReadonly);
 	}
 
 	#endregion
@@ -532,4 +538,8 @@ internal sealed record MethodSignatureInfo(
 	string DefaultExpression,
 	bool ThrowsOnDefault,
 	/// <summary>Per-signature user method name for partial overload coverage. Null if no user override for this signature.</summary>
-	string? UserMethodName = null);
+	string? UserMethodName = null,
+	/// <summary>True if the method returns by ref (ref T).</summary>
+	bool ReturnsByRef = false,
+	/// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
+	bool ReturnsByRefReadonly = false);

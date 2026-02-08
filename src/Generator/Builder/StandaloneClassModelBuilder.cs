@@ -288,7 +288,9 @@ internal static class StandaloneClassModelBuilder
                 ReturnType: m.ReturnType,
                 HasGetter: m.HasGetter,
                 HasSetter: m.HasSetter,
-                TargetMemberDescription: $"{cls.FullName}.{m.Name}"))
+                TargetMemberDescription: $"{cls.FullName}.{m.Name}",
+                ReturnsByRef: m.ReturnsByRef,
+                ReturnsByRefReadonly: m.ReturnsByRefReadonly))
             .ToEquatableArray();
 
         // Build base class methods (virtual protected methods for user override pattern)
@@ -301,7 +303,9 @@ internal static class StandaloneClassModelBuilder
                 ParameterDeclarations: string.Join(", ", m.Parameters.Select(p => FormatParameter(p))),
                 IsVoid: m.ReturnType == "void",
                 IsAbstract: m.IsAbstract,
-                TargetMemberDescription: $"{cls.FullName}.{m.Name}"))
+                TargetMemberDescription: $"{cls.FullName}.{m.Name}",
+                ReturnsByRef: m.ReturnsByRef,
+                ReturnsByRefReadonly: m.ReturnsByRefReadonly))
             .ToEquatableArray();
 
         return new StandaloneClassGenerationUnit(
@@ -392,7 +396,9 @@ internal static class StandaloneClassModelBuilder
             IsVoid: isVoid,
             HasRefOrOutParams: hasRefOrOut,
             DefaultExpression: defaultExpr,
-            ThrowsOnDefault: false);
+            ThrowsOnDefault: false,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     #endregion
@@ -418,7 +424,9 @@ internal static class StandaloneClassModelBuilder
             IsRequired: member.IsRequired,
             StubClassName: stubClassRef,
             TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+            ConstraintClauses: constraintClause,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineClassIndexerModel BuildIndexerModel(
@@ -454,7 +462,9 @@ internal static class StandaloneClassModelBuilder
             KeyExpression: keyExpr,
             StubClassName: stubClassRef,
             TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+            ConstraintClauses: constraintClause,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineClassEventModel BuildEventModel(
@@ -499,7 +509,9 @@ internal static class StandaloneClassModelBuilder
             HasSetter: member.HasSetter,
             IsInitOnly: member.IsInitOnly,
             IsAbstract: member.IsAbstract,
-            HasUserOverride: hasUserOverride);
+            HasUserOverride: hasUserOverride,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineClassImplIndexerModel BuildImplIndexerModel(ClassMemberInfo member, int indexerCount)
@@ -523,7 +535,9 @@ internal static class StandaloneClassModelBuilder
             IsAbstract: member.IsAbstract,
             IsNullable: member.IsNullable,
             DefaultStrategy: member.DefaultStrategy,
-            ConcreteTypeForNew: member.ConcreteTypeForNew);
+            ConcreteTypeForNew: member.ConcreteTypeForNew,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineClassImplMethodModel BuildImplMethodModel(
@@ -558,7 +572,9 @@ internal static class StandaloneClassModelBuilder
             InputArgumentList: inputArgList,
             CallArgumentList: callArgs,
             InvokeSuffix: invokeSuffix,
-            HasUserOverride: hasUserOverride);
+            HasUserOverride: hasUserOverride,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     /// <summary>
@@ -634,7 +650,9 @@ internal static class StandaloneClassModelBuilder
             ConstraintClauses: "", // Must be empty for overrides -- C# inherits constraints from base
             OfTypeAccess: $".Of<{typeParamNames}>()",
             NonGenericArgList: nonGenericArgList,
-            TaskTypeArg: taskTypeArg);
+            TaskTypeArg: taskTypeArg,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     /// <summary>

@@ -1992,10 +1992,20 @@ internal static class FlatRenderer
 			return;
 		}
 
-		w.Line($"{prop.ReturnType} {prop.DeclaringInterface}.{prop.MemberName}");
+		w.Line($"{prop.RefReturnPrefix}{prop.ReturnType} {prop.DeclaringInterface}.{prop.MemberName}");
 		using (w.Braces())
 		{
-			if (prop.IsInitOnly)
+			if (prop.IsRefReturn)
+			{
+				// Ref return properties are always get-only (C# constraint)
+				w.Line("get");
+				using (w.Braces())
+				{
+					w.Line($"{prop.InterceptorName}.InvokeRefGet(Strict);");
+					w.Line($"return ref {prop.InterceptorName}._refReturnBacking;");
+				}
+			}
+			else if (prop.IsInitOnly)
 			{
 				// Init-only: use InvokeGet for getter, but init setter records and sets value via SetValue
 				w.Line($"get => {prop.InterceptorName}.InvokeGet(Strict);");
@@ -2101,18 +2111,31 @@ internal static class FlatRenderer
 			? mapped
 			: indexer.InterceptorName;
 
-		w.Line($"{indexer.ReturnType} {indexer.DeclaringInterface}.this[{indexer.KeyType} {indexer.KeyParamName}]");
+		w.Line($"{indexer.RefReturnPrefix}{indexer.ReturnType} {indexer.DeclaringInterface}.this[{indexer.KeyType} {indexer.KeyParamName}]");
 		using (w.Braces())
 		{
-			// Use InvokeGet/InvokeSet which handle the priority chain
-			if (indexer.HasGetter)
+			if (indexer.IsRefReturn)
 			{
-				w.Line($"get => {accessExpr}.InvokeGet(Strict, {indexer.KeyParamName});");
+				// Ref return indexers are always get-only (C# constraint)
+				w.Line("get");
+				using (w.Braces())
+				{
+					w.Line($"{accessExpr}.InvokeRefGet(Strict, {indexer.KeyParamName});");
+					w.Line($"return ref {accessExpr}._refReturnBacking;");
+				}
 			}
-
-			if (indexer.HasSetter)
+			else
 			{
-				w.Line($"set => {accessExpr}.InvokeSet(Strict, {indexer.KeyParamName}, value);");
+				// Use InvokeGet/InvokeSet which handle the priority chain
+				if (indexer.HasGetter)
+				{
+					w.Line($"get => {accessExpr}.InvokeGet(Strict, {indexer.KeyParamName});");
+				}
+
+				if (indexer.HasSetter)
+				{
+					w.Line($"set => {accessExpr}.InvokeSet(Strict, {indexer.KeyParamName}, value);");
+				}
 			}
 		}
 		w.Line();
@@ -2156,7 +2179,7 @@ internal static class FlatRenderer
 		var invokeSuffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
 
 		// Non-generic methods use the new Invoke pattern
-		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
+		w.Line($"{method.RefReturnPrefix}{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
 		using (w.Braces())
 		{
 			// Build invoke args (includes Strict, no stub parameter)
@@ -2164,7 +2187,14 @@ internal static class FlatRenderer
 				? "Strict, " + string.Join(", ", method.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"))
 				: "Strict";
 
-			if (method.IsVoid)
+			if (method.IsRefReturn)
+			{
+				var invokeRefSuffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
+				var backingField = isMultiOverload ? $"_refReturnBacking_{GetSignatureSuffix(method)}" : "_refReturnBacking";
+				w.Line($"{method.InterceptorName}.InvokeRef{invokeRefSuffix}({invokeArgs});");
+				w.Line($"return ref {method.InterceptorName}.{backingField};");
+			}
+			else if (method.IsVoid)
 				w.Line($"{method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");
 			else
 				w.Line($"return {method.InterceptorName}.Invoke{invokeSuffix}({invokeArgs});");

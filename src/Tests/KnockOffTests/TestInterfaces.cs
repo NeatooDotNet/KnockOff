@@ -589,4 +589,42 @@ public partial class MixedRefReturnServiceKnockOff : IMixedRefReturnService
 {
 }
 
+/// <summary>
+/// Abstract base class with ref return members for testing class stub patterns.
+/// Covers abstract and virtual methods, properties, and indexers with ref/ref readonly returns.
+/// </summary>
+public abstract class RefReturnServiceBase
+{
+	// Abstract ref return method
+	public abstract ref int GetValueRef();
+
+	// Abstract ref readonly return method
+	public abstract ref readonly int GetValueRefReadonly();
+
+	// Virtual ref return method with base implementation
+	private int _virtualBacking = 99;
+	public virtual ref int GetVirtualValueRef() => ref _virtualBacking;
+
+	// Abstract ref return property
+	public abstract ref int RefProperty { get; }
+
+	// Abstract ref readonly return property
+	public abstract ref readonly int RefReadonlyProperty { get; }
+
+	// Virtual ref return property with base implementation
+	private int _virtualPropBacking = 77;
+	public virtual ref int VirtualRefProperty => ref _virtualPropBacking;
+
+	// Abstract ref return indexer
+	public abstract ref int this[int index] { get; }
+
+	// Non-ref member to verify mixed generation works
+	public abstract string Name { get; }
+}
+
+[KnockOffBase<RefReturnServiceBase>]
+public partial class RefReturnServiceBaseKnockOff
+{
+}
+
 #endregion

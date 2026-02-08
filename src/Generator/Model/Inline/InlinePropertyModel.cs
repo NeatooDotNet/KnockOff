@@ -29,4 +29,16 @@ internal sealed record InlinePropertyModel(
     /// <summary>Constraint clauses for type parameters.</summary>
     string ConstraintClauses,
     /// <summary>The declaring interface type for Source(T) feature.</summary>
-    string DeclaringInterface);
+    string DeclaringInterface,
+
+    // Ref return support
+    /// <summary>True if the property returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the property returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the property returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}

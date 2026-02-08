@@ -38,4 +38,16 @@ internal sealed record MethodOverloadSignature(
     /// User method name for this signature's fallback (e.g., "Process_"). Null if no user override exists.
     /// In mixed overload groups, some signatures may have user overrides while others do not.
     /// </summary>
-    string? UserMethodName = null);
+    string? UserMethodName = null,
+
+    // Ref return support
+    /// <summary>True if this signature returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if this signature returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if this signature returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}

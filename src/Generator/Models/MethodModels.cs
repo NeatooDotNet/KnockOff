@@ -24,7 +24,10 @@ internal sealed record MethodOverloadInfo(
 	bool IsVoid,
 	bool IsNullable,
 	bool IsGenericMethod,
-	EquatableArray<TypeParameterInfo> TypeParameters) : IEquatable<MethodOverloadInfo>;
+	EquatableArray<TypeParameterInfo> TypeParameters,
+	// Ref return support
+	bool ReturnsByRef = false,
+	bool ReturnsByRefReadonly = false) : IEquatable<MethodOverloadInfo>;
 
 /// <summary>
 /// Represents a parameter in the combined tuple (nullable if not in all overloads)

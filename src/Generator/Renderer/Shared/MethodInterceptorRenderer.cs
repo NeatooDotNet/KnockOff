@@ -333,8 +333,23 @@ internal static class MethodInterceptorRenderer
 			RenderVoidWhenEntryPoints(w, fullInterceptorClassName, model.Parameters, delegateType, null);
 		}
 
+		// Ref return backing field (for ref return methods, must be emitted inside the interceptor class)
+		if (model.IsRefReturn)
+		{
+			w.Line("#pragma warning disable CS8618 // Ref return backing field initialized by InvokeRef before use");
+			w.Line($"internal {model.ReturnType} _refReturnBacking;");
+			w.Line("#pragma warning restore CS8618");
+			w.Line();
+		}
+
 		// Invoke method
 		RenderInvokeMethod(w, model, options, null);
+
+		// InvokeRef method (for ref return methods - writes to _refReturnBacking instead of returning)
+		if (model.IsRefReturn)
+		{
+			RenderInvokeRefMethod(w, model, options, null);
+		}
 
 		// Reset method - clears counts but preserves configuration and verifiable marking
 		RenderResetMethod(w, model.Overloads, model.LastArgType, model.LastArgsType,
@@ -579,10 +594,26 @@ internal static class MethodInterceptorRenderer
 			}
 		}
 
+		// Ref return backing fields for overloads that return by ref
+		foreach (var overload in model.Overloads)
+		{
+			if (overload.IsRefReturn)
+			{
+				w.Line("#pragma warning disable CS8618 // Ref return backing field initialized by InvokeRef before use");
+				w.Line($"internal {overload.ReturnType} _refReturnBacking_{overload.SignatureSuffix};");
+				w.Line("#pragma warning restore CS8618");
+				w.Line();
+			}
+		}
+
 		// Invoke methods for each unique signature
 		foreach (var overload in model.Overloads)
 		{
 			RenderOverloadInvokeMethod(w, model, overload, options);
+			if (overload.IsRefReturn)
+			{
+				RenderOverloadInvokeRefMethod(w, model, overload, options);
+			}
 		}
 
 		// Reset method (resets all)
@@ -1093,6 +1124,310 @@ internal static class MethodInterceptorRenderer
 
 				// Return value directly - Call() returns the full return type (async wrapping done at config time)
 				w.Line($"return matcher.Call({callbackArgs});");
+			}
+			w.Line("else if (matcher.IsTerminal)");
+			using (w.Braces())
+			{
+				w.Line("// ThenNone: didn't match (always false), exhaust by advancing past it");
+				w.Line($"{whenChainHeadField}++;");
+			}
+			w.Line("// Non-terminal didn't match: fall through to rest of priority chain");
+		}
+		w.Line();
+	}
+
+	#endregion
+
+	#region InvokeRef Methods (Ref Return Support)
+
+	/// <summary>
+	/// Renders the InvokeRef method for single-signature ref return methods.
+	/// This is a simplified version of Invoke that writes to _refReturnBacking instead of returning,
+	/// and skips all async branches (C# prohibits async ref returns).
+	/// </summary>
+	private static void RenderInvokeRefMethod(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		InterceptorRenderOptions options,
+		string? signatureSuffix)
+	{
+		// Include stub parameter when user method fallback is needed and we have a stub type
+		var needsStubParam = options.UserMethodFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.UserMethodName);
+		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
+
+		// Determine if value overload exists for this method
+		var hasRefOrOut = HasRefOrOutParameters(model.Parameters);
+		var canHaveValueOverload = !model.IsVoid && !hasRefOrOut;
+
+		w.Line($"/// <summary>Invokes the configured callback, writing result to _refReturnBacking. Called by ref return interface implementations.</summary>");
+		w.Line($"internal void InvokeRef({invokeParams})");
+		using (w.Braces())
+		{
+			// Initialize out parameters
+			foreach (var p in model.Parameters.Where(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Out))
+			{
+				w.Line($"{p.EscapedName} = default!;");
+			}
+
+			var trackingArgs = UnifiedInterceptorBuilder.BuildTrackingArgs(model.TrackableParameters);
+
+			// When chain - check HEAD matcher first (highest priority)
+			// For non-void methods with parameters and no ref/out
+			var canHaveWhenChain = !model.IsVoid && model.Parameters.Count > 0 && !hasRefOrOut;
+			if (canHaveWhenChain)
+			{
+				RenderWhenChainInvokeRefCheck(w, model.Parameters, null);
+			}
+
+			// Check sequence (takes priority if When chain didn't match)
+			w.Line("if (_sequence != null && _sequenceIndex < _sequence.Count)");
+			using (w.Braces())
+			{
+				w.Line("var (callback, tracking) = _sequence[_sequenceIndex];");
+				w.Line($"tracking.RecordCall({trackingArgs});");
+				w.Line("_sequenceIndex++;");
+				var callbackArgs = BuildCallbackArgs(model.Parameters);
+				w.Line($"_refReturnBacking = callback({callbackArgs});");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Check repeating Returns value (before callback - value is simpler, check it first)
+			if (canHaveValueOverload)
+			{
+				w.Line("if (_hasReturnValue && _returnValueTracking != null)");
+				using (w.Braces())
+				{
+					w.Line($"_returnValueTracking.RecordCall({trackingArgs});");
+					// Direct assignment - no Task/ValueTask wrapping (ref returns can't be async)
+					w.Line("_refReturnBacking = _returnValue;");
+					w.Line("return;");
+				}
+				w.Line();
+			}
+
+			// Check repeating callback
+			w.Line("if (_call != null && _callTracking != null)");
+			using (w.Braces())
+			{
+				w.Line($"_callTracking.RecordCall({trackingArgs});");
+				var callbackArgs = BuildCallbackArgs(model.Parameters);
+				w.Line($"_refReturnBacking = _call({callbackArgs});");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Steps 7-8 SKIPPED: simplified callback for Task<T>/ValueTask<T> and void Task/ValueTask
+			// C# prohibits async ref returns, so these branches are never applicable.
+
+			// No callback configured - track, check source, then strict/default
+			w.Line("_unconfiguredCallCount++;");
+			if (model.LastArgType != null && model.TrackableParameters.Count > 0)
+			{
+				var firstParam = model.TrackableParameters.First().EscapedName;
+				w.Line($"_unconfiguredLastArg = {firstParam};");
+			}
+			if (model.LastArgsType != null)
+			{
+				w.Line($"_unconfiguredLastArgs = ({trackingArgs});");
+			}
+
+			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then default
+			w.Line("if (_sequence != null && _sequenceIndex >= _sequence.Count)");
+			using (w.Braces())
+			{
+				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.MethodName}\");");
+				// Repeat last value if enabled (default behavior in non-strict mode)
+				w.Line("if (_repeatLastValue && _sequence.Count > 0)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _sequence[_sequence.Count - 1];");
+					w.Line($"tracking.RecordCall({trackingArgs});");
+					var repeatCallbackArgs = BuildCallbackArgs(model.Parameters);
+					w.Line($"_refReturnBacking = callback({repeatCallbackArgs});");
+					w.Line("return;");
+				}
+				// Write default to backing (only reached when _repeatLastValue is false via ThenDefault())
+				w.Line("_refReturnBacking = default!;");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Final fallback: User Method > Source > Strict > Default
+			if (options.UserMethodFallback && !string.IsNullOrEmpty(model.UserMethodName))
+			{
+				// User method fallback - writes result to _refReturnBacking
+				var userMethodCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
+				w.Line($"_refReturnBacking = {methodPrefix}{model.UserMethodName}({userMethodCallArgs});");
+				w.Line("return;");
+			}
+			else
+			{
+				// Standard fallback: Source > Strict > Default
+				if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				{
+					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					var sourceCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+					// Source delegation: copy source's value to _refReturnBacking (lossy ref redirection, acceptable for stubs)
+					w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src.{model.MethodName}({sourceCallArgs}); return; }}");
+					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+				}
+
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
+				w.Line("_refReturnBacking = default!;");
+				w.Line("return;");
+			}
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the InvokeRef method for overload-group ref return methods.
+	/// </summary>
+	private static void RenderOverloadInvokeRefMethod(
+		CodeWriter w,
+		UnifiedMethodInterceptorModel model,
+		MethodOverloadSignature overload,
+		InterceptorRenderOptions options)
+	{
+		// Include stub parameter when user method fallback is needed and we have a stub type
+		var needsStubParam = options.UserMethodFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(overload.UserMethodName);
+		var invokeParams = BuildInvokeParams(overload.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
+		var backingField = $"_refReturnBacking_{overload.SignatureSuffix}";
+
+		w.Line($"/// <summary>Invokes configured callback for {model.MethodName}({GetParamTypeList(overload.Parameters)}), writing result to backing field.</summary>");
+		w.Line($"internal void InvokeRef_{overload.SignatureSuffix}({invokeParams})");
+		using (w.Braces())
+		{
+			// Initialize out parameters
+			foreach (var p in overload.Parameters.Where(p => p.RefKind == Microsoft.CodeAnalysis.RefKind.Out))
+			{
+				w.Line($"{p.EscapedName} = default!;");
+			}
+
+			var trackingArgs = UnifiedInterceptorBuilder.BuildTrackingArgs(overload.TrackableParameters);
+
+			// When chain - check HEAD matcher first (highest priority)
+			var hasRefOrOutForWhen = HasRefOrOutParameters(overload.Parameters);
+			var canHaveWhenChain = !overload.IsVoid && overload.Parameters.Count > 0 && !hasRefOrOutForWhen;
+			if (canHaveWhenChain)
+			{
+				RenderWhenChainInvokeRefCheck(w, overload.Parameters, overload.SignatureSuffix, backingField);
+			}
+
+			// Check sequence (takes priority if When chain didn't match)
+			w.Line($"if (_sequence_{overload.SignatureSuffix} != null && _sequenceIndex_{overload.SignatureSuffix} < _sequence_{overload.SignatureSuffix}.Count)");
+			using (w.Braces())
+			{
+				w.Line($"var (callback, tracking) = _sequence_{overload.SignatureSuffix}[_sequenceIndex_{overload.SignatureSuffix}];");
+				w.Line($"tracking.RecordCall({trackingArgs});");
+				w.Line($"_sequenceIndex_{overload.SignatureSuffix}++;");
+				var callbackArgs = BuildCallbackArgs(overload.Parameters);
+				w.Line($"{backingField} = callback({callbackArgs});");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Check repeating callback
+			w.Line($"if (_call_{overload.SignatureSuffix} != null && _callTracking_{overload.SignatureSuffix} != null)");
+			using (w.Braces())
+			{
+				w.Line($"_callTracking_{overload.SignatureSuffix}.RecordCall({trackingArgs});");
+				var callbackArgs = BuildCallbackArgs(overload.Parameters);
+				w.Line($"{backingField} = _call_{overload.SignatureSuffix}({callbackArgs});");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Steps 7-8 SKIPPED: async branches impossible for ref returns
+
+			// No callback configured
+			w.Line("_unconfiguredCallCount++;");
+
+			// Sequence exhausted
+			w.Line($"if (_sequence_{overload.SignatureSuffix} != null && _sequenceIndex_{overload.SignatureSuffix} >= _sequence_{overload.SignatureSuffix}.Count)");
+			using (w.Braces())
+			{
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.MethodName}\");");
+				w.Line($"if (_repeatLastValue_{overload.SignatureSuffix} && _sequence_{overload.SignatureSuffix}.Count > 0)");
+				using (w.Braces())
+				{
+					w.Line($"var (callback, tracking) = _sequence_{overload.SignatureSuffix}[_sequence_{overload.SignatureSuffix}.Count - 1];");
+					w.Line($"tracking.RecordCall({trackingArgs});");
+					var repeatCallbackArgs = BuildCallbackArgs(overload.Parameters);
+					w.Line($"{backingField} = callback({repeatCallbackArgs});");
+					w.Line("return;");
+				}
+				w.Line($"{backingField} = default!;");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Final fallback: User Method > Source > Strict > Default
+			if (options.UserMethodFallback && !string.IsNullOrEmpty(overload.UserMethodName))
+			{
+				var userMethodCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
+				w.Line($"{backingField} = {methodPrefix}{overload.UserMethodName}({userMethodCallArgs});");
+				w.Line("return;");
+			}
+			else
+			{
+				if (!string.IsNullOrEmpty(model.DeclaringInterface))
+				{
+					w.Line("#pragma warning disable CS8601, SYSLIB0050");
+					var sourceCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+					w.Line($"if (_source is {{ }} src) {{ {backingField} = src.{model.MethodName}({sourceCallArgs}); return; }}");
+					w.Line("#pragma warning restore CS8601, SYSLIB0050");
+				}
+
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.MethodName}\");");
+				w.Line($"{backingField} = default!;");
+				w.Line("return;");
+			}
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders the When chain invoke check for InvokeRef (ref return methods).
+	/// Writes to _refReturnBacking instead of returning.
+	/// </summary>
+	private static void RenderWhenChainInvokeRefCheck(
+		CodeWriter w,
+		EquatableArray<ParameterModel> parameters,
+		string? signatureSuffix,
+		string backingField = "_refReturnBacking")
+	{
+		var suffix = signatureSuffix == null ? "" : $"_{signatureSuffix}";
+		var whenChainField = signatureSuffix == null ? "_whenChain" : $"_whenChain_{signatureSuffix}";
+		var whenChainHeadField = signatureSuffix == null ? "_whenChainHead" : $"_whenChainHead_{signatureSuffix}";
+		var callbackArgs = BuildCallbackArgs(parameters);
+
+		w.Line($"// When chain - check HEAD matcher first (highest priority)");
+		w.Line($"if ({whenChainField} != null && {whenChainHeadField} < {whenChainField}.Count)");
+		using (w.Braces())
+		{
+			w.Line($"var matcher = {whenChainField}[{whenChainHeadField}];");
+			w.Line($"if (matcher.Matches({callbackArgs}))");
+			using (w.Braces())
+			{
+				w.Line("matcher.CallCount++;");
+				w.Line();
+				w.Line("// Advance HEAD unless at last matcher (which repeats)");
+				w.Line($"if ({whenChainHeadField} < {whenChainField}.Count - 1)");
+				using (w.Braces())
+				{
+					w.Line($"{whenChainHeadField}++;");
+				}
+				w.Line("// At last matcher: never advance (repeat behavior for both ThenWhen and ThenCall)");
+				w.Line();
+
+				// Write result to backing field instead of returning
+				w.Line($"{backingField} = matcher.Call({callbackArgs});");
+				w.Line("return;");
 			}
 			w.Line("else if (matcher.IsTerminal)");
 			using (w.Braces())

@@ -39,4 +39,16 @@ internal sealed record InlineIndexerModel(
     /// <summary>The declaring interface type for Source(T) feature.</summary>
     string DeclaringInterface,
     /// <summary>Friendly name for the key type (e.g., "Int32", "String") for OfXxx pattern.</summary>
-    string KeyTypeFriendlyName);
+    string KeyTypeFriendlyName,
+
+    // Ref return support
+    /// <summary>True if the indexer returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the indexer returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the indexer returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}

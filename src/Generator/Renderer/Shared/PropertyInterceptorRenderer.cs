@@ -266,10 +266,24 @@ internal static class PropertyInterceptorRenderer
 		// They separate tracking from callback invocation for the base class pattern
 		RenderUserOverrideSupportMethods(w, model);
 
+		// Ref return backing field (for ref return properties)
+		if (model.IsRefReturn)
+		{
+			w.Line("#pragma warning disable CS8618 // Ref return backing field initialized by InvokeRefGet before use");
+			w.Line($"internal {model.ValueType} _refReturnBacking;");
+			w.Line("#pragma warning restore CS8618");
+			w.Line();
+		}
+
 		// InvokeGet/InvokeSet methods
 		if (model.HasGetter)
 		{
 			RenderInvokeGet(w, model, options);
+			// InvokeRefGet for ref return properties - writes to _refReturnBacking instead of returning
+			if (model.IsRefReturn)
+			{
+				RenderInvokeRefGet(w, model, options);
+			}
 		}
 		if (model.HasSetter)
 		{
@@ -564,6 +578,85 @@ internal static class PropertyInterceptorRenderer
 				w.Line("_value = value;");
 				w.Line("_valueSet = true;");
 			}
+		}
+		w.Line();
+	}
+
+	/// <summary>
+	/// Renders InvokeRefGet for ref return properties.
+	/// Same priority chain as InvokeGet but writes to _refReturnBacking instead of returning.
+	/// </summary>
+	private static void RenderInvokeRefGet(
+		CodeWriter w,
+		UnifiedPropertyInterceptorModel model,
+		PropertyInterceptorRenderOptions options)
+	{
+		var strictParam = options.IncludeStrictParameter ? "bool strict" : "";
+
+		w.Line($"/// <summary>Invokes the configured getter callback, writing result to _refReturnBacking. Called by ref return interface implementations.</summary>");
+		w.Line($"internal void InvokeRefGet({strictParam})");
+		using (w.Braces())
+		{
+			// Priority 1: Sequence (if present and not exhausted)
+			w.Line("if (_getSequence != null && _getSequenceIndex < _getSequence.Count)");
+			using (w.Braces())
+			{
+				w.Line("var (callback, tracking) = _getSequence[_getSequenceIndex];");
+				w.Line("tracking.RecordCall();");
+				w.Line("_getSequenceIndex++;");
+				w.Line("_refReturnBacking = callback();");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Priority 2: Repeating Get callback
+			w.Line("if (_get != null && _getTracking != null)");
+			using (w.Braces())
+			{
+				w.Line("_getTracking.RecordCall();");
+				w.Line("_refReturnBacking = _get();");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// No callback configured - track unconfigured call
+			w.Line("_unconfiguredGetCount++;");
+			w.Line();
+
+			// Sequence exhausted - check strict mode first (always throws), then repeat-last-value, then default
+			w.Line("if (_getSequence != null && _getSequenceIndex >= _getSequence.Count)");
+			using (w.Braces())
+			{
+				// Strict mode ALWAYS throws on exhaustion (regardless of _repeatLastValue)
+				w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.SequenceExhausted(\"{model.PropertyName} (get)\");");
+				// Repeat last value if enabled (default behavior in non-strict mode)
+				w.Line("if (_getRepeatLastValue && _getSequence.Count > 0)");
+				using (w.Braces())
+				{
+					w.Line("var (callback, tracking) = _getSequence[_getSequence.Count - 1];");
+					w.Line("tracking.RecordCall();");
+					w.Line("_refReturnBacking = callback();");
+					w.Line("return;");
+				}
+				// Write default to backing (only reached when _repeatLastValue is false via ThenDefault())
+				w.Line("_refReturnBacking = default!;");
+				w.Line("return;");
+			}
+			w.Line();
+
+			// Priority 3: Source (if available)
+			if (!string.IsNullOrEmpty(model.DeclaringInterface) && !model.IsInitOnly)
+			{
+				// Source delegation: copy source's value to _refReturnBacking (lossy ref redirection)
+				w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src.{model.PropertyName}; return; }}");
+				w.Line();
+			}
+
+			// Priority 4: Strict mode check
+			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.PropertyName}\");");
+
+			// Priority 5: Write default to backing
+			w.Line("_refReturnBacking = default!;");
 		}
 		w.Line();
 	}

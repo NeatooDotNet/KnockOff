@@ -22,12 +22,17 @@ public partial class MixedRefReturnInlineTest
 {
 }
 
+[KnockOff<RefReturnServiceBase>]
+public partial class RefReturnClassInlineTest
+{
+}
+
 #endregion
 
 /// <summary>
-/// Exploratory tests for ref return support in KnockOff.
-/// Tests both standalone ([KnockOff]) and inline ([KnockOff&lt;T&gt;]) patterns.
-/// Expected: compilation failures because the generator doesn't preserve ref return modifiers.
+/// Tests for ref return support in KnockOff.
+/// Tests standalone ([KnockOff]), inline ([KnockOff&lt;T&gt;]), and class stub
+/// ([KnockOffBase&lt;T&gt;], [KnockOff&lt;ClassBase&gt;]) patterns.
 /// </summary>
 public class RefReturnTests
 {
@@ -139,7 +144,7 @@ public class RefReturnTests
 		IRefReturnIndexerService service = knockOff;
 
 		ref int value = ref service[0];
-		knockOff.Indexer.VerifyGet(Called.Once);
+		knockOff.Indexer.OfInt32.VerifyGet(Called.Once);
 	}
 
 	[Fact]
@@ -149,7 +154,7 @@ public class RefReturnTests
 		IRefReturnIndexerService service = knockOff;
 
 		ref readonly int value = ref service["key"];
-		knockOff.IndexerString.VerifyGet(Called.Once);
+		knockOff.Indexer.OfString.VerifyGet(Called.Once);
 	}
 
 	#endregion
@@ -315,7 +320,7 @@ public class RefReturnTests
 		IRefReturnIndexerService service = stub;
 
 		ref int value = ref service[0];
-		stub.Indexer.VerifyGet(Called.Once);
+		stub.Indexer.OfInt32.VerifyGet(Called.Once);
 	}
 
 	[Fact]
@@ -325,7 +330,7 @@ public class RefReturnTests
 		IRefReturnIndexerService service = stub;
 
 		ref readonly int value = ref service["key"];
-		stub.IndexerString.VerifyGet(Called.Once);
+		stub.Indexer.OfString.VerifyGet(Called.Once);
 	}
 
 	#endregion
@@ -383,6 +388,248 @@ public class RefReturnTests
 
 		ref readonly int value = ref service.ReadonlyValue;
 		stub.ReadonlyValue.VerifyGet(Called.Once);
+	}
+
+	#endregion
+
+	#region Standalone Class Stub - Ref Return Methods
+
+	[Fact]
+	public void StandaloneClass_RefReturn_Compiles()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		Assert.NotNull(service);
+	}
+
+	[Fact]
+	public void StandaloneClass_AbstractRefReturnMethod_CanBeCalled()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		ref int result = ref service.GetValueRef();
+		stub.GetValueRef.Verify(Called.Once);
+	}
+
+	[Fact]
+	public void StandaloneClass_AbstractRefReadonlyReturnMethod_CanBeCalled()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		ref readonly int result = ref service.GetValueRefReadonly();
+		stub.GetValueRefReadonly.Verify(Called.Once);
+	}
+
+	[Fact]
+	public void StandaloneClass_VirtualRefReturnMethod_FallsBackToBase()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		// Virtual method -- unconfigured should fall back to base implementation
+		ref int result = ref service.GetVirtualValueRef();
+		Assert.Equal(99, result);
+	}
+
+	[Fact]
+	public void StandaloneClass_VirtualRefReturnMethod_ConfiguredOverridesBase()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		stub.GetVirtualValueRef.Return(42);
+		ref int result = ref service.GetVirtualValueRef();
+		Assert.Equal(42, result);
+		stub.GetVirtualValueRef.Verify(Called.Once);
+	}
+
+	#endregion
+
+	#region Standalone Class Stub - Ref Return Properties
+
+	[Fact]
+	public void StandaloneClass_AbstractRefReturnProperty_CanBeCalled()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		ref int result = ref service.RefProperty;
+		stub.RefProperty.VerifyGet(Called.Once);
+	}
+
+	[Fact]
+	public void StandaloneClass_AbstractRefReadonlyReturnProperty_CanBeCalled()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		ref readonly int result = ref service.RefReadonlyProperty;
+		stub.RefReadonlyProperty.VerifyGet(Called.Once);
+	}
+
+	[Fact]
+	public void StandaloneClass_VirtualRefReturnProperty_FallsBackToBase()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		// Virtual property -- unconfigured should fall back to base implementation
+		ref int result = ref service.VirtualRefProperty;
+		Assert.Equal(77, result);
+	}
+
+	#endregion
+
+	#region Standalone Class Stub - Ref Return Indexers
+
+	[Fact]
+	public void StandaloneClass_AbstractRefReturnIndexer_CanBeCalled()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		ref int result = ref service[0];
+		stub.Indexer.VerifyGet(Called.Once);
+	}
+
+	#endregion
+
+	#region Standalone Class Stub - Mixed Members
+
+	[Fact]
+	public void StandaloneClass_NormalMember_StillWorks()
+	{
+		var stub = new RefReturnServiceBaseKnockOff();
+		RefReturnServiceBase service = stub.Object;
+
+		stub.Name.Get("TestService");
+		var name = service.Name;
+
+		Assert.Equal("TestService", name);
+		stub.Name.VerifyGet(Called.Once);
+	}
+
+	#endregion
+
+	#region Inline Class Stub - Ref Return Methods
+
+	[Fact]
+	public void InlineClass_RefReturn_Compiles()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		Assert.NotNull(service);
+	}
+
+	[Fact]
+	public void InlineClass_AbstractRefReturnMethod_CanBeCalled()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		ref int result = ref service.GetValueRef();
+		stub.GetValueRef.Verify(Called.Once);
+	}
+
+	[Fact]
+	public void InlineClass_AbstractRefReadonlyReturnMethod_CanBeCalled()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		ref readonly int result = ref service.GetValueRefReadonly();
+		stub.GetValueRefReadonly.Verify(Called.Once);
+	}
+
+	[Fact]
+	public void InlineClass_VirtualRefReturnMethod_FallsBackToBase()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		ref int result = ref service.GetVirtualValueRef();
+		Assert.Equal(99, result);
+	}
+
+	[Fact]
+	public void InlineClass_VirtualRefReturnMethod_ConfiguredOverridesBase()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		stub.GetVirtualValueRef.Return(42);
+		ref int result = ref service.GetVirtualValueRef();
+		Assert.Equal(42, result);
+		stub.GetVirtualValueRef.Verify(Called.Once);
+	}
+
+	#endregion
+
+	#region Inline Class Stub - Ref Return Properties
+
+	[Fact]
+	public void InlineClass_AbstractRefReturnProperty_CanBeCalled()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		ref int result = ref service.RefProperty;
+		stub.RefProperty.VerifyGet(Called.Once);
+	}
+
+	[Fact]
+	public void InlineClass_AbstractRefReadonlyReturnProperty_CanBeCalled()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		ref readonly int result = ref service.RefReadonlyProperty;
+		stub.RefReadonlyProperty.VerifyGet(Called.Once);
+	}
+
+	[Fact]
+	public void InlineClass_VirtualRefReturnProperty_FallsBackToBase()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		ref int result = ref service.VirtualRefProperty;
+		Assert.Equal(77, result);
+	}
+
+	#endregion
+
+	#region Inline Class Stub - Ref Return Indexers
+
+	[Fact]
+	public void InlineClass_AbstractRefReturnIndexer_CanBeCalled()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		ref int result = ref service[0];
+		stub.Indexer.VerifyGet(Called.Once);
+	}
+
+	#endregion
+
+	#region Inline Class Stub - Mixed Members
+
+	[Fact]
+	public void InlineClass_NormalMember_StillWorks()
+	{
+		var stub = new RefReturnClassInlineTest.Stubs.RefReturnServiceBase();
+		RefReturnServiceBase service = stub.Object;
+
+		stub.Name.Get("TestService");
+		var name = service.Name;
+
+		Assert.Equal("TestService", name);
+		stub.Name.VerifyGet(Called.Once);
 	}
 
 	#endregion
