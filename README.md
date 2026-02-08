@@ -161,58 +161,16 @@ myRepoKO.Verify();
 
 ---
 
-## Unique Feature: Source Delegation
+## Where KnockOff is Improved
 
-`stub.Source(realImplementation)` delegates unconfigured method calls to a real object. Configured methods (Return, Call, When) still take priority.
+Source generation gives KnockOff access to full type information at compile time. These are areas where that advantage produces a meaningfully cleaner API than runtime proxy-based mocking:
 
-**The key: you don't need a complete implementation.** KnockOff generates a separate `Source()` overload for each interface in the hierarchy. Pass an object that implements any interface in the hierarchy — only the matching methods get delegated.
-
-For example, stub an interface that extends `IList<string>`:
-
-<!-- snippet: source-hierarchy-interface -->
-```cs
-public interface IStepList : IList<string>
-{
-    void AddRange(IEnumerable<string> items);
-}
-```
-<!-- endSnippet -->
-
-Now pass a `List<string>` — it implements `IList<string>` but not `IStepList`:
-
-<!-- snippet: source-hierarchy-partial -->
-```cs
-var realList = new List<string> { "step1", "step2", "step3" };
-
-// List<string> doesn't implement IStepList, but it does implement IList<string>
-// KnockOff delegates IList/ICollection/IEnumerable members to the real list
-stub.Source(realList);
-
-IStepList list = stub;
-
-// These work — delegated to List<string>
-Assert.Equal(3, list.Count);          // ICollection<T>.Count
-Assert.Equal("step1", list[0]);       // IList<T> indexer
-var items = new List<string>();
-foreach (var item in list)            // IEnumerable<T>
-{
-    items.Add(item);
-}
-Assert.Equal(new[] { "step1", "step2", "step3" }, items);
-
-// AddRange is NOT delegated — it's on IStepList, which List<string> doesn't implement
-// Configure it explicitly, or it returns the smart default
-stub.AddRange.Call((newItems) =>
-{
-    foreach (var newItem in newItems)
-    {
-        list.Add(newItem);
-    }
-});
-```
-<!-- endSnippet -->
-
-Not available in Moq or NSubstitute. See the [full Source Delegation guide](docs/guides/source-delegation.md) for hierarchy details, priority order, and complete examples.
+| Feature | KnockOff | Moq | NSubstitute |
+|---------|----------|-----|-------------|
+| **[Source Delegation](docs/guides/source-delegation.md)** | `stub.Source(real)` — delegates to real implementation, override specific methods | No equivalent | No equivalent |
+| **[Protected Methods](docs/guides/protected-methods.md)** | Same `Return`/`Call`/`Verify` API, fully typed | `Mock.Protected()` — string names, no compile-time safety | Not supported |
+| **[Ref/Out Parameters](docs/guides/ref-out-parameters.md)** | Natural lambda syntax with `ref`/`out` keywords | `It.Ref<T>.IsAny` + special callback syntax | Index-based `x[1] = value` |
+| **[Multiple Interfaces](docs/guides/multiple-interfaces.md)** | Unified interceptors on one stub, Source() per hierarchy level | `.As<T>()` — separate references per interface | Casting required for secondary interfaces |
 
 ---
 

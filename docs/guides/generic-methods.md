@@ -74,7 +74,7 @@ After execution, verify calls per type using the same `.Of<T>()` accessor. The `
 
 <!-- snippet: generic-verify-typed -->
 ```cs
-// Verify calls for specific type using Called
+// Verify calls for specific type using Times
 tracking.Verify(Called.Exactly(2));
 ```
 <!-- endSnippet -->
