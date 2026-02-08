@@ -647,6 +647,36 @@ public partial class KnockOffGenerator
 
 		// Get directly implemented interfaces (what user declared in base list)
 		var directInterfaces = classSymbol.Interfaces;
+
+		// Check for class with concrete base type but no interfaces (KO0201)
+		// User likely meant to use [KnockOffBase<T>] or [KnockOff<T>]
+		if (directInterfaces.Length == 0 &&
+			classSymbol.BaseType is { } baseTypeForDiag &&
+			baseTypeForDiag.SpecialType != SpecialType.System_Object)
+		{
+			var location = classDeclaration.Identifier.GetLocation();
+			var lineSpan = location.GetLineSpan();
+			diagnostics.Add(new DiagnosticInfo(
+				"KO0201",
+				filePath,
+				lineSpan.StartLinePosition.Line,
+				lineSpan.StartLinePosition.Character,
+				new[] { classSymbol.Name, baseTypeForDiag.ToDisplayString() }));
+
+			return new KnockOffTypeInfo(
+				Namespace: namespaceName,
+				ClassName: classSymbol.Name,
+				ContainingTypes: containingTypes,
+				TypeParameters: classTypeParameters,
+				Interfaces: new EquatableArray<InterfaceInfo>(Array.Empty<InterfaceInfo>()),
+				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
+				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
+				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
+				UserOverrideMethods: EquatableArray<string>.Empty,
+				UserOverrideProperties: EquatableArray<string>.Empty,
+				Strict: strict);
+		}
+
 		if (directInterfaces.Length == 0)
 			return null;
 

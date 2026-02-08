@@ -174,7 +174,8 @@ internal static class ClassModelBuilder
         {
             implEvents.Add(new InlineClassImplEventModel(
                 EventName: evt.Name,
-                DelegateType: evt.FullDelegateTypeName.TrimEnd('?')));
+                DelegateType: evt.FullDelegateTypeName.TrimEnd('?'),
+                AccessModifier: evt.AccessModifier));
         }
 
         return new InlineClassStubModel(

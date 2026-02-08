@@ -274,4 +274,6 @@ internal sealed record InlineClassImplEventModel(
     /// <summary>The event name.</summary>
     string EventName,
     /// <summary>The delegate type.</summary>
-    string DelegateType);
+    string DelegateType,
+    /// <summary>The access modifier (public, protected, etc.).</summary>
+    string AccessModifier = "public");

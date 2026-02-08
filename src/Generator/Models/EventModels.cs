@@ -12,7 +12,8 @@ internal sealed record EventMemberInfo(
 	EquatableArray<ParameterInfo> DelegateParameters,
 	string? ReturnTypeName,
 	bool IsAsync,
-	string DeclaringInterfaceFullName) : IEquatable<EventMemberInfo>
+	string DeclaringInterfaceFullName,
+	string AccessModifier = "public") : IEquatable<EventMemberInfo>
 {
 	/// <summary>
 	/// Creates an EventMemberInfo from an event symbol.
@@ -21,6 +22,15 @@ internal sealed record EventMemberInfo(
 	{
 		var delegateType = (INamedTypeSymbol)eventSymbol.Type;
 		var invokeMethod = delegateType.DelegateInvokeMethod;
+
+		var accessModifier = eventSymbol.DeclaredAccessibility switch
+		{
+			Accessibility.Public => "public",
+			Accessibility.Protected => "protected",
+			Accessibility.ProtectedOrInternal => "protected internal",
+			Accessibility.Internal => "internal",
+			_ => "public"
+		};
 
 		if (invokeMethod is null)
 		{
@@ -32,7 +42,8 @@ internal sealed record EventMemberInfo(
 				DelegateParameters: EquatableArray<ParameterInfo>.Empty,
 				ReturnTypeName: null,
 				IsAsync: false,
-				DeclaringInterfaceFullName: declaringInterfaceFullName);
+				DeclaringInterfaceFullName: declaringInterfaceFullName,
+				AccessModifier: accessModifier);
 		}
 
 		var delegateKind = SymbolHelpers.ClassifyDelegateKind(delegateType);
@@ -52,7 +63,8 @@ internal sealed record EventMemberInfo(
 			DelegateParameters: new EquatableArray<ParameterInfo>(parameters),
 			ReturnTypeName: returnType,
 			IsAsync: isAsync,
-			DeclaringInterfaceFullName: declaringInterfaceFullName);
+			DeclaringInterfaceFullName: declaringInterfaceFullName,
+			AccessModifier: accessModifier);
 	}
 }
 

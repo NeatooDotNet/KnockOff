@@ -197,7 +197,8 @@ internal static class StandaloneClassModelBuilder
         {
             implEvents.Add(new InlineClassImplEventModel(
                 EventName: evt.Name,
-                DelegateType: evt.FullDelegateTypeName.TrimEnd('?')));
+                DelegateType: evt.FullDelegateTypeName.TrimEnd('?'),
+                AccessModifier: evt.AccessModifier));
         }
 
         // Build containing types models
