@@ -109,6 +109,14 @@ internal static class StandaloneClassRenderer
             RenderEventInterceptorClass(w, evt, unit.ClassName, indent);
         }
 
+        // Render generic method handler interceptor classes (Of<T>() pattern)
+        // Pass emitHelperInterfaces=true because standalone interceptors are top-level classes,
+        // not nested inside a containing class that provides IGenericMethodCallTracker/IResettable
+        foreach (var handler in unit.GenericMethodHandlers)
+        {
+            ClassRenderer.RenderClassGenericMethodHandler(w, handler, indent, emitHelperInterfaces: true);
+        }
+
         // Render the wrapper partial class (user's class)
         // Extends the generated base class for user property overrides
         var baseClassName = $"{unit.ClassName}Base{typeParamList}";
@@ -806,6 +814,12 @@ internal static class StandaloneClassRenderer
 
     private static void RenderImplMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
     {
+        if (method.IsGenericMethod)
+        {
+            ClassRenderer.RenderImplGenericMethodOverride(w, method, indent, indent1);
+            return;
+        }
+
         w.Line($"{indent}/// <inheritdoc />");
         w.Line($"{indent}{method.AccessModifier} override {method.ReturnType} {method.MethodName}({method.ParameterDeclarations})");
         w.Line($"{indent}{{");

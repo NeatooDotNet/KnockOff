@@ -46,7 +46,10 @@ internal static class InlineModelBuilder
         // Build class stubs
         foreach (var cls in info.Classes)
         {
-            classStubs.Add(BuildClassStub(cls));
+            var classStub = BuildClassStub(cls);
+            classStubs.Add(classStub);
+            if (classStub.GenericMethodHandlers.Count > 0)
+                hasGenericMethods = true;
         }
 
         // Build partial properties

@@ -69,6 +69,12 @@ internal static class ClassRenderer
             MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
         }
 
+        // Render generic method handler interceptor classes (Of<T>() pattern)
+        foreach (var handler in cls.GenericMethodHandlers)
+        {
+            RenderClassGenericMethodHandler(w, handler, indent);
+        }
+
         foreach (var evt in cls.Events)
         {
             RenderEventInterceptorClass(w, evt, cls.StubClassName, indent);
@@ -295,6 +301,216 @@ internal static class ClassRenderer
             }
         }
         w.Line();
+    }
+
+    #endregion
+
+    #region Generic Method Handler Rendering
+
+    /// <summary>
+    /// Renders a generic method handler interceptor class for class stubs.
+    /// Reuses the same Of&lt;T&gt;() pattern as the interface stub pipeline.
+    /// </summary>
+    internal static void RenderClassGenericMethodHandler(CodeWriter w, InlineGenericMethodHandlerModel handler, string indent, bool emitHelperInterfaces = false)
+    {
+        var indent1 = indent + "\t";
+        var indent2 = indent + "\t\t";
+        var indent3 = indent + "\t\t\t";
+        var indent4 = indent + "\t\t\t\t";
+
+        var ifaceTypeParamList = handler.InterfaceTypeParameterList;
+        var ifaceConstraintClause = handler.InterfaceConstraintClauses;
+
+        w.Line($"{indent}/// <summary>Interceptor for {handler.MethodName}.</summary>");
+        w.Line($"{indent}public sealed class {handler.InterceptorClassName}{ifaceTypeParamList}{ifaceConstraintClause}");
+        w.Line($"{indent}{{");
+
+        // For standalone stubs, emit helper interfaces inside each interceptor class
+        // to avoid namespace-level collisions between multiple stub files
+        if (emitHelperInterfaces)
+        {
+            w.Line($"{indent1}private interface IGenericMethodCallTracker {{ int CallCount {{ get; }} }}");
+            w.Line($"{indent1}private interface IResettable {{ void Reset(); }}");
+            w.Line();
+        }
+
+        // Dictionary for typed handlers
+        w.Line($"{indent1}private readonly global::System.Collections.Generic.Dictionary<{handler.KeyType}, object> _typedHandlers = new();");
+        w.Line();
+
+        // Of<T>() method
+        w.Line($"{indent1}/// <summary>Gets the typed handler for the specified type argument(s).</summary>");
+        w.Line($"{indent1}public {handler.TypedHandlerClassName}<{handler.TypeParameterNames}> Of<{handler.TypeParameterNames}>(){handler.MethodConstraintClauses}");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent2}var key = {handler.KeyConstruction};");
+        w.Line($"{indent2}if (!_typedHandlers.TryGetValue(key, out var handler))");
+        w.Line($"{indent2}{{");
+        w.Line($"{indent3}handler = new {handler.TypedHandlerClassName}<{handler.TypeParameterNames}>();");
+        w.Line($"{indent3}_typedHandlers[key] = handler;");
+        w.Line($"{indent2}}}");
+        w.Line($"{indent2}return ({handler.TypedHandlerClassName}<{handler.TypeParameterNames}>)handler;");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // Aggregate tracking
+        w.Line($"{indent1}private int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
+        w.Line();
+        w.Line($"{indent1}/// <summary>All type argument(s) that were used in calls.</summary>");
+        w.Line($"{indent1}public global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();");
+        w.Line();
+
+        // Reset method
+        w.Line($"{indent1}/// <summary>Resets tracking state (call counts) but preserves configuration (Return/Call callbacks).</summary>");
+        w.Line($"{indent1}public void Reset()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent2}foreach (var handler in _typedHandlers.Values.Cast<IResettable>())");
+        w.Line($"{indent3}handler.Reset();");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // Verify methods
+        w.Line($"{indent1}/// <summary>Verifies method was called at least once with any type argument. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies total call count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify(global::KnockOff.Called times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent2}if (!times.Validate(TotalCallCount))");
+        w.Line($"{indent3}throw new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{handler.MethodName}\", times, TotalCallCount));");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // Internal verification support
+        w.Line($"{indent1}internal bool IsVerifiable => false;");
+        w.Line($"{indent1}internal bool IsConfigured => _typedHandlers.Count > 0;");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerification() => null;");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
+        w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent2}if (!IsConfigured) return null;");
+        w.Line($"{indent2}return TotalCallCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{handler.MethodName}\", global::KnockOff.Called.AtLeastOnce, TotalCallCount);");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // Nested Typed Handler Class
+        RenderClassTypedHandlerClass(w, handler, indent1);
+
+        w.Line($"{indent}}}");
+        w.Line();
+    }
+
+    internal static void RenderClassTypedHandlerClass(CodeWriter w, InlineGenericMethodHandlerModel handler, string indent)
+    {
+        var indent1 = indent + "\t";
+        var indent2 = indent + "\t\t";
+
+        w.Line($"{indent}/// <summary>Typed handler for {handler.MethodName} with specific type arguments.</summary>");
+        w.Line($"{indent}public sealed class {handler.TypedHandlerClassName}<{handler.TypeParameterNames}> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking{handler.MethodConstraintClauses}");
+        w.Line($"{indent}{{");
+
+        // Delegate
+        w.Line($"{indent1}/// <summary>Delegate for {handler.MethodName}.</summary>");
+        w.Line($"{indent1}{handler.DelegateSignature}");
+        w.Line();
+
+        // Private callback field
+        w.Line($"{indent1}private {handler.MethodName}Delegate? _call;");
+        w.Line();
+
+        // CallCount
+        w.Line($"{indent1}private int _callCount;");
+        w.Line($"{indent1}int IGenericMethodCallTracker.CallCount => _callCount;");
+        w.Line();
+
+        // LastArg/LastArgs
+        if (handler.LastCallArgType != null)
+        {
+            var param = handler.NonGenericParameters.GetArray()![0];
+            w.Line($"{indent1}/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
+            w.Line($"{indent1}public {handler.LastCallArgType} LastArg {{ get; private set; }}");
+            w.Line();
+        }
+        else if (handler.LastCallArgsType != null)
+        {
+            w.Line($"{indent1}/// <summary>The arguments from the most recent call.</summary>");
+            w.Line($"{indent1}public {handler.LastCallArgsType} LastArgs {{ get; private set; }}");
+            w.Line();
+        }
+
+        // Return/Call method
+        var typedHandlerEntryPoint = handler.IsVoid ? "Call" : "Return";
+        w.Line($"{indent1}/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
+        w.Line($"{indent1}public global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({handler.MethodName}Delegate callback) {{ _call = callback; return this; }}");
+        w.Line();
+
+        // Callback property
+        w.Line($"{indent1}/// <summary>Gets the configured callback (internal use).</summary>");
+        w.Line($"{indent1}internal {handler.MethodName}Delegate? Callback => _call;");
+        w.Line();
+
+        // RecordCall
+        w.Line($"{indent1}/// <summary>Records a method call.</summary>");
+        if (handler.NonGenericParameters.Count == 0)
+        {
+            w.Line($"{indent1}public void RecordCall() => _callCount++;");
+        }
+        else if (handler.NonGenericParameters.Count == 1)
+        {
+            var param = handler.NonGenericParameters.GetArray()![0];
+            w.Line($"{indent1}public void RecordCall({param.Type} {param.Name}) {{ _callCount++; LastArg = {param.Name}; }}");
+        }
+        else
+        {
+            var paramList = string.Join(", ", handler.NonGenericParameters.Select(p => $"{p.Type} {p.Name}"));
+            var tupleConstruction = string.Join(", ", handler.NonGenericParameters.Select(p => p.Name));
+            w.Line($"{indent1}public void RecordCall({paramList}) {{ _callCount++; LastArgs = ({tupleConstruction}); }}");
+        }
+        w.Line();
+
+        // Reset
+        w.Line($"{indent1}/// <summary>Resets tracking state but preserves configuration.</summary>");
+        if (handler.NonGenericParameters.Count == 0)
+        {
+            w.Line($"{indent1}public void Reset() {{ _callCount = 0; }}");
+        }
+        else if (handler.NonGenericParameters.Count == 1)
+        {
+            w.Line($"{indent1}public void Reset() {{ _callCount = 0; LastArg = default; }}");
+        }
+        else
+        {
+            w.Line($"{indent1}public void Reset() {{ _callCount = 0; LastArgs = default; }}");
+        }
+        w.Line();
+
+        // Verify methods
+        w.Line($"{indent1}/// <summary>Verifies call count is at least once. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Verifies call count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+        w.Line($"{indent1}public void Verify(global::KnockOff.Called times)");
+        w.Line($"{indent1}{{");
+        w.Line($"{indent2}if (!times.Validate(_callCount))");
+        w.Line($"{indent2}\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"method\", times, _callCount));");
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // Verifiable methods
+        w.Line($"{indent1}/// <summary>Marks for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public global::KnockOff.IMethodTracking Verifiable() => this;");
+        w.Line();
+
+        w.Line($"{indent1}/// <summary>Marks for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public global::KnockOff.IMethodTracking Verifiable(global::KnockOff.Called times) => this;");
+
+        w.Line($"{indent}}}");
     }
 
     #endregion
@@ -573,6 +789,12 @@ internal static class ClassRenderer
 
     private static void RenderImplMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
     {
+        if (method.IsGenericMethod)
+        {
+            RenderImplGenericMethodOverride(w, method, indent, indent1);
+            return;
+        }
+
         w.Line($"{indent}/// <inheritdoc />");
         w.Line($"{indent}{method.AccessModifier} override {method.ReturnType} {method.MethodName}({method.ParameterDeclarations})");
         w.Line($"{indent}{{");
@@ -664,6 +886,109 @@ internal static class ClassRenderer
                 w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
                 w.Line($"{indent1}}}");
                 w.Line($"{indent1}return result;");
+            }
+        }
+
+        w.Line($"{indent}}}");
+        w.Line();
+    }
+
+    /// <summary>
+    /// Renders a generic method override in the Impl class using the Of&lt;T&gt;() handler pattern.
+    /// </summary>
+    internal static void RenderImplGenericMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
+    {
+        w.Line($"{indent}/// <inheritdoc />");
+        // NOTE: No constraint clauses on override -- C# inherits them from the base method.
+        w.Line($"{indent}{method.AccessModifier} override {method.ReturnType} {method.MethodName}{method.TypeParameterDecl}({method.ParameterDeclarations})");
+        w.Line($"{indent}{{");
+
+        // Null check for base constructor calls
+        w.Line($"{indent1}if (_stub == null)");
+        w.Line($"{indent1}{{");
+        if (method.IsAbstract)
+        {
+            if (method.IsVoid)
+            {
+                w.Line($"{indent1}\treturn;");
+            }
+            else if (method.IsTask && !string.IsNullOrEmpty(method.TaskTypeArg))
+            {
+                w.Line($"{indent1}\treturn global::System.Threading.Tasks.Task.FromResult<{method.TaskTypeArg}>(default!);");
+            }
+            else if (method.IsTask)
+            {
+                w.Line($"{indent1}\treturn global::System.Threading.Tasks.Task.CompletedTask;");
+            }
+            else if (method.IsValueTask && !string.IsNullOrEmpty(method.TaskTypeArg))
+            {
+                w.Line($"{indent1}\treturn new global::System.Threading.Tasks.ValueTask<{method.TaskTypeArg}>(default!);");
+            }
+            else if (method.IsValueTask)
+            {
+                w.Line($"{indent1}\treturn default;");
+            }
+            else
+            {
+                w.Line($"{indent1}\treturn default!;");
+            }
+        }
+        else
+        {
+            // Virtual - delegate to base
+            if (method.IsVoid)
+            {
+                w.Line($"{indent1}\tbase.{method.MethodName}{method.TypeParameterDecl}({method.ArgumentList});");
+                w.Line($"{indent1}\treturn;");
+            }
+            else
+            {
+                w.Line($"{indent1}\treturn base.{method.MethodName}{method.TypeParameterDecl}({method.ArgumentList});");
+            }
+        }
+        w.Line($"{indent1}}}");
+        w.Line();
+
+        // Get typed handler via Of<T>()
+        w.Line($"{indent1}var typedHandler = _stub.{method.HandlerName}{method.OfTypeAccess};");
+
+        // Record the call -- NonGenericArgList excludes params typed with method-level type params
+        if (string.IsNullOrEmpty(method.NonGenericArgList))
+            w.Line($"{indent1}typedHandler.RecordCall();");
+        else
+            w.Line($"{indent1}typedHandler.RecordCall({method.NonGenericArgList});");
+
+        // Check for callback
+        w.Line($"{indent1}if (typedHandler.Callback is {{ }} callCallback)");
+        if (method.IsVoid)
+            w.Line($"{indent1}{{ callCallback({method.ArgumentList}); return; }}");
+        else
+            w.Line($"{indent1}\treturn callCallback({method.ArgumentList});");
+
+        // Fallback for unconfigured calls
+        if (!method.IsAbstract)
+        {
+            // Virtual: fall back to base
+            if (method.IsVoid)
+                w.Line($"{indent1}base.{method.MethodName}{method.TypeParameterDecl}({method.ArgumentList});");
+            else
+                w.Line($"{indent1}return base.{method.MethodName}{method.TypeParameterDecl}({method.ArgumentList});");
+        }
+        else
+        {
+            // Abstract: return default
+            if (!method.IsVoid)
+            {
+                if (method.IsTask && !string.IsNullOrEmpty(method.TaskTypeArg))
+                    w.Line($"{indent1}return global::System.Threading.Tasks.Task.FromResult<{method.TaskTypeArg}>(default!);");
+                else if (method.IsTask)
+                    w.Line($"{indent1}return global::System.Threading.Tasks.Task.CompletedTask;");
+                else if (method.IsValueTask && !string.IsNullOrEmpty(method.TaskTypeArg))
+                    w.Line($"{indent1}return new global::System.Threading.Tasks.ValueTask<{method.TaskTypeArg}>(default!);");
+                else if (method.IsValueTask)
+                    w.Line($"{indent1}return default;");
+                else
+                    w.Line($"{indent1}return default!;");
             }
         }
 

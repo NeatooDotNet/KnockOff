@@ -519,15 +519,26 @@ public partial class KnockOffGenerator
 				// Only include virtual/abstract/override properties that aren't sealed
 				if ((property.IsVirtual || property.IsAbstract || property.IsOverride) && !property.IsSealed)
 				{
-					members.Add(ClassMemberInfo.FromProperty(property));
+					var memberInfo = ClassMemberInfo.FromProperty(property);
+					memberInfo = memberInfo with {
+						AccessModifier = AdjustAccessModifierForCrossAssembly(
+							memberInfo.AccessModifier, property, knockOffAssembly)
+					};
+					members.Add(memberInfo);
 				}
 			}
 			else if (member is IMethodSymbol method && method.MethodKind == MethodKind.Ordinary)
 			{
 				// Only include virtual/abstract/override methods that aren't sealed
+				// Generic methods are supported via the Of<T>() handler pattern
 				if ((method.IsVirtual || method.IsAbstract || method.IsOverride) && !method.IsSealed)
 				{
-					members.Add(ClassMemberInfo.FromMethod(method));
+					var memberInfo = ClassMemberInfo.FromMethod(method);
+					memberInfo = memberInfo with {
+						AccessModifier = AdjustAccessModifierForCrossAssembly(
+							memberInfo.AccessModifier, method, knockOffAssembly)
+					};
+					members.Add(memberInfo);
 				}
 			}
 			else if (member is IEventSymbol eventSymbol)
@@ -535,7 +546,12 @@ public partial class KnockOffGenerator
 				// Only include virtual/abstract/override events that aren't sealed
 				if ((eventSymbol.IsVirtual || eventSymbol.IsAbstract || eventSymbol.IsOverride) && !eventSymbol.IsSealed)
 				{
-					events.Add(EventMemberInfo.FromEvent(eventSymbol, classFullName));
+					var eventInfo = EventMemberInfo.FromEvent(eventSymbol, classFullName);
+					eventInfo = eventInfo with {
+						AccessModifier = AdjustAccessModifierForCrossAssembly(
+							eventInfo.AccessModifier, eventSymbol, knockOffAssembly)
+					};
+					events.Add(eventInfo);
 				}
 			}
 		}
@@ -1155,6 +1171,22 @@ public partial class KnockOffGenerator
 
 		// Public and Protected members are accessible
 		return true;
+	}
+
+	/// <summary>
+	/// Adjusts the access modifier for cross-assembly overrides.
+	/// When overriding a 'protected internal' member from a different assembly,
+	/// C# requires 'protected' (the 'internal' part is inaccessible cross-assembly).
+	/// </summary>
+	private static string AdjustAccessModifierForCrossAssembly(
+		string accessModifier, ISymbol member, IAssemblySymbol knockOffAssembly)
+	{
+		if (accessModifier == "protected internal" &&
+			!SymbolEqualityComparer.Default.Equals(member.ContainingAssembly, knockOffAssembly))
+		{
+			return "protected";
+		}
+		return accessModifier;
 	}
 
 	/// <summary>

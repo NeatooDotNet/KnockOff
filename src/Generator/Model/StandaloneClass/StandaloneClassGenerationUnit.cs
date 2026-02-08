@@ -31,6 +31,8 @@ internal sealed record StandaloneClassGenerationUnit(
     EquatableArray<UnifiedMethodInterceptorModel> Methods,
     /// <summary>Event interceptors to generate.</summary>
     EquatableArray<InlineClassEventModel> Events,
+    /// <summary>Generic method handler interceptor classes (Of&lt;T&gt;() pattern).</summary>
+    EquatableArray<InlineGenericMethodHandlerModel> GenericMethodHandlers,
     /// <summary>Interceptor properties to add to the wrapper class.</summary>
     EquatableArray<InlineInterceptorPropertyModel> InterceptorProperties,
     /// <summary>Reset statements for ResetInterceptors method.</summary>

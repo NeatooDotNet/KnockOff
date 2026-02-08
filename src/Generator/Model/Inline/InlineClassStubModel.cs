@@ -46,6 +46,8 @@ internal sealed record InlineClassStubModel(
     EquatableArray<InlineClassImplMethodModel> ImplMethods,
     /// <summary>Impl class event overrides.</summary>
     EquatableArray<InlineClassImplEventModel> ImplEvents,
+    /// <summary>Generic method handler interceptor classes (Of&lt;T&gt;() pattern).</summary>
+    EquatableArray<InlineGenericMethodHandlerModel> GenericMethodHandlers,
     /// <summary>Whether the class has required members.</summary>
     bool HasRequiredMembers,
     /// <summary>Required member names for initialization.</summary>
@@ -265,7 +267,24 @@ internal sealed record InlineClassImplMethodModel(
     /// True if the user has defined a 'protected override' method with the _ suffix
     /// in their partial class (base class user method pattern).
     /// </summary>
-    bool HasUserOverride = false);
+    bool HasUserOverride = false,
+    /// <summary>Whether this is a generic method override. Routes to generic rendering path in the Impl class.</summary>
+    bool IsGenericMethod = false,
+    /// <summary>Type parameter declaration for the override signature (e.g., "&lt;T&gt;" or "&lt;TKey, TValue&gt;").
+    /// Empty for non-generic methods.</summary>
+    string TypeParameterDecl = "",
+    /// <summary>Constraint clauses for the override. Must be EMPTY for overrides -- C# inherits constraints from base.
+    /// This field exists for potential future use but must be empty for override signatures.</summary>
+    string ConstraintClauses = "",
+    /// <summary>Of&lt;T&gt;() access expression to get the typed handler (e.g., ".Of&lt;T&gt;()").
+    /// Empty for non-generic methods.</summary>
+    string OfTypeAccess = "",
+    /// <summary>Non-generic argument list for RecordCall. Excludes parameters typed with method-level type parameters.
+    /// Empty for non-generic methods.</summary>
+    string NonGenericArgList = "",
+    /// <summary>Inner type argument for Task&lt;T&gt;/ValueTask&lt;T&gt; return types (e.g., "TResult").
+    /// Used for async return type handling in abstract method fallback. Empty when not applicable.</summary>
+    string TaskTypeArg = "");
 
 /// <summary>
 /// Model for an event override in the Impl class.
