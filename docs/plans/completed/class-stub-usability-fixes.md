@@ -1,9 +1,9 @@
 # Class Stub Usability: Event AccessModifier + KO0201 Diagnostic
 
 **Date:** 2026-02-07
-**Related Todo:** [Class Stub Usability](../todos/class-stub-usability.md)
-**Status:** Verified
-**Last Updated:** 2026-02-07 (architect verification passed)
+**Related Todo:** [Class Stub Usability](../todos/completed/class-stub-usability.md)
+**Status:** Complete
+**Last Updated:** 2026-02-07
 
 ---
 

@@ -1,9 +1,9 @@
 # Class Stub Usability: Event AccessModifier + Silent Skip Diagnostic
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** High
 **Created:** 2026-02-07
-**Last Updated:** 2026-02-07 (plan created)
+**Last Updated:** 2026-02-07
 
 ---
 
@@ -31,17 +31,17 @@ This work was previously completed on the `origin/protectedMethods` branch but c
 
 ## Plans
 
-- [Class Stub Usability Fixes](../plans/class-stub-usability-fixes.md)
+- [Class Stub Usability Fixes](../plans/completed/class-stub-usability-fixes.md)
 
 ---
 
 ## Tasks
 
-- [ ] Add protected members to `ServiceBase` in Design.Domain
-- [ ] Fix event AccessModifier pipeline (EventMemberInfo, InlineClassImplEventModel, builders, renderers)
-- [ ] Add KO0201 diagnostic for `[KnockOff]` on class with base type
-- [ ] Verify Design.Stubs compiles with zero errors
-- [ ] Verify all tests pass
+- [x] Add protected members to `ServiceBase` in Design.Domain
+- [x] Fix event AccessModifier pipeline (EventMemberInfo, InlineClassImplEventModel, builders, renderers)
+- [x] Add KO0201 diagnostic for `[KnockOff]` on class with base type
+- [x] Verify Design.Stubs compiles with zero errors
+- [x] Verify all tests pass
 
 ---
 
@@ -63,15 +63,15 @@ This work was previously completed on the `origin/protectedMethods` branch but c
 
 Before marking this todo as Complete, verify:
 
-- [ ] Design project builds successfully
-- [ ] Design project tests pass
+- [x] Design project builds successfully
+- [x] Design project tests pass
 
 **Verification results:**
-- Design build: [Pending]
-- Design tests: [Pending]
+- Design build: Pass (0 errors, 0 warnings across net8.0/net9.0/net10.0)
+- Design tests: Pass (777 tests, 0 failures)
 
 ---
 
 ## Results / Conclusions
 
-[What was learned? What decisions were made?]
+Both fixes implemented and verified. The event AccessModifier pipeline now matches the existing method/property/indexer pattern. KO0201 diagnostic guides users who misapply `[KnockOff]` to classes with concrete base types. Three new diagnostic tests added via `CSharpGeneratorDriver`.
