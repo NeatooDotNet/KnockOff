@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------------
-// Design.Stubs - User-Defined Properties
+// Design.Stubs - Stub Override Properties
 // -----------------------------------------------------------------------------
 // This file explores and documents user-defined property patterns:
 // - Base class pattern (protected override properties with _ suffix)
@@ -7,7 +7,7 @@
 // - Tracking API on interceptors (VerifyGet, VerifySet, LastSetValue)
 // - Get/Set to supersede user properties
 // - Mixed scenarios (some with user properties, some without)
-// - Priority: Get/Set > user property
+// - Priority: Get/Set > stub override property
 // - Strict mode behavior
 // - All four applicable standalone patterns
 // -----------------------------------------------------------------------------
@@ -16,13 +16,13 @@ using Design.Domain.Abstractions;
 using Design.Domain.Services;
 using KnockOff;
 
-namespace Design.Stubs.UserProperties;
+namespace Design.Stubs.StubOverrideProperties;
 
 // =============================================================================
-// USER PROPERTIES - OVERVIEW
+// STUB OVERRIDE PROPERTIES - OVERVIEW
 // =============================================================================
 //
-// WHAT ARE USER PROPERTIES?
+// WHAT ARE STUB OVERRIDE PROPERTIES?
 // User properties are protected override properties you define in a partial stub
 // class to provide default behavior for interface properties. KnockOff generates
 // a base class with virtual properties that you can override.
@@ -35,11 +35,11 @@ namespace Design.Stubs.UserProperties;
 // 5. Compile-time safety - Signature errors caught by compiler
 //
 // THE BASE CLASS PATTERN:
-// KnockOff generates a base class (e.g., BasicUserPropertyStubBase) with virtual
+// KnockOff generates a base class (e.g., BasicStubOverridePropertyStubBase) with virtual
 // protected properties suffixed with underscore (e.g., Count_). You override
 // these properties to provide default behavior:
 //
-//   // Generated base class (BasicUserPropertyStubBase):
+//   // Generated base class (BasicStubOverridePropertyStubBase):
 //   protected virtual int Count_ => default!;
 //
 //   // Your override:
@@ -52,13 +52,13 @@ namespace Design.Stubs.UserProperties;
 // =============================================================================
 
 // =============================================================================
-// PATTERN 1: STANDALONE INTERFACE STUB WITH USER PROPERTIES
+// PATTERN 1: STANDALONE INTERFACE STUB WITH STUB OVERRIDE PROPERTIES
 // =============================================================================
 
 [KnockOff]
-public partial class BasicUserPropertyStub : IUserPropertyService { }
+public partial class BasicStubOverridePropertyStub : IStubOverridePropertyService { }
 
-public partial class BasicUserPropertyStub
+public partial class BasicStubOverridePropertyStub
 {
     // =========================================================================
     // User Property Definition - Base Class Pattern
@@ -72,7 +72,7 @@ public partial class BasicUserPropertyStub
     // If you typo the property name, the compiler catches it
     // (no suitable property to override). No more silent failures!
     //
-    // GENERATED BASE CLASS (BasicUserPropertyStubBase):
+    // GENERATED BASE CLASS (BasicStubOverridePropertyStubBase):
     // protected virtual int Count_ => default!;
     // protected virtual string Name_ { get => default!; set { } }
     // protected virtual string Setting_ { set { } }
@@ -120,8 +120,8 @@ public partial class BasicUserPropertyStub
     protected override string? Description_ => _name.Length > 0 ? $"Description for {_name}" : null;
 }
 
-[KnockOff<IUserPropertyService>]
-public partial class UserPropertyBasicsDemo
+[KnockOff<IStubOverridePropertyService>]
+public partial class StubOverridePropertyBasicsDemo
 {
     // =========================================================================
     // Using Stubs with User Properties
@@ -129,8 +129,8 @@ public partial class UserPropertyBasicsDemo
 
     public void BasicUsage()
     {
-        var stub = new BasicUserPropertyStub();
-        IUserPropertyService service = stub;
+        var stub = new BasicStubOverridePropertyStub();
+        IStubOverridePropertyService service = stub;
 
         // Set up backing field via public method
         stub.SetCount(42);
@@ -167,16 +167,16 @@ public partial class UserPropertyBasicsDemo
     // - VerifySet(Called) - verify setter call count
     // - LastSetValue - last value passed to setter
     // - Reset() - clear tracking state
-    // - Get() - supersede user property getter per-test
-    // - Set() - supersede user property setter per-test
+    // - Get() - supersede stub override property getter per-test
+    // - Set() - supersede stub override property setter per-test
     // =========================================================================
 
     public void TrackingWithVerifyGet()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(100);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         _ = service.Count;
         _ = service.Count;
@@ -189,8 +189,8 @@ public partial class UserPropertyBasicsDemo
 
     public void TrackingWithVerifySet()
     {
-        var stub = new BasicUserPropertyStub();
-        IUserPropertyService service = stub;
+        var stub = new BasicStubOverridePropertyStub();
+        IStubOverridePropertyService service = stub;
 
         service.Name = "First";
         service.Name = "Second";
@@ -201,8 +201,8 @@ public partial class UserPropertyBasicsDemo
 
     public void TrackingWithLastSetValue()
     {
-        var stub = new BasicUserPropertyStub();
-        IUserPropertyService service = stub;
+        var stub = new BasicStubOverridePropertyStub();
+        IStubOverridePropertyService service = stub;
 
         service.Name = "First Value";
         service.Name = "Last Value";
@@ -214,9 +214,9 @@ public partial class UserPropertyBasicsDemo
 
     public void TrackingWithReset()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(50);
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         _ = service.Count;
         stub.Count.VerifyGet(Called.Once);
@@ -225,9 +225,9 @@ public partial class UserPropertyBasicsDemo
         stub.Count.Reset();
 
         stub.Count.VerifyGet(Called.Never);
-        // But user property still works
+        // But stub override property still works
         var count = service.Count;
-        // count == 50 (user override still active)
+        // count == 50 (stub override still active)
     }
 
     // =========================================================================
@@ -236,7 +236,7 @@ public partial class UserPropertyBasicsDemo
     // User properties provide shareable defaults. Get/Set override per test.
     //
     // RATIONALE: Stubs should be shareable yet configurable per test.
-    // - User property = sensible default for most tests
+    // - Stub override property = sensible default for most tests
     // - Get/Set = override when a specific test needs different behavior
     //
     // GENERATED CODE PATTERN:
@@ -244,7 +244,7 @@ public partial class UserPropertyBasicsDemo
     //   {
     //       Count.RecordGet();
     //       if (Count.HasGet) return Count.InvokeGetCallback();  // Get wins
-    //       return Count_;                                          // User override
+    //       return Count_;                                          // Stub override
     //   }
     //
     // Reset() behavior: Clears tracking state but PRESERVES Get/Set configuration.
@@ -253,16 +253,16 @@ public partial class UserPropertyBasicsDemo
 
     public void Get_SupersedesUserProperty()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(42);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
-        // By default, user property is called
+        // By default, stub override property is called
         var defaultValue = service.Count;
         // defaultValue == 42 (from Count_ override)
 
-        // Get supersedes the user property for per-test override
+        // Get supersedes the stub override property for per-test override
         stub.Count.Get(999);
         var overrideValue = service.Count;
         // overrideValue == 999 (Get wins)
@@ -272,27 +272,27 @@ public partial class UserPropertyBasicsDemo
 
     public void Set_SupersedesUserProperty()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         var capturedValue = "";
 
-        // Set supersedes the user property setter
+        // Set supersedes the stub override property setter
         stub.Name.Set(v => capturedValue = $"Captured: {v}");
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         service.Name = "Test";
 
         // capturedValue == "Captured: Test" (Set was invoked)
-        // stub._name is NOT set because Set bypassed the user override
+        // stub._name is NOT set because Set bypassed the stub override
 
         stub.Name.VerifySet(Called.Once);
     }
 
     public void Reset_PreservesGetConfiguration()
     {
-        var stub = new BasicUserPropertyStub();
-        stub.Count.Get(100); // Override user property
+        var stub = new BasicStubOverridePropertyStub();
+        stub.Count.Get(100); // Override stub override property
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         _ = service.Count;
         stub.Count.VerifyGet(Called.Once);
 
@@ -310,75 +310,75 @@ public partial class UserPropertyBasicsDemo
 // =============================================================================
 
 [KnockOff]
-public partial class MixedUserPropertyStub : IMixedUserPropertyService { }
+public partial class MixedStubOverridePropertyStub : IMixedStubOverridePropertyService { }
 
-public partial class MixedUserPropertyStub
+public partial class MixedStubOverridePropertyStub
 {
     // Only override SOME interface properties as user properties
     // Others will use the regular interceptor API (no override needed)
 
-    private int _userPropertyValue = 100;
+    private int _stubOverridePropertyValue = 100;
 
-    protected override int WithUserProperty_ => _userPropertyValue;
+    protected override int WithStubOverrideProperty_ => _stubOverridePropertyValue;
 
-    protected override string ComputedWithUserProperty_ => $"Computed: {_userPropertyValue}";
+    protected override string ComputedWithStubOverrideProperty_ => $"Computed: {_stubOverridePropertyValue}";
 
-    public void SetUserPropertyValue(int value) => _userPropertyValue = value;
+    public void SetStubOverridePropertyValue(int value) => _stubOverridePropertyValue = value;
 
-    // WithoutUserProperty_ and ComputedWithoutUserProperty_ are NOT overridden
+    // WithoutStubOverrideProperty_ and ComputedWithoutStubOverrideProperty_ are NOT overridden
     // They use the regular interceptor path (Get or default)
 }
 
-[KnockOff<IMixedUserPropertyService>]
-public partial class MixedUserPropertyDemo
+[KnockOff<IMixedStubOverridePropertyService>]
+public partial class MixedStubOverridePropertyDemo
 {
     public void MixedScenario()
     {
-        var stub = new MixedUserPropertyStub();
+        var stub = new MixedStubOverridePropertyStub();
 
-        // Properties WITH user override use the interceptor for tracking + Get
-        stub.WithUserProperty.VerifyGet(Called.Never);
+        // Properties WITH stub override use the interceptor for tracking + Get
+        stub.WithStubOverrideProperty.VerifyGet(Called.Never);
 
-        // Properties WITHOUT user override also use interceptor (same API)
-        stub.WithoutUserProperty.Get(42);
-        stub.WithoutUserProperty.VerifyGet(Called.Never);
+        // Properties WITHOUT stub override also use interceptor (same API)
+        stub.WithoutStubOverrideProperty.Get(42);
+        stub.WithoutStubOverrideProperty.VerifyGet(Called.Never);
 
-        stub.ComputedWithoutUserProperty.Get("Configured value");
+        stub.ComputedWithoutStubOverrideProperty.Get("Configured value");
 
-        IMixedUserPropertyService service = stub;
+        IMixedStubOverridePropertyService service = stub;
 
-        var r1 = service.WithUserProperty;       // 100 (from override)
-        var r2 = service.WithoutUserProperty;    // 42 (from Get)
-        var r3 = service.ComputedWithUserProperty;  // "Computed: 100" (from override)
-        var r4 = service.ComputedWithoutUserProperty; // "Configured value" (from Get)
+        var r1 = service.WithStubOverrideProperty;       // 100 (from override)
+        var r2 = service.WithoutStubOverrideProperty;    // 42 (from Get)
+        var r3 = service.ComputedWithStubOverrideProperty;  // "Computed: 100" (from override)
+        var r4 = service.ComputedWithoutStubOverrideProperty; // "Configured value" (from Get)
 
-        stub.WithUserProperty.VerifyGet(Called.Once);
-        stub.WithoutUserProperty.VerifyGet(Called.Once);
+        stub.WithStubOverrideProperty.VerifyGet(Called.Once);
+        stub.WithoutStubOverrideProperty.VerifyGet(Called.Once);
     }
 
     // =========================================================================
     // DESIGN OBSERVATION: Consistent Naming
     // =========================================================================
     // With the base class pattern, interceptor names are ALWAYS clean:
-    // - User property present: stub.Property (with override behavior)
-    // - No user property: stub.Property (default/interceptor behavior)
+    // - Stub override property present: stub.Property (with override behavior)
+    // - No stub override property: stub.Property (default/interceptor behavior)
     //
-    // The presence or absence of a user override is detected at compile time.
-    // When override exists: Get > User override
+    // The presence or absence of a stub override is detected at compile time.
+    // When override exists: Get > Stub override
     // When no override: Get > Strict/Default
     // =========================================================================
 }
 
 // =============================================================================
-// STRICT MODE AND USER PROPERTIES
+// STRICT MODE AND STUB OVERRIDE PROPERTIES
 // =============================================================================
 
 [KnockOff(Strict = true)]
-public partial class StrictUserPropertyStub : IUserPropertyService { }
+public partial class StrictStubOverridePropertyStub : IStubOverridePropertyService { }
 
-public partial class StrictUserPropertyStub
+public partial class StrictStubOverridePropertyStub
 {
-    // User overrides bypass strict mode - they ARE the configuration
+    // Stub overrides bypass strict mode - they ARE the configuration
     private int _count = 10;
     private string _name = "Strict Default";
     private string _setting = "";
@@ -391,21 +391,21 @@ public partial class StrictUserPropertyStub
     public void SetCount(int value) => _count = value;
 }
 
-[KnockOff<IUserPropertyService>]
-public partial class StrictModeUserPropertyDemo
+[KnockOff<IStubOverridePropertyService>]
+public partial class StrictModeStubOverridePropertyDemo
 {
     public void StrictMode_UserPropertiesBypassed()
     {
-        var stub = new StrictUserPropertyStub();
-        IUserPropertyService service = stub;
+        var stub = new StrictStubOverridePropertyStub();
+        IStubOverridePropertyService service = stub;
 
-        // User overrides work in strict mode - they ARE the configuration
+        // Stub overrides work in strict mode - they ARE the configuration
         var count = service.Count;  // 10 (from override)
         var name = service.Name;    // "Strict Default"
         var desc = service.Description; // "Strict description"
 
         // Set-only also works
-        service.Setting = "value";  // Calls user override
+        service.Setting = "value";  // Calls stub override
 
         // All tracked correctly
         stub.Count.VerifyGet(Called.Once);
@@ -413,22 +413,22 @@ public partial class StrictModeUserPropertyDemo
     }
 
     // =========================================================================
-    // DESIGN DECISION: User Overrides Bypass Strict Mode
+    // DESIGN DECISION: Stub Overrides Bypass Strict Mode
     // =========================================================================
-    // Strict mode means "throw if unconfigured". User overrides ARE configured
+    // Strict mode means "throw if unconfigured". Stub overrides ARE configured
     // by their very existence. This is consistent - the override IS the
     // behavior, just defined in a different way than Get.
     // =========================================================================
 }
 
 // =============================================================================
-// PATTERN 2: GENERIC STANDALONE INTERFACE STUB WITH USER PROPERTIES
+// PATTERN 2: GENERIC STANDALONE INTERFACE STUB WITH STUB OVERRIDE PROPERTIES
 // =============================================================================
 
 [KnockOff]
-public partial class GenericUserPropertyStub<T> : IGenericUserPropertyService<T> where T : class { }
+public partial class GenericStubOverridePropertyStub<T> : IGenericStubOverridePropertyService<T> where T : class { }
 
-public partial class GenericUserPropertyStub<T> where T : class
+public partial class GenericStubOverridePropertyStub<T> where T : class
 {
     // =========================================================================
     // Generic User Properties
@@ -436,7 +436,7 @@ public partial class GenericUserPropertyStub<T> where T : class
     // User properties work naturally with generic type parameters.
     // The base class generates virtual properties using the type parameter:
     //
-    // GENERATED BASE CLASS (GenericUserPropertyStubBase<T>):
+    // GENERATED BASE CLASS (GenericStubOverridePropertyStubBase<T>):
     // protected virtual T? CurrentItem_ => default!;
     // protected virtual T? DefaultItem_ { get => default!; set { } }
     // protected virtual int ItemCount_ => default!;
@@ -461,16 +461,16 @@ public partial class GenericUserPropertyStub<T> where T : class
     public void SetItemCount(int count) => _itemCount = count;
 }
 
-[KnockOff<IGenericUserPropertyService<string>>]
-public partial class GenericUserPropertyDemo
+[KnockOff<IGenericStubOverridePropertyService<string>>]
+public partial class GenericStubOverridePropertyDemo
 {
     public void GenericStandalone_Usage()
     {
-        var stub = new GenericUserPropertyStub<string>();
+        var stub = new GenericStubOverridePropertyStub<string>();
         stub.SetCurrentItem("Current Value");
         stub.SetItemCount(5);
 
-        IGenericUserPropertyService<string> service = stub;
+        IGenericStubOverridePropertyService<string> service = stub;
 
         var current = service.CurrentItem;
         // current == "Current Value"
@@ -490,29 +490,29 @@ public partial class GenericUserPropertyDemo
 
     public void GenericStandalone_GetSupersedes()
     {
-        var stub = new GenericUserPropertyStub<string>();
+        var stub = new GenericStubOverridePropertyStub<string>();
         stub.SetCurrentItem("Default");
 
-        // Get supersedes the user property
+        // Get supersedes the stub override property
         stub.CurrentItem.Get("Override Value");
 
-        IGenericUserPropertyService<string> service = stub;
+        IGenericStubOverridePropertyService<string> service = stub;
         var value = service.CurrentItem;
-        // value == "Override Value" (Get wins over user property)
+        // value == "Override Value" (Get wins over stub override property)
     }
 }
 
 // =============================================================================
-// PATTERN 3: STANDALONE CLASS STUB WITH USER PROPERTIES
+// PATTERN 3: STANDALONE CLASS STUB WITH STUB OVERRIDE PROPERTIES
 // =============================================================================
 // When stubbing a CLASS (not interface), user properties work the same way.
 // The key difference: use .Object to access the class instance.
 // =============================================================================
 
 [KnockOffBase<ConfigBase>]
-public partial class ConfigUserPropertyStub { }
+public partial class ConfigStubOverridePropertyStub { }
 
-public partial class ConfigUserPropertyStub
+public partial class ConfigStubOverridePropertyStub
 {
     // =========================================================================
     // Class Stub User Properties
@@ -520,7 +520,7 @@ public partial class ConfigUserPropertyStub
     // For standalone class stubs, user properties override the base class's
     // abstract/virtual properties. The pattern is identical to interface stubs.
     //
-    // GENERATED BASE CLASS (ConfigUserPropertyStubBase):
+    // GENERATED BASE CLASS (ConfigStubOverridePropertyStubBase):
     // protected virtual string ConfigName_ => default!;
     // protected virtual int MaxRetries_ { get => default!; set { } }
     // protected virtual bool IsDebugMode_ => default!;
@@ -556,28 +556,28 @@ public partial class ConfigUserPropertyStub
 }
 
 [KnockOff<ConfigBase>]
-public partial class StandaloneClassUserPropertyDemo
+public partial class StandaloneClassStubOverridePropertyDemo
 {
     public void StandaloneClass_Usage()
     {
-        var stub = new ConfigUserPropertyStub();
+        var stub = new ConfigStubOverridePropertyStub();
         stub.SetConfigName("Test Config");
 
         // IMPORTANT: Use .Object to get the actual class instance
         ConfigBase config = stub.Object;
 
         var name = config.ConfigName;
-        // name == "Test Config" (from user override)
+        // name == "Test Config" (from stub override)
 
         var retries = config.MaxRetries;
-        // retries == 5 (from user override)
+        // retries == 5 (from stub override)
 
         config.MaxRetries = 10;
         retries = config.MaxRetries;
         // retries == 10 (setter updated backing field)
 
         var debugMode = config.IsDebugMode;
-        // debugMode == true (from user override)
+        // debugMode == true (from stub override)
 
         config.LogPath = "/var/log/app.log";
         var path = stub.GetLogPath();
@@ -591,10 +591,10 @@ public partial class StandaloneClassUserPropertyDemo
 
     public void StandaloneClass_GetSupersedes()
     {
-        var stub = new ConfigUserPropertyStub();
+        var stub = new ConfigStubOverridePropertyStub();
         stub.SetConfigName("Default");
 
-        // Get supersedes the user property
+        // Get supersedes the stub override property
         stub.ConfigName.Get("Override Config");
 
         ConfigBase config = stub.Object;
@@ -606,13 +606,13 @@ public partial class StandaloneClassUserPropertyDemo
 }
 
 // =============================================================================
-// PATTERN 4: GENERIC STANDALONE CLASS STUB WITH USER PROPERTIES
+// PATTERN 4: GENERIC STANDALONE CLASS STUB WITH STUB OVERRIDE PROPERTIES
 // =============================================================================
 
 [KnockOffBase(typeof(CacheBase<>))]
-public partial class CacheUserPropertyStub<T> where T : class { }
+public partial class CacheStubOverridePropertyStub<T> where T : class { }
 
-public partial class CacheUserPropertyStub<T> where T : class
+public partial class CacheStubOverridePropertyStub<T> where T : class
 {
     // =========================================================================
     // Generic Class Stub User Properties
@@ -620,7 +620,7 @@ public partial class CacheUserPropertyStub<T> where T : class
     // For generic standalone class stubs, user properties work with the type
     // parameter from the stub class declaration.
     //
-    // GENERATED BASE CLASS (CacheUserPropertyStubBase<T>):
+    // GENERATED BASE CLASS (CacheStubOverridePropertyStubBase<T>):
     // protected virtual T? DefaultValue_ => default!;
     // protected virtual T? CurrentValue_ { get => default!; set { } }
     // protected virtual int CacheSize_ => default!;
@@ -651,11 +651,11 @@ public partial class CacheUserPropertyStub<T> where T : class
 }
 
 [KnockOff(typeof(CacheBase<>))]
-public partial class GenericStandaloneClassUserPropertyDemo
+public partial class GenericStandaloneClassStubOverridePropertyDemo
 {
     public void GenericStandaloneClass_Usage()
     {
-        var stub = new CacheUserPropertyStub<string>();
+        var stub = new CacheStubOverridePropertyStub<string>();
         stub.SetDefaultValue("Default String");
         stub.SetCacheSize(100);
         stub.SetCacheName("String Cache");
@@ -684,10 +684,10 @@ public partial class GenericStandaloneClassUserPropertyDemo
 
     public void GenericStandaloneClass_GetSupersedes()
     {
-        var stub = new CacheUserPropertyStub<string>();
+        var stub = new CacheStubOverridePropertyStub<string>();
         stub.SetDefaultValue("Default");
 
-        // Get supersedes the user property
+        // Get supersedes the stub override property
         stub.DefaultValue.Get("Override Default");
 
         CacheBase<string> cache = stub.Object;
@@ -697,7 +697,7 @@ public partial class GenericStandaloneClassUserPropertyDemo
 }
 
 // =============================================================================
-// DESIGN SUMMARY - USER PROPERTIES
+// DESIGN SUMMARY - STUB OVERRIDE PROPERTIES
 // =============================================================================
 //
 // **THE BASE CLASS PATTERN:**
@@ -717,8 +717,8 @@ public partial class GenericStandaloneClassUserPropertyDemo
 // - Get/set: protected override string Name_ { get => _name; set => _name = value; }
 //
 // **APPLICABLE PATTERNS (Standalone Only):**
-// User properties apply to standalone patterns only (same as user methods).
-// Inline patterns generate the entire stub class - no partial for user overrides.
+// User properties apply to standalone patterns only (same as stub overrides).
+// Inline patterns generate the entire stub class - no partial for stub overrides.
 //
 // | Pattern | User Properties Supported |
 // |---------|---------------------------|
@@ -729,7 +729,7 @@ public partial class GenericStandaloneClassUserPropertyDemo
 // | 5-9. Inline patterns | No - entire class generated, no partial available |
 //
 // **PRIORITY ORDER:**
-// Get()/Set() > User override > Smart default (or StubException in strict mode)
+// Get()/Set() > Stub override > Smart default (or StubException in strict mode)
 //
 // **NOT SUPPORTED (by design):**
 // - Inline stubs - only standalone patterns support user properties

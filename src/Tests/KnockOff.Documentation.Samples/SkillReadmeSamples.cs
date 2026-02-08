@@ -5,7 +5,7 @@ namespace KnockOff.Documentation.Samples.SkillReadme;
 // =============================================================================
 
 // -----------------------------------------------------------------------------
-// User Methods (Stand-Alone Only) Section
+// Stub Overrides (Stand-Alone Only) Section
 // The README shows stub declaration AND usage patterns together.
 // We need an interface, stub class, and usage examples.
 // -----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ public interface IRepo
     User? GetById(int id);
 }
 
-#region skill-readme-user-methods
+#region skill-readme-stub-overrides
 [KnockOff]
 public partial class RepoStub : IRepo { }
 
@@ -26,15 +26,15 @@ public partial class RepoStub
 }
 #endregion
 
-public class SkillReadmeUserMethodsTests
+public class SkillReadmeStubOverridesTests
 {
     [Fact]
-    public void UserMethods_ReturnSupersedes()
+    public void StubOverrides_ReturnSupersedes()
     {
-        #region skill-readme-user-methods-usage
+        #region skill-readme-stub-overrides-usage
         var stub = new RepoStub();
 
-        // User override is fallback; Return supersedes it
+        // Stub override is fallback; Return supersedes it
         stub.GetById.Return(id => new User { Id = id, Name = "Override" });
 
         // Returns for constant values (auto-wraps for async)
@@ -49,10 +49,10 @@ public class SkillReadmeUserMethodsTests
     }
 
     [Fact]
-    public void UserMethods_FallbackToUserOverride()
+    public void StubOverrides_FallbackToUserOverride()
     {
         var stub = new RepoStub();
-        // No Return configured - falls back to user override
+        // No Return configured - falls back to stub override
 
         IRepo repo = stub;
         var user = repo.GetById(42);

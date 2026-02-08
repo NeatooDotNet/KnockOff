@@ -125,7 +125,7 @@ public class MethodValueOverloadTests
 		var knockOff = new AsyncServiceKnockOff();
 		IAsyncService service = knockOff;
 
-		// GetRequiredAsync returns Task<string> - no user method, so we can test value overload
+		// GetRequiredAsync returns Task<string> - no stub override, so we can test value overload
 		knockOff.GetRequiredAsync.Return("async result");
 
 		var result = await service.GetRequiredAsync();

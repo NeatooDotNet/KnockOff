@@ -11,13 +11,13 @@ public class GenericMethodBugTests
 
 	/// <summary>
 	/// Tests that generic methods use OnCall for configuration.
-	/// NOTE: Generic methods do NOT support user overrides by design. Use OnCall instead.
+	/// NOTE: Generic methods do NOT support stub overrides by design. Use OnCall instead.
 	/// </summary>
 	[Fact]
 	public void GenericMethod_OnCall_ReturnsConfiguredValue()
 	{
-		var knockOff = new GenericMethodWithUserMethodKnockOff();
-		IGenericMethodWithUserMethod service = knockOff;
+		var knockOff = new GenericMethodWithStubOverrideKnockOff();
+		IGenericMethodWithStubOverride service = knockOff;
 
 		knockOff.Create.Of<TestEntity>().Return(() => new TestEntity { Id = 999 });
 
@@ -30,8 +30,8 @@ public class GenericMethodBugTests
 	[Fact]
 	public void GenericMethod_OnCall_WithParameter_TransformsValue()
 	{
-		var knockOff = new GenericMethodWithUserMethodKnockOff();
-		IGenericMethodWithUserMethod service = knockOff;
+		var knockOff = new GenericMethodWithStubOverrideKnockOff();
+		IGenericMethodWithStubOverride service = knockOff;
 
 		// OnCall doubles integers
 		knockOff.Transform.Of<int>().Return((value) => value * 2);
@@ -47,8 +47,8 @@ public class GenericMethodBugTests
 	[Fact]
 	public void GenericMethod_MultipleTypeParams_OnCall()
 	{
-		var knockOff = new GenericMethodWithUserMethodKnockOff();
-		IGenericMethodWithUserMethod service = knockOff;
+		var knockOff = new GenericMethodWithStubOverrideKnockOff();
+		IGenericMethodWithStubOverride service = knockOff;
 
 		knockOff.Convert.Of<int, TestEntity>().Return((input) => new TestEntity { Id = input * 10 });
 
@@ -348,9 +348,9 @@ public class TestAttribute : Attribute
 #region Bug Test Types
 
 /// <summary>
-/// Interface for testing user method detection with generic methods.
+/// Interface for testing stub override detection with generic methods.
 /// </summary>
-public interface IGenericMethodWithUserMethod
+public interface IGenericMethodWithStubOverride
 {
 	T Create<T>() where T : new();
 	T Transform<T>(T value);
@@ -359,11 +359,11 @@ public interface IGenericMethodWithUserMethod
 
 /// <summary>
 /// KnockOff for testing generic methods.
-/// NOTE: Generic methods do NOT support user overrides by design.
+/// NOTE: Generic methods do NOT support stub overrides by design.
 /// Use OnCall to configure behavior instead.
 /// </summary>
 [KnockOff]
-public partial class GenericMethodWithUserMethodKnockOff : IGenericMethodWithUserMethod
+public partial class GenericMethodWithStubOverrideKnockOff : IGenericMethodWithStubOverride
 {
 }
 

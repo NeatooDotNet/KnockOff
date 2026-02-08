@@ -1,34 +1,34 @@
 using KnockOff;
 using System.Threading.Tasks;
 
-namespace KnockOff.Documentation.Samples.UserMethods;
+namespace KnockOff.Documentation.Samples.StubOverrides;
 
 // =============================================================================
-// Interfaces for User Methods Samples
+// Interfaces for Stub Overrides Samples
 // =============================================================================
 
-public interface IUserMethodsRepo
+public interface IStubOverridesRepo
 {
     User? GetUserById(int id);
     bool IsActive(int userId);
     decimal GetBalance(int userId);
 }
 
-public interface IAsyncUserMethodRepo
+public interface IAsyncStubOverrideRepo
 {
     Task<User?> GetUserByIdAsync(int id);
 }
 
 // =============================================================================
-// Stubs with User Methods
+// Stubs with Stub Overrides
 // =============================================================================
 
-#region user-methods-basic
+#region stub-overrides-basic
 [KnockOff]
-public partial class UserMethodsRepoStub : IUserMethodsRepo { }
+public partial class StubOverridesRepoStub : IStubOverridesRepo { }
 
-// User methods provide default behavior
-public partial class UserMethodsRepoStub
+// Stub overrides provide default behavior
+public partial class StubOverridesRepoStub
 {
     // Protected override method with underscore suffix
     // This is the fallback when no Return is configured
@@ -49,11 +49,11 @@ public partial class UserMethodsRepoStub
 }
 #endregion
 
-// Async user method stub
+// Async stub override stub
 [KnockOff]
-public partial class AsyncUserMethodRepoStub : IAsyncUserMethodRepo { }
+public partial class AsyncStubOverrideRepoStub : IAsyncStubOverrideRepo { }
 
-public partial class AsyncUserMethodRepoStub
+public partial class AsyncStubOverrideRepoStub
 {
     protected override Task<User?> GetUserByIdAsync_(int id)
     {
@@ -62,19 +62,19 @@ public partial class AsyncUserMethodRepoStub
 }
 
 // =============================================================================
-// Fallback Tests - User methods provide defaults when no Return configured
+// Fallback Tests - Stub overrides provide defaults when no Return configured
 // =============================================================================
 
-public class UserMethodFallbackTests
+public class StubOverrideFallbackTests
 {
     [Fact]
-    public void UserMethod_ProvidesDefaultBehavior()
+    public void StubOverride_ProvidesDefaultBehavior()
     {
-        var stub = new UserMethodsRepoStub();
-        IUserMethodsRepo repository = stub;
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo repository = stub;
 
-        #region user-methods-fallback
-        // No Return configured - user method provides behavior
+        #region stub-overrides-fallback
+        // No Return configured - stub override provides behavior
         var user = repository.GetUserById(1);
 
         // Verify the call was tracked
@@ -88,19 +88,19 @@ public class UserMethodFallbackTests
 }
 
 // =============================================================================
-// Return Tests - Return supersedes user method
+// Return Tests - Return supersedes stub override
 // =============================================================================
 
-public class UserMethodReturnTests
+public class StubOverrideReturnTests
 {
     [Fact]
-    public void Return_SupersedesUserMethod()
+    public void Return_SupersedesStubOverride()
     {
-        var stub = new UserMethodsRepoStub();
-        IUserMethodsRepo repository = stub;
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo repository = stub;
 
-        #region user-methods-oncall
-        // Return supersedes the user method
+        #region stub-overrides-oncall
+        // Return supersedes the stub override
         stub.GetUserById.Return(id => new User { Id = id, Name = "Overridden" });
 
         var user = repository.GetUserById(42);
@@ -111,12 +111,12 @@ public class UserMethodReturnTests
     }
 
     [Fact]
-    public void Returns_SupersedesUserMethod()
+    public void Returns_SupersedesStubOverride()
     {
-        var stub = new UserMethodsRepoStub();
-        IUserMethodsRepo repository = stub;
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo repository = stub;
 
-        #region user-methods-returns
+        #region stub-overrides-returns
         // Return() for constant values
         stub.GetBalance.Return(500.00m);
 
@@ -130,15 +130,15 @@ public class UserMethodReturnTests
 // Async Return Tests - Returns auto-wraps in Task.FromResult
 // =============================================================================
 
-public class UserMethodAsyncReturnTests
+public class StubOverrideAsyncReturnTests
 {
     [Fact]
     public async Task Returns_AutoWrapsForAsyncMethods()
     {
-        var stub = new AsyncUserMethodRepoStub();
-        IAsyncUserMethodRepo repository = stub;
+        var stub = new AsyncStubOverrideRepoStub();
+        IAsyncStubOverrideRepo repository = stub;
 
-        #region user-methods-async-returns
+        #region stub-overrides-async-returns
         // Returns auto-wraps value in Task.FromResult for async methods
         stub.GetUserByIdAsync.Return(new User { Id = 99, Name = "Test User" });
 
@@ -152,19 +152,19 @@ public class UserMethodAsyncReturnTests
 // Verification Tests - Tracking still works with Return
 // =============================================================================
 
-public class UserMethodVerificationTests
+public class StubOverrideVerificationTests
 {
     [Fact]
     public void TrackingWorksWithReturn()
     {
-        var stub = new UserMethodsRepoStub();
-        IUserMethodsRepo repository = stub;
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo repository = stub;
 
-        #region user-methods-tracking
+        #region stub-overrides-tracking
         stub.IsActive.Return(false);
         repository.IsActive(42);
 
-        // Tracking works whether using Return or user method
+        // Tracking works whether using Return or stub override
         stub.IsActive.Verify(Called.Once);
         Assert.Equal(42, stub.IsActive.LastArg);
         #endregion
@@ -175,19 +175,19 @@ public class UserMethodVerificationTests
 // Reset Tests
 // =============================================================================
 
-public class UserMethodResetTests
+public class StubOverrideResetTests
 {
     [Fact]
     public void Reset_ClearsTrackingButPreservesReturn()
     {
-        var stub = new UserMethodsRepoStub();
-        IUserMethodsRepo repository = stub;
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo repository = stub;
 
         stub.GetBalance.Return(999.99m);
         repository.GetBalance(1);
         stub.GetBalance.Verify(Called.Once);
 
-        #region user-methods-reset
+        #region stub-overrides-reset
         // Reset clears tracking state but preserves Return configuration
         stub.GetBalance.Reset();
         stub.GetBalance.Verify(Called.Never);
@@ -217,7 +217,7 @@ public interface INotificationService
 /// Base stub with sensible defaults for common test scenarios.
 /// Tests can override specific methods using Return when needed.
 /// </summary>
-#region user-methods-shareable-base
+#region stub-overrides-shareable-base
 [KnockOff]
 public partial class NotificationServiceStub : INotificationService { }
 
@@ -239,7 +239,7 @@ public class ShareableStubPatternTests
         var stub = new NotificationServiceStub();
         INotificationService service = stub;
 
-        #region user-methods-shareable-default
+        #region stub-overrides-shareable-default
         // Most tests use the defaults
         var sent = service.SendEmail("user@test.com", "Welcome");
         Assert.True(sent); // Default behavior: success
@@ -252,18 +252,18 @@ public class ShareableStubPatternTests
         var stub = new NotificationServiceStub();
         INotificationService service = stub;
 
-        #region user-methods-shareable-override
+        #region stub-overrides-shareable-override
         // Specific test overrides to simulate failure
         stub.SendEmail.Return(false);
 
         var sent = service.SendEmail("user@test.com", "Welcome");
-        Assert.False(sent); // Return supersedes user method
+        Assert.False(sent); // Return supersedes stub override
         #endregion
     }
 }
 
 // =============================================================================
-// Standalone Pattern Example - User Method with Return Override
+// Standalone Pattern Example - Stub Override with Return Override
 // =============================================================================
 
 public interface ISkillRepo
@@ -271,7 +271,7 @@ public interface ISkillRepo
     User? GetById(int id);
 }
 
-#region user-methods-standalone-example
+#region stub-overrides-standalone-example
 [KnockOff]
 public partial class SkillRepoStub : ISkillRepo { }
 
@@ -283,7 +283,7 @@ public partial class SkillRepoStub
 #endregion
 
 // =============================================================================
-// API Reference Example - Comprehensive User Method Interceptor Demo
+// API Reference Example - Comprehensive Stub Override Interceptor Demo
 // =============================================================================
 
 public interface IApiRepo
@@ -302,19 +302,19 @@ public partial class ApiRepoStub
 }
 #endregion
 
-public class UserMethodInterceptorApiExampleTests
+public class StubOverrideInterceptorApiExampleTests
 {
     [Fact]
-    public void UserMethodInterceptor_CompleteApiExample()
+    public void StubOverrideInterceptor_CompleteApiExample()
     {
         #region user-method-interceptor-usage-api-example
         var stub = new ApiRepoStub();
         IApiRepo repo = stub;
 
-        // User method provides default behavior
+        // Stub override provides default behavior
         var user1 = repo.GetById(1);  // Returns "Default"
 
-        // Return supersedes user method (clean interceptor name)
+        // Return supersedes stub override (clean interceptor name)
         stub.GetById.Return(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Returns "Override"
 
@@ -333,20 +333,20 @@ public class UserMethodInterceptorApiExampleTests
     }
 }
 
-public class UserMethodStandalonePatternTests
+public class StubOverrideStandalonePatternTests
 {
     [Fact]
-    public void UserMethod_FullExample()
+    public void StubOverride_FullExample()
     {
-        #region user-methods-standalone-usage
+        #region stub-overrides-standalone-usage
         // Usage:
         var stub = new SkillRepoStub();
         ISkillRepo repo = stub;
 
-        // Without Return: user method provides behavior
+        // Without Return: stub override provides behavior
         var user1 = repo.GetById(1);  // Name = "Default"
 
-        // With Return: callback supersedes user method (clean interceptor name)
+        // With Return: callback supersedes stub override (clean interceptor name)
         stub.GetById.Return(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Name = "Override"
         #endregion
@@ -356,12 +356,12 @@ public class UserMethodStandalonePatternTests
     }
 
     [Fact]
-    public void UserMethod_TrackingWithReturn()
+    public void StubOverride_TrackingWithReturn()
     {
         var stub = new SkillRepoStub();
         ISkillRepo repo = stub;
 
-        #region user-methods-tracking-with-oncall
+        #region stub-overrides-tracking-with-oncall
         stub.GetById.Return(id => new User { Id = id });
         repo.GetById(42);
 
@@ -371,12 +371,12 @@ public class UserMethodStandalonePatternTests
     }
 
     [Fact]
-    public void UserMethod_ResetPreservesReturn()
+    public void StubOverride_ResetPreservesReturn()
     {
         var stub = new SkillRepoStub();
         ISkillRepo repo = stub;
 
-        #region user-methods-reset-preserves-oncall
+        #region stub-overrides-reset-preserves-oncall
         stub.GetById.Return(id => new User { Id = id });
         repo.GetById(1);
         stub.GetById.Verify(Called.Once);
@@ -384,7 +384,7 @@ public class UserMethodStandalonePatternTests
         stub.GetById.Reset();
         stub.GetById.Verify(Called.Never);  // Tracking cleared
 
-        repo.GetById(2);  // Still uses Return callback (not reset to user method)
+        repo.GetById(2);  // Still uses Return callback (not reset to stub override)
         #endregion
 
         Assert.Equal(2, stub.GetById.LastArg);
@@ -400,10 +400,10 @@ public class GeneratedBaseClassTests
     [Fact]
     public void GeneratedBaseClass_ShowsPattern()
     {
-        #region user-methods-generated-base
+        #region stub-overrides-generated-base
         // Generated base class (you don't write this -- KnockOff generates it):
         //
-        //   public partial class UserMethodsRepoStubBase
+        //   public partial class StubOverridesRepoStubBase
         //   {
         //       protected virtual User? GetUserById_(int id) => default!;
         //       protected virtual bool IsActive_(int userId) => default!;
@@ -414,8 +414,8 @@ public class GeneratedBaseClassTests
         //   protected override User? GetUserById_(int id) => new User { Id = id };
         #endregion
 
-        var stub = new UserMethodsRepoStub();
-        IUserMethodsRepo repo = stub;
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo repo = stub;
         var user = repo.GetUserById(1);
         Assert.NotNull(user);
         Assert.Equal("Default User", user.Name);
@@ -433,10 +433,10 @@ public interface IFormatter
 }
 
 [KnockOff]
-public partial class UserMethodsFormatterStub : IFormatter { }
+public partial class StubOverrideFormatterStub : IFormatter { }
 
-#region user-methods-overloads
-public partial class UserMethodsFormatterStub
+#region stub-overrides-overloads
+public partial class StubOverrideFormatterStub
 {
     // Override only the overloads you need
     protected override string Format_(string input) => input.ToUpperInvariant();
@@ -447,12 +447,12 @@ public partial class UserMethodsFormatterStub
 }
 #endregion
 
-public class OverloadUserMethodTests
+public class OverloadStubOverrideTests
 {
     [Fact]
     public void Overloads_SelectiveOverride()
     {
-        var stub = new UserMethodsFormatterStub();
+        var stub = new StubOverrideFormatterStub();
         IFormatter formatter = stub;
 
         var result1 = formatter.Format("hello");
@@ -467,16 +467,16 @@ public class OverloadUserMethodTests
 // Complete Example
 // =============================================================================
 
-public class CompleteUserMethodExampleTests
+public class CompleteStubOverrideExampleTests
 {
     [Fact]
-    public void StandardUserRetrieval_UsesUserMethodDefaults()
+    public void StandardUserRetrieval_UsesStubOverrideDefaults()
     {
-        var stub = new UserMethodsRepoStub();
-        IUserMethodsRepo repository = stub;
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo repository = stub;
 
-        #region user-methods-complete-example
-        // User method provides default; Return can override
+        #region stub-overrides-complete-example
+        // Stub override provides default; Return can override
         var user = repository.GetUserById(42);
         stub.GetUserById.Verify(Called.Once);
 
@@ -493,8 +493,8 @@ public class CompleteUserMethodExampleTests
     [Fact]
     public void MultipleCallsTrackedCorrectly()
     {
-        var stub = new UserMethodsRepoStub();
-        IUserMethodsRepo repository = stub;
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo repository = stub;
 
         repository.GetUserById(1);
         repository.GetUserById(2);

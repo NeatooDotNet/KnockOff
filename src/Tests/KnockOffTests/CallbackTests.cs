@@ -33,7 +33,7 @@ public class CallbackTests
 
 		var result = service.GetValue(5);
 
-		// User method returns input * 2
+		// Stub override returns input * 2
 		Assert.Equal(10, result);
 		Assert.Equal(5, knockOff.GetValue.LastArg);
 		knockOff.GetValue.Verify(Called.Once);
@@ -71,11 +71,11 @@ public class CallbackTests
 
 		service.DoSomething();
 
-		// GetValue has user implementation - we just verify tracking works
+		// GetValue has stub override - we just verify tracking works
 		var result = service.GetValue(3);
 
 		doSomethingTracking.Verify();
-		Assert.Equal(6, result); // User method returns input * 2
+		Assert.Equal(6, result); // Stub override returns input * 2
 	}
 
 	[Fact]
@@ -118,7 +118,7 @@ public class CallbackTests
 	public void Callback_Reset_ClearsTracking()
 	{
 		// Note: Reset() only clears tracking state, not the configured callback.
-		// Use GetOptional (no user method) to test OnCall behavior.
+		// Use GetOptional (no stub override) to test OnCall behavior.
 		var knockOff = new SampleKnockOff();
 		ISampleService service = knockOff;
 
@@ -148,7 +148,7 @@ public class CallbackTests
 
 		var result = await service.GetValueAsync(7);
 
-		// User method returns input * 3
+		// Stub override returns input * 3
 		Assert.Equal(21, result);
 		Assert.Equal(7, knockOff.GetValueAsync.LastArg);
 	}

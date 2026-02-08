@@ -52,7 +52,7 @@ User method detection and the `_` suffix pattern were implemented only in `FlatM
 
 ## Plans
 
-- [Standalone Class User Methods - Implementation Plan](../plans/standalone-class-user-methods.md)
+- [Standalone Class User Methods - Implementation Plan](../plans/standalone-class-stub-overrides.md)
 
 ---
 
@@ -72,7 +72,7 @@ User method detection and the `_` suffix pattern were implemented only in `FlatM
 
 **2026-02-05**: Created todo. Gap discovered during `.When()` + user methods implementation on branch `when-with-user-methods`. The architect scope table falsely claimed support; the standalone class pipeline has never been wired for user method detection.
 
-**2026-02-05**: Architectural plan created at `docs/plans/standalone-class-user-methods.md`. Deep codebase analysis completed. All four gaps identified (Transform, Builder, Model, Renderer). Design.Stubs acceptance criteria verified (CS0115 errors confirmed). Most infrastructure already exists -- work is primarily wiring existing components through the standalone class pipeline.
+**2026-02-05**: Architectural plan created at `docs/plans/standalone-class-stub-overrides.md`. Deep codebase analysis completed. All four gaps identified (Transform, Builder, Model, Renderer). Design.Stubs acceptance criteria verified (CS0115 errors confirmed). Most infrastructure already exists -- work is primarily wiring existing components through the standalone class pipeline.
 
 **2026-02-05**: Clarification review completed. Seven design decisions confirmed and recorded in plan's Design Decisions section. Key decisions: (1) user method completely replaces base.Method() call, (2) interceptor-internal fallback pattern, (3) generate virtual _ methods for ALL target class methods, (4) pattern 4 needs explicit verification, (5) .When() is in scope, (6) HasUserOverride on shared InlineClassImplMethodModel, (7) CS0115 sufficient -- no custom diagnostic. Added pattern 4 (generic standalone class) acceptance criteria to Design.Stubs using `[KnockOffBase(typeof(RepositoryBase<>))]` with three user method overrides exercising generic type parameters and partial overload coverage. All 5 CS0115 errors confirmed (2 pattern 3, 3 pattern 4). Plan ready for developer review.
 

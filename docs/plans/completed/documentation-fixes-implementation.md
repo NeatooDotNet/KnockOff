@@ -336,7 +336,7 @@ Completed comprehensive review of all user-facing documentation in docs/ (exclud
 - guides/properties.md ✓ - Fixed (issues 1-2 above)
 - guides/source-delegation.md ✓ - Clear delegation patterns
 - guides/stub-patterns.md ✓ - Fixed (issue 4 above)
-- guides/user-methods.md ✓ - Clear user method explanation
+- guides/stub-overrides.md ✓ - Clear stub override explanation
 - guides/verification.md ✓ - Comprehensive verification guide
 - migration/from-moq.md ✓ - Excellent migration guide
 - reference/attribute-options.md ✓ - Clear attribute documentation

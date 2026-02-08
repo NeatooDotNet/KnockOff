@@ -17,9 +17,9 @@ public interface IUserRepoStandalone
 public partial class UserRepoStandaloneStub : IUserRepoStandalone { }
 #endregion
 
-#region patterns-user-methods
+#region patterns-stub-overrides
 [KnockOff]
-public partial class UserRepoWithUserMethodsStub : IUserRepoStandalone
+public partial class UserRepoWithStubOverridesStub : IUserRepoStandalone
 {
     // Override base class method with underscore suffix
     protected override User? GetById_(int id)

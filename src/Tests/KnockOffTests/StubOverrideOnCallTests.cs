@@ -5,38 +5,38 @@ using Xunit;
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for OnCall/Returns on user method interceptors.
-/// OnCall supersedes the user method; user method is the fallback.
+/// Tests for OnCall/Returns on stub override interceptors.
+/// OnCall supersedes the stub override; stub override is the fallback.
 /// </summary>
-public class UserMethodOnCallTests
+public class StubOverrideOnCallTests
 {
-    #region OnCall Supersedes User Method
+    #region OnCall Supersedes Stub Override
 
     [Fact]
-    public void OnCall_SupersedesUserMethod_NonVoid()
+    public void OnCall_SupersedesStubOverride_NonVoid()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Return(x => x * 100); // Override user method (which does x * 10)
+        var stub = new StrictModeStubOverrideStub();
+        stub.GetValue.Return(x => x * 100); // Override stub override (which does x * 10)
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         var result = service.GetValue(5);
 
-        // Assert - OnCall wins over user method
+        // Assert - OnCall wins over stub override
         Assert.Equal(500, result); // 5 * 100, not 5 * 10
     }
 
     [Fact]
-    public void OnCall_SupersedesUserMethod_Void()
+    public void OnCall_SupersedesStubOverride_Void()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         var callbackInvoked = false;
         stub.DoSomething.Call(() => callbackInvoked = true);
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.DoSomething();
 
         // Assert - OnCall was invoked
@@ -45,51 +45,51 @@ public class UserMethodOnCallTests
 
     #endregion
 
-    #region Returns Supersedes User Method
+    #region Returns Supersedes Stub Override
 
     [Fact]
-    public void Returns_SupersedesUserMethod_NonVoid()
+    public void Returns_SupersedesStubOverride_NonVoid()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Return(999); // Override user method
+        var stub = new StrictModeStubOverrideStub();
+        stub.GetValue.Return(999); // Override stub override
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         var result = service.GetValue(5);
 
-        // Assert - Returns wins over user method
-        Assert.Equal(999, result); // Not 50 (user method: x * 10)
+        // Assert - Returns wins over stub override
+        Assert.Equal(999, result); // Not 50 (stub override: x * 10)
     }
 
     #endregion
 
-    #region User Method Fallback
+    #region Stub Override Fallback
 
     [Fact]
-    public void UserMethod_IsCalledWhenNoCallback()
+    public void StubOverride_IsCalledWhenNoCallback()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         // No OnCall configured
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         var result = service.GetValue(5);
 
-        // Assert - User method is called as fallback
-        Assert.Equal(50, result); // User method: x * 10
+        // Assert - Stub override is called as fallback
+        Assert.Equal(50, result); // Stub override: x * 10
     }
 
     [Fact]
-    public void UserMethod_IsCalledWhenNoCallback_Void()
+    public void StubOverride_IsCalledWhenNoCallback_Void()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         // No OnCall configured
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.DoSomething(); // Should not throw
 
         // Assert - Verify it was tracked
@@ -104,10 +104,10 @@ public class UserMethodOnCallTests
     public void Reset_PreservesOnCallConfiguration()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Return(x => x * 100);
 
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(5);
         stub.GetValue.Verify(Called.Once);
 
@@ -124,10 +124,10 @@ public class UserMethodOnCallTests
     public void Reset_ClearsTrackingState()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Return(42);
 
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(1);
         service.GetValue(2);
         stub.GetValue.Verify(Called.Exactly(2));
@@ -147,11 +147,11 @@ public class UserMethodOnCallTests
     public void OnCall_WithMultipleParameters()
     {
         // Arrange
-        var stub = new MultiParamUserMethodStub();
-        stub.Calculate.Return((a, b) => a - b); // Override user method (which does a + b)
+        var stub = new MultiParamStubOverrideStub();
+        stub.Calculate.Return((a, b) => a - b); // Override stub override (which does a + b)
 
         // Act
-        IMultiParamUserMethodService service = stub;
+        IMultiParamStubOverrideService service = stub;
         var result = service.Calculate(10, 3);
 
         // Assert - OnCall wins (subtraction instead of addition)
@@ -162,11 +162,11 @@ public class UserMethodOnCallTests
     public void Returns_WithMultipleParameters()
     {
         // Arrange
-        var stub = new MultiParamUserMethodStub();
+        var stub = new MultiParamStubOverrideStub();
         stub.Calculate.Return(999);
 
         // Act
-        IMultiParamUserMethodService service = stub;
+        IMultiParamStubOverrideService service = stub;
         var result = service.Calculate(10, 3);
 
         // Assert - Returns constant value
@@ -181,11 +181,11 @@ public class UserMethodOnCallTests
     public void LastArg_TracksWithOnCallConfigured()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Return(x => x * 100);
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(7);
 
         // Assert - LastArg still tracks even with OnCall
@@ -196,7 +196,7 @@ public class UserMethodOnCallTests
     public void Verifiable_WorksWithOnCall()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Return(x => 42).Verifiable();
 
         // Act - Don't call the method
@@ -209,11 +209,11 @@ public class UserMethodOnCallTests
     public void Verify_WorksWithOnCall()
     {
         // Arrange
-        var stub = new StrictModeUserMethodStub();
+        var stub = new StrictModeStubOverrideStub();
         stub.GetValue.Return(x => x);
 
         // Act
-        IStrictModeUserMethodTest service = stub;
+        IStrictModeStubOverrideTest service = stub;
         service.GetValue(1);
         service.GetValue(2);
 
@@ -223,32 +223,32 @@ public class UserMethodOnCallTests
 
     #endregion
 
-    #region Async User Methods With OnCall
+    #region Async Stub Overrides With OnCall
 
     [Fact]
-    public async Task OnCall_SupersedesAsyncUserMethod()
+    public async Task OnCall_SupersedesAsyncStubOverride()
     {
         // Arrange
-        var stub = new AsyncUserMethodTestStub();
+        var stub = new AsyncStubOverrideTestStub();
         stub.ProcessAsync.Return(input => Task.FromResult($"[OnCall: {input}]"));
 
         // Act
-        IAsyncUserMethodTestService service = stub;
+        IAsyncStubOverrideTestService service = stub;
         var result = await service.ProcessAsync("test");
 
-        // Assert - OnCall wins over user method
+        // Assert - OnCall wins over stub override
         Assert.Equal("[OnCall: test]", result);
     }
 
     [Fact]
-    public async Task Returns_SupersedesAsyncUserMethod_WithAutoWrap()
+    public async Task Returns_SupersedesAsyncStubOverride_WithAutoWrap()
     {
         // Arrange
-        var stub = new AsyncUserMethodTestStub();
+        var stub = new AsyncStubOverrideTestStub();
         stub.ProcessAsync.Return("constant value"); // Returns auto-wraps in Task.FromResult
 
         // Act
-        IAsyncUserMethodTestService service = stub;
+        IAsyncStubOverrideTestService service = stub;
         var result = await service.ProcessAsync("ignored");
 
         // Assert
@@ -256,17 +256,17 @@ public class UserMethodOnCallTests
     }
 
     [Fact]
-    public async Task AsyncUserMethod_FallbackWhenNoCallback()
+    public async Task AsyncStubOverride_FallbackWhenNoCallback()
     {
         // Arrange
-        var stub = new AsyncUserMethodTestStub();
+        var stub = new AsyncStubOverrideTestStub();
         // No OnCall configured
 
         // Act
-        IAsyncUserMethodTestService service = stub;
+        IAsyncStubOverrideTestService service = stub;
         var result = await service.ProcessAsync("hello");
 
-        // Assert - User method is called (returns "[Async: hello]")
+        // Assert - Stub override is called (returns "[Async: hello]")
         Assert.Equal("[Async: hello]", result);
     }
 
@@ -274,11 +274,11 @@ public class UserMethodOnCallTests
     public async Task ValueTask_Returns_WithAutoWrap()
     {
         // Arrange
-        var stub = new AsyncUserMethodTestStub();
+        var stub = new AsyncStubOverrideTestStub();
         stub.ComputeAsync.Return(42); // Returns auto-wraps in new ValueTask<int>()
 
         // Act
-        IAsyncUserMethodTestService service = stub;
+        IAsyncStubOverrideTestService service = stub;
         var result = await service.ComputeAsync(999);
 
         // Assert
@@ -290,19 +290,19 @@ public class UserMethodOnCallTests
 
 #region Test Interfaces and Stubs
 
-/// <summary>Interface for multi-parameter user method tests.</summary>
-public interface IMultiParamUserMethodService
+/// <summary>Interface for multi-parameter stub override tests.</summary>
+public interface IMultiParamStubOverrideService
 {
     int Calculate(int a, int b);
 }
 
-/// <summary>Stub with multi-parameter user method.</summary>
+/// <summary>Stub with multi-parameter stub override.</summary>
 [KnockOff]
-public partial class MultiParamUserMethodStub : IMultiParamUserMethodService
+public partial class MultiParamStubOverrideStub : IMultiParamStubOverrideService
 {
 }
 
-public partial class MultiParamUserMethodStub
+public partial class MultiParamStubOverrideStub
 {
     protected override int Calculate_(int a, int b)
     {
@@ -310,20 +310,20 @@ public partial class MultiParamUserMethodStub
     }
 }
 
-/// <summary>Interface for async user method tests.</summary>
-public interface IAsyncUserMethodTestService
+/// <summary>Interface for async stub override tests.</summary>
+public interface IAsyncStubOverrideTestService
 {
     Task<string> ProcessAsync(string input);
     ValueTask<int> ComputeAsync(int value);
 }
 
-/// <summary>Stub with async user methods.</summary>
+/// <summary>Stub with async stub overrides.</summary>
 [KnockOff]
-public partial class AsyncUserMethodTestStub : IAsyncUserMethodTestService
+public partial class AsyncStubOverrideTestStub : IAsyncStubOverrideTestService
 {
 }
 
-public partial class AsyncUserMethodTestStub
+public partial class AsyncStubOverrideTestStub
 {
     protected override async Task<string> ProcessAsync_(string input)
     {

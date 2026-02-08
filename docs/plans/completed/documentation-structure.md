@@ -30,7 +30,7 @@ KnockOff/
     │   ├── advanced-callbacks.md       # Sequential returns, exceptions
     │   ├── generic-methods.md          # Of<T>() pattern for generics
     │   ├── source-delegation.md        # Source(T) for real implementations
-    │   └── user-methods.md             # Compile-time defaults
+    │   └── stub-overrides.md             # Compile-time defaults
     ├── reference/                      # API documentation
     │   ├── interceptor-api.md          # Complete interceptor member reference
     │   ├── attribute-options.md        # KnockOff attribute configuration
@@ -155,7 +155,7 @@ KnockOff/
 7. **Priority Order** - OnCall > User Method > Source > Smart Default
 8. **Complete Example**
 
-### docs/guides/user-methods.md
+### docs/guides/stub-overrides.md
 
 1. **Introduction** - Compile-time defaults
 2. **Defining User Methods** - Protected method syntax
@@ -225,7 +225,7 @@ KnockOff/
 10. **guides/advanced-callbacks.md**
 11. **guides/generic-methods.md**
 12. **guides/source-delegation.md**
-13. **guides/user-methods.md**
+13. **guides/stub-overrides.md**
 14. **reference/attribute-options.md**
 15. **reference/smart-defaults.md**
 16. **migration/from-moq.md**

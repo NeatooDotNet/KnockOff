@@ -109,13 +109,13 @@ stub.Verify();
 
 Generated for non-generic interface methods. Tracks call counts, captures arguments, and supports callback configuration.
 
-### User Method Interceptors (Stand-Alone Pattern)
+### Stub Override Interceptors (Stand-Alone Pattern)
 
-When you define a **user method** (override a virtual method with underscore suffix), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). This interceptor:
+When you define a **stub override** (override a virtual method with underscore suffix), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). This interceptor:
 
 - Tracks all calls to the interface method
-- Allows `Return(callback)` to supersede the user method
-- Uses the user method as fallback when no `Return` callback is configured
+- Allows `Return(callback)` to supersede the stub override
+- Uses the stub override as fallback when no `Return` callback is configured
 
 <!-- snippet: user-method-interceptor-standalone-api-example -->
 ```cs
@@ -135,10 +135,10 @@ public partial class ApiRepoStub
 var stub = new ApiRepoStub();
 IApiRepo repo = stub;
 
-// User method provides default behavior
+// Stub override provides default behavior
 var user1 = repo.GetById(1);  // Returns "Default"
 
-// Return supersedes user method (clean interceptor name)
+// Return supersedes stub override (clean interceptor name)
 stub.GetById.Return(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns "Override"
 
@@ -152,7 +152,7 @@ var user3 = repo.GetById(3);  // Returns User { Id = 99 }
 ```
 <!-- endSnippet -->
 
-**Reset behavior for user method interceptors:** `Reset()` clears tracking state (call count, LastArg) but preserves the Return configuration.
+**Reset behavior for stub override interceptors:** `Reset()` clears tracking state (call count, LastArg) but preserves the Return configuration.
 
 ### Properties
 
@@ -570,7 +570,7 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 | Interceptor Type | Reset Clears | Reset Preserves |
 |-----------------|--------------|-----------------|
 | **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position, source delegation | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
-| **User Method** | Call counts, `LastArg` | `Return`/`Call` configuration, verifiable marking |
+| **Stub Override** | Call counts, `LastArg` | `Return`/`Call` configuration, verifiable marking |
 | **Property** | Get/set counts, `LastSetValue`, sequence index, source delegation | `Get`/`Set` callbacks, sequence structure, verifiable marking |
 | **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `Get`/`Set` callbacks, `Backing` dictionary, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
@@ -680,7 +680,7 @@ KnockOff evaluates member calls in this order:
 
 1. **When chains** -- `stub.Method.When(...).Return(...)`
 2. **Return / Call** -- `stub.Method.Return(...)` or `stub.Method.Call(...)`
-3. **User methods** -- `protected override` with `_` suffix (Standalone only)
+3. **Stub overrides** -- `protected override` with `_` suffix (Standalone only)
 4. **Source delegation** -- `stub.Source(realImplementation)`
 5. **Smart default** -- KnockOff's built-in default value
 
@@ -692,7 +692,7 @@ Class stubs do not use Source delegation. Instead, unconfigured virtual methods 
 
 1. **When chains** -- `stub.Method.When(...).Return(...)`
 2. **Return / Call** -- `stub.Method.Return(...)` or `stub.Method.Call(...)`
-3. **User methods** -- `protected override` with `_` suffix (Standalone Class only)
+3. **Stub overrides** -- `protected override` with `_` suffix (Standalone Class only)
 4. **Base class implementation** -- for virtual methods (the default)
 5. **Smart default** -- for abstract methods: returns `default(T)` (or throws in strict mode)
 

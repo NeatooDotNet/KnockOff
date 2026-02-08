@@ -389,15 +389,15 @@ stub.ProcessData.Reset();
 - Testing a sequence of interactions where counts should restart
 - Isolating assertions between test setup and execution phases
 
-**Note:** User method interceptors have different reset semantics. See the User Method Interceptors section below.
+**Note:** Stub override interceptors have different reset semantics. See the Stub Override Interceptors section below.
 
 ---
 
-## User Method Interceptors (Stand-Alone Pattern)
+## Stub Override Interceptors (Stand-Alone Pattern)
 
-When you define a **user method** (override a virtual method with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). These interceptors support `Return(callback)` and `Return(value)` to override the user method.
+When you define a **stub override** (override a virtual method with underscore suffix in a Stand-Alone stub), the interceptor uses a clean name (e.g., `GetById`, not `GetById2`). These interceptors support `Return(callback)` and `Return(value)` to override the stub override.
 
-### Return Supersedes User Method
+### Return Supersedes Stub Override
 
 <!-- snippet: user-methods-standalone-example -->
 ```cs
@@ -418,10 +418,10 @@ public partial class SkillRepoStub
 var stub = new SkillRepoStub();
 ISkillRepo repo = stub;
 
-// Without Return: user method provides behavior
+// Without Return: stub override provides behavior
 var user1 = repo.GetById(1);  // Name = "Default"
 
-// With Return: callback supersedes user method (clean interceptor name)
+// With Return: callback supersedes stub override (clean interceptor name)
 stub.GetById.Return(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Name = "Override"
 ```
@@ -440,7 +440,7 @@ stub.GetUserAsync.Return(new User { Id = 1 });  // Auto-wrapped in Task.FromResu
 
 ### Full Tracking Support
 
-User method interceptors provide full tracking even when using `Return`:
+Stub override interceptors provide full tracking even when using `Return`:
 
 <!-- snippet: user-methods-tracking-with-oncall -->
 ```cs
@@ -454,7 +454,7 @@ Assert.Equal(42, stub.GetById.LastArg);
 
 ### Reset Preserves Return Configuration
 
-Like regular method interceptors, user method interceptors preserve `Return` configuration across `Reset()`:
+Like regular method interceptors, stub override interceptors preserve `Return` configuration across `Reset()`:
 
 <!-- snippet: user-methods-reset-preserves-oncall -->
 ```cs
@@ -465,7 +465,7 @@ stub.GetById.Verify(Called.Once);
 stub.GetById.Reset();
 stub.GetById.Verify(Called.Never);  // Tracking cleared
 
-repo.GetById(2);  // Still uses Return callback (not reset to user method)
+repo.GetById(2);  // Still uses Return callback (not reset to stub override)
 ```
 <!-- endSnippet -->
 
@@ -504,9 +504,9 @@ var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 | Get last single arg | `tracking.LastArg` |
 | Get last multiple args | `tracking.LastArgs` (named tuple) |
 | Reset interceptor | `stub.Method.Reset()` |
-| Override user method | `stub.Method.Return((args) => returnValue)` |
-| Override user method (constant) | `stub.Method.Return(value)` |
-| Override async user method | `stub.AsyncMethod.Return(value)` (auto-wraps) |
+| Override stub override | `stub.Method.Return((args) => returnValue)` |
+| Override stub override (constant) | `stub.Method.Return(value)` |
+| Override async stub override | `stub.AsyncMethod.Return(value)` (auto-wraps) |
 
 ---
 
@@ -521,9 +521,9 @@ var saveTracking = stub.SaveUser.Call((user) => { }).Verifiable();
 - **Arguments**: `LastArg` for single parameters, `LastArgs` tuple for multiple
 - **Overloads**: Distinguished by callback parameter types - use explicit types in lambdas
 - **Reset**: Clears call counts and tracking state, preserves Return/Call callbacks
-- **User methods**: Override virtual methods (with underscore suffix) in Stand-Alone stubs for default behavior
-- **User method override**: Use `stub.Method.Return(callback)` or `stub.Method.Return(value)` to supersede user method
-- **User method reset**: `Reset()` preserves Return configuration (same semantics as regular interceptors)
+- **Stub overrides**: Override virtual methods (with underscore suffix) in Stand-Alone stubs for default behavior
+- **Stub override**: Use `stub.Method.Return(callback)` or `stub.Method.Return(value)` to supersede stub override
+- **Stub override reset**: `Reset()` preserves Return configuration (same semantics as regular interceptors)
 
 ---
 

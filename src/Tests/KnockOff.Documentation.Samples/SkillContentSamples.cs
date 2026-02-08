@@ -123,20 +123,20 @@ public partial class DelegateHost { }
 [KnockOff(Strict = true)]
 public partial class StrictStub : ISvc { }
 
-// User method stubs
-#region skill-user-method-define
+// Stub override method stubs
+#region skill-stub-override-define
 [KnockOff]
-public partial class SkUserMethodRepoStub : IUserRepo { }
+public partial class SkStubOverrideRepoStub : IUserRepo { }
 
-public partial class SkUserMethodRepoStub
+public partial class SkStubOverrideRepoStub
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 #endregion
 
-// User property stubs
-#region skill-user-property-define
+// Stub override property stubs
+#region skill-stub-override-property-define
 [KnockOff]
 public partial class SkUserPropServiceStub : IUserService { }
 
@@ -676,22 +676,22 @@ public class StrictModeConfigTests
 }
 
 // =============================================================================
-// User Methods
+// Stub Overrides
 // =============================================================================
 
-public class UserMethodTests
+public class StubOverrideTests
 {
     [Fact]
-    public void UserMethodReturnOverride()
+    public void StubOverrideReturnOverride()
     {
-        #region skill-user-method-oncall
-        var stub = new SkUserMethodRepoStub();
+        #region skill-stub-override-oncall
+        var stub = new SkStubOverrideRepoStub();
         IUserRepo repo = stub;
 
-        // Without Returns: user method is called
+        // Without Returns: stub override is called
         var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
 
-        // With Returns: callback supersedes user method (clean interceptor name)
+        // With Returns: callback supersedes stub override (clean interceptor name)
         stub.GetById.Return(id => new User { Id = id, Name = "Override" });
         var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
         #endregion
@@ -701,11 +701,11 @@ public class UserMethodTests
     }
 
     [Fact]
-    public void UserMethodReturns()
+    public void StubOverrideReturns()
     {
-        var stub = new SkUserMethodRepoStub();
+        var stub = new SkStubOverrideRepoStub();
 
-        #region skill-user-method-returns
+        #region skill-stub-override-returns
         stub.GetById.Return(new User { Id = 99, Name = "Fixed" });
         #endregion
 
@@ -714,7 +714,7 @@ public class UserMethodTests
     }
 
     [Fact]
-    public void UserMethodReturnsCombined()
+    public void StubOverrideReturnsCombined()
     {
         var stub = new SvcStub();
 
@@ -728,11 +728,11 @@ public class UserMethodTests
     }
 
     [Fact]
-    public async Task UserMethodAsyncReturns()
+    public async Task StubOverrideAsyncReturns()
     {
         var stub = new SvcStub();
 
-        #region skill-user-method-async-returns
+        #region skill-stub-override-async-returns
         // Returns auto-wraps in Task.FromResult
         stub.GetUserAsync.Return(new User { Id = 1 });
         #endregion
@@ -743,12 +743,12 @@ public class UserMethodTests
     }
 
     [Fact]
-    public void UserMethodTracking()
+    public void StubOverrideTracking()
     {
-        var stub = new SkUserMethodRepoStub();
+        var stub = new SkStubOverrideRepoStub();
         IUserRepo repo = stub;
 
-        #region skill-user-method-tracking
+        #region skill-stub-override-tracking
         stub.GetById.Return(id => new User { Id = id });
         repo.GetById(42);
 
@@ -758,12 +758,12 @@ public class UserMethodTests
     }
 
     [Fact]
-    public void UserMethodReset()
+    public void StubOverrideReset()
     {
-        var stub = new SkUserMethodRepoStub();
+        var stub = new SkStubOverrideRepoStub();
         IUserRepo repo = stub;
 
-        #region skill-user-method-reset
+        #region skill-stub-override-reset
         stub.GetById.Return(id => new User { Id = id });
         repo.GetById(1);
         stub.GetById.Verify(Called.Once);
@@ -787,7 +787,7 @@ public class UserPropertyTests
     [Fact]
     public void UserPropertyOnGetOverride()
     {
-        #region skill-user-property-onget
+        #region skill-stub-override-property-onget
         var stub = new SkUserPropServiceStub();
         stub.SetCount(42);
         IUserService service = stub;
@@ -811,7 +811,7 @@ public class UserPropertyTests
         stub.SetCount(42);
         IUserService service = stub;
 
-        #region skill-user-property-tracking
+        #region skill-stub-override-property-tracking
         _ = service.Count;
         _ = service.Count;
 
@@ -825,7 +825,7 @@ public class UserPropertyTests
         var stub = new SkUserPropServiceStub();
         IUserService service = stub;
 
-        #region skill-user-property-reset
+        #region skill-stub-override-property-reset
         stub.Count.Get(100);
         _ = service.Count;
         stub.Count.VerifyGet(Called.Once);

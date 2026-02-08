@@ -12,14 +12,14 @@ public partial class KnockOffGenerator
 {
 	/// <summary>
 	/// Detects user-defined methods in all partial class declarations that have the 'override' modifier
-	/// and end with the '_' suffix (our base class user method naming convention).
+	/// and end with the '_' suffix (our base class stub override naming convention).
 	/// Uses syntactic detection via DeclaringSyntaxReferences - the 'override' keyword is detected
 	/// as a syntax token, which works even before the generated base class exists.
 	/// </summary>
 	/// <param name="classSymbol">The class symbol to scan for override methods</param>
 	/// <param name="compilation">The compilation, used to obtain a SemanticModel per syntax tree for type resolution</param>
-	/// <returns>A set of method signature keys (format: "MethodName_(ParamType1,ParamType2,...)") that have user overrides</returns>
-	private static HashSet<string> DetectUserOverrideMethods(INamedTypeSymbol classSymbol, Compilation compilation)
+	/// <returns>A set of method signature keys (format: "MethodName_(ParamType1,ParamType2,...)") that have stub overrides</returns>
+	private static HashSet<string> DetectStubOverrideMethods(INamedTypeSymbol classSymbol, Compilation compilation)
 	{
 		var overrideMethods = new HashSet<string>();
 
@@ -59,7 +59,7 @@ public partial class KnockOffGenerator
 	}
 
 	/// <summary>
-	/// Builds a signature key from a MethodDeclarationSyntax for matching user override methods.
+	/// Builds a signature key from a MethodDeclarationSyntax for matching stub override methods.
 	/// Format: "MethodName_(ParamType1,ParamType2,...)" - NO return type since C# forbids return-type overloading.
 	/// Includes ref/out/in modifiers as they affect the signature.
 	/// Uses the semantic model to resolve parameter types to fully-qualified names,
@@ -113,13 +113,13 @@ public partial class KnockOffGenerator
 
 	/// <summary>
 	/// Detects user-defined properties in all partial class declarations that have the 'override' modifier
-	/// and end with the '_' suffix (our base class user property naming convention).
+	/// and end with the '_' suffix (our base class stub override property naming convention).
 	/// Uses syntactic detection via DeclaringSyntaxReferences - the 'override' keyword is detected
 	/// as a syntax token, which works even before the generated base class exists.
 	/// </summary>
 	/// <param name="classSymbol">The class symbol to scan for override properties</param>
-	/// <returns>A set of property names (with _ suffix) that have user overrides</returns>
-	private static HashSet<string> DetectUserOverrideProperties(INamedTypeSymbol classSymbol)
+	/// <returns>A set of property names (with _ suffix) that have stub overrides</returns>
+	private static HashSet<string> DetectStubOverrideProperties(INamedTypeSymbol classSymbol)
 	{
 		var overrideProperties = new HashSet<string>();
 

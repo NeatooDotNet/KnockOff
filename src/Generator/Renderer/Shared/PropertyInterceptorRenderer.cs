@@ -262,7 +262,7 @@ internal static class PropertyInterceptorRenderer
 
 		}
 
-		// User override support methods - these are used by RenderPropertyUserOverrideImplementation
+		// Stub override support methods - these are used by RenderPropertyStubOverrideImplementation
 		// They separate tracking from callback invocation for the base class pattern
 		RenderUserOverrideSupportMethods(w, model);
 
@@ -314,10 +314,10 @@ internal static class PropertyInterceptorRenderer
 
 	#endregion
 
-	#region User Override Support Methods
+	#region Stub Override Support Methods
 
 	/// <summary>
-	/// Renders methods for user override property support (base class pattern).
+	/// Renders methods for stub override property support (base class pattern).
 	/// These methods separate tracking from callback invocation:
 	/// - RecordGet() / RecordSet(value) - tracking only
 	/// - HasGet / HasSet - check if callback is configured
@@ -328,15 +328,15 @@ internal static class PropertyInterceptorRenderer
 		// Getter support
 		if (model.HasGetter)
 		{
-			w.Line("/// <summary>Records a getter access (tracking only, does not invoke callback). Used by user override pattern.</summary>");
+			w.Line("/// <summary>Records a getter access (tracking only, does not invoke callback). Used by stub override pattern.</summary>");
 			w.Line("internal void RecordGet() => _unconfiguredGetCount++;");
 			w.Line();
 
-			w.Line("/// <summary>Returns true if Get is configured (callback or sequence). Used by user override pattern.</summary>");
+			w.Line("/// <summary>Returns true if Get is configured (callback or sequence). Used by stub override pattern.</summary>");
 			w.Line("internal bool HasGet => _get != null || (_getSequence?.Count ?? 0) > 0;");
 			w.Line();
 
-			w.Line("/// <summary>Invokes the configured getter callback without tracking. Used by user override pattern.</summary>");
+			w.Line("/// <summary>Invokes the configured getter callback without tracking. Used by stub override pattern.</summary>");
 			w.Line($"internal {model.ValueType} InvokeGetCallback()");
 			using (w.Braces())
 			{
@@ -364,15 +364,15 @@ internal static class PropertyInterceptorRenderer
 		// Setter support
 		if (model.HasSetter)
 		{
-			w.Line("/// <summary>Records a setter access (tracking only, does not invoke callback). Used by user override pattern.</summary>");
+			w.Line("/// <summary>Records a setter access (tracking only, does not invoke callback). Used by stub override pattern.</summary>");
 			w.Line($"internal void RecordSet({model.ValueType} value) {{ _unconfiguredSetCount++; _unconfiguredLastSetValue = value; }}");
 			w.Line();
 
-			w.Line("/// <summary>Returns true if Set is configured (callback or sequence). Used by user override pattern.</summary>");
+			w.Line("/// <summary>Returns true if Set is configured (callback or sequence). Used by stub override pattern.</summary>");
 			w.Line("internal bool HasSet => _set != null || (_setSequence?.Count ?? 0) > 0;");
 			w.Line();
 
-			w.Line("/// <summary>Invokes the configured setter callback without tracking. Used by user override pattern.</summary>");
+			w.Line("/// <summary>Invokes the configured setter callback without tracking. Used by stub override pattern.</summary>");
 			w.Line($"internal void InvokeSetCallback({model.ValueType} value)");
 			using (w.Braces())
 			{

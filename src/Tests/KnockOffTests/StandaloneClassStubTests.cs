@@ -309,7 +309,7 @@ public class StandaloneClassStubTests
 
 	#endregion
 
-	#region Custom User Methods Tests
+	#region Custom Stub Override Methods Tests
 
 	[Fact]
 	public void StandaloneClassStub_UserCanAddCustomMethods()

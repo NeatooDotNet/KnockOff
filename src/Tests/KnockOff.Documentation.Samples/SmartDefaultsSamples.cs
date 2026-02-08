@@ -274,9 +274,9 @@ public interface IOverridableService
 public partial class OverridableServiceStub : IOverridableService { }
 
 [KnockOff]
-public partial class UserMethodOverrideStub : IOverridableService
+public partial class StubOverrideOverrideStub : IOverridableService
 {
-    #region smart-defaults-override-user-method
+    #region smart-defaults-override-stub-override
     protected override User? GetUser_() => new User { Name = "Test" };
     #endregion
 }
@@ -302,9 +302,9 @@ public class OverrideSmartDefaultsTests
     }
 
     [Fact]
-    public void Override_WithUserMethod()
+    public void Override_WithStubOverride()
     {
-        var stub = new UserMethodOverrideStub();
+        var stub = new StubOverrideOverrideStub();
         IOverridableService service = stub;
         Assert.Equal("Test", service.GetUser()!.Name);
     }

@@ -53,7 +53,7 @@ internal static class FlatRenderer
 		// Calculate the class name with type parameters for delegate signatures
 		var classNameWithTypeParams = $"{unit.ClassName}{typeParams}";
 
-		// Base class for user method overrides
+		// Base class for stub overrides
 		var baseClass = $"{unit.ClassName}Base{typeParams}";
 
 		using (w.Block($"partial class {unit.ClassName}{typeParams} : {baseClass}, {interfaces}, global::KnockOff.IKnockOffStub{constraints}"))
@@ -116,7 +116,7 @@ internal static class FlatRenderer
 			}
 
 			// Render user-defined method interceptor classes (full interceptor with When/Sequence support)
-			foreach (var group in unit.UserMethodGroups)
+			foreach (var group in unit.StubOverrideGroups)
 			{
 				if (renderedInterceptorClasses.Add(group.InterceptorClassName))
 				{
@@ -125,7 +125,7 @@ internal static class FlatRenderer
 						BaseIndent: 0,
 						IncludeStrictParameter: true,
 						StrictAccessExpression: "strict",
-						UserMethodFallback: true,
+						StubOverrideFallback: true,
 						StubTypeName: classNameWithTypeParams);
 					MethodInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
 				}
@@ -137,11 +137,11 @@ internal static class FlatRenderer
 					RenderGenericMethodHandler(w, handler, classNameWithTypeParams);
 			}
 
-			// Render generic user method handler groups (for overloaded generic user methods)
-			foreach (var handlerGroup in unit.GenericUserMethodHandlerGroups)
+			// Render generic stub override handler groups (for overloaded generic stub overrides)
+			foreach (var handlerGroup in unit.GenericStubOverrideHandlerGroups)
 			{
 				if (renderedInterceptorClasses.Add(handlerGroup.InterceptorClassName))
-					RenderGenericUserMethodHandlerGroup(w, handlerGroup, classNameWithTypeParams);
+					RenderGenericStubOverrideHandlerGroup(w, handlerGroup, classNameWithTypeParams);
 			}
 
 			foreach (var evt in unit.Events)
@@ -165,16 +165,16 @@ internal static class FlatRenderer
 					.Where(g => g.Methods.Select(GetSignatureSuffix).Distinct().Count() > 1)
 					.Select(g => g.InterceptorName));
 
-			// Build set of user method interceptor names that have multiple UNIQUE overloads (need suffixed RecordCall)
-			var multiOverloadUserMethodInterceptors = new HashSet<string>(
-				unit.UserMethodGroups
+			// Build set of stub override interceptor names that have multiple UNIQUE overloads (need suffixed RecordCall)
+			var multiOverloadStubOverrideInterceptors = new HashSet<string>(
+				unit.StubOverrideGroups
 					.Where(g => g.Methods.Select(GetSignatureSuffix).Distinct().Count() > 1)
 					.Select(g => g.InterceptorName));
 
-			// Build set of generic user method interceptor names that have multiple overloads (need suffixed RecordCall/Callback)
+			// Build set of generic stub override interceptor names that have multiple overloads (need suffixed RecordCall/Callback)
 			// A generic handler group needs suffixes if it has multiple type arities OR multiple signatures per arity
-			var multiOverloadGenericUserMethodInterceptors = new HashSet<string>(
-				unit.GenericUserMethodHandlerGroups
+			var multiOverloadGenericStubOverrideInterceptors = new HashSet<string>(
+				unit.GenericStubOverrideHandlerGroups
 					.Where(g => g.TypeArityGroups.Count > 1 ||
 					            g.TypeArityGroups.Any(a => a.SignatureGroups.Count > 1))
 					.Select(g => g.InterceptorName));
@@ -190,7 +190,7 @@ internal static class FlatRenderer
 				RenderIndexerImplementation(w, indexer, indexerAccessMap);
 
 			foreach (var method in unit.Methods)
-				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadUserMethodInterceptors, multiOverloadGenericUserMethodInterceptors, unit.GenericUserMethodHandlerGroups);
+				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadStubOverrideInterceptors, multiOverloadGenericStubOverrideInterceptors, unit.GenericStubOverrideHandlerGroups);
 
 			foreach (var evt in unit.Events)
 				RenderEventImplementation(w, evt);
@@ -1265,11 +1265,11 @@ internal static class FlatRenderer
 
 	#endregion
 
-	#region Generic User Method Handler Group
+	#region Generic Stub Override Handler Group
 
-	private static void RenderGenericUserMethodHandlerGroup(CodeWriter w, FlatGenericMethodHandlerGroup group, string className)
+	private static void RenderGenericStubOverrideHandlerGroup(CodeWriter w, FlatGenericMethodHandlerGroup group, string className)
 	{
-		w.Line($"/// <summary>Interceptor for {group.MethodName} (generic user method with Of&lt;T&gt;() access).</summary>");
+		w.Line($"/// <summary>Interceptor for {group.MethodName} (generic stub override with Of&lt;T&gt;() access).</summary>");
 		using (w.Block($"public sealed class {group.InterceptorClassName}"))
 		{
 			// Each type arity gets its own dictionary
@@ -1354,13 +1354,13 @@ internal static class FlatRenderer
 			// Nested Typed Handler Classes (one per type arity)
 			foreach (var arity in group.TypeArityGroups)
 			{
-				RenderGenericUserMethodTypedHandlerClass(w, group.MethodName, arity);
+				RenderGenericStubOverrideTypedHandlerClass(w, group.MethodName, arity);
 			}
 		}
 		w.Line();
 	}
 
-	private static void RenderGenericUserMethodTypedHandlerClass(CodeWriter w, string methodName, FlatGenericTypeArityGroup arity)
+	private static void RenderGenericStubOverrideTypedHandlerClass(CodeWriter w, string methodName, FlatGenericTypeArityGroup arity)
 	{
 		w.Line($"/// <summary>Typed handler for {methodName} with specific type arguments.</summary>");
 		w.Line($"public sealed class {arity.TypedHandlerClassName}<{arity.TypeParameterNames}> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking{arity.ConstraintClauses}");
@@ -1732,13 +1732,13 @@ internal static class FlatRenderer
 			w.Line();
 		}
 
-		// Generic user method handler groups (for overloaded generic user methods)
-		foreach (var handlerGroup in unit.GenericUserMethodHandlerGroups)
+		// Generic stub override handler groups (for overloaded generic stub overrides)
+		foreach (var handlerGroup in unit.GenericStubOverrideHandlerGroups)
 		{
 			if (!renderedProperties.Add(handlerGroup.InterceptorName))
 				continue;
 			var newKeyword = handlerGroup.NeedsNewKeyword ? "new " : "";
-			w.Line($"/// <summary>Interceptor for {handlerGroup.MethodName} (generic user method with overloads).</summary>");
+			w.Line($"/// <summary>Interceptor for {handlerGroup.MethodName} (generic stub override with overloads).</summary>");
 			w.Line($"public {newKeyword}{handlerGroup.InterceptorClassName} {handlerGroup.InterceptorName} {{ get; }} = new();");
 			w.Line();
 		}
@@ -1775,11 +1775,11 @@ internal static class FlatRenderer
 		w.Line();
 
 		// Verify and VerifyAll methods (if there are any verifiable members)
-		// Must check all member types: methods, user methods, properties, events
+		// Must check all member types: methods, stub overrides, properties, events
 		// NOTE: Indexers excluded - there's a separate bug where indexer container accessor paths are wrong
 		// TODO: Fix indexer verification accessor paths (see IndexerGroups vs individual Indexers)
 		if (unit.MethodGroups.Count > 0
-			|| unit.UserMethodGroups.Count > 0
+			|| unit.StubOverrideGroups.Count > 0
 			|| unit.Properties.Count > 0
 			|| unit.Events.Count > 0)
 		{
@@ -1802,7 +1802,7 @@ internal static class FlatRenderer
 			.ToList();
 
 		// Get unique user-defined method interceptor names (tracking-only, always configured)
-		var userMethodInterceptorNames = unit.UserMethodGroups
+		var stubOverrideInterceptorNames = unit.StubOverrideGroups
 			.Select(g => g.InterceptorName)
 			.Distinct()
 			.ToList();
@@ -1857,7 +1857,7 @@ internal static class FlatRenderer
 			}
 
 			// Check verifiable user-defined method interceptors
-			foreach (var name in userMethodInterceptorNames)
+			foreach (var name in stubOverrideInterceptorNames)
 			{
 				w.Line($"if ({name}.CheckVerification() is {{ }} {name.ToLowerInvariant()}Failure) failures.Add({name.ToLowerInvariant()}Failure);");
 			}
@@ -1986,9 +1986,9 @@ internal static class FlatRenderer
 		}
 
 		// User-defined properties with base class pattern: record access, check Get/Set, then delegate to virtual property
-		if (prop.HasUserOverride)
+		if (prop.HasStubOverride)
 		{
-			RenderPropertyUserOverrideImplementation(w, prop);
+			RenderPropertyStubOverrideImplementation(w, prop);
 			return;
 		}
 
@@ -2033,11 +2033,11 @@ internal static class FlatRenderer
 	}
 
 	/// <summary>
-	/// Renders the explicit interface implementation for a property with user override (base class pattern).
-	/// Priority chain: Get/Set > User Override (virtual property with _ suffix).
-	/// Unlike properties without user override, this does NOT fall through to Strict/Default.
+	/// Renders the explicit interface implementation for a property with stub override (base class pattern).
+	/// Priority chain: Get/Set > Stub override (virtual property with _ suffix).
+	/// Unlike properties without stub override, this does NOT fall through to Strict/Default.
 	/// </summary>
-	private static void RenderPropertyUserOverrideImplementation(CodeWriter w, FlatPropertyModel prop)
+	private static void RenderPropertyStubOverrideImplementation(CodeWriter w, FlatPropertyModel prop)
 	{
 		w.Line($"{prop.ReturnType} {prop.DeclaringInterface}.{prop.MemberName}");
 		using (w.Braces())
@@ -2047,11 +2047,11 @@ internal static class FlatRenderer
 				w.Line("get");
 				using (w.Braces())
 				{
-					// Get supersedes user override (InvokeGetCallback tracks internally)
+					// Get supersedes stub override (InvokeGetCallback tracks internally)
 					w.Line($"if ({prop.InterceptorName}.HasGet) return {prop.InterceptorName}.InvokeGetCallback();");
-					// Record access only for user override path (to avoid double counting)
+					// Record access only for stub override path (to avoid double counting)
 					w.Line($"{prop.InterceptorName}.RecordGet();");
-					// User override (virtual property with _ suffix)
+					// Stub override (virtual property with _ suffix)
 					w.Line($"return {prop.MemberName}_;");
 				}
 			}
@@ -2063,11 +2063,11 @@ internal static class FlatRenderer
 				w.Line("set");
 				using (w.Braces())
 				{
-					// Set supersedes user override (InvokeSetCallback tracks internally)
+					// Set supersedes stub override (InvokeSetCallback tracks internally)
 					w.Line($"if ({prop.InterceptorName}.HasSet) {{ {prop.InterceptorName}.InvokeSetCallback(value); return; }}");
-					// Record access only for user override path (to avoid double counting)
+					// Record access only for stub override path (to avoid double counting)
 					w.Line($"{prop.InterceptorName}.RecordSet(value);");
-					// User override (virtual property with _ suffix)
+					// Stub override (virtual property with _ suffix)
 					w.Line($"{prop.MemberName}_ = value;");
 				}
 				if (prop.SetterPragmaRestore != null)
@@ -2149,9 +2149,9 @@ internal static class FlatRenderer
 		CodeWriter w,
 		FlatMethodModel method,
 		HashSet<string> multiOverloadInterceptors,
-		HashSet<string> multiOverloadUserMethodInterceptors,
-		HashSet<string> multiOverloadGenericUserMethodInterceptors,
-		EquatableArray<FlatGenericMethodHandlerGroup> genericUserMethodHandlerGroups)
+		HashSet<string> multiOverloadStubOverrideInterceptors,
+		HashSet<string> multiOverloadGenericStubOverrideInterceptors,
+		EquatableArray<FlatGenericMethodHandlerGroup> genericStubOverrideHandlerGroups)
 	{
 		// Handle method delegation (e.g., IRule.RunRule(IValidateBase) delegates to IRule<T>.RunRule(T))
 		if (method.DelegationTarget != null && method.DelegationTargetInterface != null)
@@ -2163,14 +2163,14 @@ internal static class FlatRenderer
 		// Generic methods use method-based Return/Call API via typed handlers
 		if (method.IsGenericMethod)
 		{
-			RenderGenericMethodImplementation(w, method, multiOverloadGenericUserMethodInterceptors, genericUserMethodHandlerGroups);
+			RenderGenericMethodImplementation(w, method, multiOverloadGenericStubOverrideInterceptors, genericStubOverrideHandlerGroups);
 			return;
 		}
 
 		// User-defined methods with base class pattern: record call, check Return/Call, then delegate to virtual method
-		if (method.HasUserOverride)
+		if (method.HasStubOverride)
 		{
-			RenderUserOverrideImplementation(w, method, multiOverloadUserMethodInterceptors);
+			RenderStubOverrideImplementation(w, method, multiOverloadStubOverrideInterceptors);
 			return;
 		}
 
@@ -2203,14 +2203,14 @@ internal static class FlatRenderer
 	}
 
 	/// <summary>
-	/// Renders the explicit interface implementation for a method with user override (base class pattern).
-	/// Priority chain: When chains > Sequences > Return/Call > User Override (virtual method with _ suffix).
-	/// The unified interceptor handles all logic including user method fallback.
+	/// Renders the explicit interface implementation for a method with stub override (base class pattern).
+	/// Priority chain: When chains > Sequences > Return/Call > Stub override (virtual method with _ suffix).
+	/// The unified interceptor handles all logic including stub override fallback.
 	/// </summary>
-	private static void RenderUserOverrideImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadUserMethodInterceptors)
+	private static void RenderStubOverrideImplementation(CodeWriter w, FlatMethodModel method, HashSet<string> multiOverloadStubOverrideInterceptors)
 	{
-		// Determine if this user method is part of an overload group (needs suffixed Invoke)
-		var isMultiOverload = multiOverloadUserMethodInterceptors.Contains(method.InterceptorName);
+		// Determine if this stub override is part of an overload group (needs suffixed Invoke)
+		var isMultiOverload = multiOverloadStubOverrideInterceptors.Contains(method.InterceptorName);
 		var invokeSuffix = isMultiOverload ? $"_{GetSignatureSuffix(method)}" : "";
 
 		w.Line($"{method.ReturnType} {method.DeclaringInterface}.{method.MethodName}({method.ParameterDeclarations})");
@@ -2232,8 +2232,8 @@ internal static class FlatRenderer
 	private static void RenderGenericMethodImplementation(
 		CodeWriter w,
 		FlatMethodModel method,
-		HashSet<string> multiOverloadGenericUserMethodInterceptors,
-		EquatableArray<FlatGenericMethodHandlerGroup> genericUserMethodHandlerGroups)
+		HashSet<string> multiOverloadGenericStubOverrideInterceptors,
+		EquatableArray<FlatGenericMethodHandlerGroup> genericStubOverrideHandlerGroups)
 	{
 		// For methods with unconstrained nullable type parameters (T? without where T : class),
 		// we must disable nullable context. Without this, the compiler interprets T? as Nullable<T>
@@ -2270,7 +2270,7 @@ internal static class FlatRenderer
 				w.Line($"if ({interceptorAccess}.Callback is {{ }} callCallback)");
 				w.Line($"{{ callCallback({callArgs}); return; }}");
 				w.Line($"if (Strict) throw global::KnockOff.StubException.NotConfigured(\"{method.SimpleInterfaceName}\", \"{method.MethodName}\");");
-				// Generic methods don't support user overrides - just return for void
+				// Generic methods don't support stub overrides - just return for void
 			}
 			else if (method.ThrowsOnDefault)
 			{
@@ -2294,9 +2294,9 @@ internal static class FlatRenderer
 	}
 
 	/// <summary>
-	/// Gets the signature suffix for a generic user method from the handler groups.
+	/// Gets the signature suffix for a generic stub override from the handler groups.
 	/// </summary>
-	private static string GetGenericUserMethodSignatureSuffix(
+	private static string GetGenericStubOverrideSignatureSuffix(
 		FlatMethodModel method,
 		EquatableArray<FlatGenericMethodHandlerGroup> handlerGroups)
 	{
@@ -2398,7 +2398,7 @@ internal static class FlatRenderer
 
 	/// <summary>
 	/// Analyzes a return type for async patterns and extracts the inner type.
-	/// Used for Returns() auto-wrapping in user method interceptors.
+	/// Used for Returns() auto-wrapping in stub override interceptors.
 	/// </summary>
 	private static (string InnerType, bool IsTaskT, bool IsValueTaskT) GetAsyncTypeInfo(string returnType)
 	{

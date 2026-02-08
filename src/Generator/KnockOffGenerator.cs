@@ -85,12 +85,12 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 
 	/// <summary>
 	/// KO0200: Standalone stub cannot have a user-defined base class.
-	/// The generator controls the base class for user method override support.
+	/// The generator controls the base class for stub override support.
 	/// </summary>
 	private static readonly DiagnosticDescriptor KO0200_CannotHaveBaseClass = new(
 		id: "KO0200",
 		title: "Standalone stub cannot have base class",
-		messageFormat: "Standalone stub '{0}' cannot have base class '{1}'. KnockOff generates a base class for user method support. Remove the base class or use inline stub pattern instead.",
+		messageFormat: "Standalone stub '{0}' cannot have base class '{1}'. KnockOff generates a base class for stub override support. Remove the base class or use inline stub pattern instead.",
 		category: "KnockOff",
 		defaultSeverity: DiagnosticSeverity.Error,
 		isEnabledByDefault: true);
@@ -501,7 +501,7 @@ public partial class KnockOffGenerator : IIncrementalGenerator
 			? string.Join(".", typeInfo.ContainingTypes.Select(ct => ct.Name)) + "." + className
 			: className;
 
-		// Generate base class file first (contains virtual protected methods for user overrides)
+		// Generate base class file first (contains virtual protected methods for stub overrides)
 		var baseClassSource = FlatRenderer.RenderBaseClass(unit);
 		context.AddSource($"{hintName}.Base.g.cs", baseClassSource);
 

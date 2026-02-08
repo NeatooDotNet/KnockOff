@@ -656,17 +656,17 @@ public partial class CalcDelegateTests
 #endregion
 
 // =============================================================================
-// User Methods: Override Virtual Methods for Default Behavior
+// Stub Overrides: Override Virtual Methods for Default Behavior
 // =============================================================================
 
-#region troubleshoot-user-method-definition
+#region troubleshoot-stub-override-definition
 public interface ITroubleshootUserRepo
 {
     User? GetById(int id);
 }
 
 [KnockOff]
-public partial class TroubleshootUserMethodStub : ITroubleshootUserRepo
+public partial class TroubleshootStubOverrideStub : ITroubleshootUserRepo
 {
     // Override the generated virtual method with underscore suffix
     protected override User? GetById_(int id)
@@ -676,13 +676,13 @@ public partial class TroubleshootUserMethodStub : ITroubleshootUserRepo
 }
 #endregion
 
-public class UserMethodExampleTests
+public class StubOverrideExampleTests
 {
     [Fact]
-    public void UserMethod_ProvidesDefaultBehavior()
+    public void StubOverride_ProvidesDefaultBehavior()
     {
-        #region troubleshoot-user-method-usage
-        var stub = new TroubleshootUserMethodStub();
+        #region troubleshoot-stub-override-usage
+        var stub = new TroubleshootStubOverrideStub();
         // Calls your GetById_ override by default
         ITroubleshootUserRepo repo = stub;
         var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }

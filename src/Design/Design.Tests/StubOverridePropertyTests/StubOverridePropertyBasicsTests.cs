@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
-// Design.Tests - User Property Basics Tests
+// Design.Tests - Stub Override Property Basics Tests
 // -----------------------------------------------------------------------------
 // Tests for user-defined properties (protected override properties with _ suffix)
 // in standalone stubs. These tests cover:
 // - Get-only, set-only, and get/set property overrides
-// - Get/Set superseding user overrides
+// - Get/Set superseding stub overrides
 // - Tracking via VerifyGet/VerifySet
-// - LastSetValue capture through user override
+// - LastSetValue capture through stub override
 // - Strict mode bypass for overridden properties
 // - Reset behavior preserving Get/Set configuration
 // - Mixed scenarios (some properties overridden, some not)
@@ -15,17 +15,17 @@
 
 using Design.Domain.Abstractions;
 using Design.Domain.Services;
-using Design.Stubs.UserProperties;
+using Design.Stubs.StubOverrideProperties;
 using KnockOff;
 
-namespace Design.Tests.UserPropertyTests;
+namespace Design.Tests.StubOverridePropertyTests;
 
 /// <summary>
-/// Tests for user property overrides in standalone stubs.
+/// Tests for stub override property overrides in standalone stubs.
 /// User properties are protected override properties with underscore suffix
 /// that provide default behavior, superseded by Get/Set per-test.
 /// </summary>
-public class UserPropertyBasicsTests
+public class StubOverridePropertyBasicsTests
 {
     // =========================================================================
     // Test 1: Get-only property override is called when no Get configured
@@ -34,10 +34,10 @@ public class UserPropertyBasicsTests
     [Fact]
     public void GetOnlyProperty_Override_IsCalledWhenNoGetConfigured()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(42);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         Assert.Equal(42, service.Count);
     }
@@ -49,9 +49,9 @@ public class UserPropertyBasicsTests
     [Fact]
     public void GetSetProperty_Override_GetterIsCalled()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         service.Name = "Test Value";
 
         Assert.Equal("Test Value", service.Name);
@@ -60,12 +60,12 @@ public class UserPropertyBasicsTests
     [Fact]
     public void GetSetProperty_Override_SetterIsCalled()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         service.Name = "Set Value";
 
-        // The user override stores the value in a backing field
+        // The stub override stores the value in a backing field
         Assert.Equal("Set Value", service.Name);
     }
 
@@ -76,9 +76,9 @@ public class UserPropertyBasicsTests
     [Fact]
     public void SetOnlyProperty_Override_IsCalledWhenNoSetConfigured()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         service.Setting = "test-setting";
 
         // Verify via the public accessor method
@@ -92,13 +92,13 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Get_SupersedesPropertyOverride()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(42);
 
-        // Get supersedes the user property
+        // Get supersedes the stub override property
         stub.Count.Get(999);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         Assert.Equal(999, service.Count);
     }
@@ -106,13 +106,13 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Get_WithCallback_SupersedesPropertyOverride()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(42);
 
         var counter = 0;
         stub.Count.Get(() => ++counter);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         Assert.Equal(1, service.Count);
         Assert.Equal(2, service.Count);
@@ -126,31 +126,31 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Set_SupersedesPropertyOverride()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         var capturedValue = "";
 
         stub.Name.Set(v => capturedValue = $"Captured: {v}");
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         service.Name = "Test";
 
-        // Set was invoked, NOT the user override
+        // Set was invoked, NOT the stub override
         Assert.Equal("Captured: Test", capturedValue);
-        // The user override's backing field was NOT updated
+        // The stub override's backing field was NOT updated
         // because Set bypassed it
     }
 
     // =========================================================================
-    // Test 6: VerifyGet/VerifySet track calls through user override
+    // Test 6: VerifyGet/VerifySet track calls through stub override
     // =========================================================================
 
     [Fact]
     public void VerifyGet_TracksCallsThroughUserOverride()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(100);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         _ = service.Count;
         _ = service.Count;
@@ -163,9 +163,9 @@ public class UserPropertyBasicsTests
     [Fact]
     public void VerifySet_TracksCallsThroughUserOverride()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         service.Name = "First";
         service.Name = "Second";
@@ -174,15 +174,15 @@ public class UserPropertyBasicsTests
     }
 
     // =========================================================================
-    // Test 7: LastSetValue captured through user override
+    // Test 7: LastSetValue captured through stub override
     // =========================================================================
 
     [Fact]
     public void LastSetValue_CapturedThroughUserOverride()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         service.Name = "First Value";
         service.Name = "Last Value";
@@ -195,13 +195,13 @@ public class UserPropertyBasicsTests
     // =========================================================================
 
     [Fact]
-    public void StrictMode_UserPropertyOverrideBypassed()
+    public void StrictMode_StubOverridePropertyOverrideBypassed()
     {
-        var stub = new StrictUserPropertyStub();
+        var stub = new StrictStubOverridePropertyStub();
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
-        // User overrides work in strict mode - they ARE the configuration
+        // Stub overrides work in strict mode - they ARE the configuration
         var count = service.Count;  // 10 (from override)
         var name = service.Name;    // "Strict Default"
         var desc = service.Description; // "Strict description"
@@ -212,13 +212,13 @@ public class UserPropertyBasicsTests
     }
 
     [Fact]
-    public void StrictMode_SetOnlyUserPropertyOverrideBypassed()
+    public void StrictMode_SetOnlyStubOverridePropertyOverrideBypassed()
     {
-        var stub = new StrictUserPropertyStub();
+        var stub = new StrictStubOverridePropertyStub();
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
-        // Set-only user override also works in strict mode
+        // Set-only stub override also works in strict mode
         service.Setting = "value";
 
         stub.Setting.VerifySet(Called.Once);
@@ -231,10 +231,10 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Reset_PreservesGetConfiguration()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.Count.Get(100);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         _ = service.Count;
         stub.Count.VerifyGet(Called.Once);
 
@@ -249,11 +249,11 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Reset_PreservesSetConfiguration()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         var callCount = 0;
         stub.Name.Set(v => callCount++);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         service.Name = "First";
         Assert.Equal(1, callCount);
 
@@ -268,10 +268,10 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Reset_UserOverrideStillActiveAfterReset()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(50);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         _ = service.Count;
         stub.Count.VerifyGet(Called.Once);
@@ -280,7 +280,7 @@ public class UserPropertyBasicsTests
         stub.Count.Reset();
         stub.Count.VerifyGet(Called.Never);
 
-        // User override still works
+        // Stub override still works
         var count = service.Count;
         Assert.Equal(50, count);
     }
@@ -292,29 +292,29 @@ public class UserPropertyBasicsTests
     [Fact]
     public void MixedScenario_OverriddenAndNonOverriddenProperties()
     {
-        var stub = new MixedUserPropertyStub();
+        var stub = new MixedStubOverridePropertyStub();
 
-        // Properties WITH user override
-        stub.WithUserProperty.VerifyGet(Called.Never);
+        // Properties WITH stub override
+        stub.WithStubOverrideProperty.VerifyGet(Called.Never);
 
-        // Properties WITHOUT user override - configure via Get
-        stub.WithoutUserProperty.Get(42);
-        stub.ComputedWithoutUserProperty.Get("Configured value");
+        // Properties WITHOUT stub override - configure via Get
+        stub.WithoutStubOverrideProperty.Get(42);
+        stub.ComputedWithoutStubOverrideProperty.Get("Configured value");
 
-        IMixedUserPropertyService service = stub;
+        IMixedStubOverridePropertyService service = stub;
 
-        var r1 = service.WithUserProperty;       // 100 (from override)
-        var r2 = service.WithoutUserProperty;    // 42 (from Get)
-        var r3 = service.ComputedWithUserProperty;  // "Computed: 100" (from override)
-        var r4 = service.ComputedWithoutUserProperty; // "Configured value" (from Get)
+        var r1 = service.WithStubOverrideProperty;       // 100 (from override)
+        var r2 = service.WithoutStubOverrideProperty;    // 42 (from Get)
+        var r3 = service.ComputedWithStubOverrideProperty;  // "Computed: 100" (from override)
+        var r4 = service.ComputedWithoutStubOverrideProperty; // "Configured value" (from Get)
 
         Assert.Equal(100, r1);
         Assert.Equal(42, r2);
         Assert.Equal("Computed: 100", r3);
         Assert.Equal("Configured value", r4);
 
-        stub.WithUserProperty.VerifyGet(Called.Once);
-        stub.WithoutUserProperty.VerifyGet(Called.Once);
+        stub.WithStubOverrideProperty.VerifyGet(Called.Once);
+        stub.WithoutStubOverrideProperty.VerifyGet(Called.Once);
     }
 
     // =========================================================================
@@ -322,25 +322,25 @@ public class UserPropertyBasicsTests
     // =========================================================================
 
     [Fact]
-    public void Pattern1_Standalone_UserPropertiesWork()
+    public void Pattern1_Standalone_StubOverridePropertiesWork()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         stub.SetCount(42);
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         Assert.Equal(42, service.Count);
         stub.Count.VerifyGet(Called.Once);
     }
 
     [Fact]
-    public void Pattern2_GenericStandalone_UserPropertiesWork()
+    public void Pattern2_GenericStandalone_StubOverridePropertiesWork()
     {
-        var stub = new GenericUserPropertyStub<string>();
+        var stub = new GenericStubOverridePropertyStub<string>();
         stub.SetCurrentItem("Test Item");
         stub.SetItemCount(5);
 
-        IGenericUserPropertyService<string> service = stub;
+        IGenericStubOverridePropertyService<string> service = stub;
 
         Assert.Equal("Test Item", service.CurrentItem);
         Assert.Equal(5, service.ItemCount);
@@ -355,9 +355,9 @@ public class UserPropertyBasicsTests
     }
 
     [Fact]
-    public void Pattern3_StandaloneClass_UserPropertiesWork()
+    public void Pattern3_StandaloneClass_StubOverridePropertiesWork()
     {
-        var stub = new ConfigUserPropertyStub();
+        var stub = new ConfigStubOverridePropertyStub();
         stub.SetConfigName("Test Config");
         stub.SetDebugMode(true);
 
@@ -365,7 +365,7 @@ public class UserPropertyBasicsTests
         ConfigBase config = stub.Object;
 
         Assert.Equal("Test Config", config.ConfigName);
-        Assert.Equal(5, config.MaxRetries);  // Default from user override
+        Assert.Equal(5, config.MaxRetries);  // Default from stub override
         Assert.True(config.IsDebugMode);
 
         config.MaxRetries = 10;
@@ -382,9 +382,9 @@ public class UserPropertyBasicsTests
     }
 
     [Fact]
-    public void Pattern4_GenericStandaloneClass_UserPropertiesWork()
+    public void Pattern4_GenericStandaloneClass_StubOverridePropertiesWork()
     {
-        var stub = new CacheUserPropertyStub<string>();
+        var stub = new CacheStubOverridePropertyStub<string>();
         stub.SetDefaultValue("Default String");
         stub.SetCacheSize(100);
         stub.SetCacheName("String Cache");
@@ -413,10 +413,10 @@ public class UserPropertyBasicsTests
     [Fact]
     public void NullableProperty_Override_ReturnsNullWhenConditionNotMet()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
         // Name is empty, so Description_ returns null
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
 
         Assert.Null(service.Description);
     }
@@ -424,9 +424,9 @@ public class UserPropertyBasicsTests
     [Fact]
     public void NullableProperty_Override_ReturnsValueWhenConditionMet()
     {
-        var stub = new BasicUserPropertyStub();
+        var stub = new BasicStubOverridePropertyStub();
 
-        IUserPropertyService service = stub;
+        IStubOverridePropertyService service = stub;
         service.Name = "TestName";
 
         Assert.Equal("Description for TestName", service.Description);
@@ -435,10 +435,10 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Get_SupersedesOnStandaloneClass()
     {
-        var stub = new ConfigUserPropertyStub();
+        var stub = new ConfigStubOverridePropertyStub();
         stub.SetConfigName("Default");
 
-        // Get supersedes the user property
+        // Get supersedes the stub override property
         stub.ConfigName.Get("Override Config");
 
         ConfigBase config = stub.Object;
@@ -450,13 +450,13 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Get_SupersedesOnGenericStandalone()
     {
-        var stub = new GenericUserPropertyStub<string>();
+        var stub = new GenericStubOverridePropertyStub<string>();
         stub.SetCurrentItem("Default");
 
-        // Get supersedes the user property
+        // Get supersedes the stub override property
         stub.CurrentItem.Get("Override Value");
 
-        IGenericUserPropertyService<string> service = stub;
+        IGenericStubOverridePropertyService<string> service = stub;
 
         Assert.Equal("Override Value", service.CurrentItem);
     }
@@ -464,10 +464,10 @@ public class UserPropertyBasicsTests
     [Fact]
     public void Get_SupersedesOnGenericStandaloneClass()
     {
-        var stub = new CacheUserPropertyStub<string>();
+        var stub = new CacheStubOverridePropertyStub<string>();
         stub.SetDefaultValue("Default");
 
-        // Get supersedes the user property
+        // Get supersedes the stub override property
         stub.DefaultValue.Get("Override Default");
 
         CacheBase<string> cache = stub.Object;

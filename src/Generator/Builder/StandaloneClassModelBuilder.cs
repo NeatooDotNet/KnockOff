@@ -53,9 +53,9 @@ internal static class StandaloneClassModelBuilder
             Name: tp.Name,
             Constraints: string.Join(", ", tp.Constraints))).ToEquatableArray();
 
-        // Build user override lookups for base class pattern
-        var userOverrideProperties = new HashSet<string>(info.UserOverrideProperties.GetArray() ?? Array.Empty<string>());
-        var userOverrideMethods = new HashSet<string>(info.UserOverrideMethods.GetArray() ?? Array.Empty<string>());
+        // Build stub override lookups for base class pattern
+        var stubOverrideProperties = new HashSet<string>(info.StubOverrideProperties.GetArray() ?? Array.Empty<string>());
+        var stubOverrideMethods = new HashSet<string>(info.StubOverrideMethods.GetArray() ?? Array.Empty<string>());
 
         // Build models for interceptor classes
         var properties = new List<InlineClassPropertyModel>();
@@ -150,20 +150,20 @@ internal static class StandaloneClassModelBuilder
             var ownerClassName = $"{stubClassName}{typeParamList}";
 
             // Convert ClassMemberInfo to MethodSignatureInfo for UnifiedInterceptorBuilder
-            // Set per-signature UserMethodName for overloads with user overrides
+            // Set per-signature StubOverrideName for overloads with stub overrides
             var signatures = group.Members
                 .Select(m =>
                 {
                     var sig = ToMethodSignatureInfo(m);
-                    var hasUserOverride = userOverrideMethods.Contains(
+                    var hasStubOverride = stubOverrideMethods.Contains(
                         SymbolHelpers.BuildOverrideSignatureKey(m.Name, m.Parameters));
-                    return hasUserOverride ? sig with { UserMethodName = $"__UserMethod_{m.Name}" } : sig;
+                    return hasStubOverride ? sig with { StubOverrideName = $"__StubOverride_{m.Name}" } : sig;
                 })
                 .ToList();
 
-            // Pass userMethodName to the interceptor builder if ANY overload has a user override
-            var anyHasUserOverride = signatures.Any(s => s.UserMethodName != null);
-            var userMethodName = anyHasUserOverride ? $"__UserMethod_{group.MethodName}" : null;
+            // Pass stubOverrideName to the interceptor builder if ANY overload has a stub override
+            var anyHasStubOverride = signatures.Any(s => s.StubOverrideName != null);
+            var stubOverrideName = anyHasStubOverride ? $"__StubOverride_{group.MethodName}" : null;
 
             var methodModel = UnifiedInterceptorBuilder.BuildMethodInterceptor(
                 interceptorClassName: interceptorClassName,
@@ -172,7 +172,7 @@ internal static class StandaloneClassModelBuilder
                 ownerClassName: ownerClassName,
                 ownerTypeParameters: "",
                 overloads: signatures,
-                userMethodName: userMethodName);
+                stubOverrideName: stubOverrideName);
 
             methods.Add(methodModel);
 
@@ -213,8 +213,8 @@ internal static class StandaloneClassModelBuilder
             if (member.IsProperty && !member.IsIndexer)
             {
                 // Check if this property has a user-defined override (PropertyName_ suffix)
-                var hasUserOverride = userOverrideProperties.Contains(member.Name + "_");
-                implProperties.Add(BuildImplPropertyModel(member, hasUserOverride));
+                var hasStubOverride = stubOverrideProperties.Contains(member.Name + "_");
+                implProperties.Add(BuildImplPropertyModel(member, hasStubOverride));
             }
             else if (member.IsIndexer)
             {
@@ -240,11 +240,11 @@ internal static class StandaloneClassModelBuilder
                     invokeSuffix = "_" + UnifiedInterceptorBuilder.GetSignatureSuffix(sig.Parameters, sig.ReturnType);
                 }
 
-                // Check if this specific method overload has a user override
-                var hasUserOverride = userOverrideMethods.Contains(
+                // Check if this specific method overload has a stub override
+                var hasStubOverride = stubOverrideMethods.Contains(
                     SymbolHelpers.BuildOverrideSignatureKey(member.Name, member.Parameters));
 
-                implMethods.Add(BuildImplMethodModel(member, group.GroupName, invokeSuffix, hasOverloads, hasUserOverride));
+                implMethods.Add(BuildImplMethodModel(member, group.GroupName, invokeSuffix, hasOverloads, hasStubOverride));
             }
         }
 
@@ -280,7 +280,7 @@ internal static class StandaloneClassModelBuilder
             Name: ct.Name,
             AccessModifier: ct.AccessibilityModifier)).ToEquatableArray();
 
-        // Build base class properties (virtual protected properties for user override pattern)
+        // Build base class properties (virtual protected properties for stub override pattern)
         var baseClassProperties = cls.Members
             .Where(m => m.IsProperty && !m.IsIndexer)
             .Select(m => new BaseClassPropertyModel(
@@ -293,8 +293,8 @@ internal static class StandaloneClassModelBuilder
                 ReturnsByRefReadonly: m.ReturnsByRefReadonly))
             .ToEquatableArray();
 
-        // Build base class methods (virtual protected methods for user override pattern)
-        // Skip generic methods -- user method overrides for generic methods are not supported
+        // Build base class methods (virtual protected methods for stub override pattern)
+        // Skip generic methods -- stub override overrides for generic methods are not supported
         var baseClassMethods = cls.Members
             .Where(m => !m.IsProperty && !m.IsIndexer && !m.IsGenericMethod)
             .Select(m => new BaseClassMethodModel(
@@ -498,7 +498,7 @@ internal static class StandaloneClassModelBuilder
             BaseCallArguments: argList);
     }
 
-    private static InlineClassImplPropertyModel BuildImplPropertyModel(ClassMemberInfo member, bool hasUserOverride)
+    private static InlineClassImplPropertyModel BuildImplPropertyModel(ClassMemberInfo member, bool hasStubOverride)
     {
         return new InlineClassImplPropertyModel(
             PropertyName: member.Name,
@@ -509,7 +509,7 @@ internal static class StandaloneClassModelBuilder
             HasSetter: member.HasSetter,
             IsInitOnly: member.IsInitOnly,
             IsAbstract: member.IsAbstract,
-            HasUserOverride: hasUserOverride,
+            HasStubOverride: hasStubOverride,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
@@ -545,7 +545,7 @@ internal static class StandaloneClassModelBuilder
         string handlerName,
         string invokeSuffix,
         bool hasOverloads,
-        bool hasUserOverride = false)
+        bool hasStubOverride = false)
     {
         var paramList = string.Join(", ", member.Parameters.Select(p => FormatParameter(p)));
         var argList = string.Join(", ", member.Parameters.Select(p => FormatArgument(p)));
@@ -572,7 +572,7 @@ internal static class StandaloneClassModelBuilder
             InputArgumentList: inputArgList,
             CallArgumentList: callArgs,
             InvokeSuffix: invokeSuffix,
-            HasUserOverride: hasUserOverride,
+            HasStubOverride: hasStubOverride,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }

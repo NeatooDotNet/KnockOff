@@ -1,13 +1,13 @@
 // -----------------------------------------------------------------------------
-// Design.Stubs - User-Defined Methods
+// Design.Stubs - Stub Overrides
 // -----------------------------------------------------------------------------
 // This file explores and documents user-defined method patterns:
 // - Base class pattern (protected override methods with _ suffix)
 // - Tracking API on interceptors (Verify, LastArg, Reset)
-// - Returns/Execute to supersede user methods
-// - User method overloads
-// - Mixed scenarios (some with user methods, some without)
-// - Priority: Returns/Execute > user method
+// - Returns/Execute to supersede stub overrides
+// - Stub override overloads
+// - Mixed scenarios (some with stub overrides, some without)
+// - Priority: Returns/Execute > stub override
 // - Strict mode behavior
 // -----------------------------------------------------------------------------
 
@@ -15,14 +15,14 @@ using System.Text;
 using Design.Domain.Services;
 using KnockOff;
 
-namespace Design.Stubs.UserMethods;
+namespace Design.Stubs.StubOverrides;
 
 // =============================================================================
-// USER METHODS - OVERVIEW
+// STUB OVERRIDES - OVERVIEW
 // =============================================================================
 //
-// WHAT ARE USER METHODS?
-// User methods are protected override methods you define in a partial stub class
+// WHAT ARE STUB OVERRIDES?
+// Stub overrides are protected override methods you define in a partial stub class
 // to provide default behavior for interface methods. KnockOff generates a base
 // class with virtual methods that you can override.
 //
@@ -34,11 +34,11 @@ namespace Design.Stubs.UserMethods;
 // 5. Compile-time safety - Signature errors caught by compiler
 //
 // THE BASE CLASS PATTERN:
-// KnockOff generates a base class (e.g., BasicUserMethodStubBase) with virtual
+// KnockOff generates a base class (e.g., BasicStubOverrideStubBase) with virtual
 // protected methods suffixed with underscore (e.g., Process_). You override
 // these methods to provide default behavior:
 //
-//   // Generated base class (BasicUserMethodStubBase):
+//   // Generated base class (BasicStubOverrideStubBase):
 //   protected virtual string Process_(string input) => default!;
 //
 //   // Your override:
@@ -51,16 +51,16 @@ namespace Design.Stubs.UserMethods;
 // =============================================================================
 
 // =============================================================================
-// BASIC USER METHODS
+// BASIC STUB OVERRIDES
 // =============================================================================
 
 [KnockOff]
-public partial class BasicUserMethodStub : IUserMethodService { }
+public partial class BasicStubOverrideStub : IStubOverrideService { }
 
-public partial class BasicUserMethodStub
+public partial class BasicStubOverrideStub
 {
     // =========================================================================
-    // User Method Definition - Base Class Pattern
+    // Stub Override Definition - Base Class Pattern
     // =========================================================================
     // PATTERN: Override the generated virtual method with underscore suffix:
     // - Add 'override' keyword
@@ -71,7 +71,7 @@ public partial class BasicUserMethodStub
     // If you typo the method name or get parameters wrong, the compiler
     // catches it (no suitable method to override). No more silent failures!
     //
-    // GENERATED BASE CLASS (BasicUserMethodStubBase):
+    // GENERATED BASE CLASS (BasicStubOverrideStubBase):
     // protected virtual string Process_(string input) => default!;
     // protected virtual int Calculate_(int a, int b) => default!;
     // protected virtual void Execute_(string command) { }
@@ -103,17 +103,17 @@ public partial class BasicUserMethodStub
     }
 }
 
-[KnockOff<IUserMethodService>]
-public partial class UserMethodBasicsDemo
+[KnockOff<IStubOverrideService>]
+public partial class StubOverrideBasicsDemo
 {
     // =========================================================================
-    // Using Stubs with User Methods
+    // Using Stubs with Stub Overrides
     // =========================================================================
 
     public void BasicUsage()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         // Calls your protected override Process_ method
         var result = service.Process("hello");
@@ -137,14 +137,14 @@ public partial class UserMethodBasicsDemo
     // - LastArg - last single argument
     // - LastArgs - last arguments as tuple
     // - Reset() - clear tracking state
-    // - Returns()/Execute() - supersede user method per-test
-    // - Returns() - constant value that supersedes user method
+    // - Returns()/Execute() - supersede stub override per-test
+    // - Returns() - constant value that supersedes stub override
     // =========================================================================
 
     public void TrackingWithVerify()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         service.Process("first");
         service.Process("second");
@@ -157,8 +157,8 @@ public partial class UserMethodBasicsDemo
 
     public void TrackingWithLastArg()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         service.FindById(42);
         service.FindById(99);
@@ -170,8 +170,8 @@ public partial class UserMethodBasicsDemo
 
     public void TrackingWithLastArgs()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         service.Calculate(10, 20);
         service.Calculate(30, 40);
@@ -183,8 +183,8 @@ public partial class UserMethodBasicsDemo
 
     public void TrackingWithReset()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         service.Process("test");
         stub.Process.Verify(Called.Once);
@@ -197,32 +197,32 @@ public partial class UserMethodBasicsDemo
     }
 
     // =========================================================================
-    // Returns()/Execute() Supersedes User Methods
+    // Returns()/Execute() Supersedes Stub Overrides
     // =========================================================================
-    // User methods provide shareable defaults. Returns/Execute override per test.
+    // Stub overrides provide shareable defaults. Returns/Execute override per test.
     //
     // RATIONALE: Stubs should be shareable yet configurable per test.
-    // - User method = sensible default for most tests
+    // - Stub override = sensible default for most tests
     // - Returns/Execute = override when a specific test needs different behavior
     //
     // GENERATED CODE PATTERN:
     //   if (Interceptor.Callback is { } callback) return callback(args);  // Returns wins
-    //   return Process_(args);                                            // User override
+    //   return Process_(args);                                            // Stub override
     //
     // Reset() behavior: Clears tracking state but PRESERVES Returns/Execute configuration.
     // This matches regular interceptor semantics.
     // =========================================================================
 
-    public void Returns_SupersedesUserMethod_Callback()
+    public void Returns_SupersedesStubOverride_Callback()
     {
-        var stub = new BasicUserMethodStub();
+        var stub = new BasicStubOverrideStub();
 
-        // By default, user method is called
-        IUserMethodService service = stub;
+        // By default, stub override is called
+        IStubOverrideService service = stub;
         var defaultResult = service.Process("hello");
         // defaultResult == "[Processed: hello]" (from Process_ override)
 
-        // Returns supersedes the user method for per-test override
+        // Returns supersedes the stub override for per-test override
         stub.Process.Return(input => $"[Override: {input}]");
         var overrideResult = service.Process("hello");
         // overrideResult == "[Override: hello]" (Returns wins)
@@ -230,35 +230,35 @@ public partial class UserMethodBasicsDemo
         stub.Process.Verify(Called.Exactly(2)); // Both calls tracked
     }
 
-    public void Returns_SupersedesUserMethod()
+    public void Returns_SupersedesStubOverride()
     {
-        var stub = new BasicUserMethodStub();
+        var stub = new BasicStubOverrideStub();
         stub.Process.Return("constant"); // Returns(value) is shorthand for Returns(_ => value)
 
-        IUserMethodService service = stub;
+        IStubOverrideService service = stub;
         var result = service.Process("ignored");
         // result == "constant" (Returns wins, ignores argument)
     }
 
     public void VoidMethod_ExecuteSupersedes()
     {
-        var stub = new BasicUserMethodStub();
+        var stub = new BasicStubOverrideStub();
         var callbackInvoked = false;
         stub.Execute.Call(cmd => callbackInvoked = true);
 
-        IUserMethodService service = stub;
+        IStubOverrideService service = stub;
         service.Execute("test");
 
-        // callbackInvoked == true (Execute was invoked, not user method)
+        // callbackInvoked == true (Execute was invoked, not stub override)
         stub.Execute.Verify(Called.Once);
     }
 
     public void Reset_PreservesReturnsConfiguration()
     {
-        var stub = new BasicUserMethodStub();
+        var stub = new BasicStubOverrideStub();
         stub.Calculate.Return((a, b) => a * b); // Override addition with multiplication
 
-        IUserMethodService service = stub;
+        IStubOverrideService service = stub;
         service.Calculate(3, 4);
         stub.Calculate.Verify(Called.Once);
 
@@ -272,9 +272,9 @@ public partial class UserMethodBasicsDemo
 }
 
 // =============================================================================
-// USER METHOD OVERLOADS
+// STUB OVERRIDE OVERLOADS
 // =============================================================================
-// User methods work naturally with overloads. Each overload gets its own
+// Stub overrides work naturally with overloads. Each overload gets its own
 // virtual method in the base class (with underscore suffix). You can override
 // any subset of overloads - unoverridden ones use the interceptor path.
 //
@@ -293,12 +293,12 @@ public partial class UserMethodBasicsDemo
 // RecordCall methods for correct argument tracking.
 // =============================================================================
 
-// Generator produces per-signature RecordCall methods for user method overloads
+// Generator produces per-signature RecordCall methods for stub override methods
 [KnockOff]
-public partial class OverloadedUserMethodStub : IOverloadedUserMethodService { }
+public partial class OverloadedStubOverrideStub : IOverloadedStubOverrideService { }
 
 #pragma warning disable CA1062 // Validate arguments of public methods
-public partial class OverloadedUserMethodStub
+public partial class OverloadedStubOverrideStub
 {
     protected override string Format_(string input) => input.ToUpperInvariant();
     protected override string Format_(string input, bool uppercase) => uppercase ? input.ToUpperInvariant() : input;
@@ -313,72 +313,72 @@ public partial class OverloadedUserMethodStub
 // =============================================================================
 
 [KnockOff]
-public partial class MixedUserMethodStub : IMixedUserMethodService { }
+public partial class MixedStubOverrideStub : IMixedStubOverrideService { }
 
-public partial class MixedUserMethodStub
+public partial class MixedStubOverrideStub
 {
-    // Only override SOME interface methods as user methods
+    // Only override SOME interface methods as stub overrides
     // Others will use the regular interceptor API (no override needed)
 
-    protected override string WithUserMethod_(string input)
+    protected override string WithStubOverride_(string input)
     {
         return $"[User: {input}]";
     }
 
-    protected override int ComputeWithUserMethod_(int value)
+    protected override int ComputeWithStubOverride_(int value)
     {
         return value * 2;
     }
 
-    // WithoutUserMethod_ and ComputeWithoutUserMethod_ are NOT overridden
+    // WithoutStubOverride_ and ComputeWithoutStubOverride_ are NOT overridden
     // They use the regular interceptor path (Returns, Execute, or default)
 }
 
-[KnockOff<IMixedUserMethodService>]
-public partial class MixedUserMethodDemo
+[KnockOff<IMixedStubOverrideService>]
+public partial class MixedStubOverrideDemo
 {
     public void MixedScenario()
     {
-        var stub = new MixedUserMethodStub();
+        var stub = new MixedStubOverrideStub();
 
-        // Methods WITH user override use the interceptor for tracking + Returns
-        stub.WithUserMethod.Verify(Called.Never);
+        // Methods WITH stub override use the interceptor for tracking + Returns
+        stub.WithStubOverride.Verify(Called.Never);
 
-        // Methods WITHOUT user override also use interceptor (same API)
-        stub.WithoutUserMethod.Return((input) => $"[Configured: {input}]");
-        stub.WithoutUserMethod.Verify(Called.Never);
+        // Methods WITHOUT stub override also use interceptor (same API)
+        stub.WithoutStubOverride.Return((input) => $"[Configured: {input}]");
+        stub.WithoutStubOverride.Verify(Called.Never);
 
-        stub.ComputeWithoutUserMethod.Return(42);
+        stub.ComputeWithoutStubOverride.Return(42);
 
-        IMixedUserMethodService service = stub;
+        IMixedStubOverrideService service = stub;
 
-        var r1 = service.WithUserMethod("test");       // "[User: test]" (from override)
-        var r2 = service.WithoutUserMethod("test");    // "[Configured: test]" (from Returns)
-        var r3 = service.ComputeWithUserMethod(5);     // 10 (from override)
-        var r4 = service.ComputeWithoutUserMethod(5);  // 42 (from Returns)
+        var r1 = service.WithStubOverride("test");       // "[User: test]" (from override)
+        var r2 = service.WithoutStubOverride("test");    // "[Configured: test]" (from Returns)
+        var r3 = service.ComputeWithStubOverride(5);     // 10 (from override)
+        var r4 = service.ComputeWithoutStubOverride(5);  // 42 (from Returns)
 
-        stub.WithUserMethod.Verify(Called.Once);
-        stub.WithoutUserMethod.Verify(Called.Once);
+        stub.WithStubOverride.Verify(Called.Once);
+        stub.WithoutStubOverride.Verify(Called.Once);
     }
 
     // =========================================================================
     // DESIGN OBSERVATION: Consistent Naming
     // =========================================================================
     // With the base class pattern, interceptor names are ALWAYS clean:
-    // - User method present: stub.Method (with override behavior)
-    // - No user method: stub.Method (default/interceptor behavior)
+    // - Stub override present: stub.Method (with override behavior)
+    // - No stub override: stub.Method (default/interceptor behavior)
     //
-    // The presence or absence of a user override is detected at compile time.
-    // When override exists: Returns > User override
+    // The presence or absence of a stub override is detected at compile time.
+    // When override exists: Returns > Stub override
     // When no override: Returns > Strict/Default
     // =========================================================================
 }
 
 // =============================================================================
-// PARTIAL USER METHOD COVERAGE FOR OVERLOADS
+// PARTIAL STUB OVERRIDE COVERAGE FOR OVERLOADS
 // =============================================================================
 // You can override only SOME overloads. Each overload is handled independently:
-// - Overridden: Returns > User override
+// - Overridden: Returns > Stub override
 // - Not overridden: Returns > Strict/Default
 //
 // Example: Format has 3 overloads, but only Format(string) is overridden.
@@ -390,45 +390,45 @@ public partial class MixedUserMethodDemo
 // =============================================================================
 
 [KnockOff]
-public partial class PartialOverloadUserMethodStub : IOverloadedUserMethodService { }
+public partial class PartialOverloadStubOverrideStub : IOverloadedStubOverrideService { }
 
 #pragma warning disable CA1062 // Validate arguments of public methods
-public partial class PartialOverloadUserMethodStub
+public partial class PartialOverloadStubOverrideStub
 {
     // Only Format(string) is overridden - the other two Format overloads are NOT
     protected override string Format_(string input) => $"[User1: {input}]";
 
-    // All Log overloads have user overrides
+    // All Log overloads have stub overrides
     protected override void Log_(string message) { }
     protected override void Log_(string message, int level) { }
 }
 #pragma warning restore CA1062
 
 // =============================================================================
-// STRICT MODE AND USER METHODS
+// STRICT MODE AND STUB OVERRIDES
 // =============================================================================
 
 [KnockOff(Strict = true)]
-public partial class StrictUserMethodStub : IUserMethodService { }
+public partial class StrictStubOverrideStub : IStubOverrideService { }
 
-public partial class StrictUserMethodStub
+public partial class StrictStubOverrideStub
 {
-    // User overrides bypass strict mode - they ARE the configuration
+    // Stub overrides bypass strict mode - they ARE the configuration
     protected override string Process_(string input) => $"[Strict: {input}]";
 
     // Only Process_ is overridden
     // Other methods will throw in strict mode if called without Returns/Execute configuration
 }
 
-[KnockOff<IUserMethodService>]
-public partial class StrictModeUserMethodDemo
+[KnockOff<IStubOverrideService>]
+public partial class StrictModeStubOverrideDemo
 {
-    public void StrictMode_UserMethodsBypassed()
+    public void StrictMode_StubOverridesBypassed()
     {
-        var stub = new StrictUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new StrictStubOverrideStub();
+        IStubOverrideService service = stub;
 
-        // User override works in strict mode - it IS the configuration
+        // Stub override works in strict mode - it IS the configuration
         var result = service.Process("test");  // "[Strict: test]"
 
         // Non-overridden method in strict mode would throw without Returns
@@ -436,27 +436,27 @@ public partial class StrictModeUserMethodDemo
     }
 
     // =========================================================================
-    // DESIGN DECISION: User Overrides Bypass Strict Mode
+    // DESIGN DECISION: Stub Overrides Bypass Strict Mode
     // =========================================================================
-    // Strict mode means "throw if unconfigured". User overrides ARE configured
+    // Strict mode means "throw if unconfigured". Stub overrides ARE configured
     // by their very existence. This is consistent - the override IS the
     // behavior, just defined in a different way than Returns/Execute.
     // =========================================================================
 }
 
 // =============================================================================
-// ASYNC USER METHODS
+// ASYNC STUB OVERRIDES
 // =============================================================================
 
 [KnockOff]
-public partial class AsyncUserMethodStub : IAsyncUserMethodService { }
+public partial class AsyncStubOverrideStub : IAsyncStubOverrideService { }
 
-public partial class AsyncUserMethodStub
+public partial class AsyncStubOverrideStub
 {
     // =========================================================================
-    // Async User Methods - Task<T>, Task, ValueTask<T>
+    // Async Stub Overrides - Task<T>, Task, ValueTask<T>
     // =========================================================================
-    // Async user methods work exactly like sync methods - override the virtual
+    // Async stub overrides work exactly like sync methods - override the virtual
     // method with underscore suffix. The base class generates:
     //   protected virtual Task<string> ProcessAsync_(string input) => default!;
     //   protected virtual Task ExecuteAsync_(string command) => Task.CompletedTask;
@@ -485,15 +485,15 @@ public partial class AsyncUserMethodStub
     }
 }
 
-[KnockOff<IAsyncUserMethodService>]
-public partial class AsyncUserMethodDemo
+[KnockOff<IAsyncStubOverrideService>]
+public partial class AsyncStubOverrideDemo
 {
-    public async Task AsyncUserMethod_BasicUsage()
+    public async Task AsyncStubOverride_BasicUsage()
     {
-        var stub = new AsyncUserMethodStub();
-        IAsyncUserMethodService service = stub;
+        var stub = new AsyncStubOverrideStub();
+        IAsyncStubOverrideService service = stub;
 
-        // Call async user method
+        // Call async stub override
         var result = await service.ProcessAsync("hello");
         // result == "[Async: hello]"
 
@@ -501,10 +501,10 @@ public partial class AsyncUserMethodDemo
         stub.ProcessAsync.Verify(Called.Once);
     }
 
-    public async Task AsyncUserMethod_VoidTask()
+    public async Task AsyncStubOverride_VoidTask()
     {
-        var stub = new AsyncUserMethodStub();
-        IAsyncUserMethodService service = stub;
+        var stub = new AsyncStubOverrideStub();
+        IAsyncStubOverrideService service = stub;
 
         await service.ExecuteAsync("command");
 
@@ -513,10 +513,10 @@ public partial class AsyncUserMethodDemo
         var lastCommand = stub.ExecuteAsync.LastArg;
     }
 
-    public async Task AsyncUserMethod_ValueTask()
+    public async Task AsyncStubOverride_ValueTask()
     {
-        var stub = new AsyncUserMethodStub();
-        IAsyncUserMethodService service = stub;
+        var stub = new AsyncStubOverrideStub();
+        IAsyncStubOverrideService service = stub;
 
         var result = await service.ComputeAsync(21);
         // result == 42
@@ -526,21 +526,21 @@ public partial class AsyncUserMethodDemo
 }
 
 // =============================================================================
-// GENERIC USER METHODS - EXCLUDED FROM BASE CLASS PATTERN
+// GENERIC STUB OVERRIDES - EXCLUDED FROM BASE CLASS PATTERN
 // =============================================================================
 
 [KnockOff]
-public partial class GenericUserMethodStub : IGenericUserMethodService { }
+public partial class GenericStubOverrideStub : IGenericStubOverrideService { }
 
-public partial class GenericUserMethodStub
+public partial class GenericStubOverrideStub
 {
     // =========================================================================
-    // Generic User Methods - NOT SUPPORTED in Base Class Pattern
+    // Generic Stub Overrides - NOT SUPPORTED in Base Class Pattern
     // =========================================================================
     // DESIGN DECISION: Generic methods are EXCLUDED from the base class pattern.
     //
     // WHY:
-    // 1. User override is ONE method for ALL type arguments
+    // 1. Stub override is ONE method for ALL type arguments
     // 2. The Of<T>() pattern allows DIFFERENT callbacks per type argument
     // 3. These are fundamentally different approaches
     //
@@ -551,7 +551,7 @@ public partial class GenericUserMethodStub
     // The Of<T>() pattern handles both behavior AND verification consistently.
     // =========================================================================
 
-    // These are NOT user methods - generic methods don't get base class virtuals
+    // These are NOT stub overrides - generic methods don't get base class virtuals
     // Use stub.Create.Of<T>() instead
 
     // If you need generic "default" behavior, you can still use:
@@ -559,13 +559,13 @@ public partial class GenericUserMethodStub
     //   stub.Transform.Of<string, StringBuilder>().Return(new StringBuilder());
 }
 
-[KnockOff<IGenericUserMethodService>]
-public partial class GenericUserMethodDemo
+[KnockOff<IGenericStubOverrideService>]
+public partial class GenericStubOverrideDemo
 {
     public void GenericMethod_UseOfTPattern()
     {
-        var stub = new GenericUserMethodStub();
-        IGenericUserMethodService service = stub;
+        var stub = new GenericStubOverrideStub();
+        IGenericStubOverrideService service = stub;
 
         // Configure via Of<T>().Return() - this is the ONLY way for generic methods
         stub.Create.Of<List<int>>().Return(() => new List<int> { 1, 2, 3 });
@@ -579,8 +579,8 @@ public partial class GenericUserMethodDemo
 
     public void GenericMethod_MultiTypeParam()
     {
-        var stub = new GenericUserMethodStub();
-        IGenericUserMethodService service = stub;
+        var stub = new GenericStubOverrideStub();
+        IGenericStubOverrideService service = stub;
 
         // Multi-type-parameter methods also use Of<T>().Return()
         stub.Transform.Of<string, StringBuilder>().Return(input => new StringBuilder($"transformed: {input}"));
@@ -593,44 +593,44 @@ public partial class GenericUserMethodDemo
 }
 
 // =============================================================================
-// OVERLOADED GENERIC USER METHODS - EXCLUDED FROM BASE CLASS PATTERN
+// OVERLOADED GENERIC STUB OVERRIDES - EXCLUDED FROM BASE CLASS PATTERN
 // =============================================================================
 // Generic methods (including overloaded ones) are excluded from the base class
 // pattern. Use the standard Of<T>() interceptor API for all generic methods.
 //
 // NOTE: Overloaded generic methods have complex code generation requirements.
-// See IGenericUserMethodService (single overload) for working examples.
+// See IGenericStubOverrideService (single overload) for working examples.
 // =============================================================================
 
-// OverloadedGenericUserMethodStub removed - generator has a known issue with
-// overloaded generic methods. See IGenericUserMethodService for working examples.
+// OverloadedGenericStubOverrideStub removed - generator has a known issue with
+// overloaded generic methods. See IGenericStubOverrideService for working examples.
 
 // =============================================================================
-// WHEN CHAIN SUPPORT WITH USER METHODS
+// WHEN CHAIN SUPPORT WITH STUB OVERRIDES
 // =============================================================================
 //
-// User method stubs now support the full .When() API. When chains have highest
-// priority, allowing per-test customization while preserving user method fallback.
+// Stub override stubs now support the full .When() API. When chains have highest
+// priority, allowing per-test customization while preserving stub override fallback.
 //
 // PRIORITY CHAIN:
 // 1. When chains (parameter-specific matching)
 // 2. Sequences (ThenReturns/ThenExecute chain)
 // 3. Returns/Execute (explicit configuration)
-// 4. User Method (fallback - always called if nothing else matches)
+// 4. Stub Override (fallback - always called if nothing else matches)
 //
-// This is the same priority order as inline stubs, except user method replaces
+// This is the same priority order as inline stubs, except stub override replaces
 // Source/Strict as the final fallback.
 
-public static class WhenChainUserMethodDemo
+public static class WhenChainStubOverrideDemo
 {
     // =========================================================================
     // BASIC WHEN MATCHING
     // =========================================================================
 
-    public static void WhenMatchingWithUserMethodFallback()
+    public static void WhenMatchingWithStubOverrideFallback()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         // Configure When chain for specific values
         stub.Process.When("special").Return("[SPECIAL HANDLING]");
@@ -638,10 +638,10 @@ public static class WhenChainUserMethodDemo
         // Call with matching value - When chain handles it
         var result1 = service.Process("special");  // Returns "[SPECIAL HANDLING]"
 
-        // Call with non-matching value - falls through to user method
-        var result2 = service.Process("normal");   // Returns user method result
+        // Call with non-matching value - falls through to stub override
+        var result2 = service.Process("normal");   // Returns stub override result
 
-        // LastArg tracks the most recent call (from When or user method)
+        // LastArg tracks the most recent call (from When or stub override)
         var lastInput = stub.Process.LastArg;      // "normal"
     }
 
@@ -649,10 +649,10 @@ public static class WhenChainUserMethodDemo
     // PREDICATE WHEN MATCHING
     // =========================================================================
 
-    public static void PredicateWhenWithUserMethodFallback()
+    public static void PredicateWhenWithStubOverrideFallback()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         // Configure predicate matching
         stub.Process.When(input => input.StartsWith("VIP:", StringComparison.Ordinal))
@@ -661,8 +661,8 @@ public static class WhenChainUserMethodDemo
         // Matching calls go to When chain
         var vip = service.Process("VIP:12345");     // Returns "[VIP CUSTOMER]"
 
-        // Non-matching calls fall to user method
-        var regular = service.Process("REG:12345"); // Returns user method result
+        // Non-matching calls fall to stub override
+        var regular = service.Process("REG:12345"); // Returns stub override result
     }
 
     // =========================================================================
@@ -671,8 +671,8 @@ public static class WhenChainUserMethodDemo
 
     public static void WhenChainThenWhen()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         // Chain of When matchers
         stub.Process.When("first").Return("[1st]")
@@ -682,7 +682,7 @@ public static class WhenChainUserMethodDemo
         // First three calls match the chain
         var r1 = service.Process("first");    // "[1st]"
         var r2 = service.Process("second");   // "[2nd]"
-        var r3 = service.Process("third");    // Falls to user method
+        var r3 = service.Process("third");    // Falls to stub override
     }
 
     // =========================================================================
@@ -691,8 +691,8 @@ public static class WhenChainUserMethodDemo
 
     public static void MultiParameterWhenMatching()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         // Configure specific parameter combinations
         stub.Calculate.When(0, 0).Return(0);  // Edge case
@@ -702,8 +702,8 @@ public static class WhenChainUserMethodDemo
         var zero = service.Calculate(0, 0);      // 0 (from When)
         var neg = service.Calculate(-5, -3);     // -1 (from predicate When)
 
-        // Non-matching calls fall to user method
-        var normal = service.Calculate(10, 20);  // User method result
+        // Non-matching calls fall to stub override
+        var normal = service.Calculate(10, 20);  // Stub override result
     }
 
     // =========================================================================
@@ -712,8 +712,8 @@ public static class WhenChainUserMethodDemo
 
     public static void VerifiableWhenChain()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
         // Mark When chain as verifiable
         stub.Process.When("expected").Return("result").Verifiable();
@@ -726,31 +726,31 @@ public static class WhenChainUserMethodDemo
     }
 
     // =========================================================================
-    // MIXED SCENARIO - WHEN, SEQUENCE, AND USER METHOD
+    // MIXED SCENARIO - WHEN, SEQUENCE, AND STUB OVERRIDE
     // =========================================================================
 
     public static void MixedConfiguration()
     {
-        var stub = new BasicUserMethodStub();
-        IUserMethodService service = stub;
+        var stub = new BasicStubOverrideStub();
+        IStubOverrideService service = stub;
 
-        // Priority: When > Sequences > Returns > User Method
+        // Priority: When > Sequences > Returns > Stub Override
         stub.Process.When("priority1").Return("[FROM WHEN]");
 
         // First call matches When
         var from_when = service.Process("priority1");  // "[FROM WHEN]"
 
-        // Subsequent calls fall to user method (When chain exhausted for non-matching)
-        var from_user = service.Process("anything");   // User method result
+        // Subsequent calls fall to stub override (When chain exhausted for non-matching)
+        var from_user = service.Process("anything");   // Stub override result
 
-        // You can also configure Returns which takes precedence over user method
+        // You can also configure Returns which takes precedence over stub override
         stub.Process.Return(input => $"[RETURNS: {input}]");
         var from_returns = service.Process("test");     // "[RETURNS: test]"
     }
 }
 
 // =============================================================================
-// DESIGN SUMMARY - BASE CLASS USER METHODS
+// DESIGN SUMMARY - BASE CLASS STUB OVERRIDES
 // =============================================================================
 //
 // **THE BASE CLASS PATTERN:**
@@ -765,42 +765,42 @@ public static class WhenChainUserMethodDemo
 // 4. Same API for configured and override methods
 //
 // **CONFIRMED WORKING:**
-// - Basic user overrides (any parameter count)
+// - Basic stub overrides (any parameter count)
 // - Clean interceptor names (stub.Process, not stub.Process2)
 // - Interceptors with Verify(), LastArg, LastArgs, Reset(), Verifiable()
-// - Returns/Execute supersede user overrides per-test
+// - Returns/Execute supersede stub overrides per-test
 // - Mixed stubs (some methods overridden, some not)
 // - Strict mode bypass for overridden methods
-// - Async user methods (Task<T>, Task, ValueTask<T>)
-// - User method overloads (each overload independently overridable)
+// - Async stub overrides (Task<T>, Task, ValueTask<T>)
+// - Stub override overloads (each overload independently overridable)
 // - Partial overload coverage (override some, configure others)
 //
 // **NOT SUPPORTED (by design):**
 // - Generic methods - use Of<T>() pattern instead
-// - Inline stubs - only standalone pattern supports user methods
+// - Inline stubs - only standalone pattern supports stub overrides
 // - User-defined base classes - KnockOff generates the base class
 //
 // **ANSWERED QUESTIONS:**
 //
 // 1. INLINE PATTERN SUPPORT
-//    Q: Can inline stubs ([KnockOff<T>]) have user methods?
-//    A: NO - Inline stubs generate the entire class. User methods require
+//    Q: Can inline stubs ([KnockOff<T>]) have stub overrides?
+//    A: NO - Inline stubs generate the entire class. Stub overrides require
 //       a partial class where you can add protected overrides. These are
 //       fundamentally incompatible patterns.
 //
-// 2. ASYNC USER METHODS
-//    Q: Do async user overrides work as expected?
+// 2. ASYNC STUB OVERRIDES
+//    Q: Do async stub overrides work as expected?
 //    A: YES - Task<T>, Task, and ValueTask<T> all work correctly.
 //       - Override the virtual method (ProcessAsync_)
 //       - Interceptors have Returns/Execute with auto-wrap
-//       - See AsyncUserMethodStub for working examples
+//       - See AsyncStubOverrideStub for working examples
 //
-// 3. GENERIC USER METHODS
-//    Q: Can user methods be generic?
+// 3. GENERIC STUB OVERRIDES
+//    Q: Can stub overrides be generic?
 //    A: NO - Generic methods are excluded from the base class pattern.
 //       - Use stub.Create.Of<T>() to configure behavior per type argument
 //       - The Of<T>() pattern handles both behavior AND verification
-//       - See GenericUserMethodDemo for examples
+//       - See GenericStubOverrideDemo for examples
 //
 // 4. EXISTING BASE CLASS
 //    Q: What if my stub already has a base class?

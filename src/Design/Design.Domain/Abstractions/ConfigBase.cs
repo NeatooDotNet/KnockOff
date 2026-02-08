@@ -1,12 +1,12 @@
 // -----------------------------------------------------------------------------
-// Design.Domain - Abstract base class for demonstrating user property patterns
+// Design.Domain - Abstract base class for demonstrating stub override property patterns
 // with standalone class stubs
 // -----------------------------------------------------------------------------
 
 namespace Design.Domain.Abstractions;
 
 /// <summary>
-/// Abstract base class for testing user property overrides with standalone class stubs.
+/// Abstract base class for testing stub override property overrides with standalone class stubs.
 /// Tests [KnockOffBase&lt;ConfigBase&gt;] pattern with virtual/abstract properties.
 /// </summary>
 public abstract class ConfigBase
@@ -27,7 +27,7 @@ public abstract class ConfigBase
 }
 
 /// <summary>
-/// Generic abstract base class for testing user property overrides with
+/// Generic abstract base class for testing stub override property overrides with
 /// generic standalone class stubs.
 /// Tests [KnockOffBase(typeof(CacheBase&lt;&gt;))] pattern.
 /// </summary>

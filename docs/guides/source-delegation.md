@@ -92,7 +92,7 @@ KnockOff evaluates member calls in this order:
 
 1. **When chains** — `stub.Method.When(...).Return(...)`
 2. **Return / Call** — `stub.Method.Return(...)` or `stub.Method.Call(...)`
-3. **User methods** — `protected override` with `_` suffix (Standalone only)
+3. **Stub overrides** — `protected override` with `_` suffix (Standalone only)
 4. **Source delegation** — `stub.Source(realImplementation)`
 5. **Smart default** — KnockOff's built-in default value
 
@@ -117,5 +117,5 @@ The first match wins. This makes Source ideal as a baseline: set it once, then s
 
 **Next Steps:**
 - [Methods Guide](methods.md) - Complete guide to Returns, Execute, and When chains
-- [User Methods Guide](user-methods.md) - Default behavior through override methods
+- [Stub Overrides Guide](stub-overrides.md) - Default behavior through override methods
 - [Verification Guide](verification.md) - Assert on stub interactions

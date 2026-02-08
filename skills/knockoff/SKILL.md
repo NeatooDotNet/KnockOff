@@ -132,14 +132,14 @@ service.Name = "test";
 | Interceptor | Reset Clears | Reset Preserves |
 |-------------|--------------|-----------------|
 | Method | Counts, LastArg/LastArgs, sequence index, When chain position, source delegation | **Return/Call callbacks**, sequence structure, verifiable flag |
-| User Method | Counts, LastArg | **Return/Call configuration**, verifiable flag |
+| Stub Override | Counts, LastArg | **Return/Call configuration**, verifiable flag |
 | Property | Get/set counts, LastSetValue, sequence index, source delegation | **Get/Set callbacks**, verifiable flag |
-| User Property | Get/set counts, LastSetValue | **Get/Set configuration**, verifiable flag |
+| Stub Override Property | Get/set counts, LastSetValue | **Get/Set configuration**, verifiable flag |
 | Indexer | Get/set counts, LastGetKey, LastSetEntry | **Backing dictionary**, Get/Set callbacks |
 | Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **Return/Call callbacks**, sequence structure, verifiable flag |
 | Event | Tracking counts | **Active subscribers**, verifiable flag |
 
-**Note:** User method and user property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve Return/Call/Get/Set configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
+**Note:** Stub override method and property interceptors (e.g., `GetById` when you have a `GetById_` override, or `Count` when you have a `Count_` override) preserve Return/Call/Get/Set configuration across Reset(). This matches regular interceptor semantics where the configuration represents "what the stub does" rather than tracking state.
 
 ---
 
@@ -210,7 +210,7 @@ public void StandaloneStub_ConfigureAndVerify()
 ```
 <!-- endSnippet -->
 
-**User Methods & Properties:** Stand-Alone stubs can define protected methods and properties that provide default behavior. See the User Methods and User Properties sections below.
+**Stub Overrides & Properties:** Stand-Alone stubs can define protected methods and properties that provide default behavior. See the Stub Overrides and Stub Override Properties sections below.
 
 ### Inline Interface Pattern
 
@@ -525,11 +525,11 @@ stub.Strict();
 
 ---
 
-## User Methods (Stand-Alone Only)
+## Stub Overrides (Stand-Alone Only)
 
-User methods let you define default stub behavior at compile time. The user method is the fallback when no `Return`/`Call` callback is configured.
+Stub overrides let you define default stub behavior at compile time. The stub override is the fallback when no `Return`/`Call` callback is configured.
 
-### Defining User Methods
+### Defining Stub Overrides
 
 Override virtual methods with underscore suffix - the compiler enforces signature correctness:
 
@@ -548,19 +548,19 @@ public partial class SkUserMethodRepoStub
 
 The interceptor uses a clean name (e.g., `GetById`, not `GetById2`) regardless of whether you override the method.
 
-### Return(callback) Supersedes User Method
+### Return(callback) Supersedes Stub Override
 
-Use `Return(callback)` to override the user method for specific tests:
+Use `Return(callback)` to override the stub override for specific tests:
 
 <!-- snippet: skill-user-method-oncall -->
 ```cs
 var stub = new SkUserMethodRepoStub();
 IUserRepo repo = stub;
 
-// Without Returns: user method is called
+// Without Returns: stub override is called
 var user1 = repo.GetById(1);  // Returns User { Id = 1, Name = "Default" }
 
-// With Returns: callback supersedes user method (clean interceptor name)
+// With Returns: callback supersedes stub override (clean interceptor name)
 stub.GetById.Return(id => new User { Id = id, Name = "Override" });
 var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
 ```
@@ -587,7 +587,7 @@ stub.GetUserAsync.Return(new User { Id = 1 });
 
 ### Tracking Works with Return
 
-User method interceptors provide full tracking even when using `Return`:
+Stub override interceptors provide full tracking even when using `Return`:
 
 <!-- snippet: skill-user-method-tracking -->
 ```cs
@@ -618,15 +618,15 @@ repo.GetById(2);  // Still uses Returns callback
 
 ---
 
-## User Properties (Stand-Alone Only)
+## Stub Override Properties (Stand-Alone Only)
 
-User properties let you define default property behavior at compile time. The user property is the fallback when no `Get`/`Set` is configured.
+User properties let you define default property behavior at compile time. The stub override property is the fallback when no `Get`/`Set` is configured.
 
-### Defining User Properties
+### Defining Stub Override Properties
 
 Override virtual properties with underscore suffix - the compiler enforces signature correctness:
 
-<!-- snippet: skill-user-property-define -->
+<!-- snippet: skill-stub-override-property-define -->
 ```cs
 [KnockOff]
 public partial class SkUserPropServiceStub : IUserService { }
@@ -645,30 +645,30 @@ public partial class SkUserPropServiceStub
 
 The interceptor uses a clean name (e.g., `Count`, not `Count2`) regardless of whether you override the property.
 
-### Get/Set Supersede User Property
+### Get/Set Supersede Stub Override Property
 
-Use `Get()` or `Set()` to override the user property for specific tests:
+Use `Get()` or `Set()` to override the stub override property for specific tests:
 
-<!-- snippet: skill-user-property-onget -->
+<!-- snippet: skill-stub-override-property-onget -->
 ```cs
 var stub = new SkUserPropServiceStub();
 stub.SetCount(42);
 IUserService service = stub;
 
-// Without Get: user property is called
+// Without Get: stub override property is called
 var count1 = service.Count;  // Returns 42 (from Count_ override)
 
-// With Get: Get supersedes user property (clean interceptor name)
+// With Get: Get supersedes stub override property (clean interceptor name)
 stub.Count.Get(999);
 var count2 = service.Count;  // Returns 999 (Get wins)
 ```
 <!-- endSnippet -->
 
-### Tracking Works with User Properties
+### Tracking Works with Stub Override Properties
 
-User property interceptors provide full tracking even when using the user override:
+Stub override property interceptors provide full tracking even when using the stub override:
 
-<!-- snippet: skill-user-property-tracking -->
+<!-- snippet: skill-stub-override-property-tracking -->
 ```cs
 _ = service.Count;
 _ = service.Count;
@@ -681,7 +681,7 @@ stub.Count.VerifyGet(Called.Exactly(2));
 
 `Reset()` clears tracking state but preserves the Get/Set configuration:
 
-<!-- snippet: skill-user-property-reset -->
+<!-- snippet: skill-stub-override-property-reset -->
 ```cs
 stub.Count.Get(100);
 _ = service.Count;
@@ -722,7 +722,7 @@ KnockOff evaluates member calls in this order:
 
 1. **When chains** -- `stub.Method.When(...).Return(...)`
 2. **Return / Call** -- `stub.Method.Return(...)` or `stub.Method.Call(...)`
-3. **User methods** -- `protected override` with `_` suffix (Standalone only)
+3. **Stub overrides** -- `protected override` with `_` suffix (Standalone only)
 4. **Source delegation** -- `stub.Source(realImplementation)`
 5. **Smart default** -- KnockOff's built-in default value
 
@@ -843,7 +843,7 @@ For detailed documentation, see the reference files in `references/`:
 
 - **`references/patterns.md`** - Complete pattern guide with examples
 - **`references/methods.md`** - Method configuration and verification
-- **`references/properties.md`** - Property interceptors and user properties
+- **`references/properties.md`** - Property interceptors and stub override properties
 - **`references/api-reference.md`** - Complete API reference
 - **`references/strict-mode.md`** - Strict mode configuration
 - **`references/moq-migration.md`** - Migration guide

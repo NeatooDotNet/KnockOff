@@ -19,7 +19,7 @@ KnockOff generates six types of interceptors, each exposed through properties on
 
 All interceptors provide a `Reset()` method to clear tracking state (counts, captured arguments, and sequence positions) while preserving configured callbacks.
 
-**Pattern Note**: The three KnockOff patterns (Standalone, Inline Interface, Inline Class) all expose the same interceptor API. The only difference is how you declare the stub class. For Stand-Alone stubs, KnockOff also generates a base class with virtual methods that you can override to provide custom behavior. See the [User Methods Guide](../guides/user-methods.md) for details. Delegate stubs (Pattern 7) use a different access pattern — see [Delegate Interceptor](#delegate-interceptor) below.
+**Pattern Note**: The three KnockOff patterns (Standalone, Inline Interface, Inline Class) all expose the same interceptor API. The only difference is how you declare the stub class. For Stand-Alone stubs, KnockOff also generates a base class with virtual methods that you can override to provide custom behavior. See the [Stub Overrides Guide](../guides/stub-overrides.md) for details. Delegate stubs (Pattern 7) use a different access pattern — see [Delegate Interceptor](#delegate-interceptor) below.
 
 ---
 

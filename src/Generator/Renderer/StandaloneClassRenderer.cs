@@ -89,17 +89,17 @@ internal static class StandaloneClassRenderer
         // Use shared MethodInterceptorRenderer for method interceptors
         foreach (var method in unit.Methods)
         {
-            // Check if any signature in this interceptor has a user method override
-            var hasUserMethod = !string.IsNullOrEmpty(method.UserMethodName) ||
-                method.Overloads.Any(o => !string.IsNullOrEmpty(o.UserMethodName));
+            // Check if any signature in this interceptor has a stub override
+            var hasStubOverride = !string.IsNullOrEmpty(method.StubOverrideName) ||
+                method.Overloads.Any(o => !string.IsNullOrEmpty(o.StubOverrideName));
             var options = new InterceptorRenderOptions(
                 BaseIndent: baseIndent,
                 IncludeStrictParameter: true,
                 StrictAccessExpression: "strict",
                 InterceptorTypeParameters: typeParamList,
                 InterceptorConstraints: constraintClauses,
-                UserMethodFallback: hasUserMethod,
-                StubTypeName: hasUserMethod ? $"{unit.ClassName}{typeParamList}" : null);
+                StubOverrideFallback: hasStubOverride,
+                StubTypeName: hasStubOverride ? $"{unit.ClassName}{typeParamList}" : null);
             w.SetIndent(baseIndent);
             MethodInterceptorRenderer.RenderInterceptorClass(w, method, options);
         }
@@ -118,7 +118,7 @@ internal static class StandaloneClassRenderer
         }
 
         // Render the wrapper partial class (user's class)
-        // Extends the generated base class for user property overrides
+        // Extends the generated base class for stub override properties
         var baseClassName = $"{unit.ClassName}Base{typeParamList}";
         w.Line($"{indent}/// <summary>Generated completion for {unit.ClassName} stub. Provides interceptors and .Object property.</summary>");
         w.Line($"{indent}partial class {unit.ClassName}{typeParamList} : {baseClassName}, global::KnockOff.IKnockOffStub{constraintClauses}");
@@ -163,12 +163,12 @@ internal static class StandaloneClassRenderer
         // Verify and VerifyAll methods
         RenderVerifyMethods(w, unit, indent1, indent2);
 
-        // Internal forwarding methods for user method overrides
+        // Internal forwarding methods for stub overrides
         // Interceptor classes are top-level (not nested), so they cannot access
         // protected virtual methods on the base class. These internal forwarders
-        // bridge the gap: interceptor calls stub.__UserMethod_X() which forwards
+        // bridge the gap: interceptor calls stub.__StubOverride_X() which forwards
         // to the protected Execute_() method.
-        RenderUserMethodForwarders(w, unit, indent1);
+        RenderStubOverrideForwarders(w, unit, indent1);
 
         // Nested Impl class
         RenderImplClass(w, unit, indent1, indent2, indent3, indent4);
@@ -541,24 +541,24 @@ internal static class StandaloneClassRenderer
 
     #endregion
 
-    #region User Method Forwarders
+    #region Stub Override Forwarders
 
     /// <summary>
-    /// Generates internal forwarding methods for user method overrides.
+    /// Generates internal forwarding methods for stub overrides.
     /// Standalone class interceptors are top-level classes (not nested inside the stub),
     /// so they cannot access protected virtual methods on the stub's base class.
-    /// These internal forwarders bridge the gap: the interceptor calls stub.__UserMethod_X()
+    /// These internal forwarders bridge the gap: the interceptor calls stub.__StubOverride_X()
     /// which has internal access, and the forwarder delegates to the protected Execute_() method.
     /// </summary>
-    private static void RenderUserMethodForwarders(CodeWriter w, StandaloneClassGenerationUnit unit, string indent)
+    private static void RenderStubOverrideForwarders(CodeWriter w, StandaloneClassGenerationUnit unit, string indent)
     {
-        var methodsWithUserOverride = unit.ImplMethods.Where(m => m.HasUserOverride).ToList();
-        if (methodsWithUserOverride.Count == 0)
+        var methodsWithStubOverride = unit.ImplMethods.Where(m => m.HasStubOverride).ToList();
+        if (methodsWithStubOverride.Count == 0)
             return;
 
-        foreach (var method in methodsWithUserOverride)
+        foreach (var method in methodsWithStubOverride)
         {
-            var forwarderName = $"__UserMethod_{method.MethodName}";
+            var forwarderName = $"__StubOverride_{method.MethodName}";
             var targetName = $"{method.MethodName}_";
 
             if (method.IsVoid)
@@ -730,13 +730,13 @@ internal static class StandaloneClassRenderer
                 w.Line($"{indent1}get");
                 w.Line($"{indent1}{{");
 
-                if (prop.HasUserOverride)
+                if (prop.HasStubOverride)
                 {
-                    // User override pattern:
+                    // Stub override pattern:
                     // 1. Null check for calls during base constructor (fall back to base for virtual)
-                    // 2. Get supersedes user override (InvokeGetCallback tracks internally)
-                    // 3. Record access only for user override path (to avoid double counting)
-                    // 4. User override (virtual property with _ suffix in stub's base class)
+                    // 2. Get supersedes stub override (InvokeGetCallback tracks internally)
+                    // 3. Record access only for stub override path (to avoid double counting)
+                    // 4. Stub override (virtual property with _ suffix in stub's base class)
                     var fallback = prop.IsAbstract ? "default!" : $"base.{prop.PropertyName}";
                     w.Line($"{indent2}if (_stub == null) return {fallback};");
                     w.Line($"{indent2}if (_stub.{prop.PropertyName}.HasGet) return _stub.{prop.PropertyName}.InvokeGetCallback();");
@@ -745,7 +745,7 @@ internal static class StandaloneClassRenderer
                 }
                 else
                 {
-                    // No user override - delegate to interceptor which handles full priority chain
+                    // No stub override - delegate to interceptor which handles full priority chain
                     // (sequence > Get > strict/default) and falls back to base for virtual properties
                     if (prop.IsAbstract)
                     {
@@ -770,13 +770,13 @@ internal static class StandaloneClassRenderer
                 w.Line($"{indent1}{setterKeyword}");
                 w.Line($"{indent1}{{");
 
-                if (prop.HasUserOverride)
+                if (prop.HasStubOverride)
                 {
-                    // User override pattern:
+                    // Stub override pattern:
                     // 1. Null check for calls during base constructor (fall back to base for virtual)
-                    // 2. Set supersedes user override (InvokeSetCallback tracks internally)
-                    // 3. Record access only for user override path (to avoid double counting)
-                    // 4. User override (virtual property with _ suffix in stub's base class)
+                    // 2. Set supersedes stub override (InvokeSetCallback tracks internally)
+                    // 3. Record access only for stub override path (to avoid double counting)
+                    // 4. Stub override (virtual property with _ suffix in stub's base class)
                     if (prop.IsAbstract)
                     {
                         w.Line($"{indent2}if (_stub == null) return;");
@@ -791,7 +791,7 @@ internal static class StandaloneClassRenderer
                 }
                 else
                 {
-                    // No user override - delegate to interceptor which handles full priority chain
+                    // No stub override - delegate to interceptor which handles full priority chain
                     // (sequence > Set > strict/default) and falls back to base for virtual properties
                     if (prop.IsAbstract)
                     {
@@ -940,12 +940,12 @@ internal static class StandaloneClassRenderer
                 ? "Invoke"
                 : $"Invoke{method.InvokeSuffix}";
 
-            if (method.HasUserOverride)
+            if (method.HasStubOverride)
             {
-                // User method override pattern:
-                // The interceptor handles user method fallback internally via stub.MethodName_()
-                // Pass _stub to Invoke() so the interceptor can call the user method when unconfigured
-                // No base.Method() call -- user method completely replaces base call (Design Decision 1)
+                // Stub override pattern:
+                // The interceptor handles stub override fallback internally via stub.MethodName_()
+                // Pass _stub to Invoke() so the interceptor can call the stub override when unconfigured
+                // No base.Method() call -- stub override completely replaces base call (Design Decision 1)
 
                 // Null check for calls during base constructor
                 if (method.IsVoid)
@@ -963,7 +963,7 @@ internal static class StandaloneClassRenderer
             }
             else
             {
-                // Standard interceptor pattern (no user method override)
+                // Standard interceptor pattern (no stub override)
 
                 // Null check for calls during base constructor
                 w.Line($"{indent1}if (_stub == null)");

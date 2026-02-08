@@ -133,13 +133,13 @@ Per CLAUDE.md's Pipeline Verification Rule, I traced which pipelines are affecte
 12. `Design.Stubs/Properties/PropertySequences.cs` -- Same
 13. `Design.Stubs/Indexers/IndexerBasics.cs` -- Same
 14. `Design.Stubs/Indexers/IndexerSequences.cs` -- Same
-15. `Design.Stubs/UserProperties/UserPropertyBasics.cs` -- Same
+15. `Design.Stubs/StubOverrideProperties/StubOverridePropertyBasics.cs` -- Same
 16. `Design.Stubs/StubPatterns/AllPatterns.cs` -- Same
 17. `Design.Tests/PropertyTests/PropertyBasicsTests.cs` -- Same
 18. `Design.Tests/PropertyTests/PropertySequenceTests.cs` -- Same
 19. `Design.Tests/IndexerTests/IndexerBasicsTests.cs` -- Same
 20. `Design.Tests/IndexerTests/IndexerSequenceTests.cs` -- Same
-21. `Design.Tests/UserPropertyTests/UserPropertyBasicsTests.cs` -- Same
+21. `Design.Tests/StubOverridePropertyTests/StubOverridePropertyBasicsTests.cs` -- Same
 22. `Design.Tests/AdvancedTests/VerificationTests.cs` -- Check for OnGet/OnSet
 23. `Design.Tests/AdvancedTests/StrictModeTests.cs` -- Check for OnGet/OnSet
 24. `Design.Tests/PatternTests/*.cs` -- Check for OnGet/OnSet
@@ -266,7 +266,7 @@ All Design.Stubs code currently uses `OnGet`/`OnSet`. Once the generator is upda
 - `Design.Stubs/Properties/PropertySequences.cs` -- Exercises `OnGet().ThenGet()`, `OnSet().ThenSet()`. **Will need: `.OnGet(` -> `.Get(`, `.OnSet(` -> `.Set(`**
 - `Design.Stubs/Indexers/IndexerBasics.cs` -- Exercises `OnGet(callback)`, `OnSet(callback)` on indexers. **Will need same rename.**
 - `Design.Stubs/Indexers/IndexerSequences.cs` -- Exercises `OnGet().ThenGet()`, `OnSet().ThenSet()` on indexers. **Will need same rename.**
-- `Design.Stubs/UserProperties/UserPropertyBasics.cs` -- Exercises user override property pattern with `OnGet`/`OnSet`. **Will need same rename.**
+- `Design.Stubs/StubOverrideProperties/StubOverridePropertyBasics.cs` -- Exercises user override property pattern with `OnGet`/`OnSet`. **Will need same rename.**
 - `Design.Stubs/StubPatterns/AllPatterns.cs` -- Multi-pattern exercise. **Will need same rename.**
 
 **Verification approach:** Since this is a mechanical rename (no new features), the existing Design.Stubs code + renamed API calls IS the acceptance criteria. No new failing code needs to be written -- the rename itself is the test.
@@ -320,7 +320,7 @@ This plan is a mechanical rename with no behavioral changes. The architect perfo
 
 1. **Occurrence counts are undercounted.** Plan says ~319 doc occurrences (52 files) and ~57 skill occurrences (5 files). Actual: ~530 doc occurrences (37 non-completed files) and ~150 skill occurrences (5 files). This does not affect implementation since the developer will use grep-based sweeps.
 
-2. **Design.Domain files not listed.** `IEntity.cs`, `ICollection.cs`, `IUserPropertyService.cs`, `IUserMethodService.cs` have OnGet/OnSet in doc comments. Covered implicitly by Phase 3 ("Design project updates") but not enumerated.
+2. **Design.Domain files not listed.** `IEntity.cs`, `ICollection.cs`, `IStubOverridePropertyService.cs`, `IUserMethodService.cs` have OnGet/OnSet in doc comments. Covered implicitly by Phase 3 ("Design project updates") but not enumerated.
 
 3. **Model doc comments not listed.** `UnifiedPropertyInterceptorModel.cs` and `UnifiedIndexerInterceptorModel.cs` have OnGet/OnSet in doc comments (line 10 each). Covered implicitly by Phase 1 step 6 ("Update doc comments in all generator files").
 
@@ -356,9 +356,9 @@ No new failing code -- this is a mechanical rename. The acceptance criteria is:
   - [ ] Update 6 interface files: IPropertyCallBuilder.cs, IPropertySequence.cs, IPropertyTracking.cs, IIndexerCallBuilder.cs, IIndexerSequence.cs, IIndexerTracking.cs
   - [ ] **Checkpoint**: `dotnet build src/KnockOff/KnockOff.csproj` succeeds
 - [ ] Phase 3: Design project updates
-  - [ ] Rename in Design.Stubs files (Properties, Indexers, UserProperties, StubPatterns)
-  - [ ] Rename in Design.Tests files (PropertyTests, IndexerTests, UserPropertyTests, PatternTests, GenericOverloadTests, AdvancedTests)
-  - [ ] Update Design.Domain doc comments (IEntity.cs, ICollection.cs, IUserPropertyService.cs, IUserMethodService.cs)
+  - [ ] Rename in Design.Stubs files (Properties, Indexers, StubOverrideProperties, StubPatterns)
+  - [ ] Rename in Design.Tests files (PropertyTests, IndexerTests, StubOverridePropertyTests, PatternTests, GenericOverloadTests, AdvancedTests)
+  - [ ] Update Design.Domain doc comments (IEntity.cs, ICollection.cs, IStubOverridePropertyService.cs, IUserMethodService.cs)
   - [ ] **Checkpoint**: `dotnet build src/Design/Design.Stubs` and `dotnet test src/Design/Design.Tests` pass
 - [ ] Phase 4: Test project updates
   - [ ] Rename across all test files in src/Tests/ (grep-based sweep)

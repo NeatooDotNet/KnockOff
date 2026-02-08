@@ -98,7 +98,7 @@ stub.Verify();
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
-- **User methods**: Add custom methods directly on the stub class
+- **Stub overrides**: Add custom methods directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **Clean syntax**: Simple `new MyStub()` instantiation
@@ -109,7 +109,7 @@ stub.Verify();
 - **Partial class**: Must remember to mark the class as `partial`
 - **Manual interface**: Must manually implement the interface signature
 
-### User Methods
+### Stub Overrides
 
 Override protected virtual methods with the underscore suffix convention to provide default implementations:
 
@@ -176,7 +176,7 @@ productRepo.GetById.Return((id) => new Product { Id = id, Name = "Widget" }).Ver
 - **Reusable**: Share across multiple test files
 - **Type-safe**: Compiler enforces type constraints
 - **Clean syntax**: `new RepositoryStub<User>()` - clear and readable
-- **User methods**: Supports custom helper methods like Standalone
+- **Stub overrides**: Supports custom helper methods like Standalone
 
 ### Trade-offs
 
@@ -191,7 +191,7 @@ productRepo.GetById.Return((id) => new Product { Id = id, Name = "Widget" }).Ver
 | **Syntax** | `[KnockOff] class Stub<T> : IFoo<T>` | `[KnockOff(typeof(IFoo<>))]` |
 | **Instantiation** | `new Stub<User>()` | `new Stubs.IFoo<User>()` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods** | Yes | No |
+| **Stub overrides** | Yes | No |
 | **Best for** | Shared generic stubs | One-time use |
 
 ---
@@ -253,7 +253,7 @@ This is equivalent to Moq's `CallBase = true`, but it is the default behavior in
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
-- **User methods**: Add custom methods directly on the stub class
+- **Stub overrides**: Add custom methods directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **No interface needed**: Stub classes directly without creating interfaces
@@ -321,7 +321,7 @@ Like Standalone Class stubs, generic standalone class stubs call the base class 
 - **Reusable**: Share across multiple test files
 - **Type-safe**: Compiler enforces type constraints
 - **Clean syntax**: `new RepositoryStub<User>().Object` - clear and readable
-- **User methods**: Supports custom helper methods like Standalone patterns
+- **Stub overrides**: Supports custom helper methods like Standalone patterns
 - **No interface needed**: Stub generic classes directly
 - **CallBase by default**: Virtual methods fall back to base implementation automatically
 
@@ -340,7 +340,7 @@ Like Standalone Class stubs, generic standalone class stubs call the base class 
 | **Syntax** | `[KnockOffBase(typeof(Foo<>))] class Stub<T>` | `[KnockOff(typeof(Foo<>))]` |
 | **Instantiation** | `new Stub<User>().Object` | `new Stubs.Foo<User>().Object` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods** | Yes | No |
+| **Stub overrides** | Yes | No |
 | **Best for** | Shared generic class stubs | One-time use |
 
 ---
@@ -392,7 +392,7 @@ stub.Verify();
 
 ### Trade-offs
 
-- **No user methods**: Cannot add custom methods to the generated stub
+- **No stub overrides**: Cannot add custom methods to the generated stub
 - **Stubs namespace**: Must use `Stubs.IFoo` syntax to instantiate
 - **Test-local only**: Cannot reuse across multiple test classes
 
@@ -466,7 +466,7 @@ This is equivalent to Moq's `CallBase = true`, but it is the default behavior in
 
 - **Must use .Object**: The stub is a wrapper; use `.Object` property to get the actual instance
 - **Virtual/abstract only**: Only overrides members marked `virtual` or `abstract`
-- **No user methods**: Cannot add custom methods like Standalone pattern
+- **No stub overrides**: Cannot add custom methods like Standalone pattern
 - **Class limitations**: Subject to any sealed/non-virtual restrictions
 
 ---
@@ -584,7 +584,7 @@ userStub.Verify();
 ### Trade-offs
 
 - **Test-local only**: Cannot reuse across multiple test classes
-- **No user methods**: Cannot add custom methods to the generated stub
+- **No stub overrides**: Cannot add custom methods to the generated stub
 - **typeof syntax**: Requires `typeof(IFoo<>)` with empty angle brackets
 - **Stubs namespace**: Must use `Stubs.IFoo<T>` syntax
 
@@ -654,7 +654,7 @@ Like all class stubs, open generic class stubs call the base class implementatio
 
 - **Must use .Object**: The stub is a wrapper; use `.Object` property to get the actual instance
 - **Test-local only**: Cannot reuse across multiple test classes
-- **No user methods**: Cannot add custom methods to the generated stub
+- **No stub overrides**: Cannot add custom methods to the generated stub
 - **typeof syntax**: Requires `typeof(Foo<>)` with empty angle brackets
 - **Virtual/abstract only**: Only overrides members marked `virtual` or `abstract`
 
@@ -676,7 +676,7 @@ Like all class stubs, open generic class stubs call the base class implementatio
 | Feature | Standalone | Generic Standalone | Standalone Class | Generic Standalone Class | Inline Interface | Inline Class | Inline Delegate | Open Generic Interface | Open Generic Class |
 |---------|------------|-------------------|-----------------|--------------------------|------------------|--------------|-----------------|----------------------|-------------------|
 | **Reusable across test files** | Yes | Yes | Yes | Yes | No | No | No | No | No |
-| **Custom user methods** | Yes | Yes | Yes | Yes | No | No | No | No | No |
+| **Custom stub overrides** | Yes | Yes | Yes | Yes | No | No | No | No | No |
 | **Extra file required** | Yes | Yes | Yes | Yes | No | No | No | No | No |
 | **Supports interfaces** | Yes | Yes | No | No | Yes | No | No | Yes | No |
 | **Supports classes** | No | No | Yes | Yes | No | Yes | No | No | Yes |

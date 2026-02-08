@@ -45,6 +45,6 @@ public interface ICalculator
 [KnockOff]
 public partial class CalculatorKnockOff : ICalculator
 {
-    // User method for Add
+    // Stub override for Add
     protected override int Add_(int a, int b) => a + b;
 }

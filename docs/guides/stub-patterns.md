@@ -95,7 +95,7 @@ stub.Save.Call((user) => { }).Verifiable();
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
-- **User methods and properties**: Add custom methods and override properties directly on the stub class
+- **Stub overrides**: Add custom methods and override properties directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **Clean syntax**: Simple `new MyStub()` instantiation
@@ -106,16 +106,16 @@ stub.Save.Call((user) => { }).Verifiable();
 - **Partial class**: Must remember to mark the class as `partial`
 - **Manual interface**: Must manually implement the interface signature
 
-### Base Class and User Methods/Properties
+### Base Class and Stub Overrides
 
 The Standalone pattern generates a base class (e.g., `UserRepoStandaloneStubBase`) that your stub inherits from. This base class exposes `protected virtual` methods and properties for each interface member, allowing you to add custom stub behavior through inheritance.
 
 Override these members using the **underscore suffix convention** (`_`) to provide default implementations:
 
-<!-- snippet: patterns-user-methods -->
+<!-- snippet: patterns-stub-overrides -->
 ```cs
 [KnockOff]
-public partial class UserRepoWithUserMethodsStub : IUserRepoStandalone
+public partial class UserRepoWithStubOverridesStub : IUserRepoStandalone
 {
     // Override base class method with underscore suffix
     protected override User? GetById_(int id)
@@ -126,7 +126,7 @@ public partial class UserRepoWithUserMethodsStub : IUserRepoStandalone
 ```
 <!-- endSnippet -->
 
-The interceptor name remains clean (`GetById`), while your implementation uses the suffix (`GetById_`). This keeps user methods and properties separate from the generated code. See [User Methods](user-methods.md) for methods and [Properties Guide](properties.md#user-properties-standalone-patterns) for user properties.
+The interceptor name remains clean (`GetById`), while your implementation uses the suffix (`GetById_`). This keeps stub overrides separate from the generated code. See [Stub Overrides](stub-overrides.md) for methods and [Properties Guide](properties.md#stub-override-properties-standalone-patterns) for stub override properties.
 
 ---
 
@@ -177,7 +177,7 @@ productRepo.GetById.Return((id) => new Product { Id = id, Name = "Widget" }).Ver
 - **Reusable**: Share across multiple test files
 - **Type-safe**: Compiler enforces type constraints
 - **Clean syntax**: `new RepositoryStub<User>()` - clear and readable
-- **User methods and properties**: Supports custom helper methods and property overrides like Standalone
+- **Stub overrides**: Supports custom helper methods and property overrides like Standalone
 
 ### Trade-offs
 
@@ -192,7 +192,7 @@ productRepo.GetById.Return((id) => new Product { Id = id, Name = "Widget" }).Ver
 | **Syntax** | `[KnockOff] class Stub<T> : IFoo<T>` | `[KnockOff(typeof(IFoo<>))]` |
 | **Instantiation** | `new Stub<User>()` | `new Stubs.IFoo<User>()` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods/properties** | Yes | No |
+| **Stub overrides** | Yes | No |
 | **Best for** | Shared generic stubs | One-time use |
 
 ---
@@ -239,7 +239,7 @@ ServiceBaseNonGeneric service = stub.Object;
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
-- **User methods and properties**: Add custom methods and override properties directly on the stub class
+- **Stub overrides**: Add custom methods and override properties directly on the stub class
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **No interface needed**: Stub classes directly without creating interfaces
@@ -258,7 +258,7 @@ ServiceBaseNonGeneric service = stub.Object;
 | **Syntax** | `[KnockOffBase<Foo>] class Stub` | `[KnockOff<Foo>]` |
 | **Instantiation** | `new ServiceStub().Object` | `new Stubs.Service().Object` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods/properties** | Yes | No |
+| **Stub overrides** | Yes | No |
 | **Best for** | Shared class stubs | One-time use |
 
 ---
@@ -308,7 +308,7 @@ RepositoryBase<User> service = stub.Object;
 - **Reusable**: Share across multiple test files
 - **Type-safe**: Compiler enforces type constraints
 - **Clean syntax**: `new RepositoryStub<User>().Object` - clear and readable
-- **User methods and properties**: Supports custom helper methods and property overrides like Standalone patterns
+- **Stub overrides**: Supports custom helper methods and property overrides like Standalone patterns
 - **No interface needed**: Stub generic classes directly
 
 ### Trade-offs
@@ -326,7 +326,7 @@ RepositoryBase<User> service = stub.Object;
 | **Syntax** | `[KnockOffBase(typeof(Foo<>))] class Stub<T>` | `[KnockOff(typeof(Foo<>))]` |
 | **Instantiation** | `new Stub<User>().Object` | `new Stubs.Foo<User>().Object` |
 | **Reusability** | Across test files | Within one test class |
-| **User methods/properties** | Yes | No |
+| **Stub overrides** | Yes | No |
 | **Best for** | Shared generic class stubs | One-time use |
 
 ---
@@ -374,7 +374,7 @@ stub.Save.Call((user) => { }).Verifiable();
 
 ### Trade-offs
 
-- **No user methods**: Cannot add custom methods to the generated stub
+- **No stub overrides**: Cannot add custom methods to the generated stub
 - **Stubs namespace**: Must use `Stubs.IFoo` syntax to instantiate
 - **Test-local only**: Cannot reuse across multiple test classes
 
@@ -433,7 +433,7 @@ UserServiceClass service = stub.Object;
 
 - **Must use .Object**: The stub is a wrapper; use `.Object` property to get the actual instance
 - **Virtual/abstract only**: Only overrides members marked `virtual` or `abstract`
-- **No user methods**: Cannot add custom methods like Standalone pattern
+- **No stub overrides**: Cannot add custom methods like Standalone pattern
 - **Class limitations**: Subject to any sealed/non-virtual restrictions
 
 ---
@@ -541,7 +541,7 @@ productStub.GetItem.Return((id) => new Product { Id = id, Name = "FromStub" }).V
 ### Trade-offs
 
 - **Test-local only**: Cannot reuse across multiple test classes
-- **No user methods**: Cannot add custom methods to the generated stub
+- **No stub overrides**: Cannot add custom methods to the generated stub
 - **typeof syntax**: Requires `typeof(IFoo<>)` with empty angle brackets
 - **Stubs namespace**: Must use `Stubs.IFoo<T>` syntax
 
@@ -606,7 +606,7 @@ userStub.Verify();
 
 - **Must use .Object**: The stub is a wrapper; use `.Object` property to get the actual instance
 - **Test-local only**: Cannot reuse across multiple test classes
-- **No user methods**: Cannot add custom methods to the generated stub
+- **No stub overrides**: Cannot add custom methods to the generated stub
 - **typeof syntax**: Requires `typeof(Foo<>)` with empty angle brackets
 - **Virtual/abstract only**: Only overrides members marked `virtual` or `abstract`
 
@@ -628,7 +628,7 @@ userStub.Verify();
 | Feature | Standalone | Generic Standalone | Standalone Class | Generic Standalone Class | Inline Interface | Inline Class | Inline Delegate | Open Generic Interface | Open Generic Class |
 |---------|------------|-------------------|-----------------|--------------------------|------------------|--------------|-----------------|----------------------|-------------------|
 | **Reusable across test files** | Yes | Yes | Yes | Yes | No | No | No | No | No |
-| **Custom user methods/properties** | Yes | Yes | Yes | Yes | No | No | No | No | No |
+| **Custom stub overrides** | Yes | Yes | Yes | Yes | No | No | No | No | No |
 | **Extra file required** | Yes | Yes | Yes | Yes | No | No | No | No | No |
 | **Supports interfaces** | Yes | Yes | No | No | Yes | No | No | Yes | No |
 | **Supports classes** | No | No | Yes | Yes | No | Yes | No | No | Yes |
