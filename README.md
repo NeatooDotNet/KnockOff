@@ -135,7 +135,7 @@ myRepoKO.Verify();
 
 ## What Sets KnockOff Apart
 
-- **Reusable stub classes** — Define once, customize per-test. No more copying mock setups or shared factory methods.
+- **[Reusable stub classes](docs/guides/reusable-stubs.md)** — Define once, customize per-test. Your stub is a real class — pass it through constructors, register it in DI.
 - **[Source delegation](docs/guides/source-delegation.md)** — Delegate to a real implementation, override only specific methods. No equivalent in Moq or NSubstitute.
 - **[Protected methods](docs/guides/protected-methods.md)** — Same `Return`/`Call`/`Verify` API, fully typed. No string-based names, no manual subclasses.
 - **[Ref/out parameters](docs/guides/ref-out-parameters.md)** — Natural lambda syntax with `ref`/`out` keywords. No special matchers or index-based access.
@@ -145,7 +145,6 @@ myRepoKO.Verify();
 - **Built-in argument capture** — `LastArg`, `LastArgs`, `LastSetValue`, `LastSetEntry` — no manual `Arg.Do<>` or `Callback<>` setup.
 - **Event verification** — `VerifyAdd()` / `VerifyRemove()` / `HasSubscribers` — not available in Moq or NSubstitute.
 - **Explicit Get/Set verification** — `VerifyGet(Called)` / `VerifySet(Called)` for properties and indexers.
-- **Integration tests with DI** — Your stub is a real class. Register it in a DI container, pass it through constructors.
 - **Stubbing concrete classes** — Override virtual methods on non-sealed classes with the same API.
 
 ---
