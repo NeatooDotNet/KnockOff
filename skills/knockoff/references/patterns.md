@@ -240,6 +240,16 @@ stub.Verify();
 ```
 <!-- endSnippet -->
 
+### Base Fallback Behavior
+
+Standalone class stubs call the base class implementation by default for unconfigured virtual methods. Only configure what you need to override. Abstract methods return `default(T)` when unconfigured (there is no base to call).
+
+- **Virtual method, unconfigured**: calls base class implementation
+- **Virtual method, configured** (Return/Call/When): interceptor handles it, base is NOT called
+- **Abstract method, unconfigured**: returns `default(T)` (or throws in strict mode)
+
+This is equivalent to Moq's `CallBase = true`, but it is the default behavior in KnockOff -- no opt-in required.
+
 ### Benefits
 
 - **Reusable**: Reference the stub from any test file
@@ -247,6 +257,7 @@ stub.Verify();
 - **Discoverable**: Appears in IntelliSense when browsing your test project
 - **Explicit**: Clear separation between test code and stub implementation
 - **No interface needed**: Stub classes directly without creating interfaces
+- **CallBase by default**: Virtual methods fall back to base implementation automatically
 
 ### Trade-offs
 
@@ -300,6 +311,10 @@ userRepo.Verify();
 ```
 <!-- endSnippet -->
 
+### Base Fallback Behavior
+
+Like Standalone Class stubs, generic standalone class stubs call the base class implementation by default for unconfigured virtual methods. Abstract methods return `default(T)` when unconfigured. See the Standalone Class pattern's "Base Fallback Behavior" section for details.
+
 ### Benefits
 
 - **Single definition**: Define once, use with any type argument
@@ -308,6 +323,7 @@ userRepo.Verify();
 - **Clean syntax**: `new RepositoryStub<User>().Object` - clear and readable
 - **User methods**: Supports custom helper methods like Standalone patterns
 - **No interface needed**: Stub generic classes directly
+- **CallBase by default**: Virtual methods fall back to base implementation automatically
 
 ### Trade-offs
 
@@ -428,12 +444,23 @@ stub.Verify();
 ```
 <!-- endSnippet -->
 
+### Base Fallback Behavior
+
+Inline class stubs call the base class implementation by default for unconfigured virtual methods. Only configure what you need to override. Abstract methods return `default(T)` when unconfigured (there is no base to call).
+
+- **Virtual method, unconfigured**: calls base class implementation
+- **Virtual method, configured** (Return/Call/When): interceptor handles it, base is NOT called
+- **Abstract method, unconfigured**: returns `default(T)` (or throws in strict mode)
+
+This is equivalent to Moq's `CallBase = true`, but it is the default behavior in KnockOff -- no opt-in required.
+
 ### Benefits
 
 - **Stub classes**: Works with classes, not just interfaces
 - **No interface extraction**: Avoids creating interfaces just for testing
 - **Virtual members**: Intercepts any `virtual` or `abstract` members
 - **Inheritance**: Properly inherits from the target class
+- **CallBase by default**: Virtual methods fall back to base implementation automatically
 
 ### Trade-offs
 
@@ -610,6 +637,10 @@ userStub.Verify();
 ```
 <!-- endSnippet -->
 
+### Base Fallback Behavior
+
+Like all class stubs, open generic class stubs call the base class implementation by default for unconfigured virtual methods. Abstract methods return `default(T)` when unconfigured. See the Inline Class pattern's "Base Fallback Behavior" section for details.
+
 ### Benefits
 
 - **Flexible**: Use any type argument without defining separate stubs
@@ -617,6 +648,7 @@ userStub.Verify();
 - **Type constraints**: Preserves constraints from the original generic type
 - **Multiple types**: Use different type arguments in the same test class
 - **Class support**: Works with abstract classes, not just interfaces
+- **CallBase by default**: Virtual methods fall back to base implementation automatically
 
 ### Trade-offs
 
@@ -784,4 +816,4 @@ ServiceBaseGeneric<Order> service = serviceStub.Object;  // .Object required for
 
 ---
 
-**UPDATED:** 2026-02-07 (Nine patterns including Standalone Class stubs)
+**UPDATED:** 2026-02-08 (Nine patterns including Standalone Class stubs; class stub CallBase behavior)

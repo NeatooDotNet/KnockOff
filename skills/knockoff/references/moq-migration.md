@@ -45,7 +45,8 @@ This guide walks you through the migration step-by-step, with side-by-side compa
 | `mock.Verify()` | `stub.Verify()` |
 | `It.IsAny<T>()` | Callback receives all args |
 | `It.Is<T>(pred)` | `stub.Method.When(pred).Return(val)` |
-| `mock.CallBase = true` | `stub.Source(realImpl)` (interface stubs only) |
+| `mock.CallBase = true` (class mock) | Default behavior -- just don't configure the member |
+| `mock.CallBase = true` (interface mock) | `stub.Source(realImpl)` (interface stubs only) |
 
 ---
 
@@ -283,6 +284,47 @@ stub.GetUser.Return((id) =>
 
 ---
 
+## Step 9: CallBase Behavior
+
+Replace Moq's `CallBase = true` with KnockOff's default behavior for class stubs.
+
+**Moq:**
+
+```csharp
+// Moq requires explicit opt-in to call base implementations
+var mock = new Mock<MyService>();
+mock.CallBase = true;  // Without this, virtual methods return default
+mock.Setup(x => x.GetStatus()).Returns("overridden");
+
+// Virtual methods not configured in Setup call the real implementation
+mock.Object.Initialize();  // Calls real Initialize()
+```
+
+**KnockOff:**
+
+```csharp
+// KnockOff class stubs call base by default -- no opt-in needed
+[KnockOff<MyService>]
+partial class Tests { }
+
+var stub = new Stubs.MyService();
+stub.GetStatus.Return("overridden");  // Override just this method
+
+MyService service = stub.Object;
+service.Initialize();  // Calls real Initialize() -- this is the default!
+```
+
+**Key differences:**
+
+- **Moq** requires `CallBase = true` to call base implementations. Without it, virtual methods return default values.
+- **KnockOff class stubs** call base implementations by default for unconfigured virtual methods. There is no `CallBase` property because it is always on.
+- Only configure the members you want to override. Everything else falls through to the real implementation.
+- **Abstract methods** return `default(T)` when unconfigured in both Moq (with CallBase) and KnockOff -- there is no base to call.
+
+**For interface stubs**, KnockOff does not have a direct `CallBase` equivalent because interfaces have no base implementation. Use `stub.Source(realImplementation)` to delegate unconfigured calls to a real implementation instance.
+
+---
+
 ## Complete Before/After Example
 
 This example shows a full test class migrated from Moq to KnockOff.
@@ -504,4 +546,4 @@ Use this checklist when migrating a test file from Moq to KnockOff:
 
 ---
 
-**UPDATED:** 2026-02-07
+**UPDATED:** 2026-02-08

@@ -664,7 +664,7 @@ If any verification fails, `Verify()` throws an exception detailing which interc
 
 ## Source Delegation
 
-`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Available for **interface stubs only** (Standalone, Generic Standalone, Inline Interface, Open Generic Interface patterns). Class stubs inherit from the base class directly and do not need Source().
+`stub.Source(realImplementation)` delegates unconfigured calls to a real implementation. Available for **interface stubs only** (Standalone, Generic Standalone, Inline Interface, Open Generic Interface patterns). Class stubs do not need Source() because they already call the base class implementation by default for unconfigured virtual methods.
 
 ### Stub-Level API
 
@@ -685,6 +685,18 @@ KnockOff evaluates member calls in this order:
 5. **Smart default** -- KnockOff's built-in default value
 
 The first match wins. Return/Call takes full control when configured -- Source is not consulted even for arguments that do not match When predicates.
+
+### Priority Order for Class Stubs (Patterns 3, 4, 6, 9)
+
+Class stubs do not use Source delegation. Instead, unconfigured virtual methods fall back to the base class implementation:
+
+1. **When chains** -- `stub.Method.When(...).Return(...)`
+2. **Return / Call** -- `stub.Method.Return(...)` or `stub.Method.Call(...)`
+3. **User methods** -- `protected override` with `_` suffix (Standalone Class only)
+4. **Base class implementation** -- for virtual methods (the default)
+5. **Smart default** -- for abstract methods: returns `default(T)` (or throws in strict mode)
+
+This is equivalent to Moq's `CallBase = true`, but it is the default behavior in KnockOff -- no opt-in required.
 
 ### Reset Interaction
 
@@ -710,4 +722,4 @@ The first match wins. Return/Call takes full control when configured -- Source i
 
 ---
 
-**UPDATED:** 2026-02-07
+**UPDATED:** 2026-02-08

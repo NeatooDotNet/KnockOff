@@ -692,7 +692,7 @@ stub.GetUserAsync.Return(testUser);
 // stub.Received().GetUser(42);          // Compile error
 // stub.DidNotReceive().DeleteUser(1);    // Compile error
 
-// Correct: Use Verify with Called
+// Correct: Use Verify with Times
 stub.GetUser.Verify(Called.Once);
 stub.DeleteUser.Verify(Called.Never);
 ```

@@ -155,7 +155,7 @@ stub.Interceptor.Verify();
 
 <!-- snippet: delegate-stub-verification-times -->
 ```cs
-// Verify with Called constraints
+// Verify with Times constraints
 stub.Interceptor.Verify(Called.Exactly(3));
 stub.Interceptor.Verify(Called.AtLeast(2));
 stub.Interceptor.Verify(Called.AtMost(5));
@@ -207,7 +207,7 @@ Assert.Equal(25, stub.Interceptor.LastArgs!.Value.age);
 
 <!-- snippet: delegate-stub-callcount -->
 ```cs
-// Verify invocation count using Called constraints
+// Verify invocation count using Times constraints
 stub.Interceptor.Verify(Called.Exactly(3));
 ```
 <!-- endSnippet -->

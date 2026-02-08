@@ -111,7 +111,7 @@ You can specify `Called` constraints when marking with `.Verifiable()`.
 
 <!-- snippet: verify-verifiable-times -->
 ```cs
-// Mark with Called constraint for batch verification
+// Mark with Times constraint for batch verification
 stub.Refresh.Call(() => { }).Verifiable(Called.Exactly(2));
 ```
 <!-- endSnippet -->
@@ -310,7 +310,7 @@ Here's a comprehensive verification scenario demonstrating the recommended patte
 
 <!-- snippet: verify-complete-example -->
 ```cs
-// 1. Batch verification - checks all Called constraints
+// 1. Batch verification - checks all Times constraints
 stub.Verify();
 
 // 2. Argument verification via tracking
@@ -375,7 +375,7 @@ stub.Interceptor.Return((a, b) => a + b).Verifiable();
 VerifyArithmeticOp op = stub;
 op(2, 3);
 
-// Direct verification with Called
+// Direct verification with Times
 stub.Interceptor.Verify(Called.Once);
 
 // Argument tracking via LastArgs
