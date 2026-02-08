@@ -142,6 +142,27 @@ public class MethodSequenceTests
     }
 
     // =========================================================================
+    // Return(value).ThenReturn(value) - Value-Based Sequence (NRE Bug Fix)
+    // =========================================================================
+
+    [Fact]
+    public void ReturnValue_ThenReturnValue_ReturnsSequence()
+    {
+        var stub = new MethodSequencesDemo.Stubs.ICalculator();
+
+        // Value-based Return followed by value-based ThenReturn
+        // This was previously an NRE bug: _call was null during sequence elevation
+        stub.Add.Return(1).ThenReturn(2).ThenReturn(3);
+
+        ICalculator calc = stub;
+
+        Assert.Equal(1, calc.Add(0, 0));
+        Assert.Equal(2, calc.Add(0, 0));
+        Assert.Equal(3, calc.Add(0, 0));
+        Assert.Equal(3, calc.Add(0, 0)); // Repeats last
+    }
+
+    // =========================================================================
     // Original OnCall().ThenReturn() - Callback Sequences
     // =========================================================================
 

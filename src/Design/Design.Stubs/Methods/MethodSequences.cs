@@ -196,6 +196,35 @@ public partial class MethodSequencesDemo
     }
 
     // =========================================================================
+    // Return(value).ThenReturn(value) - Value-Based Sequence Start
+    // =========================================================================
+    // DESIGN DECISION: Return(value) can now be followed by ThenReturn(value)
+    // to create sequences entirely from values. Previously this caused an NRE
+    // because _call was null during sequence elevation.
+    //
+    // This is the most concise syntax for constant-value sequences:
+    //   stub.Method.Return(1).ThenReturn(2).ThenReturn(3);
+    //
+    // For even more concise syntax, use params:
+    //   stub.Method.Return(1, 2, 3);
+    // =========================================================================
+
+    public void ReturnValue_ThenReturnValue_Sequence()
+    {
+        var stub = new Stubs.ICalculator();
+
+        // Value-based sequence: Return(value).ThenReturn(value)
+        stub.Add.Return(1).ThenReturn(2).ThenReturn(3);
+
+        ICalculator calc = stub;
+
+        var r1 = calc.Add(0, 0); // 1
+        var r2 = calc.Add(0, 0); // 2
+        var r3 = calc.Add(0, 0); // 3
+        var r4 = calc.Add(0, 0); // 3 (repeats last)
+    }
+
+    // =========================================================================
     // Returns().ThenReturn() - Callback Sequences
     // =========================================================================
     // DESIGN DECISION: ThenReturns(callback) chains multiple callbacks that execute
