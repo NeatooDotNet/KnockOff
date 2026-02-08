@@ -102,7 +102,7 @@ public class InitPropertyStandaloneTests
 		_ = entity.Id;
 
 		// Assert
-		stub.Id.VerifyGet(Times.Exactly(2));
+		stub.Id.VerifyGet(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -213,7 +213,7 @@ public class InitPropertyStandaloneTests
 		stub.Id.Reset();
 
 		// Assert - Reset() clears tracking but preserves configuration (Get callback)
-		stub.Id.VerifyGet(Times.Never);
+		stub.Id.VerifyGet(Called.Never);
 		Assert.Equal("reset-test", entity.Id); // Configuration is preserved, verify through interface
 	}
 
@@ -237,12 +237,12 @@ public class InitPropertyStandaloneTests
 		// These compile-time checks verify the interceptor structure
 		// BUG: The following lines will fail to compile because the standalone
 		// interceptor is missing SetCount, LastSetValue, and RecordSet
-		stub.Id.VerifySet(Times.Never);
+		stub.Id.VerifySet(Called.Never);
 		Assert.Null(stub.Id.LastSetValue);
 
 		// Verify RecordSet method exists and works
 		stub.Id.RecordSet("test-value");
-		stub.Id.VerifySet(Times.Once);
+		stub.Id.VerifySet(Called.Once);
 		Assert.Equal("test-value", stub.Id.LastSetValue);
 	}
 }
@@ -307,7 +307,7 @@ public class InitPropertyInlineStubTests
 		_ = entity.Id;
 
 		// Assert
-		stub.Id.VerifyGet(Times.Exactly(2));
+		stub.Id.VerifyGet(Called.Exactly(2));
 	}
 
 	/// <summary>
@@ -331,12 +331,12 @@ public class InitPropertyInlineStubTests
 
 		// Assert - interceptor should have SetCount and LastSetValue fields
 		// These compile-time checks verify the interceptor structure
-		stub.Id.VerifySet(Times.Never);
+		stub.Id.VerifySet(Called.Never);
 		Assert.Null(stub.Id.LastSetValue);
 
 		// Verify RecordSet method exists and works
 		stub.Id.RecordSet("test-value");
-		stub.Id.VerifySet(Times.Once);
+		stub.Id.VerifySet(Called.Once);
 		Assert.Equal("test-value", stub.Id.LastSetValue);
 	}
 
@@ -352,7 +352,7 @@ public class InitPropertyInlineStubTests
 		stub.Id.RecordSet("third");
 
 		// Assert
-		stub.Id.VerifySet(Times.Exactly(3));
+		stub.Id.VerifySet(Called.Exactly(3));
 		Assert.Equal("third", stub.Id.LastSetValue);
 	}
 
@@ -362,13 +362,13 @@ public class InitPropertyInlineStubTests
 		// Arrange
 		var stub = new InitPropertyInlineTests.Stubs.IEntityWithInitProperty();
 		stub.Id.RecordSet("some-value");
-		stub.Id.VerifySet(Times.Once);
+		stub.Id.VerifySet(Called.Once);
 
 		// Act
 		stub.Id.Reset();
 
 		// Assert
-		stub.Id.VerifySet(Times.Never);
+		stub.Id.VerifySet(Called.Never);
 		Assert.Null(stub.Id.LastSetValue);
 	}
 
@@ -382,7 +382,7 @@ public class InitPropertyInlineStubTests
 		stub.Object.Title = "test-title";
 
 		// Assert - regular setter should track SetCount
-		stub.Title.VerifySet(Times.Once);
+		stub.Title.VerifySet(Called.Once);
 		Assert.Equal("test-title", stub.Title.LastSetValue);
 	}
 }
@@ -492,7 +492,7 @@ public class ClassInitPropertyStubTests
 		_ = stub.Object.Id;
 
 		// Assert
-		stub.Id.VerifyGet(Times.Exactly(2));
+		stub.Id.VerifyGet(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -561,7 +561,7 @@ public class ClassInitPropertyStubTests
 
 		// Assert
 		Assert.Equal("new-name", stub.Object.Name);
-		stub.Name.VerifySet(Times.Once);
+		stub.Name.VerifySet(Called.Once);
 	}
 }
 
@@ -608,7 +608,7 @@ public class ClassRequiredPropertyStubTests
 
 		// Assert
 		Assert.Equal("set-after-construction", stub.Object.Id);
-		stub.Id.VerifySet(Times.Once);
+		stub.Id.VerifySet(Called.Once);
 	}
 
 	[Fact]
@@ -663,10 +663,10 @@ public class ClassRequiredPropertyStubTests
 		stub.Object.Version = 1;
 
 		// Assert
-		stub.Id.VerifyGet(Times.Once);
-		stub.Name.VerifyGet(Times.Exactly(2));
-		stub.Name.VerifySet(Times.Once);
-		stub.Version.VerifySet(Times.Once);
+		stub.Id.VerifyGet(Called.Once);
+		stub.Name.VerifyGet(Called.Exactly(2));
+		stub.Name.VerifySet(Called.Once);
+		stub.Version.VerifySet(Called.Once);
 	}
 
 	[Fact]
@@ -681,7 +681,7 @@ public class ClassRequiredPropertyStubTests
 		stub.Id.Reset();
 
 		// Assert - Reset() clears tracking but preserves configuration (Get callback)
-		stub.Id.VerifyGet(Times.Never);
+		stub.Id.VerifyGet(Called.Never);
 		// Get callback is preserved - verify by calling getter again
 		Assert.Equal("test", stub.Object.Id);
 	}

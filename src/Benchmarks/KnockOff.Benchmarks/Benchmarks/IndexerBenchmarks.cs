@@ -113,7 +113,7 @@ public class IndexerVerificationBenchmarks
     {
         try
         {
-            _knockOffStub.Indexer.OfString.VerifyGet(Times.AtLeastOnce);
+            _knockOffStub.Indexer.OfString.VerifyGet(Called.AtLeastOnce);
             return _knockOffStub.Indexer.OfString.LastGetKey == "key";
         }
         catch (VerificationException)

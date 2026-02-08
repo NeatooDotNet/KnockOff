@@ -16,7 +16,7 @@ public class GenericMethodTests
 		service.Create<TestEntity>();
 		service.Create<TestEntity>();
 
-		knockOff.Create.Of<TestEntity>().Verify(Times.Exactly(2));
+		knockOff.Create.Of<TestEntity>().Verify(Called.Exactly(2));
 		knockOff.Create.Of<TestEntity>().Verify();
 	}
 
@@ -30,8 +30,8 @@ public class GenericMethodTests
 		service.Create<List<int>>();
 		service.Create<List<int>>();
 
-		knockOff.Create.Of<TestEntity>().Verify(Times.Once);
-		knockOff.Create.Of<List<int>>().Verify(Times.Exactly(2));
+		knockOff.Create.Of<TestEntity>().Verify(Called.Once);
+		knockOff.Create.Of<List<int>>().Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -44,8 +44,8 @@ public class GenericMethodTests
 		service.Process(42);
 		service.Process(42);
 
-		knockOff.Process.Of<string>().Verify(Times.Once);
-		knockOff.Process.Of<int>().Verify(Times.Exactly(2));
+		knockOff.Process.Of<string>().Verify(Called.Once);
+		knockOff.Process.Of<int>().Verify(Called.Exactly(2));
 	}
 
 	#endregion
@@ -62,7 +62,7 @@ public class GenericMethodTests
 		service.Create<List<int>>();
 		service.Create<List<string>>();
 
-		knockOff.Create.Verify(Times.Exactly(3));
+		knockOff.Create.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -71,7 +71,7 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 		IGenericMethodService service = knockOff;
 
-		knockOff.Create.Verify(Times.Never);
+		knockOff.Create.Verify(Called.Never);
 
 		service.Create<TestEntity>();
 
@@ -183,7 +183,7 @@ public class GenericMethodTests
 		service.Find<User>(2);
 		service.Find<User>(3);
 
-		knockOff.Find.Of<User>().Verify(Times.Exactly(3));
+		knockOff.Find.Of<User>().Verify(Called.Exactly(3));
 		Assert.Equal(3, knockOff.Find.Of<User>().LastArg); // Last call was Find<User>(3)
 	}
 
@@ -255,8 +255,8 @@ public class GenericMethodTests
 		service.Convert<string, int>("hello");
 		service.Convert<int, string>(42);
 
-		knockOff.Convert.Of<string, int>().Verify(Times.Once);
-		knockOff.Convert.Of<int, string>().Verify(Times.Once);
+		knockOff.Convert.Of<string, int>().Verify(Called.Once);
+		knockOff.Convert.Of<int, string>().Verify(Called.Once);
 	}
 
 	[Fact]
@@ -285,7 +285,7 @@ public class GenericMethodTests
 		service.Convert<string, int>("b");
 		service.Convert<int, string>(1);
 
-		knockOff.Convert.Verify(Times.Exactly(3));
+		knockOff.Convert.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -335,7 +335,7 @@ public class GenericMethodTests
 
 		service.CreateEntity<TestEntityWithInterface>();
 
-		knockOff.CreateEntity.Of<TestEntityWithInterface>().Verify(Times.Once);
+		knockOff.CreateEntity.Of<TestEntityWithInterface>().Verify(Called.Once);
 	}
 
 	[Fact]
@@ -361,7 +361,7 @@ public class GenericMethodTests
 		var entity = new TestEntityWithInterface { Id = 1 };
 		service.SaveEntity(entity);
 
-		knockOff.SaveEntity.Of<TestEntityWithInterface>().Verify(Times.Once);
+		knockOff.SaveEntity.Of<TestEntityWithInterface>().Verify(Called.Once);
 	}
 
 	[Fact]
@@ -409,8 +409,8 @@ public class GenericMethodTests
 
 		knockOff.Create.Of<TestEntity>().Reset();
 
-		knockOff.Create.Of<TestEntity>().Verify(Times.Never);
-		knockOff.Create.Of<TestEntity>().Verify(Times.Never);
+		knockOff.Create.Of<TestEntity>().Verify(Called.Never);
+		knockOff.Create.Of<TestEntity>().Verify(Called.Never);
 		// OnCall is now a method, callback state is internal
 	}
 
@@ -425,8 +425,8 @@ public class GenericMethodTests
 
 		knockOff.Create.Reset();
 
-		knockOff.Create.Verify(Times.Never);
-		knockOff.Create.Verify(Times.Never);
+		knockOff.Create.Verify(Called.Never);
+		knockOff.Create.Verify(Called.Never);
 		Assert.Empty(knockOff.Create.CalledTypeArguments);
 	}
 
@@ -441,7 +441,7 @@ public class GenericMethodTests
 
 		knockOff.Deserialize.Of<TestEntity>().Reset();
 
-		knockOff.Deserialize.Of<TestEntity>().Verify(Times.Never);
+		knockOff.Deserialize.Of<TestEntity>().Verify(Called.Never);
 		Assert.Null(knockOff.Deserialize.Of<TestEntity>().LastArg);
 	}
 
@@ -455,8 +455,8 @@ public class GenericMethodTests
 		var knockOff = new GenericMethodServiceKnockOff();
 
 		// Accessing Of<T>() without calling should have zero count
-		knockOff.Create.Of<TestEntity>().Verify(Times.Never);
-		knockOff.Create.Of<TestEntity>().Verify(Times.Never);
+		knockOff.Create.Of<TestEntity>().Verify(Called.Never);
+		knockOff.Create.Of<TestEntity>().Verify(Called.Never);
 	}
 
 	[Fact]
@@ -472,8 +472,8 @@ public class GenericMethodTests
 	{
 		var knockOff = new GenericMethodServiceKnockOff();
 
-		knockOff.Create.Verify(Times.Never);
-		knockOff.Create.Verify(Times.Never);
+		knockOff.Create.Verify(Called.Never);
+		knockOff.Create.Verify(Called.Never);
 	}
 
 	#endregion

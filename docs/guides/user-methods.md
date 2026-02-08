@@ -81,7 +81,7 @@ This provides compile-time safety: if you typo the method name or get the signat
 var user = repository.GetUserById(1);
 
 // Verify the call was tracked
-stub.GetUserById.Verify(Times.Once);
+stub.GetUserById.Verify(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -139,7 +139,7 @@ stub.IsActive.Return(false);
 repository.IsActive(42);
 
 // Tracking works whether using Return or user method
-stub.IsActive.Verify(Times.Once);
+stub.IsActive.Verify(Called.Once);
 Assert.Equal(42, stub.IsActive.LastArg);
 ```
 <!-- endSnippet -->
@@ -156,7 +156,7 @@ Call `Reset()` to clear call count and argument tracking. The `Return`/`Call` co
 ```cs
 // Reset clears tracking state but preserves Return configuration
 stub.GetBalance.Reset();
-stub.GetBalance.Verify(Times.Never);
+stub.GetBalance.Verify(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -216,7 +216,7 @@ This pattern keeps test code DRY while maintaining flexibility for edge cases.
 ```cs
 // User method provides default; Return can override
 var user = repository.GetUserById(42);
-stub.GetUserById.Verify(Times.Once);
+stub.GetUserById.Verify(Called.Once);
 
 // Override for next call
 stub.GetUserById.Return(id => new User { Id = id, Name = "Custom" });

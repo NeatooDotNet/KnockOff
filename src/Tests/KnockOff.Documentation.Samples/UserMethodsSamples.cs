@@ -78,7 +78,7 @@ public class UserMethodFallbackTests
         var user = repository.GetUserById(1);
 
         // Verify the call was tracked
-        stub.GetUserById.Verify(Times.Once);
+        stub.GetUserById.Verify(Called.Once);
         #endregion
 
         Assert.NotNull(user);
@@ -107,7 +107,7 @@ public class UserMethodReturnTests
         Assert.Equal("Overridden", user!.Name);
         #endregion
 
-        stub.GetUserById.Verify(Times.Once);
+        stub.GetUserById.Verify(Called.Once);
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public class UserMethodVerificationTests
         repository.IsActive(42);
 
         // Tracking works whether using Return or user method
-        stub.IsActive.Verify(Times.Once);
+        stub.IsActive.Verify(Called.Once);
         Assert.Equal(42, stub.IsActive.LastArg);
         #endregion
     }
@@ -185,18 +185,18 @@ public class UserMethodResetTests
 
         stub.GetBalance.Return(999.99m);
         repository.GetBalance(1);
-        stub.GetBalance.Verify(Times.Once);
+        stub.GetBalance.Verify(Called.Once);
 
         #region user-methods-reset
         // Reset clears tracking state but preserves Return configuration
         stub.GetBalance.Reset();
-        stub.GetBalance.Verify(Times.Never);
+        stub.GetBalance.Verify(Called.Never);
         #endregion
 
         // Return configuration is preserved after reset
         var balance = repository.GetBalance(2);
         Assert.Equal(999.99m, balance);
-        stub.GetBalance.Verify(Times.Once);
+        stub.GetBalance.Verify(Called.Once);
     }
 }
 
@@ -319,7 +319,7 @@ public class UserMethodInterceptorApiExampleTests
         var user2 = repo.GetById(2);  // Returns "Override"
 
         // Full tracking works - counts all calls regardless of configuration
-        stub.GetById.Verify(Times.Exactly(2));
+        stub.GetById.Verify(Called.Exactly(2));
         Assert.Equal(2, stub.GetById.LastArg);
 
         // Returns for constant values (auto-wraps for async)
@@ -365,7 +365,7 @@ public class UserMethodStandalonePatternTests
         stub.GetById.Return(id => new User { Id = id });
         repo.GetById(42);
 
-        stub.GetById.Verify(Times.Once);
+        stub.GetById.Verify(Called.Once);
         Assert.Equal(42, stub.GetById.LastArg);
         #endregion
     }
@@ -379,10 +379,10 @@ public class UserMethodStandalonePatternTests
         #region user-methods-reset-preserves-oncall
         stub.GetById.Return(id => new User { Id = id });
         repo.GetById(1);
-        stub.GetById.Verify(Times.Once);
+        stub.GetById.Verify(Called.Once);
 
         stub.GetById.Reset();
-        stub.GetById.Verify(Times.Never);  // Tracking cleared
+        stub.GetById.Verify(Called.Never);  // Tracking cleared
 
         repo.GetById(2);  // Still uses Return callback (not reset to user method)
         #endregion
@@ -478,7 +478,7 @@ public class CompleteUserMethodExampleTests
         #region user-methods-complete-example
         // User method provides default; Return can override
         var user = repository.GetUserById(42);
-        stub.GetUserById.Verify(Times.Once);
+        stub.GetUserById.Verify(Called.Once);
 
         // Override for next call
         stub.GetUserById.Return(id => new User { Id = id, Name = "Custom" });
@@ -500,7 +500,7 @@ public class CompleteUserMethodExampleTests
         repository.GetUserById(2);
         repository.GetUserById(3);
 
-        stub.GetUserById.Verify(Times.Exactly(3));
+        stub.GetUserById.Verify(Called.Exactly(3));
         Assert.Equal(3, stub.GetUserById.LastArg);
     }
 }

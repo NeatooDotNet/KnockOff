@@ -154,7 +154,7 @@ public class VoidUserMethodFallbackTests
 
         // OnCall works regardless of the user method detection bug
         Assert.True(captured);
-        stub.SaveOrder.Verify(Times.Once);
+        stub.SaveOrder.Verify(Called.Once);
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class VoidUserMethodFallbackTests
 
         // OnCall works regardless of the user method detection bug
         Assert.Equal("Custom: 99", result);
-        stub.FormatOrder.Verify(Times.Once);
+        stub.FormatOrder.Verify(Called.Once);
     }
 
     // =========================================================================
@@ -190,7 +190,7 @@ public class VoidUserMethodFallbackTests
         service.SaveOrder(new Order { Id = 2 });
 
         // Tracking works even though user method fallback is broken
-        stub.SaveOrder.Verify(Times.Exactly(2));
+        stub.SaveOrder.Verify(Called.Exactly(2));
     }
 
     // =========================================================================

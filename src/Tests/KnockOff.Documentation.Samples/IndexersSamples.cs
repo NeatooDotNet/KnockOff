@@ -222,8 +222,8 @@ public class VerificationSamples
 
         #region indexers-verify-access
         // Verify indexer get/set call counts
-        stub.Indexer.VerifyGet(Times.Exactly(2));
-        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Exactly(2));
+        stub.Indexer.VerifySet(Called.Once);
         #endregion
     }
 
@@ -320,8 +320,8 @@ public class MultipleOverloadsSamples
         Assert.Equal("Alice", store["name"]);
         Assert.Equal(100, store[0]);
 
-        stub.Indexer.OfString.VerifyGet(Times.Once);
-        stub.Indexer.OfInt32.VerifyGet(Times.Once);
+        stub.Indexer.OfString.VerifyGet(Called.Once);
+        stub.Indexer.OfInt32.VerifyGet(Called.Once);
     }
 }
 
@@ -392,16 +392,16 @@ public class ResetSamples
         _ = config["ApiKey"];
         config["NewKey"] = "value";
 
-        stub.Indexer.VerifyGet(Times.Once);
-        stub.Indexer.VerifySet(Times.Once);
+        stub.Indexer.VerifyGet(Called.Once);
+        stub.Indexer.VerifySet(Called.Once);
 
         #region indexers-reset
         // Reset clears tracking but preserves Backing and callbacks
         stub.Indexer.Reset();
         #endregion
 
-        stub.Indexer.VerifyGet(Times.Never);
-        stub.Indexer.VerifySet(Times.Never);
+        stub.Indexer.VerifyGet(Called.Never);
+        stub.Indexer.VerifySet(Called.Never);
         Assert.Null(stub.Indexer.LastGetKey);
         Assert.Null(stub.Indexer.LastSetEntry);
 
@@ -445,17 +445,17 @@ public class CompleteExampleTests
 
         Assert.Null(cache[404]);
 
-        stub.Indexer.VerifyGet(Times.AtLeast(3));
+        stub.Indexer.VerifyGet(Called.AtLeast(3));
         Assert.Equal(404, stub.Indexer.LastGetKey);
 
         cache[3] = new User { Id = 3, Name = "Charlie" };
         cache[4] = new User { Id = 4, Name = "Diana" };
 
         Assert.Equal(2, cacheUpdates.Count);
-        stub.Indexer.VerifySet(Times.Exactly(2));
+        stub.Indexer.VerifySet(Called.Exactly(2));
 
         stub.Indexer.Reset();
-        stub.Indexer.VerifyGet(Times.Never);
-        stub.Indexer.VerifySet(Times.Never);
+        stub.Indexer.VerifyGet(Called.Never);
+        stub.Indexer.VerifySet(Called.Never);
     }
 }

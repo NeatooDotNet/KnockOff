@@ -483,7 +483,7 @@ ValidationRule rule = ruleStub;
 - **Invocation tracking**: Use `Verify()`, `LastArg`, `LastArgs`
 - **Behavior configuration**: Use `Return`, `Call`, sequences, and When chains
 - **Async auto-wrapping**: `Return(42)` auto-wraps for `Task<int>` delegates
-- **Verification**: Use `Verify()`, `Times` constraints, and `Verifiable()` chaining
+- **Verification**: Use `Verify()`, `Called` constraints, and `Verifiable()` chaining
 - **Strict mode**: `stub.Strict = true` throws on unconfigured invocations
 
 ### Trade-offs

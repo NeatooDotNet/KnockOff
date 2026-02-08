@@ -350,7 +350,7 @@ public class MethodsVerifyCountKnockOffTests
         calc.Add(3, 4);
         calc.Add(5, 6);
 
-        stub.Add.Verify(Times.Exactly(3));
+        stub.Add.Verify(Called.Exactly(3));
     }
 }
 
@@ -617,7 +617,7 @@ public class PropertiesVerifyCountKnockOffTests
         _ = calc.Mode;
         _ = calc.Mode;
 
-        stub.Mode.VerifyGet(Times.Exactly(3));
+        stub.Mode.VerifyGet(Called.Exactly(3));
     }
 }
 
@@ -707,7 +707,7 @@ public class EventsVerifySubscriptionKnockOffTests
         ICalculator calc = stub;
         calc.PoweringUp += (sender, args) => { };
 
-        stub.PoweringUp.VerifyAdd(Times.Once);
+        stub.PoweringUp.VerifyAdd(Called.Once);
     }
 
     [Fact]
@@ -720,7 +720,7 @@ public class EventsVerifySubscriptionKnockOffTests
         calc.PoweringUp += handler;
         calc.PoweringUp -= handler;
 
-        stub.PoweringUp.VerifyRemove(Times.Once);
+        stub.PoweringUp.VerifyRemove(Called.Once);
     }
 
     [Fact]

@@ -43,7 +43,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Verifiable(Times.Exactly(2));
+        stub.GetValue.Verifiable(Called.Exactly(2));
 
         // Act - Call exactly twice
         IStrictModeUserMethodTest service = stub;
@@ -59,7 +59,7 @@ public class UserMethodVerificationTests
     {
         // Arrange
         var stub = new StrictModeUserMethodStub();
-        stub.GetValue.Verifiable(Times.Exactly(2));
+        stub.GetValue.Verifiable(Called.Exactly(2));
 
         // Act - Call only once (expected 2)
         IStrictModeUserMethodTest service = stub;
@@ -252,7 +252,7 @@ public class UserMethodVerificationTests
 
         // Assert - Individual Verify() on the interceptor should work
         stub.GetValue.Verify(); // Should not throw
-        stub.GetValue.Verify(Times.Once);
+        stub.GetValue.Verify(Called.Once);
     }
 
     [Fact]

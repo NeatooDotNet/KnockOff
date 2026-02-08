@@ -272,7 +272,7 @@ public partial class RefOutDemo
         service.TryGetValue("key1", out _);
         service.TryGetValue("key2", out _);
 
-        stub.TryGetValue.Verify(Times.Exactly(2));
+        stub.TryGetValue.Verify(Called.Exactly(2));
     }
 
     // =========================================================================

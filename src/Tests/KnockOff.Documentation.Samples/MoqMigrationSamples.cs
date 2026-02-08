@@ -286,7 +286,7 @@ public class VerificationCombinedSamples
         var stub2 = new MoqUserRepoStub();
         var tracking = stub2.SaveUser.Call((user) => { });
         ((IMoqUserRepo)stub2).SaveUser(new User { Name = "Bob" });
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
         #endregion
     }
 }
@@ -707,7 +707,7 @@ public class CompleteKnockOffTests
         Assert.NotNull(savedUser);
         Assert.Equal("Bob", savedUser?.Name);
         // Or verify with Times constraint on tracking object
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
     }
 }
 
@@ -952,11 +952,11 @@ public class TimesMatcherTests
         mock.Verify(x => x.SaveUser(It.IsAny<User>()), Moq.Times.Exactly(3));
 
         // KnockOff
-        stub.SaveUser.Verify(Times.Exactly(3));
+        stub.SaveUser.Verify(Called.Exactly(3));
 
-        // For range verification (no Times.Between in KnockOff):
-        stub.SaveUser.Verify(Times.AtLeast(1));
-        stub.SaveUser.Verify(Times.AtMost(5));
+        // For range verification (no Called.Between in KnockOff):
+        stub.SaveUser.Verify(Called.AtLeast(1));
+        stub.SaveUser.Verify(Called.AtMost(5));
         #endregion
     }
 }

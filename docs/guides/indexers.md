@@ -131,8 +131,8 @@ Indexer interceptors support verification and tracking similar to properties and
 <!-- snippet: indexers-verify-access -->
 ```cs
 // Verify indexer get/set call counts
-stub.Indexer.VerifyGet(Times.Exactly(2));
-stub.Indexer.VerifySet(Times.Once);
+stub.Indexer.VerifyGet(Called.Exactly(2));
+stub.Indexer.VerifySet(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -150,8 +150,8 @@ Assert.Equal("60", stub.Indexer.LastSetEntry.Value.Value);
 <!-- endSnippet -->
 
 **Verification methods:**
-- `VerifyGet(Times)` - Verify indexer getter was called specified number of times
-- `VerifySet(Times)` - Verify indexer setter was called specified number of times
+- `VerifyGet(Called)` - Verify indexer getter was called specified number of times
+- `VerifySet(Called)` - Verify indexer setter was called specified number of times
 
 **Inspection properties:**
 - `LastGetKey` - The key from the most recent getter call (null if never accessed)
@@ -290,7 +290,7 @@ Choose your configuration approach based on the test scenario:
 | Track all writes to indexer | `Set` | `stub.Store.Set((k, v) => log.Add((k, v)));` |
 | Simulate validation in indexer | `Set` | `stub.Config.Set((k, v) => Validate(k));` |
 | Indexer validation changes per write | `Set().ThenSet()` | `stub.Db.Set((k, v) => Fail()).ThenSet((k, v) => Ok());` |
-| Verify indexer was accessed | Verification | `stub.Indexer.VerifyGet(Times.Once);` |
+| Verify indexer was accessed | Verification | `stub.Indexer.VerifyGet(Called.Once);` |
 | Verify last key written | Verification | `Assert.Equal(42, stub.Indexer.LastGetKey);` |
 
 ---

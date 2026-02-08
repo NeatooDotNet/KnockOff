@@ -41,7 +41,7 @@ stub.GetData.Return("test-value");
 stub.GetData.Return((id) => $"Data-{id}");
 
 // Verify calls
-stub.GetData.Verify(Times.Never);
+stub.GetData.Verify(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -49,7 +49,7 @@ stub.GetData.Verify(Times.Never);
 |---------|:--------------:|
 | `Return(value)` | ✓ |
 | `Return((args) => result)` / `Call((args) => { })` | ✓ |
-| `Verify(Times.X)` | ✓ |
+| `Verify(Called.X)` | ✓ |
 | `LastArg` / `LastArgs` | ✓ |
 
 ---
@@ -67,8 +67,8 @@ stub.Name.Get("test-name");
 stub.Name.Set((value) => { /* capture or validate */ });
 
 // Verify
-stub.Name.VerifyGet(Times.Never);
-stub.Name.VerifySet(Times.Never);
+stub.Name.VerifyGet(Called.Never);
+stub.Name.VerifySet(Called.Never);
 
 // Access history
 // var lastSet = stub.Name.LastSetValue;
@@ -79,8 +79,8 @@ stub.Name.VerifySet(Times.Never);
 |---------|:--------------:|
 | `Get(value)` | ✓ |
 | `Set((v) => { })` | ✓ |
-| `VerifyGet(Times.X)` | ✓ |
-| `VerifySet(Times.X)` | ✓ |
+| `VerifyGet(Called.X)` | ✓ |
+| `VerifySet(Called.X)` | ✓ |
 | `LastSetValue` | ✓ |
 
 ---
@@ -101,8 +101,8 @@ stub.Indexer.Set((key, value) => { });
 stub.Indexer.Backing["preloaded"] = "data";
 
 // Verify
-stub.Indexer.VerifyGet(Times.Never);
-stub.Indexer.VerifySet(Times.Never);
+stub.Indexer.VerifyGet(Called.Never);
+stub.Indexer.VerifySet(Called.Never);
 
 // Access history
 // var lastKey = stub.Indexer.LastGetKey;
@@ -133,8 +133,8 @@ stub.DataReceived.Raise(stub, new DataEventArgs { Data = "test" });
 bool hasSubscribers = stub.DataReceived.HasSubscribers;
 
 // Verify add/remove
-stub.DataReceived.VerifyAdd(Times.Never);
-stub.DataReceived.VerifyRemove(Times.Never);
+stub.DataReceived.VerifyAdd(Called.Never);
+stub.DataReceived.VerifyRemove(Called.Never);
 ```
 <!-- endSnippet -->
 
@@ -142,8 +142,8 @@ stub.DataReceived.VerifyRemove(Times.Never);
 |---------|:--------------:|
 | `Raise(sender, args)` | ✓ |
 | `HasSubscribers` | ✓ |
-| `VerifyAdd(Times.X)` | ✓ |
-| `VerifyRemove(Times.X)` | ✓ |
+| `VerifyAdd(Called.X)` | ✓ |
+| `VerifyRemove(Called.X)` | ✓ |
 
 **Note:** All patterns use clean event names (e.g., `stub.DataReceived`). This is consistent across standalone, inline, and class stubs.
 
@@ -221,7 +221,7 @@ stub.GetData.Return((id) => "data").Verifiable();
 // stub.VerifyAll();  // Throws if any configured member not called
 
 // Individual member verification
-// stub.GetData.Verify(Times.Once);
+// stub.GetData.Verify(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -230,7 +230,7 @@ stub.GetData.Return((id) => "data").Verifiable();
 | `.Verifiable()` | ✓ |
 | `stub.Verify()` | ✓ |
 | `stub.VerifyAll()` | ✓ |
-| `Times.Once/Never/Exactly/AtLeast/AtMost` | ✓ |
+| `Called.Once/Never/Exactly/AtLeast/AtMost` | ✓ |
 
 ---
 
@@ -421,7 +421,7 @@ var result = calc.Add(3, 4);
 Assert.Equal(7, result);
 
 // Verification - same API across all patterns
-calcStub.Add.Verify(Times.Once);
+calcStub.Add.Verify(Called.Once);
 Assert.Equal((3, 4), calcStub.Add.LastArgs);
 ```
 <!-- endSnippet -->

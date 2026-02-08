@@ -103,7 +103,7 @@ public class DelegateStubTests
         action();
 
         Assert.Equal(3, callCount);
-        stub.Interceptor.Verify(Times.Exactly(3));
+        stub.Interceptor.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class DelegateStubTests
         operation(1, 2);
         operation(3, 4);
 
-        stub.Interceptor.Verify(Times.Exactly(2));
+        stub.Interceptor.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -160,6 +160,6 @@ public class DelegateStubTests
         Assert.Equal(42, operation(3, 4));
 
         // But tracking reset
-        stub.Interceptor.Verify(Times.Once);
+        stub.Interceptor.Verify(Called.Once);
     }
 }

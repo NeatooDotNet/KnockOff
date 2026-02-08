@@ -127,12 +127,12 @@ public class ParamTypeSuffixTests
 		service.Process((nint)1);
 		service.Process((nuint)2);
 
-		tracking1.Verify(Times.Once);
-		tracking2.Verify(Times.Once);
-		tracking3.Verify(Times.Once);
-		tracking4.Verify(Times.Once);
-		tracking5.Verify(Times.Once);
-		tracking6.Verify(Times.Once);
+		tracking1.Verify(Called.Once);
+		tracking2.Verify(Called.Once);
+		tracking3.Verify(Called.Once);
+		tracking4.Verify(Called.Once);
+		tracking5.Verify(Called.Once);
+		tracking6.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -155,7 +155,7 @@ public class ParamTypeSuffixTests
 		service.Process((nint)1);
 		service.Process((nuint)2);
 
-		knockOff.Process.Verify(Times.Exactly(6));
+		knockOff.Process.Verify(Called.Exactly(6));
 	}
 
 	#endregion
@@ -273,12 +273,12 @@ public class ParamTypeSuffixTests
 		service.Process((nint)1);
 		service.Process((nuint)2);
 
-		tracking1.Verify(Times.Once);
-		tracking2.Verify(Times.Once);
-		tracking3.Verify(Times.Once);
-		tracking4.Verify(Times.Once);
-		tracking5.Verify(Times.Once);
-		tracking6.Verify(Times.Once);
+		tracking1.Verify(Called.Once);
+		tracking2.Verify(Called.Once);
+		tracking3.Verify(Called.Once);
+		tracking4.Verify(Called.Once);
+		tracking5.Verify(Called.Once);
+		tracking6.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -301,7 +301,7 @@ public class ParamTypeSuffixTests
 		service.Process((nint)1);
 		service.Process((nuint)2);
 
-		stub.Process.Verify(Times.Exactly(6));
+		stub.Process.Verify(Called.Exactly(6));
 	}
 
 	#endregion

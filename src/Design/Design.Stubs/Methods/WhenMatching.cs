@@ -6,7 +6,7 @@
 // - When(predicate).Return(value) for predicate matching
 // - ThenWhen() for chaining multiple matchers
 // - Void method variants with IVoidWhenChain
-// - When chain verification with Verify(Times)
+// - When chain verification with Verify(Called)
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Services;
@@ -270,7 +270,7 @@ public partial class WhenMatchingDemo
     //   {
     //       public IVoidWhenChain Call(Action callback) { ... }
     //       public IVoidWhenChain ThenWhen() { ... }
-    //       public void Verify(Times times) { ... }
+    //       public void Verify(Called called) { ... }
     //   }
     // =========================================================================
 
@@ -281,7 +281,7 @@ public partial class WhenMatchingDemo
     // =========================================================================
     // When Chain Verification (Void Methods Only)
     // =========================================================================
-    // DESIGN DECISION: Parameter-specific verification with Verify(Times) is
+    // DESIGN DECISION: Parameter-specific verification with Verify(Called) is
     // available on IVoidWhenChain (void methods) but not on IWhenChain
     // (return methods).
     //
@@ -291,7 +291,7 @@ public partial class WhenMatchingDemo
     //   // Later:
     //   stub.Verify();  // Checks all Verifiable() marked items
     //
-    // DID NOT DO THIS: Add Verify(Times) to IWhenChain for return methods
+    // DID NOT DO THIS: Add Verify(Called) to IWhenChain for return methods
     //
     // WHY NOT: The implementation complexity of tracking call counts per
     // When matcher for return methods was deferred. Batch verification via

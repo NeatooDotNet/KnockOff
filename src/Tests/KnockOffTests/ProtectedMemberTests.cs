@@ -43,7 +43,7 @@ public class ProtectedMemberTests
 		stub.Object.GetDescription();
 		stub.Object.GetDescription();
 
-		stub.GetInternalId.Verify(Times.Exactly(2));
+		stub.GetInternalId.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -92,7 +92,7 @@ public class ProtectedMemberTests
 
 		stub.Object.GetDescription(); // calls FormatLabel once
 
-		stub.FormatLabel.Verify(Times.Once);
+		stub.FormatLabel.Verify(Called.Once);
 	}
 
 	#endregion
@@ -132,7 +132,7 @@ public class ProtectedMemberTests
 		// GetDescription calls FormatLabel (base), which reads Label
 		stub.Object.GetDescription();
 
-		stub.Label.VerifyGet(Times.Once);
+		stub.Label.VerifyGet(Called.Once);
 	}
 
 	#endregion
@@ -168,7 +168,7 @@ public class ProtectedMemberTests
 
 		stub.Object.SetItemAt(0, "value");
 
-		stub.Indexer.VerifySet(Times.Once);
+		stub.Indexer.VerifySet(Called.Once);
 	}
 
 	[Fact]
@@ -194,7 +194,7 @@ public class ProtectedMemberTests
 		stub.Object.GetItemAt(1);
 		stub.Object.GetItemAt(2);
 
-		stub.Indexer.VerifyGet(Times.Exactly(3));
+		stub.Indexer.VerifyGet(Called.Exactly(3));
 	}
 
 	#endregion
@@ -232,8 +232,8 @@ public class ProtectedMemberTests
 		stub.Object.GetDescription();
 		stub.Object.GetDescription();
 
-		stub.GetInternalId.Verify(Times.Exactly(3));
-		stub.FormatLabel.Verify(Times.Exactly(3));
+		stub.GetInternalId.Verify(Called.Exactly(3));
+		stub.FormatLabel.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
@@ -244,7 +244,7 @@ public class ProtectedMemberTests
 		stub.Object.GetDescription(); // calls GetInternalId once
 
 		Assert.Throws<VerificationException>(() =>
-			stub.GetInternalId.Verify(Times.Exactly(2)));
+			stub.GetInternalId.Verify(Called.Exactly(2)));
 	}
 
 	[Fact]
@@ -332,11 +332,11 @@ public class ProtectedMemberTests
 		var tracking = stub.GetInternalId.Return(() => "id");
 
 		stub.Object.GetDescription();
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 
 		stub.GetInternalId.Reset();
 
-		tracking.Verify(Times.Never);
+		tracking.Verify(Called.Never);
 	}
 
 	[Fact]
@@ -351,10 +351,10 @@ public class ProtectedMemberTests
 
 		stub.ResetInterceptors();
 
-		stub.GetInternalId.Verify(Times.Never);
-		stub.FormatLabel.Verify(Times.Never);
-		stub.Indexer.VerifyGet(Times.Never);
-		stub.Indexer.VerifySet(Times.Never);
+		stub.GetInternalId.Verify(Called.Never);
+		stub.FormatLabel.Verify(Called.Never);
+		stub.Indexer.VerifyGet(Called.Never);
+		stub.Indexer.VerifySet(Called.Never);
 	}
 
 	#endregion
@@ -424,9 +424,9 @@ public class ProtectedMemberTests
 		stub.Object.GetItemAt(0);
 		stub.Object.GetItemAt(1);
 
-		stub.GetInternalId.Verify(Times.Once);
-		stub.FormatLabel.Verify(Times.Once);
-		stub.Indexer.VerifyGet(Times.Exactly(2));
+		stub.GetInternalId.Verify(Called.Once);
+		stub.FormatLabel.Verify(Called.Once);
+		stub.Indexer.VerifyGet(Called.Exactly(2));
 	}
 
 	#endregion

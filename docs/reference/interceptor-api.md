@@ -79,9 +79,9 @@ When a callback is configured, it is invoked instead of user-defined methods. Fo
 | Method | Description |
 |--------|-------------|
 | `Verify()` | Verify method was called at least once (throws if not) |
-| `Verify(Times)` | Verify method was called according to Times constraint |
+| `Verify(Called)` | Verify method was called according to Called constraint |
 | `Verifiable()` | Mark interceptor for batch verification with default constraint (AtLeastOnce) |
-| `Verifiable(Times)` | Mark interceptor for batch verification with specific Times constraint |
+| `Verifiable(Called)` | Mark interceptor for batch verification with specific Called constraint |
 
 ### Methods
 
@@ -130,13 +130,13 @@ Generated for interface properties. Tracks get/set operations, stores backing va
 | Method | Description |
 |--------|-------------|
 | `Verify()` | Verify property was accessed (get or set) at least once (throws if not) |
-| `Verify(Times)` | Verify total property access count (get + set) matches Times constraint |
+| `Verify(Called)` | Verify total property access count (get + set) matches Called constraint |
 | `VerifyGet()` | Verify property getter was called at least once (throws if not) |
-| `VerifyGet(Times)` | Verify property getter was called according to Times constraint |
+| `VerifyGet(Called)` | Verify property getter was called according to Called constraint |
 | `VerifySet()` | Verify property setter was called at least once (throws if not) |
-| `VerifySet(Times)` | Verify property setter was called according to Times constraint |
+| `VerifySet(Called)` | Verify property setter was called according to Called constraint |
 | `Verifiable()` | Mark property for batch verification with default constraint (AtLeastOnce). Returns this for fluent chaining. |
-| `Verifiable(Times)` | Mark property for batch verification with specific Times constraint. Returns this for fluent chaining. |
+| `Verifiable(Called)` | Mark property for batch verification with specific Called constraint. Returns this for fluent chaining. |
 
 **Note**: `Verifiable()` marks BOTH getter and setter. Use tracking object's `Verifiable()` to mark only getter or setter.
 
@@ -193,13 +193,13 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 | Method | Description |
 |--------|-------------|
 | `Verify()` | Verify indexer was accessed (get or set) at least once (throws if not) |
-| `Verify(Times)` | Verify total indexer access count (get + set) matches Times constraint |
+| `Verify(Called)` | Verify total indexer access count (get + set) matches Called constraint |
 | `VerifyGet()` | Verify indexer getter was called at least once (throws if not) |
-| `VerifyGet(Times)` | Verify indexer getter was called according to Times constraint |
+| `VerifyGet(Called)` | Verify indexer getter was called according to Called constraint |
 | `VerifySet()` | Verify indexer setter was called at least once (throws if not) |
-| `VerifySet(Times)` | Verify indexer setter was called according to Times constraint |
+| `VerifySet(Called)` | Verify indexer setter was called according to Called constraint |
 | `Verifiable()` | Mark indexer for batch verification with default constraint (AtLeastOnce). Returns this for fluent chaining. |
-| `Verifiable(Times)` | Mark indexer for batch verification with specific Times constraint. Returns this for fluent chaining. |
+| `Verifiable(Called)` | Mark indexer for batch verification with specific Called constraint. Returns this for fluent chaining. |
 
 ### Behavior Notes
 
@@ -246,11 +246,11 @@ Generated for interface events. Tracks add/remove operations, checks for subscri
 | Method | Description |
 |--------|-------------|
 | `Verify()` | Verify event was accessed (add or remove) at least once (throws if not) |
-| `Verify(Times)` | Verify total event access count (add + remove) matches Times constraint |
+| `Verify(Called)` | Verify total event access count (add + remove) matches Called constraint |
 | `VerifyAdd()` | Verify event was subscribed at least once (throws if not) |
-| `VerifyAdd(Times)` | Verify event was subscribed according to Times constraint |
+| `VerifyAdd(Called)` | Verify event was subscribed according to Called constraint |
 | `VerifyRemove()` | Verify event was unsubscribed at least once (throws if not) |
-| `VerifyRemove(Times)` | Verify event was unsubscribed according to Times constraint |
+| `VerifyRemove(Called)` | Verify event was unsubscribed according to Called constraint |
 
 ### Methods
 
@@ -274,7 +274,7 @@ Calling `Raise` invokes all subscribed handlers with the provided arguments.
 |--------|-------------|
 | `void Reset()` | Clears tracking state (add/remove counts) and removes all active subscribers. Does NOT reset verifiable marking. |
 | `TInterceptor Verifiable()` | Mark for batch verification with default constraint (AtLeastOnce). Returns this for fluent chaining. |
-| `TInterceptor Verifiable(Times)` | Mark for batch verification with specific Times constraint. Returns this for fluent chaining. |
+| `TInterceptor Verifiable(Called)` | Mark for batch verification with specific Called constraint. Returns this for fluent chaining. |
 
 **Note**: `Verifiable()` verifies the total access count (add + remove operations combined).
 
@@ -289,7 +289,7 @@ var hasSubscribers = stub.Changed.HasSubscribers;
 stub.Changed.Raise(repository, EventArgs.Empty);
 
 // VerifyAdd/VerifyRemove: check subscription counts
-stub.Changed.VerifyAdd(Times.Once);
+stub.Changed.VerifyAdd(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -337,9 +337,9 @@ The callback delegate type follows the same signature rules as non-generic metho
 | Method | Description |
 |--------|-------------|
 | `Verify()` | Verify method was called with these type arguments at least once (throws if not) |
-| `Verify(Times)` | Verify method was called with these type arguments according to Times constraint |
+| `Verify(Called)` | Verify method was called with these type arguments according to Called constraint |
 | `Verifiable()` | Mark interceptor for batch verification with default constraint (AtLeastOnce) |
-| `Verifiable(Times)` | Mark interceptor for batch verification with specific Times constraint |
+| `Verifiable(Called)` | Mark interceptor for batch verification with specific Called constraint |
 
 ### Methods
 
@@ -426,16 +426,16 @@ stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
 | `LastArg` | `T?` | Single-parameter delegates | The argument from the most recent invocation |
 | `LastArgs` | `(T1?, T2?, ...)?` | Multi-parameter delegates | Named tuple of arguments from the most recent invocation |
 
-Zero-parameter delegates have neither property — only call count tracking via `Verify(Times)`.
+Zero-parameter delegates have neither property — only call count tracking via `Verify(Called)`.
 
 ### Verification Methods
 
 | Method | Description |
 |--------|-------------|
 | `Verify()` | Verify delegate was invoked at least once (throws if not) |
-| `Verify(Times)` | Verify delegate was invoked according to Times constraint |
+| `Verify(Called)` | Verify delegate was invoked according to Called constraint |
 | `Verifiable()` | Mark interceptor for batch verification with default constraint (AtLeastOnce) |
-| `Verifiable(Times)` | Mark interceptor for batch verification with specific Times constraint |
+| `Verifiable(Called)` | Mark interceptor for batch verification with specific Called constraint |
 
 ### Sequence Building
 
@@ -540,7 +540,7 @@ chain.ThenWhen(1, 2).Return(100);
 | `ThenCall(TDelegate callback)` | `IWhenTracking` | Add unconditional terminal matcher that repeats forever. |
 | `ThenNone()` | `IWhenTracking` | Close chain - subsequent calls fall through to next configured behavior. |
 | `Verify()` | `void` | Verify chain reached terminal state. |
-| `Verify(Times)` | `void` | Verify chain reached terminal state according to Times constraint. |
+| `Verify(Called)` | `void` | Verify chain reached terminal state according to Called constraint. |
 | `Verifiable()` | `IWhenChain<TDelegate, TReturn>` | Mark for batch verification. Returns this for fluent chaining. |
 | `Reset()` | `void` | Reset chain to beginning, clear all matcher call counts. |
 
@@ -568,7 +568,7 @@ chain.Call((a, b) => called = true);
 | `ThenCall(TDelegate callback)` | `IWhenTracking` | Add unconditional terminal matcher that repeats forever. |
 | `ThenNone()` | `IWhenTracking` | Close chain - subsequent calls fall through to next configured behavior. |
 | `Verify()` | `void` | Verify chain reached terminal state. |
-| `Verify(Times)` | `void` | Verify specific matcher was called according to Times constraint (parameter-specific count). |
+| `Verify(Called)` | `void` | Verify specific matcher was called according to Called constraint (parameter-specific count). |
 | `Verifiable()` | `IVoidWhenChain<TDelegate>` | Mark for batch verification. Returns this for fluent chaining. |
 | `Reset()` | `void` | Reset chain to beginning, clear all matcher call counts. |
 
@@ -609,19 +609,19 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 
 ---
 
-## Times Constraints
+## Called Constraints
 
-All `Verify()` and `Verifiable()` methods accept an optional `Times` constraint. Common values:
+All `Verify()` and `Verifiable()` methods accept an optional `Called` constraint. Common values:
 
 | Constraint | Description |
 |-----------|-------------|
-| `Times.AtLeastOnce` | Called one or more times (default for `Verifiable()`) |
-| `Times.Once` | Called exactly once |
-| `Times.Twice` | Called exactly twice |
-| `Times.Never` | Never called |
-| `Times.Exactly(n)` | Called exactly n times |
-| `Times.AtLeast(n)` | Called n or more times |
-| `Times.AtMost(n)` | Called n or fewer times |
+| `Called.AtLeastOnce` | Called one or more times (default for `Verifiable()`) |
+| `Called.Once` | Called exactly once |
+| `Called.Twice` | Called exactly twice |
+| `Called.Never` | Never called |
+| `Called.Exactly(n)` | Called exactly n times |
+| `Called.AtLeast(n)` | Called n or more times |
+| `Called.AtMost(n)` | Called n or fewer times |
 
 See the [Verification Guide](../guides/verification.md) for detailed examples.
 
@@ -652,8 +652,8 @@ repo.GetById(42);
 Assert.Equal(42, getTracking.LastArg);
 
 // Both support verification
-stub.GetById.Verify(Times.Once);      // Interceptor verification
-getTracking.Verify(Times.Once);       // Tracking object verification
+stub.GetById.Verify(Called.Once);      // Interceptor verification
+getTracking.Verify(Called.Once);       // Tracking object verification
 ```
 <!-- endSnippet -->
 

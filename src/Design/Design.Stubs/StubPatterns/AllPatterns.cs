@@ -157,7 +157,7 @@ public partial class CalculatorStub : ICalculator
 //   IRepository<Product> productService = productRepo;
 //
 //   // Verify calls per-instance
-//   userRepo.GetById.Verify(Times.Once);
+//   userRepo.GetById.Verify(Called.Once);
 //
 // VS OPEN GENERIC PATTERN (PATTERN 6):
 //
@@ -341,7 +341,7 @@ public partial class StandaloneServiceStub
 //   RepositoryBase<Product> productService = productRepo.Object;
 //
 //   // Verify calls per-instance
-//   userRepo.GetById.Verify(Times.Once);
+//   userRepo.GetById.Verify(Called.Once);
 //
 // VS OPEN GENERIC CLASS PATTERN (PATTERN 9):
 //

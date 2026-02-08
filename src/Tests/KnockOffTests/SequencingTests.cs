@@ -59,7 +59,7 @@ public class SequencingTests
         Assert.Equal(7, svc.Add(3, 4));
         Assert.Equal(11, svc.Add(5, 6));
 
-        tracking.Verify(Times.Exactly(3));
+        tracking.Verify(Called.Exactly(3));
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class SequencingTests
         svc.DoWork();
 
         Assert.Equal(2, callCount);
-        tracking.Verify(Times.Exactly(2));
+        tracking.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -294,7 +294,7 @@ public class IndexerOfXxxTests
         var result = svc["key1"];
 
         Assert.Equal("value1", result);
-        stub.Indexer.OfString.VerifyGet(Times.Once);
+        stub.Indexer.OfString.VerifyGet(Called.Once);
         Assert.Equal("key1", stub.Indexer.OfString.LastGetKey);
     }
 
@@ -311,7 +311,7 @@ public class IndexerOfXxxTests
         Assert.Equal(100, svc[0]);
         Assert.Equal(200, svc[1]);
 
-        stub.Indexer.OfInt32.VerifyGet(Times.Exactly(2));
+        stub.Indexer.OfInt32.VerifyGet(Called.Exactly(2));
         Assert.Equal(1, stub.Indexer.OfInt32.LastGetKey);
     }
 
@@ -336,7 +336,7 @@ public class IndexerOfXxxTests
         svc["key1"] = "value1";
         svc["key2"] = "value2";
 
-        stub.Indexer.OfString.VerifySet(Times.Exactly(2));
+        stub.Indexer.OfString.VerifySet(Called.Exactly(2));
         Assert.Equal(("key2", "value2"), stub.Indexer.OfString.LastSetEntry);
     }
 
@@ -376,8 +376,8 @@ public class IndexerOfXxxTests
         Assert.Equal(42, svc[42]);
 
         // Verify tracking is independent
-        stub.Indexer.OfString.VerifyGet(Times.Once);
-        stub.Indexer.OfInt32.VerifyGet(Times.Once);
+        stub.Indexer.OfString.VerifyGet(Called.Once);
+        stub.Indexer.OfInt32.VerifyGet(Called.Once);
     }
 }
 
@@ -404,9 +404,9 @@ public class MethodOverloadTests
         Assert.Equal("world", svc.Format("world", false));
         Assert.Equal("hel", svc.Format("hello", 3));
 
-        tracking1.Verify(Times.Once);
-        tracking2.Verify(Times.Once);
-        tracking3.Verify(Times.Once);
+        tracking1.Verify(Called.Once);
+        tracking2.Verify(Called.Once);
+        tracking3.Verify(Called.Once);
     }
 
     [Fact]
@@ -423,10 +423,10 @@ public class MethodOverloadTests
         svc.Format("b");
         svc.Format("c", true);
 
-        tracking1.Verify(Times.Exactly(2));
+        tracking1.Verify(Called.Exactly(2));
         Assert.Equal("b", tracking1.LastArg);
 
-        tracking2.Verify(Times.Once);
+        tracking2.Verify(Called.Once);
         Assert.Equal(("c", true), tracking2.LastArgs);
     }
 }

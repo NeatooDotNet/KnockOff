@@ -231,12 +231,12 @@ public class ResetBehaviorTests
 
         _ = config.Host;
         _ = config.Host;
-        stub.Host.VerifyGet(Times.Exactly(2));
+        stub.Host.VerifyGet(Called.Exactly(2));
 
         #region troubleshoot-reset-value
         // Reset() clears tracking but preserves Get configuration
         stub.Host.Reset();
-        stub.Host.VerifyGet(Times.Never);  // Tracking cleared
+        stub.Host.VerifyGet(Called.Never);  // Tracking cleared
         Assert.Equal("configured-host", config.Host);  // Config preserved
         #endregion
     }
@@ -517,7 +517,7 @@ public class MultipleInterfaceTests
         bar.DoWork();
 
         // Verify tracks calls from both interfaces combined
-        stub.DoWork.Verify(Times.Exactly(2));
+        stub.DoWork.Verify(Called.Exactly(2));
     }
     #endregion
 }
@@ -549,8 +549,8 @@ public class PropertySetterTests
         readWriteConfig.Version = "3.0.0";
 
         // Can verify both get and set
-        readWriteStub.Version.VerifyGet(Times.Once);
-        readWriteStub.Version.VerifySet(Times.Once);
+        readWriteStub.Version.VerifyGet(Called.Once);
+        readWriteStub.Version.VerifySet(Called.Once);
     }
     #endregion
 }
@@ -613,7 +613,7 @@ public partial class CalcDelegateTests
 
         CalcOperation op = delegateStub;
         Assert.Equal(42, op(1, 2));
-        delegateStub.Interceptor.Verify(Times.Once);
+        delegateStub.Interceptor.Verify(Called.Once);
     }
 
     [Fact]

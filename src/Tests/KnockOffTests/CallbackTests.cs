@@ -36,7 +36,7 @@ public class CallbackTests
 		// User method returns input * 2
 		Assert.Equal(10, result);
 		Assert.Equal(5, knockOff.GetValue.LastArg);
-		knockOff.GetValue.Verify(Times.Once);
+		knockOff.GetValue.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -89,7 +89,7 @@ public class CallbackTests
 		var result = service.Name;
 
 		Assert.Equal("FromCallback", result);
-		knockOff.Name.VerifyGet(Times.Once);
+		knockOff.Name.VerifyGet(Called.Once);
 	}
 
 	[Fact]
@@ -107,7 +107,7 @@ public class CallbackTests
 		service.Name = "TestValue";
 
 		Assert.Equal("TestValue", capturedValue);
-		knockOff.Name.VerifySet(Times.Once);
+		knockOff.Name.VerifySet(Called.Once);
 
 		// Since Set was used (without Get), getter returns default
 		var storedValue = service.Name;
@@ -126,16 +126,16 @@ public class CallbackTests
 
 		var resultBefore = service.GetOptional();
 		Assert.Equal("callback value", resultBefore);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 
 		knockOff.GetOptional.Reset();
 
 		// After reset, tracking state is cleared but callback still works
-		tracking.Verify(Times.Never);
+		tracking.Verify(Called.Never);
 
 		var resultAfter = service.GetOptional();
 		Assert.Equal("callback value", resultAfter);
-		tracking.Verify(Times.Once); // Called once more after reset
+		tracking.Verify(Called.Once); // Called once more after reset
 	}
 
 	[Fact]
@@ -183,6 +183,6 @@ public class CallbackTests
 		var result = entity.Id;
 
 		Assert.Equal(999, result);
-		knockOff.Id.VerifyGet(Times.Once);
+		knockOff.Id.VerifyGet(Called.Once);
 	}
 }

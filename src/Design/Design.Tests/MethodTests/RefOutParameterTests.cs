@@ -261,7 +261,7 @@ public class RefOutParameterTests
         service.TryGetValue("key1", out _);
         service.TryGetValue("key2", out _);
 
-        stub.TryGetValue.Verify(Times.Exactly(2));
+        stub.TryGetValue.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -279,7 +279,7 @@ public class RefOutParameterTests
         service.TryGetValue("key1", out _);
 
         Assert.Throws<VerificationException>(() =>
-            stub.TryGetValue.Verify(Times.Exactly(2)));
+            stub.TryGetValue.Verify(Called.Exactly(2)));
     }
 
     // =========================================================================

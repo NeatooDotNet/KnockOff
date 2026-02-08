@@ -109,7 +109,7 @@ public class VerifyTypedCallsTests
 
         #region generic-verify-typed
         // Verify calls for specific type using Times
-        tracking.Verify(Times.Exactly(2));
+        tracking.Verify(Called.Exactly(2));
         #endregion
         Assert.Equal(2, stub.GetById.Of<User>().LastArg);
     }
@@ -133,8 +133,8 @@ public class VerifyAggregateCallsTests
 
         #region generic-verify-aggregate
         // Verify each type was called independently
-        userTracking.Verify(Times.Exactly(2));
-        orderTracking.Verify(Times.Once);
+        userTracking.Verify(Called.Exactly(2));
+        orderTracking.Verify(Called.Once);
         #endregion
     }
 }
@@ -222,8 +222,8 @@ public class ResetTypedTests
         // Reset only User-specific state
         stub.GetById.Of<User>().Reset();
 
-        stub.GetById.Of<User>().Verify(Times.Never);
-        stub.GetById.Of<Order>().Verify(Times.Once);
+        stub.GetById.Of<User>().Verify(Called.Never);
+        stub.GetById.Of<Order>().Verify(Called.Once);
         #endregion
     }
 }
@@ -247,8 +247,8 @@ public class ResetAllTests
         // Reset all type-specific state
         stub.GetById.Reset();
 
-        stub.GetById.Of<User>().Verify(Times.Never);
-        stub.GetById.Of<Order>().Verify(Times.Never);
+        stub.GetById.Of<User>().Verify(Called.Never);
+        stub.GetById.Of<Order>().Verify(Called.Never);
         #endregion
         Assert.Empty(stub.GetById.CalledTypeArguments);
     }
@@ -292,10 +292,10 @@ public class CompleteGenericExampleTests
         var order = serializer.Deserialize<Order>(orderJson);
 
         // Verify per-type calls with Times
-        serializeUserTracking.Verify(Times.Once);
-        serializeOrderTracking.Verify(Times.Once);
-        deserializeUserTracking.Verify(Times.Once);
-        deserializeOrderTracking.Verify(Times.Once);
+        serializeUserTracking.Verify(Called.Once);
+        serializeOrderTracking.Verify(Called.Once);
+        deserializeUserTracking.Verify(Called.Once);
+        deserializeOrderTracking.Verify(Called.Once);
 
         // Verify called type arguments
         Assert.Contains(typeof(User), stub.Serialize.CalledTypeArguments);

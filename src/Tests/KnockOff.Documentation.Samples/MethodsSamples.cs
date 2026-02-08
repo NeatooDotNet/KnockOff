@@ -197,7 +197,7 @@ public class MethodVerificationTests
 
         #region methods-verify-callcount
         // Verify exact call count (throws if different)
-        tracking.Verify(Times.Exactly(2));
+        tracking.Verify(Called.Exactly(2));
         #endregion
     }
 
@@ -208,7 +208,7 @@ public class MethodVerificationTests
 
         #region methods-verify-verifiable
         // Mark expected calls with Verifiable(), then stub.Verify() checks all
-        stub.Save.Call((entity) => { }).Verifiable(Times.Once);
+        stub.Save.Call((entity) => { }).Verifiable(Called.Once);
         stub.GetById.Return((id) => new User { Id = id }).Verifiable();
         #endregion
 
@@ -277,14 +277,14 @@ public class MethodResetTests
         IProcessorMethods processor = stub;
         processor.ProcessData("initial");
 
-        tracking.Verify(Times.Once);
+        tracking.Verify(Called.Once);
 
         #region methods-reset
         // Reset clears call count and captured arguments, but preserves callbacks
         stub.ProcessData.Reset();
         #endregion
 
-        tracking.Verify(Times.Never);
+        tracking.Verify(Called.Never);
     }
 }
 

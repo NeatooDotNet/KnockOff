@@ -109,6 +109,14 @@ internal static class StandaloneClassRenderer
             RenderEventInterceptorClass(w, evt, unit.ClassName, indent);
         }
 
+        // Render generic method handler interceptor classes (Of<T>() pattern)
+        // Pass emitHelperInterfaces=true because standalone interceptors are top-level classes,
+        // not nested inside a containing class that provides IGenericMethodCallTracker/IResettable
+        foreach (var handler in unit.GenericMethodHandlers)
+        {
+            ClassRenderer.RenderClassGenericMethodHandler(w, handler, indent, emitHelperInterfaces: true);
+        }
+
         // Render the wrapper partial class (user's class)
         // Extends the generated base class for user property overrides
         var baseClassName = $"{unit.ClassName}Base{typeParamList}";
@@ -335,15 +343,15 @@ internal static class StandaloneClassRenderer
 
         // Verification API
         w.Line($"{indent1}private bool _isVerifiable;");
-        w.Line($"{indent1}private global::KnockOff.Times? _verifiableTimes;");
+        w.Line($"{indent1}private global::KnockOff.Called? _verifiableTimes;");
         w.Line();
 
         w.Line($"{indent1}/// <summary>Verifies the event was subscribed to at least once.</summary>");
-        w.Line($"{indent1}public void VerifyAdd() => VerifyAdd(global::KnockOff.Times.AtLeastOnce);");
+        w.Line($"{indent1}public void VerifyAdd() => VerifyAdd(global::KnockOff.Called.AtLeastOnce);");
         w.Line();
 
-        w.Line($"{indent1}/// <summary>Verifies the event subscription count matches the Times constraint.</summary>");
-        w.Line($"{indent1}public void VerifyAdd(global::KnockOff.Times times)");
+        w.Line($"{indent1}/// <summary>Verifies the event subscription count matches the Called constraint.</summary>");
+        w.Line($"{indent1}public void VerifyAdd(global::KnockOff.Called times)");
         w.Line($"{indent1}{{");
         w.Line($"{indent1}\tif (!times.Validate(_addCount))");
         w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' add verification failed: expected {{times}}, but was called {{_addCount}} time(s).\");");
@@ -351,11 +359,11 @@ internal static class StandaloneClassRenderer
         w.Line();
 
         w.Line($"{indent1}/// <summary>Verifies the event was unsubscribed at least once.</summary>");
-        w.Line($"{indent1}public void VerifyRemove() => VerifyRemove(global::KnockOff.Times.AtLeastOnce);");
+        w.Line($"{indent1}public void VerifyRemove() => VerifyRemove(global::KnockOff.Called.AtLeastOnce);");
         w.Line();
 
-        w.Line($"{indent1}/// <summary>Verifies the event unsubscription count matches the Times constraint.</summary>");
-        w.Line($"{indent1}public void VerifyRemove(global::KnockOff.Times times)");
+        w.Line($"{indent1}/// <summary>Verifies the event unsubscription count matches the Called constraint.</summary>");
+        w.Line($"{indent1}public void VerifyRemove(global::KnockOff.Called times)");
         w.Line($"{indent1}{{");
         w.Line($"{indent1}\tif (!times.Validate(_removeCount))");
         w.Line($"{indent1}\t\tthrow new global::KnockOff.VerificationException($\"Event '{evt.EventName}' remove verification failed: expected {{times}}, but was called {{_removeCount}} time(s).\");");
@@ -363,11 +371,11 @@ internal static class StandaloneClassRenderer
         w.Line();
 
         w.Line($"{indent1}/// <summary>Verifies the event was accessed (add or remove) at least once.</summary>");
-        w.Line($"{indent1}public void Verify() => Verify(global::KnockOff.Times.AtLeastOnce);");
+        w.Line($"{indent1}public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
         w.Line();
 
-        w.Line($"{indent1}/// <summary>Verifies the total event access count matches the Times constraint.</summary>");
-        w.Line($"{indent1}public void Verify(global::KnockOff.Times times)");
+        w.Line($"{indent1}/// <summary>Verifies the total event access count matches the Called constraint.</summary>");
+        w.Line($"{indent1}public void Verify(global::KnockOff.Called times)");
         w.Line($"{indent1}{{");
         w.Line($"{indent1}\tvar totalCount = _addCount + _removeCount;");
         w.Line($"{indent1}\tif (!times.Validate(totalCount))");
@@ -379,13 +387,13 @@ internal static class StandaloneClassRenderer
         w.Line($"{indent1}public {evt.InterceptorClassName}{evt.TypeParameterList} Verifiable()");
         w.Line($"{indent1}{{");
         w.Line($"{indent1}\t_isVerifiable = true;");
-        w.Line($"{indent1}\t_verifiableTimes = global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\t_verifiableTimes = global::KnockOff.Called.AtLeastOnce;");
         w.Line($"{indent1}\treturn this;");
         w.Line($"{indent1}}}");
         w.Line();
 
-        w.Line($"{indent1}/// <summary>Marks this event for verification by Stub.Verify() with Times constraint. Returns this for fluent chaining.</summary>");
-        w.Line($"{indent1}public {evt.InterceptorClassName}{evt.TypeParameterList} Verifiable(global::KnockOff.Times times)");
+        w.Line($"{indent1}/// <summary>Marks this event for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
+        w.Line($"{indent1}public {evt.InterceptorClassName}{evt.TypeParameterList} Verifiable(global::KnockOff.Called times)");
         w.Line($"{indent1}{{");
         w.Line($"{indent1}\t_isVerifiable = true;");
         w.Line($"{indent1}\t_verifiableTimes = times;");
@@ -402,7 +410,7 @@ internal static class StandaloneClassRenderer
         w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerification()");
         w.Line($"{indent1}{{");
         w.Line($"{indent1}\tif (!_isVerifiable) return null;");
-        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
         w.Line($"{indent1}\tvar totalCount = _addCount + _removeCount;");
         w.Line($"{indent1}\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{evt.EventName}\", times, totalCount);");
         w.Line($"{indent1}}}");
@@ -412,7 +420,7 @@ internal static class StandaloneClassRenderer
         w.Line($"{indent1}internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
         w.Line($"{indent1}{{");
         w.Line($"{indent1}\tif (!IsConfigured && !_isVerifiable) return null;");
-        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Times.AtLeastOnce;");
+        w.Line($"{indent1}\tvar times = _verifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
         w.Line($"{indent1}\tvar totalCount = _addCount + _removeCount;");
         w.Line($"{indent1}\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{evt.EventName}\", times, totalCount);");
         w.Line($"{indent1}}}");
@@ -806,6 +814,12 @@ internal static class StandaloneClassRenderer
 
     private static void RenderImplMethodOverride(CodeWriter w, InlineClassImplMethodModel method, string indent, string indent1)
     {
+        if (method.IsGenericMethod)
+        {
+            ClassRenderer.RenderImplGenericMethodOverride(w, method, indent, indent1);
+            return;
+        }
+
         w.Line($"{indent}/// <inheritdoc />");
         w.Line($"{indent}{method.AccessModifier} override {method.ReturnType} {method.MethodName}({method.ParameterDeclarations})");
         w.Line($"{indent}{{");

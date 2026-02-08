@@ -113,7 +113,7 @@ public class EventBasicsTests
         source.Started += (s, e) => { };
         source.Started += (s, e) => { };
 
-        stub.Started.VerifyAdd(Times.Exactly(2));
+        stub.Started.VerifyAdd(Called.Exactly(2));
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class EventBasicsTests
         source.Started += Handler;
         source.Started -= Handler;
 
-        stub.Started.VerifyRemove(Times.Once);
+        stub.Started.VerifyRemove(Called.Once);
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class EventBasicsTests
 
         Assert.False(stub.Started.HasSubscribers);
         Assert.Throws<VerificationException>(() =>
-            stub.Started.VerifyAdd(Times.AtLeastOnce));
+            stub.Started.VerifyAdd(Called.AtLeastOnce));
     }
 
     [Fact]

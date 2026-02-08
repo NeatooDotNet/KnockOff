@@ -71,9 +71,9 @@ public class ArrayParamOverloadTests
 		service.GetItems(new[] { "x" });
 		service.GetItems(new[] { "y" }, 5);
 
-		tracking1.Verify(Times.Once);
-		tracking2.Verify(Times.Once);
-		tracking3.Verify(Times.Once);
+		tracking1.Verify(Called.Once);
+		tracking2.Verify(Called.Once);
+		tracking3.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -90,7 +90,7 @@ public class ArrayParamOverloadTests
 		service.GetItems(new[] { "a" });
 		service.GetItems(new[] { "b" }, 1);
 
-		knockOff.GetItems.Verify(Times.Exactly(3));
+		knockOff.GetItems.Verify(Called.Exactly(3));
 	}
 
 	#endregion
@@ -159,9 +159,9 @@ public class ArrayParamOverloadTests
 		service.GetItems(new[] { "y" }, 5);
 		service.GetItems(new[] { "z" }, 10);
 
-		tracking1.Verify(Times.Exactly(2));
-		tracking2.Verify(Times.Once);
-		tracking3.Verify(Times.Exactly(2));
+		tracking1.Verify(Called.Exactly(2));
+		tracking2.Verify(Called.Once);
+		tracking3.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -179,7 +179,7 @@ public class ArrayParamOverloadTests
 		service.GetItems(new[] { "b" }, 1);
 		service.GetItems(new[] { "c" }, 2);
 
-		stub.GetItems.Verify(Times.Exactly(4));
+		stub.GetItems.Verify(Called.Exactly(4));
 	}
 
 	#endregion

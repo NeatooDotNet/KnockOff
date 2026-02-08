@@ -53,7 +53,7 @@ public class MixedRefOutTests
 		int counter = 5;
 		service.Process("test-input", out _, ref counter);
 
-		knockOff.Process.Verify(Times.Once);
+		knockOff.Process.Verify(Called.Once);
 		// LastArgs captures normal + ref params (at call time), excludes out params
 		var args = knockOff.Process.LastArgs;
 		Assert.Equal("test-input", args!.Value.input);
@@ -130,7 +130,7 @@ public class MixedRefOutTests
 		service.Process("a", out _, ref c);
 		service.Process("b", out _, ref c);
 
-		knockOff.Process.Verify(Times.Exactly(2));
+		knockOff.Process.Verify(Called.Exactly(2));
 	}
 
 	[Fact]
@@ -149,7 +149,7 @@ public class MixedRefOutTests
 		service.Transform("once", out _, out _);
 
 		Assert.Throws<VerificationException>(() =>
-			knockOff.Transform.Verify(Times.Exactly(2)));
+			knockOff.Transform.Verify(Called.Exactly(2)));
 	}
 
 	[Fact]
@@ -203,9 +203,9 @@ public class MixedRefOutTests
 
 		int c = 0;
 		service.Process("test", out _, ref c);
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 
 		knockOff.Process.Reset();
-		tracking.Verify(Times.Never);
+		tracking.Verify(Called.Never);
 	}
 }

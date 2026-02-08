@@ -309,9 +309,9 @@ public class VerificationTests
 
         #region delegate-stub-verification-times
         // Verify with Times constraints
-        stub.Interceptor.Verify(Times.Exactly(3));
-        stub.Interceptor.Verify(Times.AtLeast(2));
-        stub.Interceptor.Verify(Times.AtMost(5));
+        stub.Interceptor.Verify(Called.Exactly(3));
+        stub.Interceptor.Verify(Called.AtLeast(2));
+        stub.Interceptor.Verify(Called.AtMost(5));
         #endregion
     }
 
@@ -379,7 +379,7 @@ public class TrackingTests
 
         #region delegate-stub-callcount
         // Verify invocation count using Times constraints
-        stub.Interceptor.Verify(Times.Exactly(3));
+        stub.Interceptor.Verify(Called.Exactly(3));
         #endregion
     }
 }
@@ -453,14 +453,14 @@ public class ResetTests
         format("hello");
         format("world");
 
-        stub.Interceptor.Verify(Times.Exactly(2));
+        stub.Interceptor.Verify(Called.Exactly(2));
         Assert.Equal("world", stub.Interceptor.LastArg);
 
         #region delegate-stub-reset
         // Reset clears tracking state but preserves configuration
         stub.Interceptor.Reset();
 
-        stub.Interceptor.Verify(Times.Never);
+        stub.Interceptor.Verify(Called.Never);
         Assert.Null(stub.Interceptor.LastArg);
         Assert.Equal("TEST", format("test")); // Return still works
         #endregion
@@ -528,7 +528,7 @@ public class RealWorldExampleTests
         IsUniqueRule isUnique = stub;
         Assert.False(isUnique("admin"));
         Assert.True(isUnique("newuser"));
-        stub.Interceptor.Verify(Times.Exactly(2));
+        stub.Interceptor.Verify(Called.Exactly(2));
     }
 
     [Fact]
@@ -635,8 +635,8 @@ public class CompleteExampleTests
         Assert.True(valid3);
         Assert.Null(error3);
 
-        formatStub.Interceptor.Verify(Times.Exactly(3));
-        uniqueStub.Interceptor.Verify(Times.Exactly(2));
+        formatStub.Interceptor.Verify(Called.Exactly(3));
+        uniqueStub.Interceptor.Verify(Called.Exactly(2));
     }
 }
 
@@ -654,13 +654,13 @@ public class VerifiablePatternTests
         #region delegate-verifiable-pattern
         // Mark for verification with Verifiable() chaining
         stub.Interceptor.Return((x) => x * 2).Verifiable();
-        stub.Interceptor.Verify(Times.Never); // Not called yet
+        stub.Interceptor.Verify(Called.Never); // Not called yet
 
         Transform transform = stub;
         var result = transform(21);
 
         // Verify the delegate was called
-        stub.Interceptor.Verify(Times.Once);
+        stub.Interceptor.Verify(Called.Once);
         #endregion
 
         Assert.Equal(42, result);

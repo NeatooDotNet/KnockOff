@@ -140,7 +140,7 @@ stub.Interceptor.Return((name, age) => $"{name} is {age} years old");
 
 ## Verification
 
-Verify delegate invocations using `stub.Interceptor.Verify()` and `Times` constraints.
+Verify delegate invocations using `stub.Interceptor.Verify()` and `Called` constraints.
 
 ### Basic Verification
 
@@ -151,14 +151,14 @@ stub.Interceptor.Verify();
 ```
 <!-- endSnippet -->
 
-### Verification with Times
+### Verification with Called
 
 <!-- snippet: delegate-stub-verification-times -->
 ```cs
-// Verify with Times constraints
-stub.Interceptor.Verify(Times.Exactly(3));
-stub.Interceptor.Verify(Times.AtLeast(2));
-stub.Interceptor.Verify(Times.AtMost(5));
+// Verify with Called constraints
+stub.Interceptor.Verify(Called.Exactly(3));
+stub.Interceptor.Verify(Called.AtLeast(2));
+stub.Interceptor.Verify(Called.AtMost(5));
 ```
 <!-- endSnippet -->
 
@@ -170,13 +170,13 @@ Delegate stubs support `.Verifiable()` chaining on `Return()` and `Call()`, just
 ```cs
 // Mark for verification with Verifiable() chaining
 stub.Interceptor.Return((x) => x * 2).Verifiable();
-stub.Interceptor.Verify(Times.Never); // Not called yet
+stub.Interceptor.Verify(Called.Never); // Not called yet
 
 Transform transform = stub;
 var result = transform(21);
 
 // Verify the delegate was called
-stub.Interceptor.Verify(Times.Once);
+stub.Interceptor.Verify(Called.Once);
 ```
 <!-- endSnippet -->
 
@@ -207,8 +207,8 @@ Assert.Equal(25, stub.Interceptor.LastArgs!.Value.age);
 
 <!-- snippet: delegate-stub-callcount -->
 ```cs
-// Verify invocation count using Times constraints
-stub.Interceptor.Verify(Times.Exactly(3));
+// Verify invocation count using Called constraints
+stub.Interceptor.Verify(Called.Exactly(3));
 ```
 <!-- endSnippet -->
 
@@ -263,7 +263,7 @@ Use `stub.Interceptor.Reset()` to clear tracking state while preserving configur
 // Reset clears tracking state but preserves configuration
 stub.Interceptor.Reset();
 
-stub.Interceptor.Verify(Times.Never);
+stub.Interceptor.Verify(Called.Never);
 Assert.Null(stub.Interceptor.LastArg);
 Assert.Equal("TEST", format("test")); // Return still works
 ```

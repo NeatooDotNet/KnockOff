@@ -36,7 +36,7 @@ public class RefParameterTests
 		service.Increment(ref myValue);
 
 		// The ref param should be tracked with its input value (5), not the modified value
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 		Assert.Equal(5, tracking.LastArg);
 	}
 
@@ -80,7 +80,7 @@ public class RefParameterTests
 		Assert.Equal("HELLO", text);
 
 		// Check tracking - should have both key and the original value
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 		var args = tracking.LastArgs;
 		Assert.Equal("valid", args.key);
 		Assert.Equal("hello", args.value); // Original value, before modification
@@ -99,7 +99,7 @@ public class RefParameterTests
 		service.Increment(ref v2);
 		service.Increment(ref v3);
 
-		tracking.Verify(Times.Exactly(3));
+		tracking.Verify(Called.Exactly(3));
 		Assert.Equal(3, tracking.LastArg); // Last original value passed
 
 		// And the values were modified
@@ -123,7 +123,7 @@ public class RefParameterTests
 		Assert.Equal(100, val);
 
 		// Call was tracked
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -138,11 +138,11 @@ public class RefParameterTests
 		service.Increment(ref x);
 		service.Increment(ref x);
 
-		tracking.Verify(Times.Exactly(2));
+		tracking.Verify(Called.Exactly(2));
 
 		knockOff.Increment.Reset();
 
-		tracking.Verify(Times.Never);
+		tracking.Verify(Called.Never);
 	}
 
 	[Fact]
@@ -176,12 +176,12 @@ public class RefParameterTests
 
 		var tracking = knockOff.Increment.Call((ref int v) => { });
 
-		tracking.Verify(Times.Never);
+		tracking.Verify(Called.Never);
 
 		int dummy = 0;
 		service.Increment(ref dummy);
 
-		tracking.Verify(Times.Once);
+		tracking.Verify(Called.Once);
 	}
 
 	[Fact]
@@ -245,6 +245,6 @@ public class RefParameterTests
 		service.Increment(ref dummy);
 
 		Assert.Throws<VerificationException>(() =>
-			knockOff.Increment.Verify(Times.Exactly(2)));
+			knockOff.Increment.Verify(Called.Exactly(2)));
 	}
 }

@@ -96,7 +96,7 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyCallCount()
     {
-        _knockOffSimpleTracking.Verify(Times.Exactly(3));
+        _knockOffSimpleTracking.Verify(Called.Exactly(3));
     }
 
     [Benchmark]
@@ -139,9 +139,9 @@ public class VerificationBenchmarks
     [Benchmark]
     public void KnockOff_VerifyMultiple()
     {
-        _knockOffSimpleTracking.Verify(Times.AtLeastOnce);
-        _knockOffSimpleTracking.Verify(Times.Exactly(3));
-        _knockOffCalculatorTracking.Verify(Times.Exactly(2));
+        _knockOffSimpleTracking.Verify(Called.AtLeastOnce);
+        _knockOffSimpleTracking.Verify(Called.Exactly(3));
+        _knockOffCalculatorTracking.Verify(Called.Exactly(2));
     }
 
     [Benchmark]
