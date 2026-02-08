@@ -1463,6 +1463,19 @@ internal static class MethodInterceptorRenderer
 		var callFieldName = signatureSuffix == null ? "_call" : $"_call_{signatureSuffix}";
 		var callTrackingFieldName = signatureSuffix == null ? "_callTracking" : $"_callTracking_{signatureSuffix}";
 
+		// Field name variables for simplified callback storage (needed for sequence elevation fix)
+		var callSimplifiedFieldName = signatureSuffix == null ? "_callSimplified" : $"_callSimplified_{signatureSuffix}";
+		var callSimplifiedTrackingFieldName = signatureSuffix == null ? "_callSimplifiedTracking" : $"_callSimplifiedTracking_{signatureSuffix}";
+		var callSimplifiedVoidFieldName = signatureSuffix == null ? "_callSimplifiedVoid" : $"_callSimplifiedVoid_{signatureSuffix}";
+		var callSimplifiedVoidTrackingFieldName = signatureSuffix == null ? "_callSimplifiedVoidTracking" : $"_callSimplifiedVoidTracking_{signatureSuffix}";
+
+		// Derive conditions for which branches to emit in sequence elevation
+		var canHaveValueOverload = !isVoid && !hasRefOrOut && signatureSuffix == null;
+		var (elevationInnerType, elevationIsTaskT, elevationIsValueTaskT) = GetAsyncTypeInfo(returnType);
+		var elevationIsAsyncWithInnerType = elevationIsTaskT || elevationIsValueTaskT;
+		var (elevationIsVoidTask, elevationIsVoidValueTask) = GetVoidAsyncInfo(returnType);
+		var elevationIsVoidAsync = elevationIsVoidTask || elevationIsVoidValueTask;
+
 		w.Line($"/// <summary>Builder for callback registration. Supports tracking and lazy elevation to sequence.</summary>");
 		w.Line($"public sealed class {className} : {builderInterface}");
 		using (w.Braces())
@@ -1554,17 +1567,14 @@ internal static class MethodInterceptorRenderer
 			w.Line($"public {sequenceClassName} {thenChainName}({delegateType} callback)");
 			using (w.Braces())
 			{
-				// Lazy elevation: if not already in sequence mode, move this callback into sequence as first element
-				w.Line($"if (_interceptor.{sequenceFieldName} == null)");
-				using (w.Braces())
-				{
-					w.Line($"_interceptor.{sequenceFieldName} = new global::System.Collections.Generic.List<({delegateType} Callback, {className} Tracking)>();");
-					// Move current callback into sequence as first element (this builder tracks it)
-					w.Line($"_interceptor.{sequenceFieldName}.Add((_interceptor.{callFieldName}!, this));");
-					w.Line($"_interceptor.{callFieldName} = null;");
-					w.Line($"_interceptor.{callTrackingFieldName} = null;");
-					w.Line($"_interceptor.{sequenceIndexFieldName} = 0;");
-				}
+				// Lazy elevation: if not already in sequence mode, move current callback/value into sequence as first element
+				EmitSequenceElevation(w, sequenceFieldName, delegateType, className,
+					callFieldName, callTrackingFieldName, sequenceIndexFieldName,
+					canHaveValueOverload, elevationIsAsyncWithInnerType, elevationIsVoidAsync,
+					elevationIsTaskT, elevationIsValueTaskT, elevationIsVoidTask, elevationIsVoidValueTask,
+					elevationInnerType, callSimplifiedFieldName, callSimplifiedTrackingFieldName,
+					callSimplifiedVoidFieldName, callSimplifiedVoidTrackingFieldName,
+					hasRefOrOut, parameterCount, parameters);
 				// Add new callback with fresh builder for its tracking
 				w.Line($"var nextBuilder = new {className}(_interceptor);");
 				w.Line($"_interceptor.{sequenceFieldName}.Add((callback, nextBuilder));");
@@ -1601,15 +1611,13 @@ internal static class MethodInterceptorRenderer
 					using (w.Braces())
 					{
 						// Elevate to sequence mode without adding any new values (same as ThenReturn elevation)
-						w.Line($"if (_interceptor.{sequenceFieldName} == null)");
-						using (w.Braces())
-						{
-							w.Line($"_interceptor.{sequenceFieldName} = new global::System.Collections.Generic.List<({delegateType} Callback, {className} Tracking)>();");
-							w.Line($"_interceptor.{sequenceFieldName}.Add((_interceptor.{callFieldName}!, this));");
-							w.Line($"_interceptor.{callFieldName} = null;");
-							w.Line($"_interceptor.{callTrackingFieldName} = null;");
-							w.Line($"_interceptor.{sequenceIndexFieldName} = 0;");
-						}
+						EmitSequenceElevation(w, sequenceFieldName, delegateType, className,
+							callFieldName, callTrackingFieldName, sequenceIndexFieldName,
+							canHaveValueOverload, elevationIsAsyncWithInnerType, elevationIsVoidAsync,
+							elevationIsTaskT, elevationIsValueTaskT, elevationIsVoidTask, elevationIsVoidValueTask,
+							elevationInnerType, callSimplifiedFieldName, callSimplifiedTrackingFieldName,
+							callSimplifiedVoidFieldName, callSimplifiedVoidTrackingFieldName,
+							hasRefOrOut, parameterCount, parameters);
 						w.Line($"return new {sequenceClassName}(_interceptor);");
 					}
 					w.Line("var seq = ThenReturn(values[0]);");
@@ -2630,6 +2638,128 @@ internal static class MethodInterceptorRenderer
 	#endregion
 
 	#region Helpers
+
+	/// <summary>
+	/// Emits the sequence elevation block used by ThenReturn/ThenCall and ThenReturn(params) when
+	/// the sequence has not yet been created. Handles three cases where _call may be null:
+	/// Return(value), Return(simplifiedCallback), and Call(simplifiedVoidCallback).
+	/// </summary>
+	private static void EmitSequenceElevation(
+		CodeWriter w,
+		string sequenceFieldName,
+		string delegateType,
+		string className,
+		string callFieldName,
+		string callTrackingFieldName,
+		string sequenceIndexFieldName,
+		bool canHaveValueOverload,
+		bool isAsyncWithInnerType,
+		bool isVoidAsync,
+		bool isTaskT,
+		bool isValueTaskT,
+		bool isVoidTask,
+		bool isVoidValueTask,
+		string innerType,
+		string callSimplifiedFieldName,
+		string callSimplifiedTrackingFieldName,
+		string callSimplifiedVoidFieldName,
+		string callSimplifiedVoidTrackingFieldName,
+		bool hasRefOrOut,
+		int parameterCount,
+		EquatableArray<ParameterModel> parameters)
+	{
+		w.Line($"if (_interceptor.{sequenceFieldName} == null)");
+		using (w.Braces())
+		{
+			w.Line($"_interceptor.{sequenceFieldName} = new global::System.Collections.Generic.List<({delegateType} Callback, {className} Tracking)>();");
+
+			// Branch 1: _call is non-null (Return(callback) or Call(callback) was used -- existing non-buggy path)
+			w.Line($"if (_interceptor.{callFieldName} != null)");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor.{sequenceFieldName}.Add((_interceptor.{callFieldName}, this));");
+			}
+
+			// Branch 2: _hasReturnValue is true (Return(value) was used)
+			// Only emitted for single-signature, non-void, no ref/out interceptors
+			if (canHaveValueOverload)
+			{
+				var discardPrefix = BuildDiscardLambdaPrefix(parameterCount);
+				w.Line("else if (_interceptor._hasReturnValue)");
+				using (w.Braces())
+				{
+					w.Line("var capturedValue = _interceptor._returnValue;");
+					if (isTaskT)
+					{
+						w.Line($"_interceptor.{sequenceFieldName}.Add(({discardPrefix} => global::System.Threading.Tasks.Task.FromResult(capturedValue), this));");
+					}
+					else if (isValueTaskT)
+					{
+						w.Line($"_interceptor.{sequenceFieldName}.Add(({discardPrefix} => new global::System.Threading.Tasks.ValueTask<{innerType}>(capturedValue), this));");
+					}
+					else
+					{
+						w.Line($"_interceptor.{sequenceFieldName}.Add(({discardPrefix} => capturedValue, this));");
+					}
+					w.Line("_interceptor._hasReturnValue = false;");
+					w.Line("_interceptor._returnValue = default!;");
+					w.Line("_interceptor._returnValueTracking = null;");
+				}
+			}
+
+			// Branch 3: _callSimplified is non-null (Return(simplifiedCallback) was used for Task<T>/ValueTask<T>)
+			// Only emitted when method is Task<T> or ValueTask<T> and has no ref/out params
+			if (isAsyncWithInnerType && !hasRefOrOut)
+			{
+				var lambdaParams = BuildLambdaParams(parameters);
+				var callbackArgs = BuildCallbackArgs(parameters);
+				var lambdaCall = parameters.Count == 0 ? "captured()" : $"captured({callbackArgs})";
+				w.Line($"else if (_interceptor.{callSimplifiedFieldName} != null)");
+				using (w.Braces())
+				{
+					w.Line($"var captured = _interceptor.{callSimplifiedFieldName};");
+					if (isTaskT)
+					{
+						w.Line($"_interceptor.{sequenceFieldName}.Add((({lambdaParams}) => global::System.Threading.Tasks.Task.FromResult({lambdaCall}), this));");
+					}
+					else // isValueTaskT
+					{
+						w.Line($"_interceptor.{sequenceFieldName}.Add((({lambdaParams}) => new global::System.Threading.Tasks.ValueTask<{innerType}>({lambdaCall}), this));");
+					}
+					w.Line($"_interceptor.{callSimplifiedFieldName} = null;");
+					w.Line($"_interceptor.{callSimplifiedTrackingFieldName} = null;");
+				}
+			}
+
+			// Branch 4: _callSimplifiedVoid is non-null (Call(simplifiedVoidCallback) was used for Task/ValueTask void)
+			// Only emitted when method is void Task or void ValueTask and has no ref/out params
+			if (isVoidAsync && !hasRefOrOut)
+			{
+				var lambdaParams = BuildLambdaParams(parameters);
+				var callbackArgs = BuildCallbackArgs(parameters);
+				var lambdaCall = parameters.Count == 0 ? "captured()" : $"captured({callbackArgs})";
+				w.Line($"else if (_interceptor.{callSimplifiedVoidFieldName} != null)");
+				using (w.Braces())
+				{
+					w.Line($"var captured = _interceptor.{callSimplifiedVoidFieldName};");
+					if (isVoidTask)
+					{
+						w.Line($"_interceptor.{sequenceFieldName}.Add((({lambdaParams}) => {{ {lambdaCall}; return global::System.Threading.Tasks.Task.CompletedTask; }}, this));");
+					}
+					else // isVoidValueTask
+					{
+						w.Line($"_interceptor.{sequenceFieldName}.Add((({lambdaParams}) => {{ {lambdaCall}; return default; }}, this));");
+					}
+					w.Line($"_interceptor.{callSimplifiedVoidFieldName} = null;");
+					w.Line($"_interceptor.{callSimplifiedVoidTrackingFieldName} = null;");
+				}
+			}
+
+			w.Line($"_interceptor.{callFieldName} = null;");
+			w.Line($"_interceptor.{callTrackingFieldName} = null;");
+			w.Line($"_interceptor.{sequenceIndexFieldName} = 0;");
+		}
+	}
 
 	private static string GetOwnerWithParams(UnifiedMethodInterceptorModel model)
 	{
