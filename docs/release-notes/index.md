@@ -8,6 +8,7 @@ Releases with notable changes.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| [v0.40.0](v0.40.0.md) | 2026-02-07 | Fix CS0108 and CS1061 bugs in class stub generation |
 | [v0.39.0](v0.39.0.md) | 2026-02-07 | **Breaking:** Singular method API — Returns→Return, Execute→Call, OnCall→Return/Call |
 | [v0.38.0](v0.38.0.md) | 2026-02-07 | **Breaking:** Unified method API — OnCall→Returns/Execute, ThenCall→ThenReturns/ThenExecute, simplified async sequences |
 | [v0.36.0](v0.36.0.md) | 2026-02-06 | Delegate stub rewrite, async API consistency across all 9 patterns, 3 bug fixes |
@@ -40,6 +41,7 @@ Releases with notable changes.
 
 ## All Releases
 
+- [v0.40.0](v0.40.0.md) - 2026-02-07 - Fix CS0108 and CS1061 bugs in class stub generation
 - [v0.39.0](v0.39.0.md) - 2026-02-07 - **Breaking:** Singular method API — Returns→Return, Execute→Call, OnCall→Return/Call
 - [v0.38.0](v0.38.0.md) - 2026-02-07 - **Breaking:** Unified method API — OnCall→Returns/Execute, ThenCall→ThenReturns/ThenExecute, simplified async sequences
 - [v0.37.0](v0.37.0.md) - 2026-02-06 - Unified event API (Raise, HasSubscribers) across all patterns, fix array parameter types
