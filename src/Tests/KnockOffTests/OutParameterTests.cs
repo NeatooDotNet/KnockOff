@@ -231,7 +231,7 @@ public class OutParameterTests
 		service.TryGetValue("key1", out _);
 
 		Assert.Throws<VerificationException>(() =>
-			knockOff.TryGetValue.Verify(Times.Exactly(2)));
+			knockOff.TryGetValue.Verify(Called.Exactly(2)));
 	}
 
 	[Fact]

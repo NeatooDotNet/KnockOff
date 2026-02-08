@@ -242,8 +242,8 @@ public partial class ProtectedMethodBehaviorDemo
         service.GetDescription(); // calls again
 
         // Verify protected method was called
-        stub.GetInternalId.Verify(Times.Exactly(2));
-        stub.FormatTag.Verify(Times.Exactly(2));
+        stub.GetInternalId.Verify(Called.Exactly(2));
+        stub.FormatTag.Verify(Called.Exactly(2));
     }
 
     // =========================================================================

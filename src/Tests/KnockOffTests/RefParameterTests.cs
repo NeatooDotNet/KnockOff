@@ -245,6 +245,6 @@ public class RefParameterTests
 		service.Increment(ref dummy);
 
 		Assert.Throws<VerificationException>(() =>
-			knockOff.Increment.Verify(Times.Exactly(2)));
+			knockOff.Increment.Verify(Called.Exactly(2)));
 	}
 }
