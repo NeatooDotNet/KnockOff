@@ -32,7 +32,19 @@ internal sealed record UnifiedPropertyInterceptorModel(
     /// <summary>Whether the property has a setter.</summary>
     bool HasSetter,
     /// <summary>Whether this is an init-only property (setter is init accessor).</summary>
-    bool IsInitOnly);
+    bool IsInitOnly,
+
+    // Ref return support
+    /// <summary>True if the property returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the property returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the property returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}
 
 /// <summary>
 /// Options controlling property interceptor rendering behavior.

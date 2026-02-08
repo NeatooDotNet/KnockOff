@@ -85,7 +85,18 @@ internal sealed record InlineClassPropertyModel(
     /// <summary>Type parameter list string (e.g., "&lt;T&gt;").</summary>
     string TypeParameterList = "",
     /// <summary>Constraint clauses string (e.g., "where T : class").</summary>
-    string ConstraintClauses = "");
+    string ConstraintClauses = "",
+    // Ref return support
+    /// <summary>True if the property returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the property returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the property returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}
 
 /// <summary>
 /// Model for an indexer in class stub generation.
@@ -114,7 +125,18 @@ internal sealed record InlineClassIndexerModel(
     /// <summary>Type parameter list string (e.g., "&lt;T&gt;").</summary>
     string TypeParameterList = "",
     /// <summary>Constraint clauses string (e.g., "where T : class").</summary>
-    string ConstraintClauses = "");
+    string ConstraintClauses = "",
+    // Ref return support
+    /// <summary>True if the indexer returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the indexer returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the indexer returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}
 
 /// <summary>
 /// Model for a method in class stub generation.
@@ -202,7 +224,18 @@ internal sealed record InlineClassImplPropertyModel(
     /// True if the user has defined a 'protected override' property with the _ suffix
     /// in their partial class (base class user property pattern).
     /// </summary>
-    bool HasUserOverride = false);
+    bool HasUserOverride = false,
+    // Ref return support
+    /// <summary>True if the property returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the property returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the property returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}
 
 /// <summary>
 /// Model for an indexer override in the Impl class.
@@ -231,7 +264,18 @@ internal sealed record InlineClassImplIndexerModel(
     /// <summary>Default value strategy.</summary>
     DefaultValueStrategy DefaultStrategy,
     /// <summary>Concrete type for new() if applicable.</summary>
-    string? ConcreteTypeForNew);
+    string? ConcreteTypeForNew,
+    // Ref return support
+    /// <summary>True if the indexer returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the indexer returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the indexer returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}
 
 /// <summary>
 /// Model for a method override in the Impl class.
@@ -284,7 +328,18 @@ internal sealed record InlineClassImplMethodModel(
     string NonGenericArgList = "",
     /// <summary>Inner type argument for Task&lt;T&gt;/ValueTask&lt;T&gt; return types (e.g., "TResult").
     /// Used for async return type handling in abstract method fallback. Empty when not applicable.</summary>
-    string TaskTypeArg = "");
+    string TaskTypeArg = "",
+    // Ref return support
+    /// <summary>True if the method returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the method returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}
 
 /// <summary>
 /// Model for an event override in the Impl class.

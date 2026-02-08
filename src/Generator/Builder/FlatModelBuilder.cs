@@ -369,7 +369,9 @@ internal static class FlatModelBuilder
 					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
 					DelegationTarget: delegationTarget,
 					DelegationTargetInterface: delegationInterface,
-					HasUserOverride: hasUserOverride));
+					HasUserOverride: hasUserOverride,
+					ReturnsByRef: member.ReturnsByRef,
+					ReturnsByRefReadonly: member.ReturnsByRefReadonly));
 			}
 		}
 
@@ -631,7 +633,9 @@ internal static class FlatModelBuilder
 					SimpleInterfaceName: simpleIfaceName,
 					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
 					KeyTypeFriendlyName: UnifiedInterceptorBuilder.GetTypeSuffix(keyType),
-					BaseName: "Indexer"));
+					BaseName: "Indexer",
+					ReturnsByRef: member.ReturnsByRef,
+					ReturnsByRefReadonly: member.ReturnsByRefReadonly));
 			}
 		}
 
@@ -868,7 +872,9 @@ internal static class FlatModelBuilder
 			DelegationTarget: delegationTarget,
 			DelegationTargetInterface: delegationInterface,
 			SignatureSuffix: signatureSuffix,
-			IsPartOfOverloadGroup: false); // Will be updated in third pass
+			IsPartOfOverloadGroup: false, // Will be updated in third pass
+			ReturnsByRef: member.ReturnsByRef,
+			ReturnsByRefReadonly: member.ReturnsByRefReadonly);
 	}
 
 	/// <summary>
@@ -985,7 +991,9 @@ internal static class FlatModelBuilder
 			DelegationTarget: delegationTarget,
 			DelegationTargetInterface: delegationInterface,
 			SignatureSuffix: signatureSuffix,
-			IsPartOfOverloadGroup: false); // Generic methods don't use overload groups
+			IsPartOfOverloadGroup: false, // Generic methods don't use overload groups
+			ReturnsByRef: member.ReturnsByRef,
+			ReturnsByRefReadonly: member.ReturnsByRefReadonly);
 	}
 
 	/// <summary>
@@ -1358,7 +1366,9 @@ internal static class FlatModelBuilder
 					o.ReturnType == "void",
 					o.IsNullable,
 					o.IsGenericMethod,
-					o.TypeParameters))
+					o.TypeParameters,
+					ReturnsByRef: o.ReturnsByRef,
+					ReturnsByRefReadonly: o.ReturnsByRefReadonly))
 				.ToArray();
 
 			result[methodName] = new MethodGroupInfo(

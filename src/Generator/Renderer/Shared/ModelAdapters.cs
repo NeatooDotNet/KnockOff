@@ -34,7 +34,9 @@ internal static class ModelAdapters
 			IsVoid: m.IsVoid,
 			HasRefOrOutParams: m.NeedsCustomDelegate && m.CustomDelegateName != null, // Approximation
 			DefaultExpression: m.DefaultExpression,
-			ThrowsOnDefault: m.ThrowsOnDefault)).ToList();
+			ThrowsOnDefault: m.ThrowsOnDefault,
+			ReturnsByRef: m.ReturnsByRef,
+			ReturnsByRefReadonly: m.ReturnsByRefReadonly)).ToList();
 
 		// Get unique signatures
 		var uniqueSignatures = GetUniqueSignatures(signatures);
@@ -87,7 +89,9 @@ internal static class ModelAdapters
 			ThrowsOnDefault: first.ThrowsOnDefault,
 			// User method name: if HasUserOverride, the user method name is MethodName + "_"
 			UserMethodName: first.HasUserOverride ? $"{first.MethodName}_" : null,
-			Overloads: EquatableArray<MethodOverloadSignature>.Empty);
+			Overloads: EquatableArray<MethodOverloadSignature>.Empty,
+			ReturnsByRef: first.ReturnsByRef,
+			ReturnsByRefReadonly: first.ReturnsByRefReadonly);
 	}
 
 	private static UnifiedMethodInterceptorModel BuildMultiOverloadModel(
@@ -133,7 +137,9 @@ internal static class ModelAdapters
 				DefaultExpression: method.DefaultExpression,
 				ThrowsOnDefault: method.ThrowsOnDefault,
 				// Per-signature user method name for mixed overload groups
-				UserMethodName: method.HasUserOverride ? $"{method.MethodName}_" : null));
+				UserMethodName: method.HasUserOverride ? $"{method.MethodName}_" : null,
+				ReturnsByRef: method.ReturnsByRef,
+				ReturnsByRefReadonly: method.ReturnsByRefReadonly));
 		}
 
 		// For overload groups, check if any method has user override (for model-level tracking)
@@ -162,7 +168,9 @@ internal static class ModelAdapters
 			ThrowsOnDefault: first.ThrowsOnDefault,
 			// For overload groups, user method is tracked per-signature (see overloads below)
 			UserMethodName: anyHasUserOverride ? $"{first.MethodName}_" : null,
-			Overloads: new EquatableArray<MethodOverloadSignature>(overloads.ToArray()));
+			Overloads: new EquatableArray<MethodOverloadSignature>(overloads.ToArray()),
+			ReturnsByRef: first.ReturnsByRef,
+			ReturnsByRefReadonly: first.ReturnsByRefReadonly);
 	}
 
 	private static List<MethodSignatureInfo> GetUniqueSignatures(List<MethodSignatureInfo> signatures)
@@ -251,7 +259,9 @@ internal static class ModelAdapters
 			DefaultExpression: prop.DefaultExpression,
 			HasGetter: prop.HasGetter,
 			HasSetter: prop.HasSetter,
-			IsInitOnly: prop.IsInitOnly);
+			IsInitOnly: prop.IsInitOnly,
+			ReturnsByRef: prop.ReturnsByRef,
+			ReturnsByRefReadonly: prop.ReturnsByRefReadonly);
 	}
 
 	/// <summary>
@@ -268,7 +278,9 @@ internal static class ModelAdapters
 			DefaultExpression: "default!",
 			HasGetter: prop.HasGetter,
 			HasSetter: prop.HasSetter,
-			IsInitOnly: prop.IsInitOnly);
+			IsInitOnly: prop.IsInitOnly,
+			ReturnsByRef: prop.ReturnsByRef,
+			ReturnsByRefReadonly: prop.ReturnsByRefReadonly);
 	}
 
 	#endregion
@@ -295,7 +307,9 @@ internal static class ModelAdapters
 			HasSetter: indexer.HasSetter,
 			ParameterSignature: $"{indexer.KeyType} {indexer.KeyParamName}",
 			ParameterTypes: indexer.KeyType,
-			KeyExpression: indexer.KeyParamName);
+			KeyExpression: indexer.KeyParamName,
+			ReturnsByRef: indexer.ReturnsByRef,
+			ReturnsByRefReadonly: indexer.ReturnsByRefReadonly);
 	}
 
 	/// <summary>
@@ -318,7 +332,9 @@ internal static class ModelAdapters
 			HasSetter: indexer.HasSetter,
 			ParameterSignature: indexer.ParameterSignature,
 			ParameterTypes: indexer.ParameterTypes,
-			KeyExpression: indexer.KeyExpression);
+			KeyExpression: indexer.KeyExpression,
+			ReturnsByRef: indexer.ReturnsByRef,
+			ReturnsByRefReadonly: indexer.ReturnsByRefReadonly);
 	}
 
 	#endregion

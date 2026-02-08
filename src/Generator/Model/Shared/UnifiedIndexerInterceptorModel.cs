@@ -46,7 +46,19 @@ internal sealed record UnifiedIndexerInterceptorModel(
     /// <summary>Parameter types for callback delegates (e.g., "int, int").</summary>
     string ParameterTypes,
     /// <summary>Key expression for recording (e.g., "key" or "(x, y)").</summary>
-    string KeyExpression);
+    string KeyExpression,
+
+    // Ref return support
+    /// <summary>True if the indexer returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the indexer returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the indexer returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}
 
 /// <summary>
 /// Options controlling indexer interceptor rendering behavior.

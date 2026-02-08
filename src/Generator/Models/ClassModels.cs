@@ -61,7 +61,15 @@ internal sealed record ClassMemberInfo(
 	/// True if the property has the 'required' modifier (C# 11).
 	/// When true, the generated override must also be required.
 	/// </summary>
-	bool IsRequired = false) : IEquatable<ClassMemberInfo>
+	bool IsRequired = false,
+	/// <summary>
+	/// True if the member returns by ref (ref T).
+	/// </summary>
+	bool ReturnsByRef = false,
+	/// <summary>
+	/// True if the member returns by ref readonly (ref readonly T).
+	/// </summary>
+	bool ReturnsByRefReadonly = false) : IEquatable<ClassMemberInfo>
 {
 	/// <summary>
 	/// Creates ClassMemberInfo for a property (including indexers).
@@ -126,7 +134,9 @@ internal sealed record ClassMemberInfo(
 			AccessModifier: accessModifier,
 			IndexerTypeSuffix: indexerTypeSuffix,
 			IsInitOnly: isInitOnly,
-			IsRequired: isRequired);
+			IsRequired: isRequired,
+			ReturnsByRef: property.ReturnsByRef,
+			ReturnsByRefReadonly: property.ReturnsByRefReadonly);
 	}
 
 	/// <summary>
@@ -204,7 +214,9 @@ internal sealed record ClassMemberInfo(
 			IsGenericMethod: method.IsGenericMethod,
 			TypeParameters: typeParameters,
 			IsAbstract: method.IsAbstract,
-			AccessModifier: accessModifier);
+			AccessModifier: accessModifier,
+			ReturnsByRef: method.ReturnsByRef,
+			ReturnsByRefReadonly: method.ReturnsByRefReadonly);
 	}
 }
 

@@ -323,7 +323,9 @@ internal static class ClassModelBuilder
             IsVoid: isVoid,
             HasRefOrOutParams: hasRefOrOut,
             DefaultExpression: defaultExpr,
-            ThrowsOnDefault: false);
+            ThrowsOnDefault: false,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     #endregion
@@ -349,7 +351,9 @@ internal static class ClassModelBuilder
             IsRequired: member.IsRequired,
             StubClassName: stubClassRef,
             TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+            ConstraintClauses: constraintClause,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineClassIndexerModel BuildIndexerModel(
@@ -385,7 +389,9 @@ internal static class ClassModelBuilder
             KeyExpression: keyExpr,
             StubClassName: stubClassRef,
             TypeParameterList: typeParamList,
-            ConstraintClauses: constraintClause);
+            ConstraintClauses: constraintClause,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineClassEventModel BuildEventModel(
@@ -429,7 +435,9 @@ internal static class ClassModelBuilder
             HasGetter: member.HasGetter,
             HasSetter: member.HasSetter,
             IsInitOnly: member.IsInitOnly,
-            IsAbstract: member.IsAbstract);
+            IsAbstract: member.IsAbstract,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineClassImplIndexerModel BuildImplIndexerModel(ClassMemberInfo member, int indexerCount)
@@ -453,7 +461,9 @@ internal static class ClassModelBuilder
             IsAbstract: member.IsAbstract,
             IsNullable: member.IsNullable,
             DefaultStrategy: member.DefaultStrategy,
-            ConcreteTypeForNew: member.ConcreteTypeForNew);
+            ConcreteTypeForNew: member.ConcreteTypeForNew,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineClassImplMethodModel BuildImplMethodModel(
@@ -486,7 +496,9 @@ internal static class ClassModelBuilder
             ArgumentList: argList,
             InputArgumentList: inputArgList,
             CallArgumentList: callArgs,
-            InvokeSuffix: invokeSuffix);
+            InvokeSuffix: invokeSuffix,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     /// <summary>
@@ -562,7 +574,9 @@ internal static class ClassModelBuilder
             ConstraintClauses: "", // Must be empty for overrides -- C# inherits constraints from base
             OfTypeAccess: $".Of<{typeParamNames}>()",
             NonGenericArgList: nonGenericArgList,
-            TaskTypeArg: taskTypeArg);
+            TaskTypeArg: taskTypeArg,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     /// <summary>

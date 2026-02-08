@@ -246,7 +246,9 @@ internal static class InlineModelBuilder
             StubClassName: $"Stubs.{stubClassName}{typeParamList}",
             TypeParameterList: typeParamList,
             ConstraintClauses: constraintClause,
-            DeclaringInterface: declaringInterface);
+            DeclaringInterface: declaringInterface,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineIndexerModel BuildIndexerModel(
@@ -299,7 +301,9 @@ internal static class InlineModelBuilder
             TypeParameterList: typeParamList,
             ConstraintClauses: constraintClause,
             DeclaringInterface: declaringInterface,
-            KeyTypeFriendlyName: keyTypeFriendlyName);
+            KeyTypeFriendlyName: keyTypeFriendlyName,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static UnifiedMethodInterceptorModel BuildMethodModel(
@@ -357,7 +361,9 @@ internal static class InlineModelBuilder
                 IsVoid: overload.IsVoid,
                 HasRefOrOutParams: hasRefOrOut,
                 DefaultExpression: defaultExpr,
-                ThrowsOnDefault: throwsOnDefault));
+                ThrowsOnDefault: throwsOnDefault,
+                ReturnsByRef: overload.ReturnsByRef,
+                ReturnsByRefReadonly: overload.ReturnsByRefReadonly));
         }
 
         // If no non-generic overloads, create empty model
@@ -769,7 +775,9 @@ internal static class InlineModelBuilder
             IsGenericMethod: false,
             KeyArg: null,
             DelegationTarget: delegation,
-            OutParameterInitializations: EquatableArray<string>.Empty);
+            OutParameterInitializations: EquatableArray<string>.Empty,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineInterfaceImplementation BuildIndexerImplementation(
@@ -825,7 +833,9 @@ internal static class InlineModelBuilder
             IsGenericMethod: false,
             KeyArg: keyArg,
             DelegationTarget: null,
-            OutParameterInitializations: EquatableArray<string>.Empty);
+            OutParameterInitializations: EquatableArray<string>.Empty,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineInterfaceImplementation BuildMethodImplementation(
@@ -915,7 +925,9 @@ internal static class InlineModelBuilder
             IsGenericMethod: false,
             KeyArg: null,
             DelegationTarget: null,
-            OutParameterInitializations: outParamInits);
+            OutParameterInitializations: outParamInits,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static int GetUniqueSignatureCount(MethodOverloadInfo[] overloads)
@@ -994,7 +1006,9 @@ internal static class InlineModelBuilder
             IsGenericMethod: true,
             KeyArg: null,
             DelegationTarget: null,
-            OutParameterInitializations: outParamInits);
+            OutParameterInitializations: outParamInits,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineInterfaceImplementation BuildMethodDelegationImplementation(
@@ -1057,7 +1071,9 @@ internal static class InlineModelBuilder
             IsGenericMethod: false,
             KeyArg: null,
             DelegationTarget: delegation,
-            OutParameterInitializations: EquatableArray<string>.Empty);
+            OutParameterInitializations: EquatableArray<string>.Empty,
+            ReturnsByRef: member.ReturnsByRef,
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
     private static InlineInterfaceImplementation BuildEventImplementation(
@@ -1273,7 +1289,9 @@ internal static class InlineModelBuilder
                 o.ReturnType == "void",
                 o.IsNullable,
                 o.IsGenericMethod,
-                o.TypeParameters))
+                o.TypeParameters,
+                ReturnsByRef: o.ReturnsByRef,
+                ReturnsByRefReadonly: o.ReturnsByRefReadonly))
             .ToArray();
 
         return new MethodGroupInfo(

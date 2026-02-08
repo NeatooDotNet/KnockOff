@@ -65,7 +65,19 @@ internal sealed record InlineInterfaceImplementation(
     /// <summary>Delegation target if this member delegates to another.</summary>
     InlineDelegationTarget? DelegationTarget,
     /// <summary>Statements to initialize out parameters (e.g., "paramName = default!;").</summary>
-    EquatableArray<string> OutParameterInitializations);
+    EquatableArray<string> OutParameterInitializations,
+
+    // Ref return support
+    /// <summary>True if the member returns by ref (ref T).</summary>
+    bool ReturnsByRef = false,
+    /// <summary>True if the member returns by ref readonly (ref readonly T).</summary>
+    bool ReturnsByRefReadonly = false)
+{
+    /// <summary>True if the member returns by ref or ref readonly.</summary>
+    public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
+    /// <summary>The ref/ref readonly prefix for the return type in signatures.</summary>
+    public string RefReturnPrefix => ReturnsByRef ? "ref " : ReturnsByRefReadonly ? "ref readonly " : "";
+}
 
 /// <summary>
 /// The kind of member being implemented.

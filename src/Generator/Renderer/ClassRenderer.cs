@@ -605,6 +605,30 @@ internal static class ClassRenderer
         w.Line($"{indent1}private readonly {stubClassName} _stub;");
         w.Line();
 
+        // Default ref backing fields for abstract ref return members (_stub == null path during base constructor)
+        foreach (var prop in cls.ImplProperties)
+        {
+            if (prop.IsRefReturn && prop.IsAbstract)
+            {
+                w.Line($"{indent1}private {prop.ReturnType} _defaultRefBacking_{prop.PropertyName};");
+            }
+        }
+        foreach (var indexer in cls.ImplIndexers)
+        {
+            if (indexer.IsRefReturn && indexer.IsAbstract)
+            {
+                w.Line($"{indent1}private {indexer.ReturnType} _defaultRefBacking_{indexer.IndexerName};");
+            }
+        }
+        foreach (var method in cls.ImplMethods)
+        {
+            if (method.IsRefReturn && method.IsAbstract)
+            {
+                w.Line($"{indent1}private {method.ReturnType} _defaultRefBacking_{method.MethodName};");
+            }
+        }
+        w.Line();
+
         // Constructors
         foreach (var ctor in cls.Constructors)
         {
@@ -678,52 +702,80 @@ internal static class ClassRenderer
         var requiredKeyword = prop.IsRequired ? "required " : "";
 
         w.Line($"{indent}/// <inheritdoc />");
-        w.Line($"{indent}{requiredKeyword}{prop.AccessModifier} override {prop.ReturnType} {prop.PropertyName}");
+        w.Line($"{indent}{requiredKeyword}{prop.AccessModifier} override {prop.RefReturnPrefix}{prop.ReturnType} {prop.PropertyName}");
         w.Line($"{indent}{{");
 
-        if (prop.HasGetter)
+        if (prop.IsRefReturn)
         {
+            // Ref return properties are always get-only (C# constraint)
             w.Line($"{indent1}get");
             w.Line($"{indent1}{{");
-            // Handle calls from base constructor when _stub is null
             if (prop.IsAbstract)
             {
-                // Abstract: always use InvokeGet (no base to fall back to)
-                w.Line($"{indent2}if (_stub == null) return default!;");
-                w.Line($"{indent2}return _stub.{prop.PropertyName}.InvokeGet(_stub.Strict);");
+                w.Line($"{indent2}if (_stub == null) {{ _defaultRefBacking_{prop.PropertyName} = default!; return ref _defaultRefBacking_{prop.PropertyName}; }}");
+                w.Line($"{indent2}_stub.{prop.PropertyName}.InvokeRefGet(_stub.Strict);");
+                w.Line($"{indent2}return ref _stub.{prop.PropertyName}._refReturnBacking;");
             }
             else
             {
-                // Virtual: always track via InvokeGet, but also fall back to base if not configured
-                w.Line($"{indent2}if (_stub == null) return base.{prop.PropertyName};");
-                w.Line($"{indent2}if (_stub.{prop.PropertyName}.IsConfigured) return _stub.{prop.PropertyName}.InvokeGet(_stub.Strict);");
-                // Not configured: track the unconfigured call, then return base value
-                w.Line($"{indent2}_stub.{prop.PropertyName}.InvokeGet(_stub.Strict);");
-                w.Line($"{indent2}return base.{prop.PropertyName};");
+                // Virtual: IsConfigured-first pattern
+                w.Line($"{indent2}if (_stub == null) return ref base.{prop.PropertyName};");
+                w.Line($"{indent2}if (_stub.{prop.PropertyName}.IsConfigured)");
+                w.Line($"{indent2}{{");
+                w.Line($"{indent2}\t_stub.{prop.PropertyName}.InvokeRefGet(_stub.Strict);");
+                w.Line($"{indent2}\treturn ref _stub.{prop.PropertyName}._refReturnBacking;");
+                w.Line($"{indent2}}}");
+                w.Line($"{indent2}_stub.{prop.PropertyName}.InvokeRefGet(_stub.Strict);");
+                w.Line($"{indent2}return ref base.{prop.PropertyName};");
             }
             w.Line($"{indent1}}}");
         }
-
-        if (prop.HasSetter)
+        else
         {
-            var setterKeyword = prop.IsInitOnly ? "init" : "set";
-            w.Line($"{indent1}{setterKeyword}");
-            w.Line($"{indent1}{{");
-            // Handle calls from base constructor when _stub is null
-            if (prop.IsAbstract)
+            if (prop.HasGetter)
             {
-                // Abstract: always use InvokeSet (no base to fall back to)
-                w.Line($"{indent2}if (_stub == null) return;");
-                w.Line($"{indent2}_stub.{prop.PropertyName}.InvokeSet(_stub.Strict, value);");
+                w.Line($"{indent1}get");
+                w.Line($"{indent1}{{");
+                // Handle calls from base constructor when _stub is null
+                if (prop.IsAbstract)
+                {
+                    // Abstract: always use InvokeGet (no base to fall back to)
+                    w.Line($"{indent2}if (_stub == null) return default!;");
+                    w.Line($"{indent2}return _stub.{prop.PropertyName}.InvokeGet(_stub.Strict);");
+                }
+                else
+                {
+                    // Virtual: always track via InvokeGet, but also fall back to base if not configured
+                    w.Line($"{indent2}if (_stub == null) return base.{prop.PropertyName};");
+                    w.Line($"{indent2}if (_stub.{prop.PropertyName}.IsConfigured) return _stub.{prop.PropertyName}.InvokeGet(_stub.Strict);");
+                    // Not configured: track the unconfigured call, then return base value
+                    w.Line($"{indent2}_stub.{prop.PropertyName}.InvokeGet(_stub.Strict);");
+                    w.Line($"{indent2}return base.{prop.PropertyName};");
+                }
+                w.Line($"{indent1}}}");
             }
-            else
+
+            if (prop.HasSetter)
             {
-                // Virtual: always track via InvokeSet, but also delegate to base if not configured
-                w.Line($"{indent2}if (_stub == null) {{ base.{prop.PropertyName} = value; return; }}");
-                w.Line($"{indent2}_stub.{prop.PropertyName}.InvokeSet(_stub.Strict, value);");
-                w.Line($"{indent2}if (!_stub.{prop.PropertyName}.IsConfigured) base.{prop.PropertyName} = value;");
+                var setterKeyword = prop.IsInitOnly ? "init" : "set";
+                w.Line($"{indent1}{setterKeyword}");
+                w.Line($"{indent1}{{");
+                // Handle calls from base constructor when _stub is null
+                if (prop.IsAbstract)
+                {
+                    // Abstract: always use InvokeSet (no base to fall back to)
+                    w.Line($"{indent2}if (_stub == null) return;");
+                    w.Line($"{indent2}_stub.{prop.PropertyName}.InvokeSet(_stub.Strict, value);");
+                }
+                else
+                {
+                    // Virtual: always track via InvokeSet, but also delegate to base if not configured
+                    w.Line($"{indent2}if (_stub == null) {{ base.{prop.PropertyName} = value; return; }}");
+                    w.Line($"{indent2}_stub.{prop.PropertyName}.InvokeSet(_stub.Strict, value);");
+                    w.Line($"{indent2}if (!_stub.{prop.PropertyName}.IsConfigured) base.{prop.PropertyName} = value;");
+                }
+                w.Line($"{indent1}}}");
             }
-            w.Line($"{indent1}}}");
         }
 
         w.Line($"{indent}}}");
@@ -735,52 +787,80 @@ internal static class ClassRenderer
         var indent2 = indent1 + "\t";
 
         w.Line($"{indent}/// <inheritdoc />");
-        w.Line($"{indent}{indexer.AccessModifier} override {indexer.ReturnType} this[{indexer.ParameterDeclarations}]");
+        w.Line($"{indent}{indexer.AccessModifier} override {indexer.RefReturnPrefix}{indexer.ReturnType} this[{indexer.ParameterDeclarations}]");
         w.Line($"{indent}{{");
 
-        if (indexer.HasGetter)
+        if (indexer.IsRefReturn)
         {
+            // Ref return indexers are always get-only (C# constraint)
             w.Line($"{indent1}get");
             w.Line($"{indent1}{{");
-            // Handle calls from base constructor when _stub is null
             if (indexer.IsAbstract)
             {
-                // Abstract: always use InvokeGet (no base to fall back to)
-                var defaultExpr = indexer.IsNullable ? "default" : GetDefaultForType(indexer.ReturnType, indexer.DefaultStrategy, indexer.ConcreteTypeForNew);
-                w.Line($"{indent2}if (_stub == null) return {defaultExpr};");
-                w.Line($"{indent2}return _stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
+                w.Line($"{indent2}if (_stub == null) {{ _defaultRefBacking_{indexer.IndexerName} = default!; return ref _defaultRefBacking_{indexer.IndexerName}; }}");
+                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeRefGet(_stub.Strict, {indexer.ArgumentList});");
+                w.Line($"{indent2}return ref _stub.{indexer.IndexerName}._refReturnBacking;");
             }
             else
             {
-                // Virtual: always track via InvokeGet, but also fall back to base if not configured
-                w.Line($"{indent2}if (_stub == null) return base[{indexer.ArgumentList}];");
-                w.Line($"{indent2}if (_stub.{indexer.IndexerName}.IsConfigured) return _stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
-                // Not configured: track the unconfigured call, then return base value
-                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
-                w.Line($"{indent2}return base[{indexer.ArgumentList}];");
+                // Virtual: IsConfigured-first pattern
+                w.Line($"{indent2}if (_stub == null) return ref base[{indexer.ArgumentList}];");
+                w.Line($"{indent2}if (_stub.{indexer.IndexerName}.IsConfigured)");
+                w.Line($"{indent2}{{");
+                w.Line($"{indent2}\t_stub.{indexer.IndexerName}.InvokeRefGet(_stub.Strict, {indexer.ArgumentList});");
+                w.Line($"{indent2}\treturn ref _stub.{indexer.IndexerName}._refReturnBacking;");
+                w.Line($"{indent2}}}");
+                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeRefGet(_stub.Strict, {indexer.ArgumentList});");
+                w.Line($"{indent2}return ref base[{indexer.ArgumentList}];");
             }
             w.Line($"{indent1}}}");
         }
-
-        if (indexer.HasSetter)
+        else
         {
-            w.Line($"{indent1}set");
-            w.Line($"{indent1}{{");
-            // Handle calls from base constructor when _stub is null
-            if (indexer.IsAbstract)
+            if (indexer.HasGetter)
             {
-                // Abstract: always use InvokeSet (no base to fall back to)
-                w.Line($"{indent2}if (_stub == null) return;");
-                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeSet(_stub.Strict, {indexer.ArgumentList}, value);");
+                w.Line($"{indent1}get");
+                w.Line($"{indent1}{{");
+                // Handle calls from base constructor when _stub is null
+                if (indexer.IsAbstract)
+                {
+                    // Abstract: always use InvokeGet (no base to fall back to)
+                    var defaultExpr = indexer.IsNullable ? "default" : GetDefaultForType(indexer.ReturnType, indexer.DefaultStrategy, indexer.ConcreteTypeForNew);
+                    w.Line($"{indent2}if (_stub == null) return {defaultExpr};");
+                    w.Line($"{indent2}return _stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
+                }
+                else
+                {
+                    // Virtual: always track via InvokeGet, but also fall back to base if not configured
+                    w.Line($"{indent2}if (_stub == null) return base[{indexer.ArgumentList}];");
+                    w.Line($"{indent2}if (_stub.{indexer.IndexerName}.IsConfigured) return _stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
+                    // Not configured: track the unconfigured call, then return base value
+                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
+                    w.Line($"{indent2}return base[{indexer.ArgumentList}];");
+                }
+                w.Line($"{indent1}}}");
             }
-            else
+
+            if (indexer.HasSetter)
             {
-                // Virtual: always track via InvokeSet, but also delegate to base if not configured
-                w.Line($"{indent2}if (_stub == null) {{ base[{indexer.ArgumentList}] = value; return; }}");
-                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeSet(_stub.Strict, {indexer.ArgumentList}, value);");
-                w.Line($"{indent2}if (!_stub.{indexer.IndexerName}.IsConfigured) base[{indexer.ArgumentList}] = value;");
+                w.Line($"{indent1}set");
+                w.Line($"{indent1}{{");
+                // Handle calls from base constructor when _stub is null
+                if (indexer.IsAbstract)
+                {
+                    // Abstract: always use InvokeSet (no base to fall back to)
+                    w.Line($"{indent2}if (_stub == null) return;");
+                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeSet(_stub.Strict, {indexer.ArgumentList}, value);");
+                }
+                else
+                {
+                    // Virtual: always track via InvokeSet, but also delegate to base if not configured
+                    w.Line($"{indent2}if (_stub == null) {{ base[{indexer.ArgumentList}] = value; return; }}");
+                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeSet(_stub.Strict, {indexer.ArgumentList}, value);");
+                    w.Line($"{indent2}if (!_stub.{indexer.IndexerName}.IsConfigured) base[{indexer.ArgumentList}] = value;");
+                }
+                w.Line($"{indent1}}}");
             }
-            w.Line($"{indent1}}}");
         }
 
         w.Line($"{indent}}}");
@@ -796,96 +876,129 @@ internal static class ClassRenderer
         }
 
         w.Line($"{indent}/// <inheritdoc />");
-        w.Line($"{indent}{method.AccessModifier} override {method.ReturnType} {method.MethodName}({method.ParameterDeclarations})");
+        w.Line($"{indent}{method.AccessModifier} override {method.RefReturnPrefix}{method.ReturnType} {method.MethodName}({method.ParameterDeclarations})");
         w.Line($"{indent}{{");
 
-        // Null check for calls during base constructor
-        w.Line($"{indent1}if (_stub == null)");
-        w.Line($"{indent1}{{");
-        if (method.IsAbstract)
+        if (method.IsRefReturn)
         {
-            // Abstract - return default
-            if (method.IsVoid)
+            // Ref return method override - uses InvokeRef + _refReturnBacking pattern
+            var invokeRefMethodName = string.IsNullOrEmpty(method.InvokeSuffix)
+                ? "InvokeRef"
+                : $"InvokeRef{method.InvokeSuffix}";
+            var backingField = string.IsNullOrEmpty(method.InvokeSuffix)
+                ? "_refReturnBacking"
+                : $"_refReturnBacking{method.InvokeSuffix}";
+            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+
+            if (method.IsAbstract)
             {
-                w.Line($"{indent1}\treturn;");
-            }
-            else if (method.IsTask)
-            {
-                w.Line($"{indent1}\treturn global::System.Threading.Tasks.Task.CompletedTask;");
-            }
-            else if (method.IsValueTask)
-            {
-                w.Line($"{indent1}\treturn default;");
+                w.Line($"{indent1}if (_stub == null) {{ _defaultRefBacking_{method.MethodName} = default!; return ref _defaultRefBacking_{method.MethodName}; }}");
+                w.Line($"{indent1}_stub.{method.HandlerName}.{invokeRefMethodName}({invokeArgs});");
+                w.Line($"{indent1}return ref _stub.{method.HandlerName}.{backingField};");
             }
             else
             {
-                w.Line($"{indent1}\treturn default!;");
+                // Virtual: IsConfigured-first pattern
+                w.Line($"{indent1}if (_stub == null) return ref base.{method.MethodName}({method.ArgumentList});");
+                w.Line($"{indent1}if (_stub.{method.HandlerName}.IsConfigured)");
+                w.Line($"{indent1}{{");
+                w.Line($"{indent1}\t_stub.{method.HandlerName}.{invokeRefMethodName}({invokeArgs});");
+                w.Line($"{indent1}\treturn ref _stub.{method.HandlerName}.{backingField};");
+                w.Line($"{indent1}}}");
+                w.Line($"{indent1}_stub.{method.HandlerName}.{invokeRefMethodName}({invokeArgs});");
+                w.Line($"{indent1}return ref base.{method.MethodName}({method.ArgumentList});");
             }
         }
         else
         {
-            // Virtual - delegate to base
-            if (method.IsVoid)
+            // Null check for calls during base constructor
+            w.Line($"{indent1}if (_stub == null)");
+            w.Line($"{indent1}{{");
+            if (method.IsAbstract)
             {
-                w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
-                w.Line($"{indent1}\treturn;");
+                // Abstract - return default
+                if (method.IsVoid)
+                {
+                    w.Line($"{indent1}\treturn;");
+                }
+                else if (method.IsTask)
+                {
+                    w.Line($"{indent1}\treturn global::System.Threading.Tasks.Task.CompletedTask;");
+                }
+                else if (method.IsValueTask)
+                {
+                    w.Line($"{indent1}\treturn default;");
+                }
+                else
+                {
+                    w.Line($"{indent1}\treturn default!;");
+                }
             }
             else
             {
-                w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
+                // Virtual - delegate to base
+                if (method.IsVoid)
+                {
+                    w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
+                    w.Line($"{indent1}\treturn;");
+                }
+                else
+                {
+                    w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
+                }
             }
-        }
-        w.Line($"{indent1}}}");
-        w.Line();
+            w.Line($"{indent1}}}");
+            w.Line();
 
-        // Both single-signature and multi-overload interceptors use the shared MethodInterceptorRenderer
-        // which generates Invoke/Invoke_{suffix} methods that handle everything internally.
-        // For class stubs:
-        // - Abstract methods: always use Invoke (no base to fall back to)
-        // - Virtual methods: call Invoke, but check if it actually handled the call and fall back to base if not
+            // Both single-signature and multi-overload interceptors use the shared MethodInterceptorRenderer
+            // which generates Invoke/Invoke_{suffix} methods that handle everything internally.
+            // For class stubs:
+            // - Abstract methods: always use Invoke (no base to fall back to)
+            // - Virtual methods: call Invoke, but check if it actually handled the call and fall back to base if not
 
-        // Determine the invoke method name
-        var invokeMethodName = string.IsNullOrEmpty(method.InvokeSuffix)
-            ? "Invoke"
-            : $"Invoke{method.InvokeSuffix}";
+            // Determine the invoke method name
+            var invokeMethodName = string.IsNullOrEmpty(method.InvokeSuffix)
+                ? "Invoke"
+                : $"Invoke{method.InvokeSuffix}";
 
-        // Build invoke arguments: strict, then method parameters
-        var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
+            // Build invoke arguments: strict, then method parameters
+            var invokeArgs = "_stub.Strict" + (string.IsNullOrEmpty(method.InputArgumentList) ? "" : $", {method.InputArgumentList}");
 
-        if (method.IsAbstract)
-        {
-            // Abstract methods: always use Invoke - it handles everything
-            if (method.IsVoid)
+            if (method.IsAbstract)
             {
-                w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
-            }
-            else
-            {
-                w.Line($"{indent1}return _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
-            }
-        }
-        else
-        {
-            // Virtual methods: track whether a real handler handled the call
-            // The shared interceptor tracks unconfigured calls via UnconfiguredCallCount
-            // If this counter increments during Invoke, nothing handled the call -> use base
-            w.Line($"{indent1}var unconfiguredBefore = _stub.{method.HandlerName}.UnconfiguredCallCount;");
-            if (method.IsVoid)
-            {
-                w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
-                w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
-                w.Line($"{indent1}{{");
-                w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
-                w.Line($"{indent1}}}");
+                // Abstract methods: always use Invoke - it handles everything
+                if (method.IsVoid)
+                {
+                    w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+                }
+                else
+                {
+                    w.Line($"{indent1}return _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+                }
             }
             else
             {
-                w.Line($"{indent1}var result = _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
-                w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
-                w.Line($"{indent1}{{");
-                w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
-                w.Line($"{indent1}}}");
-                w.Line($"{indent1}return result;");
+                // Virtual methods: track whether a real handler handled the call
+                // The shared interceptor tracks unconfigured calls via UnconfiguredCallCount
+                // If this counter increments during Invoke, nothing handled the call -> use base
+                w.Line($"{indent1}var unconfiguredBefore = _stub.{method.HandlerName}.UnconfiguredCallCount;");
+                if (method.IsVoid)
+                {
+                    w.Line($"{indent1}_stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+                    w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
+                    w.Line($"{indent1}{{");
+                    w.Line($"{indent1}\tbase.{method.MethodName}({method.ArgumentList});");
+                    w.Line($"{indent1}}}");
+                }
+                else
+                {
+                    w.Line($"{indent1}var result = _stub.{method.HandlerName}.{invokeMethodName}({invokeArgs});");
+                    w.Line($"{indent1}if (_stub.{method.HandlerName}.UnconfiguredCallCount > unconfiguredBefore)");
+                    w.Line($"{indent1}{{");
+                    w.Line($"{indent1}\treturn base.{method.MethodName}({method.ArgumentList});");
+                    w.Line($"{indent1}}}");
+                    w.Line($"{indent1}return result;");
+                }
             }
         }
 
@@ -1026,7 +1139,9 @@ internal static class ClassRenderer
             DefaultExpression: "default!",
             HasGetter: prop.HasGetter,
             HasSetter: prop.HasSetter,
-            IsInitOnly: false);
+            IsInitOnly: false,
+            ReturnsByRef: prop.ReturnsByRef,
+            ReturnsByRefReadonly: prop.ReturnsByRefReadonly);
     }
 
     /// <summary>
@@ -1052,7 +1167,9 @@ internal static class ClassRenderer
             HasSetter: indexer.HasSetter,
             ParameterSignature: indexer.ParameterDeclarations,
             ParameterTypes: paramList,
-            KeyExpression: indexer.KeyExpression);
+            KeyExpression: indexer.KeyExpression,
+            ReturnsByRef: indexer.ReturnsByRef,
+            ReturnsByRefReadonly: indexer.ReturnsByRefReadonly);
     }
 
     #endregion
