@@ -1,6 +1,6 @@
 # Rename "User Methods" to "Stub Overrides"
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** Medium
 **Created:** 2026-02-08
 **Last Updated:** 2026-02-08
@@ -26,21 +26,21 @@ The rename covers:
 
 ## Plans
 
-- [Rename "User Methods" to "Stub Overrides" - Implementation Plan](../plans/rename-user-methods-to-stub-overrides.md)
+- [Rename "User Methods" to "Stub Overrides" - Implementation Plan](../plans/completed/rename-user-methods-to-stub-overrides.md)
 
 ---
 
 ## Tasks
 
 - [x] Create implementation plan mapping all rename locations
-- [ ] Rename code identifiers in generator (models, builders, renderers)
-- [ ] Rename code identifiers in library
-- [ ] Rename Design project files and identifiers
-- [ ] Rename test files and identifiers
-- [ ] Rename documentation files and content
-- [ ] Rename skill files and content
-- [ ] Verify all builds pass
-- [ ] Verify all tests pass
+- [x] Rename code identifiers in generator (models, builders, renderers)
+- [x] Rename code identifiers in library
+- [x] Rename Design project files and identifiers
+- [x] Rename test files and identifiers
+- [x] Rename documentation files and content
+- [x] Rename skill files and content
+- [x] Verify all builds pass
+- [x] Verify all tests pass
 
 ---
 
@@ -62,15 +62,15 @@ The rename covers:
 
 Before marking this todo as Complete, verify:
 
-- [ ] Design project builds successfully
-- [ ] Design project tests pass
+- [x] Design project builds successfully
+- [x] Design project tests pass
 
 **Verification results:**
-- Design build: [Pending]
-- Design tests: [Pending]
+- Design build: 0 errors, 0 warnings
+- Design tests: 1,068 passed, 0 failed
 
 ---
 
 ## Results / Conclusions
 
-[What was learned? What decisions were made?]
+Renamed "user methods" to "stub overrides" and "user properties" to "stub override properties" across the entire codebase. 106 files changed (17 file/folder renames, 89 content modifications). All 6,336 tests passing. Zero grep matches for old terminology in active files. PR #65.

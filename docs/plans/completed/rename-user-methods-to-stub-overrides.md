@@ -2,8 +2,8 @@
 
 **Date:** 2026-02-08
 **Related Todo:** [Rename "User Methods" to "Stub Overrides"](../todos/rename-user-methods-to-stub-overrides.md)
-**Status:** Under Review (Developer)
-**Last Updated:** 2026-02-08 (updated: all developer review concerns addressed)
+**Status:** Complete
+**Last Updated:** 2026-02-08
 
 ---
 
