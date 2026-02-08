@@ -525,3 +525,68 @@ public partial class ParamTypeSuffixInlineTests
 }
 
 #endregion
+
+#region Ref Return Test Types
+
+/// <summary>
+/// Interface with ref return methods for testing ref return support.
+/// </summary>
+public interface IRefReturnMethodService
+{
+	ref int GetValueRef();
+	ref readonly int GetValueRefReadonly();
+	ref string GetItemRef(int index);
+	ref readonly string GetItemRefReadonly(int index);
+}
+
+/// <summary>
+/// Interface with ref return properties (get-only, C# constraint).
+/// </summary>
+public interface IRefReturnPropertyService
+{
+	ref int Value { get; }
+	ref readonly int ReadonlyValue { get; }
+}
+
+/// <summary>
+/// Interface with ref return indexers.
+/// </summary>
+public interface IRefReturnIndexerService
+{
+	ref int this[int index] { get; }
+	ref readonly int this[string key] { get; }
+}
+
+/// <summary>
+/// Mix of normal + ref return members.
+/// Tests whether ref return members break generation of adjacent normal members.
+/// </summary>
+public interface IMixedRefReturnService
+{
+	int NormalValue { get; set; }
+	int GetNormal(int input);
+	ref int GetValueRef();
+	ref readonly int ReadonlyValue { get; }
+}
+
+[KnockOff]
+public partial class RefReturnMethodServiceKnockOff : IRefReturnMethodService
+{
+}
+
+[KnockOff]
+public partial class RefReturnPropertyServiceKnockOff : IRefReturnPropertyService
+{
+}
+
+[KnockOff]
+public partial class RefReturnIndexerServiceKnockOff : IRefReturnIndexerService
+{
+}
+
+[KnockOff]
+public partial class MixedRefReturnServiceKnockOff : IMixedRefReturnService
+{
+}
+
+#endregion
