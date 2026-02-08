@@ -105,7 +105,7 @@ This was explicitly called a **breaking change** with migration steps.
 
 | File | Synced From | Action |
 |------|-------------|--------|
-| `docs/guides/user-methods.md` | `Documentation.Samples/UserMethodsSamples.cs` | Will auto-update via mdsnippets |
+| `docs/guides/stub-overrides.md` | `Documentation.Samples/UserMethodsSamples.cs` | Will auto-update via mdsnippets |
 
 ---
 
@@ -198,13 +198,13 @@ public partial class UserMethodsRepoStub
 dotnet tool run mdsnippets
 ```
 
-This will sync the updated `#region` blocks to `docs/guides/user-methods.md`.
+This will sync the updated `#region` blocks to `docs/guides/stub-overrides.md`.
 
 ### Phase 5: Verify Consistency
 
 1. Build all projects
 2. Run all tests
-3. Review `docs/guides/user-methods.md` to confirm:
+3. Review `docs/guides/stub-overrides.md` to confirm:
    - Code samples use `protected override MethodName_()` pattern
    - Interceptor references use clean names (no `2` suffix)
    - Prose and code are consistent
@@ -273,7 +273,7 @@ This will sync the updated `#region` blocks to `docs/guides/user-methods.md`.
     dotnet tool run mdsnippets
     ```
 
-14. [ ] **Review `docs/guides/user-methods.md`:**
+14. [ ] **Review `docs/guides/stub-overrides.md`:**
     - Verify code samples show `protected override MethodName_()` pattern
     - Verify interceptor references use clean names (no `2` suffix)
     - Verify prose is consistent with samples
@@ -308,7 +308,7 @@ This will sync the updated `#region` blocks to `docs/guides/user-methods.md`.
 
 ### Documentation
 - [ ] mdsnippets runs without errors
-- [ ] `docs/guides/user-methods.md` shows `protected override MethodName_()` pattern
+- [ ] `docs/guides/stub-overrides.md` shows `protected override MethodName_()` pattern
 - [ ] No `2` suffix interceptors in documentation samples
 
 ---
@@ -379,7 +379,7 @@ This will sync the updated `#region` blocks to `docs/guides/user-methods.md`.
 After this change, only ONE pattern will exist for user methods:
 - `protected override MethodName_(args)` with `stub.MethodName` interceptor
 
-This matches the documented behavior in `docs/guides/user-methods.md`.
+This matches the documented behavior in `docs/guides/stub-overrides.md`.
 
 ### Diagnostic Requirements
 
@@ -445,7 +445,7 @@ This matches the documented behavior in `docs/guides/user-methods.md`.
 
 | File | Issue |
 |------|-------|
-| `docs/guides/user-methods.md` | Prose describes NEW pattern but code snippets (via mdsnippets) show OLD pattern. Will self-correct after `UserMethodsSamples.cs` migration + mdsnippets run. |
+| `docs/guides/stub-overrides.md` | Prose describes NEW pattern but code snippets (via mdsnippets) show OLD pattern. Will self-correct after `UserMethodsSamples.cs` migration + mdsnippets run. |
 
 ### Legacy Code Flow (to be removed)
 
@@ -585,7 +585,7 @@ This plan is approved because:
 **Phase 3: Documentation Sync**
 
 - [ ] 3.1 Run mdsnippets: `dotnet tool run mdsnippets`
-- [ ] 3.2 Review `docs/guides/user-methods.md`:
+- [ ] 3.2 Review `docs/guides/stub-overrides.md`:
   - Verify code samples show `protected override MethodName_()` pattern
   - Verify interceptor references use clean names (no `2` suffix)
 - [ ] **Checkpoint 4:** Final test run - `dotnet test src/KnockOff.sln`
@@ -668,7 +668,7 @@ All tests passed:
 ### Phase 3: Documentation Sync - COMPLETE
 
 - [x] Ran `dotnet tool run mdsnippets` - successful (384 snippets extracted)
-- [x] Verified `docs/guides/user-methods.md` shows correct pattern:
+- [x] Verified `docs/guides/stub-overrides.md` shows correct pattern:
   - Code samples use `protected override MethodName_()` pattern
   - Interceptor references use clean names (no `2` suffix)
   - Documentation is consistent with code
@@ -698,7 +698,7 @@ Passed!  - Failed:     0, Passed:   473, Skipped:     0, Total:   473 - KnockOff
 Passed!  - Failed:     0, Passed:  1033, Skipped:     0, Total:  1033 - KnockOffTests.dll
 ```
 
-### Documentation Sample (from user-methods.md)
+### Documentation Sample (from stub-overrides.md)
 
 ```csharp
 [KnockOff]

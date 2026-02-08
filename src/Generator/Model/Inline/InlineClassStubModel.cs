@@ -222,9 +222,9 @@ internal sealed record InlineClassImplPropertyModel(
     bool IsAbstract,
     /// <summary>
     /// True if the user has defined a 'protected override' property with the _ suffix
-    /// in their partial class (base class user property pattern).
+    /// in their partial class (base class stub override property pattern).
     /// </summary>
-    bool HasUserOverride = false,
+    bool HasStubOverride = false,
     // Ref return support
     /// <summary>True if the property returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
@@ -309,9 +309,9 @@ internal sealed record InlineClassImplMethodModel(
     string InvokeSuffix,
     /// <summary>
     /// True if the user has defined a 'protected override' method with the _ suffix
-    /// in their partial class (base class user method pattern).
+    /// in their partial class (base class stub override pattern).
     /// </summary>
-    bool HasUserOverride = false,
+    bool HasStubOverride = false,
     /// <summary>Whether this is a generic method override. Routes to generic rendering path in the Impl class.</summary>
     bool IsGenericMethod = false,
     /// <summary>Type parameter declaration for the override signature (e.g., "&lt;T&gt;" or "&lt;TKey, TValue&gt;").

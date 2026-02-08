@@ -1,7 +1,7 @@
-# Enable .When() API with User Methods - Implementation Plan
+# Enable .When() API with Stub Overrides - Implementation Plan
 
 **Date:** 2026-02-05
-**Related Todo:** [Enable .When() API with User Methods](../todos/when-with-user-methods.md)
+**Related Todo:** [Enable .When() API with Stub Overrides](../todos/when-with-user-methods.md)
 **Status:** Complete
 **Last Updated:** 2026-02-05
 
@@ -9,9 +9,9 @@
 
 ## Overview
 
-Extend standalone stub interceptors to support the `.When()` API when user methods are defined. Currently, methods with user overrides (the `_` suffix pattern) receive a simplified "tracking-only" interceptor that lacks `.When()` chains, sequences, and other features available in inline stubs.
+Extend standalone stub interceptors to support the `.When()` API when stub overrides are defined. Currently, methods with user overrides (the `_` suffix pattern) receive a simplified "tracking-only" interceptor that lacks `.When()` chains, sequences, and other features available in inline stubs.
 
-The goal is API uniformity: standalone stubs with user methods should have the same interceptor capabilities as inline stubs.
+The goal is API uniformity: standalone stubs with stub overrides should have the same interceptor capabilities as inline stubs.
 
 ---
 
@@ -19,7 +19,7 @@ The goal is API uniformity: standalone stubs with user methods should have the s
 
 ### Patterns Affected
 
-| Pattern | User Methods Supported | `.When()` Support After |
+| Pattern | Stub Overrides Supported | `.When()` Support After |
 |---------|----------------------|------------------------|
 | Standalone (interface) | Yes | Yes |
 | Generic Standalone (interface) | Yes | Yes |
@@ -52,18 +52,18 @@ The goal is API uniformity: standalone stubs with user methods should have the s
 
 ### Priority Chain Specification
 
-**Current User Method Interceptor:**
+**Current Stub Override Interceptor:**
 ```
 1. OnCall/Returns (if configured)
-2. User Method (fallback)
+2. Stub Override (fallback)
 ```
 
-**New User Method Interceptor (matches inline pattern):**
+**New Stub Override Interceptor (matches inline pattern):**
 ```
 1. When chains (parameter-specific matching)
 2. Sequences (ThenCall chain)
 3. OnCall/Returns (explicit configuration)
-4. User Method (fallback - replaces Source/Strict from inline)
+4. Stub Override (fallback - replaces Source/Strict from inline)
 ```
 
 ### Generated Code Pattern
@@ -74,7 +74,7 @@ string IService.Process(string input)
 {
     Process.RecordCall(input);
     if (Process.Callback is { } callback) return callback(input);
-    return Process_(input);  // User method
+    return Process_(input);  // Stub override
 }
 ```
 
@@ -127,7 +127,7 @@ internal string Invoke(bool strict, string input)
         return _onCall(input);
     }
 
-    // User Method fallback (NEW - replaces Source/Strict)
+    // Stub Override fallback (NEW - replaces Source/Strict)
     _unconfiguredCallCount++;
     _unconfiguredLastArg = input;
     return Process_(input);  // Call user override
@@ -136,13 +136,13 @@ internal string Invoke(bool strict, string input)
 
 ### Key Differences from Inline Interceptor
 
-The only difference between the user method interceptor and inline interceptor is the final fallback:
+The only difference between the stub override interceptor and inline interceptor is the final fallback:
 - **Inline**: Falls to Source delegation, then Strict mode, then smart default
-- **User Method**: Falls to user method (which IS the "configured" behavior)
+- **Stub Override**: Falls to stub override (which IS the "configured" behavior)
 
 ### Interceptor Class Structure
 
-User method interceptors will gain these additional members:
+Stub override interceptors will gain these additional members:
 
 ```csharp
 public sealed class ProcessInterceptor
@@ -191,17 +191,17 @@ public sealed class ProcessInterceptor
 
 ### Strategy: Unify with Inline Interceptor Generation
 
-Rather than maintaining two separate interceptor rendering paths, extend the existing `MethodInterceptorRenderer` to handle user method interceptors by:
+Rather than maintaining two separate interceptor rendering paths, extend the existing `MethodInterceptorRenderer` to handle stub override interceptors by:
 
-1. Adding a parameter to indicate "user method fallback" instead of "Source/Strict fallback"
+1. Adding a parameter to indicate "stub override fallback" instead of "Source/Strict fallback"
 2. Reusing all the When chain, Sequence, and verification rendering logic
-3. Generating the `Invoke()` method with user method as final fallback
+3. Generating the `Invoke()` method with stub override as final fallback
 
 ### Alternative Considered: Separate Renderer
 
 Rejected because:
 - Would duplicate ~1000 lines of interceptor generation code
-- Changes to inline interceptor would need mirroring in user method interceptor
+- Changes to inline interceptor would need mirroring in stub override interceptor
 - Higher maintenance burden
 
 ---
@@ -210,7 +210,7 @@ Rejected because:
 
 ### Phase 1: Model Updates
 
-Update the model layer to support unified rendering with user method fallback.
+Update the model layer to support unified rendering with stub override fallback.
 
 **Files:**
 - `src/Generator/Model/Shared/UnifiedMethodInterceptorModel.cs` - Add `UserMethodName` property (string, null when no user override)
@@ -222,11 +222,11 @@ Update the model layer to support unified rendering with user method fallback.
 
 ### Phase 2: Renderer Integration
 
-Extend `MethodInterceptorRenderer` to handle user method interceptors.
+Extend `MethodInterceptorRenderer` to handle stub override interceptors.
 
 **Files:**
 - `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Add `UserMethodFallback` option to `InterceptorRenderOptions`
-- `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Modify `RenderInvokeMethod()` to use user method as final fallback (skip Source/Strict checks)
+- `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Modify `RenderInvokeMethod()` to use stub override as final fallback (skip Source/Strict checks)
 - `src/Generator/Renderer/FlatRenderer.cs` - Replace `RenderUserMethodInterceptorClass()` calls with unified renderer
 
 **Verification:**
@@ -237,56 +237,56 @@ Extend `MethodInterceptorRenderer` to handle user method interceptors.
    - ProcessInterceptor contains `When()` method overloads
    - ProcessInterceptor contains `WhenBuilder` and `WhenChain` nested classes
    - ProcessInterceptor contains `Invoke()` method with priority chain
-   - Invoke() ends with `return Process_(input);` (user method fallback), NOT Strict check
+   - Invoke() ends with `return Process_(input);` (stub override fallback), NOT Strict check
 
 ### Phase 3: Interface Implementation Update
 
-Update interface implementation generation to use `Invoke()` pattern for user methods.
+Update interface implementation generation to use `Invoke()` pattern for stub overrides.
 
 **Files:**
 - `src/Generator/Renderer/FlatRenderer.cs` - Modify `RenderUserOverrideImplementation()` to call `Invoke()` instead of inline logic
 
-**Verification:** Build succeeds, existing user method tests pass
+**Verification:** Build succeeds, existing stub override tests pass
 
 ### Phase 4: Overload Group Support
 
-Handle user method overloads (multiple signatures with same name), including **mixed overload groups** where some signatures have user methods and others do not.
+Handle stub override overloads (multiple signatures with same name), including **mixed overload groups** where some signatures have stub overrides and others do not.
 
 **Files:**
 - `src/Generator/Renderer/FlatRenderer.cs` - Update `RenderUserMethodGroupInterceptorClass()` to use unified renderer
 - `src/Generator/Builder/FlatModelBuilder.cs` - Ensure overload groups populate unified model correctly
 
 **Mixed Overload Group Handling:**
-When an overload group has mixed user method coverage (e.g., Format(string) has user override, Format(string, bool) does not):
+When an overload group has mixed stub override coverage (e.g., Format(string) has user override, Format(string, bool) does not):
 - Per-signature `Invoke_*` methods must use appropriate fallback:
-  - Signature WITH user override: Falls to user method
+  - Signature WITH user override: Falls to stub override
   - Signature WITHOUT user override: Falls to Source/Strict
 - The interceptor class contains all When/Sequence infrastructure per signature
 - `Source(T)` only populates `_source` for signatures without user overrides
 
-**Verification:** Build succeeds, overload user method tests pass, mixed overload scenarios verified
+**Verification:** Build succeeds, overload stub override tests pass, mixed overload scenarios verified
 
 ### Phase 5: Test Coverage
 
-Add comprehensive tests for `.When()` with user methods.
+Add comprehensive tests for `.When()` with stub overrides.
 
 **Files:**
 - `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Add When chain examples
-- `src/Design/Design.Tests/UserMethodTests/` - Add test files for When + user method combinations
+- `src/Design/Design.Tests/UserMethodTests/` - Add test files for When + stub override combinations
 - `src/Tests/KnockOffTests/` - Add generator output verification tests
 
 **Test Cases:**
-- [ ] Basic `.When(value).Returns(value)` with user method fallback
-- [ ] Predicate `.When(predicate).Returns(value)` with user method fallback
-- [ ] `.When().ThenWhen()` chaining with user method fallback
-- [ ] Void method `.When(args).Call(callback)` with user method fallback
+- [ ] Basic `.When(value).Returns(value)` with stub override fallback
+- [ ] Predicate `.When(predicate).Returns(value)` with stub override fallback
+- [ ] `.When().ThenWhen()` chaining with stub override fallback
+- [ ] Void method `.When(args).Call(callback)` with stub override fallback
 - [ ] Async method `.When(args).Returns(innerValue)` auto-wrap
-- [ ] Sequences `.Returns().ThenReturns()` with user method fallback
+- [ ] Sequences `.Returns().ThenReturns()` with stub override fallback
 - [ ] `.Verifiable()` on When chains
 - [ ] `stub.Verify()` integration
-- [ ] Mixed scenario: some calls match When, some fall to user method
-- [ ] Generic standalone with user methods
-- [ ] Overloaded user methods with When chains
+- [ ] Mixed scenario: some calls match When, some fall to stub override
+- [ ] Generic standalone with stub overrides
+- [ ] Overloaded stub overrides with When chains
 
 **Verification:** All new tests pass
 
@@ -295,7 +295,7 @@ Add comprehensive tests for `.When()` with user methods.
 Update documentation to reflect new capability.
 
 **Files:**
-- `docs/api-consistency-matrix.md` - Update to show `.When()` works with user methods
+- `docs/api-consistency-matrix.md` - Update to show `.When()` works with stub overrides
 - `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Add documentation comments
 
 **Verification:** Documentation builds, examples compile
@@ -306,16 +306,16 @@ Update documentation to reflect new capability.
 
 - [ ] `.When(value).Returns(value)` works on methods with user overrides
 - [ ] `.When(predicate).Returns(value)` works on methods with user overrides
-- [ ] When chain falls through to user method when no match
+- [ ] When chain falls through to stub override when no match
 - [ ] Sequences work: `.OnCall().ThenCall()`, `.Returns().ThenReturns()`
 - [ ] Void methods support `.When(args).Call(callback)`
 - [ ] Async methods auto-wrap inner type with `Task.FromResult`
 - [ ] `.Verifiable()` works on When chains
 - [ ] `stub.Verify()` includes When chain verification
-- [ ] All existing user method tests continue to pass
+- [ ] All existing stub override tests continue to pass
 - [ ] All existing non-user-method tests continue to pass
-- [ ] Generic standalone stubs with user methods have `.When()` support
-- [ ] Overloaded user methods have `.When()` support
+- [ ] Generic standalone stubs with stub overrides have `.When()` support
+- [ ] Overloaded stub overrides have `.When()` support
 
 ---
 
@@ -329,47 +329,47 @@ Update documentation to reflect new capability.
 
 ### Risk: Generated Code Size Increase
 
-User method interceptors will grow significantly (from ~80 lines to ~400+ lines).
+Stub override interceptors will grow significantly (from ~80 lines to ~400+ lines).
 
 **Mitigation:** This is acceptable - the code is generated, not maintained by users. The benefit of API consistency outweighs the generated code size.
 
-### Risk: Breaking Existing User Method Behavior
+### Risk: Breaking Existing Stub Override Behavior
 
-If the priority chain is incorrect, existing user method stubs could behave differently.
+If the priority chain is incorrect, existing stub override stubs could behave differently.
 
 **Mitigation:**
 - Existing tests verify current behavior
-- New `Invoke()` method has user method as final fallback (same effective behavior when no When/Sequence/OnCall configured)
+- New `Invoke()` method has stub override as final fallback (same effective behavior when no When/Sequence/OnCall configured)
 - Phase 3 verification explicitly checks existing tests pass
 
 ### Risk: Overload Complexity
 
-Overloaded user methods require per-signature When chains, adding complexity.
+Overloaded stub overrides require per-signature When chains, adding complexity.
 
 **Mitigation:** The codebase already handles overload groups for inline stubs. Reuse that pattern.
 
 ### Note: Source(T) Behavior
 
-User method stubs have empty `Source(T)` method bodies by design. The user method IS the fallback, so Source delegation is not applicable. This is intentional and will remain unchanged.
+Stub override stubs have empty `Source(T)` method bodies by design. The stub override IS the fallback, so Source delegation is not applicable. This is intentional and will remain unchanged.
 
 ---
 
 ## Architectural Verification
 
 **Nine Patterns Analysis:**
-- Standalone (interface): Primary target - gains `.When()` with user method fallback
-- Generic Standalone (interface): Target - gains `.When()` with user method fallback
-- Standalone Class: Target - gains `.When()` with user method fallback
-- Generic Standalone Class: Target - gains `.When()` with user method fallback
-- Inline Interface: N/A - cannot have user methods, already has `.When()`
-- Inline Class: N/A - cannot have user methods, already has `.When()`
-- Inline Delegate: N/A - cannot have user methods
-- Open Generic Interface: N/A - cannot have user methods, already has `.When()`
-- Open Generic Class: N/A - cannot have user methods, already has `.When()`
+- Standalone (interface): Primary target - gains `.When()` with stub override fallback
+- Generic Standalone (interface): Target - gains `.When()` with stub override fallback
+- Standalone Class: Target - gains `.When()` with stub override fallback
+- Generic Standalone Class: Target - gains `.When()` with stub override fallback
+- Inline Interface: N/A - cannot have stub overrides, already has `.When()`
+- Inline Class: N/A - cannot have stub overrides, already has `.When()`
+- Inline Delegate: N/A - cannot have stub overrides
+- Open Generic Interface: N/A - cannot have stub overrides, already has `.When()`
+- Open Generic Class: N/A - cannot have stub overrides, already has `.When()`
 
 **Breaking Changes:** No - adding new API surface, not modifying existing behavior
 
-**Pattern Consistency:** Design follows inline pattern exactly, with user method replacing Source/Strict as final fallback
+**Pattern Consistency:** Design follows inline pattern exactly, with stub override replacing Source/Strict as final fallback
 
 **Diagnostic Requirements:** None needed - feature is purely additive
 
@@ -379,8 +379,8 @@ User method stubs have empty `Source(T)` method bodies by design. The user metho
 - New tests verify new functionality
 
 **Edge Cases:**
-- User method that throws: When chain should still work, exception propagates from user method on fallback
-- Async user method with sync When: Auto-wrap handles this
+- Stub override that throws: When chain should still work, exception propagates from stub override on fallback
+- Async stub override with sync When: Auto-wrap handles this
 - Nullable return types: Handled same as inline
 - Generic type parameters: Handled by generic standalone pattern
 
@@ -390,11 +390,11 @@ Files examined:
 - `/home/keithvoels/neatoodotnet/KnockOff/src/Generator/Renderer/FlatRenderer.cs` - Lines 2060-2260 `RenderUserMethodInterceptorClass()`
 - `/home/keithvoels/neatoodotnet/KnockOff/src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Full interceptor with When chains
 - `/home/keithvoels/neatoodotnet/KnockOff/src/Generator/Renderer/Shared/WhenChainRenderer.cs` - When chain generation
-- `/home/keithvoels/neatoodotnet/KnockOff/src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Current user method patterns
+- `/home/keithvoels/neatoodotnet/KnockOff/src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Current stub override patterns
 - `/home/keithvoels/neatoodotnet/KnockOff/src/Design/Design.Stubs/Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/BasicUserMethodStub.g.cs` - Current simplified interceptor
 - `/home/keithvoels/neatoodotnet/KnockOff/src/Design/Design.Stubs/Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/CalculatorStub.g.cs` - Full interceptor with When chains
 - `/home/keithvoels/neatoodotnet/KnockOff/src/Design/Design.Stubs/Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/WhenMatchingDemo.Stubs.g.cs` - Inline When chain example
-- `/home/keithvoels/neatoodotnet/KnockOff/src/Design/Design.Stubs/Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/GenericFormatterWithUserMethodsStub\`1.g.cs` - Mixed user/non-user methods
+- `/home/keithvoels/neatoodotnet/KnockOff/src/Design/Design.Stubs/Generated/KnockOff.Generator/KnockOff.KnockOffGenerator/GenericFormatterWithUserMethodsStub\`1.g.cs` - Mixed user/non-stub overrides
 
 ---
 
@@ -406,13 +406,13 @@ The developer raised 6 concerns during initial review. Each has been investigate
 
 ### Concern 1: OnCall/Returns Return Type Incompatibility
 
-**Concern:** Current user method interceptors return `IMethodTracking<T>` from `OnCall()`/`Returns()`, but the unified full interceptor returns `MethodCallBuilderImpl`. This could break existing code like:
+**Concern:** Current stub override interceptors return `IMethodTracking<T>` from `OnCall()`/`Returns()`, but the unified full interceptor returns `MethodCallBuilderImpl`. This could break existing code like:
 ```csharp
 IMethodTracking<string> tracking = stub.Process.OnCall(x => x);
 ```
 
 **Investigation:**
-- Current user method interceptor (BasicUserMethodStub.g.cs line 30): `public global::KnockOff.IMethodTracking<string> OnCall(ProcessDelegate callback)`
+- Current stub override interceptor (BasicUserMethodStub.g.cs line 30): `public global::KnockOff.IMethodTracking<string> OnCall(ProcessDelegate callback)`
 - Full interceptor (CalculatorStub.g.cs line 58): `public MethodCallBuilderImpl OnCall(AddDelegate callback)`
 
 **Resolution: NOT a breaking change.**
@@ -430,7 +430,7 @@ The change is **additive**: users gain `.ThenCall()`, `.ThenReturns()`, and new 
 
 ---
 
-### Concern 2: Source(T) Delegation Is Broken for User Method Stubs
+### Concern 2: Source(T) Delegation Is Broken for Stub Override Stubs
 
 **Concern:** Looking at BasicUserMethodStub.g.cs, the `Source(T)` method has an empty body:
 ```csharp
@@ -442,31 +442,31 @@ public void Source(global::Design.Domain.Services.IUserMethodService? source)
 **Investigation:**
 This is **by design**, not a bug. Looking at UserMethodBasics.cs line 141:
 ```
-// OnCall() - supersede user method per-test
+// OnCall() - supersede stub override per-test
 ```
 
-User method stubs have a different fallback model:
+Stub override stubs have a different fallback model:
 - Regular stubs: OnCall > Sequences > Returns > Source delegation > Strict/default
-- User method stubs: OnCall > User Method
+- Stub override stubs: OnCall > Stub Override
 
-The user method IS the fallback. Source delegation is not applicable because:
-1. User methods provide the default behavior (that's why you define them)
-2. If you wanted source delegation, you wouldn't use user methods
+The stub override IS the fallback. Source delegation is not applicable because:
+1. Stub overrides provide the default behavior (that's why you define them)
+2. If you wanted source delegation, you wouldn't use stub overrides
 
-**Resolution: Leave Source(T) empty for user method stubs.**
+**Resolution: Leave Source(T) empty for stub override stubs.**
 
-The empty body is intentional. The method exists only for API consistency (all stubs have Source). When user methods exist, Source delegation is conceptually replaced by user method fallback.
+The empty body is intentional. The method exists only for API consistency (all stubs have Source). When stub overrides exist, Source delegation is conceptually replaced by stub override fallback.
 
 After this feature, the new priority chain becomes:
-- When chains > Sequences > OnCall/Returns > User Method (no Source)
+- When chains > Sequences > OnCall/Returns > Stub Override (no Source)
 
-**Action:** Document in plan that Source(T) remains empty for user method stubs. This is consistent with the design: user methods ARE the fallback.
+**Action:** Document in plan that Source(T) remains empty for stub override stubs. This is consistent with the design: stub overrides ARE the fallback.
 
 ---
 
 ### Concern 3: Mixed Overload Groups Handling
 
-**Concern:** What happens when only SOME signatures in an overload group have user methods? For example:
+**Concern:** What happens when only SOME signatures in an overload group have stub overrides? For example:
 ```csharp
 // User defines:
 protected override string Format_(string input) => ...;
@@ -486,21 +486,21 @@ Methods are separated into two groups:
 - `flatUserMethodGroups`: Methods WITH user overrides (simplified interceptor)
 
 This means in a mixed overload scenario:
-- Overloads with user method: Go through user method path
-- Overloads without user method: Go through regular path
+- Overloads with stub override: Go through stub override path
+- Overloads without stub override: Go through regular path
 
 **Resolution: Handle at per-signature level, not interceptor level.**
 
 The unified interceptor approach must support **mixed overload groups** where:
-- Some signatures have user method fallback
+- Some signatures have stub override fallback
 - Some signatures have Source/Strict fallback
 
 Looking at GenericFormatterWithUserMethodsStub, it already generates per-signature Invoke methods:
 - `Invoke_T_void(bool strict, T item)` - falls to Source/Strict
 - `Invoke_T_String_void(bool strict, T item, string tag)` - falls to Source/Strict
 
-For user method interceptors, we need:
-- `Invoke_T_void(bool strict, T item)` - falls to user method
+For stub override interceptors, we need:
+- `Invoke_T_void(bool strict, T item)` - falls to stub override
 - `Invoke_T_String_void(bool strict, T item, string tag)` - falls to Source/Strict (no user override)
 
 **Action:** Update Phase 4 to explicitly handle mixed overload groups where per-signature fallback differs.
@@ -532,14 +532,14 @@ The plan incorrectly proposed `HasUserMethod`. The correct approach is to:
 
 ---
 
-### Concern 5: Strict Mode + When Chain + User Method Priority
+### Concern 5: Strict Mode + When Chain + Stub Override Priority
 
 **Concern:** What happens when:
 1. Stub is in strict mode
 2. When chain is configured but doesn't match
-3. User method exists
+3. Stub override exists
 
-Does it: (a) throw StubException, (b) call user method, or (c) something else?
+Does it: (a) throw StubException, (b) call stub override, or (c) something else?
 
 **Investigation:**
 Looking at CalculatorStub.g.cs Invoke() method (lines 118-184):
@@ -561,24 +561,24 @@ return default!;
 
 The key insight: **When chains are not "one-shot"**. If a non-terminal When matcher doesn't match, execution falls through. The Strict check only happens at the END of the priority chain.
 
-For user methods, the user method IS the final fallback, so Strict mode never triggers:
+For stub overrides, the stub override IS the final fallback, so Strict mode never triggers:
 
 ```csharp
-// User method fallback (replaces Strict check)
+// Stub override fallback (replaces Strict check)
 _unconfiguredCallCount++;
-return Process_(input);  // User method is ALWAYS called if nothing else matches
+return Process_(input);  // Stub override is ALWAYS called if nothing else matches
 ```
 
-**Resolution: User method fallback bypasses Strict mode.**
+**Resolution: Stub override fallback bypasses Strict mode.**
 
 This is consistent with existing design (UserMethodBasics.cs line 417):
 ```csharp
 // User overrides bypass strict mode - they ARE the configuration
 ```
 
-When chains that don't match fall through to user method. Strict mode is irrelevant because user method IS configuration.
+When chains that don't match fall through to stub override. Strict mode is irrelevant because stub override IS configuration.
 
-**Action:** Clarify in plan that Strict mode is not checked when user method exists. The user method IS the "configured" behavior.
+**Action:** Clarify in plan that Strict mode is not checked when stub override exists. The stub override IS the "configured" behavior.
 
 ---
 
@@ -623,7 +623,7 @@ Valid concern. Phase 2 is the core change, and we need to verify the generated o
 
 **Phase 2: Renderer Integration**
 - [x] `src/Generator/Model/Shared/UnifiedMethodInterceptorModel.cs` - Add `UserMethodFallback` option to `InterceptorRenderOptions` record
-- [x] `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Modify `RenderInvokeMethod()` to check `options.UserMethodFallback` and call user method instead of Source/Strict
+- [x] `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Modify `RenderInvokeMethod()` to check `options.UserMethodFallback` and call stub override instead of Source/Strict
 - [x] `src/Generator/Renderer/FlatRenderer.cs` - Replace calls to `RenderUserMethodInterceptorClass()` with calls to `MethodInterceptorRenderer.RenderInterceptorClass()` using new options
 - [x] Checkpoint: Build succeeds
 - [x] Checkpoint: All existing tests pass
@@ -635,18 +635,18 @@ Valid concern. Phase 2 is the core change, and we need to verify the generated o
 
 **Phase 3: Interface Implementation Update**
 - [x] `src/Generator/Renderer/FlatRenderer.cs` - Modify `RenderUserOverrideImplementation()` to call `Interceptor.Invoke(Strict, args)` instead of inline logic
-- [x] Checkpoint: Build succeeds, existing user method tests pass
+- [x] Checkpoint: Build succeeds, existing stub override tests pass
 
 **Phase 4: Overload Group Support**
-- [x] `src/Generator/Renderer/FlatRenderer.cs` - Update `RenderUserMethodGroupInterceptorClass()` to use unified renderer (already done in Phase 2 - user method groups are rendered via unified renderer at line 121-133)
+- [x] `src/Generator/Renderer/FlatRenderer.cs` - Update `RenderUserMethodGroupInterceptorClass()` to use unified renderer (already done in Phase 2 - stub override groups are rendered via unified renderer at line 121-133)
 - [x] `src/Generator/Builder/FlatModelBuilder.cs` - Ensure mixed overload groups work (per-signature fallback) (already working - PartialOverloadUserMethodStub demonstrates correct behavior)
-- [x] Checkpoint: Build succeeds, overload user method tests pass
+- [x] Checkpoint: Build succeeds, overload stub override tests pass
 - [x] Fixed `UserMethodInterceptor_CompleteApiExample` test - reordered to verify tracking before reconfiguring (behavioral change: switching from OnCall to Returns clears previous tracking)
 
 **Phase 5: Test Coverage**
 - [x] `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Add When chain usage examples (document API)
 - [x] `src/Tests/KnockOffTests/UserMethodWhenTests.cs` - New test file with:
-  - [x] Basic `.When(value).Returns(value)` with user method fallback
+  - [x] Basic `.When(value).Returns(value)` with stub override fallback
   - [x] Predicate `.When(predicate).Returns(value)`
   - [x] `.When().ThenWhen()` chaining
   - [x] Void method `.When(args).Call(callback)`
@@ -654,32 +654,32 @@ Valid concern. Phase 2 is the core change, and we need to verify the generated o
   - [x] Sequences `.Returns().ThenReturns()`
   - [x] `.Verifiable()` on When chains
   - [x] `stub.Verify()` integration
-  - [x] Mixed scenario: some calls match When, some fall to user method
+  - [x] Mixed scenario: some calls match When, some fall to stub override
   - [x] Multi-parameter When matching
 - [x] Checkpoint: All new tests pass (18 tests)
 
 **Phase 6: Documentation**
-- [x] `docs/guides/api-consistency-matrix.md` - Updated Feature 11 (User Methods) section with:
-  - `.When()` chains work with user methods as fallback
-  - Code example showing When + user method priority
+- [x] `docs/guides/api-consistency-matrix.md` - Updated Feature 11 (Stub Overrides) section with:
+  - `.When()` chains work with stub overrides as fallback
+  - Code example showing When + stub override priority
   - Priority chain documentation
 - [x] `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Documentation comments added (in Phase 5)
 - [x] Checkpoint: Documentation compiles, examples work
 
 ### Explicitly Out of Scope
 
-- **Source(T) changes** - Remains empty for user method stubs (by design)
+- **Source(T) changes** - Remains empty for stub override stubs (by design)
 - **Properties/Indexers/Events** - Methods only (matches inline pattern)
 - **Inline stubs** - Already have `.When()`, not affected
-- **Generic methods** - Excluded from user method pattern (use `Of<T>()` instead)
+- **Generic methods** - Excluded from stub override pattern (use `Of<T>()` instead)
 - **Breaking API changes** - Return types remain backward compatible
 - **New diagnostics** - Feature is purely additive
 
 ### Verification Gates
 
-1. **After Phase 2:** Generated `BasicUserMethodStub.g.cs` contains full interceptor structure (When chain, Invoke method, user method fallback)
+1. **After Phase 2:** Generated `BasicUserMethodStub.g.cs` contains full interceptor structure (When chain, Invoke method, stub override fallback)
 2. **After Phase 3:** Existing tests in `UserMethodOnCallTests.cs` and `UserMethodVerificationTests.cs` continue to pass
-3. **After Phase 5:** New When + user method tests pass
+3. **After Phase 5:** New When + stub override tests pass
 4. **Final:** All tests pass (`dotnet test src/KnockOff.sln`), generated code compiles
 
 ### Stop Conditions
@@ -719,8 +719,8 @@ The test `KnockOff.Documentation.Samples.Readme.UserDomainModelTests.UpdateTest_
 
 **Files Modified:**
 1. `src/Generator/Model/Shared/UnifiedMethodInterceptorModel.cs` - Added `UserMethodFallback` and `StubTypeName` properties to `InterceptorRenderOptions` record
-2. `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Modified `RenderInvokeMethod()` to use user method fallback when `options.UserMethodFallback` is true
-3. `src/Generator/Renderer/FlatRenderer.cs` - Added `RenderUserMethodInterceptorWithUnifiedRenderer()` helper and updated `RenderMethodInterceptorClass()` to use it for user methods
+2. `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` - Modified `RenderInvokeMethod()` to use stub override fallback when `options.UserMethodFallback` is true
+3. `src/Generator/Renderer/FlatRenderer.cs` - Added `RenderUserMethodInterceptorWithUnifiedRenderer()` helper and updated `RenderMethodInterceptorClass()` to use it for stub overrides
 
 **Verification:**
 - Build: SUCCESS
@@ -745,7 +745,7 @@ The test `KnockOff.Documentation.Samples.Readme.UserDomainModelTests.UpdateTest_
 - Tests: 2031 passed, 2 failed (same pre-existing failures)
 - Generated code BasicUserMethodStub.g.cs verified:
   - Line 2227-2230: `string global::Design.Domain.Services.IUserMethodService.Process(string input) { return Process.Invoke(Strict, this, input); }`
-  - All four user methods (Process, Calculate, Execute, FindById) call `Invoke(Strict, this, ...)`
+  - All four stub overrides (Process, Calculate, Execute, FindById) call `Invoke(Strict, this, ...)`
 
 ---
 
@@ -754,11 +754,11 @@ The test `KnockOff.Documentation.Samples.Readme.UserDomainModelTests.UpdateTest_
 **Completed:** 2026-02-05
 
 **Analysis:**
-User method overload groups were already being rendered via the unified renderer (implemented in Phase 2). The code at lines 121-133 of FlatRenderer.cs handles all user method groups (both single-method and overload groups) using the unified model and renderer.
+Stub override overload groups were already being rendered via the unified renderer (implemented in Phase 2). The code at lines 121-133 of FlatRenderer.cs handles all stub override groups (both single-method and overload groups) using the unified model and renderer.
 
 **Mixed Overload Groups:**
 Verified with `PartialOverloadUserMethodStub`:
-- `Format(string)` has user override -> FormatInterceptor with user method fallback
+- `Format(string)` has user override -> FormatInterceptor with stub override fallback
 - `Format(string, bool)` and `Format(string, bool, int)` have NO user override -> Format2Interceptor with Source/Strict fallback
 - Generated code correctly routes each overload to the appropriate interceptor
 
@@ -780,7 +780,7 @@ Fixed `UserMethodInterceptor_CompleteApiExample` test in `UserMethodsSamples.cs`
 
 **Files Created/Modified:**
 1. `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Added `WhenChainUserMethodDemo` class with examples:
-   - Basic When matching with user method fallback
+   - Basic When matching with stub override fallback
    - Predicate When matching
    - When chain with ThenWhen/ThenCall
    - Multi-parameter When matching
@@ -819,10 +819,10 @@ Fixed `UserMethodInterceptor_CompleteApiExample` test in `UserMethodsSamples.cs`
 **Completed:** 2026-02-05
 
 **Files Modified:**
-1. `docs/guides/api-consistency-matrix.md` - Updated Feature 11 (User Methods) section:
-   - Added code example showing `.When()` with user method fallback
-   - Documented priority chain: When > Sequences > OnCall/Returns > User Method
-   - Shows API parity between user method interceptors and inline stubs
+1. `docs/guides/api-consistency-matrix.md` - Updated Feature 11 (Stub Overrides) section:
+   - Added code example showing `.When()` with stub override fallback
+   - Documented priority chain: When > Sequences > OnCall/Returns > Stub Override
+   - Shows API parity between stub override interceptors and inline stubs
 
 2. `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Documentation already added in Phase 5
 
@@ -868,7 +868,7 @@ public sealed class ProcessInterceptor
         }
         // ... sequences, OnCall, Returns ...
 
-        // User method fallback (replaces Source/Strict)
+        // Stub override fallback (replaces Source/Strict)
         return stub.Process_(input);
     }
 }

@@ -1,64 +1,64 @@
 // -----------------------------------------------------------------------------
-// Design.Stubs - Standalone Class User Methods
+// Design.Stubs - Standalone Class Stub Overrides
 // -----------------------------------------------------------------------------
-// This file documents user method overrides for standalone class stubs
+// This file documents stub override overrides for standalone class stubs
 // (patterns 3 and 4). The underscore-suffix pattern works the same as
 // interface stubs, but with class-specific behavior:
 //
-// - User method completely replaces base.Method() call (no dual fallback)
+// - Stub override method completely replaces base.Method() call (no dual fallback)
 // - Base class generates virtual _ methods for ALL target class methods
 // - Each overload is handled independently (partial overload coverage)
 //
 // DESIGN DECISIONS:
-// 1. User method replaces base.Method() -- consistent with interface pipeline
-//    where user methods replace Source/Strict as fallback, and with standalone
-//    class property user overrides which replace the base value entirely.
+// 1. Stub override method replaces base.Method() -- consistent with interface pipeline
+//    where stub overrides replace Source/Strict as fallback, and with standalone
+//    class property stub overrides which replace the base value entirely.
 // 2. Interceptor-internal fallback: stub passed to Invoke(), interceptor
 //    calls stub.Method_() when unconfigured.
 // 3. Base class generates virtual _ methods for ALL target class methods,
 //    not just user-overridden ones. Provides IntelliSense discoverability.
-// 4. HasUserOverride on shared InlineClassImplMethodModel record.
+// 4. HasStubOverride on shared InlineClassImplMethodModel record.
 // 5. No custom KnockOff diagnostic; CS0115 is sufficient for mismatches.
-// 6. .When() chains supported on user method interceptors.
+// 6. .When() chains supported on stub override interceptors.
 //
 // PRIORITY CHAIN (same as interface stubs):
-//   When chains > Sequences > Returns/Execute > User Method
+//   When chains > Sequences > Returns/Execute > Stub Override
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Abstractions;
 using KnockOff;
 
-namespace Design.Stubs.UserMethods;
+namespace Design.Stubs.StubOverrides;
 
 // =============================================================================
-// PATTERN 3: STANDALONE CLASS WITH USER METHOD OVERRIDES
+// PATTERN 3: STANDALONE CLASS WITH STUB OVERRIDE METHODS
 // =============================================================================
 //
 // Use [KnockOffBase<T>] with protected override methods suffixed with
 // underscore to provide default method behavior for class stubs.
 //
-// GENERATED BASE CLASS (StandaloneClassUserMethodStubBase):
+// GENERATED BASE CLASS (StandaloneClassStubOverrideStubBase):
 //   protected virtual void Execute_(string command) { }
 //   protected virtual void Initialize_() { }
 //
 // The base class generates virtual _ methods for ALL target class methods,
-// regardless of whether the user overrides them. This allows adding overrides
+// regardless of whether the stub overrides them. This allows adding overrides
 // later without regeneration and provides IntelliSense discoverability.
 //
 // BEHAVIOR:
-// - Abstract methods (Execute): user method IS the default behavior
-// - Virtual methods (Initialize): user method REPLACES base.Initialize()
-//   The user override is the fallback, not a supplement to the base call.
-// - Returns/Execute still supersede user methods per-test
+// - Abstract methods (Execute): stub override IS the default behavior
+// - Virtual methods (Initialize): stub override REPLACES base.Initialize()
+//   The stub override is the fallback, not a supplement to the base call.
+// - Returns/Execute still supersede stub overrides per-test
 // - .When() chains have highest priority
 // =============================================================================
 
 [KnockOffBase<ServiceBase>]
-public partial class StandaloneClassUserMethodStub { }
+public partial class StandaloneClassStubOverrideStub { }
 
-public partial class StandaloneClassUserMethodStub
+public partial class StandaloneClassStubOverrideStub
 {
-    // Override abstract method -- user method provides default behavior
+    // Override abstract method -- stub override provides default behavior
     // Without this, unconfigured calls use the interceptor's strict/default path
     protected override void Execute_(string command)
     {
@@ -70,20 +70,20 @@ public partial class StandaloneClassUserMethodStub
     protected override void Initialize_()
     {
         // User-defined default behavior for virtual method
-        // NOTE: This completely replaces base.Initialize() -- the user method
+        // NOTE: This completely replaces base.Initialize() -- the stub override
         // IS the fallback, not a supplement to the base call.
     }
 }
 
 // =============================================================================
-// PATTERN 4: GENERIC STANDALONE CLASS WITH USER METHOD OVERRIDES
+// PATTERN 4: GENERIC STANDALONE CLASS WITH STUB OVERRIDE METHODS
 // =============================================================================
 //
 // Generic standalone class stubs use [KnockOffBase(typeof(T<>))] and support
-// the same user method override pattern. The generic type parameter flows
+// the same stub override override pattern. The generic type parameter flows
 // through the base class, Impl class, and interceptors.
 //
-// GENERATED BASE CLASS (RepositoryUserMethodStubBase<T>):
+// GENERATED BASE CLASS (RepositoryStubOverrideStubBase<T>):
 //   protected virtual T? GetById_(int id) => default!;
 //   protected virtual void Save_(T entity) { }
 //   protected virtual T? GetDefault_() => default!;
@@ -96,15 +96,15 @@ public partial class StandaloneClassUserMethodStub
 //
 // This is different from interface stubs where all overloads share the same
 // interceptor. For class stubs, each overload's Impl method independently
-// decides whether to pass _stub to Invoke() based on HasUserOverride.
+// decides whether to pass _stub to Invoke() based on HasStubOverride.
 // =============================================================================
 
 [KnockOffBase(typeof(RepositoryBase<>))]
-public partial class RepositoryUserMethodStub<T> where T : class { }
+public partial class RepositoryStubOverrideStub<T> where T : class { }
 
-public partial class RepositoryUserMethodStub<T> where T : class
+public partial class RepositoryStubOverrideStub<T> where T : class
 {
-    // Virtual method returning generic type T? with user override
+    // Virtual method returning generic type T? with stub override
     protected override T? GetById_(int id)
     {
         // User-defined default: return null for all lookups

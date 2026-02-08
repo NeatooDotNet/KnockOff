@@ -68,12 +68,12 @@ public partial class MatrixStatusStub : IMatrixStatusService { }
 [KnockOff]
 public partial class MatrixAsyncStub : IMatrixAsyncService { }
 
-// User methods stub for Feature 11
+// Stub overrides stub for Feature 11
 [KnockOff]
-public partial class MatrixUserMethodStub : IMatrixCalculator { }
+public partial class MatrixStubOverrideStub : IMatrixCalculator { }
 
-#region matrix-user-methods-interface
-public partial class MatrixUserMethodStub
+#region matrix-stub-overrides-interface
+public partial class MatrixStubOverrideStub
 {
     protected override int Add_(int a, int b) => a + b;
 }
@@ -376,23 +376,23 @@ public class ResetTests
 }
 
 // =============================================================================
-// Feature 11: User Methods (already defined above as MatrixUserMethodStub)
+// Feature 11: Stub Overrides (already defined above as MatrixStubOverrideStub)
 // =============================================================================
 
-public class UserMethodsTests
+public class StubOverridesTests
 {
     [Fact]
-    public void UserMethods_UsagePattern()
+    public void StubOverrides_UsagePattern()
     {
-        #region matrix-user-methods-interface-usage
-        var stub = new MatrixUserMethodStub();
+        #region matrix-stub-overrides-interface-usage
+        var stub = new MatrixStubOverrideStub();
         IMatrixCalculator calc = stub;
 
-        // User method provides default behavior
+        // Stub override provides default behavior
         var result = calc.Add(3, 4);
         Assert.Equal(7, result);
 
-        // Return supersedes user method
+        // Return supersedes stub override
         stub.Add.Return((a, b) => 999);
         var overridden = calc.Add(3, 4);
         Assert.Equal(999, overridden);

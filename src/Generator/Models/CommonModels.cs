@@ -25,17 +25,17 @@ internal sealed record KnockOffTypeInfo(
 	EquatableArray<EventMemberInfo> FlatEvents,
 	/// <summary>
 	/// Method signatures (format: "MethodName_(ParamType1,ParamType2,...)") that have user-defined
-	/// "protected override" methods. Used for base class user method pattern.
+	/// "protected override" methods. Used for base class stub override pattern.
 	/// Note: Does not include return type since C# forbids return-type overloading.
 	/// Examples: "Format_(string)", "Format_(string,bool)", "TryParse_(string,out int)".
 	/// </summary>
-	EquatableArray<string> UserOverrideMethods,
+	EquatableArray<string> StubOverrideMethods,
 	/// <summary>
 	/// Property names (with _ suffix) that have user-defined "protected override" properties.
-	/// Used for base class user property pattern.
+	/// Used for base class stub override property pattern.
 	/// Examples: "Count_", "Name_", "Value_".
 	/// </summary>
-	EquatableArray<string> UserOverrideProperties,
+	EquatableArray<string> StubOverrideProperties,
 	/// <summary>
 	/// When true, the generated constructor defaults to strict mode (throws on unconfigured calls).
 	/// From [KnockOff(Strict = true)].
@@ -61,7 +61,7 @@ internal sealed record DiagnosticInfo(
 	string[] Args) : IEquatable<DiagnosticInfo>;
 
 /// <summary>
-/// Strategy for generating default return values when no callback/user method is provided.
+/// Strategy for generating default return values when no callback/stub override is provided.
 /// </summary>
 internal enum DefaultValueStrategy
 {

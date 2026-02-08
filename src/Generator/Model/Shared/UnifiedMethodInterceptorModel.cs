@@ -52,12 +52,12 @@ internal sealed record UnifiedMethodInterceptorModel(
     /// <summary>Whether to throw when no callback and no default available.</summary>
     bool ThrowsOnDefault,
 
-    // User method fallback support
+    // Stub override fallback support
     /// <summary>
-    /// User method name for fallback (e.g., "Process_"). Null if no user override exists.
+    /// Stub override name for fallback (e.g., "Process_"). Null if no stub override exists.
     /// When set, the interceptor's Invoke() falls back to this method instead of Source/Strict.
     /// </summary>
-    string? UserMethodName,
+    string? StubOverrideName,
 
     // Overload group case (when Overloads is not empty)
     /// <summary>
@@ -94,13 +94,13 @@ internal sealed record InterceptorRenderOptions(
     /// <summary>Constraint clauses for the interceptor class (e.g., " where T : class"). Empty for non-generic.</summary>
     string InterceptorConstraints = "",
     /// <summary>
-    /// When true, the Invoke() method falls back to calling the user method instead of Source/Strict.
-    /// Used for standalone stubs with user method overrides. The user method name comes from the model.
+    /// When true, the Invoke() method falls back to calling the stub override instead of Source/Strict.
+    /// Used for standalone stubs with stub override overrides. The stub override name comes from the model.
     /// </summary>
-    bool UserMethodFallback = false,
+    bool StubOverrideFallback = false,
     /// <summary>
-    /// Stub type name for user method fallback (e.g., "MyStub" or "MyStub&lt;T&gt;").
-    /// When set along with UserMethodFallback, Invoke() takes a stub parameter to call user methods.
+    /// Stub type name for stub override fallback (e.g., "MyStub" or "MyStub&lt;T&gt;").
+    /// When set along with StubOverrideFallback, Invoke() takes a stub parameter to call stub overrides.
     /// Required for flat/standalone stubs where the interceptor is nested but needs to call instance methods.
     /// </summary>
     string? StubTypeName = null);

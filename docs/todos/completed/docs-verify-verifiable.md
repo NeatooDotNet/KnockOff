@@ -53,7 +53,7 @@ Located in `docs/`:
 - guides/stub-patterns.md - All three patterns now use `.Verify()`
 - guides/async-patterns.md - Replaced `WasCalled` with `tracking.Verify()`
 - guides/generic-methods.md - Updated to use `Verify(Times.Exactly(N))`
-- guides/user-methods.md - Updated to use `.Verify()` methods
+- guides/stub-overrides.md - Updated to use `.Verify()` methods
 - reference/interceptor-api.md - Added Verification Methods tables
 - migration/from-moq.md - Updated Quick Reference table, Step 5 comparison
 

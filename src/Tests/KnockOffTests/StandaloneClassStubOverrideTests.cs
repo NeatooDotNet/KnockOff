@@ -4,24 +4,24 @@ using Xunit;
 namespace KnockOff.Tests;
 
 /// <summary>
-/// Tests for user method overrides on standalone class stubs ([KnockOffBase&lt;T&gt;]).
-/// User methods provide default behavior via protected virtual methods with _ suffix
-/// in the generated base class. The user overrides these to define fallback behavior.
+/// Tests for stub override overrides on standalone class stubs ([KnockOffBase&lt;T&gt;]).
+/// Stub overrides provide default behavior via protected virtual methods with _ suffix
+/// in the generated base class. The stub overrides these to define fallback behavior.
 /// </summary>
-public class StandaloneClassUserMethodTests
+public class StandaloneClassStubOverrideTests
 {
-	#region User Method Fallback - Abstract Methods (Pattern 3)
+	#region Stub Override Fallback - Abstract Methods (Pattern 3)
 
 	[Fact]
 	public void AbstractMethod_UserOverride_IsCalledAsFallback()
 	{
-		// Arrange - Execute is abstract on target class; user overrides Execute_
-		var stub = new SCUserMethodStub();
+		// Arrange - Execute is abstract on target class; stub overrides Execute_
+		var stub = new SCStubOverrideStub();
 
 		// Act
 		stub.Object.Execute("test-command");
 
-		// Assert - user method was called (Execute_ records the command)
+		// Assert - stub override was called (Execute_ records the command)
 		Assert.Equal("test-command", stub.LastExecutedCommand);
 		stub.Execute.Verify(Called.Once);
 	}
@@ -29,13 +29,13 @@ public class StandaloneClassUserMethodTests
 	[Fact]
 	public void AbstractMethod_UserOverride_NonVoid_ReturnsUserValue()
 	{
-		// Arrange - Process is abstract, returns string; user override returns "[USER: input]"
-		var stub = new SCUserMethodStub();
+		// Arrange - Process is abstract, returns string; stub override returns "[USER: input]"
+		var stub = new SCStubOverrideStub();
 
 		// Act
 		var result = stub.Object.Process("hello");
 
-		// Assert - user method provided the value
+		// Assert - stub override provided the value
 		Assert.Equal("[USER: hello]", result);
 		stub.Process.Verify(Called.Once);
 	}
@@ -43,30 +43,30 @@ public class StandaloneClassUserMethodTests
 	[Fact]
 	public void AbstractMethod_NoUserOverride_ReturnsDefault()
 	{
-		// Arrange - GetCount is abstract, no user override
-		var stub = new SCUserMethodStub();
+		// Arrange - GetCount is abstract, no stub override
+		var stub = new SCStubOverrideStub();
 
 		// Act
 		var result = stub.Object.GetCount();
 
-		// Assert - returns default(int) since no user override and no OnCall
+		// Assert - returns default(int) since no stub override and no OnCall
 		Assert.Equal(0, result);
 	}
 
 	#endregion
 
-	#region User Method Fallback - Virtual Methods (Pattern 3)
+	#region Stub Override Fallback - Virtual Methods (Pattern 3)
 
 	[Fact]
 	public void VirtualMethod_UserOverride_ReplacesBaseCall()
 	{
-		// Arrange - Initialize is virtual on target class; user overrides Initialize_
-		var stub = new SCUserMethodStub();
+		// Arrange - Initialize is virtual on target class; stub overrides Initialize_
+		var stub = new SCStubOverrideStub();
 
 		// Act
 		stub.Object.Initialize();
 
-		// Assert - user method was called instead of base.Initialize()
+		// Assert - stub override was called instead of base.Initialize()
 		Assert.True(stub.InitializeCalled);
 		stub.Initialize.Verify(Called.Once);
 	}
@@ -74,8 +74,8 @@ public class StandaloneClassUserMethodTests
 	[Fact]
 	public void VirtualMethod_NoUserOverride_DelegatesToBase()
 	{
-		// Arrange - Shutdown is virtual, no user override
-		var stub = new SCNoUserOverrideStub();
+		// Arrange - Shutdown is virtual, no stub override
+		var stub = new SCNoStubOverrideStub();
 
 		// Act
 		stub.Object.Initialize();
@@ -87,65 +87,65 @@ public class StandaloneClassUserMethodTests
 
 	#endregion
 
-	#region OnCall Supersedes User Method
+	#region OnCall Supersedes Stub Override
 
 	[Fact]
-	public void OnCall_SupersedesUserMethod_VoidMethod()
+	public void OnCall_SupersedesStubOverride_VoidMethod()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		var onCallInvoked = false;
 		stub.Execute.Call((cmd) => onCallInvoked = true);
 
 		// Act
 		stub.Object.Execute("test");
 
-		// Assert - OnCall wins, user method not called
+		// Assert - OnCall wins, stub override not called
 		Assert.True(onCallInvoked);
-		Assert.Null(stub.LastExecutedCommand); // User method was NOT called
+		Assert.Null(stub.LastExecutedCommand); // Stub override was NOT called
 	}
 
 	[Fact]
-	public void OnCall_SupersedesUserMethod_NonVoidMethod()
+	public void OnCall_SupersedesStubOverride_NonVoidMethod()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.Return(input => "[ONCALL: " + input + "]");
 
 		// Act
 		var result = stub.Object.Process("hello");
 
-		// Assert - OnCall wins over user method
+		// Assert - OnCall wins over stub override
 		Assert.Equal("[ONCALL: hello]", result);
 	}
 
 	#endregion
 
-	#region Returns Supersedes User Method
+	#region Returns Supersedes Stub Override
 
 	[Fact]
-	public void Returns_SupersedesUserMethod()
+	public void Returns_SupersedesStubOverride()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.Return("[CONSTANT]");
 
 		// Act
 		var result = stub.Object.Process("ignored");
 
-		// Assert - Returns wins over user method
+		// Assert - Returns wins over stub override
 		Assert.Equal("[CONSTANT]", result);
 	}
 
 	#endregion
 
-	#region When Chains with User Method Fallback
+	#region When Chains with Stub Override Fallback
 
 	[Fact]
 	public void When_Match_ReturnsWhenValue()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.When("special").Return("[WHEN MATCHED]");
 
 		// Act
@@ -156,24 +156,24 @@ public class StandaloneClassUserMethodTests
 	}
 
 	[Fact]
-	public void When_NoMatch_FallsToUserMethod()
+	public void When_NoMatch_FallsToStubOverride()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.When("special").Return("[WHEN MATCHED]");
 
 		// Act
 		var result = stub.Object.Process("normal");
 
-		// Assert - Falls to user method
+		// Assert - Falls to stub override
 		Assert.Equal("[USER: normal]", result);
 	}
 
 	[Fact]
-	public void When_ThenWhen_ChainWithUserMethodFallback()
+	public void When_ThenWhen_ChainWithStubOverrideFallback()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.When("first").Return("[1]")
 			.ThenWhen("second").Return("[2]")
 			.ThenNone();
@@ -181,7 +181,7 @@ public class StandaloneClassUserMethodTests
 		// Act
 		var r1 = stub.Object.Process("first");
 		var r2 = stub.Object.Process("second");
-		var r3 = stub.Object.Process("third"); // Falls to user method
+		var r3 = stub.Object.Process("third"); // Falls to stub override
 
 		// Assert
 		Assert.Equal("[1]", r1);
@@ -193,7 +193,7 @@ public class StandaloneClassUserMethodTests
 	public void When_VoidMethod_CallsCallback()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		var callbackInvoked = false;
 		stub.Execute.When("trigger").Call(cmd => callbackInvoked = true);
 
@@ -205,16 +205,16 @@ public class StandaloneClassUserMethodTests
 	}
 
 	[Fact]
-	public void When_VoidMethod_NoMatch_FallsToUserMethod()
+	public void When_VoidMethod_NoMatch_FallsToStubOverride()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Execute.When("trigger").Call(cmd => { });
 
 		// Act
-		stub.Object.Execute("other"); // Falls to user method
+		stub.Object.Execute("other"); // Falls to stub override
 
-		// Assert - user method was called
+		// Assert - stub override was called
 		Assert.Equal("other", stub.LastExecutedCommand);
 		stub.Execute.Verify(Called.Once);
 	}
@@ -223,7 +223,7 @@ public class StandaloneClassUserMethodTests
 	public void When_HasPriorityOverOnCall()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.Return(s => "[ONCALL]");
 		stub.Process.When("special").Return("[WHEN]");
 
@@ -231,20 +231,20 @@ public class StandaloneClassUserMethodTests
 		var whenResult = stub.Object.Process("special");
 		var onCallResult = stub.Object.Process("other");
 
-		// Assert - When has priority, OnCall is fallback before user method
+		// Assert - When has priority, OnCall is fallback before stub override
 		Assert.Equal("[WHEN]", whenResult);
 		Assert.Equal("[ONCALL]", onCallResult);
 	}
 
 	#endregion
 
-	#region Sequences with User Method Fallback
+	#region Sequences with Stub Override Fallback
 
 	[Fact]
 	public void Sequence_ReturnsValuesInOrder()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.Return(s => "[FIRST]").ThenReturn("[SECOND]");
 
 		// Act
@@ -262,7 +262,7 @@ public class StandaloneClassUserMethodTests
 	public void Returns_Sequence_ReturnsValuesInOrder()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.Return("[1]", "[2]");
 
 		// Act
@@ -280,7 +280,7 @@ public class StandaloneClassUserMethodTests
 	public void VoidSequence_CallsInOrder()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		var calls = new System.Collections.Generic.List<string>();
 		stub.Execute.Call(cmd => calls.Add("first:" + cmd))
 			.ThenCall(cmd => calls.Add("second:" + cmd))
@@ -297,13 +297,13 @@ public class StandaloneClassUserMethodTests
 
 	#endregion
 
-	#region Verifiable on User Method Interceptors
+	#region Verifiable on Stub Override Interceptors
 
 	[Fact]
 	public void Verifiable_Called_PassesVerification()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.Verifiable();
 
 		// Act
@@ -317,7 +317,7 @@ public class StandaloneClassUserMethodTests
 	public void Verifiable_NotCalled_ThrowsVerificationException()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.Verifiable();
 		// Don't call Process
 
@@ -329,7 +329,7 @@ public class StandaloneClassUserMethodTests
 	public void Verifiable_WithTimesExactly_VerifiesCount()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Execute.Verifiable(Called.Exactly(2));
 
 		// Act
@@ -344,7 +344,7 @@ public class StandaloneClassUserMethodTests
 	public void Verifiable_WithTimesExactly_WrongCount_Throws()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Execute.Verifiable(Called.Exactly(2));
 
 		// Act - only call once
@@ -358,7 +358,7 @@ public class StandaloneClassUserMethodTests
 	public void Verifiable_VoidMethod_Called_PassesVerification()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Execute.Verifiable();
 
 		// Act
@@ -372,7 +372,7 @@ public class StandaloneClassUserMethodTests
 	public void Verifiable_VoidMethod_NotCalled_Throws()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Execute.Verifiable();
 		// Don't call Execute
 
@@ -381,25 +381,25 @@ public class StandaloneClassUserMethodTests
 	}
 
 	[Fact]
-	public void IndividualVerify_TracksUserMethodCalls()
+	public void IndividualVerify_TracksStubOverrideCalls()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 
-		// Act - call via user method fallback (no OnCall configured)
+		// Act - call via stub override fallback (no OnCall configured)
 		stub.Object.Process("a");
 		stub.Object.Process("b");
 		stub.Object.Process("c");
 
-		// Assert - tracking works even through user method fallback
+		// Assert - tracking works even through stub override fallback
 		stub.Process.Verify(Called.Exactly(3));
 	}
 
 	[Fact]
-	public void LastArg_TracksWithUserMethodFallback()
+	public void LastArg_TracksWithStubOverrideFallback()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 
 		// Act
 		stub.Object.Execute("first");
@@ -411,64 +411,64 @@ public class StandaloneClassUserMethodTests
 
 	#endregion
 
-	#region Generic Standalone Class with User Methods (Pattern 4)
+	#region Generic Standalone Class with Stub Overrides (Pattern 4)
 
 	[Fact]
-	public void GenericStandaloneClass_UserMethodFallback_ReturnsGenericType()
+	public void GenericStandaloneClass_StubOverrideFallback_ReturnsGenericType()
 	{
-		// Arrange - GetById_ returns T? and user overrides it
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		// Arrange - GetById_ returns T? and stub overrides it
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var entity = new ClassStubUser { Id = 42, Name = "Test" };
 		stub.DefaultEntity = entity;
 
 		// Act
 		var result = stub.Object.GetById(42);
 
-		// Assert - user method was called
+		// Assert - stub override was called
 		Assert.Same(entity, result);
 	}
 
 	[Fact]
-	public void GenericStandaloneClass_UserMethodFallback_VoidWithGenericParam()
+	public void GenericStandaloneClass_StubOverrideFallback_VoidWithGenericParam()
 	{
-		// Arrange - Save_ takes T param and user overrides it
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		// Arrange - Save_ takes T param and stub overrides it
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var entity = new ClassStubUser { Id = 1, Name = "Saved" };
 
 		// Act
 		stub.Object.Save(entity);
 
-		// Assert - user method was called
+		// Assert - stub override was called
 		Assert.Same(entity, stub.LastSavedEntity);
 	}
 
 	[Fact]
-	public void GenericStandaloneClass_OnCall_SupersedesUserMethod()
+	public void GenericStandaloneClass_OnCall_SupersedesStubOverride()
 	{
 		// Arrange
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var onCallEntity = new ClassStubUser { Id = 99, Name = "OnCall" };
 		stub.GetById.Return(id => onCallEntity);
 
 		// Act
 		var result = stub.Object.GetById(1);
 
-		// Assert - OnCall wins over user method
+		// Assert - OnCall wins over stub override
 		Assert.Same(onCallEntity, result);
 	}
 
 	[Fact]
-	public void GenericStandaloneClass_Returns_SupersedesUserMethod()
+	public void GenericStandaloneClass_Returns_SupersedesStubOverride()
 	{
 		// Arrange
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var returnsEntity = new ClassStubUser { Id = 77, Name = "Returns" };
 		stub.GetById.Return(returnsEntity);
 
 		// Act
 		var result = stub.Object.GetById(1);
 
-		// Assert - Returns wins over user method
+		// Assert - Returns wins over stub override
 		Assert.Same(returnsEntity, result);
 	}
 
@@ -476,7 +476,7 @@ public class StandaloneClassUserMethodTests
 	public void GenericStandaloneClass_Verifiable_Works()
 	{
 		// Arrange
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		stub.Save.Verifiable();
 
 		// Act
@@ -490,7 +490,7 @@ public class StandaloneClassUserMethodTests
 	public void GenericStandaloneClass_Verifiable_NotCalled_Throws()
 	{
 		// Arrange
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		stub.Save.Verifiable();
 		// Don't call Save
 
@@ -503,25 +503,25 @@ public class StandaloneClassUserMethodTests
 	#region Partial Overload Coverage (Pattern 4)
 
 	[Fact]
-	public void PartialOverload_OverriddenOverload_UsesUserMethod()
+	public void PartialOverload_OverriddenOverload_UsesStubOverride()
 	{
-		// Arrange - GetDefault() (no params) has user override
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		// Arrange - GetDefault() (no params) has stub override
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var defaultEntity = new ClassStubUser { Id = 0, Name = "Default" };
 		stub.DefaultGetDefaultEntity = defaultEntity;
 
 		// Act
 		var result = stub.Object.GetDefault();
 
-		// Assert - user method was called
+		// Assert - stub override was called
 		Assert.Same(defaultEntity, result);
 	}
 
 	[Fact]
 	public void PartialOverload_NonOverriddenOverload_DelegatesToBase()
 	{
-		// Arrange - GetDefault(string) has NO user override, uses base class fallback
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		// Arrange - GetDefault(string) has NO stub override, uses base class fallback
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 
 		// Act - GetDefault(string) uses the unconfigured-count + base pattern
 		var result = stub.Object.GetDefault("filter");
@@ -534,7 +534,7 @@ public class StandaloneClassUserMethodTests
 	public void PartialOverload_OnCall_OnNonOverriddenOverload_Works()
 	{
 		// Arrange
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var onCallEntity = new ClassStubUser { Id = 5, Name = "Filtered" };
 		stub.GetDefault.Return(filter => onCallEntity);
 
@@ -549,14 +549,14 @@ public class StandaloneClassUserMethodTests
 	public void PartialOverload_EachOverloadIndependent()
 	{
 		// Arrange
-		var stub = new SCGenericUserMethodStub<ClassStubUser>();
+		var stub = new SCGenericStubOverrideStub<ClassStubUser>();
 		var userEntity = new ClassStubUser { Id = 0, Name = "UserDefault" };
 		var onCallEntity = new ClassStubUser { Id = 1, Name = "FilteredResult" };
 		stub.DefaultGetDefaultEntity = userEntity;
 		stub.GetDefault.Return(filter => onCallEntity);
 
 		// Act
-		var userResult = stub.Object.GetDefault();        // User method overload
+		var userResult = stub.Object.GetDefault();        // Stub override overload
 		var onCallResult = stub.Object.GetDefault("cat"); // OnCall overload
 
 		// Assert - each overload behaves independently
@@ -572,7 +572,7 @@ public class StandaloneClassUserMethodTests
 	public void Reset_PreservesOnCallConfiguration()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Process.Return(s => "[ONCALL]");
 
 		stub.Object.Process("first");
@@ -591,7 +591,7 @@ public class StandaloneClassUserMethodTests
 	public void ResetInterceptors_ClearsAllState()
 	{
 		// Arrange
-		var stub = new SCUserMethodStub();
+		var stub = new SCStubOverrideStub();
 		stub.Object.Execute("cmd");
 		stub.Object.Process("test");
 		stub.Object.Initialize();
@@ -610,13 +610,13 @@ public class StandaloneClassUserMethodTests
 	#region Strict Mode Interaction
 
 	[Fact]
-	public void StrictMode_UserMethodBypassesStrict()
+	public void StrictMode_StubOverrideBypassesStrict()
 	{
-		// Arrange - User methods act as configured behavior, so strict mode doesn't throw
-		var stub = new SCUserMethodStub();
+		// Arrange - Stub overrides act as configured behavior, so strict mode doesn't throw
+		var stub = new SCStubOverrideStub();
 		stub.Strict = true;
 
-		// Act - Execute has user override, should not throw
+		// Act - Execute has stub override, should not throw
 		stub.Object.Execute("test");
 		var result = stub.Object.Process("hello");
 
@@ -628,11 +628,11 @@ public class StandaloneClassUserMethodTests
 	[Fact]
 	public void StrictMode_NoUserOverride_Throws()
 	{
-		// Arrange - GetCount has no user override
-		var stub = new SCUserMethodStub();
+		// Arrange - GetCount has no stub override
+		var stub = new SCStubOverrideStub();
 		stub.Strict = true;
 
-		// Act & Assert - should throw because GetCount has no user override
+		// Act & Assert - should throw because GetCount has no stub override
 		Assert.Throws<StubException>(() => stub.Object.GetCount());
 	}
 
@@ -643,7 +643,7 @@ public class StandaloneClassUserMethodTests
 
 /// <summary>
 /// Abstract target class with abstract and virtual methods for testing
-/// standalone class user method overrides (pattern 3).
+/// standalone class stub override overrides (pattern 3).
 /// </summary>
 public abstract class SCServiceBase
 {
@@ -653,7 +653,7 @@ public abstract class SCServiceBase
 	/// <summary>Abstract non-void method with parameter.</summary>
 	public abstract string Process(string input);
 
-	/// <summary>Abstract non-void method without user override.</summary>
+	/// <summary>Abstract non-void method without stub override.</summary>
 	public abstract int GetCount();
 
 	/// <summary>Virtual void method with default implementation.</summary>
@@ -661,17 +661,17 @@ public abstract class SCServiceBase
 }
 
 /// <summary>
-/// Standalone class stub with user method overrides for abstract and virtual methods.
+/// Standalone class stub with stub override overrides for abstract and virtual methods.
 /// </summary>
 [KnockOffBase<SCServiceBase>]
-public partial class SCUserMethodStub
+public partial class SCStubOverrideStub
 {
-	// State for verifying user method was called
+	// State for verifying stub override was called
 	public string? LastExecutedCommand { get; set; }
 	public bool InitializeCalled { get; set; }
 }
 
-public partial class SCUserMethodStub
+public partial class SCStubOverrideStub
 {
 	protected override void Execute_(string command)
 	{
@@ -689,15 +689,15 @@ public partial class SCUserMethodStub
 	}
 
 	// NOTE: GetCount_ is intentionally NOT overridden to test
-	// behavior without user override
+	// behavior without stub override
 }
 
 /// <summary>
-/// Standalone class stub with NO user method overrides.
+/// Standalone class stub with NO stub override overrides.
 /// Tests that the standard unconfigured-count + base call pattern still works.
 /// </summary>
 [KnockOffBase<SCServiceBase>]
-public partial class SCNoUserOverrideStub
+public partial class SCNoStubOverrideStub
 {
 }
 
@@ -706,7 +706,7 @@ public partial class SCNoUserOverrideStub
 #region Pattern 4 Target Classes and Stubs
 
 /// <summary>
-/// Generic abstract target class for testing generic standalone class user methods (pattern 4).
+/// Generic abstract target class for testing generic standalone class stub overrides (pattern 4).
 /// </summary>
 public abstract class SCRepositoryBase<T> where T : class
 {
@@ -724,19 +724,19 @@ public abstract class SCRepositoryBase<T> where T : class
 }
 
 /// <summary>
-/// Generic standalone class stub with user method overrides.
+/// Generic standalone class stub with stub override overrides.
 /// Tests partial overload coverage: GetDefault_() overridden, GetDefault_(string) not.
 /// </summary>
 [KnockOffBase(typeof(SCRepositoryBase<>))]
-public partial class SCGenericUserMethodStub<T> where T : class
+public partial class SCGenericStubOverrideStub<T> where T : class
 {
-	// State for verifying user method was called
+	// State for verifying stub override was called
 	public T? DefaultEntity { get; set; }
 	public T? LastSavedEntity { get; set; }
 	public T? DefaultGetDefaultEntity { get; set; }
 }
 
-public partial class SCGenericUserMethodStub<T> where T : class
+public partial class SCGenericStubOverrideStub<T> where T : class
 {
 	protected override T? GetById_(int id)
 	{

@@ -2,7 +2,7 @@
 
 # Reusable Stub Classes
 
-Standalone stubs are real C# classes. Define one once, add constructor parameters and user methods, then reuse it across your entire test project. Pass it through constructors, register it in a DI container, share it between test fixtures — it's just a class.
+Standalone stubs are real C# classes. Define one once, add constructor parameters and stub overrides, then reuse it across your entire test project. Pass it through constructors, register it in a DI container, share it between test fixtures — it's just a class.
 
 ---
 
@@ -51,7 +51,7 @@ public class OrderService(IOrderRepository repository)
 ```
 <!-- endSnippet -->
 
-Create a standalone stub with constructor parameters and user methods:
+Create a standalone stub with constructor parameters and stub overrides:
 
 <!-- snippet: reusable-stub-definition -->
 ```cs
@@ -74,7 +74,7 @@ public partial class OrderRepoStub
 <!-- endSnippet -->
 
 - **Constructor parameters** — `List<Order> orders` flows test data in naturally.
-- **User methods** — `GetOrder_` and `GetTotal_` provide default behavior. The underscore suffix overrides the generated base class method.
+- **Stub overrides** — `GetOrder_` and `GetTotal_` provide default behavior. The underscore suffix overrides the generated base class method.
 - **`SaveOrder`** is not overridden — it still works with `Return`/`Call`/`Verify` per-test.
 
 ---
@@ -122,11 +122,11 @@ stub.GetTotal.Return((id) => 999m);
 
 IOrderRepository repo = stub;
 Assert.Equal(999m, repo.GetTotal(1));  // Override wins
-Assert.NotNull(repo.GetOrder(1));       // User method still works
+Assert.NotNull(repo.GetOrder(1));       // Stub override still works
 ```
 <!-- endSnippet -->
 
-`Return(callback)` supersedes the user method. Other members (`GetOrder`) keep their user method behavior.
+`Return(callback)` supersedes the stub override. Other members (`GetOrder`) keep their stub override behavior.
 
 ---
 
@@ -319,13 +319,13 @@ Standalone patterns give you:
 
 - **A real C# class** — constructor parameters, fields, helper methods, inheritance
 - **Reuse across tests** — define once, instantiate with different data per test
-- **Per-test overrides** — `Return`/`Call`/`When` override user methods for specific tests
+- **Per-test overrides** — `Return`/`Call`/`When` override stub overrides for specific tests
 - **Constructor injection** — pass the stub directly as a dependency, register it in DI
 - **Full mocking API** — `Verify`, `Call`, `Return`, `When`, `Strict` all work on the same reusable class
 - **No `.Object` for interfaces** — the stub IS the implementation (patterns 1, 2)
 - **`.Object` for classes** — class stubs wrap the instance (patterns 3, 4)
 
-Next: [User Methods](user-methods.md) for details on the underscore-suffix override convention.
+Next: [Stub Overrides](stub-overrides.md) for details on the underscore-suffix override convention.
 
 ---
 

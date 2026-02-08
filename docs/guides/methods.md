@@ -144,7 +144,7 @@ stub.Find.Return((string name) => new User { Id = 1, Name = name });
 
 Each overload gets its own `Return`/`Call` overload on the same interceptor property, distinguished by the delegate signature.
 
-**Stand-Alone pattern with user methods:** Each overload gets its own virtual method in the generated base class. You can selectively override specific overloads without affecting others. See the [User Methods: Overloads](user-methods.md#overloads) section for details.
+**Stand-Alone pattern with stub overrides:** Each overload gets its own virtual method in the generated base class. You can selectively override specific overloads without affecting others. See the [Stub Overrides: Overloads](stub-overrides.md#overloads) section for details.
 
 ---
 

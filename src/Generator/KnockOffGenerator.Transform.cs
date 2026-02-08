@@ -688,8 +688,8 @@ public partial class KnockOffGenerator
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
-				UserOverrideMethods: EquatableArray<string>.Empty,
-				UserOverrideProperties: EquatableArray<string>.Empty,
+				StubOverrideMethods: EquatableArray<string>.Empty,
+				StubOverrideProperties: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
 
@@ -721,8 +721,8 @@ public partial class KnockOffGenerator
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
-				UserOverrideMethods: EquatableArray<string>.Empty,
-				UserOverrideProperties: EquatableArray<string>.Empty,
+				StubOverrideMethods: EquatableArray<string>.Empty,
+				StubOverrideProperties: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
 
@@ -759,14 +759,14 @@ public partial class KnockOffGenerator
 					Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 					FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 					FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
-					UserOverrideMethods: EquatableArray<string>.Empty,
-					UserOverrideProperties: EquatableArray<string>.Empty,
+					StubOverrideMethods: EquatableArray<string>.Empty,
+					StubOverrideProperties: EquatableArray<string>.Empty,
 					Strict: strict);
 			}
 		}
 
 		// Check for user-defined base class (KO0200)
-		// The generator needs to control the base class for user method override support.
+		// The generator needs to control the base class for stub override support.
 		// If the class already has a base class other than object, emit an error.
 		if (classSymbol.BaseType is { } baseType && baseType.SpecialType != SpecialType.System_Object)
 		{
@@ -789,8 +789,8 @@ public partial class KnockOffGenerator
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
-				UserOverrideMethods: EquatableArray<string>.Empty,
-				UserOverrideProperties: EquatableArray<string>.Empty,
+				StubOverrideMethods: EquatableArray<string>.Empty,
+				StubOverrideProperties: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
 
@@ -910,18 +910,18 @@ public partial class KnockOffGenerator
 				Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 				FlatMembers: new EquatableArray<InterfaceMemberInfo>(Array.Empty<InterfaceMemberInfo>()),
 				FlatEvents: new EquatableArray<EventMemberInfo>(Array.Empty<EventMemberInfo>()),
-				UserOverrideMethods: EquatableArray<string>.Empty,
-				UserOverrideProperties: EquatableArray<string>.Empty,
+				StubOverrideMethods: EquatableArray<string>.Empty,
+				StubOverrideProperties: EquatableArray<string>.Empty,
 				Strict: strict);
 		}
 
-		// Detect user override methods using syntactic detection (base class pattern)
-		var userOverrideMethods = DetectUserOverrideMethods(classSymbol, context.SemanticModel.Compilation);
-		var userOverrideMethodsArray = new EquatableArray<string>(userOverrideMethods.ToArray());
+		// Detect stub override methods using syntactic detection (base class pattern)
+		var stubOverrideMethods = DetectStubOverrideMethods(classSymbol, context.SemanticModel.Compilation);
+		var stubOverrideMethodsArray = new EquatableArray<string>(stubOverrideMethods.ToArray());
 
-		// Detect user override properties using syntactic detection (base class pattern)
-		var userOverrideProperties = DetectUserOverrideProperties(classSymbol);
-		var userOverridePropertiesArray = new EquatableArray<string>(userOverrideProperties.ToArray());
+		// Detect stub override properties using syntactic detection (base class pattern)
+		var stubOverrideProperties = DetectStubOverrideProperties(classSymbol);
+		var stubOverridePropertiesArray = new EquatableArray<string>(stubOverrideProperties.ToArray());
 
 		return new KnockOffTypeInfo(
 			Namespace: namespaceName,
@@ -932,8 +932,8 @@ public partial class KnockOffGenerator
 			Diagnostics: new EquatableArray<DiagnosticInfo>(diagnostics.ToArray()),
 			FlatMembers: new EquatableArray<InterfaceMemberInfo>(flatMembers),
 			FlatEvents: new EquatableArray<EventMemberInfo>(flatEvents),
-			UserOverrideMethods: userOverrideMethodsArray,
-			UserOverrideProperties: userOverridePropertiesArray,
+			StubOverrideMethods: stubOverrideMethodsArray,
+			StubOverrideProperties: stubOverridePropertiesArray,
 			Strict: strict);
 	}
 

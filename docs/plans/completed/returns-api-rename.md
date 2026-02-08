@@ -90,7 +90,7 @@ stub.Interceptor.OnCall(x => "result"); // Unchanged - callback still makes sens
 | `PatternsSamples.cs` | Pattern samples with delegate examples |
 | `docs/guides/delegates.md` | Delegate guide documentation (line ~140) |
 | `docs/guides/methods.md` | Methods guide (line ~60) |
-| `docs/guides/user-methods.md` | User methods guide (lines ~161-162) |
+| `docs/guides/stub-overrides.md` | User methods guide (lines ~161-162) |
 | `docs/guides/source-delegation.md` | Source delegation guide (line ~180) |
 | `docs/guides/stub-patterns.md` | Stub patterns guide |
 | `README.md` | Comparison sections (methods AND delegates) |
@@ -162,7 +162,7 @@ The rename maintains consistency:
 
 **Additional Files Examined During Re-Review:**
 - `src/Generator/Renderer/ClassRenderer.cs` - Confirmed Inline Class pattern does NOT use shared renderer, only has `OnCall(callback)` at line 152
-- `docs/guides/methods.md`, `docs/guides/user-methods.md`, `docs/guides/source-delegation.md` - Found additional value overload usage
+- `docs/guides/methods.md`, `docs/guides/stub-overrides.md`, `docs/guides/source-delegation.md` - Found additional value overload usage
 
 ---
 

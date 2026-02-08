@@ -668,8 +668,8 @@ internal static class MethodInterceptorRenderer
 		InterceptorRenderOptions options,
 		string? signatureSuffix)
 	{
-		// Include stub parameter when user method fallback is needed and we have a stub type
-		var needsStubParam = options.UserMethodFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.UserMethodName);
+		// Include stub parameter when stub override fallback is needed and we have a stub type
+		var needsStubParam = options.StubOverrideFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.StubOverrideName);
 		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
 		var returnType = model.IsVoid ? "void" : model.ReturnType;
 
@@ -838,21 +838,21 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Final fallback: User Method > Source > Strict > Default
-			if (options.UserMethodFallback && !string.IsNullOrEmpty(model.UserMethodName))
+			// Final fallback: Stub Override > Source > Strict > Default
+			if (options.StubOverrideFallback && !string.IsNullOrEmpty(model.StubOverrideName))
 			{
-				// User method fallback - user method IS the configured behavior, bypasses Source/Strict
-				var userMethodCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				// Stub override fallback - stub override IS the configured behavior, bypasses Source/Strict
+				var stubOverrideCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 				// Call via stub parameter if available (flat stubs), otherwise direct call (inline stubs)
 				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
 				if (model.IsVoid)
 				{
-					w.Line($"{methodPrefix}{model.UserMethodName}({userMethodCallArgs});");
+					w.Line($"{methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
 					w.Line("return;");
 				}
 				else
 				{
-					w.Line($"return {methodPrefix}{model.UserMethodName}({userMethodCallArgs});");
+					w.Line($"return {methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
 				}
 			}
 			else
@@ -894,8 +894,8 @@ internal static class MethodInterceptorRenderer
 		MethodOverloadSignature overload,
 		InterceptorRenderOptions options)
 	{
-		// Include stub parameter when user method fallback is needed and we have a stub type
-		var needsStubParam = options.UserMethodFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(overload.UserMethodName);
+		// Include stub parameter when stub override fallback is needed and we have a stub type
+		var needsStubParam = options.StubOverrideFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(overload.StubOverrideName);
 		var invokeParams = BuildInvokeParams(overload.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
 		var returnType = overload.IsVoid ? "void" : overload.ReturnType;
 
@@ -1034,21 +1034,21 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Final fallback: User Method (per-signature) > Source > Strict > Default
-			if (options.UserMethodFallback && !string.IsNullOrEmpty(overload.UserMethodName))
+			// Final fallback: Stub Override (per-signature) > Source > Strict > Default
+			if (options.StubOverrideFallback && !string.IsNullOrEmpty(overload.StubOverrideName))
 			{
-				// User method fallback - user method IS the configured behavior, bypasses Source/Strict
-				var userMethodCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				// Stub override fallback - stub override IS the configured behavior, bypasses Source/Strict
+				var stubOverrideCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 				// Call via stub parameter if available (flat stubs), otherwise direct call (inline stubs)
 				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
 				if (overload.IsVoid)
 				{
-					w.Line($"{methodPrefix}{overload.UserMethodName}({userMethodCallArgs});");
+					w.Line($"{methodPrefix}{overload.StubOverrideName}({stubOverrideCallArgs});");
 					w.Line("return;");
 				}
 				else
 				{
-					w.Line($"return {methodPrefix}{overload.UserMethodName}({userMethodCallArgs});");
+					w.Line($"return {methodPrefix}{overload.StubOverrideName}({stubOverrideCallArgs});");
 				}
 			}
 			else
@@ -1151,8 +1151,8 @@ internal static class MethodInterceptorRenderer
 		InterceptorRenderOptions options,
 		string? signatureSuffix)
 	{
-		// Include stub parameter when user method fallback is needed and we have a stub type
-		var needsStubParam = options.UserMethodFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.UserMethodName);
+		// Include stub parameter when stub override fallback is needed and we have a stub type
+		var needsStubParam = options.StubOverrideFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(model.StubOverrideName);
 		var invokeParams = BuildInvokeParams(model.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
 
 		// Determine if value overload exists for this method
@@ -1254,13 +1254,13 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Final fallback: User Method > Source > Strict > Default
-			if (options.UserMethodFallback && !string.IsNullOrEmpty(model.UserMethodName))
+			// Final fallback: Stub Override > Source > Strict > Default
+			if (options.StubOverrideFallback && !string.IsNullOrEmpty(model.StubOverrideName))
 			{
-				// User method fallback - writes result to _refReturnBacking
-				var userMethodCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				// Stub override method fallback - writes result to _refReturnBacking
+				var stubOverrideCallArgs = string.Join(", ", model.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
-				w.Line($"_refReturnBacking = {methodPrefix}{model.UserMethodName}({userMethodCallArgs});");
+				w.Line($"_refReturnBacking = {methodPrefix}{model.StubOverrideName}({stubOverrideCallArgs});");
 				w.Line("return;");
 			}
 			else
@@ -1292,8 +1292,8 @@ internal static class MethodInterceptorRenderer
 		MethodOverloadSignature overload,
 		InterceptorRenderOptions options)
 	{
-		// Include stub parameter when user method fallback is needed and we have a stub type
-		var needsStubParam = options.UserMethodFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(overload.UserMethodName);
+		// Include stub parameter when stub override fallback is needed and we have a stub type
+		var needsStubParam = options.StubOverrideFallback && !string.IsNullOrEmpty(options.StubTypeName) && !string.IsNullOrEmpty(overload.StubOverrideName);
 		var invokeParams = BuildInvokeParams(overload.Parameters, options.IncludeStrictParameter, needsStubParam ? options.StubTypeName : null);
 		var backingField = $"_refReturnBacking_{overload.SignatureSuffix}";
 
@@ -1365,12 +1365,12 @@ internal static class MethodInterceptorRenderer
 			}
 			w.Line();
 
-			// Final fallback: User Method > Source > Strict > Default
-			if (options.UserMethodFallback && !string.IsNullOrEmpty(overload.UserMethodName))
+			// Final fallback: Stub Override > Source > Strict > Default
+			if (options.StubOverrideFallback && !string.IsNullOrEmpty(overload.StubOverrideName))
 			{
-				var userMethodCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
+				var stubOverrideCallArgs = string.Join(", ", overload.Parameters.Select(p => $"{p.RefPrefix}{p.EscapedName}"));
 				var methodPrefix = !string.IsNullOrEmpty(options.StubTypeName) ? "stub." : "";
-				w.Line($"{backingField} = {methodPrefix}{overload.UserMethodName}({userMethodCallArgs});");
+				w.Line($"{backingField} = {methodPrefix}{overload.StubOverrideName}({stubOverrideCallArgs});");
 				w.Line("return;");
 			}
 			else

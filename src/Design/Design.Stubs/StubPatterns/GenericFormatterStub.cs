@@ -4,7 +4,7 @@
 // This stub tests the intersection of:
 // - Generic standalone stub pattern (Pattern 1B)
 // - Overload API (Returns/Execute disambiguation by parameter signature)
-// - User methods (base class overrides) with generic type T
+// - Stub override methods (base class overrides) with generic type T
 // -----------------------------------------------------------------------------
 
 using Design.Domain.Services;
@@ -30,11 +30,11 @@ public partial class GenericFormatterStub<T> : IGenericFormatter<T> where T : cl
 }
 
 /// <summary>
-/// Generic standalone stub WITH user method overrides for T-returning overloads.
-/// Demonstrates that user methods work with generic type parameter T.
+/// Generic standalone stub WITH stub override overrides for T-returning overloads.
+/// Demonstrates that stub overrides work with generic type parameter T.
 /// </summary>
 [KnockOff]
-public partial class GenericFormatterWithUserMethodsStub<T> : IGenericFormatter<T> where T : class
+public partial class GenericFormatterWithStubOverridesStub<T> : IGenericFormatter<T> where T : class
 {
     // Factory function to create instances of T - set by test
     public Func<int, T>? CreateById { get; set; }
@@ -43,10 +43,10 @@ public partial class GenericFormatterWithUserMethodsStub<T> : IGenericFormatter<
 }
 
 #pragma warning disable CA1062 // Validate arguments of public methods
-public partial class GenericFormatterWithUserMethodsStub<T>
+public partial class GenericFormatterWithStubOverridesStub<T>
 {
     // =========================================================================
-    // User Method Overrides for T Get() overloads
+    // Stub Override Overrides for T Get() overloads
     // =========================================================================
 
     protected override T Get_()
@@ -68,7 +68,7 @@ public partial class GenericFormatterWithUserMethodsStub<T>
     }
 
     // =========================================================================
-    // User Method Overrides for T Transform() overloads
+    // Stub Override Overrides for T Transform() overloads
     // =========================================================================
 
     protected override T Transform_(T item)
@@ -84,7 +84,7 @@ public partial class GenericFormatterWithUserMethodsStub<T>
     }
 
     // =========================================================================
-    // User Method Overrides for string Format() overloads
+    // Stub Override Overrides for string Format() overloads
     // =========================================================================
 
     protected override string Format_(T item)

@@ -1,7 +1,7 @@
 # User Properties Design
 
 **Date:** 2026-02-04
-**Related Todo:** [Add User Properties](../todos/add-user-properties.md)
+**Related Todo:** [Add User Properties](../todos/add-stub-override-properties.md)
 **Status:** Ready for Implementation
 **Last Updated:** 2026-02-04 (Phase 4 complete - Design.Stubs examples created)
 
@@ -491,9 +491,9 @@ Phase 4 from the original plan (interface implementation) has been merged into P
 
 ### Phase 5: Design.Stubs Examples
 
-**5.1. Create `UserProperties/UserPropertyBasics.cs`**
+**5.1. Create `StubOverrideProperties/StubOverridePropertyBasics.cs`**
 
-File: `src/Design/Design.Stubs/UserProperties/UserPropertyBasics.cs`
+File: `src/Design/Design.Stubs/StubOverrideProperties/StubOverridePropertyBasics.cs`
 
 Parallel to `UserMethodBasics.cs`:
 - Basic get-only property override
@@ -515,7 +515,7 @@ Demonstrate in each pattern:
 
 **6.1. Create test file**
 
-File: `src/Design/Design.Tests/UserPropertyTests/UserPropertyBasicsTests.cs`
+File: `src/Design/Design.Tests/StubOverridePropertyTests/StubOverridePropertyBasicsTests.cs`
 
 Tests per Test Strategy section above.
 
@@ -616,7 +616,7 @@ The implementation changes `RenderPropertyImplementation()` in FlatRenderer.cs b
 4. The new interceptor methods (`RecordGet`, `RecordSet`, `HasOnGet`, `HasOnSet`, `InvokeGetCallback`, `InvokeSetCallback`) are additions that don't change existing method signatures
 
 **Tests to add (new, not modifications):**
-- `src/Design/Design.Tests/UserPropertyTests/UserPropertyBasicsTests.cs` - New test file per Phase 6
+- `src/Design/Design.Tests/StubOverridePropertyTests/StubOverridePropertyBasicsTests.cs` - New test file per Phase 6
 
 ---
 
@@ -745,7 +745,7 @@ This keeps the interceptor simpler (just callback storage + tracking) while the 
 7. **`src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs`**
    - Comprehensive examples of user method pattern
    - Shows: basic overrides, tracking, OnCall superseding, strict mode bypass, async, overloads
-   - **Use as template** for `UserProperties/UserPropertyBasics.cs`
+   - **Use as template** for `StubOverrideProperties/StubOverridePropertyBasics.cs`
 
 8. **Generated code sample:** `BasicUserMethodStub.Base.g.cs`
    - Shows clean base class with virtual methods only
@@ -771,7 +771,7 @@ No new diagnostics required. Existing patterns:
 
 ### Test Strategy
 
-**New test file:** `Design.Tests/UserPropertyTests/UserPropertyBasicsTests.cs`
+**New test file:** `Design.Tests/StubOverridePropertyTests/StubOverridePropertyBasicsTests.cs`
 
 Tests required:
 1. Get-only property override is called when no OnGet configured
@@ -892,7 +892,7 @@ This handles cases like `IReadOnlyEntity.Name { get; }` + `IMutableEntity.Name {
 
 - `src/Generator/Models/CommonModels.cs` (line 32) - `KnockOffTypeInfo` has `UserOverrideMethods`. A parallel `UserOverrideProperties` field will be needed.
 
-- `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Good template for the proposed `UserPropertyBasics.cs`.
+- `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` - Good template for the proposed `StubOverridePropertyBasics.cs`.
 
 **Searches Performed:**
 - Searched for "HasUserOverride" - found 21 usages in FlatModelBuilder.cs, FlatRenderer.cs, FlatMethodModel.cs
@@ -1014,7 +1014,7 @@ All four concerns have been satisfactorily addressed by the architect:
 - [ ] **Checkpoint:** Build solution, run existing property tests, verify they pass
 
 **Phase 4: Design.Stubs Examples**
-- [x] Create `src/Design/Design.Stubs/UserProperties/UserPropertyBasics.cs` with comprehensive examples
+- [x] Create `src/Design/Design.Stubs/StubOverrideProperties/StubOverridePropertyBasics.cs` with comprehensive examples
 - [x] Include all three accessor patterns (get-only, set-only, get/set)
 - [x] Include all four applicable standalone patterns
 - [x] Include OnGet/OnSet superseding user override examples
@@ -1022,7 +1022,7 @@ All four concerns have been satisfactorily addressed by the architect:
 - [x] **Checkpoint:** Build Design.Stubs project, verify generated code compiles
 
 **Phase 5: Tests**
-- [ ] Create `src/Design/Design.Tests/UserPropertyTests/UserPropertyBasicsTests.cs`
+- [ ] Create `src/Design/Design.Tests/StubOverridePropertyTests/StubOverridePropertyBasicsTests.cs`
 - [ ] Test: Get-only property override is called when no OnGet configured
 - [ ] Test: Get/set property override is called (both accessors)
 - [ ] Test: Set-only property override is called when no OnSet configured
@@ -1154,21 +1154,21 @@ public class EntityBaseStubBase
 **Completed:** 2026-02-04
 **Agent:** knockoff-developer (Examples Agent)
 
-- [x] Created `src/Design/Design.Stubs/UserProperties/UserPropertyBasics.cs` with comprehensive examples
+- [x] Created `src/Design/Design.Stubs/StubOverrideProperties/StubOverridePropertyBasics.cs` with comprehensive examples
 - [x] All three accessor patterns demonstrated (get-only, set-only, get/set)
 - [x] All four applicable standalone patterns demonstrated:
-  - Pattern 1: Standalone (`BasicUserPropertyStub : IUserPropertyService`)
-  - Pattern 2: Generic Standalone (`GenericUserPropertyStub<T> : IGenericUserPropertyService<T>`)
-  - Pattern 3: Standalone Class (`ConfigUserPropertyStub` with `[KnockOffBase<ConfigBase>]`)
-  - Pattern 4: Generic Standalone Class (`CacheUserPropertyStub<T>` with `[KnockOffBase(typeof(CacheBase<>))]`)
+  - Pattern 1: Standalone (`BasicStubOverridePropertyStub : IStubOverridePropertyService`)
+  - Pattern 2: Generic Standalone (`GenericStubOverridePropertyStub<T> : IGenericStubOverridePropertyService<T>`)
+  - Pattern 3: Standalone Class (`ConfigStubOverridePropertyStub` with `[KnockOffBase<ConfigBase>]`)
+  - Pattern 4: Generic Standalone Class (`CacheStubOverridePropertyStub<T>` with `[KnockOffBase(typeof(CacheBase<>))]`)
 - [x] OnGet/OnSet superseding user override examples included
 - [x] Strict mode with user property override examples included
 - [x] Mixed scenario (some properties overridden, some not) demonstrated
 - [x] **Checkpoint:** Build succeeded, Design.Stubs compiles, all tests pass
 
 **Files Created:**
-- `src/Design/Design.Stubs/UserProperties/UserPropertyBasics.cs` - Comprehensive examples file
-- `src/Design/Design.Domain/Services/IUserPropertyService.cs` - Interfaces for user property demos
+- `src/Design/Design.Stubs/StubOverrideProperties/StubOverridePropertyBasics.cs` - Comprehensive examples file
+- `src/Design/Design.Domain/Services/IStubOverridePropertyService.cs` - Interfaces for user property demos
 - `src/Design/Design.Domain/Abstractions/ConfigBase.cs` - Abstract classes for class stub demos
 
 **Test Results After Phase 4:**
@@ -1182,5 +1182,5 @@ All tests pass across all target frameworks:
 
 ### Remaining Phases
 
-- **Phase 5:** Tests - Create `Design.Tests/UserPropertyTests/UserPropertyBasicsTests.cs`
+- **Phase 5:** Tests - Create `Design.Tests/StubOverridePropertyTests/StubOverridePropertyBasicsTests.cs`
 - **Phase 6:** Documentation - Update knockoff skill with user property examples

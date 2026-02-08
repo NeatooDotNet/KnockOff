@@ -7,11 +7,11 @@
 KnockOff determines what to return from a stub method using this priority:
 
 1. **Return/Call callback** - Explicit configuration via `MethodName.Return(...)` or `MethodName.Call(...)`
-2. **User method** - Your implementation in the stub class
+2. **Stub override** - Your implementation in the stub class
 3. **Source** - Delegation to another instance via `Source(T)`
 4. **Smart default** - Automatic default value (this document)
 
-Smart defaults apply only when none of the higher-priority options (Return/Call, user method, or Source) are configured.
+Smart defaults apply only when none of the higher-priority options (Return/Call, stub override, or Source) are configured.
 
 ---
 
@@ -111,7 +111,7 @@ stub.GetUser.Return(() => new UserWithRequiredCtor(1, "Configured"));
 
 **How to fix:**
 - **Configure Return/Call** - Provide explicit return value or callback
-- **Implement user method** - Add your own implementation in the stub class
+- **Implement stub override** - Add your own implementation in the stub class
 - **Use Source** - Delegate to a real instance
 
 ---
@@ -173,7 +173,7 @@ This allows async stub methods to complete synchronously with predictable values
 
 Smart defaults only apply when:
 1. No `Returns`/`Execute` callback is configured
-2. No user method is implemented in the stub
+2. No stub override is implemented in the stub
 3. No `Source` delegation is configured
 
 To override smart defaults:
@@ -185,8 +185,8 @@ stub.GetUser.Return(() => new User { Name = "Test" });
 ```
 <!-- endSnippet -->
 
-**Option 2: User method**
-<!-- snippet: smart-defaults-override-user-method -->
+**Option 2: Stub override**
+<!-- snippet: smart-defaults-override-stub-override -->
 ```cs
 protected override User? GetUser_() => new User { Name = "Test" };
 ```
@@ -204,7 +204,7 @@ stub.Source(new RealOverridableService());
 ## See Also
 
 - [Interceptor API Reference](interceptor-api.md) - Return/Call and other explicit configuration
-- [User Methods](../guides/user-methods.md) - Custom implementations
+- [Stub Overrides](../guides/stub-overrides.md) - Custom implementations
 - [Source Delegation](../guides/source-delegation.md) - Delegating to real instances
 - [Getting Started](../getting-started.md) - First steps with KnockOff
 - [Reference Documentation](../README.md) - Complete API reference

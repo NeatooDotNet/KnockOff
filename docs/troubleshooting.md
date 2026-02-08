@@ -269,9 +269,9 @@ Review the build output messages for specific guidance on resolving each diagnos
 
 ### KO0200: Standalone stub cannot have base class
 
-**Error message:** `Standalone stub 'YourStubClass' cannot have base class 'YourBaseClass'. KnockOff generates a base class for user method support. Remove the base class or use inline stub pattern instead.`
+**Error message:** `Standalone stub 'YourStubClass' cannot have base class 'YourBaseClass'. KnockOff generates a base class for stub override support. Remove the base class or use inline stub pattern instead.`
 
-**Cause:** KnockOff generates a base class (`YourStubBase`) containing virtual methods for user method support. C# does not allow multiple inheritance, so user-defined base classes conflict with KnockOff's generated base class.
+**Cause:** KnockOff generates a base class (`YourStubBase`) containing virtual methods for stub override support. C# does not allow multiple inheritance, so user-defined base classes conflict with KnockOff's generated base class.
 
 <!-- snippet: troubleshoot-ko0200-error -->
 ```cs
@@ -283,11 +283,11 @@ Review the build output messages for specific guidance on resolving each diagnos
 ```
 <!-- endSnippet -->
 
-**Understanding user methods:**
+**Understanding stub overrides:**
 
-User methods let you add custom default behavior to stubs by overriding generated virtual methods with an underscore suffix. KnockOff generates a base class with these methods so you can override them in your stub class:
+Stub overrides let you add custom default behavior to stubs by overriding generated virtual methods with an underscore suffix. KnockOff generates a base class with these methods so you can override them in your stub class:
 
-<!-- snippet: troubleshoot-user-method-definition -->
+<!-- snippet: troubleshoot-stub-override-definition -->
 ```cs
 public interface ITroubleshootUserRepo
 {
@@ -295,7 +295,7 @@ public interface ITroubleshootUserRepo
 }
 
 [KnockOff]
-public partial class TroubleshootUserMethodStub : ITroubleshootUserRepo
+public partial class TroubleshootStubOverrideStub : ITroubleshootUserRepo
 {
     // Override the generated virtual method with underscore suffix
     protected override User? GetById_(int id)
@@ -306,11 +306,11 @@ public partial class TroubleshootUserMethodStub : ITroubleshootUserRepo
 ```
 <!-- endSnippet -->
 
-In your tests, the user method provides the default behavior:
+In your tests, the stub override provides the default behavior:
 
-<!-- snippet: troubleshoot-user-method-usage -->
+<!-- snippet: troubleshoot-stub-override-usage -->
 ```cs
-var stub = new TroubleshootUserMethodStub();
+var stub = new TroubleshootStubOverrideStub();
 // Calls your GetById_ override by default
 ITroubleshootUserRepo repo = stub;
 var user = repo.GetById(123);  // Returns User { Id = 123, Name = "Default User" }
@@ -323,12 +323,12 @@ stub.GetById.Return(id => new User { Id = id, Name = "Test User" });
 **Key points:**
 - Use `protected override` keyword
 - Add underscore suffix to method name (e.g., `GetById_`)
-- User methods provide default behavior for all tests
+- Stub overrides provide default behavior for all tests
 - Individual tests can still override with `Return`/`Call`
 
 **Solutions:**
 
-1. **Remove the base class** from the standalone stub if the base class behavior is not essential—KnockOff's generated base class provides user method support
+1. **Remove the base class** from the standalone stub if the base class behavior is not essential—KnockOff's generated base class provides stub override support
 2. **Use inline stub pattern** if you need the stub inside a class that has a base class (see example below)
 3. **Use composition instead of inheritance** if you need shared behavior across stubs—inject or delegate to the shared logic rather than inheriting from a base class
 

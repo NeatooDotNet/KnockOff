@@ -342,8 +342,8 @@ internal static class SymbolHelpers
 	}
 
 	/// <summary>
-	/// Builds a signature key from a method name and parameters for matching against user override methods.
-	/// Format: "MethodName_(ParamType1,ParamType2,...)" - matches the format from DetectUserOverrideMethods.
+	/// Builds a signature key from a method name and parameters for matching against stub override methods.
+	/// Format: "MethodName_(ParamType1,ParamType2,...)" - matches the format from DetectStubOverrideMethods.
 	/// Includes ref/out/in modifiers as they affect the signature.
 	/// Shared by both FlatModelBuilder (InterfaceMemberInfo) and StandaloneClassModelBuilder (ClassMemberInfo).
 	/// </summary>
@@ -367,7 +367,7 @@ internal static class SymbolHelpers
 	}
 
 	/// <summary>
-	/// Normalizes type names for matching user override methods.
+	/// Normalizes type names for matching stub override methods.
 	/// Converts fully qualified types to C# keywords and removes global:: prefix.
 	/// This ensures semantic model types match syntax-based type names.
 	/// </summary>

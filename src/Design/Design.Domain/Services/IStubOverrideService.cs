@@ -1,51 +1,51 @@
 // -----------------------------------------------------------------------------
-// Design.Domain - Interfaces for demonstrating user-defined method patterns
+// Design.Domain - Interfaces for demonstrating stub override patterns
 // -----------------------------------------------------------------------------
-// These interfaces are designed to explore and document user method behavior:
-// - Basic user methods (protected override methods with underscore suffix)
-// - User method overloads (multiple signatures, same name)
-// - Async user methods
-// - Generic user methods
-// - Mixed scenarios (some methods with user impl, some without)
+// These interfaces are designed to explore and document stub override behavior:
+// - Basic stub overrides (protected override methods with underscore suffix)
+// - Stub override overloads (multiple signatures, same name)
+// - Async stub overrides
+// - Generic stub overrides
+// - Mixed scenarios (some methods with stub override impl, some without)
 // -----------------------------------------------------------------------------
 
 namespace Design.Domain.Services;
 
 /// <summary>
-/// Basic interface for demonstrating user-defined methods.
-/// User methods are protected override methods with underscore suffix (e.g., Process_).
+/// Basic interface for demonstrating stub overrides.
+/// Stub overrides are protected override methods with underscore suffix (e.g., Process_).
 /// </summary>
-public interface IUserMethodService
+public interface IStubOverrideService
 {
     /// <summary>
     /// Simple method with single parameter.
-    /// Demonstrates: basic user method pattern
+    /// Demonstrates: basic stub override pattern
     /// </summary>
     string Process(string input);
 
     /// <summary>
     /// Method with multiple parameters.
-    /// Demonstrates: multi-parameter user methods
+    /// Demonstrates: multi-parameter stub overrides
     /// </summary>
     int Calculate(int a, int b);
 
     /// <summary>
     /// Void method.
-    /// Demonstrates: void user methods
+    /// Demonstrates: void stub overrides
     /// </summary>
     void Execute(string command);
 
     /// <summary>
     /// Method that returns nullable.
-    /// Demonstrates: nullable return types in user methods
+    /// Demonstrates: nullable return types in stub overrides
     /// </summary>
     string? FindById(int id);
 }
 
 /// <summary>
-/// Interface with overloaded methods for testing user method overloads.
+/// Interface with overloaded methods for testing stub override overloads.
 /// </summary>
-public interface IOverloadedUserMethodService
+public interface IOverloadedStubOverrideService
 {
     /// <summary>Format with single parameter.</summary>
     string Format(string input);
@@ -64,28 +64,28 @@ public interface IOverloadedUserMethodService
 }
 
 /// <summary>
-/// Interface for testing mixed scenarios - some methods have user implementations,
+/// Interface for testing mixed scenarios - some methods have stub override implementations,
 /// others don't.
 /// </summary>
-public interface IMixedUserMethodService
+public interface IMixedStubOverrideService
 {
-    /// <summary>Will have user method implementation.</summary>
-    string WithUserMethod(string input);
+    /// <summary>Will have stub override implementation.</summary>
+    string WithStubOverride(string input);
 
-    /// <summary>Will NOT have user method - uses OnCall instead.</summary>
-    string WithoutUserMethod(string input);
+    /// <summary>Will NOT have stub override - uses OnCall instead.</summary>
+    string WithoutStubOverride(string input);
 
-    /// <summary>Will have user method implementation.</summary>
-    int ComputeWithUserMethod(int value);
+    /// <summary>Will have stub override implementation.</summary>
+    int ComputeWithStubOverride(int value);
 
-    /// <summary>Will NOT have user method - uses Returns instead.</summary>
-    int ComputeWithoutUserMethod(int value);
+    /// <summary>Will NOT have stub override - uses Returns instead.</summary>
+    int ComputeWithoutStubOverride(int value);
 }
 
 /// <summary>
-/// Interface with async methods for testing async user methods.
+/// Interface with async methods for testing async stub overrides.
 /// </summary>
-public interface IAsyncUserMethodService
+public interface IAsyncStubOverrideService
 {
     /// <summary>Async method returning Task of T.</summary>
     Task<string> ProcessAsync(string input);
@@ -98,9 +98,9 @@ public interface IAsyncUserMethodService
 }
 
 /// <summary>
-/// Interface with generic methods for testing generic user methods.
+/// Interface with generic methods for testing generic stub overrides.
 /// </summary>
-public interface IGenericUserMethodService
+public interface IGenericStubOverrideService
 {
     /// <summary>Generic method with type parameter.</summary>
     T Create<T>() where T : new();
@@ -113,9 +113,9 @@ public interface IGenericUserMethodService
 }
 
 /// <summary>
-/// Interface with overloaded generic methods for testing generic user method overloads.
+/// Interface with overloaded generic methods for testing generic stub override overloads.
 /// </summary>
-public interface IOverloadedGenericUserMethodService
+public interface IOverloadedGenericStubOverrideService
 {
     /// <summary>Single-parameter generic overload.</summary>
     T Process<T>(T input);
@@ -130,7 +130,7 @@ public interface IOverloadedGenericUserMethodService
 /// <summary>
 /// Interface with properties and methods for testing coexistence.
 /// </summary>
-public interface IUserMethodWithPropertiesService
+public interface IStubOverrideWithPropertiesService
 {
     /// <summary>Property - uses Get/Set interceptor.</summary>
     string Title { get; set; }

@@ -74,9 +74,9 @@ public partial class GenericMethodInlineClassTest
 // to inline class stubs. The user's partial class provides interceptor properties
 // via the generated code, and generic methods use Of<T>() handlers.
 //
-// Note: User method overrides (MethodName_ pattern) are NOT supported for
+// Note: Stub override methods (MethodName_ pattern) are NOT supported for
 // generic methods. This is consistent with the interface pipeline where
-// generic methods do not support user overrides.
+// generic methods do not support stub overrides.
 // =============================================================================
 
 [KnockOffBase<GenericMethodBase>]

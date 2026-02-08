@@ -126,7 +126,7 @@ public partial class CmdInlineClassTests
 }
 
 // =============================================================================
-// User Methods for Stand-Alone Stubs
+// Stub Overrides for Stand-Alone Stubs
 // =============================================================================
 
 public interface IUserRepoCmd
@@ -154,15 +154,15 @@ public partial class UserRepoCmdStub
 }
 #endregion
 
-public class UserMethodsCommandTests
+public class StubOverridesCommandTests
 {
     [Fact]
-    public void UserMethod_ProvidesDefaultBehavior()
+    public void StubOverride_ProvidesDefaultBehavior()
     {
         var stub = new UserRepoCmdStub();
         IUserRepoCmd repository = stub;
 
-        // User method provides default data
+        // Stub override provides default data
         var users = repository.FindAll().ToList();
 
         Assert.Equal(2, users.Count);

@@ -457,14 +457,14 @@ public class GenericStandaloneOverloadTests
         tracking2.Verify(Called.Once);
     }
     // =========================================================================
-    // USER METHODS - Overrides Returning Generic Type T
+    // STUB OVERRIDE METHODS - Overrides Returning Generic Type T
     // =========================================================================
 
     [Fact]
-    public void UserMethod_Get_OverloadsReturningT_Work()
+    public void StubOverride_Get_OverloadsReturningT_Work()
     {
         // Arrange
-        var stub = new GenericFormatterWithUserMethodsStub<TestEntity>();
+        var stub = new GenericFormatterWithStubOverridesStub<TestEntity>();
 
         var defaultEntity = new TestEntity { Id = 0, Name = "Default" };
         var byIdEntity = new TestEntity { Id = 42, Name = "ById" };
@@ -476,7 +476,7 @@ public class GenericStandaloneOverloadTests
 
         IGenericFormatter<TestEntity> formatter = stub;
 
-        // Act - each overload calls its user method override
+        // Act - each overload calls its stub override override
         var result1 = formatter.Get();
         var result2 = formatter.Get(42);
         var result3 = formatter.Get("TestName");
@@ -489,15 +489,15 @@ public class GenericStandaloneOverloadTests
     }
 
     [Fact]
-    public void UserMethod_Transform_OverloadsWithT_Work()
+    public void StubOverride_Transform_OverloadsWithT_Work()
     {
         // Arrange
-        var stub = new GenericFormatterWithUserMethodsStub<TestEntity>();
+        var stub = new GenericFormatterWithStubOverridesStub<TestEntity>();
         var entity = new TestEntity { Id = 1, Name = "Original" };
 
         IGenericFormatter<TestEntity> formatter = stub;
 
-        // Act - Transform user methods just return the item
+        // Act - Transform stub overrides just return the item
         var result1 = formatter.Transform(entity);
         var result2 = formatter.Transform(entity, "options");
 
@@ -507,10 +507,10 @@ public class GenericStandaloneOverloadTests
     }
 
     [Fact]
-    public void UserMethod_Format_OverloadsWithTParameter_Work()
+    public void StubOverride_Format_OverloadsWithTParameter_Work()
     {
         // Arrange
-        var stub = new GenericFormatterWithUserMethodsStub<TestEntity>();
+        var stub = new GenericFormatterWithStubOverridesStub<TestEntity>();
         var entity = new TestEntity { Id = 1, Name = "Test" };
 
         IGenericFormatter<TestEntity> formatter = stub;
@@ -520,17 +520,17 @@ public class GenericStandaloneOverloadTests
         var result2 = formatter.Format(entity, uppercase: true);
         var result3 = formatter.Format(entity, uppercase: false, maxLength: 5);
 
-        // Assert - user method implementations
+        // Assert - stub override implementations
         Assert.StartsWith("[User:", result1, StringComparison.Ordinal);
         Assert.Contains("TEST", result2, StringComparison.Ordinal); // uppercase
         Assert.Equal(5, result3.Length); // truncated
     }
 
     [Fact]
-    public void UserMethod_Tracking_WorksWithUserMethods()
+    public void StubOverride_Tracking_WorksWithStubOverrides()
     {
         // Arrange
-        var stub = new GenericFormatterWithUserMethodsStub<TestEntity>();
+        var stub = new GenericFormatterWithStubOverridesStub<TestEntity>();
         stub.DefaultInstance = new TestEntity { Id = 0, Name = "Default" };
         stub.CreateById = id => new TestEntity { Id = id, Name = "ById" };
 
@@ -548,13 +548,13 @@ public class GenericStandaloneOverloadTests
     }
 
     [Fact]
-    public void UserMethod_OnCall_SupersedesUserMethod()
+    public void StubOverride_OnCall_SupersedesStubOverride()
     {
         // Arrange
-        var stub = new GenericFormatterWithUserMethodsStub<TestEntity>();
-        stub.DefaultInstance = new TestEntity { Id = 0, Name = "UserMethod" };
+        var stub = new GenericFormatterWithStubOverridesStub<TestEntity>();
+        stub.DefaultInstance = new TestEntity { Id = 0, Name = "StubOverride" };
 
-        // OnCall supersedes the user method - overloads are disambiguated by delegate type
+        // OnCall supersedes the stub override - overloads are disambiguated by delegate type
         stub.Get.Return(() => new TestEntity { Id = 999, Name = "OnCallOverride" });
 
         IGenericFormatter<TestEntity> formatter = stub;
@@ -562,18 +562,18 @@ public class GenericStandaloneOverloadTests
         // Act
         var result = formatter.Get();
 
-        // Assert - OnCall wins over user method
+        // Assert - OnCall wins over stub override
         Assert.Equal(999, result.Id);
         Assert.Equal("OnCallOverride", result.Name);
     }
 
     [Fact]
-    public void UserMethod_OnCall_SupersedesSpecificOverload()
+    public void StubOverride_OnCall_SupersedesSpecificOverload()
     {
         // Arrange
-        var stub = new GenericFormatterWithUserMethodsStub<TestEntity>();
+        var stub = new GenericFormatterWithStubOverridesStub<TestEntity>();
         stub.DefaultInstance = new TestEntity { Id = 0, Name = "Default" };
-        stub.CreateById = id => new TestEntity { Id = id, Name = "UserMethodById" };
+        stub.CreateById = id => new TestEntity { Id = id, Name = "StubOverrideById" };
         stub.CreateByName = name => new TestEntity { Id = 0, Name = name };
 
         // Override only the int overload with OnCall - overloads are disambiguated by delegate type
@@ -582,24 +582,24 @@ public class GenericStandaloneOverloadTests
         IGenericFormatter<TestEntity> formatter = stub;
 
         // Act
-        var result1 = formatter.Get();           // Uses user method
-        var result2 = formatter.Get(5);          // Uses OnCall (supersedes user method)
-        var result3 = formatter.Get("test");     // Uses user method
+        var result1 = formatter.Get();           // Uses stub override
+        var result2 = formatter.Get(5);          // Uses OnCall (supersedes stub override)
+        var result3 = formatter.Get("test");     // Uses stub override
 
         // Assert
-        Assert.Equal("Default", result1.Name);       // User method
+        Assert.Equal("Default", result1.Name);       // Stub override method
         Assert.Equal(50, result2.Id);                // OnCall: 5 * 10
         Assert.Equal("OnCallById", result2.Name);    // OnCall
-        Assert.Equal("test", result3.Name);          // User method
+        Assert.Equal("test", result3.Name);          // Stub override method
     }
 
 
     [Fact]
-    public void UserMethod_DifferentTypeArguments_IndependentBehavior()
+    public void StubOverride_DifferentTypeArguments_IndependentBehavior()
     {
         // Arrange - two stubs with different type arguments
-        var stringStub = new GenericFormatterWithUserMethodsStub<string>();
-        var entityStub = new GenericFormatterWithUserMethodsStub<TestEntity>();
+        var stringStub = new GenericFormatterWithStubOverridesStub<string>();
+        var entityStub = new GenericFormatterWithStubOverridesStub<TestEntity>();
 
         stringStub.DefaultInstance = "DefaultString";
         stringStub.CreateById = id => $"String-{id}";
@@ -614,7 +614,7 @@ public class GenericStandaloneOverloadTests
         var stringResult = stringFormatter.Get(5);
         var entityResult = entityFormatter.Get(5);
 
-        // Assert - each uses its own type's user method
+        // Assert - each uses its own type's stub override
         Assert.Equal("String-5", stringResult);
         Assert.Equal("Entity-5", entityResult.Name);
     }

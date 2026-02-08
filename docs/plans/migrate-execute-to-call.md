@@ -361,9 +361,9 @@ Use `handler.IsVoid` to select the method name.
 
 #### StandaloneClassRenderer.cs `Execute_()` forwarder
 
-**NOT in scope.** The comments at lines ~157 and ~538 of `StandaloneClassRenderer.cs` mention `Execute_()` -- this refers to a user method forwarder where the domain class (`ServiceBase`) happens to have a method named `Execute(string command)`. The generated user method override is named `Execute_()` following the `MethodName_()` naming convention. This has nothing to do with the void callback API. The `Execute_` name is derived from the *member name on the target type*, not from the `.Execute()` API.
+**NOT in scope.** The comments at lines ~157 and ~538 of `StandaloneClassRenderer.cs` mention `Execute_()` -- this refers to a stub override forwarder where the domain class (`ServiceBase`) happens to have a method named `Execute(string command)`. The generated stub override override is named `Execute_()` following the `MethodName_()` naming convention. This has nothing to do with the void callback API. The `Execute_` name is derived from the *member name on the target type*, not from the `.Execute()` API.
 
-**Verification:** `src/Design/Design.Domain/Abstractions/ServiceBase.cs` line 46: `public abstract void Execute(string command)`. The user method stubs at `Design.Stubs/UserMethods/UserMethodBasics.cs` lines 77, 93 override `Execute_()`. This is the domain method name, not the API.
+**Verification:** `src/Design/Design.Domain/Abstractions/ServiceBase.cs` line 46: `public abstract void Execute(string command)`. The stub override stubs at `Design.Stubs/StubOverrides/StubOverrideBasics.cs` lines 77, 93 override `Execute_()`. This is the domain method name, not the API.
 
 #### Non-void When chain ThenCall
 
@@ -588,11 +588,11 @@ All three renames apply.
 
 **Design.Stubs -- OnCall -> Return/Call:**
 - Update all `.Of<T>().OnCall(` to `.Of<T>().Return(` (non-void) or `.Of<T>().Call(` (void)
-- `src/Design/Design.Stubs/UserMethods/UserMethodBasics.cs` has 2 `.OnCall(` occurrences (both non-void -> `.Return(`)
+- `src/Design/Design.Stubs/StubOverrides/StubOverrideBasics.cs` has 2 `.OnCall(` occurrences (both non-void -> `.Return(`)
 
 **Critical distinction in Design.Stubs:**
 - `stub.Execute.Execute(cmd => ...)` becomes `stub.Execute.Call(cmd => ...)` -- the first `Execute` is the interceptor property name (from `ServiceBase.Execute(string)` domain method), the second was the void callback API
-- `stub.Execute_(string command)` user method override stays unchanged (domain method name)
+- `stub.Execute_(string command)` stub override override stays unchanged (domain method name)
 
 **Design.Tests** -- same transformation rules for all three renames.
 
@@ -624,7 +624,7 @@ All three renames apply.
 - `IMethodReturnsBuilder`/`IMethodReturnsSequence` interface references in API docs -> `IMethodReturnBuilder`/`IMethodReturnSequence`
 
 **Documentation guides -- Execute -> Call** (~20 files):
-- `docs/guides/methods.md`, `docs/guides/async-patterns.md`, `docs/guides/delegates.md`, `docs/guides/verification.md`, `docs/guides/parameter-matching.md`, `docs/guides/api-consistency-matrix.md`, `docs/guides/user-methods.md`, `docs/guides/advanced-callbacks.md`, `docs/guides/source-delegation.md`, `docs/guides/stub-patterns.md`
+- `docs/guides/methods.md`, `docs/guides/async-patterns.md`, `docs/guides/delegates.md`, `docs/guides/verification.md`, `docs/guides/parameter-matching.md`, `docs/guides/api-consistency-matrix.md`, `docs/guides/stub-overrides.md`, `docs/guides/advanced-callbacks.md`, `docs/guides/source-delegation.md`, `docs/guides/stub-patterns.md`
 - `docs/reference/interceptor-api.md`, `docs/reference/smart-defaults.md`
 - `docs/getting-started.md`, `docs/troubleshooting.md`, `docs/comparison.md`, `docs/type-safety.md`
 - `docs/migration/from-moq.md`, `docs/migration/from-nsubstitute.md`
@@ -633,7 +633,7 @@ All three renames apply.
 **Documentation guides -- OnCall -> Returns/Call** (key files):
 - `docs/guides/generic-methods.md` -- 18 occurrences (primary typed handler docs, extensive rewrite needed: `OnCall` -> `Returns` throughout, section titles, explanatory text)
 - `docs/guides/methods.md` -- 3 occurrences in comments
-- `docs/guides/user-methods.md` -- 8 occurrences (OnCall supersedes user method)
+- `docs/guides/stub-overrides.md` -- 8 occurrences (OnCall supersedes stub override)
 - `docs/guides/api-consistency-matrix.md` -- 3 occurrences
 - `docs/guides/delegates.md` -- 2 occurrences
 - `docs/guides/parameter-matching.md` -- 1 occurrence
@@ -747,7 +747,7 @@ The typed handler rename (OnCall->Return/Call) introduces a behavioral split tha
 
 ### Stale OnCall References in Documentation.Samples Comments
 
-Many Documentation.Samples files have `OnCall` in comments and test method names from the pre-v0.38.0 era (e.g., `VoidMethod_ConfiguredWithOnCall`, `OnCall_SupersedesUserMethod`). While these don't affect compilation, they create confusion because the actual API calls will use `Return`/`Call` after this rename. This plan should update these cosmetic references for consistency, but it's low-risk if some are missed -- they don't affect functionality.
+Many Documentation.Samples files have `OnCall` in comments and test method names from the pre-v0.38.0 era (e.g., `VoidMethod_ConfiguredWithOnCall`, `OnCall_SupersedesStubOverride`). While these don't affect compilation, they create confusion because the actual API calls will use `Return`/`Call` after this rename. This plan should update these cosmetic references for consistency, but it's low-risk if some are missed -- they don't affect functionality.
 
 ---
 
@@ -824,7 +824,7 @@ Deferred to Phase 4. Design projects will be updated after generator changes and
 - `src/Generator/Renderer/Shared/MethodInterceptorRenderer.cs` (~2800+ lines) -- all `Execute` references audited. Found: entry point names (lines ~170, ~305, ~485, ~539), builder/sequence ThenExecute (lines ~1552, ~1688, ~1720, ~1722, ~1725, ~1859, ~1860), void When chain Execute/ThenExecute (lines ~2484, ~2505, ~2513, ~2548), internal matchers (lines ~1895-1957 non-void, ~2398-2465 void), matcher dispatch (lines ~1095, ~2384), error messages (lines ~849, ~1045), ~25 comments
 - `src/Generator/Builder/UnifiedInterceptorBuilder.cs` -- `GetBuilderInterface()` at lines ~267-281, 3 `IMethodExecuteBuilder` references
 - `src/Generator/Renderer/Shared/ModelAdapters.cs` -- `GetBuilderInterface()` at lines ~200-212, 3 `IMethodExecuteBuilder` references
-- `src/Generator/Renderer/StandaloneClassRenderer.cs` -- lines ~157, ~538 mention `Execute_()` -- confirmed OUT OF SCOPE (user method forwarder, domain method name)
+- `src/Generator/Renderer/StandaloneClassRenderer.cs` -- lines ~157, ~538 mention `Execute_()` -- confirmed OUT OF SCOPE (stub override forwarder, domain method name)
 
 **Generator files -- OnCall -> Returns/Call (typed handlers):**
 - `src/Generator/Renderer/FlatRenderer.cs` -- 10 `OnCall` references audited: single-sig method (line ~1201), overload method (line ~1413), error messages (lines ~1932, ~2244), comments (lines ~1199, ~1409, ~2141, ~2148, ~2178, ~2209). Internal `_onCall` field (line ~1176) and `Callback` property (line ~1206) stay unchanged.
@@ -843,9 +843,9 @@ Deferred to Phase 4. Design projects will be updated after generator changes and
 - `src/KnockOff/IMethodSequence.cs` -- confirmed unchanged (no Execute references)
 
 **Design domain:**
-- `src/Design/Design.Domain/Abstractions/ServiceBase.cs` line 46 -- `public abstract void Execute(string command)` confirms `Execute_()` user method is domain-derived
+- `src/Design/Design.Domain/Abstractions/ServiceBase.cs` line 46 -- `public abstract void Execute(string command)` confirms `Execute_()` stub override is domain-derived
 - `src/Design/Design.Domain/Abstractions/EventServiceBase.cs` line 27 -- same pattern
-- `src/Design/Design.Domain/Services/IUserMethodService.cs` lines 36, 94 -- `Execute` and `ExecuteAsync` domain methods
+- `src/Design/Design.Domain/Services/IStubOverrideService.cs` lines 36, 94 -- `Execute` and `ExecuteAsync` domain methods
 
 **Audit results (grep "Execute"):**
 - `src/KnockOff/` -- 26 lines across 3 files (all in scope)
@@ -862,7 +862,7 @@ Deferred to Phase 4. Design projects will be updated after generator changes and
 - `src/Tests/KnockOffTests/` -- 24 occurrences across 3 files (GenericMethodTests, GenericMethodBugTests, InlineStubTests)
 - `src/Tests/KnockOff.Documentation.Samples/` -- ~130+ occurrences across ~20 files (mix of typed handler API calls and cosmetic comments/names from pre-v0.38.0)
 - `src/Tests/KnockOff.NeatooInterfaceTests/` -- 4 occurrences across 2 files
-- `src/Design/Design.Stubs/` -- 2 occurrences in 1 file (UserMethodBasics.cs)
+- `src/Design/Design.Stubs/` -- 2 occurrences in 1 file (StubOverrideBasics.cs)
 - `skills/knockoff/` -- 25 occurrences across 4 files
 - `docs/` -- ~1900+ occurrences across ~150 files (vast majority in completed todos/plans and old release notes -- only active guides/references need updating)
 
@@ -1057,9 +1057,9 @@ If any of these occur, STOP and report:
 - Bulk renamed `.ThenReturns(` -> `.ThenReturn(`, `.ThenExecute(` -> `.ThenCall(`, `.Returns(` -> `.Return(`, `.Execute(` -> `.Call(` across all test files
 - Bulk renamed `.OnCall(` -> `.Return(` across all test files
 - Fixed domain method false positives:
-  - `stub.Object.Call(` -> `stub.Object.Execute(` in StandaloneClassUserMethodTests.cs, InlineStubTests.cs, StandaloneClassStubTests.cs
+  - `stub.Object.Call(` -> `stub.Object.Execute(` in StandaloneClassStubOverrideTests.cs, InlineStubTests.cs, StandaloneClassStubTests.cs
   - `rule.Call(` -> `rule.Execute(` in InlineStubBugTests.cs, GenericInheritanceTypeMismatchBugTests.cs
-  - `service.Call(` -> `service.Execute(` in UserMethodWhenTests.cs
+  - `service.Call(` -> `service.Execute(` in StubOverrideWhenTests.cs
   - `service.Execute("hello")` restored in StandaloneClassStubTests.cs helper method
 - Fixed void typed handler false positives: `Process.Of<>().Return(` -> `.Call(` and `Transfer.Of<>().Return(` -> `.Call(` and `SaveEntity.Of<>().Return(` -> `.Call(` in GenericMethodTests.cs
 - Additional projects missed by initial sed: KnockOffTests.AssemblyStrict (`.Returns(` -> `.Return(`) and KnockOffSandbox (`.Execute(` -> `.Call(` for void API methods)
@@ -1068,8 +1068,8 @@ If any of these occur, STOP and report:
 ### Phase 4: Design Project Updates -- COMPLETE
 
 - Applied same bulk renames to Design.Stubs and Design.Tests (excluding obj/ and Generated/ directories)
-- Fixed domain method false positive: `service.Call("test")` -> `service.Execute("test")` in UserMethodBasics.cs
-- Renamed 2 remaining `.OnCall(` to `.Return(` in UserMethodBasics.cs (both on non-void generic methods)
+- Fixed domain method false positive: `service.Call("test")` -> `service.Execute("test")` in StubOverrideBasics.cs
+- Renamed 2 remaining `.OnCall(` to `.Return(` in StubOverrideBasics.cs (both on non-void generic methods)
 - **Checkpoint 4:** PASS -- Design.Stubs: Build succeeded (0 warnings, 0 errors). Design.Tests: 259/259/259 passed (net10/net9/net8)
 
 ### Observations
