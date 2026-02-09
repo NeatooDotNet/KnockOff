@@ -1,10 +1,10 @@
 # Generic Type Gaps
 
-**Status:** In Progress
+**Status:** Complete
 **Priority:** High
 **Created:** 2026-02-08
 **Last Updated:** 2026-02-09
-**Plan:** [generic-type-gaps.md](../plans/generic-type-gaps.md)
+**Plans:** [generic-type-gaps.md](../plans/generic-type-gaps.md), [generic-type-validation.md](../plans/generic-type-validation.md)
 
 ---
 
@@ -78,6 +78,7 @@ Where clauses must be validated in ALL patterns, not just open generics:
 ## Plans
 
 - [Generic Type Gaps - Validation and Fix Plan](../plans/generic-type-gaps.md)
+- [Generic Type Validation Plan](../plans/generic-type-validation.md)
 
 ## Rocks Library Findings (Gaps 25-31)
 
@@ -112,17 +113,18 @@ Gaps discovered while using KnockOff to stub interfaces from the Rocks test libr
 - [x] Fix Gap 26: `in` modifier stripped from indexer parameters
 - [x] Fix Gap 27/28: Generic methods with out/ref params in inline pattern
 - [x] Fix Gap 31: Generic methods with 2+ type parameters (needs Of<T1,T2>() support)
-- [ ] Validate Feature A: Multi-type-param interfaces across applicable patterns
-- [ ] Validate Feature B: Multi-type-param classes across applicable patterns
-- [ ] Validate Feature C: Methods using class type params
-- [ ] Validate Feature D: Methods with own type params (single)
-- [ ] Validate Feature E: Methods with multiple own type params
-- [ ] Validate Feature F: Where clauses on class/interface type params
-- [ ] Validate Feature G: Where clauses on method type params
-- [ ] Validate Feature H: Multiple where clauses on methods in ALL patterns
-- [ ] Validate Feature I: Generic delegates with multiple type params
-- [ ] Validate where clause combinations (struct, unmanaged, notnull, cross-referencing)
+- [x] Validate Feature A: Multi-type-param interfaces across applicable patterns
+- [x] Validate Feature B: Multi-type-param classes across applicable patterns
+- [x] Validate Feature C: Methods using class type params
+- [x] Validate Feature D: Methods with own type params (single)
+- [x] Validate Feature E: Methods with multiple own type params
+- [x] Validate Feature F: Where clauses on class/interface type params
+- [x] Validate Feature G: Where clauses on method type params
+- [x] Validate Feature H: Multiple where clauses on methods in ALL patterns
+- [x] Validate Feature I: Generic delegates with multiple type params
+- [x] Validate where clause combinations (struct, notnull, cross-referencing)
 - [ ] Update documentation
+- [ ] Fix `unmanaged` constraint bug (new bug — tracked separately)
 
 ## Progress Log
 
