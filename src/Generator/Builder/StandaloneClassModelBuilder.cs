@@ -445,7 +445,7 @@ internal static class StandaloneClassModelBuilder
             ? member.IndexerParameters.GetArray()![0].Type
             : $"({string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"))})";
 
-        var paramSig = string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"));
+        var paramSig = string.Join(", ", member.IndexerParameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}"));
         var argList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
         var keyExpr = member.IndexerParameters.Count == 1
             ? member.IndexerParameters.GetArray()![0].Name
@@ -518,7 +518,7 @@ internal static class StandaloneClassModelBuilder
     private static InlineClassImplIndexerModel BuildImplIndexerModel(ClassMemberInfo member, int indexerCount)
     {
         var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
-        var paramList = string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"));
+        var paramList = string.Join(", ", member.IndexerParameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}"));
         var argList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
         var keyArg = member.IndexerParameters.Count == 1
             ? member.IndexerParameters.GetArray()![0].Name
@@ -672,85 +672,106 @@ internal static class StandaloneClassModelBuilder
         var interceptClassName = $"{stubClassName}_{groupName}Interceptor";
         var stubClassRef = $"{stubClassName}{classTypeParamList}";
 
-        // Get the first generic member's type parameters
-        var firstMember = genericMembers[0];
-        var typeParams = firstMember.TypeParameters.GetArray()!;
-        var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
-        var typeParamCount = typeParams.Length;
+        // Group generic members by type parameter count to support mixed arities
+        // (e.g., Run<T>() and Run<TIn, TOut>(TIn input))
+        var arityGroupsMap = genericMembers
+            .GroupBy(m => m.TypeParameters.Count)
+            .OrderBy(g => g.Key);
 
-        // Build constraint clauses for method type parameters
-        var methodConstraintClauses = GetConstraintClauses(typeParams);
-
-        // Get non-generic parameters (exclude params typed with method-level type params)
-        var typeParamSet = new HashSet<string>(typeParams.Select(tp => tp.Name));
-        var inputParams = firstMember.Parameters
-            .Where(p => p.RefKind != RefKind.Out)
-            .ToArray();
-        var nonGenericParams = inputParams
-            .Where(p => !IsGenericParameterType(p.Type, typeParamSet))
-            .ToArray();
-
-        // Build the dictionary key type
-        var keyType = typeParamCount == 1
-            ? "global::System.Type"
-            : $"({string.Join(", ", typeParams.Select(_ => "global::System.Type"))})";
-
-        var keyConstruction = typeParamCount == 1
-            ? $"typeof({typeParams[0].Name})"
-            : $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
-
-        // Build delegate signature (all params, not just non-generic)
-        var delegateReturnType = firstMember.ReturnType == "void" ? "void" : firstMember.ReturnType;
-        var allParams = firstMember.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
-        var delegateParams = new List<string>();
-        foreach (var p in allParams)
+        var arityGroups = new List<InlineGenericTypeArityGroup>();
+        foreach (var arityGroup in arityGroupsMap)
         {
-            delegateParams.Add($"{p.Type} {p.Name}");
-        }
-        var delegateParamList = string.Join(", ", delegateParams);
-        var isVoid = firstMember.ReturnType == "void";
-        var delegateSignature = isVoid
-            ? $"public delegate void {methodName}Delegate({delegateParamList});"
-            : $"public delegate {delegateReturnType} {methodName}Delegate({delegateParamList});";
+            // Use the first member in this arity group as representative
+            var representative = arityGroup.First();
+            var typeParams = representative.TypeParameters.GetArray()!;
+            var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
+            var typeParamCount = typeParams.Length;
 
-        // LastCallArg/Args types
-        string? lastCallArgType = null;
-        string? lastCallArgsType = null;
-        if (nonGenericParams.Length == 1)
-        {
-            lastCallArgType = MakeNullable(nonGenericParams[0].Type);
-        }
-        else if (nonGenericParams.Length > 1)
-        {
-            lastCallArgsType = "(" + string.Join(", ", nonGenericParams.Select(p => $"{p.Type} {p.Name}")) + ")?";
-        }
+            // Build constraint clauses for method type parameters
+            var methodConstraintClauses = GetConstraintClauses(typeParams);
 
-        // Build non-generic parameters model
-        var nonGenericParamModels = nonGenericParams.Select(p => new ParameterModel(
-            Name: p.Name,
-            EscapedName: EscapeIdentifier(p.Name),
-            Type: p.Type,
-            NullableType: MakeNullable(p.Type),
-            RefKind: p.RefKind,
-            RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+            // Get non-generic parameters (exclude params typed with method-level type params)
+            var typeParamSet = new HashSet<string>(typeParams.Select(tp => tp.Name));
+            var inputParams = representative.Parameters
+                .Where(p => p.RefKind != RefKind.Out)
+                .ToArray();
+            var nonGenericParams = inputParams
+                .Where(p => !IsGenericParameterType(p.Type, typeParamSet))
+                .ToArray();
+
+            // Build the dictionary key type
+            var keyType = typeParamCount == 1
+                ? "global::System.Type"
+                : $"({string.Join(", ", typeParams.Select(_ => "global::System.Type"))})";
+
+            var keyConstruction = typeParamCount == 1
+                ? $"typeof({typeParams[0].Name})"
+                : $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
+
+            // Build delegate signature (all params, not just non-generic)
+            var delegateReturnType = representative.ReturnType == "void" ? "void" : representative.ReturnType;
+            var allParams = representative.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+            var delegateParams = new List<string>();
+            foreach (var p in allParams)
+            {
+                delegateParams.Add($"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}");
+            }
+            var delegateParamList = string.Join(", ", delegateParams);
+            var isVoid = representative.ReturnType == "void";
+            var delegateSignature = isVoid
+                ? $"public delegate void {methodName}Delegate({delegateParamList});"
+                : $"public delegate {delegateReturnType} {methodName}Delegate({delegateParamList});";
+
+            // LastCallArg/Args types
+            string? lastCallArgType = null;
+            string? lastCallArgsType = null;
+            if (nonGenericParams.Length == 1)
+            {
+                lastCallArgType = MakeNullable(nonGenericParams[0].Type);
+            }
+            else if (nonGenericParams.Length > 1)
+            {
+                lastCallArgsType = "(" + string.Join(", ", nonGenericParams.Select(p => $"{p.Type} {p.Name}")) + ")?";
+            }
+
+            // Build non-generic parameters model
+            var nonGenericParamModels = nonGenericParams.Select(p => new ParameterModel(
+                Name: p.Name,
+                EscapedName: EscapeIdentifier(p.Name),
+                Type: p.Type,
+                NullableType: MakeNullable(p.Type),
+                RefKind: p.RefKind,
+                RefPrefix: GetRefKindPrefix(p.RefKind))).ToEquatableArray();
+
+            // Typed handler class name: append arity count for arities > 1 when multiple arities exist
+            var typedHandlerClassName = $"{methodName}TypedHandler";
+            if (typeParamCount > 1)
+            {
+                typedHandlerClassName = $"{methodName}TypedHandler{typeParamCount}";
+            }
+
+            arityGroups.Add(new InlineGenericTypeArityGroup(
+                TypeParameterNames: typeParamNames,
+                TypeParameterCount: typeParamCount,
+                KeyType: keyType,
+                KeyConstruction: keyConstruction,
+                ConstraintClauses: methodConstraintClauses,
+                TypedHandlerClassName: typedHandlerClassName,
+                DelegateSignature: delegateSignature,
+                IsVoid: isVoid,
+                ReturnType: representative.ReturnType,
+                NonGenericParameters: nonGenericParamModels,
+                LastCallArgType: lastCallArgType,
+                LastCallArgsType: lastCallArgsType));
+        }
 
         return new InlineGenericMethodHandlerModel(
             InterceptorClassName: interceptClassName,
             MethodName: methodName,
-            ReturnType: firstMember.ReturnType,
-            IsVoid: isVoid,
-            TypeParameterNames: typeParamNames,
-            KeyType: keyType,
-            KeyConstruction: keyConstruction,
-            MethodConstraintClauses: methodConstraintClauses,
-            TypedHandlerClassName: $"{methodName}TypedHandler",
-            DelegateSignature: delegateSignature,
-            NonGenericParameters: nonGenericParamModels,
-            LastCallArgType: lastCallArgType,
-            LastCallArgsType: lastCallArgsType,
             StubClassName: stubClassRef,
             InterfaceTypeParameterList: classTypeParamList,
-            InterfaceConstraintClauses: classConstraintClause);
+            InterfaceConstraintClauses: classConstraintClause,
+            ArityGroups: arityGroups.ToEquatableArray());
     }
 
     #endregion

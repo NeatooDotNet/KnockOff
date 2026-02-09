@@ -613,8 +613,11 @@ internal static class FlatModelBuilder
 				var keyParamName = member.IndexerParameters.Count > 0
 					? member.IndexerParameters.GetArray()![0].Name
 					: "key";
+				var keyRefPrefix = member.IndexerParameters.Count > 0
+					? GetRefKindPrefix(member.IndexerParameters.GetArray()![0].RefKind)
+					: "";
 
-				var paramSignature = string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"));
+				var paramSignature = string.Join(", ", member.IndexerParameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}"));
 				var paramTypesList = string.Join(", ", member.IndexerParameters.Select(p => p.Type));
 				var keyExpression = member.IndexerParameters.Count == 1
 					? member.IndexerParameters.GetArray()![0].Name
@@ -636,6 +639,7 @@ internal static class FlatModelBuilder
 					DefaultExpression: defaultExpr,
 					KeyType: keyType,
 					KeyParamName: keyParamName,
+					KeyRefPrefix: keyRefPrefix,
 					NullableKeyType: MakeNullable(keyType),
 					HasGetter: member.HasGetter,
 					HasSetter: member.HasSetter,
@@ -1130,80 +1134,101 @@ internal static class FlatModelBuilder
 		var interceptorName = nameMap[genericKey];
 		var interceptorClassName = $"{interceptorName}Interceptor";
 
-		// Get type parameters from the first generic overload
-		var genericOverload = group.Overloads.First(o => o.IsGenericMethod);
-		var typeParams = genericOverload.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
-		var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
-		var constraintClauses = GetConstraintClauses(typeParams);
-
-		// Determine key type based on type parameter count
-		var keyType = typeParams.Length == 1
-			? "global::System.Type"
-			: $"({string.Join(", ", typeParams.Select(_ => "global::System.Type"))})";
-
-		var keyConstruction = typeParams.Length == 1
-			? $"typeof({typeParams[0].Name})"
-			: $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
-
 		var methodName = group.Name.EndsWith(GenericSuffix, StringComparison.Ordinal)
 			? group.Name.Substring(0, group.Name.Length - GenericSuffix.Length)
 			: group.Name;
 
-		// Non-generic parameters (parameters that don't depend on type parameters)
-		var paramArray = genericOverload.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
-		var nonGenericParams = paramArray
-			.Where(p => p.RefKind != RefKind.Out)
-			.Where(p => !typeParams.Any(tp => p.Type.Contains(tp.Name)))
-			.Select(p => new ParameterModel(
-				Name: p.Name,
-				EscapedName: EscapeIdentifier(p.Name),
-				Type: p.Type,
-				NullableType: MakeNullable(p.Type),
-				RefKind: p.RefKind,
-				RefPrefix: GetRefKindPrefix(p.RefKind)))
-			.ToEquatableArray();
+		// Group generic overloads by type parameter count to support mixed arities
+		// (e.g., Run<T>() and Run<TIn, TOut>(TIn input))
+		var genericOverloads = group.Overloads.Where(o => o.IsGenericMethod).ToArray();
+		var arityGroupsMap = genericOverloads
+			.GroupBy(o => o.TypeParameters.Count)
+			.OrderBy(g => g.Key);
 
-		// LastCall type
-		string? lastCallType = null;
-		if (nonGenericParams.Count == 1)
+		var arityGroups = new List<FlatGenericMethodArityGroup>();
+		foreach (var arityGroup in arityGroupsMap)
 		{
-			lastCallType = nonGenericParams.GetArray()![0].NullableType;
-		}
-		else if (nonGenericParams.Count > 1)
-		{
-			lastCallType = $"({string.Join(", ", nonGenericParams.Select(p => $"{p.NullableType} {p.EscapedName}"))})";
-		}
+			// Use the first overload in this arity group as representative
+			var representative = arityGroup.First();
+			var typeParams = representative.TypeParameters.GetArray() ?? Array.Empty<TypeParameterInfo>();
+			var typeParamNames = string.Join(", ", typeParams.Select(tp => tp.Name));
+			var typeParamCount = typeParams.Length;
+			var constraintClauses = GetConstraintClauses(typeParams);
 
-		// Delegate signature (no stub parameter)
-		var isVoid = group.IsVoid;
-		var delegateReturnType = isVoid ? "void" : group.ReturnType;
-		var delegateParams = new List<string>();
-		foreach (var p in paramArray)
-		{
-			delegateParams.Add(FormatParameterWithRefKind(p));
-		}
-		var delegateParamList = string.Join(", ", delegateParams);
-		var delegateSignature = isVoid
-			? $"public delegate void {methodName}Delegate({delegateParamList});"
-			: $"public delegate {delegateReturnType} {methodName}Delegate({delegateParamList});";
+			// Determine key type based on type parameter count
+			var keyType = typeParamCount == 1
+				? "global::System.Type"
+				: $"({string.Join(", ", typeParams.Select(_ => "global::System.Type"))})";
 
-		var typedHandlerClassName = $"{methodName}TypedHandler";
+			var keyConstruction = typeParamCount == 1
+				? $"typeof({typeParams[0].Name})"
+				: $"({string.Join(", ", typeParams.Select(tp => $"typeof({tp.Name})"))})";
+
+			// Non-generic parameters (parameters that don't depend on type parameters)
+			var paramArray = representative.Parameters.GetArray() ?? Array.Empty<ParameterInfo>();
+			var nonGenericParams = paramArray
+				.Where(p => p.RefKind != RefKind.Out)
+				.Where(p => !typeParams.Any(tp => p.Type.Contains(tp.Name)))
+				.Select(p => new ParameterModel(
+					Name: p.Name,
+					EscapedName: EscapeIdentifier(p.Name),
+					Type: p.Type,
+					NullableType: MakeNullable(p.Type),
+					RefKind: p.RefKind,
+					RefPrefix: GetRefKindPrefix(p.RefKind)))
+				.ToEquatableArray();
+
+			// LastCall type
+			string? lastCallType = null;
+			if (nonGenericParams.Count == 1)
+			{
+				lastCallType = nonGenericParams.GetArray()![0].NullableType;
+			}
+			else if (nonGenericParams.Count > 1)
+			{
+				lastCallType = $"({string.Join(", ", nonGenericParams.Select(p => $"{p.NullableType} {p.EscapedName}"))})";
+			}
+
+			// Delegate signature (no stub parameter)
+			var isVoid = representative.IsVoid;
+			var delegateReturnType = isVoid ? "void" : representative.ReturnType;
+			var delegateParams = new List<string>();
+			foreach (var p in paramArray)
+			{
+				delegateParams.Add(FormatParameterWithRefKind(p));
+			}
+			var delegateParamList = string.Join(", ", delegateParams);
+			var delegateSignature = isVoid
+				? $"public delegate void {methodName}Delegate({delegateParamList});"
+				: $"public delegate {delegateReturnType} {methodName}Delegate({delegateParamList});";
+
+			// Typed handler class name: append arity count for arities > 1 when multiple arities exist
+			var typedHandlerClassName = $"{methodName}TypedHandler";
+			if (typeParamCount > 1)
+			{
+				typedHandlerClassName = $"{methodName}TypedHandler{typeParamCount}";
+			}
+
+			arityGroups.Add(new FlatGenericMethodArityGroup(
+				TypeParameterNames: typeParamNames,
+				TypeParameterCount: typeParamCount,
+				KeyType: keyType,
+				KeyConstruction: keyConstruction,
+				ConstraintClauses: constraintClauses,
+				TypedHandlerClassName: typedHandlerClassName,
+				DelegateSignature: delegateSignature,
+				NonGenericParams: nonGenericParams,
+				LastCallType: lastCallType,
+				IsVoid: isVoid,
+				ReturnType: representative.ReturnType));
+		}
 
 		return new FlatGenericMethodHandlerModel(
 			InterceptorName: interceptorName,
 			InterceptorClassName: interceptorClassName,
 			MethodName: methodName,
-			TypeParameterNames: typeParamNames,
-			KeyType: keyType,
-			KeyConstruction: keyConstruction,
-			ConstraintClauses: constraintClauses,
-			TypedHandlerClassName: typedHandlerClassName,
-			DelegateSignature: delegateSignature,
-			NonGenericParams: nonGenericParams,
-			LastCallType: lastCallType,
-			IsVoid: isVoid,
-			ReturnType: group.ReturnType,
-			NeedsNewKeyword: NeedsNewKeyword(interceptorName));
+			NeedsNewKeyword: NeedsNewKeyword(interceptorName),
+			ArityGroups: arityGroups.ToEquatableArray());
 	}
 
 	/// <summary>

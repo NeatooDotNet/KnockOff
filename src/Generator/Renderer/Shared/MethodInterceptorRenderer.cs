@@ -3127,7 +3127,15 @@ internal static class MethodInterceptorRenderer
 		var parts = new List<string>();
 		foreach (var p in parameters)
 		{
-			parts.Add($"{p.RefPrefix}{p.EscapedName}");
+			// Only include ref/out at call sites - 'in' and 'ref readonly' are not valid
+			// at call sites for Action/Func delegates which don't declare these modifiers.
+			var callSitePrefix = p.RefKind switch
+			{
+				Microsoft.CodeAnalysis.RefKind.Ref => "ref ",
+				Microsoft.CodeAnalysis.RefKind.Out => "out ",
+				_ => ""
+			};
+			parts.Add($"{callSitePrefix}{p.EscapedName}");
 		}
 		return string.Join(", ", parts);
 	}
