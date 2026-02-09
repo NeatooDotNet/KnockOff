@@ -446,7 +446,7 @@ stub.Format.Return((string input, bool uppercase) => uppercase ? input.ToUpper()
 
 KnockOff supports [9 patterns](docs/guides/stub-patterns.md) total. Here are the three most common:
 
-**Standalone** - Reusable across your project:
+**[Standalone](docs/guides/stub-patterns.md#standalone-pattern)** - Reusable across your project:
 <!-- snippet: readme-pattern-standalone -->
 ```cs
 [KnockOff]
@@ -454,7 +454,7 @@ public partial class ReadmeStandaloneStub : IUserRepo { }
 ```
 <!-- endSnippet -->
 
-**Inline Interface** - Test-local stubs:
+**[Inline Interface](docs/guides/stub-patterns.md#inline-interface-pattern)** - Test-local stubs:
 <!-- snippet: readme-pattern-inline-interface -->
 ```cs
 [Fact]
@@ -469,7 +469,7 @@ public void InlineInterface_Pattern()
 ```
 <!-- endSnippet -->
 
-**Inline Class** - Stub virtual members:
+**[Inline Class](docs/guides/stub-patterns.md#inline-class-pattern)** - Stub virtual members:
 <!-- snippet: readme-pattern-inline-class -->
 ```cs
 [Fact]
