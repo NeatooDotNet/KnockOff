@@ -1197,7 +1197,8 @@ internal static class InlineRenderer
             if (impl.HasSetter)
             {
                 // Use InvokeSet which handles the priority chain
-                w.Line($"\t\t\t\tset => {impl.InterceptorName}.InvokeSet(Strict, {impl.ArgumentList}, value);");
+                var setterKeyword = impl.IsInitOnly ? "init" : "set";
+                w.Line($"\t\t\t\t{setterKeyword} => {impl.InterceptorName}.InvokeSet(Strict, {impl.ArgumentList}, value);");
             }
         }
 

@@ -605,12 +605,21 @@ internal static class FlatModelBuilder
 				var interceptorName = nameMap[key];
 				var interceptorClassName = $"{interceptorName}Interceptor";
 
-				var keyType = member.IndexerParameters.Count > 0
+				var keyType = member.IndexerParameters.Count == 1
 					? member.IndexerParameters.GetArray()![0].Type
-					: "object";
+					: member.IndexerParameters.Count > 1
+						? $"({string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"))})"
+						: "object";
 				var keyParamName = member.IndexerParameters.Count > 0
 					? member.IndexerParameters.GetArray()![0].Name
 					: "key";
+
+				var paramSignature = string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"));
+				var paramTypesList = string.Join(", ", member.IndexerParameters.Select(p => p.Type));
+				var keyExpression = member.IndexerParameters.Count == 1
+					? member.IndexerParameters.GetArray()![0].Name
+					: $"({string.Join(", ", member.IndexerParameters.Select(p => p.Name))})";
+				var argumentList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
 
 				var defaultExpr = member.IsNullable
 					? "default"
@@ -634,6 +643,11 @@ internal static class FlatModelBuilder
 					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
 					KeyTypeFriendlyName: UnifiedInterceptorBuilder.GetTypeSuffix(keyType),
 					BaseName: "Indexer",
+					ParameterSignature: paramSignature,
+					ParameterTypes: paramTypesList,
+					KeyExpression: keyExpression,
+					ArgumentList: argumentList,
+					IsInitOnly: member.IsInitOnly,
 					ReturnsByRef: member.ReturnsByRef,
 					ReturnsByRefReadonly: member.ReturnsByRefReadonly));
 			}

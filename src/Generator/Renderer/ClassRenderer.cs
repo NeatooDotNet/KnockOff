@@ -1153,6 +1153,11 @@ internal static class ClassRenderer
         var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => p.Trim().Split(' ')[0]).ToArray();
         var paramList = string.Join(", ", paramTypes);
 
+        // For source delegation, compute flattened argument list from key expression
+        var argumentList = indexer.KeyExpression.StartsWith("(") && indexer.KeyExpression.EndsWith(")")
+            ? indexer.KeyExpression.Substring(1, indexer.KeyExpression.Length - 2)
+            : indexer.KeyExpression;
+
         return new UnifiedIndexerInterceptorModel(
             InterceptorClassName: indexer.InterceptorClassName,
             IndexerName: indexer.IndexerName,
@@ -1169,6 +1174,7 @@ internal static class ClassRenderer
             ParameterSignature: indexer.ParameterDeclarations,
             ParameterTypes: paramList,
             KeyExpression: indexer.KeyExpression,
+            ArgumentList: argumentList,
             ReturnsByRef: indexer.ReturnsByRef,
             ReturnsByRefReadonly: indexer.ReturnsByRefReadonly);
     }

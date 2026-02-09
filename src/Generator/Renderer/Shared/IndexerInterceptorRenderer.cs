@@ -45,9 +45,9 @@ internal static class IndexerInterceptorRenderer
 			// Getter storage and tracking (if has getter)
 			if (model.HasGetter)
 			{
-				w.Line($"private global::System.Func<{model.ParameterTypes}, {model.ValueType}>? _get;");
+				w.Line($"private global::System.Func<{model.KeyType}, {model.ValueType}>? _get;");
 				w.Line("private IndexerGetBuilderImpl? _getTracking;");
-				w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerGetBuilderImpl Tracking)>? _getSequence;");
+				w.Line($"private global::System.Collections.Generic.List<(global::System.Func<{model.KeyType}, {model.ValueType}> Callback, IndexerGetBuilderImpl Tracking)>? _getSequence;");
 				w.Line("private int _getSequenceIndex;");
 				w.Line("private bool _getRepeatLastValue = true;");
 				w.Line("private bool _isGetVerifiable;");
@@ -60,9 +60,9 @@ internal static class IndexerInterceptorRenderer
 			// Setter storage and tracking (if has setter)
 			if (model.HasSetter)
 			{
-				w.Line($"private global::System.Action<{model.ParameterTypes}, {model.ValueType}>? _set;");
+				w.Line($"private global::System.Action<{model.KeyType}, {model.ValueType}>? _set;");
 				w.Line("private IndexerSetBuilderImpl? _setTracking;");
-				w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.ParameterTypes}, {model.ValueType}> Callback, IndexerSetBuilderImpl Tracking)>? _setSequence;");
+				w.Line($"private global::System.Collections.Generic.List<(global::System.Action<{model.KeyType}, {model.ValueType}> Callback, IndexerSetBuilderImpl Tracking)>? _setSequence;");
 				w.Line("private int _setSequenceIndex;");
 				w.Line("private bool _setRepeatLastValue = true;");
 				w.Line("private bool _isSetVerifiable;");
@@ -106,7 +106,7 @@ internal static class IndexerInterceptorRenderer
 			if (model.HasGetter)
 			{
 				w.Line($"/// <summary>Configures getter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-				w.Line($"public global::KnockOff.IIndexerGetBuilder<{model.KeyType}, {model.ValueType}> Get(global::System.Func<{model.ParameterTypes}, {model.ValueType}> callback)");
+				w.Line($"public global::KnockOff.IIndexerGetBuilder<{model.KeyType}, {model.ValueType}> Get(global::System.Func<{model.KeyType}, {model.ValueType}> callback)");
 				using (w.Braces())
 				{
 					w.Line("_getSequence = null;");
@@ -125,7 +125,7 @@ internal static class IndexerInterceptorRenderer
 			if (model.HasSetter)
 			{
 				w.Line($"/// <summary>Configures setter callback that repeats indefinitely. Returns builder for tracking and sequence chaining.</summary>");
-				w.Line($"public global::KnockOff.IIndexerSetBuilder<{model.KeyType}, {model.ValueType}> Set(global::System.Action<{model.ParameterTypes}, {model.ValueType}> callback)");
+				w.Line($"public global::KnockOff.IIndexerSetBuilder<{model.KeyType}, {model.ValueType}> Set(global::System.Action<{model.KeyType}, {model.ValueType}> callback)");
 				using (w.Braces())
 				{
 					w.Line("_setSequence = null;");
@@ -176,13 +176,13 @@ internal static class IndexerInterceptorRenderer
 			// Nested classes
 			if (model.HasGetter)
 			{
-				RenderIndexerGetBuilderImpl(w, model.KeyType, model.ValueType, model.ParameterTypes, fullInterceptorClassName);
-				RenderIndexerGetSequenceImpl(w, model.KeyType, model.ValueType, model.ParameterTypes, fullInterceptorClassName);
+				RenderIndexerGetBuilderImpl(w, model.KeyType, model.ValueType, model.KeyType, fullInterceptorClassName);
+				RenderIndexerGetSequenceImpl(w, model.KeyType, model.ValueType, model.KeyType, fullInterceptorClassName);
 			}
 			if (model.HasSetter)
 			{
-				RenderIndexerSetBuilderImpl(w, model.KeyType, model.ValueType, model.ParameterTypes, fullInterceptorClassName);
-				RenderIndexerSetSequenceImpl(w, model.KeyType, model.ValueType, model.ParameterTypes, fullInterceptorClassName);
+				RenderIndexerSetBuilderImpl(w, model.KeyType, model.ValueType, model.KeyType, fullInterceptorClassName);
+				RenderIndexerSetSequenceImpl(w, model.KeyType, model.ValueType, model.KeyType, fullInterceptorClassName);
 			}
 		}
 		w.Line();
@@ -250,7 +250,7 @@ internal static class IndexerInterceptorRenderer
 			// Priority 4: Source (if available)
 			if (!string.IsNullOrEmpty(model.DeclaringInterface))
 			{
-				w.Line($"if (_source is {{ }} src) return src[{model.KeyExpression}];");
+				w.Line($"if (_source is {{ }} src) return src[{model.ArgumentList}];");
 				w.Line();
 			}
 
@@ -322,10 +322,10 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"_unconfiguredLastSetEntry = ({model.KeyExpression}, value);");
 			w.Line();
 
-			// Priority 3: Source (if available)
-			if (!string.IsNullOrEmpty(model.DeclaringInterface))
+			// Priority 3: Source (if available) - skip for init-only indexers (can't assign outside init context)
+			if (!string.IsNullOrEmpty(model.DeclaringInterface) && !model.IsInitOnly)
 			{
-				w.Line($"if (_source is {{ }} src) {{ src[{model.KeyExpression}] = value; return; }}");
+				w.Line($"if (_source is {{ }} src) {{ src[{model.ArgumentList}] = value; return; }}");
 				w.Line();
 			}
 
@@ -406,7 +406,7 @@ internal static class IndexerInterceptorRenderer
 			if (!string.IsNullOrEmpty(model.DeclaringInterface))
 			{
 				// Source delegation: copy source's value to _refReturnBacking (lossy ref redirection)
-				w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src[{model.KeyExpression}]; return; }}");
+				w.Line($"if (_source is {{ }} src) {{ _refReturnBacking = src[{model.ArgumentList}]; return; }}");
 				w.Line();
 			}
 
