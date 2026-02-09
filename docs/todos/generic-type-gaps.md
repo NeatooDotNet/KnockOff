@@ -108,11 +108,20 @@ Gaps discovered while using KnockOff to stub interfaces from the Rocks test libr
 - [x] Create implementation plan
 - [x] Add test interfaces/classes to Design.Domain
 - [x] Create Design.Stubs entries
-- [ ] Fix SmartDefault<T> type parameter collision (Bug 1 from architect)
-- [ ] Fix Gap 26: `in` modifier stripped from indexer parameters
-- [ ] Fix Gap 27/28: Generic methods with out/ref params in inline pattern
-- [ ] Fix Gap 31: Generic methods with 2+ type parameters (needs Of<T1,T2>() support)
-- [ ] Write KnockOffTests for all verified combinations
+- [x] Fix SmartDefault<T> type parameter collision (Bug 1 from architect)
+- [x] Fix Gap 26: `in` modifier stripped from indexer parameters
+- [x] Fix Gap 27/28: Generic methods with out/ref params in inline pattern
+- [x] Fix Gap 31: Generic methods with 2+ type parameters (needs Of<T1,T2>() support)
+- [ ] Validate Feature A: Multi-type-param interfaces across applicable patterns
+- [ ] Validate Feature B: Multi-type-param classes across applicable patterns
+- [ ] Validate Feature C: Methods using class type params
+- [ ] Validate Feature D: Methods with own type params (single)
+- [ ] Validate Feature E: Methods with multiple own type params
+- [ ] Validate Feature F: Where clauses on class/interface type params
+- [ ] Validate Feature G: Where clauses on method type params
+- [ ] Validate Feature H: Multiple where clauses on methods in ALL patterns
+- [ ] Validate Feature I: Generic delegates with multiple type params
+- [ ] Validate where clause combinations (struct, unmanaged, notnull, cross-referencing)
 - [ ] Update documentation
 
 ## Progress Log
@@ -121,7 +130,20 @@ Gaps discovered while using KnockOff to stub interfaces from the Rocks test libr
 - 2026-02-08: Architect completed codebase analysis and Design.Stubs verification. Discovered Bug 1: SmartDefault<T> type parameter name collision (CS0693) in FlatRenderer and InlineRenderer. Affects P2 and P8 when generic stubs have interfaces with generic methods. P4 and P9 verified working with new CacheBase<TKey, TValue> type. Plan updated to "Under Review (Developer)".
 - 2026-02-08: Rocks library gap analysis. Reproduced 4 of 7 reported gaps (26, 27, 28, 31). Gaps 25 and 30 already work. Gap 29 needs further investigation. Added reproduction tests in RocksGapReproductionTests.cs with commented-out stubs for failing cases.
 - 2026-02-08: Developer review identified 5 concerns about plan scope: class patterns (P3, P4, P6, P9) also affected by Bugs 3 and 4; additional Bug 2 locations in class model builders and ModelAdapters.cs; Bug 4 inline approach needed commitment. Architect verified all 5 concerns and updated plan.
+- 2026-02-09: Implementation complete. All 4 bugs fixed in 4 phases. Architect verification passed with zero test failures.
 
 ## Results / Conclusions
 
-*(To be filled on completion)*
+All 4 generator bugs fixed and verified:
+
+1. **Bug 1 (SmartDefault collision):** Renamed `SmartDefault<T>` to `SmartDefault<TSmartDefault>` in FlatRenderer and InlineRenderer. Unblocks P2/P8 generic stubs with method-level generics.
+
+2. **Bug 2 (Gap 26 — `in` indexer params):** Preserved `in` modifier across all 4 pipelines (14+ locations). Also fixed pre-existing bug where `in` was incorrectly passed at delegate call sites.
+
+3. **Bug 3 (Gaps 27/28 — generic method out/ref delegates):** Added RefKind to delegate parameter formatting in InlineModelBuilder, ClassModelBuilder, and StandaloneClassModelBuilder.
+
+4. **Bug 4 (Gap 31 — multi-arity generic methods):** Introduced `InlineGenericTypeArityGroup` and `FlatGenericMethodArityGroup` model records to support `Of<T>()` and `Of<T1,T2>()` on the same interceptor. All 4 pipelines updated.
+
+**Architect verification passed:** All 5 test projects pass across net8.0/net9.0/net10.0 with zero failures (1351+ KnockOffTests, 599 Documentation.Samples, 473 NeatooInterfaceTests, 356 Design.Tests, 14 AssemblyStrict).
+
+**Remaining:** Systematic validation of Features A-I and where clause combinations across all applicable patterns. Documentation update for closed generic naming convention (Gap 30).
