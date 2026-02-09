@@ -113,7 +113,7 @@ stub.Verify();
 
 Override protected virtual methods with the underscore suffix convention to provide default implementations:
 
-<!-- snippet: skill-patterns-user-methods -->
+<!-- snippet: skill-patterns-stub-overrides -->
 ```cs
 [KnockOff]
 public partial class PtUserRepositoryStubWithDefaults : IUserRepository

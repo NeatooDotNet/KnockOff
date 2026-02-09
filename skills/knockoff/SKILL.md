@@ -533,12 +533,12 @@ Stub overrides let you define default stub behavior at compile time. The stub ov
 
 Override virtual methods with underscore suffix - the compiler enforces signature correctness:
 
-<!-- snippet: skill-user-method-define -->
+<!-- snippet: skill-stub-override-define -->
 ```cs
 [KnockOff]
-public partial class SkUserMethodRepoStub : IUserRepo { }
+public partial class SkStubOverrideRepoStub : IUserRepo { }
 
-public partial class SkUserMethodRepoStub
+public partial class SkStubOverrideRepoStub
 {
     // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
@@ -552,9 +552,9 @@ The interceptor uses a clean name (e.g., `GetById`, not `GetById2`) regardless o
 
 Use `Return(callback)` to override the stub override for specific tests:
 
-<!-- snippet: skill-user-method-oncall -->
+<!-- snippet: skill-stub-override-oncall -->
 ```cs
-var stub = new SkUserMethodRepoStub();
+var stub = new SkStubOverrideRepoStub();
 IUserRepo repo = stub;
 
 // Without Returns: stub override is called
@@ -570,7 +570,7 @@ var user2 = repo.GetById(2);  // Returns User { Id = 2, Name = "Override" }
 
 Use `Return()` for constant return values:
 
-<!-- snippet: skill-user-method-returns -->
+<!-- snippet: skill-stub-override-returns -->
 ```cs
 stub.GetById.Return(new User { Id = 99, Name = "Fixed" });
 ```
@@ -578,7 +578,7 @@ stub.GetById.Return(new User { Id = 99, Name = "Fixed" });
 
 For async methods (`Task<T>`, `ValueTask<T>`), `Return()` auto-wraps the value:
 
-<!-- snippet: skill-user-method-async-returns -->
+<!-- snippet: skill-stub-override-async-returns -->
 ```cs
 // Returns auto-wraps in Task.FromResult
 stub.GetUserAsync.Return(new User { Id = 1 });
@@ -589,7 +589,7 @@ stub.GetUserAsync.Return(new User { Id = 1 });
 
 Stub override interceptors provide full tracking even when using `Return`:
 
-<!-- snippet: skill-user-method-tracking -->
+<!-- snippet: skill-stub-override-tracking -->
 ```cs
 stub.GetById.Return(id => new User { Id = id });
 repo.GetById(42);
@@ -603,7 +603,7 @@ Assert.Equal(42, stub.GetById.LastArg);
 
 `Reset()` clears tracking state but preserves the Return configuration:
 
-<!-- snippet: skill-user-method-reset -->
+<!-- snippet: skill-stub-override-reset -->
 ```cs
 stub.GetById.Return(id => new User { Id = id });
 repo.GetById(1);
@@ -655,10 +655,10 @@ var stub = new SkUserPropServiceStub();
 stub.SetCount(42);
 IUserService service = stub;
 
-// Without Get: stub override property is called
+// Without Get: user property is called
 var count1 = service.Count;  // Returns 42 (from Count_ override)
 
-// With Get: Get supersedes stub override property (clean interceptor name)
+// With Get: Get supersedes user property (clean interceptor name)
 stub.Count.Get(999);
 var count2 = service.Count;  // Returns 999 (Get wins)
 ```

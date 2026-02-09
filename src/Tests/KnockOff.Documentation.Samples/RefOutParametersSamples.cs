@@ -26,6 +26,20 @@ public interface IMixedRefOutService
     bool Process(string input, out string output, ref int counter);
 }
 
+#region refout-simple-interface
+public interface IRefOutService
+{
+    void RefArgument(ref int a);
+    void OutArgument(out int a);
+    void InArgument(in int a);
+}
+#endregion
+
+public interface IGenericRefOutService
+{
+    void OutArgumentsWithGenerics<T1, T2>(T1 a, out T2 b);
+}
+
 // =============================================================================
 // Inline stubs
 // =============================================================================
@@ -33,6 +47,8 @@ public interface IMixedRefOutService
 [KnockOff<IOutParameterService>]
 [KnockOff<IRefParameterService>]
 [KnockOff<IMixedRefOutService>]
+[KnockOff<IRefOutService>]
+[KnockOff<IGenericRefOutService>]
 public partial class RefOutTests { }
 
 public partial class RefOutTests
@@ -229,5 +245,52 @@ public partial class RefOutTests
         #endregion
 
         Assert.Equal("key2", lastKey);
+    }
+
+    // =========================================================================
+    // Configuring ref/out callbacks (concise combined example)
+    // =========================================================================
+
+    [Fact]
+    public void RefOut_ConfiguringCallbacks()
+    {
+        var stub = new Stubs.IRefOutService();
+
+        #region refout-configuring-callbacks
+        // out parameter -- callback must use 'out'
+        stub.OutArgument.Call((out int a) => { a = 42; });
+
+        // ref parameter -- callback must use 'ref'
+        stub.RefArgument.Call((ref int a) => { a = a + 1; });
+        #endregion
+
+        IRefOutService service = stub;
+
+        service.OutArgument(out int outResult);
+        Assert.Equal(42, outResult);
+
+        int refValue = 10;
+        service.RefArgument(ref refValue);
+        Assert.Equal(11, refValue);
+    }
+
+    // =========================================================================
+    // Generic methods with ref/out parameters
+    // =========================================================================
+
+    [Fact]
+    public void GenericMethod_WithOutParameter()
+    {
+        var stub = new Stubs.IGenericRefOutService();
+
+        #region refout-generic-methods
+        // Generic methods with ref/out use custom delegates via Of<T>()
+        stub.OutArgumentsWithGenerics.Of<string, int>().Call((string a, out int b) => { b = 99; });
+        #endregion
+
+        IGenericRefOutService service = stub;
+        service.OutArgumentsWithGenerics("hello", out int result);
+
+        Assert.Equal(99, result);
     }
 }

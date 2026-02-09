@@ -15,10 +15,10 @@ KnockOff generates a base class with virtual methods for each interface member. 
 <!-- snippet: stub-overrides-basic -->
 ```cs
 [KnockOff]
-public partial class StubOverrideRepoStub : IStubOverrideRepo { }
+public partial class StubOverridesRepoStub : IStubOverridesRepo { }
 
 // Stub overrides provide default behavior
-public partial class StubOverrideRepoStub
+public partial class StubOverridesRepoStub
 {
     // Protected override method with underscore suffix
     // This is the fallback when no Return is configured
@@ -55,7 +55,7 @@ KnockOff generates a base class (e.g., `StubOverrideRepoStubBase`) with virtual 
 ```cs
 // Generated base class (you don't write this -- KnockOff generates it):
 //
-//   public partial class StubOverrideRepoStubBase
+//   public partial class StubOverridesRepoStubBase
 //   {
 //       protected virtual User? GetUserById_(int id) => default!;
 //       protected virtual bool IsActive_(int userId) => default!;

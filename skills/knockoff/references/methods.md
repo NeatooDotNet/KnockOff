@@ -106,6 +106,59 @@ stub.ValidateCredentials.Return((username, password) =>
 
 ---
 
+## Methods with ref, out, and in Parameters
+
+KnockOff generates **custom delegate types** for methods with `ref`, `out`, or `in` parameters. It does NOT use `Action<>` or `Func<>` (which cannot express ref kinds in C#).
+
+Given an interface with ref-kind parameters:
+
+<!-- snippet: refout-simple-interface -->
+```cs
+public interface IRefOutService
+{
+    void RefArgument(ref int a);
+    void OutArgument(out int a);
+    void InArgument(in int a);
+}
+```
+<!-- endSnippet -->
+
+KnockOff generates named delegates per-method (e.g., `delegate void RefArgumentDelegate(ref int a)`). These replace `Action<>` and `Func<>`, which cannot express `ref`, `out`, or `in` modifiers in C#.
+
+### Configuring ref/out Methods
+
+Callbacks must match the delegate signature including ref/out modifiers:
+
+<!-- snippet: refout-configuring-callbacks -->
+```cs
+// out parameter -- callback must use 'out'
+stub.OutArgument.Call((out int a) => { a = 42; });
+
+// ref parameter -- callback must use 'ref'
+stub.RefArgument.Call((ref int a) => { a = a + 1; });
+```
+<!-- endSnippet -->
+
+### Generic Methods with ref/out Parameters
+
+Generic methods with ref/out parameters also use custom delegates. The `Of<T>()` typed handler provides the correctly-typed delegate:
+
+<!-- snippet: refout-generic-methods -->
+```cs
+// Generic methods with ref/out use custom delegates via Of<T>()
+stub.OutArgumentsWithGenerics.Of<string, int>().Call((string a, out int b) => { b = 99; });
+```
+<!-- endSnippet -->
+
+### Key Points
+
+- Custom delegates are generated per-method -- never `Action<ref T>` or `Func<out T>`
+- Works across all 9 patterns (standalone, inline, class, open generic)
+- Both generic and non-generic methods are supported
+- `in` parameters are preserved in indexer signatures and method signatures
+
+---
+
 ## Verifying Method Calls
 
 ### Using Verify()
@@ -399,7 +452,7 @@ When you define a **stub override** (override a virtual method with underscore s
 
 ### Return Supersedes Stub Override
 
-<!-- snippet: user-methods-standalone-example -->
+<!-- snippet: stub-overrides-standalone-example -->
 ```cs
 [KnockOff]
 public partial class SkillRepoStub : ISkillRepo { }
@@ -412,7 +465,7 @@ public partial class SkillRepoStub
 ```
 <!-- endSnippet -->
 
-<!-- snippet: user-methods-standalone-usage -->
+<!-- snippet: stub-overrides-standalone-usage -->
 ```cs
 // Usage:
 var stub = new SkillRepoStub();
@@ -442,7 +495,7 @@ stub.GetUserAsync.Return(new User { Id = 1 });  // Auto-wrapped in Task.FromResu
 
 Stub override interceptors provide full tracking even when using `Return`:
 
-<!-- snippet: user-methods-tracking-with-oncall -->
+<!-- snippet: stub-overrides-tracking-with-oncall -->
 ```cs
 stub.GetById.Return(id => new User { Id = id });
 repo.GetById(42);
@@ -456,7 +509,7 @@ Assert.Equal(42, stub.GetById.LastArg);
 
 Like regular method interceptors, stub override interceptors preserve `Return` configuration across `Reset()`:
 
-<!-- snippet: user-methods-reset-preserves-oncall -->
+<!-- snippet: stub-overrides-reset-preserves-oncall -->
 ```cs
 stub.GetById.Return(id => new User { Id = id });
 repo.GetById(1);

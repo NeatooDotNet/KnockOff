@@ -204,8 +204,12 @@ The callback type varies based on method signature:
 | `R M()` | `Return(callback)` | `Func<R>` |
 | `R M(T arg)` | `Return(callback)` | `Func<T, R>` |
 | `R M(T1 a, T2 b)` | `Return(callback)` | `Func<T1, T2, R>` |
+| `void M(ref T a)` | `Call(callback)` | Custom delegate: `delegate void MDelegate(ref T a)` |
+| `void M(out T a)` | `Call(callback)` | Custom delegate: `delegate void MDelegate(out T a)` |
 
 When `Return`/`Call` is set with a callback, the callback is invoked instead of user-defined methods. For `Func<>` callbacks, the return value is used as the method result.
+
+**Note on ref/out/in parameters:** Methods with `ref`, `out`, or `in` parameters cannot use `Action<>` or `Func<>` (C# does not allow ref kinds as generic type arguments). KnockOff generates custom named delegates with the correct ref kind modifiers. This applies to both non-generic and generic methods across all patterns.
 
 ### Sequence Building Methods
 
