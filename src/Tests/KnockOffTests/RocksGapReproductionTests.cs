@@ -50,12 +50,11 @@ public interface IGap26_InParameter
 	int this[in int a] { get; }
 }
 
-// COMMENTED OUT: These don't compile due to bug. Uncomment after fix.
-// [KnockOff<IGap26_InParameter>]
-// public partial class Gap26InlineTest { }
-//
-// [KnockOff]
-// public partial class Gap26StandaloneKnockOff : IGap26_InParameter { }
+[KnockOff<IGap26_InParameter>]
+public partial class Gap26InlineTest { }
+
+[KnockOff]
+public partial class Gap26StandaloneKnockOff : IGap26_InParameter { }
 
 // ============================================================================
 // Gap 27: out parameters on generic methods — REPRODUCED
@@ -73,9 +72,8 @@ public interface IGap27_OutParameter
 	void OutArgumentsWithGenerics<T1, T2>(T1 a, out T2 b);  // FAILS in inline
 }
 
-// COMMENTED OUT: Generic method with out param fails inline. Uncomment after fix.
-// [KnockOff<IGap27_OutParameter>]
-// public partial class Gap27InlineTest { }
+[KnockOff<IGap27_OutParameter>]
+public partial class Gap27InlineTest { }
 
 // Test that non-generic out works in inline
 public interface IGap27_OutParameterSimple
@@ -100,9 +98,8 @@ public interface IGap28_RefParameter
 	void RefArgumentsWithGenerics<T1, T2>(T1 a, ref T2 b);  // FAILS in inline
 }
 
-// COMMENTED OUT: Generic method with ref param fails inline. Uncomment after fix.
-// [KnockOff<IGap28_RefParameter>]
-// public partial class Gap28InlineTest { }
+[KnockOff<IGap28_RefParameter>]
+public partial class Gap28InlineTest { }
 
 // Test that non-generic ref works in inline
 public interface IGap28_RefParameterSimple
@@ -153,12 +150,11 @@ public interface IGap31_GenericMethods
 	TReturn Run<TInput, TReturn>(TInput input) where TReturn : new();
 }
 
-// COMMENTED OUT: Both patterns fail for 2-type-param generic methods.
-// [KnockOff<IGap31_GenericMethods>]
-// public partial class Gap31InlineTest { }
-//
-// [KnockOff]
-// public partial class Gap31StandaloneKnockOff : IGap31_GenericMethods { }
+[KnockOff<IGap31_GenericMethods>]
+public partial class Gap31InlineTest { }
+
+[KnockOff]
+public partial class Gap31StandaloneKnockOff : IGap31_GenericMethods { }
 
 // Test that single-type-param generic methods work fine
 public interface IGap31_SingleTypeParamOnly
@@ -270,5 +266,47 @@ public class RocksGapReproductionTests
 		var knockOff = new Gap31SingleTypeStandaloneKnockOff();
 		IGap31_SingleTypeParamOnly service = knockOff;
 		Assert.NotNull(knockOff);
+	}
+
+	[Fact]
+	public void Gap31_MixedArity_InlineCompiles()
+	{
+		var stub = new Gap31InlineTest.Stubs.IGap31_GenericMethods();
+		IGap31_GenericMethods service = stub;
+		Assert.NotNull(stub);
+	}
+
+	[Fact]
+	public void Gap31_MixedArity_StandaloneCompiles()
+	{
+		var knockOff = new Gap31StandaloneKnockOff();
+		IGap31_GenericMethods service = knockOff;
+		Assert.NotNull(knockOff);
+	}
+
+	[Fact]
+	public void Gap31_MixedArity_InlineCanConfigureBothArities()
+	{
+		var stub = new Gap31InlineTest.Stubs.IGap31_GenericMethods();
+		// Single-type-param arity: Run<TReturn>()
+		stub.Run.Of<int>().Return(() => 42);
+		// Two-type-param arity: Run<TInput, TReturn>(TInput input)
+		stub.Run.Of<string, int>().Return((input) => 99);
+		IGap31_GenericMethods service = stub;
+		Assert.Equal(42, service.Run<int>());
+		Assert.Equal(99, service.Run<string, int>("hello"));
+	}
+
+	[Fact]
+	public void Gap31_MixedArity_StandaloneCanConfigureBothArities()
+	{
+		var knockOff = new Gap31StandaloneKnockOff();
+		// Single-type-param arity: Run<TReturn>()
+		knockOff.Run.Of<int>().Return(() => 42);
+		// Two-type-param arity: Run<TInput, TReturn>(TInput input)
+		knockOff.Run.Of<string, int>().Return((input) => 99);
+		IGap31_GenericMethods service = knockOff;
+		Assert.Equal(42, service.Run<int>());
+		Assert.Equal(99, service.Run<string, int>("hello"));
 	}
 }

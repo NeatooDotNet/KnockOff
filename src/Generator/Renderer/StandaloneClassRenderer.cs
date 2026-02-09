@@ -1065,7 +1065,7 @@ internal static class StandaloneClassRenderer
 
     private static UnifiedIndexerInterceptorModel ToUnifiedIndexerModel(InlineClassIndexerModel indexer)
     {
-        var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => p.Trim().Split(' ')[0]).ToArray();
+        var paramTypes = indexer.ParameterDeclarations.Split(',').Select(p => { var parts = p.Trim().Split(' '); return parts[parts.Length - 2]; }).ToArray();
         var paramList = string.Join(", ", paramTypes);
 
         return new UnifiedIndexerInterceptorModel(

@@ -3,7 +3,7 @@
 **Status:** In Progress
 **Priority:** High
 **Created:** 2026-02-08
-**Last Updated:** 2026-02-08
+**Last Updated:** 2026-02-09
 **Plan:** [generic-type-gaps.md](../plans/generic-type-gaps.md)
 
 ---
@@ -88,9 +88,9 @@ Gaps discovered while using KnockOff to stub interfaces from the Rocks test libr
 | Gap | Issue | Root Cause | Patterns Affected | Error |
 |-----|-------|-----------|-------------------|-------|
 | 26 | `in` params stripped from indexer params | Generator doesn't emit `in` modifier on indexer parameter in explicit interface impl | All patterns (indexers only) | CS0535, CS0539 |
-| 27 | Generic methods with `out` params | Inline generated invoke call passes `out` to method that doesn't accept it | Inline (P5) for generic methods only | CS1615 |
-| 28 | Generic methods with `ref` params | Same root cause as Gap 27 — `ref` modifier on generic method params | Inline (P5) for generic methods only | CS1615 |
-| 31 | Generic methods with 2+ type params | Interceptor only supports `Of<T>()` with 1 type arg; no `Of<T1,T2>()` | ALL patterns (standalone + inline) | CS0246 (inline), CS0305 (standalone) |
+| 27 | Generic methods with `out` params | Delegate params missing RefKind in inline and class model builders | Inline + Class (P3, P4, P5, P6, P8, P9) for generic methods only | CS1615 |
+| 28 | Generic methods with `ref` params | Same root cause as Gap 27 | Inline + Class (P3, P4, P5, P6, P8, P9) for generic methods only | CS1615 |
+| 31 | Generic methods with 2+ type params | Interceptor only supports `Of<T>()` with 1 type arg; no `Of<T1,T2>()` | ALL patterns with generic method handlers (P1-P6, P8, P9) | CS0246 (inline), CS0305 (standalone) |
 
 ### Not Reproduced (Already Working / Fixed)
 
@@ -100,7 +100,7 @@ Gaps discovered while using KnockOff to stub interfaces from the Rocks test libr
 
 ### Notes
 
-- Gaps 27/28 are NOT about out/ref params in general (those work fine in standalone). They're specifically about **generic methods** with out/ref params in the **inline pattern**.
+- Gaps 27/28 are NOT about out/ref params in general (those work fine in standalone). They're specifically about **generic methods** with out/ref params in the **inline and class patterns** (InlineModelBuilder, ClassModelBuilder, StandaloneClassModelBuilder). The flat pipeline (FlatModelBuilder) is NOT affected because it correctly uses `FormatParameterWithRefKind(p)`.
 - Gap 31 is a fundamental limitation: the generic method interceptor only supports `Of<T>()` with a single type parameter. Methods like `TReturn Run<TInput, TReturn>(TInput input)` need `Of<TInput, TReturn>()` which doesn't exist.
 
 ## Tasks
@@ -120,6 +120,7 @@ Gaps discovered while using KnockOff to stub interfaces from the Rocks test libr
 - 2026-02-08: Created todo with full pattern/feature matrix.
 - 2026-02-08: Architect completed codebase analysis and Design.Stubs verification. Discovered Bug 1: SmartDefault<T> type parameter name collision (CS0693) in FlatRenderer and InlineRenderer. Affects P2 and P8 when generic stubs have interfaces with generic methods. P4 and P9 verified working with new CacheBase<TKey, TValue> type. Plan updated to "Under Review (Developer)".
 - 2026-02-08: Rocks library gap analysis. Reproduced 4 of 7 reported gaps (26, 27, 28, 31). Gaps 25 and 30 already work. Gap 29 needs further investigation. Added reproduction tests in RocksGapReproductionTests.cs with commented-out stubs for failing cases.
+- 2026-02-08: Developer review identified 5 concerns about plan scope: class patterns (P3, P4, P6, P9) also affected by Bugs 3 and 4; additional Bug 2 locations in class model builders and ModelAdapters.cs; Bug 4 inline approach needed commitment. Architect verified all 5 concerns and updated plan.
 
 ## Results / Conclusions
 
