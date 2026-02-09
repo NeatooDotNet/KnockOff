@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.45.0</FileVersion>
-		<PackageVersion>0.45.0</PackageVersion>
+		<FileVersion>0.46.0</FileVersion>
+		<PackageVersion>0.46.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Add record type stub support, filter static virtual/abstract interface members.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix 7 generator bugs: multi-param indexers, init-only indexers, multi-arity generic methods, in indexer params, generic ref/out delegates.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>
