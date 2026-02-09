@@ -305,9 +305,11 @@ internal static class ModelAdapters
 			DefaultExpression: indexer.DefaultExpression,
 			HasGetter: indexer.HasGetter,
 			HasSetter: indexer.HasSetter,
-			ParameterSignature: $"{indexer.KeyRefPrefix}{indexer.KeyType} {indexer.KeyParamName}",
-			ParameterTypes: indexer.KeyType,
-			KeyExpression: indexer.KeyParamName,
+			ParameterSignature: indexer.ParameterSignature,
+			ParameterTypes: indexer.ParameterTypes,
+			KeyExpression: indexer.KeyExpression,
+			ArgumentList: indexer.ArgumentList,
+			IsInitOnly: indexer.IsInitOnly,
 			ReturnsByRef: indexer.ReturnsByRef,
 			ReturnsByRefReadonly: indexer.ReturnsByRefReadonly);
 	}
@@ -317,6 +319,11 @@ internal static class ModelAdapters
 	/// </summary>
 	public static UnifiedIndexerInterceptorModel ToUnifiedIndexerModel(Model.Inline.InlineIndexerModel indexer)
 	{
+		// For source delegation, we need flattened argument list (e.g., "row, col") not tuple key expression "(row, col)"
+		var argumentList = indexer.KeyExpression.StartsWith("(") && indexer.KeyExpression.EndsWith(")")
+			? indexer.KeyExpression.Substring(1, indexer.KeyExpression.Length - 2)
+			: indexer.KeyExpression;
+
 		return new UnifiedIndexerInterceptorModel(
 			InterceptorClassName: indexer.InterceptorClassName,
 			IndexerName: indexer.IndexerName,
@@ -333,6 +340,8 @@ internal static class ModelAdapters
 			ParameterSignature: indexer.ParameterSignature,
 			ParameterTypes: indexer.ParameterTypes,
 			KeyExpression: indexer.KeyExpression,
+			ArgumentList: argumentList,
+			IsInitOnly: indexer.IsInitOnly,
 			ReturnsByRef: indexer.ReturnsByRef,
 			ReturnsByRefReadonly: indexer.ReturnsByRefReadonly);
 	}

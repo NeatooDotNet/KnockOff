@@ -47,6 +47,12 @@ internal sealed record UnifiedIndexerInterceptorModel(
     string ParameterTypes,
     /// <summary>Key expression for recording (e.g., "key" or "(x, y)").</summary>
     string KeyExpression,
+    /// <summary>Argument list for source delegation (e.g., "key" or "row, col").</summary>
+    string ArgumentList,
+
+    // Init-only support
+    /// <summary>True if the indexer setter is init-only (affects source delegation).</summary>
+    bool IsInitOnly = false,
 
     // Ref return support
     /// <summary>True if the indexer returns by ref (ref T).</summary>

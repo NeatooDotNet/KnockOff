@@ -62,14 +62,9 @@ public interface IReadOnlyCollection<TKey, TValue>
 /// <summary>
 /// An interface with multi-key indexer.
 ///
-/// KNOWN LIMITATION: Multi-key indexers are not currently supported by the
-/// KnockOff generator due to a bug with tuple key types in ThenGet/ThenSet
-/// sequence methods. This interface exists to document the expected API when
-/// support is added. See IndexerBasics.cs for details.
-///
 /// This interface demonstrates:
 /// - Multi-key indexers using tuple keys
-/// - IndexerContainer<(TKey1, TKey2), TValue> pattern
+/// - IndexerContainer&lt;(TKey1, TKey2), TValue&gt; pattern
 /// </summary>
 public interface IMatrix
 {
@@ -88,4 +83,19 @@ public interface IMatrix
     /// Gets the number of columns.
     /// </summary>
     int Columns { get; }
+}
+
+/// <summary>
+/// An interface with a get/init indexer.
+///
+/// This interface demonstrates:
+/// - Init-only indexer accessors
+/// - Generator must emit 'init' instead of 'set'
+/// </summary>
+public interface IInitIndexerCollection<TKey, TValue>
+{
+    /// <summary>
+    /// Indexer with get and init accessors.
+    /// </summary>
+    TValue this[TKey key] { get; init; }
 }

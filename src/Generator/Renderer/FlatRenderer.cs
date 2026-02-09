@@ -2147,7 +2147,7 @@ internal static class FlatRenderer
 			? mapped
 			: indexer.InterceptorName;
 
-		w.Line($"{indexer.RefReturnPrefix}{indexer.ReturnType} {indexer.DeclaringInterface}.this[{indexer.KeyRefPrefix}{indexer.KeyType} {indexer.KeyParamName}]");
+		w.Line($"{indexer.RefReturnPrefix}{indexer.ReturnType} {indexer.DeclaringInterface}.this[{indexer.ParameterSignature}]");
 		using (w.Braces())
 		{
 			if (indexer.IsRefReturn)
@@ -2156,7 +2156,7 @@ internal static class FlatRenderer
 				w.Line("get");
 				using (w.Braces())
 				{
-					w.Line($"{accessExpr}.InvokeRefGet(Strict, {indexer.KeyParamName});");
+					w.Line($"{accessExpr}.InvokeRefGet(Strict, {indexer.ArgumentList});");
 					w.Line($"return ref {accessExpr}._refReturnBacking;");
 				}
 			}
@@ -2165,12 +2165,13 @@ internal static class FlatRenderer
 				// Use InvokeGet/InvokeSet which handle the priority chain
 				if (indexer.HasGetter)
 				{
-					w.Line($"get => {accessExpr}.InvokeGet(Strict, {indexer.KeyParamName});");
+					w.Line($"get => {accessExpr}.InvokeGet(Strict, {indexer.ArgumentList});");
 				}
 
 				if (indexer.HasSetter)
 				{
-					w.Line($"set => {accessExpr}.InvokeSet(Strict, {indexer.KeyParamName}, value);");
+					var setterKeyword = indexer.IsInitOnly ? "init" : "set";
+					w.Line($"{setterKeyword} => {accessExpr}.InvokeSet(Strict, {indexer.ArgumentList}, value);");
 				}
 			}
 		}

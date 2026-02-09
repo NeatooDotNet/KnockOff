@@ -41,6 +41,10 @@ internal sealed record InlineIndexerModel(
     /// <summary>Friendly name for the key type (e.g., "Int32", "String") for OfXxx pattern.</summary>
     string KeyTypeFriendlyName,
 
+    // Init-only support
+    /// <summary>True if the indexer setter is init-only (affects source delegation in interceptor).</summary>
+    bool IsInitOnly = false,
+
     // Ref return support
     /// <summary>True if the indexer returns by ref (ref T).</summary>
     bool ReturnsByRef = false,

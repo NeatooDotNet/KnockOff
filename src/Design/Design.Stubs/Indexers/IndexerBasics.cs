@@ -19,8 +19,8 @@ namespace Design.Stubs.Indexers;
 // =============================================================================
 
 [KnockOff<ICollection<string, int>>]
-// Note: [KnockOff<IMatrix>] is commented out due to a known limitation with
-// multi-key indexers (tuple key types). See Multi-Key Indexers section below.
+[KnockOff<IMatrix>]
+[KnockOff<IInitIndexerCollection<string, int>>]
 public partial class IndexerBasicsDemo
 {
     // =========================================================================
@@ -186,40 +186,101 @@ public partial class IndexerBasicsDemo
     }
 
     // =========================================================================
-    // Multi-Key Indexers (Tuple Keys) - KNOWN LIMITATION
+    // Multi-Key Indexers (Tuple Keys)
     // =========================================================================
     // DESIGN DECISION: Multi-key indexers like this[int row, int col] use
-    // tuple keys internally. The IndexerContainer uses (TKey1, TKey2) as TKey.
+    // tuple keys internally. The KeyType is (int row, int col).
+    // All callbacks (Get, Set, ThenGet, ThenSet) use the tuple key type.
     //
-    // KNOWN LIMITATION: Multi-key indexers have a
-    // generator bug where ThenGet/ThenSet sequence methods are not correctly
-    // generated for tuple key types.
+    // GENERATOR BEHAVIOR:
     //
-    // EXPECTED GENERATOR BEHAVIOR (when fixed):
-    //
-    //   public class IndexerInterceptor : IndexerContainer<(int row, int col), double>
+    //   public class IndexerInterceptor
     //   {
-    //       public void Get(Func<int, int, double> callback) { ... }
-    //       public void Set(Action<int, int, double> callback) { ... }
+    //       public void Get(Func<(int row, int col), double> callback) { ... }
+    //       public void Set(Action<(int row, int col), double> callback) { ... }
     //
     //       public (int row, int col) LastGetKey { get; }
     //       public ((int row, int col) Key, double Value) LastSetEntry { get; }
     //   }
     //
-    // The callbacks should flatten the tuple for natural syntax.
+    // DID NOT DO THIS: Flatten tuple into individual parameters for callbacks
     //
-    // WORKAROUND: Use a wrapper type instead of multi-key indexer, or use
-    // a single-key indexer with a custom key type.
+    // REJECTED PATTERN:
+    //   stub.Indexer.Get((row, col) => row * 10.0 + col);  // Func<int, int, double>
+    //
+    // WHY NOT: Library interfaces use Func<TKey, TValue> where TKey is the
+    // tuple. Flattening would create a mismatch between Get() and ThenGet()
+    // callback signatures. Using the tuple key consistently avoids this.
     // =========================================================================
 
-    // Multi-key indexer example commented out due to generator limitation
-    // public void MultiKeyIndexer_TupleKeys()
-    // {
-    //     var stub = new Stubs.IMatrix();
-    //     stub.Indexer.Get((row, col) => row * 10.0 + col);
-    //     IMatrix matrix = stub;
-    //     var val = matrix[2, 3]; // Returns 23.0 (2*10 + 3)
-    // }
+    public void MultiKeyIndexer_TupleKeys()
+    {
+        var stub = new Stubs.IMatrix();
+
+        // Callback receives tuple key
+        stub.Indexer.Get(key => key.row * 10.0 + key.col);
+
+        IMatrix matrix = stub;
+        var val = matrix[2, 3]; // Returns 23.0 (2*10 + 3)
+    }
+
+    public void MultiKeyIndexer_Backing()
+    {
+        var stub = new Stubs.IMatrix();
+
+        // Backing uses tuple key
+        stub.Indexer.Backing[(1, 2)] = 12.0;
+        stub.Indexer.Backing[(3, 4)] = 34.0;
+
+        IMatrix matrix = stub;
+        var val = matrix[1, 2]; // Returns 12.0
+    }
+
+    public void MultiKeyIndexer_SetCallback()
+    {
+        var stub = new Stubs.IMatrix();
+
+        // Set callback receives tuple key and value
+        (int row, int col, double val)? captured = null;
+        stub.Indexer.Set((key, value) =>
+        {
+            captured = (key.row, key.col, value);
+        });
+
+        IMatrix matrix = stub;
+        matrix[2, 3] = 23.0;
+
+        // captured is (2, 3, 23.0)
+    }
+
+    // =========================================================================
+    // Init-Only Indexers
+    // =========================================================================
+    // DESIGN DECISION: Init-only indexer accessors use 'init' keyword instead
+    // of 'set'. This follows the same pattern as init-only properties.
+    //
+    // GENERATOR BEHAVIOR: For indexer with { get; init; }:
+    //
+    //   int IInitIndexerCollection<string, int>.this[string key]
+    //   {
+    //       get => Indexer.InvokeGet(Strict, key);
+    //       init => Indexer.InvokeSet(Strict, key, value);
+    //   }
+    //
+    // The interceptor class itself is unchanged -- only the accessor keyword
+    // differs.
+    // =========================================================================
+
+    public void InitIndexer_Backing()
+    {
+        var stub = new Stubs.IInitIndexerCollection();
+
+        // Init-only indexer still uses Backing for get
+        stub.Indexer.Backing["key"] = 42;
+
+        IInitIndexerCollection<string, int> collection = stub;
+        var val = collection["key"]; // Returns 42
+    }
 
     // =========================================================================
     // VerifyGet() and VerifySet()

@@ -302,6 +302,7 @@ internal static class InlineModelBuilder
             ConstraintClauses: constraintClause,
             DeclaringInterface: declaringInterface,
             KeyTypeFriendlyName: keyTypeFriendlyName,
+            IsInitOnly: member.IsInitOnly,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
@@ -834,7 +835,7 @@ internal static class InlineModelBuilder
             MemberName: "this",
             ReturnType: member.ReturnType,
             IsVoid: false,
-            IsInitOnly: false,
+            IsInitOnly: member.IsInitOnly,
             HasGetter: member.HasGetter,
             HasSetter: member.HasSetter,
             InterceptorName: interceptorAccessPath,
