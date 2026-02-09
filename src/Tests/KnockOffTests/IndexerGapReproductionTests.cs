@@ -17,6 +17,21 @@ public interface IMultiParamIndexerGetter
 }
 
 // =============================================================================
+// N-parameter indexers (3+)
+// Verifies the logic is generic, not hardcoded for 2 params
+// =============================================================================
+
+public interface IThreeParamIndexer
+{
+	double this[int x, int y, int z] { get; set; }
+}
+
+public interface IFourParamIndexer
+{
+	string this[string schema, string table, string column, int index] { get; }
+}
+
+// =============================================================================
 // Gap #4: Init-only indexers
 // Rocks: int this[int a] { get; init; }
 // KnockOff: no init accessor support for indexers
@@ -51,6 +66,8 @@ public interface IParamsIndexer
 
 [KnockOff<IMultiParamIndexerGetterSetter>]
 [KnockOff<IMultiParamIndexerGetter>]
+[KnockOff<IThreeParamIndexer>]
+[KnockOff<IFourParamIndexer>]
 [KnockOff<IInitIndexer>]
 [KnockOff<IInitOnlyIndexer>]
 [KnockOff<IParamsIndexer>]
@@ -84,6 +101,16 @@ public partial class InitOnlyIndexerKnockOff : IInitOnlyIndexer
 
 [KnockOff]
 public partial class ParamsIndexerKnockOff : IParamsIndexer
+{
+}
+
+[KnockOff]
+public partial class ThreeParamIndexerKnockOff : IThreeParamIndexer
+{
+}
+
+[KnockOff]
+public partial class FourParamIndexerKnockOff : IFourParamIndexer
 {
 }
 
@@ -376,5 +403,96 @@ public class IndexerGapReproductionTests
 
 		// Assert
 		Assert.Equal(50, value);
+	}
+
+	// =========================================================================
+	// N-parameter indexers (3+ params) - verifies generic logic
+	// =========================================================================
+
+	[Fact]
+	public void ThreeParam_Inline_GetCallback()
+	{
+		var stub = new IndexerGapTestClass.Stubs.IThreeParamIndexer();
+		stub.Indexer.Get(key => key.x + key.y + key.z);
+
+		IThreeParamIndexer svc = stub;
+		var value = svc[10, 20, 30];
+
+		Assert.Equal(60.0, value);
+	}
+
+	[Fact]
+	public void ThreeParam_Inline_SetCallback()
+	{
+		var stub = new IndexerGapTestClass.Stubs.IThreeParamIndexer();
+
+		(int x, int y, int z, double val)? captured = null;
+		stub.Indexer.Set((key, value) =>
+		{
+			captured = (key.x, key.y, key.z, value);
+		});
+
+		IThreeParamIndexer svc = stub;
+		svc[1, 2, 3] = 99.5;
+
+		Assert.NotNull(captured);
+		Assert.Equal(1, captured.Value.x);
+		Assert.Equal(2, captured.Value.y);
+		Assert.Equal(3, captured.Value.z);
+		Assert.Equal(99.5, captured.Value.val);
+	}
+
+	[Fact]
+	public void ThreeParam_Inline_Backing()
+	{
+		var stub = new IndexerGapTestClass.Stubs.IThreeParamIndexer();
+		stub.Indexer.Backing[(1, 2, 3)] = 42.0;
+
+		IThreeParamIndexer svc = stub;
+		Assert.Equal(42.0, svc[1, 2, 3]);
+		stub.Indexer.VerifyGet(Called.Once);
+		Assert.Equal((1, 2, 3), stub.Indexer.LastGetKey);
+	}
+
+	[Fact]
+	public void ThreeParam_Standalone_GetCallback()
+	{
+		var stub = new ThreeParamIndexerKnockOff();
+		stub.Indexer.Get(key => key.x * key.y * key.z);
+
+		IThreeParamIndexer svc = stub;
+		Assert.Equal(60.0, svc[3, 4, 5]);
+	}
+
+	[Fact]
+	public void FourParam_Inline_GetCallback()
+	{
+		var stub = new IndexerGapTestClass.Stubs.IFourParamIndexer();
+		stub.Indexer.Get(key => $"{key.schema}.{key.table}.{key.column}[{key.index}]");
+
+		IFourParamIndexer svc = stub;
+		var value = svc["dbo", "Users", "Name", 0];
+
+		Assert.Equal("dbo.Users.Name[0]", value);
+	}
+
+	[Fact]
+	public void FourParam_Inline_Backing()
+	{
+		var stub = new IndexerGapTestClass.Stubs.IFourParamIndexer();
+		stub.Indexer.Backing[("dbo", "Users", "Id", 0)] = "int";
+
+		IFourParamIndexer svc = stub;
+		Assert.Equal("int", svc["dbo", "Users", "Id", 0]);
+	}
+
+	[Fact]
+	public void FourParam_Standalone_GetCallback()
+	{
+		var stub = new FourParamIndexerKnockOff();
+		stub.Indexer.Get(key => $"{key.schema}/{key.table}");
+
+		IFourParamIndexer svc = stub;
+		Assert.Equal("public/Orders", svc["public", "Orders", "Total", 5]);
 	}
 }
