@@ -15,7 +15,7 @@ Claude Code was used to write this library. Skip to more [AI discussion](#ai).
 
 ## KnockOff Stub
 
-Here's what a KnockOff stub looks like. There are [9 patterns](docs/guides/stub-patterns.md) total, but this is where it starts:
+There are [9 patterns](docs/guides/stub-patterns.md) total, including a [standard fluent mocking approach](docs/guides/stub-patterns.md#inline-interface-pattern) with inline stubs. But reusable stub classes are where KnockOff stands apart:
 
 <!-- snippet: readme-knockoff-stub -->
 ```cs
