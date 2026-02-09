@@ -595,7 +595,8 @@ internal static class StandaloneClassRenderer
         }
 
         w.Line($"{indent}/// <summary>Internal implementation that inherits from {ExtractSimpleTypeName(unit.TargetClassName)}.</summary>");
-        w.Line($"{indent}private sealed class Impl : {unit.TargetClassForInheritance}");
+        var implKeyword = unit.IsRecord ? "record" : "class";
+        w.Line($"{indent}private sealed {implKeyword} Impl : {unit.TargetClassForInheritance}");
         w.Line($"{indent}{{");
 
         // Reference to the wrapper
