@@ -269,7 +269,8 @@ internal static class ClassModelBuilder
             ImplEvents: implEvents.ToEquatableArray(),
             GenericMethodHandlers: genericHandlers.ToEquatableArray(),
             HasRequiredMembers: hasRequiredMembers,
-            RequiredMemberNames: requiredMemberNames);
+            RequiredMemberNames: requiredMemberNames,
+            IsRecord: cls.IsRecord);
     }
 
     #region Method Grouping

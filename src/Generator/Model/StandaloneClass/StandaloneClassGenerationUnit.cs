@@ -56,4 +56,9 @@ internal sealed record StandaloneClassGenerationUnit(
     /// <summary>Properties for the base class (virtual protected, user can override with '_' suffix).</summary>
     EquatableArray<BaseClassPropertyModel> BaseClassProperties,
     /// <summary>Methods for the base class (virtual protected, user can override with '_' suffix).</summary>
-    EquatableArray<BaseClassMethodModel> BaseClassMethods);
+    EquatableArray<BaseClassMethodModel> BaseClassMethods,
+    /// <summary>
+    /// True when the target class is a C# record type.
+    /// When true, the Impl class is emitted as 'sealed record' instead of 'sealed class'.
+    /// </summary>
+    bool IsRecord = false);

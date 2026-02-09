@@ -24,7 +24,13 @@ internal sealed record ClassStubInfo(
 	/// Type parameters for open generic classes (e.g., T, TKey, TValue).
 	/// Empty for closed generic or non-generic classes.
 	/// </summary>
-	EquatableArray<TypeParameterInfo> TypeParameters = default) : IEquatable<ClassStubInfo>;
+	EquatableArray<TypeParameterInfo> TypeParameters = default,
+	/// <summary>
+	/// True when the target class is a C# record type.
+	/// When true, the generated Impl uses 'sealed record' instead of 'sealed class',
+	/// and record-synthesized members are filtered from the member list.
+	/// </summary>
+	bool IsRecord = false) : IEquatable<ClassStubInfo>;
 
 /// <summary>
 /// Info about a virtual/abstract member of a class for stubbing.

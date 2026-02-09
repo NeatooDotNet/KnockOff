@@ -51,7 +51,12 @@ internal sealed record InlineClassStubModel(
     /// <summary>Whether the class has required members.</summary>
     bool HasRequiredMembers,
     /// <summary>Required member names for initialization.</summary>
-    EquatableArray<string> RequiredMemberNames);
+    EquatableArray<string> RequiredMemberNames,
+    /// <summary>
+    /// True when the target class is a C# record type.
+    /// When true, the Impl class is emitted as 'sealed record' instead of 'sealed class'.
+    /// </summary>
+    bool IsRecord = false);
 
 /// <summary>
 /// Model for a constructor in class stub generation.

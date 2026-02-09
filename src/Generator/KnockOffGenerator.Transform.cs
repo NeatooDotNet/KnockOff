@@ -502,6 +502,9 @@ public partial class KnockOffGenerator
 				accessModifier));
 		}
 
+		// Detect record types
+		var isRecord = classSource.IsRecord;
+
 		// Extract virtual/abstract members (properties, methods, indexers)
 		var members = new List<ClassMemberInfo>();
 		var events = new List<EventMemberInfo>();
@@ -519,6 +522,10 @@ public partial class KnockOffGenerator
 				// Only include virtual/abstract/override properties that aren't sealed
 				if ((property.IsVirtual || property.IsAbstract || property.IsOverride) && !property.IsSealed)
 				{
+					// Skip record-synthesized properties (e.g., EqualityContract)
+					if (isRecord && IsRecordSynthesizedProperty(property))
+						continue;
+
 					var memberInfo = ClassMemberInfo.FromProperty(property);
 					memberInfo = memberInfo with {
 						AccessModifier = AdjustAccessModifierForCrossAssembly(
@@ -533,6 +540,10 @@ public partial class KnockOffGenerator
 				// Generic methods are supported via the Of<T>() handler pattern
 				if ((method.IsVirtual || method.IsAbstract || method.IsOverride) && !method.IsSealed)
 				{
+					// Skip record-synthesized methods (e.g., <Clone>$, Equals, GetHashCode, ToString, PrintMembers, Deconstruct)
+					if (isRecord && IsRecordSynthesizedMethod(method))
+						continue;
+
 					var memberInfo = ClassMemberInfo.FromMethod(method);
 					memberInfo = memberInfo with {
 						AccessModifier = AdjustAccessModifierForCrossAssembly(
@@ -575,7 +586,8 @@ public partial class KnockOffGenerator
 			new EquatableArray<ClassConstructorInfo>(constructors.ToArray()),
 			new EquatableArray<EventMemberInfo>(events.ToArray()),
 			IsOpenGeneric: isOpenGeneric,
-			TypeParameters: typeParameters);
+			TypeParameters: typeParameters,
+			IsRecord: isRecord);
 	}
 
 	/// <summary>
@@ -589,6 +601,48 @@ public partial class KnockOffGenerator
 
 		// String, Object, Array, Delegate, MulticastDelegate, ValueType, Enum
 		return type.Name is "String" or "Object" or "Array" or "Delegate" or "MulticastDelegate" or "ValueType" or "Enum";
+	}
+
+	/// <summary>
+	/// Returns true for record-synthesized properties that should not be intercepted.
+	/// </summary>
+	private static bool IsRecordSynthesizedProperty(IPropertySymbol property)
+	{
+		return property.Name == "EqualityContract";
+	}
+
+	/// <summary>
+	/// Returns true for record-synthesized methods that should not be intercepted.
+	/// The &lt;Clone&gt;$ method, equality members, formatting members, and Deconstruct
+	/// are all compiler-generated for records and should be inherited as-is.
+	/// </summary>
+	private static bool IsRecordSynthesizedMethod(IMethodSymbol method)
+	{
+		// <Clone>$ is the copy constructor used by `with` expressions
+		if (method.Name == "<Clone>$")
+			return true;
+
+		// Value equality: Equals(T), Equals(object)
+		if (method.Name == "Equals")
+			return true;
+
+		// Value equality: GetHashCode()
+		if (method.Name == "GetHashCode" && method.Parameters.Length == 0)
+			return true;
+
+		// Formatting: ToString()
+		if (method.Name == "ToString" && method.Parameters.Length == 0)
+			return true;
+
+		// Formatting: PrintMembers(StringBuilder)
+		if (method.Name == "PrintMembers" && method.Parameters.Length == 1)
+			return true;
+
+		// Positional record deconstructor
+		if (method.Name == "Deconstruct")
+			return true;
+
+		return false;
 	}
 
 	/// <summary>

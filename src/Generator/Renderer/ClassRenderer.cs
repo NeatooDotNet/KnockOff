@@ -598,7 +598,8 @@ internal static class ClassRenderer
         w.Line($"{indent}/// <summary>Internal implementation that inherits from {cls.BaseType}.</summary>");
         // Note: Impl is a nested class - it doesn't need generic type params or constraints
         // because it inherits them from the parent generic class
-        w.Line($"{indent}private sealed class Impl : {cls.BaseType}");
+        var implKeyword = cls.IsRecord ? "record" : "class";
+        w.Line($"{indent}private sealed {implKeyword} Impl : {cls.BaseType}");
         w.Line($"{indent}{{");
 
         // Reference to the wrapper
