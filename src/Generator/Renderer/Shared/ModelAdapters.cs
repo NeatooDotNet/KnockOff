@@ -305,7 +305,7 @@ internal static class ModelAdapters
 			DefaultExpression: indexer.DefaultExpression,
 			HasGetter: indexer.HasGetter,
 			HasSetter: indexer.HasSetter,
-			ParameterSignature: $"{indexer.KeyType} {indexer.KeyParamName}",
+			ParameterSignature: $"{indexer.KeyRefPrefix}{indexer.KeyType} {indexer.KeyParamName}",
 			ParameterTypes: indexer.KeyType,
 			KeyExpression: indexer.KeyParamName,
 			ReturnsByRef: indexer.ReturnsByRef,

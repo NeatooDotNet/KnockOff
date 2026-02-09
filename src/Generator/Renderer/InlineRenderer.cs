@@ -698,42 +698,86 @@ internal static class InlineRenderer
     {
         var ifaceTypeParamList = handler.InterfaceTypeParameterList;
         var ifaceConstraintClause = handler.InterfaceConstraintClauses;
+        var isMultiArity = handler.ArityGroups.Count > 1;
+        // When there's only one arity group, no suffix needed (even for multi-type-param methods like Convert<TIn, TOut>)
+        // When there are multiple arity groups, use _N suffix to disambiguate dictionaries
+        string GetDictSuffix(int typeParamCount) => isMultiArity ? $"_{typeParamCount}" : "";
 
         w.Line($"\t\t/// <summary>Interceptor for {handler.MethodName}.</summary>");
         w.Line($"\t\tpublic sealed class {handler.InterceptorClassName}{ifaceTypeParamList}{ifaceConstraintClause}");
         w.Line("\t\t{");
 
-        // Dictionary for typed handlers
-        w.Line($"\t\t\tprivate readonly global::System.Collections.Generic.Dictionary<{handler.KeyType}, object> _typedHandlers = new();");
+        // Each type arity gets its own dictionary
+        foreach (var arity in handler.ArityGroups)
+        {
+            var dictSuffix = GetDictSuffix(arity.TypeParameterCount);
+            w.Line($"\t\t\tprivate readonly global::System.Collections.Generic.Dictionary<{arity.KeyType}, object> _typedHandlers{dictSuffix} = new();");
+        }
         w.Line();
 
-        // Of<T>() method
-        w.Line($"\t\t\t/// <summary>Gets the typed handler for the specified type argument(s).</summary>");
-        w.Line($"\t\t\tpublic {handler.TypedHandlerClassName}<{handler.TypeParameterNames}> Of<{handler.TypeParameterNames}>(){handler.MethodConstraintClauses}");
-        w.Line("\t\t\t{");
-        w.Line($"\t\t\t\tvar key = {handler.KeyConstruction};");
-        w.Line($"\t\t\t\tif (!_typedHandlers.TryGetValue(key, out var handler))");
-        w.Line("\t\t\t\t{");
-        w.Line($"\t\t\t\t\thandler = new {handler.TypedHandlerClassName}<{handler.TypeParameterNames}>();");
-        w.Line("\t\t\t\t\t_typedHandlers[key] = handler;");
-        w.Line("\t\t\t\t}");
-        w.Line($"\t\t\t\treturn ({handler.TypedHandlerClassName}<{handler.TypeParameterNames}>)handler;");
-        w.Line("\t\t\t}");
-        w.Line();
+        // Of<T>() method for each type arity
+        foreach (var arity in handler.ArityGroups)
+        {
+            var dictSuffix = GetDictSuffix(arity.TypeParameterCount);
+            w.Line($"\t\t\t/// <summary>Gets the typed handler for the specified type argument(s).</summary>");
+            w.Line($"\t\t\tpublic {arity.TypedHandlerClassName}<{arity.TypeParameterNames}> Of<{arity.TypeParameterNames}>(){arity.ConstraintClauses}");
+            w.Line("\t\t\t{");
+            w.Line($"\t\t\t\tvar key = {arity.KeyConstruction};");
+            w.Line($"\t\t\t\tif (!_typedHandlers{dictSuffix}.TryGetValue(key, out var handler))");
+            w.Line("\t\t\t\t{");
+            w.Line($"\t\t\t\t\thandler = new {arity.TypedHandlerClassName}<{arity.TypeParameterNames}>();");
+            w.Line($"\t\t\t\t\t_typedHandlers{dictSuffix}[key] = handler;");
+            w.Line("\t\t\t\t}");
+            w.Line($"\t\t\t\treturn ({arity.TypedHandlerClassName}<{arity.TypeParameterNames}>)handler;");
+            w.Line("\t\t\t}");
+            w.Line();
+        }
 
         // Aggregate tracking (private - use Verify for public API)
-        w.Line("\t\t\tprivate int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
+        if (!isMultiArity)
+        {
+            w.Line("\t\t\tprivate int TotalCallCount => _typedHandlers.Values.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
+        }
+        else
+        {
+            var dictNames = string.Join(".Concat(", handler.ArityGroups.Select((a, i) =>
+                $"_typedHandlers{GetDictSuffix(a.TypeParameterCount)}.Values"));
+            dictNames += string.Join("", Enumerable.Range(0, handler.ArityGroups.Count - 1).Select(_ => ")"));
+            w.Line($"\t\t\tprivate int TotalCallCount => {dictNames}.Cast<IGenericMethodCallTracker>().Sum(h => h.CallCount);");
+        }
         w.Line();
-        w.Line($"\t\t\t/// <summary>All type argument(s) that were used in calls.</summary>");
-        w.Line($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{handler.KeyType}> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();");
-        w.Line();
+
+        // CalledTypeArguments - only for single-arity, too complex for mixed
+        if (!isMultiArity)
+        {
+            var arity = handler.ArityGroups.First();
+            w.Line($"\t\t\t/// <summary>All type argument(s) that were used in calls.</summary>");
+            w.Line($"\t\t\tpublic global::System.Collections.Generic.IReadOnlyList<{arity.KeyType}> CalledTypeArguments => _typedHandlers.Where(kvp => ((IGenericMethodCallTracker)kvp.Value).CallCount > 0).Select(kvp => kvp.Key).ToList();");
+            w.Line();
+        }
+
+        // IsConfigured check across all dictionaries
+        if (!isMultiArity)
+        {
+            w.Line("\t\t\tinternal bool IsConfigured => _typedHandlers.Count > 0;");
+        }
+        else
+        {
+            var configChecks = string.Join(" || ", handler.ArityGroups.Select(a =>
+                $"_typedHandlers{GetDictSuffix(a.TypeParameterCount)}.Count > 0"));
+            w.Line($"\t\t\tinternal bool IsConfigured => {configChecks};");
+        }
 
         // Reset method - clears tracking state but preserves configuration (typed handlers with Return/Call)
         w.Line("\t\t\t/// <summary>Resets tracking state (call counts) but preserves configuration (Return/Call callbacks).</summary>");
         w.Line("\t\t\tpublic void Reset()");
         w.Line("\t\t\t{");
-        w.Line("\t\t\t\tforeach (var handler in _typedHandlers.Values.Cast<IResettable>())");
-        w.Line("\t\t\t\t\thandler.Reset();");
+        foreach (var arity in handler.ArityGroups)
+        {
+            var dictSuffix = GetDictSuffix(arity.TypeParameterCount);
+            w.Line($"\t\t\t\tforeach (var handler in _typedHandlers{dictSuffix}.Values.Cast<IResettable>())");
+            w.Line("\t\t\t\t\thandler.Reset();");
+        }
         w.Line("\t\t\t}");
         w.Line();
 
@@ -753,7 +797,6 @@ internal static class InlineRenderer
         // Internal verification support for stub-level Verify/VerifyAll
         // Generic method handlers aggregate verification from all typed handlers
         w.Line("\t\t\tinternal bool IsVerifiable => false; // Generic handlers are not individually verifiable");
-        w.Line("\t\t\tinternal bool IsConfigured => _typedHandlers.Count > 0;");
         w.Line();
 
         w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
@@ -768,26 +811,29 @@ internal static class InlineRenderer
         w.Line("\t\t\t}");
         w.Line();
 
-        // Nested Typed Handler Class
-        RenderTypedHandlerClass(w, handler);
+        // Nested Typed Handler Classes (one per type arity)
+        foreach (var arity in handler.ArityGroups)
+        {
+            RenderInlineTypedHandlerClass(w, handler.MethodName, arity);
+        }
 
         w.Line("\t\t}");
         w.Line();
     }
 
-    private static void RenderTypedHandlerClass(CodeWriter w, InlineGenericMethodHandlerModel handler)
+    private static void RenderInlineTypedHandlerClass(CodeWriter w, string methodName, InlineGenericTypeArityGroup arity)
     {
-        w.Line($"\t\t\t/// <summary>Typed handler for {handler.MethodName} with specific type arguments.</summary>");
-        w.Line($"\t\t\tpublic sealed class {handler.TypedHandlerClassName}<{handler.TypeParameterNames}> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking{handler.MethodConstraintClauses}");
+        w.Line($"\t\t\t/// <summary>Typed handler for {methodName} with specific type arguments.</summary>");
+        w.Line($"\t\t\tpublic sealed class {arity.TypedHandlerClassName}<{arity.TypeParameterNames}> : IGenericMethodCallTracker, IResettable, global::KnockOff.IMethodTracking{arity.ConstraintClauses}");
         w.Line("\t\t\t{");
 
         // Delegate
-        w.Line($"\t\t\t\t/// <summary>Delegate for {handler.MethodName}.</summary>");
-        w.Line($"\t\t\t\t{handler.DelegateSignature}");
+        w.Line($"\t\t\t\t/// <summary>Delegate for {methodName}.</summary>");
+        w.Line($"\t\t\t\t{arity.DelegateSignature}");
         w.Line();
 
         // Private callback field
-        w.Line($"\t\t\t\tprivate {handler.MethodName}Delegate? _call;");
+        w.Line($"\t\t\t\tprivate {methodName}Delegate? _call;");
         w.Line();
 
         // CallCount - private field with explicit interface implementation for aggregation
@@ -796,57 +842,57 @@ internal static class InlineRenderer
         w.Line();
 
         // LastArg/LastArgs
-        if (handler.LastCallArgType != null)
+        if (arity.LastCallArgType != null)
         {
-            var param = handler.NonGenericParameters.GetArray()![0];
+            var param = arity.NonGenericParameters.GetArray()![0];
             w.Line($"\t\t\t\t/// <summary>The '{param.Name}' argument from the most recent call.</summary>");
-            w.Line($"\t\t\t\tpublic {handler.LastCallArgType} LastArg {{ get; private set; }}");
+            w.Line($"\t\t\t\tpublic {arity.LastCallArgType} LastArg {{ get; private set; }}");
             w.Line();
         }
-        else if (handler.LastCallArgsType != null)
+        else if (arity.LastCallArgsType != null)
         {
             w.Line("\t\t\t\t/// <summary>The arguments from the most recent call.</summary>");
-            w.Line($"\t\t\t\tpublic {handler.LastCallArgsType} LastArgs {{ get; private set; }}");
+            w.Line($"\t\t\t\tpublic {arity.LastCallArgsType} LastArgs {{ get; private set; }}");
             w.Line();
         }
 
         // Return/Call method (returns IMethodTracking for consistency with regular method interceptors)
-        var typedHandlerEntryPoint = handler.IsVoid ? "Call" : "Return";
+        var typedHandlerEntryPoint = arity.IsVoid ? "Call" : "Return";
         w.Line("\t\t\t\t/// <summary>Sets the callback invoked when this method is called. Returns this handler for tracking.</summary>");
-        w.Line($"\t\t\t\tpublic global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({handler.MethodName}Delegate callback) {{ _call = callback; return this; }}");
+        w.Line($"\t\t\t\tpublic global::KnockOff.IMethodTracking {typedHandlerEntryPoint}({methodName}Delegate callback) {{ _call = callback; return this; }}");
         w.Line();
 
         // Callback property for internal use by invocation logic
         w.Line("\t\t\t\t/// <summary>Gets the configured callback (internal use).</summary>");
-        w.Line($"\t\t\t\tinternal {handler.MethodName}Delegate? Callback => _call;");
+        w.Line($"\t\t\t\tinternal {methodName}Delegate? Callback => _call;");
         w.Line();
 
         // RecordCall
         w.Line("\t\t\t\t/// <summary>Records a method call.</summary>");
-        if (handler.NonGenericParameters.Count == 0)
+        if (arity.NonGenericParameters.Count == 0)
         {
             w.Line("\t\t\t\tpublic void RecordCall() => _callCount++;");
         }
-        else if (handler.NonGenericParameters.Count == 1)
+        else if (arity.NonGenericParameters.Count == 1)
         {
-            var param = handler.NonGenericParameters.GetArray()![0];
+            var param = arity.NonGenericParameters.GetArray()![0];
             w.Line($"\t\t\t\tpublic void RecordCall({param.Type} {param.Name}) {{ _callCount++; LastArg = {param.Name}; }}");
         }
         else
         {
-            var paramList = string.Join(", ", handler.NonGenericParameters.Select(p => $"{p.Type} {p.Name}"));
-            var tupleConstruction = string.Join(", ", handler.NonGenericParameters.Select(p => p.Name));
+            var paramList = string.Join(", ", arity.NonGenericParameters.Select(p => $"{p.Type} {p.Name}"));
+            var tupleConstruction = string.Join(", ", arity.NonGenericParameters.Select(p => p.Name));
             w.Line($"\t\t\t\tpublic void RecordCall({paramList}) {{ _callCount++; LastArgs = ({tupleConstruction}); }}");
         }
         w.Line();
 
         // Reset - clears tracking state but preserves configuration (Return/Call callback)
         w.Line("\t\t\t\t/// <summary>Resets tracking state (_callCount, LastArg/LastArgs) but preserves configuration (Return/Call).</summary>");
-        if (handler.NonGenericParameters.Count == 0)
+        if (arity.NonGenericParameters.Count == 0)
         {
             w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; }");
         }
-        else if (handler.NonGenericParameters.Count == 1)
+        else if (arity.NonGenericParameters.Count == 1)
         {
             w.Line("\t\t\t\tpublic void Reset() { _callCount = 0; LastArg = default; }");
         }
@@ -1057,11 +1103,11 @@ internal static class InlineRenderer
     private static void RenderSmartDefaultMethod(CodeWriter w)
     {
         w.Line("\t\t\t/// <summary>Gets a smart default value for a generic type at runtime.</summary>");
-        w.Line("\t\t\tprivate static T SmartDefault<T>(string methodName)");
+        w.Line("\t\t\tprivate static TSmartDefault SmartDefault<TSmartDefault>(string methodName)");
         w.Line("\t\t\t{");
-        w.Line("\t\t\t\tvar type = typeof(T);");
+        w.Line("\t\t\t\tvar type = typeof(TSmartDefault);");
         w.Line();
-        w.Line("\t\t\t\t// Value types -> default(T)");
+        w.Line("\t\t\t\t// Value types -> default(TSmartDefault)");
         w.Line("\t\t\t\tif (type.IsValueType)");
         w.Line("\t\t\t\t\treturn default!;");
         w.Line();
@@ -1071,7 +1117,7 @@ internal static class InlineRenderer
         w.Line("\t\t\t\t\tnull, System.Type.EmptyTypes, null);");
         w.Line();
         w.Line("\t\t\t\tif (ctor != null)");
-        w.Line("\t\t\t\t\treturn (T)ctor.Invoke(null);");
+        w.Line("\t\t\t\t\treturn (TSmartDefault)ctor.Invoke(null);");
         w.Line();
         w.Line("\t\t\t\tthrow new global::System.InvalidOperationException(");
         w.Line("\t\t\t\t\t$\"No implementation provided for {methodName}<{type.Name}>. \" +");

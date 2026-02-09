@@ -15,6 +15,8 @@ internal sealed record FlatIndexerModel(
     string DefaultExpression,
     string KeyType,
     string KeyParamName,
+    /// <summary>Ref kind prefix for the key parameter (e.g., "in " for in parameters).</summary>
+    string KeyRefPrefix,
     string NullableKeyType,
     bool HasGetter,
     bool HasSetter,
