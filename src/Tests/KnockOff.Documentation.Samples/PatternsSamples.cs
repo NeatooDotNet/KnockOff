@@ -14,12 +14,12 @@ public interface IUserRepoStandalone
 }
 
 [KnockOff]
-public partial class UserRepoStandaloneStub : IUserRepoStandalone { }
+public partial class UserRepoStandaloneStub : IUserRepoStandalone { } // Stub classes MUST be partial
 #endregion
 
 #region patterns-stub-overrides
 [KnockOff]
-public partial class UserRepoWithStubOverridesStub : IUserRepoStandalone
+public partial class UserRepoWithStubOverridesStub : IUserRepoStandalone // Stub classes MUST be partial
 {
     // Override base class method with underscore suffix
     protected override User? GetById_(int id)
@@ -63,7 +63,7 @@ public interface IUserRepoInline
 
 #region patterns-inline-interface-basic
 [KnockOff<IUserRepoInline>]
-public partial class InlineInterfaceTests
+public partial class InlineInterfaceTests // Test classes MUST be partial to use inline KnockOff stubs
 {
     // The generator creates Stubs.IUserRepoInline
 }
@@ -105,7 +105,7 @@ public class UserServiceClass
 }
 
 [KnockOff<UserServiceClass>]
-public partial class InlineClassTests
+public partial class InlineClassTests // Test classes MUST be partial to use inline KnockOff stubs
 {
     // The generator creates Stubs.UserServiceClass
 }
@@ -142,7 +142,7 @@ public delegate T Factory<T>();
 
 [KnockOff<ValidationRule>]
 [KnockOff<Factory<User>>]
-public partial class InlineDelegateTests
+public partial class InlineDelegateTests // Test classes MUST be partial to use inline KnockOff stubs
 {
     // The generator creates Stubs.ValidationRule and Stubs.Factory<User>
 }
@@ -183,7 +183,7 @@ public interface IRepositoryGeneric<T> where T : class
 }
 
 [KnockOff]
-public partial class RepositoryGenericStub<T> : IRepositoryGeneric<T> where T : class { }
+public partial class RepositoryGenericStub<T> : IRepositoryGeneric<T> where T : class { } // Stub classes MUST be partial
 #endregion
 
 public class GenericStandalonePatternTests
@@ -229,7 +229,7 @@ public abstract class ServiceBaseNonGeneric
 }
 
 [KnockOffBase<ServiceBaseNonGeneric>]
-public partial class ServiceBaseStub { }
+public partial class ServiceBaseStub { } // Stub classes MUST be partial
 #endregion
 
 public class StandaloneClassPatternTests
@@ -264,7 +264,7 @@ public abstract class RepositoryBase<T> where T : class
 }
 
 [KnockOffBase(typeof(RepositoryBase<>))]
-public partial class RepositoryBaseStub<T> where T : class { }
+public partial class RepositoryBaseStub<T> where T : class { } // Stub classes MUST be partial
 #endregion
 
 public class GenericStandaloneClassPatternTests
@@ -301,7 +301,7 @@ public interface IServiceOpenGeneric<T>
 
 #region patterns-open-generic-basic
 [KnockOff(typeof(IServiceOpenGeneric<>))]
-public partial class OpenGenericTests
+public partial class OpenGenericTests // Test classes MUST be partial to use inline KnockOff stubs
 {
     // The generator creates Stubs.IServiceOpenGeneric<T>
 }
@@ -348,7 +348,7 @@ public abstract class ServiceBaseOpenGeneric<T>
 }
 
 [KnockOff(typeof(ServiceBaseOpenGeneric<>))]
-public partial class OpenGenericClassTests
+public partial class OpenGenericClassTests // Test classes MUST be partial to use inline KnockOff stubs
 {
     // The generator creates Stubs.ServiceBaseOpenGeneric<T>
 }
