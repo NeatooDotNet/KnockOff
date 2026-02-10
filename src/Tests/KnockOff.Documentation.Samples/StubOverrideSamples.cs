@@ -19,6 +19,12 @@ public interface IAsyncStubOverrideRepo
     Task<User?> GetUserByIdAsync(int id);
 }
 
+public interface IAsyncOverrideDemo
+{
+    Task<string> ProcessAsync(string input);
+    ValueTask<int> ComputeAsync(int value);
+}
+
 // =============================================================================
 // Stubs with Stub Overrides
 // =============================================================================
@@ -60,6 +66,27 @@ public partial class AsyncStubOverrideRepoStub
         return Task.FromResult<User?>(new User { Id = id, Name = "Default User" });
     }
 }
+
+// Async stub override demo with Task<T> and ValueTask<T>
+[KnockOff]
+public partial class AsyncOverrideDemoStub : IAsyncOverrideDemo { }
+
+#region async-stub-overrides-define
+public partial class AsyncOverrideDemoStub
+{
+    protected override async Task<string> ProcessAsync_(string input)
+    {
+        await Task.Delay(1);
+        return $"[Async: {input}]";
+    }
+
+    protected override async ValueTask<int> ComputeAsync_(int value)
+    {
+        await Task.Yield();
+        return value * 2;
+    }
+}
+#endregion
 
 // =============================================================================
 // Fallback Tests - Stub overrides provide defaults when no Return configured

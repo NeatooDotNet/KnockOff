@@ -180,19 +180,24 @@ Assert.Equal(2, stub.FetchAsync.LastArg); // last argument
 
 Standalone stubs can define async stub overrides:
 
-```csharp
-protected override async Task<string> ProcessAsync_(string input)
+<!-- snippet: async-stub-overrides-define -->
+```cs
+public partial class AsyncOverrideDemoStub
 {
-    await Task.Delay(1);
-    return $"[Async: {input}]";
-}
+    protected override async Task<string> ProcessAsync_(string input)
+    {
+        await Task.Delay(1);
+        return $"[Async: {input}]";
+    }
 
-protected override async ValueTask<int> ComputeAsync_(int value)
-{
-    await Task.Yield();
-    return value * 2;
+    protected override async ValueTask<int> ComputeAsync_(int value)
+    {
+        await Task.Yield();
+        return value * 2;
+    }
 }
 ```
+<!-- endSnippet -->
 
 `Return()` supersedes async stub overrides per-test, same as sync methods.
 

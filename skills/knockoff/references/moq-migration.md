@@ -290,29 +290,30 @@ Replace Moq's `CallBase = true` with KnockOff's default behavior for class stubs
 
 **Moq:**
 
-```csharp
+<!-- snippet: moq-migration-callbase-moq -->
+```cs
 // Moq requires explicit opt-in to call base implementations
-var mock = new Mock<MyService>();
+var mock = new Mock<MoqCallBaseService>();
 mock.CallBase = true;  // Without this, virtual methods return default
 mock.Setup(x => x.GetStatus()).Returns("overridden");
 
 // Virtual methods not configured in Setup call the real implementation
 mock.Object.Initialize();  // Calls real Initialize()
 ```
+<!-- endSnippet -->
 
 **KnockOff:**
 
-```csharp
+<!-- snippet: moq-migration-callbase-knockoff -->
+```cs
 // KnockOff class stubs call base by default -- no opt-in needed
-[KnockOff<MyService>]
-partial class Tests { }
-
-var stub = new Stubs.MyService();
+var stub = new Stubs.MoqCallBaseService();
 stub.GetStatus.Return("overridden");  // Override just this method
 
-MyService service = stub.Object;
+MoqCallBaseService service = stub.Object;
 service.Initialize();  // Calls real Initialize() -- this is the default!
 ```
+<!-- endSnippet -->
 
 **Key differences:**
 
