@@ -13,8 +13,8 @@
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<FileVersion>0.47.0</FileVersion>
-		<PackageVersion>0.47.0</PackageVersion>
+		<FileVersion>0.48.0</FileVersion>
+		<PackageVersion>0.48.0</PackageVersion>
 		<PackageTags>Unit Testing Mocking Stubs Source Generator .NET</PackageTags>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<RepositoryType>git</RepositoryType>
@@ -22,7 +22,7 @@
 		<PackageProjectUrl>https://github.com/NeatooDotNet/KnockOff</PackageProjectUrl>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageReleaseNotes>Breaking: Major indexer API redesign — per-key builders, flattened multi-param accessors, When(predicate) key matching, per-key verification.</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix: multi-param indexer method name mismatch in multi-indexer interfaces.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
 </Project>
