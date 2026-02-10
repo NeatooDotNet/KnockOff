@@ -750,6 +750,205 @@ public class WhenCompleteExampleTests
 }
 
 // =============================================================================
+// When Chain Reference Samples (for when-chains.md)
+// =============================================================================
+
+public class WhenRefValueTests
+{
+    [Fact]
+    public void When_ValueEquality()
+    {
+        var stub = new WhenCalculatorStub();
+
+        #region when-chains-ref-value
+        stub.Add.When(1, 2).Return(100)
+            .ThenWhen(5, 5).Return(500);
+
+        IWhenCalculator calc = stub;
+        calc.Add(1, 2);  // 100 (matched)
+        calc.Add(5, 5);  // 500 (matched)
+        calc.Add(3, 4);  // falls to Return/default
+        #endregion
+
+        Assert.Equal(0, calc.Add(3, 4));
+    }
+
+    [Fact]
+    public void When_Predicate()
+    {
+        var stub = new WhenCalculatorStub();
+
+        #region when-chains-ref-predicate
+        // Range check
+        stub.Add.When((a, b) => a > 0 && b > 0).Return(42);
+        #endregion
+
+        IWhenCalculator calc = stub;
+        Assert.Equal(42, calc.Add(1, 1));
+    }
+}
+
+public class WhenRefChainingTests
+{
+    [Fact]
+    public void When_ThenWhenChaining()
+    {
+        var stub = new WhenCalculatorStub();
+
+        #region when-chains-ref-thenwhen
+        stub.Add
+            .When(1, 1).Return(1)
+            .ThenWhen(2, 2).Return(2)
+            .ThenWhen(3, 3).Return(3);
+
+        IWhenCalculator calc = stub;
+        calc.Add(1, 1); // 1
+        calc.Add(2, 2); // 2
+        calc.Add(3, 3); // 3
+        calc.Add(4, 4); // falls to Return/default
+        #endregion
+
+        Assert.Equal(0, calc.Add(4, 4));
+    }
+
+    [Fact]
+    public void When_MixValueAndPredicate()
+    {
+        var stub = new WhenTransformerStub();
+        var adminUser = "admin";
+        var premiumUser = "premium";
+        var regularUser = "regular";
+
+        #region when-chains-ref-mixed
+        stub.Transform
+            .When("admin").Return(adminUser)
+            .ThenWhen(s => s.Length > 10).Return(premiumUser)
+            .ThenWhen(s => s.Length > 0).Return(regularUser);
+        #endregion
+
+        IWhenTransformer t = stub;
+        Assert.Equal("admin", t.Transform("admin"));
+    }
+}
+
+public class WhenRefVoidTests
+{
+    [Fact]
+    public void When_VoidCall()
+    {
+        var stub = new WhenProcessorStub();
+        var errors = new List<string>();
+        var warnings = new List<string>();
+
+        #region when-chains-ref-void-call
+        stub.Process.When(1, 2).Call((a, b) => errors.Add($"{a},{b}"));
+        #endregion
+
+        IWhenProcessor p = stub;
+        p.Process(1, 2);
+        Assert.Single(errors);
+    }
+
+    [Fact]
+    public void When_ThenCallTerminal()
+    {
+        var stub = new WhenCalculatorStub();
+
+        #region when-chains-ref-thencall
+        stub.Add
+            .When(1, 2).Return(100)
+            .ThenWhen(3, 4).Return(200)
+            .ThenCall((a, b) => a + b);  // Fallback for unmatched
+
+        IWhenCalculator calc = stub;
+        calc.Add(1, 2); // 100
+        calc.Add(3, 4); // 200
+        calc.Add(5, 6); // 11 (fallback computes)
+        #endregion
+
+        Assert.Equal(11, calc.Add(5, 6));
+    }
+}
+
+public class WhenRefPriorityTests
+{
+    [Fact]
+    public void When_PriorityOverReturn()
+    {
+        var stub = new WhenCalculatorStub();
+
+        #region when-chains-ref-priority
+        stub.Add.Return(0);                     // Default for unmatched
+        stub.Add.When(1, 2).Return(100);        // Specific match
+
+        IWhenCalculator calc = stub;
+        calc.Add(1, 2); // 100 (When matched)
+        calc.Add(3, 4); // 0 (fell to Return)
+        #endregion
+
+        Assert.Equal(100, calc.Add(1, 2));
+        Assert.Equal(0, calc.Add(3, 4));
+    }
+}
+
+public class WhenRefAsyncTests
+{
+    [Fact]
+    public async Task When_AsyncAutoWrap()
+    {
+        var stub = new WhenAsyncDataServiceStub();
+
+        #region when-chains-ref-async
+        stub.GetAsync.When("key1").Return("Item 1");     // Auto-wrapped in Task.FromResult
+        stub.GetAsync.When("key2").Return("Item 2");
+
+        IWhenAsyncDataService service = stub;
+        var r = await service.GetAsync("key1"); // "Item 1"
+        #endregion
+
+        Assert.Equal("Item 1", r);
+    }
+}
+
+public class WhenRefVerifyTests
+{
+    [Fact]
+    public void When_Verifiable()
+    {
+        var stub = new WhenCalculatorStub();
+
+        #region when-chains-ref-verifiable
+        stub.Add.When(1, 2).Return(100).Verifiable();
+        stub.Add.When(5, 5).Return(500).Verifiable();
+        #endregion
+
+        IWhenCalculator calc = stub;
+        calc.Add(1, 2);
+        calc.Add(5, 5);
+        stub.Verify();
+    }
+
+    [Fact]
+    public void When_ChainVerify()
+    {
+        var stub = new WhenCalculatorStub();
+
+        #region when-chains-ref-chain-verify
+        var chain = stub.Add.When(1, 2).Return(10)
+            .ThenWhen(3, 4).Return(20)
+            .ThenCall((a, b) => 999);
+
+        IWhenCalculator calc = stub;
+        calc.Add(1, 2);
+        calc.Add(3, 4);
+        calc.Add(0, 0);
+
+        chain.Verify(); // Passes -- all matchers consumed
+        #endregion
+    }
+}
+
+// =============================================================================
 // Interceptor API Reference - When Chain API
 // =============================================================================
 

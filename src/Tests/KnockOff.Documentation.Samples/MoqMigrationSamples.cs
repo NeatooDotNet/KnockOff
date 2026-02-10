@@ -960,3 +960,48 @@ public class TimesMatcherTests
         #endregion
     }
 }
+
+// =============================================================================
+// CallBase Behavior Samples
+// =============================================================================
+
+public class MoqCallBaseService
+{
+    public virtual string GetStatus() => "real-status";
+    public virtual void Initialize() { }
+}
+
+[KnockOff<MoqCallBaseService>]
+public partial class CallBaseDemoTests
+{
+    [Fact]
+    public void CallBase_MoqApproach()
+    {
+        #region moq-migration-callbase-moq
+        // Moq requires explicit opt-in to call base implementations
+        var mock = new Mock<MoqCallBaseService>();
+        mock.CallBase = true;  // Without this, virtual methods return default
+        mock.Setup(x => x.GetStatus()).Returns("overridden");
+
+        // Virtual methods not configured in Setup call the real implementation
+        mock.Object.Initialize();  // Calls real Initialize()
+        #endregion
+
+        Assert.Equal("overridden", mock.Object.GetStatus());
+    }
+
+    [Fact]
+    public void CallBase_KnockOffApproach()
+    {
+        #region moq-migration-callbase-knockoff
+        // KnockOff class stubs call base by default -- no opt-in needed
+        var stub = new Stubs.MoqCallBaseService();
+        stub.GetStatus.Return("overridden");  // Override just this method
+
+        MoqCallBaseService service = stub.Object;
+        service.Initialize();  // Calls real Initialize() -- this is the default!
+        #endregion
+
+        Assert.Equal("overridden", service.GetStatus());
+    }
+}

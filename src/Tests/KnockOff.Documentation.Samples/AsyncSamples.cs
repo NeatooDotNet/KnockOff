@@ -13,6 +13,16 @@ public interface IAsyncUserSvc
     ValueTask<User?> GetCachedUserAsync(int id);
 }
 
+public interface IAsyncFetchSvc
+{
+    Task<string> FetchAsync(int id);
+    Task ExecuteAsync(string command);
+    Task<string> GetDataAsync(int id);
+}
+
+[KnockOff]
+public partial class AsyncFetchSvcStub : IAsyncFetchSvc { }
+
 public interface IAsyncRepo
 {
     Task<User?> FindAsync(int id);
@@ -282,6 +292,190 @@ public class UserManager
         user.Name = newName;
         await _repository.SaveAsync(user);
         return true;
+    }
+}
+
+// =============================================================================
+// Async Reference Samples (for async-methods.md)
+// =============================================================================
+
+public class AsyncTierTests
+{
+    [Fact]
+    public async Task Async_Tier1_Value()
+    {
+        var stub = new AsyncFetchSvcStub();
+
+        #region async-tier1-value
+        stub.FetchAsync.Return("value");
+        // Internally: Task.FromResult("value")
+
+        IAsyncFetchSvc service = stub;
+        var result = await service.FetchAsync(1); // "value"
+        #endregion
+
+        Assert.Equal("value", result);
+    }
+
+    [Fact]
+    public async Task Async_Tier2_SimplifiedCallback()
+    {
+        var stub = new AsyncFetchSvcStub();
+
+        #region async-tier2-callback
+        stub.FetchAsync.Return((id) => $"Fetch-{id}");
+        // Internally: Task.FromResult(callback(id))
+
+        IAsyncFetchSvc service = stub;
+        var result = await service.FetchAsync(42); // "Fetch-42"
+        #endregion
+
+        Assert.Equal("Fetch-42", result);
+    }
+
+    [Fact]
+    public async Task Async_Tier3_FullCallback()
+    {
+        var stub = new AsyncFetchSvcStub();
+
+        #region async-tier3-full
+        stub.FetchAsync.Return((int id) => Task.FromResult($"Full-{id}"));
+        // Used as-is -- for custom async behavior
+
+        IAsyncFetchSvc service = stub;
+        var result = await service.FetchAsync(99); // "Full-99"
+        #endregion
+
+        Assert.Equal("Full-99", result);
+    }
+
+    [Fact]
+    public async Task Async_VoidMethod()
+    {
+        var stub = new AsyncFetchSvcStub();
+
+        #region async-void-method
+        stub.ExecuteAsync.Return((command) => { /* side effect */ });
+
+        IAsyncFetchSvc service = stub;
+        await service.ExecuteAsync("test"); // Callback invoked
+        #endregion
+    }
+
+    [Fact]
+    public async Task Async_Sequences()
+    {
+        var stub = new AsyncFetchSvcStub();
+
+        #region async-sequences-autowrap
+        stub.GetDataAsync.Return("first", "second", "third");
+
+        IAsyncFetchSvc service = stub;
+        var r1 = await service.GetDataAsync(1); // "first"
+        var r2 = await service.GetDataAsync(2); // "second"
+        var r3 = await service.GetDataAsync(3); // "third"
+        var r4 = await service.GetDataAsync(4); // "third" (repeats)
+        #endregion
+
+        Assert.Equal("first", r1);
+        Assert.Equal("third", r4);
+    }
+
+    [Fact]
+    public async Task Async_CallbackSequences()
+    {
+        var stub = new AsyncFetchSvcStub();
+
+        #region async-callback-sequences
+        stub.FetchAsync.Return((id) => $"First-{id}")
+            .ThenReturn((id) => $"Second-{id}")
+            .ThenReturn("constant");
+        #endregion
+
+        IAsyncFetchSvc service = stub;
+        Assert.Equal("First-1", await service.FetchAsync(1));
+        Assert.Equal("Second-2", await service.FetchAsync(2));
+        Assert.Equal("constant", await service.FetchAsync(3));
+    }
+
+    [Fact]
+    public async Task Async_WhenChains()
+    {
+        var stub = new AsyncFetchSvcStub();
+
+        #region async-when-chains
+        stub.GetDataAsync.When(1).Return("Item 1");
+        stub.GetDataAsync.When(2).Return("Item 2");
+        stub.GetDataAsync.When((id) => id > 100).Return("Bulk item");
+
+        IAsyncFetchSvc service = stub;
+        var r = await service.GetDataAsync(1); // "Item 1"
+        #endregion
+
+        Assert.Equal("Item 1", r);
+    }
+
+    [Fact]
+    public async Task Async_Verification()
+    {
+        var stub = new AsyncFetchSvcStub();
+        stub.FetchAsync.Return("result");
+
+        IAsyncFetchSvc service = stub;
+
+        #region async-verification
+        await service.FetchAsync(1);
+        await service.FetchAsync(2);
+
+        stub.FetchAsync.Verify(Called.Exactly(2));
+        Assert.Equal(2, stub.FetchAsync.LastArg); // last argument
+        #endregion
+    }
+}
+
+// =============================================================================
+// Async Delegate Samples (for async-methods.md)
+// =============================================================================
+
+public delegate Task<int> AsyncOp(int x);
+
+[KnockOff<AsyncOp>]
+public partial class AsyncDelegateHost { }
+
+public partial class AsyncDelegateHost
+{
+    [Fact]
+    public async Task Async_Delegate_ThreeTier()
+    {
+        #region async-delegate-tiers
+        var stub = new Stubs.AsyncOp();
+
+        // Tier 1: auto-wraps int -> Task<int>
+        stub.Interceptor.Return(42);
+
+        AsyncOp op = stub;
+        var result = await op(10); // 42
+        #endregion
+
+        Assert.Equal(42, result);
+    }
+
+    [Fact]
+    public async Task Async_Delegate_Sequences()
+    {
+        #region async-delegate-sequences
+        var stub = new Stubs.AsyncOp();
+        stub.Interceptor.Return(10, 20);
+
+        AsyncOp op = stub;
+        var r1 = await op(0); // 10
+        var r2 = await op(0); // 20
+        var r3 = await op(0); // 20 (repeats)
+        #endregion
+
+        Assert.Equal(10, r1);
+        Assert.Equal(20, r2);
+        Assert.Equal(20, r3);
     }
 }
 

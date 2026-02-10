@@ -467,11 +467,16 @@ public class IndexerConfigTests
         stub.Indexer.Get((key) => $"computed-{key}");
         stub.Indexer.Set((key, value) => { /* handle */ });
 
-        // Per-key Returns takes priority over Get callback
+        // When(predicate) matches keys by condition
+        stub.Indexer.When(key => key.StartsWith("prefix_", StringComparison.Ordinal)).Returns("matched");
+
+        // Per-key > When > Get callback (priority order)
         #endregion
 
         IDict dict = stub;
         Assert.Equal("value1", dict["key1"]); // Per-key Returns wins
+        Assert.Equal("matched", dict["prefix_hello"]); // When predicate matches
+        Assert.Equal("computed-other", dict["other"]); // Get callback fallback
     }
 }
 

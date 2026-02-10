@@ -19,6 +19,12 @@ public interface IAsyncStubOverrideRepo
     Task<User?> GetUserByIdAsync(int id);
 }
 
+public interface IAsyncOverrideDemo
+{
+    Task<string> ProcessAsync(string input);
+    ValueTask<int> ComputeAsync(int value);
+}
+
 // =============================================================================
 // Stubs with Stub Overrides
 // =============================================================================
@@ -60,6 +66,27 @@ public partial class AsyncStubOverrideRepoStub
         return Task.FromResult<User?>(new User { Id = id, Name = "Default User" });
     }
 }
+
+// Async stub override demo with Task<T> and ValueTask<T>
+[KnockOff]
+public partial class AsyncOverrideDemoStub : IAsyncOverrideDemo { }
+
+#region async-stub-overrides-define
+public partial class AsyncOverrideDemoStub
+{
+    protected override async Task<string> ProcessAsync_(string input)
+    {
+        await Task.Delay(1);
+        return $"[Async: {input}]";
+    }
+
+    protected override async ValueTask<int> ComputeAsync_(int value)
+    {
+        await Task.Yield();
+        return value * 2;
+    }
+}
+#endregion
 
 // =============================================================================
 // Fallback Tests - Stub overrides provide defaults when no Return configured
@@ -466,6 +493,103 @@ public class OverloadStubOverrideTests
 // =============================================================================
 // Complete Example
 // =============================================================================
+
+// =============================================================================
+// Stub Override Reference Samples (for stub-overrides.md)
+// =============================================================================
+
+public interface IStubOverrideMixedSvc
+{
+    string WithOverride(string input);
+    string WithoutOverride(string input);
+}
+
+[KnockOff]
+public partial class StubOverrideMixedStub : IStubOverrideMixedSvc { }
+
+public partial class StubOverrideMixedStub
+{
+    protected override string WithOverride_(string input) => $"[User: {input}]";
+    // WithoutOverride_ is NOT overridden
+}
+
+public class StubOverrideRefMixedTests
+{
+    [Fact]
+    public void StubOverrides_Mixed()
+    {
+        var stub = new StubOverrideMixedStub();
+        IStubOverrideMixedSvc service = stub;
+
+        #region stub-overrides-ref-mixed
+        // Methods WITH override use it as default
+        service.WithOverride("test");    // "[User: test]"
+
+        // Methods WITHOUT override need configuration or return default
+        stub.WithoutOverride.Return((input) => $"[Configured: {input}]");
+        service.WithoutOverride("test"); // "[Configured: test]"
+        #endregion
+
+        Assert.Equal("[User: test]", service.WithOverride("test"));
+        Assert.Equal("[Configured: test]", service.WithoutOverride("test"));
+    }
+}
+
+public class StubOverrideRefReturnTests
+{
+    [Fact]
+    public void StubOverrides_ReturnSupersedes()
+    {
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo service = stub;
+
+        #region stub-overrides-ref-return-supersedes
+        // Default behavior from override
+        service.GetUserById(1); // "Default User"
+
+        // Supersede with Return for this test
+        stub.GetUserById.Return(id => new User { Id = id, Name = "Override" });
+        service.GetUserById(1); // "Override"
+        #endregion
+
+        Assert.Equal("Override", service.GetUserById(1)!.Name);
+    }
+
+    [Fact]
+    public void StubOverrides_WhenChain()
+    {
+        var stub = new StubOverridesRepoStub();
+        IStubOverridesRepo service = stub;
+
+        #region stub-overrides-ref-when
+        stub.GetUserById.When(42).Return(new User { Id = 42, Name = "SPECIAL" });
+
+        service.GetUserById(42); // "SPECIAL" (When matched)
+        service.GetUserById(1);  // "Default User" (stub override)
+        #endregion
+
+        Assert.Equal("SPECIAL", service.GetUserById(42)!.Name);
+        Assert.Equal("Default User", service.GetUserById(1)!.Name);
+    }
+}
+
+public class StubOverrideRefStrictTests
+{
+    [Fact]
+    public void StubOverrides_StrictBypass()
+    {
+        #region stub-overrides-ref-strict
+        var stub = new StubOverridesRepoStub();
+        stub.Strict = true;
+
+        IStubOverridesRepo service = stub;
+
+        // Stub overrides bypass strict mode -- they ARE the configuration
+        var user = service.GetUserById(1); // Works -- override IS the config
+        Assert.Equal("Default User", user!.Name);
+        #endregion
+    }
+}
 
 public class CompleteStubOverrideExampleTests
 {
