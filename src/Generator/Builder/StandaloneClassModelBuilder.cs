@@ -40,7 +40,7 @@ internal static class StandaloneClassModelBuilder
         var allMethods = cls.Members.Where(m => !m.IsProperty && !m.IsIndexer).ToList();
         var methodsByName = allMethods.GroupBy(m => m.Name).ToList();
 
-        // Count indexers to determine naming strategy
+        // Count indexers for invoke suffix computation
         var indexerCount = SymbolHelpers.CountClassIndexers(cls.Members);
 
         // Check for required members
@@ -82,15 +82,19 @@ internal static class StandaloneClassModelBuilder
             }
             else if (member.IsIndexer)
             {
-                var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
-                var indexerModel = BuildIndexerModel(member, stubClassName, indexerCount, typeParamList, constraintClause);
+                // All indexers share a single interceptor named "Indexer"
+                var indexerModel = BuildIndexerModel(member, stubClassName, typeParamList, constraintClause);
                 indexers.Add(indexerModel);
-                interceptorProperties.Add(new InlineInterceptorPropertyModel(
-                    PropertyName: indexerName,
-                    InterceptorTypeName: $"{indexerModel.InterceptorClassName}{typeParamList}",
-                    NeedsNewKeyword: NeedsNewKeyword(indexerName),
-                    Description: $"Interceptor for {indexerName}."));
-                resetStatements.Add($"{indexerName}.Reset();");
+                // Only add interceptor property and reset statement for the first indexer
+                if (indexers.Count == 1)
+                {
+                    interceptorProperties.Add(new InlineInterceptorPropertyModel(
+                        PropertyName: "Indexer",
+                        InterceptorTypeName: $"{indexerModel.InterceptorClassName}{typeParamList}",
+                        NeedsNewKeyword: NeedsNewKeyword("Indexer"),
+                        Description: $"Interceptor for Indexer."));
+                    resetStatements.Add($"Indexer.Reset();");
+                }
             }
         }
 
@@ -218,7 +222,7 @@ internal static class StandaloneClassModelBuilder
             }
             else if (member.IsIndexer)
             {
-                implIndexers.Add(BuildImplIndexerModel(member, indexerCount));
+                implIndexers.Add(BuildImplIndexerModel(member, indexerCount, cls.Members));
             }
         }
 
@@ -433,11 +437,11 @@ internal static class StandaloneClassModelBuilder
     private static InlineClassIndexerModel BuildIndexerModel(
         ClassMemberInfo member,
         string stubClassName,
-        int indexerCount,
         string typeParamList,
         string constraintClause)
     {
-        var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
+        // All indexers share a single interceptor named "Indexer"
+        var indexerName = "Indexer";
         var interceptClassName = $"{stubClassName}_{indexerName}Interceptor";
         var stubClassRef = $"{stubClassName}{typeParamList}";
 
@@ -515,14 +519,20 @@ internal static class StandaloneClassModelBuilder
             ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }
 
-    private static InlineClassImplIndexerModel BuildImplIndexerModel(ClassMemberInfo member, int indexerCount)
+    private static InlineClassImplIndexerModel BuildImplIndexerModel(ClassMemberInfo member, int indexerCount, EquatableArray<ClassMemberInfo> allMembers)
     {
-        var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
+        // All indexers share a single interceptor named "Indexer"
+        var indexerName = "Indexer";
         var paramList = string.Join(", ", member.IndexerParameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}"));
         var argList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
         var keyArg = member.IndexerParameters.Count == 1
             ? member.IndexerParameters.GetArray()![0].Name
             : $"({argList})";
+
+        // Compute invoke suffix for multi-indexer
+        var invokeSuffix = indexerCount > 1
+            ? $"_{UnifiedInterceptorBuilder.GetTypeSuffix(member.IndexerParameters.Count == 1 ? member.IndexerParameters.GetArray()![0].Type : $"({string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"))})")}"
+            : "";
 
         return new InlineClassImplIndexerModel(
             IndexerName: indexerName,
@@ -537,6 +547,7 @@ internal static class StandaloneClassModelBuilder
             IsNullable: member.IsNullable,
             DefaultStrategy: member.DefaultStrategy,
             ConcreteTypeForNew: member.ConcreteTypeForNew,
+            InvokeSuffix: invokeSuffix,
             ReturnsByRef: member.ReturnsByRef,
             ReturnsByRefReadonly: member.ReturnsByRefReadonly);
     }

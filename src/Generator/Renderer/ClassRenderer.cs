@@ -43,17 +43,20 @@ internal static class ClassRenderer
             PropertyInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
         }
 
-        foreach (var indexer in cls.Indexers)
+        // Group indexers by interceptor class name and render as a single multi-indexer interceptor
+        var indexersByClass = cls.Indexers.GroupBy(i => i.InterceptorClassName);
+        foreach (var group in indexersByClass)
         {
-            var unifiedModel = ToUnifiedIndexerModel(indexer);
+            var firstIndexer = group.First();
             var options = new IndexerInterceptorRenderOptions(
                 BaseIndent: 2,
                 IncludeStrictParameter: true,
                 StrictAccessExpression: "strict",
-                InterceptorTypeParameters: indexer.TypeParameterList,
-                InterceptorConstraints: indexer.ConstraintClauses);
+                InterceptorTypeParameters: firstIndexer.TypeParameterList,
+                InterceptorConstraints: firstIndexer.ConstraintClauses);
             w.SetIndent(2);
-            IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
+            var unifiedModels = group.Select(i => ToUnifiedIndexerModel(i)).ToList();
+            IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModels, options);
         }
 
         // Use shared MethodInterceptorRenderer for method interceptors
@@ -660,7 +663,7 @@ internal static class ClassRenderer
         {
             if (indexer.IsRefReturn && indexer.IsAbstract)
             {
-                w.Line($"{indent1}private {indexer.ReturnType} _defaultRefBacking_{indexer.IndexerName};");
+                w.Line($"{indent1}private {indexer.ReturnType} _defaultRefBacking_{indexer.IndexerName}{indexer.InvokeSuffix};");
             }
         }
         foreach (var method in cls.ImplMethods)
@@ -828,6 +831,7 @@ internal static class ClassRenderer
     private static void RenderImplIndexerOverride(CodeWriter w, InlineClassImplIndexerModel indexer, string indent, string indent1)
     {
         var indent2 = indent1 + "\t";
+        var invokeSuffix = indexer.InvokeSuffix;
 
         w.Line($"{indent}/// <inheritdoc />");
         w.Line($"{indent}{indexer.AccessModifier} override {indexer.RefReturnPrefix}{indexer.ReturnType} this[{indexer.ParameterDeclarations}]");
@@ -840,9 +844,9 @@ internal static class ClassRenderer
             w.Line($"{indent1}{{");
             if (indexer.IsAbstract)
             {
-                w.Line($"{indent2}if (_stub == null) {{ _defaultRefBacking_{indexer.IndexerName} = default!; return ref _defaultRefBacking_{indexer.IndexerName}; }}");
-                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeRefGet(_stub.Strict, {indexer.ArgumentList});");
-                w.Line($"{indent2}return ref _stub.{indexer.IndexerName}._refReturnBacking;");
+                w.Line($"{indent2}if (_stub == null) {{ _defaultRefBacking_{indexer.IndexerName}{invokeSuffix} = default!; return ref _defaultRefBacking_{indexer.IndexerName}{invokeSuffix}; }}");
+                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeRefGet{invokeSuffix}(_stub.Strict, {indexer.ArgumentList});");
+                w.Line($"{indent2}return ref _stub.{indexer.IndexerName}._refReturnBacking{invokeSuffix};");
             }
             else
             {
@@ -850,10 +854,10 @@ internal static class ClassRenderer
                 w.Line($"{indent2}if (_stub == null) return ref base[{indexer.ArgumentList}];");
                 w.Line($"{indent2}if (_stub.{indexer.IndexerName}.IsConfigured)");
                 w.Line($"{indent2}{{");
-                w.Line($"{indent2}\t_stub.{indexer.IndexerName}.InvokeRefGet(_stub.Strict, {indexer.ArgumentList});");
-                w.Line($"{indent2}\treturn ref _stub.{indexer.IndexerName}._refReturnBacking;");
+                w.Line($"{indent2}\t_stub.{indexer.IndexerName}.InvokeRefGet{invokeSuffix}(_stub.Strict, {indexer.ArgumentList});");
+                w.Line($"{indent2}\treturn ref _stub.{indexer.IndexerName}._refReturnBacking{invokeSuffix};");
                 w.Line($"{indent2}}}");
-                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeRefGet(_stub.Strict, {indexer.ArgumentList});");
+                w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeRefGet{invokeSuffix}(_stub.Strict, {indexer.ArgumentList});");
                 w.Line($"{indent2}return ref base[{indexer.ArgumentList}];");
             }
             w.Line($"{indent1}}}");
@@ -870,15 +874,15 @@ internal static class ClassRenderer
                     // Abstract: always use InvokeGet (no base to fall back to)
                     var defaultExpr = indexer.IsNullable ? "default" : GetDefaultForType(indexer.ReturnType, indexer.DefaultStrategy, indexer.ConcreteTypeForNew);
                     w.Line($"{indent2}if (_stub == null) return {defaultExpr};");
-                    w.Line($"{indent2}return _stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
+                    w.Line($"{indent2}return _stub.{indexer.IndexerName}.InvokeGet{invokeSuffix}(_stub.Strict, {indexer.ArgumentList});");
                 }
                 else
                 {
                     // Virtual: always track via InvokeGet, but also fall back to base if not configured
                     w.Line($"{indent2}if (_stub == null) return base[{indexer.ArgumentList}];");
-                    w.Line($"{indent2}if (_stub.{indexer.IndexerName}.IsConfigured) return _stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
+                    w.Line($"{indent2}if (_stub.{indexer.IndexerName}.IsConfigured) return _stub.{indexer.IndexerName}.InvokeGet{invokeSuffix}(_stub.Strict, {indexer.ArgumentList});");
                     // Not configured: track the unconfigured call, then return base value
-                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeGet(_stub.Strict, {indexer.ArgumentList});");
+                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeGet{invokeSuffix}(_stub.Strict, {indexer.ArgumentList});");
                     w.Line($"{indent2}return base[{indexer.ArgumentList}];");
                 }
                 w.Line($"{indent1}}}");
@@ -893,13 +897,13 @@ internal static class ClassRenderer
                 {
                     // Abstract: always use InvokeSet (no base to fall back to)
                     w.Line($"{indent2}if (_stub == null) return;");
-                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeSet(_stub.Strict, {indexer.ArgumentList}, value);");
+                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeSet{invokeSuffix}(_stub.Strict, {indexer.ArgumentList}, value);");
                 }
                 else
                 {
                     // Virtual: always track via InvokeSet, but also delegate to base if not configured
                     w.Line($"{indent2}if (_stub == null) {{ base[{indexer.ArgumentList}] = value; return; }}");
-                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeSet(_stub.Strict, {indexer.ArgumentList}, value);");
+                    w.Line($"{indent2}_stub.{indexer.IndexerName}.InvokeSet{invokeSuffix}(_stub.Strict, {indexer.ArgumentList}, value);");
                     w.Line($"{indent2}if (!_stub.{indexer.IndexerName}.IsConfigured) base[{indexer.ArgumentList}] = value;");
                 }
                 w.Line($"{indent1}}}");
@@ -1207,7 +1211,7 @@ internal static class ClassRenderer
             KeyType: indexer.KeyType,
             NullableKeyType: MakeNullable(indexer.KeyType),
             KeyParamName: "key", // Extracted from parameter declarations
-            SingleKeyType: indexer.KeyType.StartsWith("(") ? indexer.KeyType : indexer.KeyType, // Handle tuple keys
+            KeyTypeFriendlyName: Builder.UnifiedInterceptorBuilder.GetTypeSuffix(indexer.KeyType),
             ValueType: indexer.ReturnType,
             NullableValueType: MakeNullable(indexer.ReturnType),
             DefaultExpression: "default!",

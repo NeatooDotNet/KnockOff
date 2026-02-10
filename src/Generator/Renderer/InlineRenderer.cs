@@ -122,29 +122,22 @@ internal static class InlineRenderer
         }
 
         // Render indexer interceptor classes using shared renderer
-        foreach (var indexer in iface.Indexers)
+        // Group indexers by interceptor class name and render as a single multi-indexer interceptor
+        var indexersByClass = iface.Indexers.GroupBy(i => i.InterceptorClassName);
+        foreach (var group in indexersByClass)
         {
-            var unifiedModel = ModelAdapters.ToUnifiedIndexerModel(indexer);
-            // Use indexer-specific type parameters (may differ from interface-level for open generics)
+            var firstIndexer = group.First();
             var options = new IndexerInterceptorRenderOptions(
                 BaseIndent: 2,
                 IncludeStrictParameter: true,
                 StrictAccessExpression: "strict",
-                InterceptorTypeParameters: indexer.TypeParameterList,
-                InterceptorConstraints: indexer.ConstraintClauses);
-            IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, options);
+                InterceptorTypeParameters: firstIndexer.TypeParameterList,
+                InterceptorConstraints: firstIndexer.ConstraintClauses);
+            var unifiedModels = group.Select(ModelAdapters.ToUnifiedIndexerModel).ToList();
+            IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModels, options);
         }
 
         w.SetIndent(previousIndent);
-
-        // Render container classes for multi-indexer groups
-        foreach (var group in iface.IndexerGroups)
-        {
-            if (group.Indexers.Count > 1)
-            {
-                RenderIndexerContainerClass(w, group);
-            }
-        }
 
         // Use shared renderer for method interceptors
         // Set indent level for nested class context (inside partial class and Stubs class)
@@ -449,247 +442,8 @@ internal static class InlineRenderer
         w.Line();
     }
 
-    private static void RenderIndexerInterceptorClass(CodeWriter w, InlineIndexerModel indexer, string stubClassName)
-    {
-        var typeParamList = indexer.TypeParameterList;
-        var constraintClause = indexer.ConstraintClauses;
-
-        w.Line($"\t\t/// <summary>Interceptor for {stubClassName}.{indexer.IndexerName}.</summary>");
-        w.Line($"\t\tpublic sealed class {indexer.InterceptorClassName}{typeParamList}{constraintClause}");
-        w.Line("\t\t{");
-
-        // Verifiable state
-        w.Line("\t\t\tprivate bool _isVerifiable;");
-        w.Line("\t\t\tprivate global::KnockOff.Called? _verifiableTimes;");
-        w.Line("\t\t\tprivate bool _configured;");
-        w.Line();
-
-        if (indexer.HasGetter)
-        {
-            w.Line("\t\t\tprivate int _getCount;");
-            w.Line();
-            w.Line($"\t\t\t/// <summary>The last key used to access the getter.</summary>");
-            w.Line($"\t\t\tpublic {indexer.NullableKeyType} LastGetKey {{ get; private set; }}");
-            w.Line();
-            w.Line($"\t\t\tprivate global::System.Func<{indexer.ParameterTypes}, {indexer.ReturnType}>? _get;");
-            w.Line($"\t\t\t/// <summary>Callback for getter. Setting this marks the indexer as configured.</summary>");
-            w.Line($"\t\t\tpublic global::System.Func<{indexer.ParameterTypes}, {indexer.ReturnType}>? Get");
-            w.Line("\t\t\t{");
-            w.Line("\t\t\t\tget => _get;");
-            w.Line("\t\t\t\tset { _get = value; if (value != null) _configured = true; }");
-            w.Line("\t\t\t}");
-            w.Line();
-        }
-
-        if (indexer.HasSetter)
-        {
-            w.Line("\t\t\tprivate int _setCount;");
-            w.Line();
-            w.Line($"\t\t\t/// <summary>The last key-value pair passed to the setter.</summary>");
-            w.Line($"\t\t\tpublic ({indexer.KeyType} Key, {indexer.ReturnType} Value)? LastSetEntry {{ get; private set; }}");
-            w.Line();
-            w.Line($"\t\t\tprivate global::System.Action<{indexer.ParameterTypes}, {indexer.ReturnType}>? _set;");
-            w.Line($"\t\t\t/// <summary>Callback for setter. Setting this marks the indexer as configured.</summary>");
-            w.Line($"\t\t\tpublic global::System.Action<{indexer.ParameterTypes}, {indexer.ReturnType}>? Set");
-            w.Line("\t\t\t{");
-            w.Line("\t\t\t\tget => _set;");
-            w.Line("\t\t\t\tset { _set = value; if (value != null) _configured = true; }");
-            w.Line("\t\t\t}");
-            w.Line();
-        }
-
-        // RecordGet/RecordSet
-        if (indexer.HasGetter)
-        {
-            w.Line($"\t\t\t/// <summary>Records a getter access.</summary>");
-            w.Line($"\t\t\tpublic void RecordGet({indexer.ParameterSignature}) {{ _getCount++; LastGetKey = {indexer.KeyExpression}; }}");
-            w.Line();
-        }
-        if (indexer.HasSetter)
-        {
-            w.Line($"\t\t\t/// <summary>Records a setter access.</summary>");
-            w.Line($"\t\t\tpublic void RecordSet({indexer.ParameterSignature}, {indexer.ReturnType} value) {{ _setCount++; LastSetEntry = ({indexer.KeyExpression}, value); }}");
-            w.Line();
-        }
-
-        // Backing dictionary
-        w.Line($"\t\t\t/// <summary>Backing storage for this indexer.</summary>");
-        w.Line($"\t\t\tpublic global::System.Collections.Generic.Dictionary<{indexer.SingleKeyType}, {indexer.ReturnType}> Backing {{ get; }} = new();");
-        w.Line();
-
-        // Source field for Source(T) feature
-        if (!string.IsNullOrEmpty(indexer.DeclaringInterface))
-        {
-            w.Line($"\t\t\t/// <summary>Source object for delegation when Get/Set is not set.</summary>");
-            w.Line($"\t\t\tinternal {indexer.DeclaringInterface}? _source;");
-            w.Line();
-        }
-
-        // Reset method - clears tracking state but preserves configuration (Get/Set/Backing) and verifiable marking
-        w.Line("\t\t\t/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (Get, Set, Backing) and verifiable marking.</summary>");
-        var resetParts = new List<string>();
-        if (indexer.HasGetter) resetParts.Add("_getCount = 0; LastGetKey = default;");
-        if (indexer.HasSetter) resetParts.Add("_setCount = 0; LastSetEntry = default;");
-        if (!string.IsNullOrEmpty(indexer.DeclaringInterface)) resetParts.Add("_source = null;");
-        w.Line($"\t\t\tpublic void Reset() {{ {string.Join(" ", resetParts)} }}");
-        w.Line();
-
-        // Build total count expression based on available accessors
-        var totalCountExpr = indexer.HasGetter && indexer.HasSetter
-            ? "_getCount + _setCount"
-            : (indexer.HasGetter ? "_getCount" : "_setCount");
-
-        // Verifiable methods (fluent)
-        w.Line($"\t\t\t/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-        w.Line($"\t\t\tpublic {indexer.InterceptorClassName}{typeParamList} Verifiable() {{ _isVerifiable = true; _verifiableTimes = null; return this; }}");
-        w.Line();
-        w.Line($"\t\t\t/// <summary>Marks this indexer for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
-        w.Line($"\t\t\tpublic {indexer.InterceptorClassName}{typeParamList} Verifiable(global::KnockOff.Called times) {{ _isVerifiable = true; _verifiableTimes = times; return this; }}");
-        w.Line();
-
-        // Verify methods - throw on failure
-        w.Line("\t\t\t/// <summary>Verifies the indexer was accessed at least once. Throws VerificationException if not.</summary>");
-        w.Line("\t\t\tpublic void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
-        w.Line();
-
-        w.Line("\t\t\t/// <summary>Verifies total access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
-        w.Line("\t\t\tpublic void Verify(global::KnockOff.Called times)");
-        w.Line("\t\t\t{");
-        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
-        w.Line("\t\t\t\tif (!times.Validate(totalCount))");
-        w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", times, totalCount));");
-        w.Line("\t\t\t}");
-        w.Line();
-
-        // VerifyGet methods
-        if (indexer.HasGetter)
-        {
-            w.Line("\t\t\t/// <summary>Verifies the getter was accessed at least once. Throws VerificationException if not.</summary>");
-            w.Line("\t\t\tpublic void VerifyGet() => VerifyGet(global::KnockOff.Called.AtLeastOnce);");
-            w.Line();
-
-            w.Line("\t\t\t/// <summary>Verifies getter access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
-            w.Line("\t\t\tpublic void VerifyGet(global::KnockOff.Called times)");
-            w.Line("\t\t\t{");
-            w.Line("\t\t\t\tif (!times.Validate(_getCount))");
-            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (get)\", times, _getCount));");
-            w.Line("\t\t\t}");
-            w.Line();
-        }
-
-        // VerifySet methods
-        if (indexer.HasSetter)
-        {
-            w.Line("\t\t\t/// <summary>Verifies the setter was accessed at least once. Throws VerificationException if not.</summary>");
-            w.Line("\t\t\tpublic void VerifySet() => VerifySet(global::KnockOff.Called.AtLeastOnce);");
-            w.Line();
-
-            w.Line("\t\t\t/// <summary>Verifies setter access count satisfies the Called constraint. Throws VerificationException if not.</summary>");
-            w.Line("\t\t\tpublic void VerifySet(global::KnockOff.Called times)");
-            w.Line("\t\t\t{");
-            w.Line("\t\t\t\tif (!times.Validate(_setCount))");
-            w.Line($"\t\t\t\t\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"{indexer.IndexerName} (set)\", times, _setCount));");
-            w.Line("\t\t\t}");
-            w.Line();
-        }
-
-        // Internal verification support for stub-level Verify/VerifyAll
-        w.Line("\t\t\t/// <summary>Whether this indexer was marked with Verifiable().</summary>");
-        w.Line("\t\t\tinternal bool IsVerifiable => _isVerifiable;");
-        w.Line();
-
-        w.Line("\t\t\t/// <summary>Whether this indexer has been configured (callbacks registered).</summary>");
-        w.Line("\t\t\tinternal bool IsConfigured => _configured;");
-        w.Line();
-
-        w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
-        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerification()");
-        w.Line("\t\t\t{");
-        w.Line("\t\t\t\tif (!_isVerifiable) return null;");
-        w.Line("\t\t\t\tvar times = _verifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
-        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
-        w.Line($"\t\t\t\treturn times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", times, totalCount);");
-        w.Line("\t\t\t}");
-        w.Line();
-
-        w.Line("\t\t\t/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
-        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerificationAll()");
-        w.Line("\t\t\t{");
-        w.Line("\t\t\t\tif (!IsConfigured) return null;");
-        w.Line($"\t\t\t\tvar totalCount = {totalCountExpr};");
-        w.Line($"\t\t\t\treturn totalCount >= 1 ? null : new global::KnockOff.VerificationFailure(\"{indexer.IndexerName}\", global::KnockOff.Called.AtLeastOnce, totalCount);");
-        w.Line("\t\t\t}");
-
-        w.Line("\t\t}");
-        w.Line();
-    }
-
-    private static void RenderIndexerContainerClass(CodeWriter w, InlineIndexerGroup group)
-    {
-        // Deduplicate by KeyTypeFriendlyName - same key type shares the same interceptor in container
-        var uniqueByKeyType = group.Indexers
-            .GroupBy(i => i.KeyTypeFriendlyName)
-            .Select(g => g.First())
-            .ToList();
-
-        w.Line($"\t\t/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>");
-        w.Line($"\t\tpublic sealed class {group.ContainerClassName}");
-        w.Line("\t\t{");
-
-        // Of{KeyType} properties (container owns its interceptors)
-        foreach (var indexer in uniqueByKeyType)
-        {
-            w.Line($"\t\t\t/// <summary>Gets the interceptor for indexer with {indexer.KeyTypeFriendlyName} key type.</summary>");
-            w.Line($"\t\t\tpublic {indexer.InterceptorClassName}{indexer.TypeParameterList} Of{indexer.KeyTypeFriendlyName} {{ get; }} = new();");
-            w.Line();
-        }
-
-        // Reset method (resets all)
-        w.Line("\t\t\t/// <summary>Resets all indexer interceptors.</summary>");
-        w.Line("\t\t\tpublic void Reset()");
-        w.Line("\t\t\t{");
-        foreach (var indexer in uniqueByKeyType)
-        {
-            w.Line($"\t\t\t\tOf{indexer.KeyTypeFriendlyName}.Reset();");
-        }
-        w.Line("\t\t\t}");
-        w.Line();
-
-        // Internal verification support for stub-level Verify/VerifyAll
-        // Container aggregates verification from all indexer interceptors
-        w.Line("\t\t\tinternal bool IsVerifiable => false; // Container is not individually verifiable");
-
-        // Check if any contained interceptor is configured
-        var isConfiguredParts = uniqueByKeyType.Select(i => $"Of{i.KeyTypeFriendlyName}.IsConfigured").ToList();
-        w.Line($"\t\t\tinternal bool IsConfigured => {string.Join(" || ", isConfiguredParts)};");
-        w.Line();
-
-        w.Line("\t\t\t/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
-        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerification()");
-        w.Line("\t\t\t{");
-        // Container returns first failure from any contained interceptor
-        foreach (var indexer in uniqueByKeyType)
-        {
-            w.Line($"\t\t\t\tif (Of{indexer.KeyTypeFriendlyName}.CheckVerification() is {{ }} failure{indexer.KeyTypeFriendlyName}) return failure{indexer.KeyTypeFriendlyName};");
-        }
-        w.Line("\t\t\t\treturn null;");
-        w.Line("\t\t\t}");
-        w.Line();
-
-        w.Line("\t\t\t/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
-        w.Line("\t\t\tinternal global::KnockOff.VerificationFailure? CheckVerificationAll()");
-        w.Line("\t\t\t{");
-        // Container returns first failure from any contained interceptor
-        foreach (var indexer in uniqueByKeyType)
-        {
-            w.Line($"\t\t\t\tif (Of{indexer.KeyTypeFriendlyName}.CheckVerificationAll() is {{ }} failure{indexer.KeyTypeFriendlyName}) return failure{indexer.KeyTypeFriendlyName};");
-        }
-        w.Line("\t\t\t\treturn null;");
-        w.Line("\t\t\t}");
-
-        w.Line("\t\t}");
-        w.Line();
-    }
+    // NOTE: RenderIndexerInterceptorClass has been removed.
+    // Indexer interceptors now use the shared IndexerInterceptorRenderer.RenderInterceptorClass.
 
     // NOTE: RenderMethodInterceptorClass has been removed.
     // Method interceptors now use the shared MethodInterceptorRenderer.RenderInterceptorClass.
@@ -1220,6 +974,8 @@ internal static class InlineRenderer
 
     private static void RenderIndexerImplementation(CodeWriter w, InlineInterfaceImplementation impl)
     {
+        var invokeSuffix = impl.InvokeSuffix;
+
         w.Line($"\t\t\t{impl.RefReturnPrefix}{impl.ReturnType} {impl.InterfaceFullName}.this[{impl.ParameterDeclarations}]");
         w.Line("\t\t\t{");
 
@@ -1228,8 +984,8 @@ internal static class InlineRenderer
             // Ref return indexers are always get-only (C# constraint)
             w.Line("\t\t\t\tget");
             w.Line("\t\t\t\t{");
-            w.Line($"\t\t\t\t\t{impl.InterceptorName}.InvokeRefGet(Strict, {impl.ArgumentList});");
-            w.Line($"\t\t\t\t\treturn ref {impl.InterceptorName}._refReturnBacking;");
+            w.Line($"\t\t\t\t\t{impl.InterceptorName}.InvokeRefGet{invokeSuffix}(Strict, {impl.ArgumentList});");
+            w.Line($"\t\t\t\t\treturn ref {impl.InterceptorName}._refReturnBacking{invokeSuffix};");
             w.Line("\t\t\t\t}");
         }
         else
@@ -1237,14 +993,14 @@ internal static class InlineRenderer
             if (impl.HasGetter)
             {
                 // Use InvokeGet which handles the priority chain
-                w.Line($"\t\t\t\tget => {impl.InterceptorName}.InvokeGet(Strict, {impl.ArgumentList});");
+                w.Line($"\t\t\t\tget => {impl.InterceptorName}.InvokeGet{invokeSuffix}(Strict, {impl.ArgumentList});");
             }
 
             if (impl.HasSetter)
             {
                 // Use InvokeSet which handles the priority chain
                 var setterKeyword = impl.IsInitOnly ? "init" : "set";
-                w.Line($"\t\t\t\t{setterKeyword} => {impl.InterceptorName}.InvokeSet(Strict, {impl.ArgumentList}, value);");
+                w.Line($"\t\t\t\t{setterKeyword} => {impl.InterceptorName}.InvokeSet{invokeSuffix}(Strict, {impl.ArgumentList}, value);");
             }
         }
 

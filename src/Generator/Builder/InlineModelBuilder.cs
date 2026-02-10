@@ -97,22 +97,30 @@ internal static class InlineModelBuilder
         // Group methods by name for overload handling
         var (methodGroups, memberKeyToGroupName) = GroupMethodsByName(iface.Members.Where(m => !m.IsProperty && !m.IsIndexer));
 
-        // Count indexers for naming strategy
-        var indexerCount = SymbolHelpers.CountIndexers(iface.Members);
-
-        // Deduplicate property/indexer members by name for interceptor class generation
+        // Deduplicate property/indexer members for interceptor class generation
+        // Properties dedup by name; indexers dedup by key type (all share interceptor name "Indexer")
         var processedPropertyNames = new HashSet<string>();
+        var processedIndexerKeys = new HashSet<string>();
         var deduplicatedPropertyMembers = new List<InterfaceMemberInfo>();
         foreach (var member in iface.Members)
         {
             if (member.IsProperty || member.IsIndexer)
             {
-                var memberName = member.IsIndexer
-                    ? SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix)
-                    : member.Name;
-                if (processedPropertyNames.Add(memberName))
+                if (member.IsIndexer)
                 {
-                    deduplicatedPropertyMembers.Add(member);
+                    // Deduplicate indexers by their key type signature (different key types = different indexers)
+                    var indexerKey = string.Join(",", member.IndexerParameters.Select(p => p.Type));
+                    if (processedIndexerKeys.Add(indexerKey))
+                    {
+                        deduplicatedPropertyMembers.Add(member);
+                    }
+                }
+                else
+                {
+                    if (processedPropertyNames.Add(member.Name))
+                    {
+                        deduplicatedPropertyMembers.Add(member);
+                    }
                 }
             }
         }
@@ -145,7 +153,7 @@ internal static class InlineModelBuilder
         {
             if (member.IsIndexer)
             {
-                indexers.Add(BuildIndexerModel(member, stubClassName, indexerCount, typeParamList, constraintClause));
+                indexers.Add(BuildIndexerModel(member, stubClassName, typeParamList, constraintClause));
             }
             else
             {
@@ -184,24 +192,26 @@ internal static class InlineModelBuilder
             events.Add(BuildEventModel(evt, stubClassName, typeParamList, constraintClause));
         }
 
-        // Group indexers for OfXxx pattern
-        var indexerGroups = GroupIndexers(indexers);
-
-        // Build indexer access map for implementations and source providers
-        var indexerAccessMap = BuildIndexerAccessMap(indexerGroups);
+        // Build indexer access map: interceptor name -> property access expression (no container)
+        var indexerAccessMap = new Dictionary<string, string>();
+        foreach (var idx in indexers)
+        {
+            if (!indexerAccessMap.ContainsKey(idx.IndexerName))
+                indexerAccessMap[idx.IndexerName] = idx.IndexerName;
+        }
 
         // Build interceptor properties
         var interceptorProperties = BuildInterceptorProperties(
             deduplicatedPropertyMembers, methodGroups, deduplicatedEvents,
-            stubClassName, indexerCount, typeParamList, indexerGroups);
+            stubClassName, typeParamList, indexers);
 
         // Build implementations with indexer access map
-        var implementations = BuildImplementations(iface, methodGroups, memberKeyToGroupName, indexerCount, baseType, typeParamList, indexerAccessMap);
+        var implementations = BuildImplementations(iface, methodGroups, memberKeyToGroupName, baseType, typeParamList, indexerAccessMap);
 
         var hasGenericMethods = genericHandlers.Count > 0 || iface.Members.Any(m => m.IsGenericMethod);
 
         // Build source providers for Source(T) methods
-        var sourceProviders = BuildSourceProviders(iface, properties, indexers, indexerGroups, methods, methodGroups, stubClassName, typeParamList);
+        var sourceProviders = BuildSourceProviders(iface, properties, indexers, methods, methodGroups, stubClassName, typeParamList);
 
         return new InlineInterfaceStubModel(
             StubClassName: stubClassName,
@@ -213,7 +223,6 @@ internal static class InlineModelBuilder
             HasGenericMethods: hasGenericMethods,
             Properties: properties.ToEquatableArray(),
             Indexers: indexers.ToEquatableArray(),
-            IndexerGroups: indexerGroups.ToEquatableArray(),
             Methods: methods.ToEquatableArray(),
             GenericMethodHandlers: genericHandlers.ToEquatableArray(),
             Events: events.ToEquatableArray(),
@@ -254,20 +263,16 @@ internal static class InlineModelBuilder
     private static InlineIndexerModel BuildIndexerModel(
         InterfaceMemberInfo member,
         string stubClassName,
-        int indexerCount,
         string typeParamList,
         string constraintClause)
     {
-        var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
+        // All indexers share a single interceptor class named "Indexer"
+        var indexerName = "Indexer";
         var interceptClassName = $"{stubClassName}_{indexerName}Interceptor";
 
         var keyType = member.IndexerParameters.Count == 1
             ? member.IndexerParameters.GetArray()![0].Type
             : $"({string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"))})";
-
-        var singleKeyType = member.IndexerParameters.Count == 1
-            ? member.IndexerParameters.GetArray()![0].Type
-            : keyType;
 
         var paramSig = string.Join(", ", member.IndexerParameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}"));
         var paramTypes = string.Join(", ", member.IndexerParameters.Select(p => p.Type));
@@ -280,7 +285,7 @@ internal static class InlineModelBuilder
             ? SymbolHelpers.ReplaceUnboundGeneric(member.DeclaringInterfaceFullName, typeParamList)
             : member.DeclaringInterfaceFullName;
 
-        // Compute KeyTypeFriendlyName for OfXxx pattern
+        // Compute KeyTypeFriendlyName for type-suffixed invoke methods in multi-indexer
         var keyTypeFriendlyName = member.IndexerParameters.Count == 1
             ? UnifiedInterceptorBuilder.GetTypeSuffix(member.IndexerParameters.GetArray()![0].Type)
             : string.Join("_", member.IndexerParameters.Select(p => UnifiedInterceptorBuilder.GetTypeSuffix(p.Type)));
@@ -290,7 +295,6 @@ internal static class InlineModelBuilder
             IndexerName: indexerName,
             ReturnType: member.ReturnType,
             KeyType: keyType,
-            SingleKeyType: singleKeyType,
             NullableKeyType: MakeNullable(keyType),
             HasGetter: member.HasGetter,
             HasSetter: member.HasSetter,
@@ -589,11 +593,11 @@ internal static class InlineModelBuilder
         Dictionary<string, MethodGroupInfo> methodGroups,
         List<EventMemberInfo> events,
         string stubClassName,
-        int indexerCount,
         string typeParamList,
-        List<InlineIndexerGroup> indexerGroups)
+        List<InlineIndexerModel> indexers)
     {
         var properties = new List<InlineInterceptorPropertyModel>();
+        var renderedIndexerProperties = new HashSet<string>();
 
         // Property interceptors (non-indexer properties)
         foreach (var member in propertyMembers.Where(m => !m.IsIndexer))
@@ -607,28 +611,16 @@ internal static class InlineModelBuilder
                 Description: $"Interceptor for {member.Name}."));
         }
 
-        // Indexer interceptors - use groups for proper OfXxx pattern
-        foreach (var group in indexerGroups)
+        // Indexer interceptors - each gets its own property (no container)
+        foreach (var indexer in indexers)
         {
-            if (group.Indexers.Count == 1)
-            {
-                // Single indexer - direct property
-                var indexer = group.Indexers.GetArray()![0];
-                properties.Add(new InlineInterceptorPropertyModel(
-                    PropertyName: group.BaseName,
-                    InterceptorTypeName: $"{indexer.InterceptorClassName}{typeParamList}",
-                    NeedsNewKeyword: group.NeedsNewKeyword,
-                    Description: $"Interceptor for indexer."));
-            }
-            else
-            {
-                // Multiple indexers - container property
-                properties.Add(new InlineInterceptorPropertyModel(
-                    PropertyName: group.BaseName,
-                    InterceptorTypeName: group.ContainerClassName,
-                    NeedsNewKeyword: group.NeedsNewKeyword,
-                    Description: $"Container for indexer interceptors. Access via .OfXxx."));
-            }
+            if (!renderedIndexerProperties.Add(indexer.IndexerName))
+                continue;
+            properties.Add(new InlineInterceptorPropertyModel(
+                PropertyName: indexer.IndexerName,
+                InterceptorTypeName: $"{indexer.InterceptorClassName}{typeParamList}",
+                NeedsNewKeyword: false,
+                Description: $"Interceptor for indexer."));
         }
 
         // Method interceptors
@@ -682,7 +674,6 @@ internal static class InlineModelBuilder
         InterfaceInfo iface,
         Dictionary<string, MethodGroupInfo> methodGroups,
         Dictionary<string, string> memberKeyToGroupName,
-        int indexerCount,
         string baseType,
         string typeParamList,
         Dictionary<string, string> indexerAccessMap)
@@ -700,7 +691,7 @@ internal static class InlineModelBuilder
 
             if (member.IsIndexer)
             {
-                implementations.Add(BuildIndexerImplementation(member, memberIfaceName, simpleIfaceName, indexerCount, iface, indexerAccessMap));
+                implementations.Add(BuildIndexerImplementation(member, memberIfaceName, simpleIfaceName, iface, indexerAccessMap));
             }
             else if (member.IsProperty)
             {
@@ -808,11 +799,11 @@ internal static class InlineModelBuilder
         InterfaceMemberInfo member,
         string interfaceFullName,
         string simpleIfaceName,
-        int indexerCount,
         InterfaceInfo iface,
         Dictionary<string, string> indexerAccessMap)
     {
-        var indexerName = SymbolHelpers.GetIndexerName(indexerCount, member.IndexerTypeSuffix);
+        // All indexers share a single interceptor named "Indexer"
+        var indexerName = "Indexer";
         var paramList = string.Join(", ", member.IndexerParameters.Select(p => $"{GetRefKindPrefix(p.RefKind)}{p.Type} {p.Name}"));
         var argList = string.Join(", ", member.IndexerParameters.Select(p => p.Name));
         var keyArg = member.IndexerParameters.Count == 1
@@ -823,10 +814,16 @@ internal static class InlineModelBuilder
             ? "default"
             : GetDefaultForType(member.ReturnType, member.DefaultStrategy, member.ConcreteTypeForNew);
 
-        // Use access map to get correct interceptor path (e.g., "Indexer" or "Indexer.OfString")
+        // Use access map to get correct interceptor path
         var interceptorAccessPath = indexerAccessMap.TryGetValue(indexerName, out var path)
             ? path
             : indexerName;
+
+        // Compute invoke suffix for multi-indexer (type-suffixed InvokeGet/InvokeSet)
+        var indexerCount = SymbolHelpers.CountIndexers(iface.Members);
+        var invokeSuffix = indexerCount > 1
+            ? $"_{UnifiedInterceptorBuilder.GetTypeSuffix(member.IndexerParameters.Count == 1 ? member.IndexerParameters.GetArray()![0].Type : $"({string.Join(", ", member.IndexerParameters.Select(p => $"{p.Type} {p.Name}"))})")}"
+            : "";
 
         return new InlineInterfaceImplementation(
             Kind: InlineMemberKind.Indexer,
@@ -841,7 +838,7 @@ internal static class InlineModelBuilder
             InterceptorName: interceptorAccessPath,
             ParameterDeclarations: paramList,
             ArgumentList: argList,
-            InvokeSuffix: "",  // Indexers don't use invoke suffix
+            InvokeSuffix: invokeSuffix,
             RecordCallArgs: argList,
             CallArgs: argList,
             DefaultExpression: defaultExpr,
@@ -1755,56 +1752,6 @@ internal static class InlineModelBuilder
         return "";
     }
 
-    /// <summary>
-    /// Groups indexers by base name for OfXxx pattern.
-    /// For inline stubs, the base name is always "Indexer".
-    /// </summary>
-    private static List<InlineIndexerGroup> GroupIndexers(List<InlineIndexerModel> indexers)
-    {
-        // For inline stubs, all indexers share the same base name "Indexer"
-        if (indexers.Count == 0)
-            return new List<InlineIndexerGroup>();
-
-        return new List<InlineIndexerGroup>
-        {
-            new InlineIndexerGroup(
-                BaseName: "Indexer",
-                ContainerClassName: "IndexerContainer",
-                NeedsNewKeyword: false,
-                Indexers: indexers.ToEquatableArray())
-        };
-    }
-
-    /// <summary>
-    /// Builds a map from indexer InterceptorName to the access path (e.g., "Indexer" or "Indexer.OfString").
-    /// </summary>
-    private static Dictionary<string, string> BuildIndexerAccessMap(List<InlineIndexerGroup> groups)
-    {
-        var map = new Dictionary<string, string>();
-
-        foreach (var group in groups)
-        {
-            var indexerArray = group.Indexers.GetArray();
-            if (indexerArray == null) continue;
-
-            if (group.Indexers.Count == 1)
-            {
-                // Single indexer - direct access
-                map[indexerArray[0].IndexerName] = group.BaseName;
-            }
-            else
-            {
-                // Multiple indexers - container with OfXxx pattern
-                foreach (var indexer in indexerArray)
-                {
-                    map[indexer.IndexerName] = $"{group.BaseName}.Of{indexer.KeyTypeFriendlyName}";
-                }
-            }
-        }
-
-        return map;
-    }
-
     #endregion
 
     #region Source Provider Building
@@ -1817,7 +1764,6 @@ internal static class InlineModelBuilder
         InterfaceInfo iface,
         List<InlinePropertyModel> properties,
         List<InlineIndexerModel> indexers,
-        List<InlineIndexerGroup> indexerGroups,
         List<UnifiedMethodInterceptorModel> methods,
         Dictionary<string, MethodGroupInfo> methodGroups,
         string stubClassName,
@@ -1828,9 +1774,6 @@ internal static class InlineModelBuilder
             typeParamList.Length > 0
                 ? SymbolHelpers.ReplaceUnboundGeneric(interfaceName, typeParamList)
                 : interfaceName;
-
-        // Build indexer access map for proper source paths
-        var indexerAccessMap = BuildIndexerAccessMap(indexerGroups);
 
         // Collect all unique interceptor names with their declaring interfaces
         var interceptorToDeclaringInterface = new Dictionary<string, string>();
@@ -1849,16 +1792,13 @@ internal static class InlineModelBuilder
             }
         }
 
-        // For indexers, use the access path from indexerAccessMap
+        // For indexers, use the indexer name directly (no container indirection)
         foreach (var indexer in indexers)
         {
-            var accessPath = indexerAccessMap.TryGetValue(indexer.IndexerName, out var path)
-                ? path
-                : indexer.IndexerName;
             var member = iface.Members.FirstOrDefault(m => m.IsIndexer);
-            if (member != null && !interceptorToDeclaringInterface.ContainsKey(accessPath))
+            if (member != null && !interceptorToDeclaringInterface.ContainsKey(indexer.IndexerName))
             {
-                interceptorToDeclaringInterface[accessPath] = ToBindGeneric(member.DeclaringInterfaceFullName);
+                interceptorToDeclaringInterface[indexer.IndexerName] = ToBindGeneric(member.DeclaringInterfaceFullName);
             }
         }
 

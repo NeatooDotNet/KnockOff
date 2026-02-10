@@ -246,7 +246,7 @@ internal sealed record InlineClassImplPropertyModel(
 /// Model for an indexer override in the Impl class.
 /// </summary>
 internal sealed record InlineClassImplIndexerModel(
-    /// <summary>The indexer name (e.g., "Indexer", "IndexerString").</summary>
+    /// <summary>The indexer name (always "Indexer" -- all indexers share one interceptor).</summary>
     string IndexerName,
     /// <summary>The return type.</summary>
     string ReturnType,
@@ -270,6 +270,8 @@ internal sealed record InlineClassImplIndexerModel(
     DefaultValueStrategy DefaultStrategy,
     /// <summary>Concrete type for new() if applicable.</summary>
     string? ConcreteTypeForNew,
+    /// <summary>Invoke suffix for type-suffixed methods in multi-indexer (e.g., "_String", "_Int32"). Empty for single-indexer.</summary>
+    string InvokeSuffix = "",
     // Ref return support
     /// <summary>True if the indexer returns by ref (ref T).</summary>
     bool ReturnsByRef = false,

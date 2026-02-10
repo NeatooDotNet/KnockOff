@@ -459,19 +459,19 @@ public class IndexerConfigTests
         var stub = new DictStub();
 
         #region skill-indexer-config
-        // Use Backing dictionary for simple cases
-        stub.Indexer.Backing["key1"] = "value1";
-        stub.Indexer.Backing["key2"] = "value2";
+        // Use per-key Returns for specific keys
+        stub.Indexer["key1"].Returns("value1");
+        stub.Indexer["key2"].Returns("value2");
 
-        // Or use callbacks
+        // Or use callbacks as fallback for unconfigured keys
         stub.Indexer.Get((key) => $"computed-{key}");
         stub.Indexer.Set((key, value) => { /* handle */ });
 
-        // Note: Get/Set override Backing - they don't work together
+        // Per-key Returns takes priority over Get callback
         #endregion
 
         IDict dict = stub;
-        Assert.Equal("computed-key1", dict["key1"]); // Get overrides Backing
+        Assert.Equal("value1", dict["key1"]); // Per-key Returns wins
     }
 }
 

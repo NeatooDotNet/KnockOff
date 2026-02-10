@@ -135,7 +135,7 @@ service.Name = "test";
 | Stub Override | Counts, LastArg | **Return/Call configuration**, verifiable flag |
 | Property | Get/set counts, LastSetValue, sequence index, source delegation | **Get/Set callbacks**, verifiable flag |
 | Stub Override Property | Get/set counts, LastSetValue | **Get/Set configuration**, verifiable flag |
-| Indexer | Get/set counts, LastGetKey, LastSetEntry | **Backing dictionary**, Get/Set callbacks |
+| Indexer | Get/set counts, LastGetKey, LastSetEntry | **Per-key Returns**, Get/Set callbacks |
 | Delegate | Counts, LastArg/LastArgs, sequence index, When chain position | **Return/Call callbacks**, sequence structure, verifiable flag |
 | Event | Tracking counts | **Active subscribers**, verifiable flag |
 
@@ -361,15 +361,15 @@ stub.Counter.Get(() => 1).ThenGet(() => 2).ThenGet(() => 3);
 
 <!-- snippet: skill-indexer-config -->
 ```cs
-// Use Backing dictionary for simple cases
-stub.Indexer.Backing["key1"] = "value1";
-stub.Indexer.Backing["key2"] = "value2";
+// Use per-key Returns for specific keys
+stub.Indexer["key1"].Returns("value1");
+stub.Indexer["key2"].Returns("value2");
 
-// Or use callbacks
+// Or use callbacks as fallback for unconfigured keys
 stub.Indexer.Get((key) => $"computed-{key}");
 stub.Indexer.Set((key, value) => { /* handle */ });
 
-// Note: Get/Set override Backing - they don't work together
+// Per-key Returns takes priority over Get callback
 ```
 <!-- endSnippet -->
 

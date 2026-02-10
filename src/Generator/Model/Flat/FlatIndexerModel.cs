@@ -22,10 +22,8 @@ internal sealed record FlatIndexerModel(
     bool HasSetter,
     string SimpleInterfaceName,
     bool NeedsNewKeyword,
-    /// <summary>Friendly name for the key type (e.g., "Int32", "String") for OfXxx pattern.</summary>
+    /// <summary>Friendly name for the key type (e.g., "Int32", "String") for type-suffixed invoke methods.</summary>
     string KeyTypeFriendlyName,
-    /// <summary>Base name for indexer grouping (e.g., "Indexer").</summary>
-    string BaseName,
 
     // Multi-param indexer support
     /// <summary>Parameter declarations for the indexer (e.g., "int a, string b").</summary>

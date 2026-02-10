@@ -16,8 +16,6 @@ internal sealed record InlineIndexerModel(
     string ReturnType,
     /// <summary>The key type (single type or tuple for multiple parameters).</summary>
     string KeyType,
-    /// <summary>The single key type for dictionary backing.</summary>
-    string SingleKeyType,
     /// <summary>The nullable key type.</summary>
     string NullableKeyType,
     /// <summary>Whether the indexer has a getter.</summary>

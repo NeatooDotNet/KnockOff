@@ -84,20 +84,15 @@ internal static class FlatRenderer
 				BaseIndent: 0,
 				IncludeStrictParameter: true,
 				StrictAccessExpression: "strict");
-			foreach (var indexer in unit.Indexers)
+			// Group indexers by interceptor class name and render as a single multi-indexer interceptor
+			var indexersByClass = unit.Indexers.GroupBy(i => i.InterceptorClassName);
+			foreach (var group in indexersByClass)
 			{
-				if (renderedInterceptorClasses.Add(indexer.InterceptorClassName))
+				if (renderedInterceptorClasses.Add(group.Key))
 				{
-					var unifiedModel = ModelAdapters.ToUnifiedIndexerModel(indexer);
-					IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModel, indexerOptions);
+					var unifiedModels = group.Select(ModelAdapters.ToUnifiedIndexerModel).ToList();
+					IndexerInterceptorRenderer.RenderInterceptorClass(w, unifiedModels, indexerOptions);
 				}
-			}
-
-			// Render indexer container classes for groups with multiple indexers
-			foreach (var group in unit.IndexerGroups)
-			{
-				if (group.Indexers.Count > 1 && renderedInterceptorClasses.Add(group.ContainerClassName))
-					RenderIndexerContainerClass(w, group);
 			}
 
 			// Render method interceptor classes using groups (handles overloads)
@@ -179,15 +174,30 @@ internal static class FlatRenderer
 					            g.TypeArityGroups.Any(a => a.SignatureGroups.Count > 1))
 					.Select(g => g.InterceptorName));
 
-			// Build indexer access map for multi-indexer groups
-			var indexerAccessMap = BuildIndexerAccessMap(unit.IndexerGroups);
+			// Determine which interceptor names are multi-indexer (more than one UNIQUE key type)
+			// Diamond-inherited indexers with the same key type count as one.
+			var multiIndexerInterceptors = new HashSet<string>();
+			{
+				var keyTypesByName = new Dictionary<string, HashSet<string>>();
+				foreach (var indexer in unit.Indexers)
+				{
+					if (!keyTypesByName.ContainsKey(indexer.InterceptorName))
+						keyTypesByName[indexer.InterceptorName] = new HashSet<string>();
+					keyTypesByName[indexer.InterceptorName].Add(indexer.KeyTypeFriendlyName);
+				}
+				foreach (var kvp in keyTypesByName)
+				{
+					if (kvp.Value.Count > 1)
+						multiIndexerInterceptors.Add(kvp.Key);
+				}
+			}
 
 			// Explicit interface implementations (NOT deduplicated - one per interface member)
 			foreach (var prop in unit.Properties)
 				RenderPropertyImplementation(w, prop);
 
 			foreach (var indexer in unit.Indexers)
-				RenderIndexerImplementation(w, indexer, indexerAccessMap);
+				RenderIndexerImplementation(w, indexer, multiIndexerInterceptors);
 
 			foreach (var method in unit.Methods)
 				RenderMethodImplementation(w, method, multiOverloadInterceptors, multiOverloadStubOverrideInterceptors, multiOverloadGenericStubOverrideInterceptors, unit.GenericStubOverrideHandlerGroups);
@@ -427,40 +437,6 @@ internal static class FlatRenderer
 		}
 		w.Line();
 	}
-
-	#region Indexer Access Helpers
-
-	/// <summary>
-	/// Builds a map from indexer InterceptorName to the property access expression.
-	/// For single-indexer groups: "Indexer"
-	/// For multi-indexer groups: "Indexer.OfInt32", "Indexer.OfString", etc.
-	/// </summary>
-	private static Dictionary<string, string> BuildIndexerAccessMap(EquatableArray<FlatIndexerGroup> groups)
-	{
-		var map = new Dictionary<string, string>();
-
-		foreach (var group in groups)
-		{
-			if (group.Indexers.Count == 1)
-			{
-				// Single indexer - direct access
-				var indexer = group.Indexers.GetArray()![0];
-				map[indexer.InterceptorName] = group.BaseName;
-			}
-			else
-			{
-				// Multiple indexers - container with OfXxx pattern
-				foreach (var indexer in group.Indexers)
-				{
-					map[indexer.InterceptorName] = $"{group.BaseName}.Of{indexer.KeyTypeFriendlyName}";
-				}
-			}
-		}
-
-		return map;
-	}
-
-	#endregion
 
 	#region Type Parameter Formatting
 
@@ -822,262 +798,6 @@ internal static class FlatRenderer
 
 		// For NewInstance strategy, the expression will be like "new SomeType()"
 		return $" = {defaultExpression};";
-	}
-
-	#endregion
-
-	#region Indexer Container Class (for OfXxx pattern)
-
-	private static void RenderIndexerContainerClass(CodeWriter w, FlatIndexerGroup group)
-	{
-		// Deduplicate by KeyTypeFriendlyName - same key type shares the same interceptor in container
-		var uniqueByKeyType = group.Indexers
-			.GroupBy(i => i.KeyTypeFriendlyName)
-			.Select(g => g.First())
-			.ToList();
-
-		w.Line($"/// <summary>Container for indexer interceptors with OfXxx access pattern.</summary>");
-		using (w.Block($"public sealed class {group.ContainerClassName}"))
-		{
-			// Of{KeyType} properties (container owns its interceptors)
-			foreach (var indexer in uniqueByKeyType)
-			{
-				w.Line($"/// <summary>Gets the interceptor for indexer with {indexer.KeyTypeFriendlyName} key type.</summary>");
-				w.Line($"public {indexer.InterceptorClassName} Of{indexer.KeyTypeFriendlyName} {{ get; }} = new();");
-				w.Line();
-			}
-
-			// Reset method (resets all)
-			w.Line("/// <summary>Resets all indexer interceptors.</summary>");
-			using (w.Block("public void Reset()"))
-			{
-				foreach (var indexer in uniqueByKeyType)
-				{
-					w.Line($"Of{indexer.KeyTypeFriendlyName}.Reset();");
-				}
-			}
-			w.Line();
-
-			// Internal verification support for stub-level Verify/VerifyAll
-			// Container aggregates verification from all indexer interceptors
-			w.Line("internal bool IsVerifiable => false; // Container is not individually verifiable");
-
-			// Check if any contained interceptor is configured
-			var isConfiguredParts = uniqueByKeyType.Select(i => $"Of{i.KeyTypeFriendlyName}.IsConfigured").ToList();
-			w.Line($"internal bool IsConfigured => {string.Join(" || ", isConfiguredParts)};");
-			w.Line();
-
-			w.Line("/// <summary>Checks verification for Stub.Verify() - only checks if marked verifiable.</summary>");
-			w.Line("internal global::KnockOff.VerificationFailure? CheckVerification()");
-			using (w.Braces())
-			{
-				// Container returns first failure from any contained interceptor
-				foreach (var indexer in uniqueByKeyType)
-				{
-					w.Line($"if (Of{indexer.KeyTypeFriendlyName}.CheckVerification() is {{ }} failure{indexer.KeyTypeFriendlyName}) return failure{indexer.KeyTypeFriendlyName};");
-				}
-				w.Line("return null;");
-			}
-			w.Line();
-
-			w.Line("/// <summary>Checks verification for Stub.VerifyAll() - checks if configured.</summary>");
-			w.Line("internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
-			using (w.Braces())
-			{
-				// Container returns first failure from any contained interceptor
-				foreach (var indexer in uniqueByKeyType)
-				{
-					w.Line($"if (Of{indexer.KeyTypeFriendlyName}.CheckVerificationAll() is {{ }} failure{indexer.KeyTypeFriendlyName}) return failure{indexer.KeyTypeFriendlyName};");
-				}
-				w.Line("return null;");
-			}
-		}
-		w.Line();
-	}
-
-	#endregion
-
-	#region Indexer Interceptor Class
-
-	private static void RenderIndexerInterceptorClass(CodeWriter w, FlatIndexerModel indexer, string className)
-	{
-		w.Line($"/// <summary>Tracks and configures behavior for indexer.</summary>");
-		using (w.Block($"public sealed class {indexer.InterceptorClassName}"))
-		{
-			// Source field for Source(T) feature - uses declaring interface type
-			w.Line($"/// <summary>Source object to delegate to when no Get/Set is configured.</summary>");
-			w.Line($"internal {indexer.DeclaringInterface}? _source;");
-			w.Line();
-
-			if (indexer.HasGetter)
-			{
-				w.Line("private int _getCount;");
-				w.Line();
-
-				w.Line("/// <summary>The key from the most recent getter access.</summary>");
-				w.Line($"public {indexer.NullableKeyType} LastGetKey {{ get; private set; }}");
-				w.Line();
-
-				w.Line("/// <summary>Callback invoked when the getter is accessed.</summary>");
-				w.Line($"public global::System.Func<{indexer.KeyType}, {indexer.ReturnType}>? Get {{ get; set; }}");
-				w.Line();
-			}
-
-			if (indexer.HasSetter)
-			{
-				w.Line("private int _setCount;");
-				w.Line();
-
-				w.Line("/// <summary>The key and value from the most recent setter call.</summary>");
-				w.Line($"public ({indexer.NullableKeyType} Key, {indexer.NullableReturnType} Value)? LastSetEntry {{ get; private set; }}");
-				w.Line();
-
-				w.Line("/// <summary>Callback invoked when the setter is accessed.</summary>");
-				w.Line($"public global::System.Action<{indexer.KeyType}, {indexer.ReturnType}>? Set {{ get; set; }}");
-				w.Line();
-			}
-
-			if (indexer.HasGetter)
-			{
-				w.Line("/// <summary>Records a getter access.</summary>");
-				w.Line($"public void RecordGet({indexer.NullableKeyType} {indexer.KeyParamName}) {{ _getCount++; LastGetKey = {indexer.KeyParamName}; }}");
-				w.Line();
-			}
-
-			if (indexer.HasSetter)
-			{
-				w.Line("/// <summary>Records a setter access.</summary>");
-				w.Line($"public void RecordSet({indexer.NullableKeyType} {indexer.KeyParamName}, {indexer.NullableReturnType} value) {{ _setCount++; LastSetEntry = ({indexer.KeyParamName}, value); }}");
-				w.Line();
-			}
-
-			// Backing dictionary
-			w.Line($"/// <summary>Backing storage for this indexer.</summary>");
-			w.Line($"public global::System.Collections.Generic.Dictionary<{indexer.KeyType}, {indexer.ReturnType}> Backing {{ get; }} = new();");
-			w.Line();
-
-			// Reset method - clears tracking state but preserves configuration (Get/Set/Backing) and verifiable marking
-			w.Line("/// <summary>Resets tracking state (counts, LastGetKey, LastSetEntry) but preserves configuration (Get, Set, Backing) and verifiable marking.</summary>");
-			var resetParts = new System.Collections.Generic.List<string>();
-			if (indexer.HasGetter) resetParts.Add("_getCount = 0; LastGetKey = default;");
-			if (indexer.HasSetter) resetParts.Add("_setCount = 0; LastSetEntry = null;");
-			resetParts.Add("_source = null;");
-			// Note: Backing dictionary is intentionally NOT cleared - pre-populated data is preserved
-			w.Line($"public void Reset() {{ {string.Join(" ", resetParts)} }}");
-			w.Line();
-
-			// Verification API for indexers
-			w.Line("private bool _isVerifiable;");
-			w.Line("private global::KnockOff.Called? _verifiableTimes;");
-			w.Line();
-
-			if (indexer.HasGetter)
-			{
-				w.Line("/// <summary>Verifies the indexer getter was accessed at least once.</summary>");
-				w.Line("public void VerifyGet() => VerifyGet(global::KnockOff.Called.AtLeastOnce);");
-				w.Line();
-
-				w.Line("/// <summary>Verifies the indexer getter access count matches the Called constraint.</summary>");
-				w.Line("public void VerifyGet(global::KnockOff.Called times)");
-				using (w.Braces())
-				{
-					w.Line("if (!times.Validate(_getCount))");
-					w.Line("\tthrow new global::KnockOff.VerificationException($\"Indexer getter verification failed: expected {times}, but was called {_getCount} time(s).\");");
-				}
-				w.Line();
-			}
-
-			if (indexer.HasSetter)
-			{
-				w.Line("/// <summary>Verifies the indexer setter was accessed at least once.</summary>");
-				w.Line("public void VerifySet() => VerifySet(global::KnockOff.Called.AtLeastOnce);");
-				w.Line();
-
-				w.Line("/// <summary>Verifies the indexer setter access count matches the Called constraint.</summary>");
-				w.Line("public void VerifySet(global::KnockOff.Called times)");
-				using (w.Braces())
-				{
-					w.Line("if (!times.Validate(_setCount))");
-					w.Line("\tthrow new global::KnockOff.VerificationException($\"Indexer setter verification failed: expected {times}, but was called {_setCount} time(s).\");");
-				}
-				w.Line();
-			}
-
-			w.Line("/// <summary>Verifies the indexer was accessed at least once.</summary>");
-			w.Line("public void Verify() => Verify(global::KnockOff.Called.AtLeastOnce);");
-			w.Line();
-
-			// Build total count expression based on what accessors exist
-			var indexerTotalCountExpr = indexer.HasGetter && indexer.HasSetter
-				? "_getCount + _setCount"
-				: (indexer.HasGetter ? "_getCount" : "_setCount");
-
-			w.Line("/// <summary>Verifies the total indexer access count matches the Called constraint.</summary>");
-			w.Line("public void Verify(global::KnockOff.Called times)");
-			using (w.Braces())
-			{
-				w.Line($"var totalCount = {indexerTotalCountExpr};");
-				w.Line("if (!times.Validate(totalCount))");
-				w.Line("\tthrow new global::KnockOff.VerificationException($\"Indexer verification failed: expected {times}, but was called {totalCount} time(s).\");");
-			}
-			w.Line();
-
-			w.Line("/// <summary>Marks this indexer for verification by Stub.Verify(). Returns this for fluent chaining.</summary>");
-			w.Line($"public {indexer.InterceptorClassName} Verifiable()");
-			using (w.Braces())
-			{
-				w.Line("_isVerifiable = true;");
-				w.Line("_verifiableTimes = global::KnockOff.Called.AtLeastOnce;");
-				w.Line("return this;");
-			}
-			w.Line();
-
-			w.Line("/// <summary>Marks this indexer for verification by Stub.Verify() with Called constraint. Returns this for fluent chaining.</summary>");
-			w.Line($"public {indexer.InterceptorClassName} Verifiable(global::KnockOff.Called times)");
-			using (w.Braces())
-			{
-				w.Line("_isVerifiable = true;");
-				w.Line("_verifiableTimes = times;");
-				w.Line("return this;");
-			}
-			w.Line();
-
-			// Internal verification methods for stub-level Verify()/VerifyAll()
-			// Determine if configured based on available callbacks
-			var isConfiguredExpr = indexer.HasGetter && indexer.HasSetter
-				? "Get != null || Set != null || Backing.Count > 0"
-				: (indexer.HasGetter ? "Get != null || Backing.Count > 0" : "Set != null || Backing.Count > 0");
-
-			w.Line($"internal bool IsVerifiable => _isVerifiable;");
-			w.Line($"internal bool IsConfigured => {isConfiguredExpr};");
-			w.Line();
-
-			w.Line("/// <summary>Checks verification for Stub.Verify() - only verifiable items.</summary>");
-			w.Line("internal global::KnockOff.VerificationFailure? CheckVerification()");
-			using (w.Braces())
-			{
-				w.Line("if (!_isVerifiable) return null;");
-				w.Line("var times = _verifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
-				w.Line($"var totalCount = {indexerTotalCountExpr};");
-				w.Line("if (!times.Validate(totalCount))");
-				w.Line("\treturn new global::KnockOff.VerificationFailure(\"Indexer\", times, totalCount);");
-				w.Line("return null;");
-			}
-			w.Line();
-
-			w.Line("/// <summary>Checks verification for Stub.VerifyAll() - all configured items.</summary>");
-			w.Line("internal global::KnockOff.VerificationFailure? CheckVerificationAll()");
-			using (w.Braces())
-			{
-				w.Line("if (!IsConfigured && !_isVerifiable) return null;");
-				w.Line("var times = _verifiableTimes ?? global::KnockOff.Called.AtLeastOnce;");
-				w.Line($"var totalCount = {indexerTotalCountExpr};");
-				w.Line("if (!times.Validate(totalCount))");
-				w.Line("\treturn new global::KnockOff.VerificationFailure(\"Indexer\", times, totalCount);");
-				w.Line("return null;");
-			}
-		}
-		w.Line();
 	}
 
 	#endregion
@@ -1722,28 +1442,15 @@ internal static class FlatRenderer
 			w.Line();
 		}
 
-		// Indexers - use container pattern for groups with multiple indexers
-		foreach (var group in unit.IndexerGroups)
+		// Indexers - each indexer gets its own property (no container)
+		foreach (var indexer in unit.Indexers)
 		{
-			if (!renderedProperties.Add(group.BaseName))
+			if (!renderedProperties.Add(indexer.InterceptorName))
 				continue;
-			var newKeyword = group.NeedsNewKeyword ? "new " : "";
-
-			if (group.Indexers.Count == 1)
-			{
-				// Single indexer - direct access pattern
-				var indexer = group.Indexers.GetArray()![0];
-				w.Line($"/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>");
-				w.Line($"public {newKeyword}{indexer.InterceptorClassName} {group.BaseName} {{ get; }} = new();");
-				w.Line();
-			}
-			else
-			{
-				// Multiple indexers - container pattern with OfXxx access
-				w.Line($"/// <summary>Interceptor for indexer. Access via .Of{{KeyType}} (e.g., .OfInt32, .OfString).</summary>");
-				w.Line($"public {newKeyword}{group.ContainerClassName} {group.BaseName} {{ get; }} = new();");
-				w.Line();
-			}
+			var newKeyword = indexer.NeedsNewKeyword ? "new " : "";
+			w.Line($"/// <summary>Interceptor for indexer. Configure callbacks and track access.</summary>");
+			w.Line($"public {newKeyword}{indexer.InterceptorClassName} {indexer.InterceptorName} {{ get; }} = new();");
+			w.Line();
 		}
 
 		// Methods (only non-generic - generic methods use handler properties)
@@ -1812,8 +1519,7 @@ internal static class FlatRenderer
 
 		// Verify and VerifyAll methods (if there are any verifiable members)
 		// Must check all member types: methods, stub overrides, properties, events
-		// NOTE: Indexers excluded - there's a separate bug where indexer container accessor paths are wrong
-		// TODO: Fix indexer verification accessor paths (see IndexerGroups vs individual Indexers)
+		// NOTE: Indexers excluded from Verify/VerifyAll - will be added in the indexer API redesign
 		if (unit.MethodGroups.Count > 0
 			|| unit.StubOverrideGroups.Count > 0
 			|| unit.Properties.Count > 0
@@ -2140,12 +1846,11 @@ internal static class FlatRenderer
 
 	#region Indexer Implementation
 
-	private static void RenderIndexerImplementation(CodeWriter w, FlatIndexerModel indexer, Dictionary<string, string> indexerAccessMap)
+	private static void RenderIndexerImplementation(CodeWriter w, FlatIndexerModel indexer, HashSet<string> multiIndexerInterceptors)
 	{
-		// Get the correct access expression (e.g., "Indexer" or "Indexer.OfInt32")
-		var accessExpr = indexerAccessMap.TryGetValue(indexer.InterceptorName, out var mapped)
-			? mapped
-			: indexer.InterceptorName;
+		var accessExpr = indexer.InterceptorName;
+		var isMulti = multiIndexerInterceptors.Contains(indexer.InterceptorName);
+		var invokeSuffix = isMulti ? $"_{indexer.KeyTypeFriendlyName}" : "";
 
 		w.Line($"{indexer.RefReturnPrefix}{indexer.ReturnType} {indexer.DeclaringInterface}.this[{indexer.ParameterSignature}]");
 		using (w.Braces())
@@ -2156,8 +1861,8 @@ internal static class FlatRenderer
 				w.Line("get");
 				using (w.Braces())
 				{
-					w.Line($"{accessExpr}.InvokeRefGet(Strict, {indexer.ArgumentList});");
-					w.Line($"return ref {accessExpr}._refReturnBacking;");
+					w.Line($"{accessExpr}.InvokeRefGet{invokeSuffix}(Strict, {indexer.ArgumentList});");
+					w.Line($"return ref {accessExpr}._refReturnBacking{invokeSuffix};");
 				}
 			}
 			else
@@ -2165,13 +1870,13 @@ internal static class FlatRenderer
 				// Use InvokeGet/InvokeSet which handle the priority chain
 				if (indexer.HasGetter)
 				{
-					w.Line($"get => {accessExpr}.InvokeGet(Strict, {indexer.ArgumentList});");
+					w.Line($"get => {accessExpr}.InvokeGet{invokeSuffix}(Strict, {indexer.ArgumentList});");
 				}
 
 				if (indexer.HasSetter)
 				{
 					var setterKeyword = indexer.IsInitOnly ? "init" : "set";
-					w.Line($"{setterKeyword} => {accessExpr}.InvokeSet(Strict, {indexer.ArgumentList}, value);");
+					w.Line($"{setterKeyword} => {accessExpr}.InvokeSet{invokeSuffix}(Strict, {indexer.ArgumentList}, value);");
 				}
 			}
 		}

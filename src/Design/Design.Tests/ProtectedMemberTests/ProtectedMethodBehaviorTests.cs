@@ -166,14 +166,14 @@ public class ProtectedMethodBehaviorTests
     }
 
     [Fact]
-    public void ProtectedIndexer_BackingDictionary_WorksViaPublicMethod()
+    public void ProtectedIndexer_PerKeyReturns_WorksViaPublicMethod()
     {
         var stub = new ProtectedMemberServiceStub();
         stub.Name.Get("test");
         stub.GetInternalId.Return("id");
 
-        stub.Indexer.Backing[0] = "first";
-        stub.Indexer.Backing[1] = "second";
+        stub.Indexer[0].Returns("first");
+        stub.Indexer[1].Returns("second");
 
         ServiceBase service = stub.Object;
 
@@ -182,7 +182,7 @@ public class ProtectedMethodBehaviorTests
     }
 
     [Fact]
-    public void ProtectedIndexer_SetViaBacking_FlowsThroughPublicMethod()
+    public void ProtectedIndexer_SetTracking_FlowsThroughPublicMethod()
     {
         var stub = new ProtectedMemberServiceStub();
         stub.Name.Get("test");
@@ -191,7 +191,7 @@ public class ProtectedMethodBehaviorTests
         ServiceBase service = stub.Object;
         service.SetItemAt(5, "five");
 
-        Assert.Equal("five", stub.Indexer.Backing[5]);
+        Assert.Equal((5, "five"), stub.Indexer.LastSetEntry);
     }
 
     // =========================================================================

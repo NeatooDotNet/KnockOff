@@ -299,7 +299,7 @@ internal static class ModelAdapters
 			KeyType: indexer.KeyType,
 			NullableKeyType: indexer.NullableKeyType,
 			KeyParamName: indexer.KeyParamName,
-			SingleKeyType: indexer.KeyType,
+			KeyTypeFriendlyName: indexer.KeyTypeFriendlyName,
 			ValueType: indexer.ReturnType,
 			NullableValueType: indexer.NullableReturnType,
 			DefaultExpression: indexer.DefaultExpression,
@@ -331,7 +331,7 @@ internal static class ModelAdapters
 			KeyType: indexer.KeyType,
 			NullableKeyType: indexer.NullableKeyType,
 			KeyParamName: "key",
-			SingleKeyType: indexer.SingleKeyType,
+			KeyTypeFriendlyName: indexer.KeyTypeFriendlyName,
 			ValueType: indexer.ReturnType,
 			NullableValueType: indexer.ReturnType + "?", // Approximate nullable
 			DefaultExpression: "default!",

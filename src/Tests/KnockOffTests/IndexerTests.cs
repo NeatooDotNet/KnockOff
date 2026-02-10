@@ -11,7 +11,7 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.Indexer.Backing["Name"] = new PropertyInfo { Name = "Name", Value = "Test" };
+		knockOff.Indexer["Name"].Returns(new PropertyInfo { Name = "Name", Value = "Test" });
 
 		var result = store["Name"];
 
@@ -27,9 +27,9 @@ public class IndexerTests
 		var knockOff = new PropertyStoreKnockOff();
 		IPropertyStore store = knockOff;
 
-		knockOff.Indexer.Backing["First"] = new PropertyInfo { Name = "First", Value = "1" };
-		knockOff.Indexer.Backing["Second"] = new PropertyInfo { Name = "Second", Value = "2" };
-		knockOff.Indexer.Backing["Third"] = new PropertyInfo { Name = "Third", Value = "3" };
+		knockOff.Indexer["First"].Returns(new PropertyInfo { Name = "First", Value = "1" });
+		knockOff.Indexer["Second"].Returns(new PropertyInfo { Name = "Second", Value = "2" });
+		knockOff.Indexer["Third"].Returns(new PropertyInfo { Name = "Third", Value = "3" });
 
 		_ = store["First"];
 		_ = store["Second"];
@@ -95,16 +95,21 @@ public class IndexerTests
 	}
 
 	[Fact]
-	public void Indexer_Set_StoresInBackingDictionary()
+	public void Indexer_Set_CapturedValueCanBeRetrievedViaPerKey()
 	{
 		var knockOff = new ReadWriteStoreKnockOff();
 		IReadWriteStore store = knockOff;
 
+		// Use a Set callback to capture what was stored, then configure a Get to return it
+		var stored = new Dictionary<string, PropertyInfo?>();
+		knockOff.Indexer.Set((key, value) => stored[key] = value);
+		knockOff.Indexer.Get(key => stored.TryGetValue(key, out var v) ? v : null);
+
 		var prop = new PropertyInfo { Name = "Stored", Value = "InBacking" };
 		store["Stored"] = prop;
 
-		Assert.True(knockOff.Indexer.Backing.ContainsKey("Stored"));
-		Assert.Same(prop, knockOff.Indexer.Backing["Stored"]);
+		Assert.True(stored.ContainsKey("Stored"));
+		Assert.Same(prop, stored["Stored"]);
 
 		var retrieved = store["Stored"];
 		Assert.Same(prop, retrieved);
@@ -128,9 +133,6 @@ public class IndexerTests
 		Assert.NotNull(capturedEntry);
 		Assert.Equal("MyKey", capturedEntry.Value.key);
 		Assert.Same(prop, capturedEntry.Value.value);
-
-		// Since Set was used, backing was NOT updated
-		Assert.False(knockOff.Indexer.Backing.ContainsKey("MyKey"));
 	}
 
 	[Fact]
@@ -140,7 +142,6 @@ public class IndexerTests
 		IReadWriteStore store = knockOff;
 
 		var prop = new PropertyInfo { Name = "Test", Value = "Value" };
-		knockOff.Indexer.Backing["Existing"] = prop;
 		knockOff.Indexer.Get((key) => prop);
 
 		_ = store["Key1"];
@@ -158,10 +159,9 @@ public class IndexerTests
 		knockOff.Indexer.VerifySet(Called.Never);
 		Assert.Null(knockOff.Indexer.LastSetEntry);
 
-		// Configuration is preserved - Get callback still works and Backing dictionary preserved
+		// Configuration is preserved - Get callback still works
 		var retrieved = store["AfterReset"];
 		Assert.Same(prop, retrieved); // Get callback still returns our prop
-		Assert.True(knockOff.Indexer.Backing.ContainsKey("Existing"));
 	}
 
 	[Fact]
