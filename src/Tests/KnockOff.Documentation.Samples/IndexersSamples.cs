@@ -403,6 +403,148 @@ public class ResetSamples
 }
 
 // =============================================================================
+// Per-Key Verification Samples
+// =============================================================================
+
+public class PerKeyVerificationSamples
+{
+    [Fact]
+    public void PerKey_VerifyGet()
+    {
+        var stub = new ConfigStoreStub();
+        stub.Indexer["ApiKey"].Returns("secret");
+        stub.Indexer["Timeout"].Returns("30");
+
+        IConfigStore config = stub;
+
+        _ = config["ApiKey"];
+        _ = config["ApiKey"];
+        _ = config["Timeout"];
+
+        #region indexers-perkey-verify-get
+        // Verify a specific key was read a specific number of times
+        stub.Indexer["ApiKey"].VerifyGet(Called.Exactly(2));
+        stub.Indexer["Timeout"].VerifyGet(Called.Once);
+        #endregion
+
+        // Total get count across all keys is 3
+        stub.Indexer.VerifyGet(Called.Exactly(3));
+    }
+
+    [Fact]
+    public void PerKey_VerifySet()
+    {
+        var stub = new ConfigStoreStub();
+
+        // Per-key Set must be configured for per-key set tracking
+        stub.Indexer["ApiKey"].Set((_) => { });
+        stub.Indexer["Timeout"].Set((_) => { });
+
+        IConfigStore config = stub;
+
+        config["ApiKey"] = "secret";
+        config["Timeout"] = "30";
+        config["Timeout"] = "60";
+
+        #region indexers-perkey-verify-set
+        // Verify a specific key was written a specific number of times
+        stub.Indexer["ApiKey"].VerifySet(Called.Once);
+        stub.Indexer["Timeout"].VerifySet(Called.Exactly(2));
+        #endregion
+
+        // Total set count across all keys is 3
+        stub.Indexer.VerifySet(Called.Exactly(3));
+    }
+}
+
+// =============================================================================
+// When Predicate Samples
+// =============================================================================
+
+public class WhenPredicateSamples
+{
+    [Fact]
+    public void When_BasicPredicate_Returns()
+    {
+        var stub = new ProductInventoryStub();
+
+        #region indexers-when-predicate
+        // When(predicate) matches keys by condition
+        stub.Indexer.When(key => key.StartsWith("prefix_", StringComparison.Ordinal)).Returns(99);
+        #endregion
+
+        IProductInventory inventory = stub;
+
+        Assert.Equal(99, inventory["prefix_alpha"]);
+        Assert.Equal(99, inventory["prefix_beta"]);
+    }
+
+    [Fact]
+    public void When_WithPerKey_Priority()
+    {
+        var stub = new ProductInventoryStub();
+
+        #region indexers-when-with-perkey
+        // Per-key exact match takes priority over When predicate
+        stub.Indexer["exact"].Returns(100);
+        stub.Indexer.When(key => key.Length > 3).Returns(42);
+        #endregion
+
+        IProductInventory inventory = stub;
+
+        // Per-key wins for "exact" even though predicate also matches
+        Assert.Equal(100, inventory["exact"]);
+        // When predicate matches for other keys longer than 3 characters
+        Assert.Equal(42, inventory["hello"]);
+    }
+
+    [Fact]
+    public void When_SetCallback()
+    {
+        var stub = new ProductInventoryStub();
+
+        var captured = new List<(string key, int value)>();
+
+        #region indexers-when-set-callback
+        // When(predicate).Set() intercepts writes for matching keys
+        stub.Indexer.When(key => key.StartsWith("temp_", StringComparison.Ordinal)).Set((key, value) =>
+        {
+            captured.Add((key, value));
+        });
+        #endregion
+
+        IProductInventory inventory = stub;
+
+        inventory["temp_data"] = 42;
+        inventory["temp_count"] = 7;
+
+        Assert.Equal(2, captured.Count);
+        Assert.Contains(("temp_data", 42), captured);
+        Assert.Contains(("temp_count", 7), captured);
+    }
+
+    [Fact]
+    public void When_Chain_ThenWhen()
+    {
+        var stub = new ProductInventoryStub();
+
+        #region indexers-when-chain
+        // Chain multiple predicates with ThenWhen -- each matcher advances once
+        stub.Indexer
+            .When(key => key.StartsWith("a", StringComparison.Ordinal)).Returns(1)
+            .ThenWhen(key => key.StartsWith("b", StringComparison.Ordinal)).Returns(2);
+        #endregion
+
+        IProductInventory inventory = stub;
+
+        Assert.Equal(1, inventory["alpha"]);
+        Assert.Equal(2, inventory["beta"]);
+        // Last matcher repeats
+        Assert.Equal(2, inventory["bravo"]);
+    }
+}
+
+// =============================================================================
 // Complete Example
 // =============================================================================
 

@@ -171,13 +171,13 @@ stub.Timeout.Set((val) => { /* handle set */ });
 
 ## Indexer Interceptor
 
-Generated for interface indexers. Maintains a backing dictionary, tracks get/set operations, and supports indexed callbacks.
+Generated for interface indexers. Tracks get/set operations, supports per-key configuration, all-keys callbacks, and indexed sequences.
 
 ### Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `Backing` | `Dictionary<TKey, TValue>` | Backing dictionary used by default get/set operations |
+| `this[TKey key]` | `PerKeyBuilder` | Gets or creates a per-key builder for the specified key. Supports `.Returns(value)`, `.Get(callback)`, `.Set(callback)`, and `.ThenReturns(value)` for per-key sequences. |
 | `LastGetKey` | `TKey?` | The key from the most recent getter call (nullable for reference types) |
 | `LastSetEntry` | `(TKey, TValue)?` | Nullable tuple of key and value from the most recent setter call |
 
@@ -185,8 +185,16 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 | Method | Return Type | Description |
 |--------|-------------|-------------|
-| `Get(Func<TKey, TValue>)` | `IIndexerGetTracking<TKey, TValue>` | Configure callback invoked when indexer is read. Returns tracking interface for verification. Use `.ThenGet()` on the returned object to chain sequences. |
-| `Set(Action<TKey, TValue>)` | `IIndexerSetTracking<TKey, TValue>` | Configure callback invoked when indexer is written. Returns tracking interface for verification. Use `.ThenSet()` on the returned object to chain sequences. |
+| `this[TKey key].Returns(TValue)` | `PerKeyBuilder` | Configure a specific key to return a fixed value. Returns builder for chaining `.ThenReturns()` sequences. |
+| `this[TKey key].Get(Func<TValue>)` | `PerKeyBuilder` | Configure a specific key to use a callback for getter. Key is already bound, so callback takes no parameters. |
+| `this[TKey key].Set(Action<TValue>)` | `PerKeyBuilder` | Configure a specific key to use a callback for setter. Key is already bound, so callback takes only the value. |
+| `this[TKey key].VerifyGet()` | `void` | Verify this key's getter was called at least once. Throws `VerificationException` if not. |
+| `this[TKey key].VerifyGet(Called)` | `void` | Verify this key's getter call count satisfies the Called constraint. |
+| `this[TKey key].VerifySet()` | `void` | Verify this key's setter was called at least once. Requires per-key `.Set()` to be configured. |
+| `this[TKey key].VerifySet(Called)` | `void` | Verify this key's setter call count satisfies the Called constraint. Requires per-key `.Set()` to be configured. |
+| `When(Func<TKey, bool>)` | `IndexerWhenBuilder` | Configures predicate-based key matching. Chain `.Returns(value)` for getter, `.Get(callback)` for getter callback, or `.Set(callback)` for setter callback. |
+| `Get(Func<TKey, TValue>)` | `IIndexerGetBuilder<TKey, TValue>` | Configure all-keys getter callback as fallback. Returns builder for tracking and sequence chaining (`.ThenGet()`). |
+| `Set(Action<TKey, TValue>)` | `IIndexerSetBuilder<TKey, TValue>` | Configure all-keys setter callback as fallback. Returns builder for tracking and sequence chaining (`.ThenSet()`). |
 
 ### Verification Methods
 
@@ -203,16 +211,16 @@ Generated for interface indexers. Maintains a backing dictionary, tracks get/set
 
 ### Behavior Notes
 
-- **Backing dictionary**: By default, getter reads from `Backing[key]` and setter stores to `Backing[key]`
-- **Get replaces Backing lookup**: When a callback is configured via `Get()`, the callback's return value is used instead of `Backing` lookup
-- **Set doesn't update Backing**: When a callback is configured via `Set()`, the callback is invoked but `Backing` is NOT updated automatically unless your callback does it explicitly
+- **Per-key priority**: Per-key configuration (`stub.Indexer["key"].Returns(...)`) has highest priority. When predicate and all-keys callbacks are fallbacks.
+- **Priority chain**: Per-key exact match > When predicate match > All-keys sequence > All-keys callback (Get/Set) > Source delegation > Strict mode > Default
+- **Per-key vs all-keys**: Per-key callbacks take no key parameter (key is already bound). All-keys callbacks receive the key.
 - **Fluent returns**: Both `Get()` and `Set()` return tracking interfaces, allowing verification on the returned object
 - **Nullable tracking**: `LastGetKey` and `LastSetEntry` are nullable to handle cases where no calls have been made yet
 - **No automatic synchronization**: `Get` and `Set` callbacks are independent. If you want them to share state, you must coordinate them explicitly
 
 ### Methods
 
-- `void Reset()` - Clears tracking state (call counts, `LastGetKey`, `LastSetEntry`), resets sequence index to 0. Preserves configured callbacks (`Get`/`Set`), `Backing` dictionary, sequence structure, and verifiable marking.
+- `void Reset()` - Clears tracking state (call counts, `LastGetKey`, `LastSetEntry`), resets sequence index to 0 and per-key call counts. Preserves configured callbacks (`Get`/`Set`), per-key builders, sequence structure, and verifiable marking.
 
 ### Example
 
@@ -594,7 +602,7 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 |-----------------|--------------|-----------------|
 | **Method** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Property** | Get/set counts, `LastSetValue`, sequence index | `Get`/`Set` callbacks, sequence structure, verifiable marking |
-| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index | `Get`/`Set` callbacks, `Backing` dictionary, sequence structure, verifiable marking |
+| **Indexer** | Get/set counts, `LastGetKey`, `LastSetEntry`, sequence index, per-key call counts | `Get`/`Set` callbacks, per-key builders, sequence structure, verifiable marking |
 | **Event** | Add/remove counts, active subscribers | Verifiable marking |
 | **Delegate** | Call counts, `LastArg`/`LastArgs`, sequence index, When chain position/counts | `Return`/`Call` callbacks, sequence structure, When chain structure, verifiable marking |
 | **Generic Method (Base)** | All tracking across all type arguments | Verifiable marking |
@@ -605,7 +613,7 @@ All interceptors provide a `Reset()` method. This table summarizes what each res
 - `Reset()` clears tracking (counts, captured arguments) and resets sequence/When chain positions
 - `Reset()` preserves configured callbacks (`Return`, `Call`, `Get`, `Set`) and structure
 - `Reset()` does NOT clear verifiable marking (intentional test setup)
-- `Reset()` does NOT clear backing storage (`Backing` dictionary for indexers)
+- `Reset()` does NOT clear per-key builder configuration (per-key Returns, Get, Set callbacks are preserved)
 
 ---
 
