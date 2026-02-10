@@ -193,6 +193,20 @@ internal static class UnifiedInterceptorBuilder
 	}
 
 	/// <summary>
+	/// Computes a friendly type suffix for indexer key types from individual parameter types.
+	/// For single-param: returns GetTypeSuffix of that param's type (e.g., "Int32").
+	/// For multi-param: joins each param's type suffix with "_" (e.g., "Int32_String").
+	/// This avoids the bug where passing a combined type string like "(int a, string b)"
+	/// to GetTypeSuffix would produce "inta_stringb" instead of "Int32_String".
+	/// </summary>
+	public static string GetIndexerKeyTypeFriendlyName(EquatableArray<ParameterInfo> indexerParameters)
+	{
+		return indexerParameters.Count == 1
+			? GetTypeSuffix(indexerParameters.GetArray()![0].Type)
+			: string.Join("_", indexerParameters.Select(p => GetTypeSuffix(p.Type)));
+	}
+
+	/// <summary>
 	/// Extracts a friendly type suffix from a fully qualified type name.
 	/// E.g., "global::System.String" -> "String", "int" -> "Int32"
 	/// </summary>

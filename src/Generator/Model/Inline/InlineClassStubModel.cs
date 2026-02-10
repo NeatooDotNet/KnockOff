@@ -127,6 +127,8 @@ internal sealed record InlineClassIndexerModel(
     string KeyExpression,
     /// <summary>The stub class name for delegate references.</summary>
     string StubClassName,
+    /// <summary>Friendly name for the key type (e.g., "Int32", "Int32_String") for type-suffixed invoke methods in multi-indexer.</summary>
+    string KeyTypeFriendlyName = "",
     /// <summary>Type parameter list string (e.g., "&lt;T&gt;").</summary>
     string TypeParameterList = "",
     /// <summary>Constraint clauses string (e.g., "where T : class").</summary>

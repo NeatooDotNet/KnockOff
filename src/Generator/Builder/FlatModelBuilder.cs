@@ -642,7 +642,7 @@ internal static class FlatModelBuilder
 					HasSetter: member.HasSetter,
 					SimpleInterfaceName: simpleIfaceName,
 					NeedsNewKeyword: NeedsNewKeyword(interceptorName),
-					KeyTypeFriendlyName: UnifiedInterceptorBuilder.GetTypeSuffix(keyType),
+					KeyTypeFriendlyName: UnifiedInterceptorBuilder.GetIndexerKeyTypeFriendlyName(member.IndexerParameters),
 					ParameterSignature: paramSignature,
 					ParameterTypes: paramTypesList,
 					KeyExpression: keyExpression,
