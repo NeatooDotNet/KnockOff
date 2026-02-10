@@ -505,9 +505,33 @@ public partial class KnockOffGenerator
 				_ => "protected"
 			};
 
+			// Check for [SetsRequiredMembers] on constructor
+			var hasSetsRequiredMembers = false;
+			foreach (var attr in ctor.GetAttributes())
+			{
+				if (attr.AttributeClass?.Name == "SetsRequiredMembersAttribute")
+					hasSetsRequiredMembers = true;
+			}
+
 			constructors.Add(new ClassConstructorInfo(
 				new EquatableArray<ParameterInfo>(ctorParams.ToArray()),
-				accessModifier));
+				accessModifier,
+				hasSetsRequiredMembers));
+		}
+
+		// Collect ALL required member names (including non-virtual) from class hierarchy
+		var allRequiredMemberNames = new HashSet<string>();
+		var currentType = classSource;
+		while (currentType != null)
+		{
+			foreach (var member in currentType.GetMembers())
+			{
+				if (member is IPropertySymbol prop && prop.IsRequired)
+					allRequiredMemberNames.Add(prop.Name);
+				else if (member is IFieldSymbol field && field.IsRequired)
+					allRequiredMemberNames.Add(field.Name);
+			}
+			currentType = currentType.BaseType;
 		}
 
 		// Detect record types
@@ -595,7 +619,8 @@ public partial class KnockOffGenerator
 			new EquatableArray<EventMemberInfo>(events.ToArray()),
 			IsOpenGeneric: isOpenGeneric,
 			TypeParameters: typeParameters,
-			IsRecord: isRecord);
+			IsRecord: isRecord,
+			AllRequiredMemberNames: new EquatableArray<string>(allRequiredMemberNames.ToArray()));
 	}
 
 	/// <summary>

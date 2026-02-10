@@ -6,6 +6,7 @@
 // Related plan: docs/plans/fix-indexer-gaps.md
 // -----------------------------------------------------------------------------
 
+using Design.Domain.Abstractions;
 using Design.Domain.Entities;
 using KnockOff;
 
@@ -34,5 +35,46 @@ public partial class MatrixStandaloneStub : IMatrix
 /// </summary>
 [KnockOff]
 public partial class InitIndexerStandaloneStub : IInitIndexerCollection<string, int>
+{
+}
+
+// =============================================================================
+// Class stubs for init-only indexer (Bug #35)
+// =============================================================================
+// Without the fix, these produce CS8853: "must match by init-only of overridden member"
+// because the generator emitted 'set' instead of 'init' in the Impl class override.
+
+/// <summary>
+/// Inline class stub for InitIndexerBase (abstract class with get/init indexer).
+/// Verifies ClassRenderer emits 'init' instead of 'set' for init-only indexer overrides.
+///
+/// GENERATOR BEHAVIOR: The Impl class override must emit:
+///   public override int this[string key]
+///   {
+///       get { ... }
+///       init { ... }   // NOT 'set' -- CS8853 if 'set'
+///   }
+/// </summary>
+[KnockOff<InitIndexerBase>]
+[KnockOff<VirtualInitIndexerBase>]
+public partial class InitIndexerClassStubDemo
+{
+}
+
+/// <summary>
+/// Standalone class stub for InitIndexerBase (abstract class with get/init indexer).
+/// Verifies StandaloneClassRenderer emits 'init' instead of 'set'.
+/// </summary>
+[KnockOffBase<InitIndexerBase>]
+public partial class InitIndexerStandaloneClassStub
+{
+}
+
+/// <summary>
+/// Standalone class stub for VirtualInitIndexerBase (virtual class with get/init indexer).
+/// Verifies StandaloneClassRenderer emits 'init' instead of 'set'.
+/// </summary>
+[KnockOffBase<VirtualInitIndexerBase>]
+public partial class VirtualInitIndexerStandaloneClassStub
 {
 }

@@ -164,6 +164,17 @@ internal sealed record InterfaceMemberInfo(
 			}
 		}
 
+		// Also check property-level attributes ([AllowNull] on the property declaration
+		// applies to the setter parameter but may not appear on setterParam.GetAttributes())
+		foreach (var attr in property.GetAttributes())
+		{
+			var attrName = attr.AttributeClass?.Name;
+			if (attrName == "DisallowNullAttribute")
+				setterHasDisallowNull = true;
+			else if (attrName == "AllowNullAttribute")
+				setterHasAllowNull = true;
+		}
+
 		var isInitOnly = property.SetMethod?.IsInitOnly ?? false;
 
 		return new InterfaceMemberInfo(

@@ -30,7 +30,12 @@ internal sealed record ClassStubInfo(
 	/// When true, the generated Impl uses 'sealed record' instead of 'sealed class',
 	/// and record-synthesized members are filtered from the member list.
 	/// </summary>
-	bool IsRecord = false) : IEquatable<ClassStubInfo>;
+	bool IsRecord = false,
+	/// <summary>
+	/// Names of ALL required members on the class (including non-virtual ones).
+	/// Used to initialize required members in the Impl constructor with default! values.
+	/// </summary>
+	EquatableArray<string> AllRequiredMemberNames = default) : IEquatable<ClassStubInfo>;
 
 /// <summary>
 /// Info about a virtual/abstract member of a class for stubbing.
@@ -75,7 +80,17 @@ internal sealed record ClassMemberInfo(
 	/// <summary>
 	/// True if the member returns by ref readonly (ref readonly T).
 	/// </summary>
-	bool ReturnsByRefReadonly = false) : IEquatable<ClassMemberInfo>
+	bool ReturnsByRefReadonly = false,
+	/// <summary>
+	/// True if the property setter has [AllowNull] attribute.
+	/// When true, the generated override needs #pragma warning disable CS8765.
+	/// </summary>
+	bool SetterHasAllowNull = false,
+	/// <summary>
+	/// True if the method has [DoesNotReturn] attribute.
+	/// When true, the generated override must also have [DoesNotReturn].
+	/// </summary>
+	bool DoesNotReturn = false) : IEquatable<ClassMemberInfo>
 {
 	/// <summary>
 	/// Creates ClassMemberInfo for a property (including indexers).
@@ -122,6 +137,22 @@ internal sealed record ClassMemberInfo(
 		var isInitOnly = property.SetMethod?.IsInitOnly ?? false;
 		var isRequired = property.IsRequired;
 
+		// Check for [AllowNull] on property or setter parameter
+		bool setterHasAllowNull = false;
+		foreach (var attr in property.GetAttributes())
+		{
+			if (attr.AttributeClass?.Name == "AllowNullAttribute")
+				setterHasAllowNull = true;
+		}
+		if (!setterHasAllowNull && property.SetMethod is { } setMethod && setMethod.Parameters.Length > 0)
+		{
+			foreach (var attr in setMethod.Parameters[0].GetAttributes())
+			{
+				if (attr.AttributeClass?.Name == "AllowNullAttribute")
+					setterHasAllowNull = true;
+			}
+		}
+
 		return new ClassMemberInfo(
 			Name: name,
 			ReturnType: returnType,
@@ -142,7 +173,8 @@ internal sealed record ClassMemberInfo(
 			IsInitOnly: isInitOnly,
 			IsRequired: isRequired,
 			ReturnsByRef: property.ReturnsByRef,
-			ReturnsByRefReadonly: property.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: property.ReturnsByRefReadonly,
+			SetterHasAllowNull: setterHasAllowNull);
 	}
 
 	/// <summary>
@@ -206,6 +238,14 @@ internal sealed record ClassMemberInfo(
 			_ => "protected"
 		};
 
+		// Check for [DoesNotReturn] on method
+		bool doesNotReturn = false;
+		foreach (var attr in method.GetAttributes())
+		{
+			if (attr.AttributeClass?.Name == "DoesNotReturnAttribute")
+				doesNotReturn = true;
+		}
+
 		return new ClassMemberInfo(
 			Name: method.Name,
 			ReturnType: returnType,
@@ -223,7 +263,8 @@ internal sealed record ClassMemberInfo(
 			IsAbstract: method.IsAbstract,
 			AccessModifier: accessModifier,
 			ReturnsByRef: method.ReturnsByRef,
-			ReturnsByRefReadonly: method.ReturnsByRefReadonly);
+			ReturnsByRefReadonly: method.ReturnsByRefReadonly,
+			DoesNotReturn: doesNotReturn);
 	}
 }
 
@@ -232,7 +273,12 @@ internal sealed record ClassMemberInfo(
 /// </summary>
 internal sealed record ClassConstructorInfo(
 	EquatableArray<ParameterInfo> Parameters,
-	string AccessModifier) : IEquatable<ClassConstructorInfo>;
+	string AccessModifier,
+	/// <summary>
+	/// True if the constructor has [SetsRequiredMembers] attribute.
+	/// When true, the generated Impl constructor that chains to this must also have [SetsRequiredMembers].
+	/// </summary>
+	bool HasSetsRequiredMembers = false) : IEquatable<ClassConstructorInfo>;
 
 /// <summary>
 /// Groups class methods by name for overload handling.

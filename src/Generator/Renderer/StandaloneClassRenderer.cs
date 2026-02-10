@@ -698,6 +698,8 @@ internal static class StandaloneClassRenderer
         var indent2 = indent1 + "\t";
         var requiredKeyword = prop.IsRequired ? "required " : "";
 
+        if (prop.SetterHasAllowNull)
+            w.Line("#pragma warning disable CS8765 // Nullability of parameter doesn't match overridden member");
         w.Line($"{indent}/// <inheritdoc />");
         w.Line($"{indent}{requiredKeyword}{prop.AccessModifier} override {prop.RefReturnPrefix}{prop.ReturnType} {prop.PropertyName}");
         w.Line($"{indent}{{");
@@ -815,6 +817,8 @@ internal static class StandaloneClassRenderer
         }
 
         w.Line($"{indent}}}");
+        if (prop.SetterHasAllowNull)
+            w.Line("#pragma warning restore CS8765");
         w.Line();
     }
 
@@ -823,6 +827,8 @@ internal static class StandaloneClassRenderer
         var indent2 = indent1 + "\t";
         var invokeSuffix = indexer.InvokeSuffix;
 
+        if (indexer.SetterHasAllowNull)
+            w.Line("#pragma warning disable CS8765 // Nullability of parameter doesn't match overridden member");
         w.Line($"{indent}/// <inheritdoc />");
         w.Line($"{indent}{indexer.AccessModifier} override {indexer.RefReturnPrefix}{indexer.ReturnType} this[{indexer.ParameterDeclarations}]");
         w.Line($"{indent}{{");
@@ -876,7 +882,8 @@ internal static class StandaloneClassRenderer
 
             if (indexer.HasSetter)
             {
-                w.Line($"{indent1}set");
+                var setterKeyword = indexer.IsInitOnly ? "init" : "set";
+                w.Line($"{indent1}{setterKeyword}");
                 w.Line($"{indent1}{{");
                 if (indexer.IsAbstract)
                 {
@@ -894,6 +901,8 @@ internal static class StandaloneClassRenderer
         }
 
         w.Line($"{indent}}}");
+        if (indexer.SetterHasAllowNull)
+            w.Line("#pragma warning restore CS8765");
         w.Line();
     }
 
@@ -905,6 +914,11 @@ internal static class StandaloneClassRenderer
             return;
         }
 
+        if (method.DoesNotReturn)
+        {
+            w.Line("#pragma warning disable CS8763 // A method marked [DoesNotReturn] should not return");
+            w.Line($"{indent}[global::System.Diagnostics.CodeAnalysis.DoesNotReturn]");
+        }
         w.Line($"{indent}/// <inheritdoc />");
         w.Line($"{indent}{method.AccessModifier} override {method.RefReturnPrefix}{method.ReturnType} {method.MethodName}({method.ParameterDeclarations})");
         w.Line($"{indent}{{");
@@ -1033,6 +1047,8 @@ internal static class StandaloneClassRenderer
         }
 
         w.Line($"{indent}}}");
+        if (method.DoesNotReturn)
+            w.Line("#pragma warning restore CS8763");
         w.Line();
     }
 
