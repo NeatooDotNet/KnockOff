@@ -50,6 +50,27 @@ public interface IInitOnlyIndexer
 }
 
 // =============================================================================
+// Bug #35: Init-only indexers on classes produce CS8853
+// Generator emitted 'set' instead of 'init' in class override
+// =============================================================================
+
+public abstract class AbstractInitIndexer
+{
+	public abstract int this[int a] { get; init; }
+}
+
+public class VirtualInitIndexer
+{
+	public VirtualInitIndexer() { }
+
+	public virtual int this[int a]
+	{
+		get => 0;
+		init { }
+	}
+}
+
+// =============================================================================
 // Gap #17: Multi-parameter indexers with params arrays
 // Rocks: int this[int a, params string[] b] { get; }
 // KnockOff: generator fails to produce valid code
@@ -71,6 +92,8 @@ public interface IParamsIndexer
 [KnockOff<IInitIndexer>]
 [KnockOff<IInitOnlyIndexer>]
 [KnockOff<IParamsIndexer>]
+[KnockOff<AbstractInitIndexer>]
+[KnockOff<VirtualInitIndexer>]
 public partial class IndexerGapTestClass
 {
 }
@@ -111,6 +134,18 @@ public partial class ThreeParamIndexerKnockOff : IThreeParamIndexer
 
 [KnockOff]
 public partial class FourParamIndexerKnockOff : IFourParamIndexer
+{
+}
+
+// Bug #35: Standalone class stubs for init-only indexers
+
+[KnockOffBase<AbstractInitIndexer>]
+public partial class AbstractInitIndexerStandaloneStub
+{
+}
+
+[KnockOffBase<VirtualInitIndexer>]
+public partial class VirtualInitIndexerStandaloneStub
 {
 }
 
@@ -284,6 +319,66 @@ public class IndexerGapReproductionTests
 		// Act
 		IInitIndexer svc = stub;
 		var value = svc[3];
+
+		// Assert
+		Assert.Equal(42, value);
+	}
+
+	// =========================================================================
+	// Bug #35: Init-only indexers on classes (CS8853 fix)
+	// =========================================================================
+
+	[Fact]
+	public void Bug35_InlineClass_AbstractInitIndexer_GetWorks()
+	{
+		// Arrange - abstract class with { get; init; } indexer
+		var stub = new IndexerGapTestClass.Stubs.AbstractInitIndexer();
+		stub.Indexer[3].Returns(42);
+
+		// Act
+		var value = stub.Object[3];
+
+		// Assert
+		Assert.Equal(42, value);
+	}
+
+	[Fact]
+	public void Bug35_InlineClass_VirtualInitIndexer_GetWorks()
+	{
+		// Arrange - virtual class with { get; init; } indexer
+		var stub = new IndexerGapTestClass.Stubs.VirtualInitIndexer();
+		stub.Indexer[3].Returns(42);
+
+		// Act
+		var value = stub.Object[3];
+
+		// Assert
+		Assert.Equal(42, value);
+	}
+
+	[Fact]
+	public void Bug35_StandaloneClass_AbstractInitIndexer_GetWorks()
+	{
+		// Arrange - standalone class stub for abstract class with { get; init; }
+		var stub = new AbstractInitIndexerStandaloneStub();
+		stub.Indexer[3].Returns(42);
+
+		// Act
+		var value = stub.Object[3];
+
+		// Assert
+		Assert.Equal(42, value);
+	}
+
+	[Fact]
+	public void Bug35_StandaloneClass_VirtualInitIndexer_GetWorks()
+	{
+		// Arrange - standalone class stub for virtual class with { get; init; }
+		var stub = new VirtualInitIndexerStandaloneStub();
+		stub.Indexer[3].Returns(42);
+
+		// Act
+		var value = stub.Object[3];
 
 		// Assert
 		Assert.Equal(42, value);

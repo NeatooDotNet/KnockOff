@@ -236,7 +236,9 @@ internal sealed record InlineClassImplPropertyModel(
     /// <summary>True if the property returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if the property returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+    /// <summary>True if the property setter has [AllowNull]. Generated override needs pragma disable CS8765.</summary>
+    bool SetterHasAllowNull = false)
 {
     /// <summary>True if the property returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
@@ -278,7 +280,11 @@ internal sealed record InlineClassImplIndexerModel(
     /// <summary>True if the indexer returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if the indexer returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+    /// <summary>True if the setter is init-only.</summary>
+    bool IsInitOnly = false,
+    /// <summary>True if the setter has [AllowNull] attribute.</summary>
+    bool SetterHasAllowNull = false)
 {
     /// <summary>True if the indexer returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;
@@ -342,7 +348,9 @@ internal sealed record InlineClassImplMethodModel(
     /// <summary>True if the method returns by ref (ref T).</summary>
     bool ReturnsByRef = false,
     /// <summary>True if the method returns by ref readonly (ref readonly T).</summary>
-    bool ReturnsByRefReadonly = false)
+    bool ReturnsByRefReadonly = false,
+    /// <summary>True if the method has [DoesNotReturn]. Generated override must also have it.</summary>
+    bool DoesNotReturn = false)
 {
     /// <summary>True if the method returns by ref or ref readonly.</summary>
     public bool IsRefReturn => ReturnsByRef || ReturnsByRefReadonly;

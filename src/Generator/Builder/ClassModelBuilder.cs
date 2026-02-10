@@ -41,10 +41,12 @@ internal static class ClassModelBuilder
         // Count indexers for invoke suffix computation
         var indexerCount = SymbolHelpers.CountClassIndexers(cls.Members);
 
-        // Check for required members
-        var requiredMembers = cls.Members.Where(m => m.IsProperty && m.IsRequired).ToList();
-        var hasRequiredMembers = requiredMembers.Count > 0;
-        var requiredMemberNames = requiredMembers.Select(m => m.Name).ToEquatableArray();
+        // Check for required members — use AllRequiredMemberNames which includes non-virtual required properties
+        var hasRequiredMembers = cls.AllRequiredMemberNames.Count > 0
+            || cls.Constructors.Any(c => c.HasSetsRequiredMembers);
+        var requiredMemberNames = cls.AllRequiredMemberNames.Count > 0
+            ? cls.AllRequiredMemberNames
+            : cls.Members.Where(m => m.IsProperty && m.IsRequired).Select(m => m.Name).ToEquatableArray();
 
         // Build type parameters model
         var typeParameters = cls.TypeParameters.Select(tp => new TypeParameterModel(
@@ -443,7 +445,8 @@ internal static class ClassModelBuilder
             IsInitOnly: member.IsInitOnly,
             IsAbstract: member.IsAbstract,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            SetterHasAllowNull: member.SetterHasAllowNull);
     }
 
     private static InlineClassImplIndexerModel BuildImplIndexerModel(ClassMemberInfo member, int indexerCount, EquatableArray<ClassMemberInfo> allMembers)
@@ -476,7 +479,9 @@ internal static class ClassModelBuilder
             ConcreteTypeForNew: member.ConcreteTypeForNew,
             InvokeSuffix: invokeSuffix,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            IsInitOnly: member.IsInitOnly,
+            SetterHasAllowNull: member.SetterHasAllowNull);
     }
 
     private static InlineClassImplMethodModel BuildImplMethodModel(
@@ -511,7 +516,8 @@ internal static class ClassModelBuilder
             CallArgumentList: callArgs,
             InvokeSuffix: invokeSuffix,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            DoesNotReturn: member.DoesNotReturn);
     }
 
     /// <summary>
@@ -589,7 +595,8 @@ internal static class ClassModelBuilder
             NonGenericArgList: nonGenericArgList,
             TaskTypeArg: taskTypeArg,
             ReturnsByRef: member.ReturnsByRef,
-            ReturnsByRefReadonly: member.ReturnsByRefReadonly);
+            ReturnsByRefReadonly: member.ReturnsByRefReadonly,
+            DoesNotReturn: member.DoesNotReturn);
     }
 
     /// <summary>
