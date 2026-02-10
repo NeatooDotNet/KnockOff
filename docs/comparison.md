@@ -67,8 +67,10 @@ For argument matching, argument capture, and method overload resolution comparis
 
 | Task | Moq | NSubstitute | KnockOff |
 |------|-----|-------------|----------|
-| **Setup getter** | `mock.Setup(x => x["key"]).Returns(42);` | `dict["key"].Returns(42);` | `stub.Indexer.Backing["key"] = 42;` |
+| **Setup getter** | `mock.Setup(x => x["key"]).Returns(42);` | `dict["key"].Returns(42);` | `stub.Indexer["key"].Returns(42);` |
 | **Dynamic getter** | `mock.Setup(x => x[It.IsAny<string>()]).Returns(0);` | `dict[Arg.Any<string>()].Returns(0);` | `stub.Indexer.Get((key) => 0);` |
 | **Verify getter** | `mock.Verify(x => x["key"]);` | `_ = dict.Received()["key"];` | `stub.Indexer.VerifyGet();` |
 | **Verify setter** | `mock.VerifySet(x => x["key"] = 42);` | `dict.Received()["key"] = 42;` | `stub.Indexer.VerifySet();` |
+| **Predicate match** | `mock.Setup(x => x[It.Is<string>(k => predicate)]).Returns(42);` | `dict[Arg.Is<string>(k => predicate)].Returns(42);` | `stub.Indexer.When(k => predicate).Returns(42);` |
+| **Per-key verify** | `mock.Verify(x => x["key"]);` | `_ = dict.Received()["key"];` | `stub.Indexer["key"].VerifyGet(Called.Once);` |
 | **Capture** | *(manual with Callback)* | *(manual with When/Do)* | `stub.Indexer.LastSetEntry` (built-in) |

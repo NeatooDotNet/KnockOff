@@ -227,6 +227,101 @@ For tracking, multi-indexer stubs provide type-suffixed properties: `LastStringG
 
 ---
 
+## Per-Key Verification
+
+You can verify that a specific key was accessed a specific number of times, rather than checking total indexer access counts.
+
+### Per-Key VerifyGet
+
+<!-- snippet: indexers-perkey-verify-get -->
+```cs
+// Verify a specific key was read a specific number of times
+stub.Indexer["ApiKey"].VerifyGet(Called.Exactly(2));
+stub.Indexer["Timeout"].VerifyGet(Called.Once);
+```
+<!-- endSnippet -->
+
+### Per-Key VerifySet
+
+Per-key set verification requires a per-key `.Set()` callback to be configured so the per-key builder tracks set calls.
+
+<!-- snippet: indexers-perkey-verify-set -->
+```cs
+// Verify a specific key was written a specific number of times
+stub.Indexer["ApiKey"].VerifySet(Called.Once);
+stub.Indexer["Timeout"].VerifySet(Called.Exactly(2));
+```
+<!-- endSnippet -->
+
+**Per-key verification vs. all-keys verification:**
+- `stub.Indexer.VerifyGet(Called.Exactly(3))` - verifies total get count across all keys
+- `stub.Indexer["ApiKey"].VerifyGet(Called.Exactly(2))` - verifies get count for a specific key only
+
+---
+
+## Predicate-Based Key Matching
+
+Use `When(predicate)` to match keys by condition rather than exact value. This is useful when you want to configure behavior for a group of keys that share a pattern.
+
+### Basic Predicate Matching
+
+<!-- snippet: indexers-when-predicate -->
+```cs
+// When(predicate) matches keys by condition
+stub.Indexer.When(key => key.StartsWith("prefix_", StringComparison.Ordinal)).Returns(99);
+```
+<!-- endSnippet -->
+
+### Combining Per-Key and When Predicate
+
+Per-key exact match always takes priority over When predicate matching:
+
+<!-- snippet: indexers-when-with-perkey -->
+```cs
+// Per-key exact match takes priority over When predicate
+stub.Indexer["exact"].Returns(100);
+stub.Indexer.When(key => key.Length > 3).Returns(42);
+```
+<!-- endSnippet -->
+
+In this example, `stub["exact"]` returns 100 (per-key wins), while `stub["hello"]` returns 42 (When predicate matches).
+
+### When with Set Callback
+
+Getter and setter When chains are independent. Use `.Set()` on the When builder to intercept writes for matching keys:
+
+<!-- snippet: indexers-when-set-callback -->
+```cs
+// When(predicate).Set() intercepts writes for matching keys
+stub.Indexer.When(key => key.StartsWith("temp_", StringComparison.Ordinal)).Set((key, value) =>
+{
+    captured.Add((key, value));
+});
+```
+<!-- endSnippet -->
+
+### When Chains with ThenWhen
+
+Chain multiple predicates using `ThenWhen`. Each matcher advances after matching once; the last matcher repeats:
+
+<!-- snippet: indexers-when-chain -->
+```cs
+// Chain multiple predicates with ThenWhen -- each matcher advances once
+stub.Indexer
+    .When(key => key.StartsWith("a", StringComparison.Ordinal)).Returns(1)
+    .ThenWhen(key => key.StartsWith("b", StringComparison.Ordinal)).Returns(2);
+```
+<!-- endSnippet -->
+
+**Priority order for get operations:**
+1. Per-key exact match (highest priority)
+2. When predicate match
+3. All-keys sequence / Get callback
+4. Source delegation
+5. Strict mode / default value (lowest priority)
+
+---
+
 ## Per-Key vs. All-Keys Priority
 
 When both per-key Returns and all-keys Get callback are configured:
@@ -243,11 +338,12 @@ stub.Indexer.Get((key) => "from-callback");
 
 The full priority chain for indexer get operations:
 1. Per-key builder (highest priority)
-2. All-keys sequence (`Get().ThenGet()`)
-3. All-keys Get callback
-4. Source delegation
-5. Strict mode check
-6. Default value (lowest priority)
+2. When predicate match
+3. All-keys sequence (`Get().ThenGet()`)
+4. All-keys Get callback
+5. Source delegation
+6. Strict mode check
+7. Default value (lowest priority)
 
 ---
 
@@ -288,12 +384,16 @@ Choose your configuration approach based on the test scenario:
 |----------|----------|---------|
 | Indexer should return fixed test data | Per-key Returns | `stub.Indexer[1].Returns(user1);` |
 | Specific keys with fallback for others | Per-key + Get | `stub.Indexer["x"].Returns(1); stub.Indexer.Get(k => 0);` |
+| Keys matching a pattern return same value | `When(predicate)` | `stub.Indexer.When(k => k.StartsWith("prefix_")).Returns(99);` |
+| Per-key exact with pattern fallback | Per-key + When | `stub.Indexer["x"].Returns(1); stub.Indexer.When(k => k.Length > 3).Returns(42);` |
 | Indexer computes values from keys | `Get` | `stub.Cache.Get((id) => LoadById(id));` |
 | Indexer returns different values per access | `Get().ThenGet()` | `stub.Data.Get((k) => v1).ThenGet((k) => v2);` |
 | Track all writes to indexer | `Set` | `stub.Store.Set((k, v) => log.Add((k, v)));` |
+| Track writes for matching keys only | `When(predicate).Set()` | `stub.Indexer.When(k => k.StartsWith("temp_")).Set((k, v) => ...);` |
 | Simulate validation in indexer | `Set` | `stub.Config.Set((k, v) => Validate(k));` |
 | Indexer validation changes per write | `Set().ThenSet()` | `stub.Db.Set((k, v) => Fail()).ThenSet((k, v) => Ok());` |
 | Verify indexer was accessed | Verification | `stub.Indexer.VerifyGet(Called.Once);` |
+| Verify specific key was accessed | Per-key verification | `stub.Indexer["key"].VerifyGet(Called.Once);` |
 | Verify last key written | Verification | `Assert.Equal(42, stub.Indexer.LastGetKey);` |
 
 ---
@@ -322,13 +422,14 @@ stub.Indexer.Set((id, user) => cacheUpdates.Add((id, user)));
 ## Key Takeaways
 
 1. **Start with per-key Returns** - It covers most scenarios with simple `Indexer[key].Returns(value)` syntax
-2. **Use Get for computed values** - Key-dependent or state-dependent returns as fallback for unconfigured keys
-3. **Use Set for tracking** - When you need to verify writes or simulate validation
-4. **Use sequences for changing behavior** - `Get().ThenGet()` / `Set().ThenSet()` when values or behavior differ across calls
-5. **Per-key Returns takes priority** - Per-key configuration always wins over all-keys Get callbacks
-6. **Reset() preserves per-key Returns and callbacks** - Clears tracking state but not configuration
-7. **Verify access patterns** - Use `VerifyGet()` and `VerifySet()` like property verification
-8. **Multiple overloads** - Each indexer signature resolves via C# indexer overloads on the interceptor
+2. **Use When(predicate) for pattern matching** - Match groups of keys by condition with `When(k => predicate).Returns(value)`
+3. **Use Get for computed values** - Key-dependent or state-dependent returns as fallback for unconfigured keys
+4. **Use Set for tracking** - When you need to verify writes or simulate validation
+5. **Use sequences for changing behavior** - `Get().ThenGet()` / `Set().ThenSet()` when values or behavior differ across calls
+6. **Per-key > When > Get callback** - Per-key exact match wins over When predicate, which wins over all-keys callbacks
+7. **Verify per-key or all-keys** - `stub.Indexer["key"].VerifyGet()` for specific keys, `stub.Indexer.VerifyGet()` for totals
+8. **Reset() preserves per-key Returns and callbacks** - Clears tracking state but not configuration
+9. **Multiple overloads** - Each indexer signature resolves via C# indexer overloads on the interceptor
 
 ---
 

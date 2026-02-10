@@ -129,6 +129,28 @@ internal static class IndexerInterceptorRenderer
 				}
 			}
 
+			// When chain fields per key type (separate getter and setter chains)
+			foreach (var model in models)
+			{
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var friendlyName = isMulti ? model.KeyTypeFriendlyName : "";
+
+				if (model.HasGetter)
+				{
+					w.Line($"private global::System.Collections.Generic.List<IndexerGetWhenMatcher{friendlyName}>? _whenGetChain{suffix};");
+					w.Line($"private int _whenGetChainHead{suffix};");
+					w.Line($"private bool _whenGetVerifiable{suffix};");
+					w.Line();
+				}
+				if (model.HasSetter)
+				{
+					w.Line($"private global::System.Collections.Generic.List<IndexerSetWhenMatcher{friendlyName}>? _whenSetChain{suffix};");
+					w.Line($"private int _whenSetChainHead{suffix};");
+					w.Line($"private bool _whenSetVerifiable{suffix};");
+					w.Line();
+				}
+			}
+
 			// Aggregate total get/set count properties
 			RenderTotalCountProperties(w, models, isMulti);
 
@@ -192,6 +214,21 @@ internal static class IndexerInterceptorRenderer
 					}
 					w.Line();
 				}
+			}
+
+			// When() entry point methods per key type
+			foreach (var model in models)
+			{
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var friendlyName = isMulti ? model.KeyTypeFriendlyName : "";
+
+				w.Line($"/// <summary>Configures predicate-based key matching. Returns builder for Returns()/Get()/Set().</summary>");
+				w.Line($"public IndexerWhenBuilder{friendlyName} When(global::System.Func<{model.KeyType}, bool> predicate)");
+				using (w.Braces())
+				{
+					w.Line($"return new IndexerWhenBuilder{friendlyName}(this, predicate);");
+				}
+				w.Line();
 			}
 
 			// Ref return backing fields (per key type for multi-indexer)
@@ -261,6 +298,23 @@ internal static class IndexerInterceptorRenderer
 				{
 					RenderIndexerSetBuilderImpl(w, model, fullInterceptorClassName, friendlyName, suffix);
 					RenderIndexerSetSequenceImpl(w, model, fullInterceptorClassName, friendlyName, suffix);
+				}
+			}
+
+			// Nested When matcher, builder, and chain classes per key type
+			foreach (var model in models)
+			{
+				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var friendlyName = isMulti ? model.KeyTypeFriendlyName : "";
+
+				RenderIndexerGetWhenMatcherClasses(w, model, friendlyName);
+				RenderIndexerWhenBuilder(w, model, fullInterceptorClassName, friendlyName, suffix);
+				RenderIndexerGetWhenChain(w, model, fullInterceptorClassName, friendlyName, suffix);
+
+				if (model.HasSetter)
+				{
+					RenderIndexerSetWhenMatcherClasses(w, model, friendlyName);
+					RenderIndexerSetWhenChain(w, model, fullInterceptorClassName, friendlyName, suffix);
 				}
 			}
 		}
@@ -341,7 +395,40 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 2: All-keys sequence (if present and not exhausted)
+			// Priority 2: When predicate chain (getter)
+			{
+				var friendlyName = fieldSuffix == "" ? "" : fieldSuffix.Substring(1); // strip leading _
+				w.Line($"if (_whenGetChain{fieldSuffix} != null && _whenGetChainHead{fieldSuffix} < _whenGetChain{fieldSuffix}.Count)");
+				using (w.Braces())
+				{
+					w.Line($"var matcher = _whenGetChain{fieldSuffix}[_whenGetChainHead{fieldSuffix}];");
+					w.Line($"if (matcher.Matches({model.KeyExpression}))");
+					using (w.Braces())
+					{
+						w.Line("matcher.CallCount++;");
+						w.Line();
+						w.Line("// Advance HEAD unless at last matcher (which repeats)");
+						w.Line($"if (_whenGetChainHead{fieldSuffix} < _whenGetChain{fieldSuffix}.Count - 1)");
+						using (w.Braces())
+						{
+							w.Line($"_whenGetChainHead{fieldSuffix}++;");
+						}
+						w.Line("// At last matcher: never advance (repeat behavior for both ThenWhen and ThenGet)");
+						w.Line();
+						w.Line($"return matcher.Call({model.KeyExpression});");
+					}
+					w.Line("else if (matcher.IsTerminal)");
+					using (w.Braces())
+					{
+						w.Line("// ThenNone: didn't match (always false), exhaust by advancing past it");
+						w.Line($"_whenGetChainHead{fieldSuffix}++;");
+					}
+					w.Line("// Non-terminal didn't match: fall through to rest of priority chain");
+				}
+				w.Line();
+			}
+
+			// Priority 3: All-keys sequence (if present and not exhausted)
 			w.Line($"if (_getSequence{fieldSuffix} != null && _getSequenceIndex{fieldSuffix} < _getSequence{fieldSuffix}.Count)");
 			using (w.Braces())
 			{
@@ -367,7 +454,7 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 3: Repeating Get callback
+			// Priority 4: Repeating Get callback
 			w.Line($"if (_get{fieldSuffix} != null && _getTracking{fieldSuffix} != null)");
 			using (w.Braces())
 			{
@@ -380,17 +467,17 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"_unconfiguredGetCount{fieldSuffix}++;");
 			w.Line();
 
-			// Priority 4: Source (if available)
+			// Priority 5: Source (if available)
 			if (!string.IsNullOrEmpty(model.DeclaringInterface))
 			{
 				w.Line($"if (_source is {{ }} src) return src[{model.ArgumentList}];");
 				w.Line();
 			}
 
-			// Priority 5: Strict mode check
+			// Priority 6: Strict mode check
 			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.IndexerName}\");");
 
-			// Priority 6: Default
+			// Priority 7: Default
 			w.Line("return default!;");
 		}
 		w.Line();
@@ -424,7 +511,39 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 2: All-keys sequence (if present and not exhausted)
+			// Priority 2: When predicate chain (setter)
+			{
+				w.Line($"if (_whenSetChain{fieldSuffix} != null && _whenSetChainHead{fieldSuffix} < _whenSetChain{fieldSuffix}.Count)");
+				using (w.Braces())
+				{
+					w.Line($"var matcher = _whenSetChain{fieldSuffix}[_whenSetChainHead{fieldSuffix}];");
+					w.Line($"if (matcher.Matches({model.KeyExpression}))");
+					using (w.Braces())
+					{
+						w.Line("matcher.CallCount++;");
+						w.Line();
+						w.Line("// Advance HEAD unless at last matcher (which repeats)");
+						w.Line($"if (_whenSetChainHead{fieldSuffix} < _whenSetChain{fieldSuffix}.Count - 1)");
+						using (w.Braces())
+						{
+							w.Line($"_whenSetChainHead{fieldSuffix}++;");
+						}
+						w.Line();
+						w.Line($"matcher.Call({model.KeyExpression}, value);");
+						w.Line("return;");
+					}
+					w.Line("else if (matcher.IsTerminal)");
+					using (w.Braces())
+					{
+						w.Line("// ThenNone: didn't match (always false), exhaust by advancing past it");
+						w.Line($"_whenSetChainHead{fieldSuffix}++;");
+					}
+					w.Line("// Non-terminal didn't match: fall through to rest of priority chain");
+				}
+				w.Line();
+			}
+
+			// Priority 3: All-keys sequence (if present and not exhausted)
 			w.Line($"if (_setSequence{fieldSuffix} != null && _setSequenceIndex{fieldSuffix} < _setSequence{fieldSuffix}.Count)");
 			using (w.Braces())
 			{
@@ -453,7 +572,7 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 3: Repeating Set callback
+			// Priority 4: Repeating Set callback
 			w.Line($"if (_set{fieldSuffix} != null && _setTracking{fieldSuffix} != null)");
 			using (w.Braces())
 			{
@@ -467,14 +586,14 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"_unconfiguredSetCount{fieldSuffix}++;");
 			w.Line();
 
-			// Priority 4: Source (if available) - skip for init-only indexers
+			// Priority 5: Source (if available) - skip for init-only indexers
 			if (!string.IsNullOrEmpty(model.DeclaringInterface) && !model.IsInitOnly)
 			{
 				w.Line($"if (_source is {{ }} src) {{ src[{model.ArgumentList}] = value; return; }}");
 				w.Line();
 			}
 
-			// Priority 5: Strict mode check
+			// Priority 6: Strict mode check
 			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.IndexerName}\");");
 		}
 		w.Line();
@@ -508,7 +627,34 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 2: All-keys sequence
+			// Priority 2: When predicate chain (getter)
+			{
+				w.Line($"if (_whenGetChain{fieldSuffix} != null && _whenGetChainHead{fieldSuffix} < _whenGetChain{fieldSuffix}.Count)");
+				using (w.Braces())
+				{
+					w.Line($"var matcher = _whenGetChain{fieldSuffix}[_whenGetChainHead{fieldSuffix}];");
+					w.Line($"if (matcher.Matches({model.KeyExpression}))");
+					using (w.Braces())
+					{
+						w.Line("matcher.CallCount++;");
+						w.Line($"if (_whenGetChainHead{fieldSuffix} < _whenGetChain{fieldSuffix}.Count - 1)");
+						using (w.Braces())
+						{
+							w.Line($"_whenGetChainHead{fieldSuffix}++;");
+						}
+						w.Line($"_refReturnBacking{fieldSuffix} = matcher.Call({model.KeyExpression});");
+						w.Line("return;");
+					}
+					w.Line("else if (matcher.IsTerminal)");
+					using (w.Braces())
+					{
+						w.Line($"_whenGetChainHead{fieldSuffix}++;");
+					}
+				}
+				w.Line();
+			}
+
+			// Priority 3: All-keys sequence
 			w.Line($"if (_getSequence{fieldSuffix} != null && _getSequenceIndex{fieldSuffix} < _getSequence{fieldSuffix}.Count)");
 			using (w.Braces())
 			{
@@ -536,7 +682,7 @@ internal static class IndexerInterceptorRenderer
 			}
 			w.Line();
 
-			// Priority 3: Repeating Get callback
+			// Priority 4: Repeating Get callback
 			w.Line($"if (_get{fieldSuffix} != null && _getTracking{fieldSuffix} != null)");
 			using (w.Braces())
 			{
@@ -550,17 +696,17 @@ internal static class IndexerInterceptorRenderer
 			w.Line($"_unconfiguredGetCount{fieldSuffix}++;");
 			w.Line();
 
-			// Priority 4: Source (if available)
+			// Priority 5: Source (if available)
 			if (!string.IsNullOrEmpty(model.DeclaringInterface))
 			{
 				w.Line($"if (_source is {{ }} src) {{ _refReturnBacking{fieldSuffix} = src[{model.ArgumentList}]; return; }}");
 				w.Line();
 			}
 
-			// Priority 5: Strict mode check
+			// Priority 6: Strict mode check
 			w.Line($"if ({options.StrictAccessExpression}) throw global::KnockOff.StubException.NotConfigured(\"\", \"{model.IndexerName}\");");
 
-			// Priority 6: Default
+			// Priority 7: Default
 			w.Line($"_refReturnBacking{fieldSuffix} = default!;");
 		}
 		w.Line();
@@ -609,6 +755,18 @@ internal static class IndexerInterceptorRenderer
 						w.Line("\ttracking.Reset();");
 					}
 					w.Line($"_setSequenceIndex{suffix} = 0;");
+				}
+
+				// Reset When chains
+				if (model.HasGetter)
+				{
+					w.Line($"_whenGetChainHead{suffix} = 0;");
+					w.Line($"if (_whenGetChain{suffix} != null) foreach (var m in _whenGetChain{suffix}) m.CallCount = 0;");
+				}
+				if (model.HasSetter)
+				{
+					w.Line($"_whenSetChainHead{suffix} = 0;");
+					w.Line($"if (_whenSetChain{suffix} != null) foreach (var m in _whenSetChain{suffix}) m.CallCount = 0;");
 				}
 
 				// Reset per-key builders
@@ -743,13 +901,21 @@ internal static class IndexerInterceptorRenderer
 		var hasAnyGetter = models.Any(m => m.HasGetter);
 		var hasAnySetter = models.Any(m => m.HasSetter);
 
-		// IsVerifiable: check if ANY key type's get or set is verifiable
+		// IsVerifiable: check if ANY key type's get or set is verifiable (includes When chain verifiable)
 		var isVerifiableParts = new List<string>();
 		foreach (var model in models)
 		{
 			var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
-			if (model.HasGetter) isVerifiableParts.Add($"_isGetVerifiable{suffix}");
-			if (model.HasSetter) isVerifiableParts.Add($"_isSetVerifiable{suffix}");
+			if (model.HasGetter)
+			{
+				isVerifiableParts.Add($"_isGetVerifiable{suffix}");
+				isVerifiableParts.Add($"_whenGetVerifiable{suffix}");
+			}
+			if (model.HasSetter)
+			{
+				isVerifiableParts.Add($"_isSetVerifiable{suffix}");
+				isVerifiableParts.Add($"_whenSetVerifiable{suffix}");
+			}
 		}
 		w.Line("/// <summary>Whether this indexer was marked with Verifiable().</summary>");
 		w.Line($"internal bool IsVerifiable => {string.Join(" || ", isVerifiableParts)};");
@@ -782,25 +948,75 @@ internal static class IndexerInterceptorRenderer
 		{
 			w.Line("if (!IsVerifiable) return null;");
 
-			// For simplicity in the new design, use combined verification
-			w.Line($"var times = global::KnockOff.Called.AtLeastOnce;");
-
-			// Find any verifiable times constraint
+			// Check regular (all-keys) verifiable
+			// Build check that combines _isGetVerifiable and _isSetVerifiable
+			var regularVerifiableParts = new List<string>();
 			foreach (var model in models)
 			{
-				var suffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var rvSuffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				if (model.HasGetter) regularVerifiableParts.Add($"_isGetVerifiable{rvSuffix}");
+				if (model.HasSetter) regularVerifiableParts.Add($"_isSetVerifiable{rvSuffix}");
+			}
+			w.Line($"if ({string.Join(" || ", regularVerifiableParts)})");
+			using (w.Braces())
+			{
+				w.Line($"var times = global::KnockOff.Called.AtLeastOnce;");
+
+				// Find any verifiable times constraint
+				foreach (var model in models)
+				{
+					var rvSuffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+					if (model.HasGetter)
+					{
+						w.Line($"if (_getVerifiableTimes{rvSuffix} != null) times = _getVerifiableTimes{rvSuffix}.Value;");
+					}
+					if (model.HasSetter)
+					{
+						w.Line($"if (_setVerifiableTimes{rvSuffix} != null) times = _setVerifiableTimes{rvSuffix}.Value;");
+					}
+				}
+
+				w.Line($"var totalCount = {totalCountExpr};");
+				w.Line($"if (!times.Validate(totalCount)) return new global::KnockOff.VerificationFailure(\"{indexerName}\", times, totalCount);");
+			}
+
+			// Check When chain verifiable (getter and setter chains)
+			foreach (var model in models)
+			{
+				var wcSuffix = isMulti ? $"_{model.KeyTypeFriendlyName}" : "";
+				var friendlyName = isMulti ? model.KeyTypeFriendlyName : "";
+
 				if (model.HasGetter)
 				{
-					w.Line($"if (_getVerifiableTimes{suffix} != null) times = _getVerifiableTimes{suffix}.Value;");
+					w.Line($"if (_whenGetVerifiable{wcSuffix} && _whenGetChain{wcSuffix} != null && _whenGetChain{wcSuffix}.Count > 0)");
+					using (w.Braces())
+					{
+						w.Line($"var head = _whenGetChainHead{wcSuffix};");
+						w.Line($"var count = _whenGetChain{wcSuffix}.Count;");
+						w.Line($"if (head < count && !_whenGetChain{wcSuffix}[head].IsTerminal && _whenGetChain{wcSuffix}[head].CallCount == 0)");
+						using (w.Braces())
+						{
+							w.Line($"return global::KnockOff.VerificationFailure.SequenceIncomplete(\"indexer getter When chain\", count, head);");
+						}
+					}
 				}
 				if (model.HasSetter)
 				{
-					w.Line($"if (_setVerifiableTimes{suffix} != null) times = _setVerifiableTimes{suffix}.Value;");
+					w.Line($"if (_whenSetVerifiable{wcSuffix} && _whenSetChain{wcSuffix} != null && _whenSetChain{wcSuffix}.Count > 0)");
+					using (w.Braces())
+					{
+						w.Line($"var head = _whenSetChainHead{wcSuffix};");
+						w.Line($"var count = _whenSetChain{wcSuffix}.Count;");
+						w.Line($"if (head < count && !_whenSetChain{wcSuffix}[head].IsTerminal && _whenSetChain{wcSuffix}[head].CallCount == 0)");
+						using (w.Braces())
+						{
+							w.Line($"return global::KnockOff.VerificationFailure.SequenceIncomplete(\"indexer setter When chain\", count, head);");
+						}
+					}
 				}
 			}
 
-			w.Line($"var totalCount = {totalCountExpr};");
-			w.Line($"return times.Validate(totalCount) ? null : new global::KnockOff.VerificationFailure(\"{indexerName}\", times, totalCount);");
+			w.Line("return null;");
 		}
 		w.Line();
 
@@ -973,6 +1189,37 @@ internal static class IndexerInterceptorRenderer
 				using (w.Braces())
 				{
 					w.Line("_setCallback?.Invoke(value);");
+				}
+				w.Line();
+			}
+
+			// Per-key verification methods
+			if (model.HasGetter)
+			{
+				w.Line("/// <summary>Verifies this key's getter was called at least once. Throws VerificationException if not.</summary>");
+				w.Line("public void VerifyGet() => VerifyGet(global::KnockOff.Called.AtLeastOnce);");
+				w.Line();
+				w.Line("/// <summary>Verifies this key's getter call count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+				w.Line("public void VerifyGet(global::KnockOff.Called times)");
+				using (w.Braces())
+				{
+					w.Line("if (!times.Validate(_getCallCount))");
+					w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"indexer getter (per-key)\", times, _getCallCount));");
+				}
+				w.Line();
+			}
+
+			if (model.HasSetter)
+			{
+				w.Line("/// <summary>Verifies this key's setter was called at least once. Throws VerificationException if not.</summary>");
+				w.Line("public void VerifySet() => VerifySet(global::KnockOff.Called.AtLeastOnce);");
+				w.Line();
+				w.Line("/// <summary>Verifies this key's setter call count satisfies the Called constraint. Throws VerificationException if not.</summary>");
+				w.Line("public void VerifySet(global::KnockOff.Called times)");
+				using (w.Braces())
+				{
+					w.Line("if (!times.Validate(_setCallCount))");
+					w.Line("\tthrow new global::KnockOff.VerificationException(new global::KnockOff.VerificationFailure(\"indexer setter (per-key)\", times, _setCallCount));");
 				}
 				w.Line();
 			}
@@ -1360,6 +1607,394 @@ internal static class IndexerInterceptorRenderer
 			using (w.Braces())
 			{
 				w.Line($"_interceptor._setRepeatLastValue{fieldSuffix} = false;");
+			}
+		}
+		w.Line();
+	}
+
+	#endregion
+
+	#region Nested IndexerGetWhenMatcher Classes
+
+	private static void RenderIndexerGetWhenMatcherClasses(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		string friendlyName)
+	{
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+
+		// Abstract base
+		w.Line($"/// <summary>Abstract base for indexer getter When chain matchers.</summary>");
+		w.Line($"private abstract class IndexerGetWhenMatcher{friendlyName}");
+		using (w.Braces())
+		{
+			w.Line($"public abstract bool Matches({keyType} key);");
+			w.Line($"public abstract {valueType} Call({keyType} key);");
+			w.Line("public abstract bool IsTerminal { get; }");
+			w.Line("public int CallCount { get; set; }");
+		}
+		w.Line();
+
+		// Value matcher - predicate + stored value
+		w.Line($"/// <summary>Getter matcher that uses a predicate and returns a stored value.</summary>");
+		w.Line($"private sealed class IndexerGetWhenMatcherValue{friendlyName} : IndexerGetWhenMatcher{friendlyName}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly global::System.Func<{keyType}, bool> _predicate;");
+			w.Line($"private readonly {valueType} _value;");
+			w.Line();
+			w.Line($"public IndexerGetWhenMatcherValue{friendlyName}(global::System.Func<{keyType}, bool> predicate, {valueType} value)");
+			using (w.Braces())
+			{
+				w.Line("_predicate = predicate;");
+				w.Line("_value = value;");
+			}
+			w.Line();
+			w.Line($"public override bool Matches({keyType} key) => _predicate(key);");
+			w.Line($"public override {valueType} Call({keyType} key) => _value;");
+			w.Line("public override bool IsTerminal => false;");
+		}
+		w.Line();
+
+		// Callback matcher - predicate + callback
+		w.Line($"/// <summary>Getter matcher that uses a predicate and invokes a callback.</summary>");
+		w.Line($"private sealed class IndexerGetWhenMatcherCallback{friendlyName} : IndexerGetWhenMatcher{friendlyName}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly global::System.Func<{keyType}, bool> _predicate;");
+			w.Line($"private readonly global::System.Func<{keyType}, {valueType}> _callback;");
+			w.Line();
+			w.Line($"public IndexerGetWhenMatcherCallback{friendlyName}(global::System.Func<{keyType}, bool> predicate, global::System.Func<{keyType}, {valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("_predicate = predicate;");
+				w.Line("_callback = callback;");
+			}
+			w.Line();
+			w.Line($"public override bool Matches({keyType} key) => _predicate(key);");
+			w.Line($"public override {valueType} Call({keyType} key) => _callback(key);");
+			w.Line("public override bool IsTerminal => false;");
+		}
+		w.Line();
+
+		// None matcher - never matches, terminal
+		w.Line($"/// <summary>Getter matcher that never matches. Used to close chain without fallback. Terminal.</summary>");
+		w.Line($"private sealed class IndexerGetWhenMatcherNone{friendlyName} : IndexerGetWhenMatcher{friendlyName}");
+		using (w.Braces())
+		{
+			w.Line($"public override bool Matches({keyType} key) => false;");
+			w.Line($"public override {valueType} Call({keyType} key) => default!;");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+	}
+
+	#endregion
+
+	#region Nested IndexerSetWhenMatcher Classes
+
+	private static void RenderIndexerSetWhenMatcherClasses(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		string friendlyName)
+	{
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+
+		// Abstract base
+		w.Line($"/// <summary>Abstract base for indexer setter When chain matchers.</summary>");
+		w.Line($"private abstract class IndexerSetWhenMatcher{friendlyName}");
+		using (w.Braces())
+		{
+			w.Line($"public abstract bool Matches({keyType} key);");
+			w.Line($"public abstract void Call({keyType} key, {valueType} value);");
+			w.Line("public abstract bool IsTerminal { get; }");
+			w.Line("public int CallCount { get; set; }");
+		}
+		w.Line();
+
+		// Callback matcher - predicate + callback
+		w.Line($"/// <summary>Setter matcher that uses a predicate and invokes a callback.</summary>");
+		w.Line($"private sealed class IndexerSetWhenMatcherCallback{friendlyName} : IndexerSetWhenMatcher{friendlyName}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly global::System.Func<{keyType}, bool> _predicate;");
+			w.Line($"private readonly global::System.Action<{keyType}, {valueType}> _callback;");
+			w.Line();
+			w.Line($"public IndexerSetWhenMatcherCallback{friendlyName}(global::System.Func<{keyType}, bool> predicate, global::System.Action<{keyType}, {valueType}> callback)");
+			using (w.Braces())
+			{
+				w.Line("_predicate = predicate;");
+				w.Line("_callback = callback;");
+			}
+			w.Line();
+			w.Line($"public override bool Matches({keyType} key) => _predicate(key);");
+			w.Line($"public override void Call({keyType} key, {valueType} value) => _callback(key, value);");
+			w.Line("public override bool IsTerminal => false;");
+		}
+		w.Line();
+
+		// None matcher - never matches, terminal
+		w.Line($"/// <summary>Setter matcher that never matches. Used to close chain without fallback. Terminal.</summary>");
+		w.Line($"private sealed class IndexerSetWhenMatcherNone{friendlyName} : IndexerSetWhenMatcher{friendlyName}");
+		using (w.Braces())
+		{
+			w.Line($"public override bool Matches({keyType} key) => false;");
+			w.Line($"public override void Call({keyType} key, {valueType} value) {{ }}");
+			w.Line("public override bool IsTerminal => true;");
+		}
+		w.Line();
+	}
+
+	#endregion
+
+	#region Nested IndexerWhenBuilder
+
+	private static void RenderIndexerWhenBuilder(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		string interceptorClassName,
+		string friendlyName,
+		string fieldSuffix)
+	{
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+		var builderName = $"IndexerWhenBuilder{friendlyName}";
+
+		w.Line($"/// <summary>Builder for indexer When matchers. Captures predicate, routes Returns()/Get() to getter chain and Set() to setter chain.</summary>");
+		w.Line($"public sealed class {builderName}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _interceptor;");
+			w.Line($"private readonly global::System.Func<{keyType}, bool> _predicate;");
+			w.Line();
+
+			w.Line($"internal {builderName}({interceptorClassName} interceptor, global::System.Func<{keyType}, bool> predicate)");
+			using (w.Braces())
+			{
+				w.Line("_interceptor = interceptor;");
+				w.Line("_predicate = predicate;");
+			}
+			w.Line();
+
+			// Returns(value) - routes to getter chain
+			if (model.HasGetter)
+			{
+				w.Line($"/// <summary>Configures the return value when predicate matches (getter chain). Returns chain for ThenWhen/ThenNone.</summary>");
+				w.Line($"public IndexerGetWhenChain{friendlyName} Returns({valueType} value)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor._whenGetChain{fieldSuffix} ??= new global::System.Collections.Generic.List<IndexerGetWhenMatcher{friendlyName}>();");
+					w.Line($"_interceptor._whenGetChain{fieldSuffix}.Add(new IndexerGetWhenMatcherValue{friendlyName}(_predicate, value));");
+					w.Line($"return new IndexerGetWhenChain{friendlyName}(_interceptor);");
+				}
+				w.Line();
+
+				// Get(callback) - routes to getter chain with callback
+				w.Line($"/// <summary>Configures a callback when predicate matches (getter chain). Returns chain for ThenWhen/ThenNone.</summary>");
+				w.Line($"public IndexerGetWhenChain{friendlyName} Get(global::System.Func<{keyType}, {valueType}> callback)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor._whenGetChain{fieldSuffix} ??= new global::System.Collections.Generic.List<IndexerGetWhenMatcher{friendlyName}>();");
+					w.Line($"_interceptor._whenGetChain{fieldSuffix}.Add(new IndexerGetWhenMatcherCallback{friendlyName}(_predicate, callback));");
+					w.Line($"return new IndexerGetWhenChain{friendlyName}(_interceptor);");
+				}
+				w.Line();
+			}
+
+			// Set(callback) - routes to setter chain
+			if (model.HasSetter)
+			{
+				w.Line($"/// <summary>Configures a callback when predicate matches (setter chain). Returns chain for ThenWhen/ThenNone.</summary>");
+				w.Line($"public IndexerSetWhenChain{friendlyName} Set(global::System.Action<{keyType}, {valueType}> callback)");
+				using (w.Braces())
+				{
+					w.Line($"_interceptor._whenSetChain{fieldSuffix} ??= new global::System.Collections.Generic.List<IndexerSetWhenMatcher{friendlyName}>();");
+					w.Line($"_interceptor._whenSetChain{fieldSuffix}.Add(new IndexerSetWhenMatcherCallback{friendlyName}(_predicate, callback));");
+					w.Line($"return new IndexerSetWhenChain{friendlyName}(_interceptor);");
+				}
+				w.Line();
+			}
+		}
+		w.Line();
+	}
+
+	#endregion
+
+	#region Nested IndexerGetWhenChain
+
+	private static void RenderIndexerGetWhenChain(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		string interceptorClassName,
+		string friendlyName,
+		string fieldSuffix)
+	{
+		if (!model.HasGetter) return;
+
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+		var chainName = $"IndexerGetWhenChain{friendlyName}";
+		var builderName = $"IndexerWhenBuilder{friendlyName}";
+
+		w.Line($"/// <summary>Getter When chain implementation with ThenWhen, ThenNone, Verify, Reset.</summary>");
+		w.Line($"public sealed class {chainName}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _interceptor;");
+			w.Line();
+
+			w.Line($"internal {chainName}({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line();
+
+			// ThenWhen(predicate) - returns builder for next matcher
+			w.Line($"/// <summary>Adds another predicate matcher to the getter When chain.</summary>");
+			w.Line($"public {builderName} ThenWhen(global::System.Func<{keyType}, bool> predicate)");
+			using (w.Braces())
+			{
+				w.Line($"return new {builderName}(_interceptor, predicate);");
+			}
+			w.Line();
+
+			// ThenNone() - terminal, never matches
+			w.Line($"/// <summary>Closes getter chain with no matcher. Falls through when exhausted.</summary>");
+			w.Line("public void ThenNone()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor._whenGetChain{fieldSuffix} ??= new global::System.Collections.Generic.List<IndexerGetWhenMatcher{friendlyName}>();");
+				w.Line($"_interceptor._whenGetChain{fieldSuffix}.Add(new IndexerGetWhenMatcherNone{friendlyName}());");
+			}
+			w.Line();
+
+			// Verify() - checks if chain was consumed
+			w.Line($"/// <summary>Verifies the getter When chain was fully consumed.</summary>");
+			w.Line("public void Verify()");
+			using (w.Braces())
+			{
+				w.Line($"if (_interceptor._whenGetChain{fieldSuffix} == null || _interceptor._whenGetChain{fieldSuffix}.Count == 0) return;");
+				w.Line($"var head = _interceptor._whenGetChainHead{fieldSuffix};");
+				w.Line($"var count = _interceptor._whenGetChain{fieldSuffix}.Count;");
+				w.Line($"if (head < count && !_interceptor._whenGetChain{fieldSuffix}[head].IsTerminal && _interceptor._whenGetChain{fieldSuffix}[head].CallCount == 0)");
+				using (w.Braces())
+				{
+					w.Line("throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"indexer getter When chain\", count, head));");
+				}
+			}
+			w.Line();
+
+			// Reset() - resets HEAD and all matcher CallCounts
+			w.Line($"/// <summary>Resets getter When chain HEAD and all matcher call counts.</summary>");
+			w.Line("public void Reset()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor._whenGetChainHead{fieldSuffix} = 0;");
+				w.Line($"if (_interceptor._whenGetChain{fieldSuffix} != null)");
+				using (w.Braces())
+				{
+					w.Line($"foreach (var matcher in _interceptor._whenGetChain{fieldSuffix})");
+					w.Line("\tmatcher.CallCount = 0;");
+				}
+			}
+			w.Line();
+
+			// Verifiable()
+			w.Line($"/// <summary>Marks this getter When chain for verification by Stub.Verify().</summary>");
+			w.Line($"public {chainName} Verifiable()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor._whenGetVerifiable{fieldSuffix} = true;");
+				w.Line("return this;");
+			}
+		}
+		w.Line();
+	}
+
+	#endregion
+
+	#region Nested IndexerSetWhenChain
+
+	private static void RenderIndexerSetWhenChain(
+		CodeWriter w,
+		UnifiedIndexerInterceptorModel model,
+		string interceptorClassName,
+		string friendlyName,
+		string fieldSuffix)
+	{
+		if (!model.HasSetter) return;
+
+		var keyType = model.KeyType;
+		var valueType = model.ValueType;
+		var chainName = $"IndexerSetWhenChain{friendlyName}";
+		var builderName = $"IndexerWhenBuilder{friendlyName}";
+
+		w.Line($"/// <summary>Setter When chain implementation with ThenWhen, ThenNone, Verify, Reset.</summary>");
+		w.Line($"public sealed class {chainName}");
+		using (w.Braces())
+		{
+			w.Line($"private readonly {interceptorClassName} _interceptor;");
+			w.Line();
+
+			w.Line($"internal {chainName}({interceptorClassName} interceptor) => _interceptor = interceptor;");
+			w.Line();
+
+			// ThenWhen(predicate) - returns builder for next matcher
+			w.Line($"/// <summary>Adds another predicate matcher to the setter When chain.</summary>");
+			w.Line($"public {builderName} ThenWhen(global::System.Func<{keyType}, bool> predicate)");
+			using (w.Braces())
+			{
+				w.Line($"return new {builderName}(_interceptor, predicate);");
+			}
+			w.Line();
+
+			// ThenNone() - terminal, never matches
+			w.Line($"/// <summary>Closes setter chain with no matcher. Falls through when exhausted.</summary>");
+			w.Line("public void ThenNone()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor._whenSetChain{fieldSuffix} ??= new global::System.Collections.Generic.List<IndexerSetWhenMatcher{friendlyName}>();");
+				w.Line($"_interceptor._whenSetChain{fieldSuffix}.Add(new IndexerSetWhenMatcherNone{friendlyName}());");
+			}
+			w.Line();
+
+			// Verify() - checks if chain was consumed
+			w.Line($"/// <summary>Verifies the setter When chain was fully consumed.</summary>");
+			w.Line("public void Verify()");
+			using (w.Braces())
+			{
+				w.Line($"if (_interceptor._whenSetChain{fieldSuffix} == null || _interceptor._whenSetChain{fieldSuffix}.Count == 0) return;");
+				w.Line($"var head = _interceptor._whenSetChainHead{fieldSuffix};");
+				w.Line($"var count = _interceptor._whenSetChain{fieldSuffix}.Count;");
+				w.Line($"if (head < count && !_interceptor._whenSetChain{fieldSuffix}[head].IsTerminal && _interceptor._whenSetChain{fieldSuffix}[head].CallCount == 0)");
+				using (w.Braces())
+				{
+					w.Line("throw new global::KnockOff.VerificationException(global::KnockOff.VerificationFailure.SequenceIncomplete(\"indexer setter When chain\", count, head));");
+				}
+			}
+			w.Line();
+
+			// Reset() - resets HEAD and all matcher CallCounts
+			w.Line($"/// <summary>Resets setter When chain HEAD and all matcher call counts.</summary>");
+			w.Line("public void Reset()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor._whenSetChainHead{fieldSuffix} = 0;");
+				w.Line($"if (_interceptor._whenSetChain{fieldSuffix} != null)");
+				using (w.Braces())
+				{
+					w.Line($"foreach (var matcher in _interceptor._whenSetChain{fieldSuffix})");
+					w.Line("\tmatcher.CallCount = 0;");
+				}
+			}
+			w.Line();
+
+			// Verifiable()
+			w.Line($"/// <summary>Marks this setter When chain for verification by Stub.Verify().</summary>");
+			w.Line($"public {chainName} Verifiable()");
+			using (w.Braces())
+			{
+				w.Line($"_interceptor._whenSetVerifiable{fieldSuffix} = true;");
+				w.Line("return this;");
 			}
 		}
 		w.Line();

@@ -152,6 +152,26 @@ public partial class ReadWriteStoreKnockOff : IReadWriteStore
 {
 }
 
+public interface ISimpleIndexer
+{
+	int this[string key] { get; set; }
+}
+
+public interface IMatrixIndexer
+{
+	double this[int row, int col] { get; set; }
+}
+
+[KnockOff]
+public partial class SimpleIndexerKnockOff : ISimpleIndexer
+{
+}
+
+[KnockOff]
+public partial class MatrixIndexerKnockOff : IMatrixIndexer
+{
+}
+
 #endregion
 
 #region Event Test Types
