@@ -8,26 +8,28 @@ Indexer interceptors are generated for `this[TKey]` members on interfaces and vi
 
 Access per-key builders via the interceptor's C# indexer. Each key gets its own builder with independent configuration.
 
-```csharp
+<!-- snippet: indexers-ref-perkey -->
+```cs
 // Configure specific keys to return specific values
-stub.Indexer["existing"].Returns(100);
-stub.Indexer["special"].Returns(999);
+stub.Indexer["existing"].Returns("100");
+stub.Indexer["special"].Returns("999");
 
-ICollection<string, int> collection = stub;
-var val = collection["existing"]; // 100
-var val2 = collection["special"]; // 999
+IConfigStore collection = stub;
+var val = collection["existing"]; // "100"
+var val2 = collection["special"]; // "999"
 ```
+<!-- endSnippet -->
 
 ### Per-Key Builder API
 
 | Method | Description |
 |--------|-------------|
 | `stub.Indexer[key].Returns(value)` | Configure return value for this key |
-| `stub.Indexer[key].Get(() => value)` | Per-key getter callback (no key param — already bound) |
-| `stub.Indexer[key].Set((value) => {})` | Per-key setter callback (no key param — already bound) |
+| `stub.Indexer[key].Get(() => value)` | Per-key getter callback (no key param -- already bound) |
+| `stub.Indexer[key].Set((value) => {})` | Per-key setter callback (no key param -- already bound) |
 | `stub.Indexer[key].Returns(v1).ThenReturns(v2)` | Per-key getter sequence |
 
-**Per-key callbacks do NOT receive the key** — it's already bound by the indexer accessor.
+**Per-key callbacks do NOT receive the key** -- it's already bound by the indexer accessor.
 
 ---
 
@@ -35,18 +37,23 @@ var val2 = collection["special"]; // 999
 
 All-keys callbacks handle keys not configured with per-key builders. They receive the key as a parameter.
 
-```csharp
+<!-- snippet: indexers-ref-allkeys-get -->
+```cs
 // Get callback receives the key
-stub.Indexer.Get((key) => key.Length);
+stub.Indexer.Get((key) => key.Length.ToString());
 
-ICollection<string, int> collection = stub;
-var len1 = collection["hello"]; // 5
-var len2 = collection["hi"];    // 2
+IConfigStore collection = stub;
+var len1 = collection["hello"]; // "5"
+var len2 = collection["hi"];    // "2"
+```
+<!-- endSnippet -->
 
+<!-- snippet: indexers-ref-allkeys-set -->
+```cs
 // Set callback receives key AND value
 stub.Indexer.Set((key, value) => storage[key] = value);
-collection["one"] = 1;  // storage["one"] = 1
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -54,14 +61,16 @@ collection["one"] = 1;  // storage["one"] = 1
 
 Per-key builders take priority over all-keys callbacks. This is the recommended pattern.
 
-```csharp
-stub.Indexer["special"].Returns(999);     // Per-key: always 999
-stub.Indexer.Get((key) => key.Length);     // All-keys: fallback
+<!-- snippet: indexers-ref-perkey-fallback -->
+```cs
+stub.Indexer["special"].Returns("999");     // Per-key: always "999"
+stub.Indexer.Get((key) => key.Length.ToString());     // All-keys: fallback
 
-ICollection<string, int> collection = stub;
-var r1 = collection["special"]; // 999 (per-key wins)
-var r2 = collection["hello"];   // 5 (callback fallback)
+IConfigStore collection = stub;
+var r1 = collection["special"]; // "999" (per-key wins)
+var r2 = collection["hello"];   // "5" (callback fallback)
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -69,12 +78,12 @@ var r2 = collection["hello"];   // 5 (callback fallback)
 
 When an indexer getter is invoked, KnockOff resolves the value in this order:
 
-1. **Per-key builder** — `stub.Indexer[key].Returns(value)` (highest)
-2. **All-keys sequence** — `Get().ThenGet()` if active
-3. **All-keys Get callback** — `Get((key) => value)`
-4. **Source delegation** — `stub.Source(realImpl)`
-5. **Strict mode check** — throws `StubException` if strict
-6. **Default value** — `default(T)` (lowest)
+1. **Per-key builder** -- `stub.Indexer[key].Returns(value)` (highest)
+2. **All-keys sequence** -- `Get().ThenGet()` if active
+3. **All-keys Get callback** -- `Get((key) => value)`
+4. **Source delegation** -- `stub.Source(realImpl)`
+5. **Strict mode check** -- throws `StubException` if strict
+6. **Default value** -- `default(T)` (lowest)
 
 ---
 
@@ -84,29 +93,28 @@ For `this[int row, int col]` indexers, per-key builders use **flattened** syntax
 
 ### Per-Key: Flattened Accessors
 
-```csharp
-// Flattened — natural C# indexer syntax
+<!-- snippet: indexers-ref-multi-perkey -->
+```cs
+// Flattened -- natural C# indexer syntax
 stub.Indexer[1, 2].Returns(12.0);
 stub.Indexer[3, 4].Returns(34.0);
 
 IMatrix matrix = stub;
 var val = matrix[1, 2]; // 12.0
 ```
+<!-- endSnippet -->
 
 ### All-Keys: Tuple Callbacks
 
-```csharp
+<!-- snippet: indexers-ref-multi-allkeys -->
+```cs
 // Get callback receives named tuple
 stub.Indexer.Get(key => key.row * 10.0 + key.col);
 
 IMatrix matrix = stub;
 var val = matrix[2, 3]; // 23.0
-
-// Set callback receives tuple key and value
-stub.Indexer.Set((key, value) => {
-    // key.row, key.col, value available
-});
 ```
+<!-- endSnippet -->
 
 **Key insight**: Per-key uses flattened `[row, col]`, callbacks use tuple `(int row, int col)`.
 
@@ -116,15 +124,15 @@ stub.Indexer.Set((key, value) => {
 
 When an interface has multiple indexers distinguished by key type, C# overload resolution handles it automatically:
 
-```csharp
-// string indexer
-stub.Indexer["foo"].Returns(42);
-
-// int indexer
-stub.Indexer[3].Returns(99);
+<!-- snippet: indexers-multiple-overloads -->
+```cs
+// C# indexer overloads resolve by key type -- no OfXxx needed
+stub.Indexer["name"].Returns("Alice");
+stub.Indexer[0].Returns(100);
 ```
+<!-- endSnippet -->
 
-No special syntax needed — the compiler resolves the correct overload.
+No special syntax needed -- the compiler resolves the correct overload.
 
 ---
 
@@ -132,62 +140,64 @@ No special syntax needed — the compiler resolves the correct overload.
 
 Indexers with `{ get; init; }` work identically to `{ get; set; }`. The interceptor API is unchanged.
 
-```csharp
-stub.Indexer["key"].Returns(42);
-
-IInitIndexerCollection<string, int> collection = stub;
-var val = collection["key"]; // 42
-```
-
 ---
 
 ## Sequences (All-Keys)
 
-Indexer getter sequences are **global** — they advance on ANY key access, not per-key.
+Indexer getter sequences are **global** -- they advance on ANY key access, not per-key.
 
 ### Get().ThenGet()
 
-```csharp
-stub.Indexer.Get((k) => k.Length)
-    .ThenGet((k) => 100)
-    .ThenGet((k) => 999);
+<!-- snippet: sequences-indexer-allkeys-get -->
+```cs
+stub.Indexer.Get((k) => k.Length.ToString())
+    .ThenGet((k) => "100")
+    .ThenGet((k) => "999");
 
-ICollection<string, int> collection = stub;
-var r1 = collection["hello"]; // 5 (first callback)
-var r2 = collection["world"]; // 100 (second callback)
-var r3 = collection["foo"];   // 999 (third callback)
-var r4 = collection["bar"];   // 999 (repeats last)
+IConfigStore collection = stub;
+_ = collection["hello"]; // "5" (first callback)
+_ = collection["world"]; // "100" (second callback)
+_ = collection["foo"];   // "999" (third)
+_ = collection["bar"];   // "999" (repeats)
 ```
+<!-- endSnippet -->
 
 ### Set().ThenSet()
 
-```csharp
+<!-- snippet: sequences-indexer-allkeys-set -->
+```cs
 stub.Indexer.Set((k, v) => log.Add($"First: {k}={v}"))
-    .ThenSet((k, v) => log.Add($"Second: {k}={v}"))
     .ThenSet((k, v) => log.Add($"Final: {k}={v}"));
 ```
+<!-- endSnippet -->
 
 ### ThenDefault()
 
-Return `default(T)` after exhaustion instead of repeating last value:
+<!-- snippet: indexers-ref-thendefault -->
+```cs
+stub.Indexer.Get((k) => k.Length.ToString())
+    .ThenGet((k) => "100")
+    .ThenDefault();  // null after exhaustion
 
-```csharp
-stub.Indexer.Get((k) => k.Length)
-    .ThenGet((k) => 100)
-    .ThenDefault();  // 0 after exhaustion
-
-var r3 = collection["foo"]; // 0 (default)
+IConfigStore collection = stub;
+var r1 = collection["hello"]; // "5"
+var r2 = collection["world"]; // "100"
+var r3 = collection["foo"];   // null (default)
 ```
+<!-- endSnippet -->
 
 ### Sequences Are Global, Not Per-Key
 
-```csharp
-stub.Indexer.Get((k) => 1).ThenGet((k) => 2).ThenGet((k) => 3);
+<!-- snippet: sequences-indexer-global -->
+```cs
+stub.Indexer.Get((k) => "1").ThenGet((k) => "2").ThenGet((k) => "3");
 
-collection["a"]; // 1
-collection["b"]; // 2 (advanced despite different key)
-collection["c"]; // 3
+IConfigStore collection = stub;
+_ = collection["a"]; // "1"
+_ = collection["b"]; // "2" (advanced despite different key!)
+_ = collection["c"]; // "3"
 ```
+<!-- endSnippet -->
 
 For per-key behavior, use per-key `Returns` or a Get callback with its own dictionary.
 
@@ -200,15 +210,17 @@ For per-key behavior, use per-key `Returns` or a Get callback with its own dicti
 | `LastGetKey` | `TKey?` | Key from the most recent getter call (any path) |
 | `LastSetEntry` | `(TKey, TValue)?` | (Key, Value) from the most recent setter call (any path) |
 
-```csharp
+<!-- snippet: indexers-ref-tracking -->
+```cs
 _ = collection["a"];
 _ = collection["b"];
 var lastKey = stub.Indexer.LastGetKey; // "b"
 
-collection["x"] = 10;
-collection["y"] = 20;
-var lastEntry = stub.Indexer.LastSetEntry; // ("y", 20)
+collection["x"] = "10";
+collection["y"] = "20";
+var lastEntry = stub.Indexer.LastSetEntry; // ("y", "20")
 ```
+<!-- endSnippet -->
 
 Tracking counts ALL accesses regardless of whether handled by per-key, callback, or default.
 
@@ -225,14 +237,13 @@ Tracking counts ALL accesses regardless of whether handled by per-key, callback,
 | `Verifiable()` | Mark for batch verification (AtLeastOnce) |
 | `Verifiable(Called)` | Mark for batch verification with constraint |
 
-```csharp
-_ = collection["test"];
-_ = collection["test"];
-collection["new"] = 42;
-
+<!-- snippet: indexers-verify-access -->
+```cs
+// Verify indexer get/set call counts
 stub.Indexer.VerifyGet(Called.Exactly(2));
 stub.Indexer.VerifySet(Called.Once);
 ```
+<!-- endSnippet -->
 
 Verification counts include ALL access paths (per-key, callback, unconfigured).
 

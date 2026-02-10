@@ -422,6 +422,211 @@ public class CompleteVerificationTests
 }
 
 // =============================================================================
+// Verification Reference Samples (for verification.md)
+// =============================================================================
+
+public class VerifyRefDirectTests
+{
+    [Fact]
+    public void Verify_Direct()
+    {
+        var stub = new RepoVerifyStub();
+        stub.GetById.Return((id) => new User { Id = id });
+        stub.Refresh.Call(() => { });
+
+        IRepoVerify repo = stub;
+        repo.GetById(1);
+        repo.GetById(2);
+
+        #region verification-ref-direct
+        stub.GetById.Verify();                  // At least once (default)
+        stub.GetById.Verify(Called.Exactly(2)); // Exactly twice
+        stub.Refresh.Verify(Called.Never);       // Never called
+        #endregion
+    }
+}
+
+public class VerifyRefBatchTests
+{
+    [Fact]
+    public void Verify_Batch()
+    {
+        var stub = new RepoVerifyStub();
+
+        #region verification-ref-batch
+        // Step 1: Mark during setup
+        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.Save.Call((u) => { }).Verifiable(Called.Exactly(2));
+        stub.Refresh.Call(() => { }).Verifiable(Called.Never);
+
+        // Step 2: Exercise code
+        IRepoVerify repository = stub;
+        repository.GetById(1);
+        repository.Save(new User { Id = 1 });
+        repository.Save(new User { Id = 2 });
+
+        // Step 3: Verify all marked interceptors
+        stub.Verify();  // Checks GetById (AtLeastOnce), Save (Exactly(2)), Refresh (Never)
+        #endregion
+    }
+}
+
+public class VerifyRefVerifyAllTests
+{
+    [Fact]
+    public void Verify_All()
+    {
+        var stub = new RepoVerifyStub();
+
+        #region verification-ref-verifyall
+        stub.GetById.Return((id) => new User { Id = id });
+        stub.Save.Call((user) => { });
+
+        IRepoVerify repo = stub;
+        repo.GetById(1);
+        repo.Save(new User { Id = 1 });
+
+        stub.VerifyAll(); // Checks all configured members were called at least once
+        #endregion
+    }
+
+    [Fact]
+    public void Verify_All_Throws()
+    {
+        var stub = new RepoVerifyStub();
+
+        stub.GetById.Return((id) => new User { Id = id });
+        stub.Save.Call((user) => { });
+
+        IRepoVerify repo = stub;
+        repo.GetById(1);
+        // repo.Save not called
+
+        #region verification-ref-verifyall-throws
+        // VerifyAll THROWS if any configured member was not called
+        Assert.Throws<VerificationException>(() => stub.VerifyAll());
+        #endregion
+    }
+}
+
+public class VerifyRefSequenceTests
+{
+    [Fact]
+    public void Verify_Sequence()
+    {
+        var stub = new RepoVerifyStub();
+
+        #region verification-ref-sequence
+        var sequence = stub.GetById.Return(
+            new User { Id = 1 },
+            new User { Id = 2 },
+            new User { Id = 3 });
+
+        IRepoVerify repo = stub;
+        repo.GetById(1);
+        repo.GetById(2);
+        repo.GetById(3);
+
+        sequence.Verify(); // Passes -- all 3 consumed
+        #endregion
+    }
+}
+
+public class VerifyRefWhenChainTests
+{
+    [Fact]
+    public void Verify_WhenChain()
+    {
+        var stub = new RepoVerifyStub();
+
+        #region verification-ref-when-chain
+        var chain = stub.GetById
+            .When(1).Return(new User { Id = 1, Name = "Alice" })
+            .ThenWhen(2).Return(new User { Id = 2, Name = "Bob" })
+            .ThenCall((id) => new User { Id = id });
+
+        IRepoVerify repo = stub;
+        repo.GetById(1);
+        repo.GetById(2);
+        repo.GetById(3);
+
+        chain.Verify(); // Passes -- all matchers consumed
+        #endregion
+    }
+}
+
+public class VerifyRefExceptionTests
+{
+    [Fact]
+    public void Verify_Exception_CollectsAll()
+    {
+        var stub = new RepoVerifyStub();
+
+        #region verification-ref-exception
+        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        stub.Save.Call((user) => { }).Verifiable();
+        stub.Refresh.Call(() => { }).Verifiable();
+
+        IRepoVerify repo = stub;
+        repo.GetById(1); // Only GetById called
+
+        try { stub.Verify(); }
+        catch (VerificationException ex)
+        {
+            // ex.Failures contains Save AND Refresh failures
+            Assert.True(ex.Failures.Count >= 2);
+        }
+        #endregion
+    }
+}
+
+public class VerifyRefVerifiableChainingTests
+{
+    [Fact]
+    public void Verify_VerifiableChaining()
+    {
+        var stub = new RepoVerifyStub();
+
+        #region verification-ref-verifiable-chaining
+        // Chain with Return
+        stub.GetById.Return((id) => new User { Id = id }).Verifiable(Called.Exactly(2));
+
+        // Chain with Call
+        stub.Save.Call((u) => { }).Verifiable(Called.Once);
+        #endregion
+
+        IRepoVerify repo = stub;
+        repo.GetById(1);
+        repo.GetById(2);
+        repo.Save(new User { Id = 1 });
+
+        stub.Verify();
+    }
+}
+
+public class VerifyRefResetTests
+{
+    [Fact]
+    public void Verify_ResetPreservesVerifiable()
+    {
+        var stub = new RepoVerifyStub();
+
+        #region verification-ref-reset
+        stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+        IRepoVerify repo = stub;
+        repo.GetById(1);
+        stub.Verify(); // Passes
+
+        stub.GetById.Reset();
+        // stub.Verify(); // Would FAIL -- count reset to 0
+
+        repo.GetById(2);
+        stub.Verify(); // Passes again
+        #endregion
+    }
+}
+
+// =============================================================================
 // Delegate Verification
 // =============================================================================
 

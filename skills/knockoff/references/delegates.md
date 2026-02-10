@@ -8,30 +8,32 @@ Delegate stubs are created with `[KnockOff<DelegateType>]`. They generate a stub
 
 KnockOff requires **named delegate types**. `Func<>` and `Action<>` are NOT supported.
 
-```csharp
-// WRONG: Func<>/Action<> are not distinct types
-// [KnockOff<Func<int, int, int>>]  // Does NOT work
+<!-- snippet: delegate-func-action-not-supported -->
+```cs
+// Does NOT work:
+// [KnockOff<Func<int, int, int>>]  // Not supported
 
-// RIGHT: Define a named delegate
-public delegate int ArithmeticOperation(int a, int b);
-[KnockOff<ArithmeticOperation>]
-public partial class MyTests { }
+// Define a named delegate instead:
+public delegate int NamedCalculation(int a, int b);
+
+[KnockOff<NamedCalculation>]  // Works!
+public partial class NamedDelegateExample { }
 ```
+<!-- endSnippet -->
 
 ---
 
 ## Basic Usage
 
-```csharp
-var stub = new Stubs.ArithmeticOperation();
-
-// Configure via Interceptor
-stub.Interceptor.Return(42);
-
-// Implicit conversion to delegate type
-ArithmeticOperation operation = stub;
-var result = operation(2, 3); // 42
+<!-- snippet: delegate-stub-basic-void -->
+```cs
+// Create stub, convert to delegate, invoke, and verify
+var stub = new BasicVoidDelegateTest.Stubs.OnComplete();
+OnComplete callback = stub;
+callback();
+stub.Interceptor.Verify();
 ```
+<!-- endSnippet -->
 
 **The stub must be converted to the delegate type before invocation.** The Interceptor is for configuration, not direct invocation.
 
@@ -39,58 +41,56 @@ var result = operation(2, 3); // 42
 
 ## Configuration
 
-### Return(value) — Constant Value
+### Return(value) -- Constant Value
 
-```csharp
-stub.Interceptor.Return(100);
-
-ArithmeticOperation op = stub;
-op(1, 2);  // 100
-op(10, 20); // 100
+<!-- snippet: delegate-stub-oncall-value -->
+```cs
+// Return() - pass the return value directly (simpler syntax)
+stub.Interceptor.Return("FORMATTED");
 ```
+<!-- endSnippet -->
 
-### Return(callback) — Dynamic Behavior
+### Return(callback) -- Dynamic Behavior
 
-```csharp
-stub.Interceptor.Return((a, b) => a + b);
-
-ArithmeticOperation op = stub;
-op(2, 3);  // 5
-op(10, 20); // 30
+<!-- snippet: delegate-stub-oncall-return -->
+```cs
+// Return() - compute return value based on input
+stub.Interceptor.Return((input) => input.ToUpperInvariant());
 ```
+<!-- endSnippet -->
 
-### Call(callback) — Void Delegates
+### Call(callback) -- Void Delegates
 
-```csharp
-// delegate void LogAction(string message);
-var stub = new Stubs.LogAction();
-var logged = new List<string>();
-
-stub.Interceptor.Call(msg => logged.Add(msg));
-
-LogAction logger = stub;
-logger("Hello");  // logged: ["Hello"]
+<!-- snippet: delegate-stub-oncall-void -->
+```cs
+// Configure side effects for void delegate
+stub.Interceptor.Call(() => notified = true);
 ```
+<!-- endSnippet -->
 
 ---
 
 ## Sequences
 
-```csharp
-// Params syntax (NSubstitute-style)
+<!-- snippet: delegate-sequences -->
+```cs
+// Return different values on successive calls
 stub.Interceptor.Return(10, 20, 30);
-
-ArithmeticOperation op = stub;
-op(0, 0); // 10
-op(0, 0); // 20
-op(0, 0); // 30
-op(0, 0); // 30 (repeats last)
-
-// Callback sequences
-stub.Interceptor.Return((a, b) => a + b)
-    .ThenReturn((a, b) => a * b)
-    .ThenReturn(999);
+// Call 1: 10, Call 2: 20, Call 3+: 30 (repeats last)
 ```
+<!-- endSnippet -->
+
+Callback sequences:
+
+<!-- snippet: delegate-sequences-callback -->
+```cs
+// Callback sequences
+stub.Interceptor
+    .Return((x) => x * 1)
+    .ThenReturn((x) => x * 2)
+    .ThenReturn((x) => x * 3);
+```
+<!-- endSnippet -->
 
 ---
 
@@ -98,26 +98,24 @@ stub.Interceptor.Return((a, b) => a + b)
 
 ### Value Matching
 
-```csharp
+<!-- snippet: delegate-when-value-matching -->
+```cs
+// Match specific argument values
 stub.Interceptor.When(1, 2).Return(100)
     .ThenWhen(3, 4).Return(200)
-    .ThenCall((a, b) => a + b);  // Terminal fallback
-
-ArithmeticOperation op = stub;
-op(1, 2); // 100
-op(3, 4); // 200
-op(5, 6); // 11 (fallback)
+    .ThenCall((a, b) => a + b);  // terminal fallback
 ```
+<!-- endSnippet -->
 
 ### Predicate Matching (Void Delegates)
 
-```csharp
-// delegate void LogAction(string message);
-stub.Interceptor.When(msg => msg.StartsWith("IMPORTANT:"))
-    .Call(msg => important.Add(msg))
-    .ThenWhen(msg => true)
-    .Call(msg => normal.Add(msg));
+<!-- snippet: delegate-when-void-chains -->
+```cs
+stub.Interceptor
+    .When(1, 2).Call((a, b) => calls.Add("first"))
+    .ThenWhen(3, 4).Call((a, b) => calls.Add("second"));
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -127,41 +125,28 @@ stub.Interceptor.When(msg => msg.StartsWith("IMPORTANT:"))
 |----------------|----------|------|
 | Single parameter | `LastArg` | `T` |
 | Multiple parameters | `LastArgs` | Named tuple `(T1 a, T2 b)` |
-| No parameters | — | No tracking property |
+| No parameters | -- | No tracking property |
 
-```csharp
-// Multi-param: LastArgs
-stub.Interceptor.Return(0);
-ArithmeticOperation op = stub;
-op(5, 10);
-var args = stub.Interceptor.LastArgs; // (5, 10)
-
-// Single-param: LastArg
-// delegate void LogAction(string message);
-LogAction logger = logStub;
-logger("Test");
-var arg = logStub.Interceptor.LastArg; // "Test"
+<!-- snippet: delegate-stub-lastcallargs -->
+```cs
+// LastArgs provides named tuple access
+Assert.Equal("Bob", stub.Interceptor.LastArgs!.Value.name);
+Assert.Equal(25, stub.Interceptor.LastArgs!.Value.age);
 ```
+<!-- endSnippet -->
 
 ---
 
 ## Verification
 
-```csharp
-stub.Interceptor.Return(0);
-ArithmeticOperation op = stub;
-
-op(1, 2);
-op(3, 4);
-
-stub.Interceptor.Verify();              // At least once
-stub.Interceptor.Verify(Called.Exactly(2)); // Exactly twice
-
-// Verifiable for batch
-stub.Interceptor.Return(0).Verifiable();
-// ... later ...
-stub.Verify();
+<!-- snippet: delegate-stub-verification-times -->
+```cs
+// Verify with Times constraints
+stub.Interceptor.Verify(Called.Exactly(3));
+stub.Interceptor.Verify(Called.AtLeast(2));
+stub.Interceptor.Verify(Called.AtMost(5));
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -169,16 +154,14 @@ stub.Verify();
 
 Closed generic delegates use the **simple name** in the Stubs namespace:
 
-```csharp
-// delegate T Factory<T>();
-// [KnockOff<Factory<string>>]
-
-var stub = new Stubs.Factory();  // NOT Stubs.Factory<string>
-stub.Interceptor.Return("Created item");
-
+<!-- snippet: delegate-stub-closed-generic -->
+```cs
+// Closed generic: type arguments specified at stub definition
+var stub = new DelegateStubTests.Stubs.Factory();
+stub.Interceptor.Return(() => "generated value");
 Factory<string> factory = stub;
-var item = factory(); // "Created item"
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -186,30 +169,26 @@ var item = factory(); // "Created item"
 
 Async delegates (`Task<T>`, `ValueTask<T>`) support auto-wrapping:
 
-```csharp
-// delegate Task<int> AsyncOperation(int x);
-var stub = new Stubs.AsyncOperation();
-
-// Tier 1: Value — auto-wraps in Task.FromResult
+<!-- snippet: delegate-async-auto-wrapping -->
+```cs
+// Tier 1: Returns takes inner type - auto-wraps in Task.FromResult
 stub.Interceptor.Return(42);
-
-// Tier 2: Simplified callback — auto-wrapped
-stub.Interceptor.Return((int x) => x * 2);
-
-// Tier 3: Full callback — direct
-stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
 ```
+<!-- endSnippet -->
 
 ---
 
 ## Strict Mode
 
-```csharp
+<!-- snippet: delegate-strict-mode -->
+```cs
+var stub = new DelegateStubTests.Stubs.Calculate();
 stub.Strict = true;
 
-ArithmeticOperation op = stub;
-// op(1, 2); // Throws StubException — not configured
+Calculate calc = stub;
+Assert.Throws<StubException>(() => calc(1, 2)); // Throws StubException.NotConfigured
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -225,14 +204,16 @@ ArithmeticOperation op = stub;
 - Sequence structure, When chain structure
 - Verifiable marking
 
-```csharp
-stub.Interceptor.Return(42);
-op(1, 2);
+<!-- snippet: delegate-stub-reset -->
+```cs
+// Reset clears tracking state but preserves configuration
 stub.Interceptor.Reset();
 
-op(3, 4);  // Still returns 42 (config preserved)
-stub.Interceptor.Verify(Called.Once); // Only 1 call after reset
+stub.Interceptor.Verify(Called.Never);
+Assert.Null(stub.Interceptor.LastArg);
+Assert.Equal("TEST", format("test")); // Return still works
 ```
+<!-- endSnippet -->
 
 ---
 

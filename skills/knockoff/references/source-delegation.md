@@ -1,23 +1,25 @@
 # Source Delegation Reference
 
-Source delegation lets you delegate unconfigured calls to a real implementation. This enables partial stubbing — configure specific methods while the rest fall through to the real object.
+Source delegation lets you delegate unconfigured calls to a real implementation. This enables partial stubbing -- configure specific methods while the rest fall through to the real object.
 
 ---
 
 ## Basic Usage
 
-```csharp
-var stub = new Stubs.ICalculator();
-var realCalculator = new RealCalculator();
+<!-- snippet: source-delegation-ref-basic -->
+```cs
+var stub = new SourceCalcStub();
+var realCalculator = new RealCalc();
 
 stub.Source(realCalculator);
 
-ICalculator calc = stub;
+ISourceCalc calc = stub;
 
-// No methods configured — all delegate to source
-calc.Add(2, 3);      // Returns 5 (from real implementation)
-calc.Subtract(10, 4); // Returns 6 (from real implementation)
+// No methods configured -- all delegate to source
+var r1 = calc.Add(2, 3);      // Returns 5 (from real implementation)
+var r2 = calc.Subtract(10, 4); // Returns 6 (from real implementation)
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -25,17 +27,19 @@ calc.Subtract(10, 4); // Returns 6 (from real implementation)
 
 Configure specific methods while delegating the rest:
 
-```csharp
-var stub = new Stubs.ICalculator();
-stub.Source(new RealCalculator());
+<!-- snippet: source-delegation-ref-partial -->
+```cs
+var stub = new SourceCalcStub();
+stub.Source(new RealCalc());
 
 // Override just one method
 stub.Add.Return(999);
 
-ICalculator calc = stub;
+ISourceCalc calc = stub;
 calc.Add(2, 3);      // 999 (stub configuration wins)
 calc.Subtract(10, 4); // 6 (delegates to source)
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -50,27 +54,33 @@ Source delegation sits below configuration but above defaults:
 5. **Source delegation**
 6. **Default value** (lowest) / StubException in strict mode
 
-```csharp
+<!-- snippet: source-delegation-ref-priority -->
+```cs
 stub.Source(realCalculator);
 stub.Divide.When(10, 2).Return(5);
 
+ISourceCalc calc = stub;
 calc.Divide(10, 2);  // 5 (When chain matched)
-calc.Divide(20, 4);  // 5 (falls to source — real implementation)
+calc.Divide(20, 4);  // 5 (falls to source -- real implementation)
 ```
+<!-- endSnippet -->
 
 ---
 
-## Source(null) — Remove Delegation
+## Source(null) -- Remove Delegation
 
 Pass `null` to remove the source:
 
-```csharp
+<!-- snippet: source-delegation-ref-null -->
+```cs
 stub.Source(realCalculator);
+ISourceCalc calc = stub;
 calc.Add(2, 3); // 5 (from source)
 
 stub.Source(null);
-calc.Add(2, 3); // 0 (default — no source, no configuration)
+calc.Add(2, 3); // 0 (default -- no source, no configuration)
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -78,57 +88,32 @@ calc.Add(2, 3); // 0 (default — no source, no configuration)
 
 When stubbing an interface that extends other interfaces, KnockOff generates **separate `Source()` overloads** for each interface in the hierarchy.
 
+### Source(IStore) -- Full Delegation
+
 ```csharp
 // Given: IStore : IReadableStore
-// IReadableStore has: GetById, Count
-// IStore adds: Save, Delete
-
-var stub = new Stubs.IStore();
-```
-
-### Source(IStore) — Full Delegation
-
-```csharp
 var fullImpl = new InMemoryStore(); // implements IStore
 stub.Source(fullImpl);
-
 // ALL methods delegate
-store.GetById(1);      // delegates to fullImpl
-store.Count;           // delegates to fullImpl
-store.Save(1, "val");  // delegates to fullImpl
-store.Delete(1);       // delegates to fullImpl
 ```
 
-### Source(IReadableStore) — Partial Delegation
+### Source(IReadableStore) -- Partial Delegation
 
 ```csharp
 var readOnly = new ReadOnlyStore(); // implements IReadableStore only
 stub.Source(readOnly);
-
 // Only IReadableStore members delegate
-store.GetById(1); // delegates to readOnly
-store.Count;      // delegates to readOnly
-
-// IStore-only members are NOT delegated — returns defaults
-store.Save(1, "val"); // no-op (void default)
-store.Delete(1);      // no-op (void default)
+// IStore-only members return defaults
 ```
 
 ### Partial Source + Configuration
 
-Combine partial delegation with explicit configuration:
-
-```csharp
-stub.Source(readOnlySource);  // Delegates reads
-
-// Explicitly configure writes
-var saved = new Dictionary<int, string>();
-stub.Save.Call((id, value) => saved[id] = value);
-stub.Delete.Call((id) => saved.Remove(id));
-
-store.GetById(1);          // From readOnlySource
-store.Save(99, "new");     // Goes to saved dictionary
+<!-- snippet: source-partial-override -->
+```cs
+// Override specific member while source handles the rest
+stub.GetById.Return((id) => new User { Id = id, Name = "Test User" });
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -136,16 +121,12 @@ store.Save(99, "new");     // Goes to saved dictionary
 
 `Reset()` on an interceptor clears its source reference:
 
-```csharp
-stub.Source(realCalculator);
-calc.Add(2, 3); // 5 (from source)
-
-stub.Add.Reset();
-calc.Add(2, 3); // 0 (default — source cleared)
-
-// Re-establish if needed
-stub.Source(realCalculator);
+<!-- snippet: source-clear -->
+```cs
+// Clear source to revert to smart defaults
+stub.Source(null);
 ```
+<!-- endSnippet -->
 
 ---
 

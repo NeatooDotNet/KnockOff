@@ -361,6 +361,102 @@ public class FileDataSource : IDataSource
 [KnockOff]
 public partial class DataSourceStub : IDataSource { }
 
+// =============================================================================
+// Source Delegation Reference Samples (for source-delegation.md)
+// =============================================================================
+
+public interface ISourceCalc
+{
+    int Add(int a, int b);
+    int Subtract(int a, int b);
+    int Divide(int a, int b);
+}
+
+public class RealCalc : ISourceCalc
+{
+    public int Add(int a, int b) => a + b;
+    public int Subtract(int a, int b) => a - b;
+    public int Divide(int a, int b) => b == 0 ? 0 : a / b;
+}
+
+[KnockOff]
+public partial class SourceCalcStub : ISourceCalc { }
+
+public class SourceRefBasicTests
+{
+    [Fact]
+    public void Source_BasicDelegation()
+    {
+        #region source-delegation-ref-basic
+        var stub = new SourceCalcStub();
+        var realCalculator = new RealCalc();
+
+        stub.Source(realCalculator);
+
+        ISourceCalc calc = stub;
+
+        // No methods configured -- all delegate to source
+        var r1 = calc.Add(2, 3);      // Returns 5 (from real implementation)
+        var r2 = calc.Subtract(10, 4); // Returns 6 (from real implementation)
+        #endregion
+
+        Assert.Equal(5, r1);
+        Assert.Equal(6, r2);
+    }
+
+    [Fact]
+    public void Source_PartialStubbing()
+    {
+        #region source-delegation-ref-partial
+        var stub = new SourceCalcStub();
+        stub.Source(new RealCalc());
+
+        // Override just one method
+        stub.Add.Return(999);
+
+        ISourceCalc calc = stub;
+        calc.Add(2, 3);      // 999 (stub configuration wins)
+        calc.Subtract(10, 4); // 6 (delegates to source)
+        #endregion
+
+        Assert.Equal(999, calc.Add(0, 0));
+    }
+
+    [Fact]
+    public void Source_RemoveWithNull()
+    {
+        var stub = new SourceCalcStub();
+        var realCalculator = new RealCalc();
+
+        #region source-delegation-ref-null
+        stub.Source(realCalculator);
+        ISourceCalc calc = stub;
+        calc.Add(2, 3); // 5 (from source)
+
+        stub.Source(null);
+        calc.Add(2, 3); // 0 (default -- no source, no configuration)
+        #endregion
+
+        Assert.Equal(0, calc.Add(2, 3));
+    }
+
+    [Fact]
+    public void Source_PriorityWithWhen()
+    {
+        var stub = new SourceCalcStub();
+        var realCalculator = new RealCalc();
+
+        #region source-delegation-ref-priority
+        stub.Source(realCalculator);
+        stub.Divide.When(10, 2).Return(5);
+
+        ISourceCalc calc = stub;
+        calc.Divide(10, 2);  // 5 (When chain matched)
+        calc.Divide(20, 4);  // 5 (falls to source -- real implementation)
+        #endregion
+    }
+}
+
 public class CompleteSourceExampleTests
 {
     [Fact]

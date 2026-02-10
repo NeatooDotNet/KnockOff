@@ -29,52 +29,67 @@ stub.Save.Verify(Called.AtMost(5));
 
 Call `Verify()` directly on any interceptor for immediate checking:
 
-```csharp
-stub.Add.Verify();                  // At least once (default)
-stub.Add.Verify(Called.Exactly(2)); // Exactly twice
-stub.Divide.Verify(Called.Never);   // Never called
+<!-- snippet: verification-ref-direct -->
+```cs
+stub.GetById.Verify();                  // At least once (default)
+stub.GetById.Verify(Called.Exactly(2)); // Exactly twice
+stub.Refresh.Verify(Called.Never);       // Never called
 ```
+<!-- endSnippet -->
 
 Throws `VerificationException` immediately if the constraint is not met.
 
 ---
 
-## Batch Verification — Verifiable() + stub.Verify()
+## Batch Verification -- Verifiable() + stub.Verify()
 
 Mark interceptors during configuration, then verify all at once:
 
-```csharp
+<!-- snippet: verification-ref-batch -->
+```cs
 // Step 1: Mark during setup
-stub.GetById.Return((id) => user).Verifiable();
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
 stub.Save.Call((u) => { }).Verifiable(Called.Exactly(2));
-stub.Delete.Call((id) => { }).Verifiable(Called.Never);
+stub.Refresh.Call(() => { }).Verifiable(Called.Never);
 
 // Step 2: Exercise code
+IRepoVerify repository = stub;
 repository.GetById(1);
-repository.Save(user);
-repository.Save(user2);
+repository.Save(new User { Id = 1 });
+repository.Save(new User { Id = 2 });
 
 // Step 3: Verify all marked interceptors
-stub.Verify();  // Checks GetById (AtLeastOnce), Save (Exactly(2)), Delete (Never)
+stub.Verify();  // Checks GetById (AtLeastOnce), Save (Exactly(2)), Refresh (Never)
 ```
+<!-- endSnippet -->
 
 `stub.Verify()` only checks members marked with `.Verifiable()`. Unconfigured or unmarked members are ignored.
 
 ---
 
-## VerifyAll() — All Configured Members
+## VerifyAll() -- All Configured Members
 
 `stub.VerifyAll()` checks ALL members that were configured (Return, Call, Get, Set, When), not just those marked Verifiable. Expects each to be called at least once.
 
-```csharp
-stub.Add.Return(42);        // Configured
-stub.Subtract.Return(10);   // Configured
+<!-- snippet: verification-ref-verifyall -->
+```cs
+stub.GetById.Return((id) => new User { Id = id });
+stub.Save.Call((user) => { });
 
-calc.Add(1, 2);
-// calc.Subtract not called
+IRepoVerify repo = stub;
+repo.GetById(1);
+repo.Save(new User { Id = 1 });
 
-stub.VerifyAll(); // THROWS — Subtract was configured but never called
+stub.VerifyAll(); // Checks all configured members were called at least once
 ```
+<!-- endSnippet -->
+
+<!-- snippet: verification-ref-verifyall-throws -->
+```cs
+// VerifyAll THROWS if any configured member was not called
+Assert.Throws<VerificationException>(() => stub.VerifyAll());
+```
+<!-- endSnippet -->
 
 ---
 
@@ -129,28 +144,39 @@ stub.GetById.Of<Product>().Verify(Called.Never);
 
 Sequences have their own `Verify()` that checks if the entire sequence was consumed:
 
-```csharp
-var sequence = stub.Add.Return(1, 2, 3);
-calc.Add(0, 0); // 1
-calc.Add(0, 0); // 2
-calc.Add(0, 0); // 3
+<!-- snippet: verification-ref-sequence -->
+```cs
+var sequence = stub.GetById.Return(
+    new User { Id = 1 },
+    new User { Id = 2 },
+    new User { Id = 3 });
 
-sequence.Verify(); // Passes — all 3 consumed
+IRepoVerify repo = stub;
+repo.GetById(1);
+repo.GetById(2);
+repo.GetById(3);
+
+sequence.Verify(); // Passes -- all 3 consumed
 ```
+<!-- endSnippet -->
 
 ### When Chain Verification
 
-```csharp
-var chain = stub.Add.When(1, 2).Return(10)
-    .ThenWhen(3, 4).Return(20)
-    .ThenCall((a, b) => 999);
+<!-- snippet: verification-ref-when-chain -->
+```cs
+var chain = stub.GetById
+    .When(1).Return(new User { Id = 1, Name = "Alice" })
+    .ThenWhen(2).Return(new User { Id = 2, Name = "Bob" })
+    .ThenCall((id) => new User { Id = id });
 
-calc.Add(1, 2);
-calc.Add(3, 4);
-calc.Add(0, 0);
+IRepoVerify repo = stub;
+repo.GetById(1);
+repo.GetById(2);
+repo.GetById(3);
 
-chain.Verify(); // Passes — all matchers consumed
+chain.Verify(); // Passes -- all matchers consumed
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -158,23 +184,23 @@ chain.Verify(); // Passes — all matchers consumed
 
 When verification fails, `VerificationException` collects ALL failures and reports them together:
 
-```csharp
-stub.Add.Return(42).Verifiable();
-stub.Subtract.Return(10).Verifiable();
-stub.Divide.Return(5).Verifiable();
+<!-- snippet: verification-ref-exception -->
+```cs
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+stub.Save.Call((user) => { }).Verifiable();
+stub.Refresh.Call(() => { }).Verifiable();
 
-calc.Add(1, 2); // Only Add called
+IRepoVerify repo = stub;
+repo.GetById(1); // Only GetById called
 
 try { stub.Verify(); }
 catch (VerificationException ex)
 {
-    // ex.Failures contains Subtract AND Divide failures
-    // ex.Message lists all failures:
-    //   "Verification failed:
-    //    - Method 'Subtract' expected AtLeastOnce, was called 0 times
-    //    - Method 'Divide' expected AtLeastOnce, was called 0 times"
+    // ex.Failures contains Save AND Refresh failures
+    Assert.True(ex.Failures.Count >= 2);
 }
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -197,21 +223,15 @@ Choose based on testing philosophy:
 
 `Verifiable()` returns the interceptor for fluent chaining:
 
-```csharp
+<!-- snippet: verification-ref-verifiable-chaining -->
+```cs
 // Chain with Return
-stub.GetUser.Return((id) => user).Verifiable();
-stub.GetUser.Return((id) => user).Verifiable(Called.Exactly(2));
+stub.GetById.Return((id) => new User { Id = id }).Verifiable(Called.Exactly(2));
 
 // Chain with Call
 stub.Save.Call((u) => { }).Verifiable(Called.Once);
-
-// Properties
-stub.Name.Get("test");
-stub.Name.Verifiable();
-
-// Events
-stub.Started.Verifiable();
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -219,14 +239,17 @@ stub.Started.Verifiable();
 
 `Reset()` clears tracking (counts) but preserves the Verifiable marking:
 
-```csharp
-stub.Add.Return(42).Verifiable();
-calc.Add(1, 2);
+<!-- snippet: verification-ref-reset -->
+```cs
+stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+IRepoVerify repo = stub;
+repo.GetById(1);
 stub.Verify(); // Passes
 
-stub.Add.Reset();
-// stub.Verify(); // Would FAIL — count reset to 0
+stub.GetById.Reset();
+// stub.Verify(); // Would FAIL -- count reset to 0
 
-calc.Add(3, 4);
+repo.GetById(2);
 stub.Verify(); // Passes again
 ```
+<!-- endSnippet -->

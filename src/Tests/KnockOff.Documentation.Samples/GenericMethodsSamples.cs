@@ -24,6 +24,16 @@ public interface ISerializer
     T Deserialize<T>(string data) where T : new();
 }
 
+public interface IGenericMixed
+{
+    void Process(string label);
+    void Process<T>(T item, string label);
+    void Register<T>();
+}
+
+[KnockOff]
+public partial class GenericMixedStub : IGenericMixed { }
+
 // =============================================================================
 // Stubs for Generic Method Samples
 // =============================================================================
@@ -300,5 +310,132 @@ public class CompleteGenericExampleTests
         // Verify called type arguments
         Assert.Contains(typeof(User), stub.Serialize.CalledTypeArguments);
         Assert.Contains(typeof(Order), stub.Serialize.CalledTypeArguments);
+    }
+}
+
+// =============================================================================
+// Generic Method Reference Samples (for generic-methods.md)
+// =============================================================================
+
+public class GenericRefConfigTests
+{
+    [Fact]
+    public void Generic_ReturnConstant()
+    {
+        var stub = new RepositoryStub();
+
+        #region generic-methods-return-constant
+        stub.GetById.Of<User>().Return((id) =>
+            new User { Id = id, Name = "User" });
+        #endregion
+
+        IRepository repo = stub;
+        Assert.Equal("User", repo.GetById<User>(1)?.Name);
+    }
+
+    [Fact]
+    public void Generic_VoidMethod()
+    {
+        var stub = new GenericMixedStub();
+        var called = false;
+
+        #region generic-methods-void
+        stub.Register.Of<string>().Call(() => called = true);
+
+        IGenericMixed service = stub;
+        service.Register<string>(); // called == true
+        #endregion
+
+        Assert.True(called);
+    }
+
+    [Fact]
+    public void Generic_PerTypeVerification()
+    {
+        var stub = new RepositoryStub();
+        stub.GetById.Of<User>().Return((id) => new User { Id = id });
+        stub.GetById.Of<Order>().Return((id) => new Order { Id = id });
+
+        IRepository repo = stub;
+        repo.GetById<User>(1);
+        repo.GetById<Order>(2);
+
+        #region generic-methods-per-type-verify
+        stub.GetById.Of<User>().Verify(Called.Once);
+        stub.GetById.Of<Order>().Verify(Called.Once);
+        #endregion
+    }
+
+    [Fact]
+    public void Generic_AggregateVerification()
+    {
+        var stub = new RepositoryStub();
+        stub.GetById.Of<User>().Return((id) => new User { Id = id });
+        stub.GetById.Of<Order>().Return((id) => new Order { Id = id });
+
+        IRepository repo = stub;
+        repo.GetById<User>(1);
+        repo.GetById<Order>(2);
+
+        #region generic-methods-aggregate-verify
+        stub.GetById.Verify(Called.Exactly(2)); // Total calls across ALL type arguments
+        #endregion
+    }
+
+    [Fact]
+    public void Generic_CalledTypeArguments()
+    {
+        var stub = new RepositoryStub();
+        stub.GetById.Of<User>().Return((id) => new User { Id = id });
+        stub.GetById.Of<Order>().Return((id) => new Order { Id = id });
+
+        IRepository repo = stub;
+        repo.GetById<User>(1);
+        repo.GetById<Order>(2);
+
+        #region generic-methods-called-types
+        var calledTypes = stub.GetById.CalledTypeArguments;
+        // calledTypes contains typeof(User) and typeof(string)
+        Assert.Equal(2, calledTypes.Count);
+        #endregion
+    }
+
+    [Fact]
+    public void Generic_MixedOverloads()
+    {
+        var stub = new GenericMixedStub();
+
+        #region generic-methods-mixed-overloads
+        // Given: void Process(string label) + void Process<T>(T item, string label)
+
+        // Non-generic: stub.Process
+        stub.Process.Call((label) => { });
+
+        // Generic: stub.ProcessGeneric.Of<T>()
+        stub.ProcessGeneric.Of<int>().Call((item, label) => { });
+        #endregion
+
+        IGenericMixed service = stub;
+        service.Process("non-generic");
+        service.Process(42, "generic");
+    }
+
+    [Fact]
+    public void Generic_ResetAll()
+    {
+        var stub = new RepositoryStub();
+        stub.GetById.Of<User>().Return((id) => new User { Id = id });
+        stub.GetById.Of<Order>().Return((id) => new Order { Id = id });
+
+        IRepository repo = stub;
+        repo.GetById<User>(1);
+        repo.GetById<Order>(2);
+
+        #region generic-methods-reset
+        stub.GetById.Reset();
+
+        stub.GetById.Verify(Called.Never);
+        Assert.Empty(stub.GetById.CalledTypeArguments);
+        #endregion
     }
 }

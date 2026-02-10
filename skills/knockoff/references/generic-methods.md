@@ -21,28 +21,25 @@ stub.Convert.Of<string>().Return((value) => "converted");
 
 ## Configuration
 
-### Return(callback) — Per-Type Behavior
+### Return(callback) -- Per-Type Behavior
 
-```csharp
-stub.Convert.Of<int>().Return((value) => 42);
-stub.Convert.Of<string>().Return((value) => value.ToString()!);
-
-var intResult = service.Convert<int>("anything");   // 42
-var strResult = service.Convert<string>("anything"); // "anything"
+<!-- snippet: generic-methods-return-constant -->
+```cs
+stub.GetById.Of<User>().Return((id) =>
+    new User { Id = id, Name = "User" });
 ```
+<!-- endSnippet -->
 
-### Return(value) — Constant Per-Type
+### Call(callback) -- Void Generic Methods
 
-```csharp
-stub.Create.Of<List<int>>().Return(() => new List<int> { 1, 2, 3 });
-```
-
-### Call(callback) — Void Generic Methods
-
-```csharp
+<!-- snippet: generic-methods-void -->
+```cs
 stub.Register.Of<string>().Call(() => called = true);
+
+IGenericMixed service = stub;
 service.Register<string>(); // called == true
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -50,12 +47,17 @@ service.Register<string>(); // called == true
 
 Methods with multiple type parameters use `Of<T1, T2>()`:
 
-```csharp
-stub.Transform.Of<string, List<int>>().Return((input) => new List<int> { input.Length });
+<!-- snippet: generic-multi-param -->
+```cs
+// Configure for string -> int conversion
+stub.Convert.Of<string, int>().Return((source) =>
+    int.Parse(source));
 
-var result = service.Transform<string, List<int>>("hello");
-// result == [5]
+// Configure for int -> string conversion
+stub.Convert.Of<int, string>().Return((source) =>
+    source.ToString());
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -63,19 +65,20 @@ var result = service.Transform<string, List<int>>("hello");
 
 ### Per-Type Verification
 
-```csharp
-service.Convert<int>("a");
-service.Convert<string>("b");
-
-stub.Convert.Of<int>().Verify(Called.Once);
-stub.Convert.Of<string>().Verify(Called.Once);
+<!-- snippet: generic-methods-per-type-verify -->
+```cs
+stub.GetById.Of<User>().Verify(Called.Once);
+stub.GetById.Of<Order>().Verify(Called.Once);
 ```
+<!-- endSnippet -->
 
 ### Aggregate Verification (All Types)
 
-```csharp
-stub.Convert.Verify(Called.Exactly(2)); // Total calls across ALL type arguments
+<!-- snippet: generic-methods-aggregate-verify -->
+```cs
+stub.GetById.Verify(Called.Exactly(2)); // Total calls across ALL type arguments
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -83,14 +86,13 @@ stub.Convert.Verify(Called.Exactly(2)); // Total calls across ALL type arguments
 
 Track which type arguments were used at runtime:
 
-```csharp
-service.Convert<int>("a");
-service.Convert<string>("b");
-
-var calledTypes = stub.Convert.CalledTypeArguments;
-// calledTypes contains typeof(int) and typeof(string)
-// calledTypes.Count == 2
+<!-- snippet: generic-methods-called-types -->
+```cs
+var calledTypes = stub.GetById.CalledTypeArguments;
+// calledTypes contains typeof(User) and typeof(string)
+Assert.Equal(2, calledTypes.Count);
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -98,7 +100,8 @@ var calledTypes = stub.Convert.CalledTypeArguments;
 
 When a class has both a non-generic and generic method with the same name, they get **separate interceptors**:
 
-```csharp
+<!-- snippet: generic-methods-mixed-overloads -->
+```cs
 // Given: void Process(string label) + void Process<T>(T item, string label)
 
 // Non-generic: stub.Process
@@ -106,10 +109,8 @@ stub.Process.Call((label) => { });
 
 // Generic: stub.ProcessGeneric.Of<T>()
 stub.ProcessGeneric.Of<int>().Call((item, label) => { });
-
-service.Process("non-generic");     // Uses stub.Process
-service.Process(42, "generic");      // Uses stub.ProcessGeneric
 ```
+<!-- endSnippet -->
 
 The generic overload gets a `Generic` suffix on the interceptor name.
 
@@ -119,15 +120,14 @@ The generic overload gets a `Generic` suffix on the interceptor name.
 
 `Reset()` clears **all** typed handlers, call counts, and CalledTypeArguments:
 
-```csharp
-service.Convert<int>("a");
-service.Convert<string>("b");
+<!-- snippet: generic-methods-reset -->
+```cs
+stub.GetById.Reset();
 
-stub.Convert.Reset();
-
-stub.Convert.Verify(Called.Never);
-Assert.Empty(stub.Convert.CalledTypeArguments);
+stub.GetById.Verify(Called.Never);
+Assert.Empty(stub.GetById.CalledTypeArguments);
 ```
+<!-- endSnippet -->
 
 ---
 

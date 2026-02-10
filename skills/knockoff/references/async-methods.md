@@ -8,32 +8,41 @@ KnockOff provides three-tier auto-wrapping for async methods returning `Task<T>`
 
 For an async method like `Task<string> FetchAsync(int id)`:
 
-### Tier 1: Value — Auto-Wraps
+### Tier 1: Value -- Auto-Wraps
 
-```csharp
+<!-- snippet: async-tier1-value -->
+```cs
 stub.FetchAsync.Return("value");
 // Internally: Task.FromResult("value")
 
+IAsyncFetchSvc service = stub;
 var result = await service.FetchAsync(1); // "value"
 ```
+<!-- endSnippet -->
 
-### Tier 2: Simplified Callback — Auto-Wraps
+### Tier 2: Simplified Callback -- Auto-Wraps
 
-```csharp
+<!-- snippet: async-tier2-callback -->
+```cs
 stub.FetchAsync.Return((id) => $"Fetch-{id}");
 // Internally: Task.FromResult(callback(id))
 
+IAsyncFetchSvc service = stub;
 var result = await service.FetchAsync(42); // "Fetch-42"
 ```
+<!-- endSnippet -->
 
-### Tier 3: Full Callback — Direct
+### Tier 3: Full Callback -- Direct
 
-```csharp
+<!-- snippet: async-tier3-full -->
+```cs
 stub.FetchAsync.Return((int id) => Task.FromResult($"Full-{id}"));
-// Used as-is — for custom async behavior
+// Used as-is -- for custom async behavior
 
+IAsyncFetchSvc service = stub;
 var result = await service.FetchAsync(99); // "Full-99"
 ```
+<!-- endSnippet -->
 
 **Rule of thumb:** Use Tier 1 or 2 for simple returns. Use Tier 3 when you need actual async behavior (delays, cancellation tokens, etc.).
 
@@ -41,13 +50,16 @@ var result = await service.FetchAsync(99); // "Full-99"
 
 ## Void Async Methods (Task, ValueTask)
 
-Methods returning `Task` or `ValueTask` (no result) use `Call()`:
+Methods returning `Task` or `ValueTask` (no result) use `Return()` with an `Action`:
 
-```csharp
-stub.ExecuteAsync.Call((command) => { /* side effect */ });
+<!-- snippet: async-void-method -->
+```cs
+stub.ExecuteAsync.Return((command) => { /* side effect */ });
 
+IAsyncFetchSvc service = stub;
 await service.ExecuteAsync("test"); // Callback invoked
 ```
+<!-- endSnippet -->
 
 Unconfigured void async methods return `Task.CompletedTask` or `default(ValueTask)`.
 
@@ -57,22 +69,27 @@ Unconfigured void async methods return `Task.CompletedTask` or `default(ValueTas
 
 Params values auto-wrap for async methods:
 
-```csharp
+<!-- snippet: async-sequences-autowrap -->
+```cs
 stub.GetDataAsync.Return("first", "second", "third");
 
+IAsyncFetchSvc service = stub;
 var r1 = await service.GetDataAsync(1); // "first"
 var r2 = await service.GetDataAsync(2); // "second"
 var r3 = await service.GetDataAsync(3); // "third"
 var r4 = await service.GetDataAsync(4); // "third" (repeats)
 ```
+<!-- endSnippet -->
 
 Callback sequences also work:
 
-```csharp
+<!-- snippet: async-callback-sequences -->
+```cs
 stub.FetchAsync.Return((id) => $"First-{id}")
     .ThenReturn((id) => $"Second-{id}")
     .ThenReturn("constant");
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -80,13 +97,16 @@ stub.FetchAsync.Return((id) => $"First-{id}")
 
 When chain `Return(value)` auto-wraps for async methods:
 
-```csharp
+<!-- snippet: async-when-chains -->
+```cs
 stub.GetDataAsync.When(1).Return("Item 1");
 stub.GetDataAsync.When(2).Return("Item 2");
 stub.GetDataAsync.When((id) => id > 100).Return("Bulk item");
 
+IAsyncFetchSvc service = stub;
 var r = await service.GetDataAsync(1); // "Item 1"
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -94,31 +114,31 @@ var r = await service.GetDataAsync(1); // "Item 1"
 
 Async delegates (e.g., `delegate Task<int> AsyncOperation(int x)`) support the same three-tier pattern:
 
-```csharp
-var stub = new Stubs.AsyncOperation();
+<!-- snippet: async-delegate-tiers -->
+```cs
+var stub = new Stubs.AsyncOp();
 
 // Tier 1: auto-wraps int -> Task<int>
 stub.Interceptor.Return(42);
 
-// Tier 2: simplified callback, auto-wrapped
-stub.Interceptor.Return((int x) => x * 2);
-
-// Tier 3: full delegate
-stub.Interceptor.Return((int x) => Task.FromResult(x * 2));
-
-AsyncOperation op = stub;
-var result = await op(10); // depends on tier used
+AsyncOp op = stub;
+var result = await op(10); // 42
 ```
+<!-- endSnippet -->
 
 Sequences on async delegates also auto-wrap:
 
-```csharp
+<!-- snippet: async-delegate-sequences -->
+```cs
+var stub = new Stubs.AsyncOp();
 stub.Interceptor.Return(10, 20);
 
+AsyncOp op = stub;
 var r1 = await op(0); // 10
 var r2 = await op(0); // 20
 var r3 = await op(0); // 20 (repeats)
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -130,13 +150,13 @@ Async auto-wrapping works identically across all 9 patterns:
 |---------|--------|
 | 1. Standalone | `stub.FetchAsync.Return("value")` |
 | 2. Generic Standalone | `stub.GetByIdAsync.Return("value")` |
-| 3. Standalone Class | `stub.FetchAsync.Return("value")` → `stub.Object` |
-| 4. Generic Standalone Class | `stub.GetByIdAsync.Return("value")` → `stub.Object` |
+| 3. Standalone Class | `stub.FetchAsync.Return("value")` -> `stub.Object` |
+| 4. Generic Standalone Class | `stub.GetByIdAsync.Return("value")` -> `stub.Object` |
 | 5. Inline Interface | `stub.FetchAsync.Return("value")` |
-| 6. Inline Class | `stub.FetchAsync.Return("value")` → `stub.Object` |
+| 6. Inline Class | `stub.FetchAsync.Return("value")` -> `stub.Object` |
 | 7. Inline Delegate | `stub.Interceptor.Return(42)` |
 | 8. Open Generic Interface | `stub.GetByIdAsync.Return("value")` |
-| 9. Open Generic Class | `stub.GetByIdAsync.Return("value")` → `stub.Object` |
+| 9. Open Generic Class | `stub.GetByIdAsync.Return("value")` -> `stub.Object` |
 
 ---
 
@@ -144,13 +164,15 @@ Async auto-wrapping works identically across all 9 patterns:
 
 Async methods verify the same way as sync methods:
 
-```csharp
+<!-- snippet: async-verification -->
+```cs
 await service.FetchAsync(1);
 await service.FetchAsync(2);
 
 stub.FetchAsync.Verify(Called.Exactly(2));
-stub.FetchAsync.LastArg; // 2 (last argument)
+Assert.Equal(2, stub.FetchAsync.LastArg); // last argument
 ```
+<!-- endSnippet -->
 
 ---
 
@@ -183,7 +205,7 @@ protected override async ValueTask<int> ComputeAsync_(int value)
 | Return value (auto-wrap) | `stub.Method.Return("value")` |
 | Return callback (auto-wrap) | `stub.Method.Return((args) => result)` |
 | Return full async | `stub.Method.Return((args) => Task.FromResult(result))` |
-| Void async callback | `stub.Method.Call((args) => { })` |
+| Void async callback | `stub.Method.Return((args) => { })` |
 | Sequence (auto-wrap) | `stub.Method.Return("a", "b", "c")` |
 | When chain (auto-wrap) | `stub.Method.When(arg).Return("value")` |
 | Verify | `stub.Method.Verify(Called.Once)` |

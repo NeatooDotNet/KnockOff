@@ -30,6 +30,14 @@ public interface IMultiKeyStore
     int this[int index] { get; }
 }
 
+public interface IMatrix
+{
+    double this[int row, int col] { get; set; }
+}
+
+[KnockOff]
+public partial class MatrixStub : IMatrix { }
+
 // =============================================================================
 // Stubs for Indexer Samples
 // =============================================================================
@@ -452,5 +460,169 @@ public class CompleteExampleTests
         stub.Indexer.Reset();
         stub.Indexer.VerifyGet(Called.Never);
         stub.Indexer.VerifySet(Called.Never);
+    }
+}
+
+// =============================================================================
+// Indexer Reference Samples (for indexers.md)
+// =============================================================================
+
+public class IndexerRefPerKeyTests
+{
+    [Fact]
+    public void Indexers_PerKeyBasic()
+    {
+        var stub = new ConfigStoreStub();
+
+        #region indexers-ref-perkey
+        // Configure specific keys to return specific values
+        stub.Indexer["existing"].Returns("100");
+        stub.Indexer["special"].Returns("999");
+
+        IConfigStore collection = stub;
+        var val = collection["existing"]; // "100"
+        var val2 = collection["special"]; // "999"
+        #endregion
+
+        Assert.Equal("100", val);
+        Assert.Equal("999", val2);
+    }
+
+    [Fact]
+    public void Indexers_AllKeysCallback()
+    {
+        var stub = new ConfigStoreStub();
+
+        #region indexers-ref-allkeys-get
+        // Get callback receives the key
+        stub.Indexer.Get((key) => key.Length.ToString());
+
+        IConfigStore collection = stub;
+        var len1 = collection["hello"]; // "5"
+        var len2 = collection["hi"];    // "2"
+        #endregion
+
+        Assert.Equal("5", len1);
+        Assert.Equal("2", len2);
+    }
+
+    [Fact]
+    public void Indexers_AllKeysSet()
+    {
+        var stub = new ConfigStoreStub();
+        var storage = new Dictionary<string, string>();
+
+        #region indexers-ref-allkeys-set
+        // Set callback receives key AND value
+        stub.Indexer.Set((key, value) => storage[key] = value);
+        #endregion
+
+        IConfigStore collection = stub;
+        collection["one"] = "1";
+
+        Assert.Equal("1", storage["one"]);
+    }
+
+    [Fact]
+    public void Indexers_PerKeyWithFallback()
+    {
+        var stub = new ConfigStoreStub();
+
+        #region indexers-ref-perkey-fallback
+        stub.Indexer["special"].Returns("999");     // Per-key: always "999"
+        stub.Indexer.Get((key) => key.Length.ToString());     // All-keys: fallback
+
+        IConfigStore collection = stub;
+        var r1 = collection["special"]; // "999" (per-key wins)
+        var r2 = collection["hello"];   // "5" (callback fallback)
+        #endregion
+
+        Assert.Equal("999", r1);
+        Assert.Equal("5", r2);
+    }
+}
+
+public class IndexerRefMultiParamTests
+{
+    [Fact]
+    public void Indexers_MultiParam_PerKey()
+    {
+        var stub = new MatrixStub();
+
+        #region indexers-ref-multi-perkey
+        // Flattened -- natural C# indexer syntax
+        stub.Indexer[1, 2].Returns(12.0);
+        stub.Indexer[3, 4].Returns(34.0);
+
+        IMatrix matrix = stub;
+        var val = matrix[1, 2]; // 12.0
+        #endregion
+
+        Assert.Equal(12.0, val);
+    }
+
+    [Fact]
+    public void Indexers_MultiParam_AllKeysCallback()
+    {
+        var stub = new MatrixStub();
+
+        #region indexers-ref-multi-allkeys
+        // Get callback receives named tuple
+        stub.Indexer.Get(key => key.row * 10.0 + key.col);
+
+        IMatrix matrix = stub;
+        var val = matrix[2, 3]; // 23.0
+        #endregion
+
+        Assert.Equal(23.0, val);
+    }
+}
+
+public class IndexerRefTrackingTests
+{
+    [Fact]
+    public void Indexers_Tracking()
+    {
+        var stub = new ConfigStoreStub();
+        stub.Indexer.Get((k) => "value");
+
+        IConfigStore collection = stub;
+
+        #region indexers-ref-tracking
+        _ = collection["a"];
+        _ = collection["b"];
+        var lastKey = stub.Indexer.LastGetKey; // "b"
+
+        collection["x"] = "10";
+        collection["y"] = "20";
+        var lastEntry = stub.Indexer.LastSetEntry; // ("y", "20")
+        #endregion
+
+        Assert.Equal("b", lastKey);
+        Assert.Equal("y", lastEntry!.Value.Key);
+    }
+}
+
+public class IndexerRefThenDefaultTests
+{
+    [Fact]
+    public void Indexers_ThenDefault()
+    {
+        var stub = new ConfigStoreStub();
+
+        #region indexers-ref-thendefault
+        stub.Indexer.Get((k) => k.Length.ToString())
+            .ThenGet((k) => "100")
+            .ThenDefault();  // null after exhaustion
+
+        IConfigStore collection = stub;
+        var r1 = collection["hello"]; // "5"
+        var r2 = collection["world"]; // "100"
+        var r3 = collection["foo"];   // null (default)
+        #endregion
+
+        Assert.Equal("5", r1);
+        Assert.Equal("100", r2);
+        Assert.Null(r3);
     }
 }

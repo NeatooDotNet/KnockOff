@@ -128,14 +128,19 @@ public partial class SkillUserRepoStub : ISkillUserRepo { }
 
 <!-- snippet: skill-standalone-usage -->
 ```cs
-var stub = new SkillUserRepoStub();
-stub.GetById.Return((id) => new User { Id = id }).Verifiable();
-stub.Save.Call((user) => { }).Verifiable();
-ISkillUserRepo repo = stub;
+[Fact]
+public void StandaloneStub_ConfigureAndVerify()
+{
+    var stub = new SkillUserRepoStub();
+    stub.GetById.Return((id) => new User { Id = id }).Verifiable();
+    stub.Save.Call((user) => { }).Verifiable();
+    ISkillUserRepo repo = stub;
 
-var user = repo.GetById(42);
-repo.Save(user!);
-stub.Verify();
+    var user = repo.GetById(42);
+    repo.Save(user!);
+
+    stub.Verify();
+}
 ```
 <!-- endSnippet -->
 
@@ -187,21 +192,36 @@ stub.SaveAsync.Return((user) => { });  // Returns Task.CompletedTask
 
 <!-- snippet: skill-method-sequences -->
 ```cs
-stub.GetNext.Return(1, 2, 3);          // Repeats 3 after exhaustion
+// Concise value sequences (preferred)
+stub.GetNext.Return(1, 2, 3);
+// After third call, repeats 3 (NSubstitute-like behavior)
+
+// Mix callbacks with value sequences
 stub.Add.Return((a, b) => a + b).ThenReturn(100, 200);
-stub.GetNext.Return(1, 2).ThenDefault(); // Returns default(T) after exhaustion
+// First: computed, then 100, 200, 200...
+
+// Use ThenDefault() to return default(T) instead of repeating:
+stub.GetNext.Return(1, 2).ThenDefault();
 ```
 <!-- endSnippet -->
 
 <!-- snippet: skill-method-when -->
 ```cs
+// Value matching
 stub.GetUser.When(42).Return(adminUser);
+stub.GetUser.When(1).Return(regularUser);
+
+// Predicate matching
 stub.GetUser.When(id => id < 0).Return(null);
+
+// Chaining
 stub.GetUser
     .When(42).Return(adminUser)
     .ThenWhen(id => id > 100).Return(premiumUser)
     .ThenWhen(id => id > 0).Return(regularUser);
-stub.Log.When("error").Call((msg) => { /* handle */ }); // Void methods
+
+// Void methods use Call instead of Return
+stub.Log.When("error").Call((msg) => { /* handle */ });
 ```
 <!-- endSnippet -->
 
@@ -283,13 +303,35 @@ Delegates use `stub.Interceptor`. Named delegates only (no `Func<>`/`Action<>`).
 <!-- snippet: skill-delegate-config -->
 ```cs
 var stub = new Stubs.SkillArithmeticOp();
-stub.Interceptor.Return(42);                         // Value
-stub.Interceptor.Return((a, b) => a + b);            // Callback
-stub.Interceptor.Return(10, 20, 30);                 // Sequence
-stub.Interceptor.When(1, 2).Return(100);             // When chain
-stub.Interceptor.Verify(Called.Once);                 // Verify
-Assert.Equal((1, 2), stub.Interceptor.LastArgs);     // Arg capture
-SkillArithmeticOp op = stub;                         // Implicit conversion
+
+// Returns (value or callback)
+stub.Interceptor.Return(42);
+stub.Interceptor.Return((a, b) => a + b);
+
+// Sequences
+stub.Interceptor.Return(10, 20, 30);
+
+// When chains
+stub.Interceptor.When(1, 2).Return(100)
+    .ThenWhen(3, 4).Return(200);
+
+// Async auto-wrapping (for delegates returning Task<T>)
+// stub.Interceptor.Return(42);              // auto-wraps in Task.FromResult
+// stub.Interceptor.Return((int x) => x * 2); // simplified, auto-wrapped
+
+// Verification (fresh stub for clean tracking)
+var verifyStub = new Stubs.SkillArithmeticOp();
+verifyStub.Interceptor.Return((a, b) => a + b);
+SkillArithmeticOp op = verifyStub;
+op(1, 2);
+verifyStub.Interceptor.Verify(Called.Once);
+Assert.Equal((1, 2), verifyStub.Interceptor.LastArgs);
+
+// Strict mode
+stub.Strict = true;
+
+// Implicit conversion to delegate type
+SkillArithmeticOp opRef = stub;
 ```
 <!-- endSnippet -->
 
@@ -304,7 +346,6 @@ SkillArithmeticOp op = stub;                         // Implicit conversion
 stub.GetUser.Return((id) => new User { Id = id }).Verifiable();
 stub.Save.Call((u) => { }).Verifiable(Called.Once);
 // ... exercise stub ...
-stub.Verify();
 ```
 <!-- endSnippet -->
 
@@ -362,6 +403,7 @@ public partial class SkStubOverrideRepoStub : IUserRepo { }
 
 public partial class SkStubOverrideRepoStub
 {
+    // Override virtual method with underscore suffix - compiler enforces signature!
     protected override User? GetById_(int id) => new User { Id = id, Name = "Default" };
 }
 ```
